@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet Package Settings">
+    <AssemblyTitle>J2N</AssemblyTitle>
+    <Description>J2N provides components to assist with porting Java code to .NET. It contains collections, adapters, and other types that are not available in the .NET that are available in Java.</Description>
+    <!--<PackageTags>$(PackageTags)</PackageTags>-->
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <WarningsAsErrors>NU1605;1591</WarningsAsErrors>
+  </PropertyGroup>
+
+</Project>

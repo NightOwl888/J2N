@@ -1,0 +1,12 @@
+﻿namespace ICU4N
+{
+    internal static class AssemblyKeys
+    {
+        public const string PublicKey =
+            "0024000004800000940000000602000000240000525341310004000001000100d12801609bb37c" +
+            "42c9aa2543be20a461d42954f501628392a51bd57254b0a7c11d7e5f5d8155b6cb732c1c00786a" +
+            "cc288202b0940f237a4a97948a37b6713713612d17cac30ff9bc10782334a72dce2326c768685e" +
+            "7ce2ab5335d61c22e6224a7beed58ab3cdba23b48d7ebbbe5c94bc90586e8eae358e1c915d082f" +
+            "36f961e2";
+    }
+}

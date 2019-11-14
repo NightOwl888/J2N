@@ -1,0 +1,6 @@
+<Project>
+  <Import Project="$(SolutionDir)/build/TestReferences.Common.targets" />
+  <PropertyGroup>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+</Project>
