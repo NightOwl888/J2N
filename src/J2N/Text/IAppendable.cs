@@ -28,6 +28,10 @@ namespace J2N.Text
 
         /// <summary>
         /// Appends a copy of a specified substring to this instance.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics, that is, the third parameter is a length,
+        /// not an exclusive end index as it would be in Java. To translate from Java to .NET,
+        /// callers must account for this by subtracting (end - start) for the <paramref name="count"/>.
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> that contains the substring to append.</param>
         /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
@@ -62,6 +66,10 @@ namespace J2N.Text
 
         /// <summary>
         /// Appends a copy of a specified substring to this instance.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics, that is, the third parameter is a length,
+        /// not an exclusive end index as it would be in Java. To translate from Java to .NET,
+        /// callers must account for this by subtracting (end - start) for the <paramref name="count"/>.
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> that contains the substring to append.</param>
         /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
@@ -96,6 +104,10 @@ namespace J2N.Text
 
         /// <summary>
         /// Appends the string representation of a specified subarray of Unicode characters to this instance.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics, that is, the third parameter is a length,
+        /// not an exclusive end index as it would be in Java. To translate from Java to .NET,
+        /// callers must account for this by subtracting (end - start) for the <paramref name="count"/>.
         /// </summary>
         /// <param name="value">A character array.</param>
         /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
@@ -130,6 +142,10 @@ namespace J2N.Text
 
         /// <summary>
         /// Appends the string representation of a specified <see cref="ICharSequence"/> of Unicode characters to this instance.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics, that is, the third parameter is a length,
+        /// not an exclusive end index as it would be in Java. To translate from Java to .NET,
+        /// callers must account for this by subtracting (end - start) for the <paramref name="count"/>.
         /// </summary>
         /// <param name="value">The <see cref="ICharSequence"/> containing the characters to append.</param>
         /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>

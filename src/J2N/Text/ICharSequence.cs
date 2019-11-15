@@ -39,7 +39,8 @@ namespace J2N.Text
         /// The sub-sequence starts at a specified character position and has a specified length.
         /// <para/>
         /// IMPORTANT: This method has .NET semantics, that is, the second parameter is a length,
-        /// not an exclusive end index as it would be in Java.
+        /// not an exclusive end index as it would be in Java. To translate from Java to .NET,
+        /// callers must account for this by subtracting (end - start) for the <paramref name="length"/>.
         /// </summary>
         /// <param name="startIndex">
         /// The start index of the sub-sequence. It is inclusive, that
