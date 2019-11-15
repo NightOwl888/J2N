@@ -112,7 +112,7 @@ namespace J2N.Text
         /// <returns>A string based on this sequence.</returns>
         public override string ToString()
         {
-            return (Value == null) ? string.Empty : Value;
+            return Value ?? string.Empty;
         }
 
         #endregion
