@@ -111,7 +111,7 @@ namespace J2N.Globalization
 
             // Set both the culture and UI culture for this context.
 #if !NETSTANDARD
-            this.currentThread = Thread.CurrentThread;
+            this.currentThread = System.Threading.Thread.CurrentThread;
             currentThread.CurrentCulture = culture;
             currentThread.CurrentUICulture = uiCulture;
 #else
@@ -121,7 +121,7 @@ namespace J2N.Globalization
         }
 
 #if !NETSTANDARD
-        private readonly Thread currentThread;
+        private readonly System.Threading.Thread currentThread;
 #endif
         private readonly CultureInfo originalCulture;
         private readonly CultureInfo originalUICulture;

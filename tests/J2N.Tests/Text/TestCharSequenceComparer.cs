@@ -167,7 +167,7 @@ namespace J2N.Text
             Assert.AreNotEqual(new CharArrayCharSequence(String2.ToCharArray()).GetHashCode(), CharSequenceComparer.Ordinal.GetHashCode(String1));
 
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(emptyTarget));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(Array.Empty<char>()));
+            Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(new char[0]));
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(new StringBuilder()));
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.GetHashCode(string.Empty));
 

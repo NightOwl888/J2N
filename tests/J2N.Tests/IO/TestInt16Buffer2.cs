@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Reflection;
 
 namespace J2N.IO
 {
@@ -157,7 +158,7 @@ namespace J2N.IO
             }
             catch (Exception x)
             {
-                if (ex.IsAssignableFrom(x.GetType()))
+                if (ex.GetTypeInfo().IsAssignableFrom(x.GetType()))
                 {
                     caught = true;
                 }

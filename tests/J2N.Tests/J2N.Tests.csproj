@@ -4,6 +4,11 @@
     <RootNamespace>J2N</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
   <ItemGroup>
     <Compile Include="..\TestAssemblyInfo.cs" Link="Properties\TestAssemblyInfo.cs" />
   </ItemGroup>

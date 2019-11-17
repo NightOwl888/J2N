@@ -31,7 +31,7 @@ namespace J2N.Text
             Assert.Throws<ArgumentOutOfRangeException>(() => target.Subsequence(3, -2));
             Assert.Throws<ArgumentOutOfRangeException>(() => target.Subsequence(target.Length, 1));
 
-            char[] emptyTarget = Array.Empty<char>();
+            char[] emptyTarget = new char[0];
 
             Assert.Throws<ArgumentOutOfRangeException>(() => emptyTarget.Subsequence(0, 1));
 
