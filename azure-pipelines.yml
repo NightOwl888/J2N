@@ -1,0 +1,168 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
+
+#trigger:
+#- master
+
+# DevOps Setup: Define the following pipeline level variables in Azure DevOps build pipeline
+#
+# ArtifactFeedID: (Optional - set to your Azure DevOps Artifact (NuGet) feed. If not provided, publish job will be skipped.)
+# BuildConfiguration: 'Release'
+# BuildPlatform: 'Any CPU'
+# RunTests: 'true' (Optional - set to 'false' to disable test jobs - useful for debugging. If not provided, tests will be run.)
+
+variables:
+- name: TestTargetFrameworks
+  value: 'netcoreapp2.0;netcoreapp1.0;net451'
+- name: BinaryArtifactName
+  value: 'testbinaries'
+- name: NuGetArtifactName
+  value: 'nuget'
+- name: TestResultsArtifactName
+  value: 'testresults'
+- name: VersionArtifactName
+  value: 'version'
+- name: BuildNumberFileName
+  value: 'buildNumber.txt'
+- name: PackageVersionFileName
+  value: 'packageVersion.txt'
+- name: FileVersionFileName
+  value: 'fileVersion.txt'
+
+stages:
+- stage: Build_Stage
+  displayName: 'Build Stage:'
+  jobs:
+
+  - job: Build
+    pool:
+      vmImage: 'windows-2019'
+
+    steps:
+    - template: 'build/azure-templates/gitversioning-increment-and-persist-versions.yml'
+      parameters:
+        versionArtifactName: '$(VersionArtifactName)'
+        packageVersionFileName: '$(PackageVersionFileName)'
+        fileVersionFileName: '$(FileVersionFileName)'
+        buildNumberFileName: '$(BuildNumberFileName)'
+
+    - template: 'build/azure-templates/build-pack-and-publish-libraries.yml'
+      parameters:
+        artifactFeedID: '$(ArtifactFeedID)'
+        testTargetFrameworks: '$(TestTargetFrameworks)'
+        informationalVersion: '$(InformationalVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        fileVersion: '$(FileVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        assemblyVersion: '$(AssemblyVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        packageVersion: '$(PackageVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        buildConfiguration: '$(BuildConfiguration)'
+        buildPlatform: '$(BuildPlatform)'
+        nugetArtifactName: '$(NuGetArtifactName)'
+        binaryArtifactName: '$(BinaryArtifactName)'
+
+
+- stage: Test_Stage
+  displayName: 'Test Stage:'
+  jobs:
+  - job: Test_netcoreapp2_0
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    strategy:
+      matrix:
+        Windows:
+          osName: 'Windows'
+          imageName: 'windows-2019'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        Linux:
+          osName: 'Linux'
+          imageName: 'ubuntu-16.04'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        macOS:
+          osName: 'macOS'
+          imageName: 'macOS-10.14'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+    displayName: 'Test netcoreapp2.0 on'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - template: 'build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: $(osName)
+        testTargetFrameworks: 'netcoreapp2.0'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: $(maximumAllowedFailures)
+
+  - job: Test_netcoreapp1_0
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    strategy:
+      matrix:
+        Windows:
+          osName: 'Windows'
+          imageName: 'windows-2019'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        Linux:
+          osName: 'Linux'
+          imageName: 'ubuntu-16.04'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        macOS:
+          osName: 'macOS'
+          imageName: 'macOS-10.14'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+    displayName: 'Test netcoreapp1.0 on'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - template: 'build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: $(osName)
+        testTargetFrameworks: 'netcoreapp1.0'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: $(maximumAllowedFailures)
+
+  - job: Test_net451
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    displayName: 'Test net451 on Windows'
+    pool:
+      vmImage: 'windows-2019'
+    steps:
+    - template: 'build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: 'Windows'
+        testTargetFrameworks: 'net451'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+
+
+- stage: Publish_Stage
+  displayName: 'Publish Stage:'
+  jobs:
+  - job: Publish
+    condition: and(succeeded(), ne(variables['ArtifactFeedID'], ''))
+    pool:
+      vmImage: 'windows-2019'
+
+    steps:
+    - template: 'build/azure-templates/show-all-environment-variables.yml'
+
+    - task: DownloadBuildArtifacts@0
+      displayName: 'Download Build Artifacts: $(VersionArtifactName)'
+      inputs:
+        artifactName: '$(VersionArtifactName)'
+        downloadPath: '$(Build.ArtifactStagingDirectory)'
+
+      # NOTE: We are setting Build.BuildNumber here to the NuGet package version to work around the limitation that
+      # the version cannot be passed to the Index Sources & Publish Symbols task.
+    - powershell: |
+        $version = Get-Content '$(Build.ArtifactStagingDirectory)/$(VersionArtifactName)/$(PackageVersionFileName)' -Raw
+        Write-Host "##vso[task.setvariable variable=PackageVersion;]$version"
+        Write-Host "##vso[task.setvariable variable=Build.BuildNumber;]$version"
+      displayName: 'Read PackageVersion from File to Build.BuildNumber'
+
+    - template: 'build/azure-templates/show-all-environment-variables.yml'
+
+    - template: 'build/azure-templates/publish-nuget-packages.yml'
+      parameters:
+        artifactFeedID: '$(ArtifactFeedID)'
+        nugetArtifactName: '$(NuGetArtifactName)'

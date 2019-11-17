@@ -20,10 +20,24 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Tests", "tests\J2N.Test
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{216D6502-628E-401D-AACE-1E0687164325}"
 	ProjectSection(SolutionItems) = preProject
+		azure-pipelines.yml = azure-pipelines.yml
 		build\dependencies.props = build\dependencies.props
 		build\nuget.props = build\nuget.props
 		build\TestReferences.Common.targets = build\TestReferences.Common.targets
 		build\TestTargetFramework.props = build\TestTargetFramework.props
+		version.json = version.json
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-templates", "azure-templates", "{878BB8E3-6B5F-4600-B93F-5EA45A4E7DDA}"
+	ProjectSection(SolutionItems) = preProject
+		build\azure-templates\build-pack-and-publish-libraries.yml = build\azure-templates\build-pack-and-publish-libraries.yml
+		build\azure-templates\publish-nuget-packages.yml = build\azure-templates\publish-nuget-packages.yml
+		build\azure-templates\publish-test-results-for-target-frameworks.yml = build\azure-templates\publish-test-results-for-target-frameworks.yml
+		build\azure-templates\publish-test-results-for-test-projects.yml = build\azure-templates\publish-test-results-for-test-projects.yml
+		build\azure-templates\publish-test-results.yml = build\azure-templates\publish-test-results.yml
+		build\azure-templates\run-tests-on-os.yml = build\azure-templates\run-tests-on-os.yml
+		build\azure-templates\show-all-environment-variables.yml = build\azure-templates\show-all-environment-variables.yml
+		build\azure-templates\show-all-files.yml = build\azure-templates\show-all-files.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BFCFA4F8-C7D3-44C2-8734-8B6EEE90B037}"
@@ -53,6 +67,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{BAF633B4-F83A-453E-B612-60716155A9DC} = {9F28FE5B-BE86-4A38-8534-A6555C7C53A4}
 		{B5C3F10C-5760-4F55-9C43-9D27393F6614} = {B71E854C-1C04-4D87-8C2C-EDF62650A9AA}
+		{878BB8E3-6B5F-4600-B93F-5EA45A4E7DDA} = {216D6502-628E-401D-AACE-1E0687164325}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B477AD9F-26BF-44CF-B94C-50D89AC24836}
