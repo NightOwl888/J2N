@@ -107,7 +107,7 @@ namespace J2N.Text
             if ((long)d == d)
             {
                 // Special case: negative zero
-                if (d == 0 && BitConversion.DoubleToRawInt64Bits(d) == BitConversion.DoubleToRawInt64Bits(DoubleNegativeZero))
+                if (d.IsNegativeZero())
                     return FormatNegativeZero(numberFormat);
 
                 // Special case: When we have an integer value,
@@ -125,7 +125,7 @@ namespace J2N.Text
             if ((int)f == f)
             {
                 // Special case: negative zero
-                if (f == 0 && BitConversion.SingleToRawInt32Bits(f) == BitConversion.SingleToRawInt32Bits(FloatNegativeZero))
+                if (f.IsNegativeZero())
                     return FormatNegativeZero(numberFormat);
 
                 // Special case: When we have an integer value,
