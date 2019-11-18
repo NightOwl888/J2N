@@ -10,11 +10,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="IO\ReadFully.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\TestAssemblyInfo.cs" Link="Properties\TestAssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="IO\ReadFully.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\J2N\J2N.csproj" />
+    <ProjectReference Include="..\J2N.TestFramework\J2N.TestFramework.csproj" />
   </ItemGroup>
 
 </Project>

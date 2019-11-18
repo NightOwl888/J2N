@@ -2,7 +2,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace J2N
 {
@@ -144,5 +143,19 @@ namespace J2N
             Assert.Fail(message);
         }
 
+
+        public static Random Random => TestContext.CurrentContext.Random;
+
+        /// <summary>
+        /// True if and only if tests are run in verbose mode. If this flag is false
+        /// tests are not expected to print any messages.
+        /// </summary>
+        public static readonly bool VERBOSE = ( //SystemProperties.GetPropertyAsBoolean("tests.verbose",
+#if DEBUG
+            true
+#else
+            false
+#endif
+);
     }
 }
