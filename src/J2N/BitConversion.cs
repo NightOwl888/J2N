@@ -9,7 +9,7 @@ namespace J2N
     /// This class is a supplement to <see cref="System.BitConverter"/> to provide functionality similar to
     /// that in the JDK.
     /// </summary>
-    public static class BitConversion
+    public static class BitConversion // J2N TODO: Benchmarks - check the benefits of using unsafe pointers vs 2 method calls to BitConverter
     {
         /// <summary>
         /// NOTE: This was intBitsToFloat() in the JDK

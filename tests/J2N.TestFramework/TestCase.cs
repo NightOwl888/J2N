@@ -144,7 +144,7 @@ namespace J2N
         }
 
 
-        public static Random Random => TestContext.CurrentContext.Random;
+        public static System.Random Random => TestContext.CurrentContext.Random;
 
         /// <summary>
         /// True if and only if tests are run in verbose mode. If this flag is false
