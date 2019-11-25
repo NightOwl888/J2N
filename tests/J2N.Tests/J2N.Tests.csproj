@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="hyts_PropertiesTest.properties" />
     <None Remove="IO\ReadFully.txt" />
   </ItemGroup>
 
@@ -18,6 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="hyts_PropertiesTest.properties" />
     <EmbeddedResource Include="IO\ReadFully.txt" />
   </ItemGroup>
 
