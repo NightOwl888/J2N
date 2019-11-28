@@ -6,6 +6,9 @@ using System.Reflection;
 
 namespace J2N
 {
+    /// <summary>
+    /// Extensions to the <see cref="System.Reflection.Assembly"/> class.
+    /// </summary>
     public static class AssemblyExtensions
     {
         private static ConcurrentDictionary<TypeAndResource, string> resourceCache = new ConcurrentDictionary<TypeAndResource, string>();
@@ -13,13 +16,36 @@ namespace J2N
         /// <summary>
         /// Aggressively searches for a resource and, if found, returns an open <see cref="Stream"/>
         /// where it can be read.
+        /// <para/>
+        /// The search attempts to find the resource starting at the location of the current
+        /// class and attempts every combination of starting namespace and or starting assembly name
+        /// (split on <c>.</c>) concatenated with the <paramref name="name"/>. For example, if the
+        /// type passed is in the namespace <c>Foo.Bar</c> in an assembly named <c>Faz.Baz</c>
+        /// and the name passed is <c>res.txt</c>, the following locations are searched in this order:
+        /// <code>
+        /// 1. res.txt
+        /// 2. Faz.Baz.Foo.Bar.res.txt
+        /// 3. Foo.Bar.res.txt
+        /// 4. Faz.Baz.res.txt
+        /// </code>
+        /// <para/>
+        /// Usage Note: This method effectively treats embedded resources as being in the same
+        /// "class path" as the type that is passed, making it similar to the Class.getResourceAsStream()
+        /// method in Java.
         /// </summary>
-        /// <param name="assembly">this assembly</param>
-        /// <param name="type">a type in the same namespace as the resource</param>
-        /// <param name="name">the resource name to locate</param>
-        /// <returns>an open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
+        /// <param name="assembly">This assembly.</param>
+        /// <param name="type">A type in the same namespace as the resource.</param>
+        /// <param name="name">The resource name to locate.</param>
+        /// <returns>An open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="assembly"/> or <paramref name="type"/> is <c>null</c>.</exception>
+        /// <seealso cref="TypeExtensions.FindAndGetManifestResourceStream(Type, string)"/>
         public static Stream FindAndGetManifestResourceStream(this Assembly assembly, Type type, string name)
         {
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             string resourceName = FindResource(assembly, type, name);
             if (string.IsNullOrEmpty(resourceName))
             {
@@ -31,16 +57,37 @@ namespace J2N
 
         /// <summary>
         /// Aggressively searches to find a resource based on a <see cref="Type"/> and resource name.
+        /// <para/>
+        /// The search attempts to find the resource starting at the location of the current
+        /// class and attempts every combination of starting namespace and or starting assembly name
+        /// (split on <c>.</c>) concatenated with the <paramref name="name"/>. For example, if the
+        /// type passed is in the namespace <c>Foo.Bar</c> in an assembly named <c>Faz.Baz</c>
+        /// and the name passed is <c>res.txt</c>, the following locations are searched in this order:
+        /// <code>
+        /// 1. res.txt
+        /// 2. Faz.Baz.Foo.Bar.res.txt
+        /// 3. Foo.Bar.res.txt
+        /// 4. Faz.Baz.res.txt
+        /// </code>
+        /// <para/>
+        /// Usage Note: This method effectively treats embedded resources as being in the same
+        /// "class path" as the type that is passed, making it similar to the Class.getResource()
+        /// method in Java.
         /// </summary>
-        /// <param name="assembly">this assembly</param>
-        /// <param name="type">a type in the same namespace as the resource</param>
-        /// <param name="name">the resource name to locate</param>
-        /// <returns>the resource, if found; if not found, returns <c>null</c></returns>
+        /// <param name="assembly">This assembly.</param>
+        /// <param name="type">A type in the same namespace as the resource.</param>
+        /// <param name="name">The resource name to locate.</param>
+        /// <returns>The resource, if found; if not found, returns <c>null</c>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="assembly"/> or <paramref name="type"/> is <c>null</c>.</exception>
         public static string FindResource(this Assembly assembly, Type type, string name)
         {
-            string resourceName;
+            if (assembly == null)
+                throw new ArgumentNullException(nameof(assembly));
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
             TypeAndResource key = new TypeAndResource(type, name);
-            if (!resourceCache.TryGetValue(key, out resourceName))
+            if (!resourceCache.TryGetValue(key, out string resourceName))
             {
                 string[] resourceNames = assembly.GetManifestResourceNames();
                 resourceName = resourceNames.Where(x => x.Equals(name, StringComparison.Ordinal)).FirstOrDefault();
@@ -111,7 +158,7 @@ namespace J2N
             return true;
         }
 
-        private class TypeAndResource
+        private class TypeAndResource : IEquatable<TypeAndResource>
         {
             private readonly Type type;
             private readonly string name;
@@ -125,11 +172,18 @@ namespace J2N
             public override bool Equals(object obj)
             {
                 if (!(obj is TypeAndResource))
-                {
                     return false;
-                }
 
                 var other = obj as TypeAndResource;
+                return this.type.Equals(other.type)
+                    && this.name.Equals(other.name, StringComparison.Ordinal);
+            }
+
+            public bool Equals(TypeAndResource other)
+            {
+                if (other == null)
+                    return false;
+
                 return this.type.Equals(other.type)
                     && this.name.Equals(other.name, StringComparison.Ordinal);
             }

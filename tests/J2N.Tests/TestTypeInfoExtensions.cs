@@ -7,16 +7,16 @@ using System.Text;
 namespace J2N
 {
     [TestFixture]
-    public class TestTypeInfoExtensions
+    public class TestTypeInfoExtensions : TestCase
     {
         [Test]
         public void TestImplementsGenericInterface()
         {
-            Assert.IsTrue(typeof(List<string>).GetTypeInfo().ImplementsGenericInterface(typeof(IList<>)));
-            Assert.IsFalse(typeof(List<string>).GetTypeInfo().ImplementsGenericInterface(typeof(IDictionary<,>)));
+            assertTrue(typeof(List<string>).GetTypeInfo().ImplementsGenericInterface(typeof(IList<>)));
+            assertFalse(typeof(List<string>).GetTypeInfo().ImplementsGenericInterface(typeof(IDictionary<,>)));
 
-            Assert.IsFalse(typeof(Dictionary<string, string>).GetTypeInfo().ImplementsGenericInterface(typeof(IList<>)));
-            Assert.IsTrue(typeof(Dictionary<string, string>).GetTypeInfo().ImplementsGenericInterface(typeof(IDictionary<,>)));
+            assertFalse(typeof(Dictionary<string, string>).GetTypeInfo().ImplementsGenericInterface(typeof(IList<>)));
+            assertTrue(typeof(Dictionary<string, string>).GetTypeInfo().ImplementsGenericInterface(typeof(IDictionary<,>)));
         }
     }
 }

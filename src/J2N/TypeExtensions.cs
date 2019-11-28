@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -30,6 +31,69 @@ namespace J2N
             return target.GetTypeInfo().IsGenericType && target.GetGenericTypeDefinition().GetInterfaces().Any(
                 x => x.GetTypeInfo().IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())
             );
+        }
+
+        /// <summary>
+        /// Aggressively searches for a resource and, if found, returns an open <see cref="Stream"/>
+        /// where it can be read.
+        /// <para/>
+        /// The search attempts to find the resource starting at the location of the current
+        /// class and attempts every combination of starting namespace and or starting assembly name
+        /// (split on <c>.</c>) concatenated with the <paramref name="name"/>. For example, if the
+        /// type passed is in the namespace <c>Foo.Bar</c> in an assembly named <c>Faz.Baz</c>
+        /// and the name passed is <c>res.txt</c>, the following locations are searched in this order:
+        /// <code>
+        /// 1. res.txt
+        /// 2. Faz.Baz.Foo.Bar.res.txt
+        /// 3. Foo.Bar.res.txt
+        /// 4. Faz.Baz.res.txt
+        /// </code>
+        /// <para/>
+        /// Usage Note: This method effectively treats embedded resources as being in the same
+        /// "class path" as the type that is passed, making it similar to the Class.getResourceAsStream()
+        /// method in Java.
+        /// </summary>
+        /// <param name="type">A type in the same namespace as the resource.</param>
+        /// <param name="name">The resource name to locate.</param>
+        /// <returns>an open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="type"/> is <c>null</c>.</exception>
+        public static Stream FindAndGetManifestResourceStream(this Type type, string name)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            return AssemblyExtensions.FindAndGetManifestResourceStream(type.GetTypeInfo().Assembly, type, name);
+        }
+
+        /// <summary>
+        /// Aggressively searches to find a resource based on a <see cref="Type"/> and resource name.
+        /// <para/>
+        /// The search attempts to find the resource starting at the location of the current
+        /// class and attempts every combination of starting namespace and or starting assembly name
+        /// (split on <c>.</c>) concatenated with the <paramref name="name"/>. For example, if the
+        /// type passed is in the namespace <c>Foo.Bar</c> in an assembly named <c>Faz.Baz</c>
+        /// and the name passed is <c>res.txt</c>, the following locations are searched in this order:
+        /// <code>
+        /// 1. res.txt
+        /// 2. Faz.Baz.Foo.Bar.res.txt
+        /// 3. Foo.Bar.res.txt
+        /// 4. Faz.Baz.res.txt
+        /// </code>
+        /// <para/>
+        /// Usage Note: This method effectively treats embedded resources as being in the same
+        /// "class path" as the type that is passed, making it similar to the Class.getResource()
+        /// method in Java.
+        /// </summary>
+        /// <param name="type">A type in the same namespace as the resource.</param>
+        /// <param name="name">The resource name to locate.</param>
+        /// <returns>The resource, if found; if not found, returns <c>null</c>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="type"/> is <c>null</c>.</exception>
+        public static string FindResource(this Type type, string name)
+        {
+            if (type == null)
+                throw new ArgumentNullException(nameof(type));
+
+            return AssemblyExtensions.FindResource(type.GetTypeInfo().Assembly, type, name);
         }
     }
 }
