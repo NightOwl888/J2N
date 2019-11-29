@@ -13,6 +13,10 @@
     <!--<PackageTags>$(PackageTags)</PackageTags>-->
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Include="..\..\build\CommonAssemblyKeys.cs" Link="Properties\CommonAssemblyKeys.cs" />
+  </ItemGroup>
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.CSharp" Version="$(MicrosoftCSharpPackageReferenceVersion)" />
     <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
