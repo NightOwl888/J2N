@@ -49,8 +49,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\src\J2N.TestFramework\J2N.TestFramework.csproj" />
     <ProjectReference Include="..\..\src\J2N\J2N.csproj" />
-    <ProjectReference Include="..\J2N.TestFramework\J2N.TestFramework.csproj" />
   </ItemGroup>
 
 </Project>
