@@ -149,6 +149,21 @@ namespace J2N
         }
 
 
+        public static void DeleteFile(FileInfo fileInfo)
+        {
+            DeleteFile(fileInfo.FullName);
+        }
+
+        public static void DeleteFile(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                    File.Delete(filePath);
+            }
+            catch { }
+        }
+
         public static System.Random Random => TestContext.CurrentContext.Random;
 
         /// <summary>
