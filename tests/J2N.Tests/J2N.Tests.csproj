@@ -1,5 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+  <Import Project="$(SolutionDir)/build/TestTargetFramework.props" />
+  
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
   </PropertyGroup>

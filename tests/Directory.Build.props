@@ -7,8 +7,6 @@
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">$(MSBuildThisFileDirectory)../</SolutionDir>
   </PropertyGroup>
 
-  <Import Project="$(SolutionDir)/build/TestTargetFramework.props" />
-
   <PropertyGroup>
     <NoWarn>$(NoWarn);168;612;618;672;809</NoWarn>
   </PropertyGroup>
