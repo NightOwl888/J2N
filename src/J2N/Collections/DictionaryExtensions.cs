@@ -34,9 +34,9 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        private class UnmodifiableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IEquatable<IDictionary<TKey, TValue>>
+        internal class UnmodifiableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IEquatable<IDictionary<TKey, TValue>>
         {
-            private readonly IDictionary<TKey, TValue> dictionary;
+            internal readonly IDictionary<TKey, TValue> dictionary; // internal for testing
 
             public UnmodifiableDictionary(IDictionary<TKey, TValue> dictionary)
             {

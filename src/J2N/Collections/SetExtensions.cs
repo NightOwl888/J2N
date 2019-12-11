@@ -34,9 +34,9 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        private class UnmodifiableSet<T> : ISet<T>, IEquatable<ISet<T>>
+        internal class UnmodifiableSet<T> : ISet<T>, IEquatable<ISet<T>>
         {
-            private readonly ISet<T> set;
+            internal readonly ISet<T> set; // internal for testing
             public UnmodifiableSet(ISet<T> set)
             {
                 this.set = set ?? throw new ArgumentNullException(nameof(set));

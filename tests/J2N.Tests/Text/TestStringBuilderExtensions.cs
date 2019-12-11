@@ -1,11 +1,16 @@
-﻿using NUnit.Framework;
+﻿using J2N.Globalization;
+using NUnit.Framework;
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace J2N.Text
 {
     public class TestStringBuilderExtensions : TestCase
     {
+        // String larger than 16384 bytes
+        private const string LargeUnicodeString = "⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛⽄\u2fda⼃⾮⾵\u2fde⼒⼱⾠⽚⽕⽆⾭⾕⼇⼂⽖⽋⽲\u2fd8⿄⽁⼄⼽⾸⼉⽤⾲⼡\u2fdb⼱⼈⽥⾰⽬⼤⿃⽞⽪⽗⼟⾃⼪⾔⾏⼼\u2fdb⼩⼘⼷⾪⼲⾛⾫⾊⼃⿕⾥⿕⾫⽹⽀⼐⾤⼩⽍⿀\u2fdd⼩⿂⼞\u2fd7⿁⼚⾹⽁⼖⽐⾎⽻⼍⼻⾚⿊⼰\u2fdf⽌⾚⼥⽨⼯⼞⽩⾞⾽⾿⽳⽥⽫⽁⽛";
+
         [Test]
         public void TestAppend()
         {
@@ -166,6 +171,147 @@ namespace J2N.Text
         }
 
         #region Apache Harmony Tests
+
+        /**
+         * @tests java.lang.StringBuilder.delete(int, int)
+         */
+        [Test]
+        public void Test_DeleteII()
+        {
+            string fixture = "0123456789";
+            StringBuilder sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Delete(0, 0 - 0)); // J2N: Corrected 2nd parameter
+            assertEquals(fixture, sb.ToString());
+            assertSame(sb, sb.Delete(5, 5 - 5)); // J2N: Corrected 2nd parameter
+            assertEquals(fixture, sb.ToString());
+            assertSame(sb, sb.Delete(0, 1 - 0)); // J2N: Corrected 2nd parameter
+            assertEquals("123456789", sb.ToString());
+            assertEquals(9, sb.Length);
+            assertSame(sb, sb.Delete(0, sb.Length - 0)); // J2N: Corrected 2nd parameter
+            assertEquals("", sb.ToString());
+            assertEquals(0, sb.Length);
+
+            sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Delete(0, 11 - 0)); // J2N: Corrected 2nd parameter
+            assertEquals("", sb.ToString());
+            assertEquals(0, sb.Length);
+
+            try
+            {
+                new StringBuilder(fixture).Delete(-1, 2 - -1); // J2N: Corrected 2nd parameter
+                fail("no SIOOBE, negative start");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            try
+            {
+                new StringBuilder(fixture).Delete(11, 12 - 11); // J2N: Corrected 2nd parameter
+                fail("no SIOOBE, start too far");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            try
+            {
+                new StringBuilder(fixture).Delete(13, 12 - 13); // J2N: Corrected 2nd parameter
+                fail("no SIOOBE, start larger than end");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            // HARMONY 6212
+            sb = new StringBuilder();
+            sb.Append("abcde");
+            String str = sb.ToString();
+            sb.Delete(0, sb.Length - 0); // J2N: Corrected 2nd parameter
+            sb.Append("YY");
+            assertEquals("abcde", str);
+            assertEquals("YY", sb.ToString());
+        }
+
+        /**
+         * @tests java.lang.StringBuilder.replace(int, int, String)'
+         */
+        [Test]
+        public void Test_ReplaceIILjava_lang_String()
+        {
+            string fixture = "0000";
+            StringBuilder sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(1, 3 - 1, "11")); // J2N; Corrected 2nd parameter
+            assertEquals("0110", sb.ToString());
+            assertEquals(4, sb.Length);
+
+            sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(1, 2 - 1, "11")); // J2N; Corrected 2nd parameter
+            assertEquals("01100", sb.ToString());
+            assertEquals(5, sb.Length);
+
+            sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(4, 5 - 4, "11")); // J2N; Corrected 2nd parameter
+            assertEquals("000011", sb.ToString());
+            assertEquals(6, sb.Length);
+
+            sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(4, 6 - 4, "11")); // J2N; Corrected 2nd parameter
+            assertEquals("000011", sb.ToString());
+            assertEquals(6, sb.Length);
+
+            // FIXME Undocumented NPE in Sun's JRE 5.0_5
+            try
+            {
+                sb.Replace(1, 2 - 1, null); // J2N; Corrected 2nd parameter
+                fail("No NPE");
+            }
+            catch (ArgumentNullException e)
+            {
+                // Expected
+            }
+
+            try
+            {
+                sb = new StringBuilder(fixture);
+                sb.Replace(-1, 2 - -1, "11"); // J2N; Corrected 2nd parameter
+                fail("No SIOOBE, negative start");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            try
+            {
+                sb = new StringBuilder(fixture);
+                sb.Replace(5, 2 - 5, "11"); // J2N; Corrected 2nd parameter
+                fail("No SIOOBE, start > length");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            try
+            {
+                sb = new StringBuilder(fixture);
+                sb.Replace(3, 2 - 3, "11"); // J2N; Corrected 2nd parameter
+                fail("No SIOOBE, start > end");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            // Regression for HARMONY-348
+            StringBuilder buffer = new StringBuilder("1234567");
+            buffer.Replace(2, 6 - 2, "XXX"); // J2N; Corrected 2nd parameter
+            assertEquals("12XXX7", buffer.ToString());
+        }
 
         private void reverseTest(String org, String rev, String back)
         {
@@ -390,22 +536,47 @@ namespace J2N.Text
             }
         }
 
+
         /**
-         * @tests java.lang.StringBuilder.indexOf(String)
+         * @tests java.lang.StringBuilder.append(CharSequence)
          */
         [Test]
-        public void Test_IndexOfLSystem_String()
+        public void Test_Append_ICharSequence()
         {
-            String fixture = "0123456789";
-            StringBuilder sb = new StringBuilder(fixture);
-            assertEquals(0, sb.IndexOf("0"));
-            assertEquals(0, sb.IndexOf("012"));
-            assertEquals(-1, sb.IndexOf("02"));
-            assertEquals(8, sb.IndexOf("89"));
+            StringBuilder sb = new StringBuilder();
+            assertSame(sb, sb.Append("ab".ToCharSequence()));
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append("cd".ToCharSequence()));
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append((ICharSequence)null));
+            // assertEquals("null", sb.ToString());
+            assertEquals("", sb.ToString()); // J2N: Changed the behavior to be a no-op rather than appending the string "null"
+        }
 
+        /**
+         * @tests java.lang.StringBuilder.append(CharSequence, int, int)
+         */
+        [Test]
+        public void Test_Append_ICharSequence_Int32_Int32()
+        {
+            StringBuilder sb = new StringBuilder();
+            assertSame(sb, sb.Append("ab".ToCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append("cd".ToCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append("abcd".ToCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append("abcd".ToCharSequence(), 2, 4 - 2)); // J2N: corrected 3rd parameter
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
             try
             {
-                sb.IndexOf(null);
+                assertSame(sb, sb.Append((ICharSequence)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0's Append(StringBuilder,int,int) overload) rather than appending the string "null"
                 fail("no NPE");
             }
 #pragma warning disable 168
@@ -413,6 +584,93 @@ namespace J2N.Text
 #pragma warning restore 168
             {
                 // Expected
+            }
+            //assertEquals("nu", sb.ToString());
+            assertEquals("", sb.ToString());
+        }
+
+
+        // J2N: Excluding this overload because it is effectively the same as Append(object)
+        // that has the same behavior
+        /**
+         * @tests java.lang.StringBuilder.append(CharSequence)
+         */
+        [Test]
+        public void Test_Append_StringBuilder()
+        {
+            StringBuilder sb = new StringBuilder();
+            assertSame(sb, sb.Append(new StringBuilder("ab")));
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append(new StringBuilder("cd")));
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append((StringBuilder)null));
+            // assertEquals("null", sb.ToString());
+            assertEquals("", sb.ToString()); // J2N: Changed the behavior to be a no-op rather than appending the string "null"
+        }
+
+        /**
+         * @tests java.lang.StringBuilder.append(CharSequence, int, int)
+         */
+        [Test]
+        public void Test_Append_StringBuilder_Int32_Int32()
+        {
+            StringBuilder sb = new StringBuilder();
+            assertSame(sb, sb.Append(new StringBuilder("ab"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("ab", sb.ToString());
+            sb.Length=(0);
+            assertSame(sb, sb.Append(new StringBuilder("cd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("cd", sb.ToString());
+            sb.Length=(0);
+            assertSame(sb, sb.Append(new StringBuilder("abcd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("ab", sb.ToString());
+            sb.Length=(0);
+            assertSame(sb, sb.Append(new StringBuilder("abcd"), 2, 4 - 2)); // J2N: corrected 3rd parameter
+            assertEquals("cd", sb.ToString());
+            sb.Length=(0);
+            try
+            {
+                assertSame(sb, sb.Append((StringBuilder)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0) rather than appending the string "null"
+                fail("no NPE");
+            }
+#pragma warning disable 168
+            catch (ArgumentNullException e)
+#pragma warning restore 168
+            {
+                // Expected
+            }
+            //assertEquals("nu", sb.ToString());
+            assertEquals("", sb.ToString());
+        }
+
+
+        /**
+         * @tests java.lang.StringBuilder.indexOf(String)
+         */
+        [Test]
+        public void Test_IndexOfLSystem_String()
+        {
+            using (var context = new CultureContext("en-US"))
+            {
+                String fixture = "0123456789";
+                StringBuilder sb = new StringBuilder(fixture);
+                assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
+                assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
+                assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
+                assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal));
+
+                try
+                {
+                    sb.IndexOf((string)null, StringComparison.Ordinal);
+                    fail("no NPE");
+                }
+#pragma warning disable 168
+                catch (ArgumentNullException e)
+#pragma warning restore 168
+                {
+                    // Expected
+                }
             }
         }
 
@@ -422,36 +680,216 @@ namespace J2N.Text
         [Test]
         public void Test_IndexOfStringInt()
         {
-            String fixture = "0123456789";
-            StringBuilder sb = new StringBuilder(fixture);
-            assertEquals(0, sb.IndexOf("0"));
-            assertEquals(0, sb.IndexOf("012"));
-            assertEquals(-1, sb.IndexOf("02"));
-            assertEquals(8, sb.IndexOf("89"));
-
-            assertEquals(0, sb.IndexOf("0"), 0);
-            assertEquals(0, sb.IndexOf("012"), 0);
-            assertEquals(-1, sb.IndexOf("02"), 0);
-            assertEquals(8, sb.IndexOf("89"), 0);
-
-            assertEquals(-1, sb.IndexOf("0"), 5);
-            assertEquals(-1, sb.IndexOf("012"), 5);
-            assertEquals(-1, sb.IndexOf("02"), 0);
-            assertEquals(8, sb.IndexOf("89"), 5);
-
-            try
+            using (var context = new CultureContext("en-US"))
             {
-                sb.IndexOf(null, 0);
-                fail("no NPE");
-            }
+                String fixture = "0123456789";
+                StringBuilder sb = new StringBuilder(fixture);
+                assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
+                assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
+                assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
+                assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal));
+
+                assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal), 0);
+                assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal), 0);
+                assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
+                assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 0);
+
+                assertEquals(-1, sb.IndexOf("0", StringComparison.Ordinal), 5);
+                assertEquals(-1, sb.IndexOf("012", StringComparison.Ordinal), 5);
+                assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
+                assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 5);
+
+                try
+                {
+                    sb.IndexOf((string)null, 0, StringComparison.Ordinal);
+                    fail("no NPE");
+                }
 #pragma warning disable 168
-            catch (ArgumentNullException e)
+                catch (ArgumentNullException e)
 #pragma warning restore 168
+                {
+                    // Expected
+                }
+            }
+        }
+
+        /**
+         * @tests java.lang.StringBuilder.lastIndexOf(String)
+         */
+        [Test]
+        public void Test_LastIndexOfLjava_lang_String()
+        {
+            using (var context = new CultureContext("en-US"))
             {
-                // Expected
+                string fixture = "0123456789";
+                StringBuilder sb = new StringBuilder(fixture);
+                assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
+                assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
+                assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
+                assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal));
+
+                try
+                {
+                    sb.LastIndexOf((string)null, StringComparison.Ordinal);
+                    fail("no NPE");
+                }
+                catch (ArgumentNullException e)
+                {
+                    // Expected
+                }
+            }
+        }
+
+        /**
+         * @tests java.lang.StringBuilder.lastIndexOf(String, int)
+         */
+        [Test]
+        public void Test_LastIndexOfLjava_lang_StringI()
+        {
+            using (var context = new CultureContext("en-US"))
+            {
+                string fixture = "0123456789";
+                StringBuilder sb = new StringBuilder(fixture);
+                assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
+                assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
+                assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
+                assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal));
+
+                assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal), 0);
+                assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal), 0);
+                assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
+                assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 0);
+
+                assertEquals(-1, sb.LastIndexOf("0", StringComparison.Ordinal), 5);
+                assertEquals(-1, sb.LastIndexOf("012", StringComparison.Ordinal), 5);
+                assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
+                assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 5);
+
+                try
+                {
+                    sb.LastIndexOf((string)null, 0, StringComparison.Ordinal);
+                    fail("no NPE");
+                }
+                catch (ArgumentNullException e)
+                {
+                    // Expected
+                }
             }
         }
 
         #endregion Apache Harmony Tests
+
+        [Test]
+        public void Test_IndexOf_String_CultureSensitivity()
+        {
+            string fixture = "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ";
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.IndexOf(searchFor, StringComparison.CurrentCulture));
+                assertEquals(6, sb.IndexOf(searchFor, StringComparison.Ordinal));
+            }
+        }
+
+        [Test]
+        public void Test_IndexOf_String_CultureSensitivity_LargeString()
+        {
+            string fixture = LargeUnicodeString + "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ";
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.IndexOf(searchFor, StringComparison.CurrentCulture));
+                assertEquals(LargeUnicodeString.Length + 6, sb.IndexOf(searchFor, StringComparison.Ordinal));
+            }
+        }
+
+        [Test]
+        public void Test_IndexOf_String_Int32_CultureSensitivity()
+        {
+            string fixture = "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ";
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.IndexOf(searchFor, 4, StringComparison.CurrentCulture));
+                assertEquals(6, sb.IndexOf(searchFor, 4, StringComparison.Ordinal));
+            }
+        }
+
+        [Test]
+        public void Test_IndexOf_String_Int32_CultureSensitivity_LargeString()
+        {
+            string fixture = LargeUnicodeString + "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ";
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.IndexOf(searchFor, 4, StringComparison.CurrentCulture));
+                assertEquals(LargeUnicodeString.Length + 6, sb.IndexOf(searchFor, 4, StringComparison.Ordinal));
+            }
+        }
+
+
+        [Test]
+        public void Test_LastIndexOf_String_CultureSensitivity()
+        {
+            string fixture = "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ";
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.LastIndexOf(searchFor, StringComparison.CurrentCulture));
+                assertEquals(6, sb.LastIndexOf(searchFor, StringComparison.Ordinal));
+            }
+        }
+
+        [Test]
+        public void Test_LastIndexOf_String_CultureSensitivity_LargeString()
+        {
+            string fixture = "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ" + LargeUnicodeString;
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.LastIndexOf(searchFor, StringComparison.CurrentCulture));
+                assertEquals(6, sb.LastIndexOf(searchFor, StringComparison.Ordinal));
+            }
+        }
+
+        [Test]
+        public void Test_LastIndexOf_String_Int32_CultureSensitivity()
+        {
+            string fixture = "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ";
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.LastIndexOf(searchFor, 20, StringComparison.CurrentCulture));
+                assertEquals(6, sb.LastIndexOf(searchFor, 20, StringComparison.Ordinal));
+            }
+        }
+
+        [Test]
+        public void Test_LastIndexOf_String_Int32_CultureSensitivity_LargeString()
+        {
+            string fixture = "ዬ፡ዶጶቝአሄኢቌጕኬ\u124fቖኋዘዻ፡ሆገኅጬሷ\u135cቔቿ፺ዃጫቭዄ" + LargeUnicodeString;
+            string searchFor = "ሄኢቌጕኬ\u124fቖኋዘዻ";
+            StringBuilder sb = new StringBuilder(fixture);
+
+            using (var context = new CultureContext("ru-MD"))
+            {
+                assertEquals(-1, sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCulture));
+                assertEquals(6, sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.Ordinal));
+            }
+        }
     }
 }

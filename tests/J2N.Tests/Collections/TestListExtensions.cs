@@ -137,6 +137,15 @@ namespace J2N.Collections
             assertEquals("acb", l[0].ToString() + l[1] + l[2]);
         }
 
+        [Test]
+        public void TestShuffle_IsReadOnly()
+        {
+            var l = Enumerable.Repeat(false, 100).ToList().ToUnmodifiableList();
+
+            Assert.Throws<NotSupportedException>(() => l.Shuffle());
+            Assert.Throws<NotSupportedException>(() => l.Shuffle(Random));
+        }
+
 
         /**
          * @tests java.util.Collections#swap(java.util.List, int, int)
@@ -235,6 +244,13 @@ namespace J2N.Collections
             assertTrue(l.SequenceEqual(l2));
         }
 
+        [Test]
+        public void TestSwap_IsReadOnly()
+        {
+            var l = Enumerable.Repeat(false, 100).ToList().ToUnmodifiableList();
+
+            Assert.Throws<NotSupportedException>(() => l.Swap(0, 1));
+        }
 
 
         /**

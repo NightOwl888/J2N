@@ -324,6 +324,27 @@ namespace J2N
             assertEquals(threadCount * incrementCount, random.Seed);
         }
 
+#if FEATURE_SERIALIZABLE_RANDOM
+        [Test]
+        public void TestSerialization()
+        {
+            var target = new Randomizer(123);
+            target.Next();
+            target.NextGaussian();
+
+            var clone = Clone(target);
+
+            assertNotSame(target, clone);
+            assertEquals(target.seed, clone.seed);
+            assertEquals(target.internalSeed, clone.internalSeed);
+            assertEquals(target.haveNextNextGaussian, clone.haveNextNextGaussian);
+            assertEquals(target.nextNextGaussian, clone.nextNextGaussian);
+
+            assertEquals(target.Next(), clone.Next());
+            assertEquals(target.NextBoolean(), clone.NextBoolean());
+        }
+#endif
+
 
         /**
          * Sets up the fixture, for example, open a network connection. This method

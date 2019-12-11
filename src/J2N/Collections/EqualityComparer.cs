@@ -7,9 +7,6 @@ namespace J2N
     /// Provides a <see cref="Default"/> property that uses natural equality rules similar to those in Java.
     /// </summary>
     /// <typeparam name="T">The type of objects to compare.</typeparam>
-#if FEATURE_SERIALIZABLE
-    [Serializable]
-#endif
     public static class EqualityComparer<T> //: IEqualityComparer<T>, IEqualityComparer //IComparer<T>
     {
         /// <summary>

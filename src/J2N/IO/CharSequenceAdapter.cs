@@ -111,6 +111,8 @@ namespace J2N.IO
 
         public override sealed CharBuffer Put(char[] source, int offset, int length)
         {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
             if (offset < 0)
                 throw new ArgumentOutOfRangeException(nameof(offset));
             if (length < 0)
@@ -127,7 +129,6 @@ namespace J2N.IO
         {
             if (source == null)
                 throw new ArgumentNullException(nameof(source));
-
             int len = source.Length;
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));

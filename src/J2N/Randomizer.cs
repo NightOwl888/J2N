@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.Numerics;
+using System;
 
 namespace J2N
 {
@@ -30,42 +31,42 @@ namespace J2N
     ///     <item><description>Its initial seed can be read (as well as set) through the <see cref="Seed"/> property.</description></item>
     ///     <item><description>The <c>nextInt()</c> methods were renamed <see cref="Next()"/> and <see cref="Next(int)"/> to
     ///         override the <see cref="System.Random"/> methods.</description></item>
-    ///     <item><description>The <c>next(int)</c> method was renamed <see cref="NextInt(int)"/>. Keep this in mind when subclassing.</description></item>
+    ///     <item><description>The <c>next(int)</c> protected method was renamed <see cref="NextInt(int)"/>. Keep this in mind when subclassing.</description></item>
     /// </list>
     /// </summary>
-#if FEATURE_SERIALIZABLE
+#if FEATURE_SERIALIZABLE_RANDOM
     [Serializable]
 #endif
     public class Randomizer : System.Random
     {
         private const long multiplier = 0x5deece66dL;
 
-#if FEATURE_SERIALIZABLE
+#if FEATURE_SERIALIZABLE_RANDOM
         [NonSerialized]
 #endif
-        private readonly object syncRoot = new object();
+        private object syncRoot = new object(); // Not readonly for serializer
 
         /// <summary>
         /// The backing field for the user. This is the value the user sets, and
         /// is the value returned from the <see cref="Seed"/> property, however <see cref="internalSeed"/>
         /// is the actual value used to generate random numbers.
         /// </summary>
-        private long seed;
+        internal long seed; // internal for testing
 
         /// <summary>
         /// The boolean value indicating if the second Gaussian number is available.
         /// </summary>
-        private bool haveNextNextGaussian;
+        internal bool haveNextNextGaussian; // internal for testing
 
         /// <summary>
         /// It is associated with the internal state of this generator.
         /// </summary>
-        private long internalSeed;
+        internal long internalSeed; // internal for testing
 
         /// <summary>
         /// The second Gaussian generated number.
         /// </summary>
-        private double nextNextGaussian;
+        internal double nextNextGaussian; // internal for testing
 
         /// <summary>
         /// Construct a random generator with the current time of day in milliseconds
@@ -353,5 +354,14 @@ namespace J2N
         /// </summary>
         /// <seealso cref="Seed"/>
         public object SyncRoot => syncRoot;
+
+
+#if FEATURE_SERIALIZABLE_RANDOM
+        [System.Runtime.Serialization.OnDeserialized]
+        internal void OnDeserializedMethod(System.Runtime.Serialization.StreamingContext context)
+        {
+            syncRoot = new object();
+        }
+#endif
     }
 }

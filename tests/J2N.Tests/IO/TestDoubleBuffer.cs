@@ -38,7 +38,7 @@ namespace J2N.IO
          * infinity, negative infinity, and NaN.
          */
         [Test]
-        public void TestNaNs()
+        public virtual void TestNaNs()
         {
             long[] nans = new long[] { 0x7ff0000000000000L, unchecked((long)0xfff0000000000000L),
                 0x7ff8000000000000L };
@@ -62,7 +62,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestArray()
+        public virtual void TestArray()
         {
             double[] array = buf.Array;
             assertContentEquals(buf, array, buf.ArrayOffset, buf.Capacity);
@@ -81,7 +81,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestArrayOffset()
+        public virtual void TestArrayOffset()
         {
             double[] array = buf.Array;
             assertContentEquals(buf, array, buf.ArrayOffset, buf.Capacity);
@@ -100,7 +100,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAsReadOnlyBuffer()
+        public virtual void TestAsReadOnlyBuffer()
         {
             buf.Clear();
             buf.Mark();
@@ -126,7 +126,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestCompact()
+        public virtual void TestCompact()
         {
             // case: buffer is full
             buf.Clear();
@@ -188,7 +188,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestCompareTo()
+        public virtual void TestCompareTo()
         {
             DoubleBuffer other = DoubleBuffer.Allocate(buf.Capacity);
             loadTestData1(other);
@@ -218,7 +218,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestDuplicate()
+        public virtual void TestDuplicate()
         {
             buf.Clear();
             buf.Mark();
@@ -254,7 +254,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestEquals()
+        public virtual void TestEquals()
         {
             // equal to self
             assertTrue(buf.Equals(buf));
@@ -281,7 +281,7 @@ namespace J2N.IO
          * Class under test for double get()
          */
         [Test]
-        public void TestGet()
+        public virtual void TestGet()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -304,7 +304,7 @@ namespace J2N.IO
          * Class under test for java.nio.DoubleBuffer get(double[])
          */
         [Test]
-        public void TestGetdoubleArray()
+        public virtual void TestGetdoubleArray()
         {
             double[] array = new double[1];
             buf.Clear();
@@ -330,7 +330,7 @@ namespace J2N.IO
          * Class under test for java.nio.DoubleBuffer get(double[], int, int)
          */
         [Test]
-        public void TestGetdoubleArrayintint()
+        public virtual void TestGetdoubleArrayintint()
         {
             buf.Clear();
             double[] array = new double[buf.Capacity];
@@ -423,7 +423,7 @@ namespace J2N.IO
          * Class under test for double get(int)
          */
         [Test]
-        public void TestGetint()
+        public virtual void TestGetint()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -452,13 +452,13 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestHasArray()
+        public virtual void TestHasArray()
         {
             assertTrue(buf.HasArray);
         }
 
         [Test]
-        public void TestHashCode()
+        public virtual void TestHashCode()
         {
             buf.Clear();
             DoubleBuffer @readonly = buf.AsReadOnlyBuffer();
@@ -471,13 +471,13 @@ namespace J2N.IO
         }
 
         //[Test]
-        //public void TestIsDirect() // J2N: IsDirect not supported
+        //public virtual void TestIsDirect() // J2N: IsDirect not supported
         //{
         //    assertFalse(buf.IsDirect);
         //}
 
         [Test]
-        public void TestOrder()
+        public virtual void TestOrder()
         {
             assertEquals(ByteOrder.NativeOrder, buf.Order);
         }
@@ -486,7 +486,7 @@ namespace J2N.IO
          * Class under test for java.nio.DoubleBuffer put(double)
          */
         [Test]
-        public void TestPutdouble()
+        public virtual void TestPutdouble()
         {
 
             buf.Clear();
@@ -512,7 +512,7 @@ namespace J2N.IO
          * Class under test for java.nio.DoubleBuffer put(double[])
          */
         [Test]
-        public void TestPutdoubleArray()
+        public virtual void TestPutdoubleArray()
         {
             double[] array = new double[1];
 
@@ -540,7 +540,7 @@ namespace J2N.IO
          * Class under test for java.nio.DoubleBuffer put(double[], int, int)
          */
         [Test]
-        public void TestPutdoubleArrayintint()
+        public virtual void TestPutdoubleArrayintint()
         {
             buf.Clear();
             double[] array = new double[buf.Capacity];
@@ -633,7 +633,7 @@ namespace J2N.IO
          * Class under test for java.nio.DoubleBuffer put(java.nio.DoubleBuffer)
          */
         [Test]
-        public void TestPutDoubleBuffer()
+        public virtual void TestPutDoubleBuffer()
         {
             DoubleBuffer other = DoubleBuffer.Allocate(buf.Capacity);
 
@@ -670,7 +670,7 @@ namespace J2N.IO
          * Class under test for java.nio.DoubleBuffer put(int, double)
          */
         [Test]
-        public void TestPutintdouble()
+        public virtual void TestPutintdouble()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -701,7 +701,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestSlice()
+        public virtual void TestSlice()
         {
             assertTrue(buf.Capacity > 5);
             buf.Position = (1);
@@ -736,7 +736,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestToString()
+        public virtual void TestToString()
         {
             String str = buf.ToString();
             assertTrue(str.IndexOf("Double") >= 0 || str.IndexOf("double") >= 0);
@@ -745,7 +745,7 @@ namespace J2N.IO
             assertTrue(str.IndexOf("" + buf.Capacity) >= 0);
         }
 
-        void loadTestData1(double[] array, int offset, int length)
+        internal void loadTestData1(double[] array, int offset, int length)
         {
             for (int i = 0; i < length; i++)
             {
@@ -753,7 +753,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData2(double[] array, int offset, int length)
+        internal void loadTestData2(double[] array, int offset, int length)
         {
             for (int i = 0; i < length; i++)
             {
@@ -761,7 +761,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData1(DoubleBuffer buf)
+        internal void loadTestData1(DoubleBuffer buf)
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -770,7 +770,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData2(DoubleBuffer buf)
+        internal void loadTestData2(DoubleBuffer buf)
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)

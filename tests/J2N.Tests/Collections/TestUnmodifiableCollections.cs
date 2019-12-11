@@ -77,8 +77,26 @@ namespace J2N.Collections
             {
                 myCollection.Add(objArray[counter]);
             }
-            //new Support_UnmodifiableCollectionTest("", Collections // J2N TODO: Finish implementation
-            //        .unmodifiableCollection(myCollection)).runTest();
+            new Support_UnmodifiableCollectionTest("", (myCollection).ToUnmodifiableCollection()).RunTest();
+
+#if FEATURE_SERIALIZABLE
+            // Serialization
+            var col = (CollectionExtensions.UnmodifiableCollection<object>)myCollection.ToUnmodifiableCollection();
+            var clone = Clone(col);
+
+            assertNotSame(col, clone);
+            assertNotSame(col.collection, clone.collection);
+            assertEquals(col.Count, clone.Count);
+            
+            using (var it1 = col.GetEnumerator())
+            using (var it2 = col.GetEnumerator())
+            {
+                while (it1.MoveNext() && it2.MoveNext())
+                    assertTrue(
+                        "UnmodifiableCollectionTest - Deserialized clone returned incorrect values",
+                        it1.Current == it2.Current);
+            }
+#endif
         }
 
         /**
@@ -165,7 +183,26 @@ namespace J2N.Collections
                 assertTrue("List has wrong elements", ((int?)listIterator
                         .Current) == counter);
             }
-            //new Support_UnmodifiableCollectionTest("", smallList).runTest(); // J2N TODO: Finish implementation
+            new Support_UnmodifiableCollectionTest("", smallList).RunTest();
+
+#if FEATURE_SERIALIZABLE
+            // Serialization
+            var col = (ListExtensions.UnmodifiableList<object>)smallList.ToUnmodifiableList();
+            var clone = Clone(col);
+
+            assertNotSame(col, clone);
+            assertNotSame(col.list, clone.list);
+            assertEquals(col.Count, clone.Count);
+
+            using (var it1 = col.GetEnumerator())
+            using (var it2 = col.GetEnumerator())
+            {
+                while (it1.MoveNext() && it2.MoveNext())
+                    assertTrue(
+                        "UnmodifiableListTest - Deserialized clone returned incorrect values",
+                        it1.Current == it2.Current);
+            }
+#endif
         }
 
         /**
@@ -264,8 +301,26 @@ namespace J2N.Collections
                 smallMap[objArray[counter].ToString()] = objArray[counter];
             }
             unmodMap = smallMap.ToUnmodifiableDictionary();
-            //new Support_UnmodifiableMapTest("", unmodMap).runTest(); // J2N TODO: Finish implementation
+            new Support_UnmodifiableMapTest("", unmodMap).RunTest();
 
+#if FEATURE_SERIALIZABLE
+            // Serialization
+            var col = (DictionaryExtensions.UnmodifiableDictionary<object, object>)unmodMap;
+            var clone = Clone(col);
+
+            assertNotSame(col, clone);
+            assertNotSame(col.dictionary, clone.dictionary);
+            assertEquals(col.Count, clone.Count);
+
+            using (var it1 = col.GetEnumerator())
+            using (var it2 = col.GetEnumerator())
+            {
+                while (it1.MoveNext() && it2.MoveNext())
+                    assertTrue(
+                        "UnmodifiableDictionaryTest - Deserialized clone returned incorrect values",
+                        it1.Current.Equals(it2.Current));
+            }
+#endif
         }
 
         /**
@@ -315,8 +370,20 @@ namespace J2N.Collections
             {
                 mySet.Add(objArray[counter]);
             }
-            //new Support_UnmodifiableCollectionTest("", Collections // J2N TODO: Finish implementation
-            //        .unmodifiableSet(mySet)).runTest();
+            new Support_UnmodifiableCollectionTest("", (mySet).ToUnmodifiableSet()).RunTest();
+
+#if FEATURE_SERIALIZABLE
+            // Serialization
+            var col = (SetExtensions.UnmodifiableSet<object>)mySet.ToUnmodifiableSet();
+            var clone = Clone(col);
+
+            assertNotSame(col, clone);
+            assertNotSame(col.set, clone.set);
+            assertEquals(col.Count, clone.Count);
+
+            assertTrue("UnmodifiableSetTest - Deserialized clone returned incorrect values", 
+                col.SetEquals(clone));
+#endif
         }
 
 

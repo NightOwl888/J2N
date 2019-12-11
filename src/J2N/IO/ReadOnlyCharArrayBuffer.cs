@@ -78,12 +78,12 @@ namespace J2N.IO
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;
-            if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)offset + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(offset)} + {nameof(length)} > {nameof(source.Length)}");
+            if ((long)startIndex + (long)length > len)
+                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(source.Length)}");
 
             throw new ReadOnlyBufferException();
         }

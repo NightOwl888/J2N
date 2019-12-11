@@ -29,7 +29,7 @@ namespace J2N.Text
         }
 
         [Test]
-        public virtual void TestReferenceEquality()
+        public virtual void TestEqualityOperators()
         {
             Assert.IsTrue(target == equalTarget);
             Assert.IsTrue(equalTarget == target);

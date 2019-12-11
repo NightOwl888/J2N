@@ -34,9 +34,9 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        private class UnmodifiableCollection<T> : ICollection<T>, IEquatable<ICollection<T>>
+        internal class UnmodifiableCollection<T> : ICollection<T>, IEquatable<ICollection<T>>
         {
-            private readonly ICollection<T> collection;
+            internal readonly ICollection<T> collection; // internal for testing
 
             public UnmodifiableCollection(ICollection<T> collection)
             {

@@ -150,7 +150,7 @@ namespace J2N.IO
         public void Test_nextToken()
         {
             // SM.
-            // LUCENENET NOTE: The original test had \257 (which is octal)
+            // J2N NOTE: The original test had \257 (which is octal)
             // that is not supported in a .NET string, so we convert to decimal 175 here.
             // This also changes the semantics of the test, because for whatever
             // reason in Java it was expecting the octal number to register as a TokenType_Word.

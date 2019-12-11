@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;netstandard1.3;net45</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.0;netstandard2.0;netstandard1.3;net45</TargetFrameworks>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <WarningsAsErrors>NU1605;1591</WarningsAsErrors>
@@ -9,12 +9,17 @@
 
   <PropertyGroup Label="NuGet Package Settings">
     <AssemblyTitle>J2N</AssemblyTitle>
-    <Description>J2N provides components to assist with porting Java code to .NET. It contains collections, adapters, and other types that are not available in the .NET that are available in Java.</Description>
+    <Description>J2N is a library that helps bridge the gap between .NET and Java. It provides components to assist with porting Java code to .NET, such as collections, adapters, and extensions. It contains some features from Java that also make it generally useful in any .NET application.</Description>
     <!--<PackageTags>$(PackageTags)</PackageTags>-->
   </PropertyGroup>
 
   <ItemGroup>
     <Compile Include="..\..\build\CommonAssemblyKeys.cs" Link="Properties\CommonAssemblyKeys.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <PackageReference Include="Microsoft.CSharp" Version="$(MicrosoftCSharpPackageReferenceVersion)" />
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
@@ -32,18 +37,28 @@
     <PackageReference Include="System.Threading.Thread" Version="$(SystemThreadingThreadPackageReferenceVersion)" />
   </ItemGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY;FEATURE_STRINGINTERN;FEATURE_CONTRACTBLOCKS;FEATURE_CHARARRAYPOINTERS;FEATURE_READONLYSPAN;FEATURE_READONLYMEMORY;FEATURE_STRINGBUILDER_APPENDJOIN;FEATURE_NUMERICBITOPERATIONS</DefineConstants>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
+    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY;FEATURE_STRINGINTERN;FEATURE_CONTRACTBLOCKS;FEATURE_CHARARRAYPOINTERS;FEATURE_READONLYSPAN;FEATURE_READONLYMEMORY;FEATURE_STRINGBUILDER_APPENDJOIN</DefineConstants>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY;FEATURE_STRINGINTERN;FEATURE_CONTRACTBLOCKS;FEATURE_CHARARRAYPOINTERS</DefineConstants>
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_CHARARRAYPOINTERS</DefineConstants>
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'net45' ">
-    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE;FEATURE_SERIALIZABLE_EXCEPTIONS;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE;FEATURE_SERIALIZABLE_EXCEPTIONS;FEATURE_SERIALIZABLE_RANDOM;FEATURE_SERIALIZABLE_STRINGS;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY;FEATURE_STRINGINTERN;FEATURE_CONTRACTBLOCKS</DefineConstants>
     <DebugType>full</DebugType>
   </PropertyGroup>
 

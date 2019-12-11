@@ -8,8 +8,11 @@ namespace J2N.Text
     /// </summary>
     public static class StringBuilderExtensions
     {
+        #region Append
+
         // This doesn't work right. See: https://stackoverflow.com/a/26885473
         // However, we can fallback on the Append(object) overload and it will call ToString().
+        // To work around, call the charSequenceLabel explicitly : sb.IndexOf(charSequence: theCharSequence);
         /// <summary>
         /// Appends the given <see cref="ICharSequence"/> to this <see cref="StringBuilder"/>.
         /// </summary>
@@ -25,11 +28,13 @@ namespace J2N.Text
             // For null values, this is a no-op
             if (charSequence != null && charSequence.HasValue)
             {
-                if (charSequence is StringCharSequence)
-                    text.Append(((StringCharSequence)charSequence).Value);
-                else if (charSequence is CharArrayCharSequence)
-                    text.Append(((CharArrayCharSequence)charSequence).Value);
-                else // We don't need to check for StringBuilderCharSequence because we call ToString() on it anyway
+                if (charSequence is StringCharSequence str)
+                    text.Append(str.Value);
+                else if (charSequence is CharArrayCharSequence charArray)
+                    text.Append(charArray.Value);
+                else if (charSequence is StringBuilderCharSequence sb)
+                    text.Append(sb.Value);
+                else
                     text.Append(charSequence.ToString());
             }
             return text;
@@ -38,43 +43,127 @@ namespace J2N.Text
         /// <summary>
         /// Appends the specified range of characters of the given <see cref="ICharSequence"/> to this <see cref="StringBuilder"/>.
         /// <para/>
-        /// IMPORTANT: This method has .NET semantics, that is, the second parameter is a length,
+        /// IMPORTANT: This method has .NET semantics, that is, the third parameter is a length,
         /// not an exclusive end index as it would be in Java. To translate from Java to .NET,
-        /// callers must account for this by subtracting (end - start) for the <paramref name="count"/>.
+        /// callers must account for this by subtracting (end - start) for the <paramref name="charCount"/>.
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="charSequence">The <see cref="ICharSequence"/> to append.</param>
         /// <param name="startIndex">The starting position of the substring within <paramref name="charSequence"/>.</param>
-        /// <param name="count">The number of characters in <paramref name="charSequence"/> to append.</param>
+        /// <param name="charCount">The number of characters in <paramref name="charSequence"/> to append.</param>
         /// <returns>This <see cref="StringBuilder"/>, for chaining.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        public static StringBuilder Append(this StringBuilder text, ICharSequence charSequence, int startIndex, int count)
+        /// <exception cref="ArgumentNullException"><paramref name="charSequence"/> is <c>null</c>, and
+        /// <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> indicates a position not within <paramref name="charSequence"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="charCount"/> is less than zero.
+        /// </exception>
+        public static StringBuilder Append(this StringBuilder text, ICharSequence charSequence, int startIndex, int charCount)
         {
             if (text == null)
                 throw new ArgumentNullException(nameof(text));
-
+            if (charSequence == null && (startIndex != 0 || charCount != 0))
+                throw new ArgumentNullException(nameof(charSequence)); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
-            if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count));
+            if (charCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(charCount));
 
-            // For null values, this is a no-op
-            if (charSequence == null)
-            {
-                //text.Append("null"); // Java behavior
+            if (charSequence == null || !charSequence.HasValue)
                 return text;
-            }
 
-            int end = startIndex + count;
+            if (startIndex > charSequence.Length - charCount)
+                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(charCount)} > {nameof(charSequence.Length)}");
+
+            if (charSequence is CharArrayCharSequence charArrayCharSequence)
+                return text.Append(charArrayCharSequence.Value, startIndex, charCount);
+
+            int end = startIndex + charCount;
             for (int i = startIndex; i < end; i++)
                 text.Append(charSequence[i]);
             return text;
         }
 
+        // J2N: Excluding this overload because it is effectively the same as Append(object)
+        // and the compiler chooses that overload by default, anyway.
+        ///// <summary>
+        ///// Appends the given <see cref="StringBuilder"/> to this <see cref="StringBuilder"/>.
+        ///// <para/>
+        ///// The characters of the <paramref name="charSequence"/> argument are appended,
+        ///// in order, to this sequence, increasing the
+        ///// length of this sequence by the length of <paramref name="charSequence"/>.
+        ///// <para/>
+        ///// Usage Note: Unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
+        ///// <c>"null"</c> to the <see cref="StringBuilder"/>. Instead, it is a no-op.
+        ///// </summary>
+        ///// <param name="text">This <see cref="StringBuilder"/>.</param>
+        ///// <param name="charSequence">The <see cref="StringBuilder"/> to append.</param>
+        ///// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        //public static StringBuilder Append(this StringBuilder text, StringBuilder charSequence)
+        //{
+        //    if (text == null)
+        //        throw new ArgumentNullException(nameof(text));
+
+        //    if (charSequence != null)
+        //        text.Append(charSequence.ToString());
+        //    return text;
+        //}
+
+        /// <summary>
+        /// Appends the given <see cref="StringBuilder"/> to this <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <summary>
+        /// Appends a substring of the specified <paramref name="charSequence"/> to this <see cref="StringBuilder"/>.
+        /// <para/>
+        /// Characters of the argument <paramref name="charSequence"/>, starting at
+        /// <paramref name="startIndex"/>, are appended, in order, to the contents of
+        /// this sequence up to the specified <paramref name="charCount"/>. The length of this
+        /// sequence is increased by the value of <paramref name="charCount"/>.
+        /// <para/>
+        /// Usage Note: Unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
+        /// <c>"null"</c> to the <see cref="StringBuilder"/>. Instead, it will throw an <see cref="ArgumentNullException"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="charSequence">The <see cref="StringBuilder"/> to append.</param>
+        /// <param name="startIndex">The starting index of the subsequence to be appended.</param>
+        /// <param name="charCount">The number of characters in <paramref name="charSequence"/> to append.</param>
+        /// <returns>This <see cref="StringBuilder"/>, for chaining.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> indicates a position not within <paramref name="charSequence"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="charCount"/> is less than zero.
+        /// </exception>
+        public static StringBuilder Append(this StringBuilder text, StringBuilder charSequence, int startIndex, int charCount)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (charSequence == null && (startIndex != 0 || charCount != 0))
+                throw new ArgumentNullException(nameof(charSequence)); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (charCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(charCount));
+            if (charSequence == null)
+                return text;
+            if (startIndex > charSequence.Length - charCount)
+                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(charCount)} > {nameof(charSequence.Length)}");
+
+            return text.Append(charSequence.ToString(startIndex, charCount));
+        }
+
+        #endregion Append
+
+        #region AppendCodePoint
+
         /// <summary>
         /// Appends the string representation of the <paramref name="codePoint"/>
         /// argument to this sequence.
-        /// 
         /// <para>
         /// The argument is appended to the contents of this sequence.
         /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
@@ -88,8 +177,8 @@ namespace J2N.Text
         /// </para>
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
-        /// <param name="codePoint">a Unicode code point</param>
-        /// <returns>a reference to this object.</returns>
+        /// <param name="codePoint">A Unicode code point</param>
+        /// <returns>This <see cref="StringBuilder"/>, for chaining.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static StringBuilder AppendCodePoint(this StringBuilder text, int codePoint)
         {
@@ -100,6 +189,9 @@ namespace J2N.Text
             return text;
         }
 
+        #endregion AppendCodePoint
+
+        #region CompareToOrdinal
 
         /// <summary>
         /// This method mimics the Java String.compareTo(CharSequence) method in that it
@@ -119,7 +211,7 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder text, ICharSequence value)
+        public static int CompareToOrdinal(this StringBuilder text, ICharSequence value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (value is StringBuilderCharSequence && object.ReferenceEquals(text, value)) return 0;
             if (text == null) return -1;
@@ -157,7 +249,7 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder text, char[] value)
+        public static int CompareToOrdinal(this StringBuilder text, char[] value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text == null) return -1;
             if (value == null) return 1;
@@ -193,7 +285,7 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder text, StringBuilder value)
+        public static int CompareToOrdinal(this StringBuilder text, StringBuilder value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (object.ReferenceEquals(text, value)) return 0;
             if (text == null) return -1;
@@ -222,7 +314,7 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder text, string value)
+        public static int CompareToOrdinal(this StringBuilder text, string value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text == null) return -1;
             if (value == null) return 1;
@@ -240,17 +332,104 @@ namespace J2N.Text
             return text.Length - value.Length;
         }
 
+        #endregion CompareToOrdinal
+
+        #region Delete
+
         /// <summary>
-        /// Searches for the first index of the specified character. The search for
-        /// the character starts at the beginning and moves towards the end.
+        /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
+        /// Shifts any remaining characters to the left.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        /// <para/>
+        /// This method differs from <see cref="StringBuilder.Remove(int, int)"/> in that it will automatically
+        /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="StringBuilder.Length"/></c>
+        /// to <c><see cref="StringBuilder.Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="StringBuilder.MaxCapacity"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="startIndex">The start index in <paramref name="text"/>.</param>
+        /// <param name="count">The number of characters to delete in <paramref name="text"/>.</param>
+        /// <returns>This <see cref="StringBuilder"/>, for chaining.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than or equal to <see cref="StringBuilder.Length"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        public static StringBuilder Delete(this StringBuilder text, int startIndex, int count)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (startIndex < 0 || startIndex >= text.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+
+            if (startIndex + count > text.Length)
+                count = text.Length - startIndex;
+            if (count > 0)
+                text.Remove(startIndex, count);
+
+            return text;
+        }
+
+        #endregion Delete
+
+        #region IndexOf
+
+        // J2N: Removed this overload to prevent it from accidentally selecting culture sensitivity when it is not desired
+        ///// <summary>
+        ///// Searches for the first index of the specified character. The search for
+        ///// the character starts at the beginning and moves towards the end.
+        ///// <para/>
+        ///// Usage Note: This method has .NET semantics - it uses the current culture to compare the string.
+        ///// To match Java, use the <see cref="IndexOf(StringBuilder, string, StringComparison)"/> overload
+        ///// with <see cref="StringComparison.Ordinal"/>.
+        ///// </summary>
+        ///// <param name="text">This <see cref="StringBuilder"/>.</param>
+        ///// <param name="value">The string to find.</param>
+        ///// <returns>The index of the specified character, or <c>-1</c> if the character isn't found.</returns>
+        ///// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        //public static int IndexOf(this StringBuilder text, string value)
+        //{
+        //    return IndexOf(text, value, 0, StringComparison.CurrentCulture);
+        //}
+
+        // J2N: Removed this overload to prevent it from accidentally selecting culture sensitivity when it is not desired
+        ///// <summary>
+        ///// Searches for the index of the specified character. The search for the
+        ///// character starts at the specified offset and moves towards the end.
+        ///// <para/>
+        ///// Usage Note: This method has .NET semantics - it uses the current culture to compare the string.
+        ///// To match Java, use the <see cref="IndexOf(StringBuilder, string, int, StringComparison)"/> overload
+        ///// with <see cref="StringComparison.Ordinal"/>.
+        ///// </summary>
+        ///// <param name="text">This <see cref="StringBuilder"/>.</param>
+        ///// <param name="value">The string to find.</param>
+        ///// <param name="startIndex">The starting offset.</param>
+        ///// <returns>The index of the specified character, or <c>-1</c> if the character isn't found.</returns>
+        ///// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        //public static int IndexOf(this StringBuilder text, string value, int startIndex)
+        //{
+        //    return IndexOf(text, value, startIndex, StringComparison.CurrentCulture);
+        //}
+
+        /// <summary>
+        /// Searches for the index of the specified character. The search for the
+        /// character starts at the specified offset and moves towards the end.
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="value">The string to find.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
         /// <returns>The index of the specified character, or <c>-1</c> if the character isn't found.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
-        public static int IndexOf(this StringBuilder text, string value)
+        /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
+        public static int IndexOf(this StringBuilder text, string value, StringComparison comparisonType)
         {
-            return IndexOf(text, value, 0, StringComparison.Ordinal);
+            return IndexOf(text, value, 0, comparisonType);
         }
 
         /// <summary>
@@ -260,23 +439,10 @@ namespace J2N.Text
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="value">The string to find.</param>
         /// <param name="startIndex">The starting offset.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
         /// <returns>The index of the specified character, or <c>-1</c> if the character isn't found.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
-        public static int IndexOf(this StringBuilder text, string value, int startIndex)
-        {
-            return IndexOf(text, value, startIndex, StringComparison.Ordinal);
-        }
-
-        /// <summary>
-        /// Searches for the index of the specified character. The search for the
-        /// character starts at the specified offset and moves towards the end.
-        /// </summary>
-        /// <param name="text">This <see cref="StringBuilder"/>.</param>
-        /// <param name="value">The string to find.</param>
-        /// <param name="startIndex">The starting offset.</param>
-        /// <param name="comparisonType"></param>
-        /// <returns>The index of the specified character, or <c>-1</c> if the character isn't found.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static int IndexOf(this StringBuilder text, string value, int startIndex, StringComparison comparisonType)
         {
             if (text == null)
@@ -293,38 +459,483 @@ namespace J2N.Text
             // but also requires additional RAM. So, if the string is going
             // to take up more than 16KB, we index into the StringBuilder
             // rather than a string.
-            if (textLength <= 16384)
+            if (textLength <= 16384 || comparisonType != StringComparison.Ordinal)
                 return text.ToString().IndexOf(value, comparisonType);
 
             int maxSearchLength = (textLength - length) + 1;
-
-            if (comparisonType == StringComparison.Ordinal)
+            char firstChar = value[0];
+            int index;
+            for (int i = startIndex; i < maxSearchLength; ++i)
             {
-                int index;
-                for (int i = startIndex; i < maxSearchLength; ++i)
+                if (text[i] == firstChar)
                 {
-                    if (text[i] == value[0])
-                    {
-                        index = 1;
-                        while ((index < length) && (text[i + index] == value[index]))
-                            ++index;
+                    index = 1;
+                    while ((index < length) && (text[i + index] == value[index]))
+                        ++index;
 
-                        if (index == length)
-                            return i;
-                    }
-                }
-            }
-            else
-            {
-                for (int i = startIndex; i < maxSearchLength; ++i)
-                {
-                    if (text[i] == value[0] && text.ToString(i, length).Equals(value, comparisonType))
+                    if (index == length)
                         return i;
                 }
             }
 
             return -1;
         }
+
+        #endregion IndexOf
+
+        #region Insert
+
+        /// <summary>
+        /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="charSequence">The character sequence to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence charSequence)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (index < 0 || index > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            // For null values, this is a no-op
+            if (charSequence != null && charSequence.HasValue)
+            {
+                if (charSequence is StringCharSequence str)
+                    text.Insert(index, str.Value);
+                else if (charSequence is CharArrayCharSequence charArray)
+                    text.Insert(index, charArray.Value);
+                else if (charSequence is StringBuilderCharSequence sb)
+                    text.Insert(index, sb.Value);
+                else
+                    text.Insert(index, charSequence.ToString());
+            }
+            return text;
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="charCount"/> parameter is a count, not an exclusive end index as would be the
+        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="charCount"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="charSequence">A character sequence.</param>
+        /// <param name="startIndex">The starting index within <paramref name="charSequence"/>.</param>
+        /// <param name="charCount">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="text"/> is <c>null</c>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="charSequence"/> is <c>null</c>, and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="charSequence"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence charSequence, int startIndex, int charCount) // J2N TODO: API - extension method for StringBuilder
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (index < 0 || index > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (charCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(charCount));
+            if (charSequence == null && (startIndex != 0 || charCount != 0))
+                throw new ArgumentNullException(nameof(charSequence)); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
+            if (charSequence == null || !charSequence.HasValue)
+                return text;
+            if (startIndex > charSequence.Length - charCount)
+                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(charCount)} > {nameof(charSequence.Length)}");
+
+            if (charSequence is CharArrayCharSequence charArrayCharSequence)
+                return text.Insert(index, charArrayCharSequence.Value, startIndex, charCount);
+
+            return Insert(text, index, charSequence.Subsequence(startIndex, charCount));
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="charSequence">The character sequence to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static StringBuilder Insert(this StringBuilder text, int index, StringBuilder charSequence)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (index < 0 || index > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (charSequence == null)
+                return text;
+           
+            // NOTE: This method will not be used for .NET Standard 2.1+ because
+            // the overload already exists on StringBuilder.
+            return text.Insert(index, charSequence.ToString());
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="charCount"/> parameter is a count, not an exclusive end index as would be the
+        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="charCount"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="charSequence">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="charSequence"/>.</param>
+        /// <param name="charCount">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="text"/> is <c>null</c>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="charSequence"/> is <c>null</c>, and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="charSequence"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static StringBuilder Insert(this StringBuilder text, int index, StringBuilder charSequence, int startIndex, int charCount)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (index < 0 || index > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (charCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(charCount));
+            if (charSequence == null && (startIndex != 0 || charCount != 0))
+                throw new ArgumentNullException(nameof(charSequence)); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
+            if (charSequence == null)
+                return text;
+            if (startIndex > charSequence.Length - charCount)
+                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(charCount)} > {nameof(charSequence.Length)}");
+
+            return text.Insert(index, charSequence.ToString(startIndex, charCount));
+        }
+
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="charCount"/> parameter is a count, not an exclusive end index as would be the
+        /// case in Java. To translate from Java, use <c>end - start</c> to resolve <paramref name="charCount"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the operation has completed.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="text"/> is <c>null</c>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/> and <paramref name="charCount"/> are not zero.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/> or <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
+        /// </exception>
+        public static StringBuilder Insert(this StringBuilder text, int index, string value, int startIndex, int charCount)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (index < 0 || index > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (charCount < 0)
+                throw new ArgumentOutOfRangeException(nameof(charCount));
+            if (value == null && (startIndex != 0 || charCount != 0))
+                throw new ArgumentNullException(nameof(value)); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
+            if (value == null)
+                return text;
+            if (startIndex > value.Length - charCount)
+                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(charCount)} > {nameof(value.Length)}");
+
+            return text.Insert(index, value.Substring(startIndex, charCount));
+        }
+
+        #endregion
+
+        #region LastIndexOf
+
+        // J2N: Removed this overload to prevent it from accidentally selecting culture sensitivity when it is not desired
+        ///// <summary>
+        ///// Searches for the last index of the specified character. The search for
+        ///// the character starts at the end and moves towards the beginning.
+        ///// <para/>
+        ///// Usage Note: This method has .NET semantics - it uses the current culture to compare the string.
+        ///// To match Java, use the <see cref="LastIndexOf(StringBuilder, string, StringComparison)"/> overload
+        ///// with <see cref="StringComparison.Ordinal"/>.
+        ///// </summary>
+        ///// <param name="text">This <see cref="StringBuilder"/>.</param>
+        ///// <param name="value">The string to find.</param>
+        ///// <returns>The index of the specified character, <c>-1</c> if the character isn't found.</returns>
+        ///// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        //public static int LastIndexOf(this StringBuilder text, string value)
+        //{
+        //    if (text == null)
+        //        throw new ArgumentNullException(nameof(text));
+
+        //    return LastIndexOf(text, value, text.Length, StringComparison.CurrentCulture);
+        //}
+
+        // J2N: Removed this overload to prevent it from accidentally selecting culture sensitivity when it is not desired
+        ///// <summary>
+        ///// Searches for the index of the specified character. The search for the
+        ///// character starts at the specified offset and moves towards the beginning.
+        ///// <para/>
+        ///// Usage Note: This method has .NET semantics - it uses the current culture to compare the string.
+        ///// To match Java, use the <see cref="LastIndexOf(StringBuilder, string, int, StringComparison)"/> overload
+        ///// with <see cref="StringComparison.Ordinal"/>.
+        ///// </summary>
+        ///// <param name="text">This <see cref="StringBuilder"/>.</param>
+        ///// <param name="value">The string to find.</param>
+        ///// <param name="startIndex">The starting offset.</param>
+        ///// <returns>The index of the specified character, <c>-1</c> if the character isn't found.</returns>
+        ///// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        //public static int LastIndexOf(this StringBuilder text, string value, int startIndex)
+        //{
+        //    if (text == null)
+        //        throw new ArgumentNullException(nameof(text));
+
+        //    return LastIndexOf(text, value, startIndex, StringComparison.CurrentCulture);
+        //}
+
+        /// <summary>
+        /// Searches for the index of the specified character. The search for the
+        /// character starts at the specified offset and moves towards the beginning.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="value">The string to find.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
+        /// <returns>The index of the specified character, <c>-1</c> if the character isn't found.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
+        public static int LastIndexOf(this StringBuilder text, string value, StringComparison comparisonType)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+
+            return LastIndexOf(text, value, text.Length, comparisonType);
+        }
+
+        /// <summary>
+        /// Searches for the index of the specified character. The search for the
+        /// character starts at the specified offset and moves towards the beginning.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="value">The string to find.</param>
+        /// <param name="startIndex">The starting offset.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
+        /// <returns>The index of the specified character, <c>-1</c> if the character isn't found.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
+        public static int LastIndexOf(this StringBuilder text, string value, int startIndex, StringComparison comparisonType)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            int textLength = text.Length;
+
+            // Tradeoff: materializing the string is generally faster,
+            // but also requires additional RAM. So, if the string is going
+            // to take up more than 16KB, we index into the StringBuilder
+            // rather than a string.
+            if (textLength <= 16384 || comparisonType != StringComparison.Ordinal)
+                return text.ToString().LastIndexOf(value, comparisonType);
+
+            int subCount = value.Length;
+            if (subCount <= textLength && startIndex >= 0)
+            {
+                if (subCount > 0)
+                {
+                    if (startIndex > textLength - subCount)
+                    {
+                        startIndex = textLength - subCount; // count and subCount are both
+                    }
+                    // >= 1
+                    // TODO optimize charAt to direct array access
+                    char firstChar = value[0];
+                    while (true)
+                    {
+                        int i = startIndex;
+                        bool found = false;
+                        for (; i >= 0; --i)
+                        {
+                            if (text[i] == firstChar)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            return -1;
+                        }
+                        int o1 = i, o2 = 0;
+                        while (++o2 < subCount
+                                && text[++o1] == value[o2])
+                        {
+                            // Intentionally empty
+                        }
+                        if (o2 == subCount)
+                        {
+                            return i;
+                        }
+                        startIndex = i - 1;
+                    }
+                }
+                return startIndex < textLength ? startIndex : textLength;
+            }
+            return -1;
+        }
+
+        #endregion LastIndexOf
+
+        #region Replace
+
+        /// <summary>
+        /// Replaces the specified subsequence in this builder with the specified
+        /// string, <paramref name="newValue"/>. The substring begins at the specified
+        /// <paramref name="startIndex"/> and ends to the character at 
+        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// to the end of the sequence if no such character exists. First the
+        /// characters in the substring ar removed and then the specified 
+        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        /// This <see cref="StringBuilder"/> will be lengthened to accommodate the
+        /// specified <paramref name="newValue"/> if necessary.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count
+        /// rather than an exclusive end index. To translate from Java, use <c>end - start</c>
+        /// to resolve the <paramref name="count"/> parameter.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="startIndex">The inclusive begin index in <paramref name="text"/>.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>This <see cref="StringBuilder"/> builder.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="newValue"/> is <c>null</c>.</exception>
+        public static StringBuilder Replace(this StringBuilder text, int startIndex, int count, string newValue)
+        {
+            if (text == null)
+                throw new ArgumentNullException(nameof(text));
+            if (newValue == null)
+                throw new ArgumentNullException(nameof(newValue));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count));
+            if (text.MaxCapacity > 0 && startIndex > text.MaxCapacity - count)
+                throw new ArgumentOutOfRangeException(nameof(count), 
+                    $"{nameof(startIndex)}: {startIndex} + {nameof(count)}: {count} > {nameof(text.MaxCapacity)}: {text.MaxCapacity}");
+
+            int end = startIndex + count;
+            if (end > text.Length)
+            {
+                end = text.Length;
+            }
+            if (end > startIndex)
+            {
+                int stringLength = newValue.Length;
+                int diff = end - startIndex - stringLength;
+                if (diff > 0)
+                { // replacing with fewer characters
+                    text.Remove(startIndex, diff);
+                }
+                else if (diff < 0)
+                {
+                    // replacing with more characters...need some room
+                    text.Insert(startIndex, new char[-diff]);
+                }
+                // copy the chars based on the new length
+                for (int i = 0; i < stringLength; i++)
+                {
+                    text[i + startIndex] = newValue[i];
+                }
+                return text;
+            }
+            if (startIndex == end)
+            {
+                text.Insert(startIndex, newValue);
+                return text;
+            }
+            return text;
+        }
+
+        #endregion Replace
+
+        #region Reverse
 
         /// <summary>
         /// Causes this character sequence to be replaced by the reverse of
@@ -395,11 +1006,15 @@ namespace J2N.Text
             return text;
         }
 
+        #endregion Reverse
+
+        #region Subsequence
+
         /// <summary>
         /// Retrieves a sub-sequence from this instance.
         /// The sub-sequence starts at a specified character position and has a specified length.
         /// <para/>
-        /// IMPORTANT: This method has .NET semantics, that is, the second parameter is a length,
+        /// IMPORTANT: This method has .NET semantics, that is, the <paramref name="length"/> parameter is a length,
         /// not an exclusive end index as it would be in Java.
         /// </summary>
         /// <param name="startIndex">
@@ -407,7 +1022,7 @@ namespace J2N.Text
         /// is, the index of the first character that is included in the
         /// sub-sequence.
         /// </param>
-        /// <param name="text">This <see cref="T:char[]"/>.</param>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="length">The number of characters to return in the sub-sequence.</param>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within this instance.
@@ -433,6 +1048,10 @@ namespace J2N.Text
             return text.ToString(startIndex, length).ToCharSequence();
         }
 
+        #endregion Subsequence
+
+        #region ToCharSequence
+
         /// <summary>
         /// Convenience method to wrap a string in a <see cref="StringBuilderCharSequence"/>
         /// so a <see cref="StringBuilder"/> can be used as <see cref="ICharSequence"/> in .NET.
@@ -441,5 +1060,7 @@ namespace J2N.Text
         {
             return new StringBuilderCharSequence(text);
         }
+
+        #endregion
     }
 }

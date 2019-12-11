@@ -641,10 +641,12 @@ namespace J2N
 
         /// <summary>
         /// Returns the number of Unicode code points in the text range of the specified char sequence.
-        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number of characters specified in <paramref name="length"/>. 
+        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
+        /// of characters specified in <paramref name="length"/>. 
         /// Unpaired surrogates within the text range count as one code point each.
         /// <para/>
-        /// Usage Note: The third parameter was converted from an exclusive end index in Java into a length in .NET. To convert from
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index. To convert from
         /// Java, use <c>endIndex - startIndex</c> to obtain the length.
         /// </summary>
         /// <param name="seq">The char sequence.</param>
@@ -687,10 +689,12 @@ namespace J2N
 
         /// <summary>
         /// Returns the number of Unicode code points in the text range of the specified char sequence.
-        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number of characters specified in <paramref name="length"/>. 
+        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
+        /// of characters specified in <paramref name="length"/>. 
         /// Unpaired surrogates within the text range count as one code point each.
         /// <para/>
-        /// Usage Note: The third parameter was converted from an exclusive end index in Java into a length in .NET. To convert from
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index. To convert from
         /// Java, use <c>endIndex - startIndex</c> to obtain the length.
         /// </summary>
         /// <param name="seq">The char sequence.</param>
@@ -733,10 +737,12 @@ namespace J2N
 
         /// <summary>
         /// Returns the number of Unicode code points in the text range of the specified char sequence.
-        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number of characters specified in <paramref name="length"/>. 
+        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
+        /// of characters specified in <paramref name="length"/>. 
         /// Unpaired surrogates within the text range count as one code point each.
         /// <para/>
-        /// Usage Note: The third parameter was converted from an exclusive end index in Java into a length in .NET. To convert from
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index. To convert from
         /// Java, use <c>endIndex - startIndex</c> to obtain the length.
         /// </summary>
         /// <param name="seq">The char sequence.</param>
@@ -779,10 +785,12 @@ namespace J2N
 
         /// <summary>
         /// Returns the number of Unicode code points in the text range of the specified char sequence.
-        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number of characters specified in <paramref name="length"/>. 
+        /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
+        /// of characters specified in <paramref name="length"/>. 
         /// Unpaired surrogates within the text range count as one code point each.
         /// <para/>
-        /// Usage Note: The third parameter was converted from an exclusive end index in Java into a length in .NET. To convert from
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index. To convert from
         /// Java, use <c>endIndex - startIndex</c> to obtain the length.
         /// </summary>
         /// <param name="seq">The char sequence.</param>

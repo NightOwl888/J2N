@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.Numerics;
+using System;
 using System.Text;
 
 namespace J2N.Collections
@@ -43,7 +44,7 @@ namespace J2N.Collections
             0x800000000000000L, 0x1000000000000000L, 0x2000000000000000L,
             0x4000000000000000L, unchecked((long)0x8000000000000000L) };
 
-        private long[] bits;
+        internal long[] bits; // internal for testing serialization
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
@@ -1100,12 +1101,14 @@ namespace J2N.Collections
             return (int)x & 0x0000003f;
         }
 
-        //private void ReadObject(ObjectInputStream ois)
-        //{
-        //    ois.defaultReadObject();
-        //    this.isLengthActual = false;
-        //    this.actualArrayLength = bits.length;
-        //    this.needClear = this.getActualArrayLength() != 0;
-        //}
+#if FEATURE_SERIALIZABLE
+        [System.Runtime.Serialization.OnDeserialized]
+        internal void OnDeserializedMethod(System.Runtime.Serialization.StreamingContext context)
+        {
+            this.isLengthActual = false;
+            this.actualArrayLength = bits.Length;
+            this.needClear = this.ActualArrayLength != 0;
+        }
+#endif
     }
 }

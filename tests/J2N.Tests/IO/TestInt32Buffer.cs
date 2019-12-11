@@ -32,7 +32,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestArray()
+        public virtual void TestArray()
         {
             int[] array = buf.Array;
             assertContentEquals(buf, array, buf.ArrayOffset, buf.Capacity);
@@ -51,7 +51,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestArrayOffset()
+        public virtual void TestArrayOffset()
         {
             int[] array = buf.Array;
             assertContentEquals(buf, array, buf.ArrayOffset, buf.Capacity);
@@ -70,7 +70,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAsReadOnlyBuffer()
+        public virtual void TestAsReadOnlyBuffer()
         {
             buf.Clear();
             buf.Mark();
@@ -96,7 +96,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestCompact()
+        public virtual void TestCompact()
         {
             // case: buffer is full
             buf.Clear();
@@ -158,7 +158,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestCompareTo()
+        public virtual void TestCompareTo()
         {
             // compare to self
             assertEquals(0, buf.CompareTo(buf));
@@ -183,7 +183,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestDuplicate()
+        public virtual void TestDuplicate()
         {
             buf.Clear();
             buf.Mark();
@@ -218,7 +218,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestEquals()
+        public virtual void TestEquals()
         {
             // equal to self
             assertTrue(buf.Equals(buf));
@@ -245,7 +245,7 @@ namespace J2N.IO
          * Class under test for int get()
          */
         [Test]
-        public void TestGet()
+        public virtual void TestGet()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -268,7 +268,7 @@ namespace J2N.IO
          * Class under test for java.nio.Int32Buffer get(int[])
          */
         [Test]
-        public void TestGetintArray()
+        public virtual void TestGetintArray()
         {
             int[] array = new int[1];
             buf.Clear();
@@ -303,7 +303,7 @@ namespace J2N.IO
          * Class under test for java.nio.Int32Buffer get(int[], int, int)
          */
         [Test]
-        public void TestGetintArrayintint()
+        public virtual void TestGetintArrayintint()
         {
             buf.Clear();
             int[] array = new int[buf.Capacity];
@@ -396,7 +396,7 @@ namespace J2N.IO
          * Class under test for int get(int)
          */
         [Test]
-        public void TestGetint()
+        public virtual void TestGetint()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -425,13 +425,13 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestHasArray()
+        public virtual void TestHasArray()
         {
             assertNotNull(buf.Array);
         }
 
         [Test]
-        public void TestHashCode()
+        public virtual void TestHashCode()
         {
             buf.Clear();
             Int32Buffer @readonly = buf.AsReadOnlyBuffer();
@@ -444,13 +444,13 @@ namespace J2N.IO
         }
 
         //[Test]
-        //public void TestIsDirect() // J2N: IsDirect not supported
+        //public virtual void TestIsDirect() // J2N: IsDirect not supported
         //{
         //    assertFalse(buf.IsDirect);
         //}
 
         [Test]
-        public void TestOrder()
+        public virtual void TestOrder()
         {
             var _ = buf.Order;
             assertEquals(ByteOrder.NativeOrder, buf.Order);
@@ -460,7 +460,7 @@ namespace J2N.IO
          * Class under test for java.nio.Int32Buffer put(int)
          */
         [Test]
-        public void TestPutint()
+        public virtual void TestPutint()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -485,7 +485,7 @@ namespace J2N.IO
          * Class under test for java.nio.Int32Buffer put(int[])
          */
         [Test]
-        public void TestPutintArray()
+        public virtual void TestPutintArray()
         {
             int[] array = new int[1];
             buf.Clear();
@@ -522,7 +522,7 @@ namespace J2N.IO
          * Class under test for java.nio.Int32Buffer put(int[], int, int)
          */
         [Test]
-        public void TestPutintArrayintint()
+        public virtual void TestPutintArrayintint()
         {
             buf.Clear();
             int[] array = new int[buf.Capacity];
@@ -614,7 +614,7 @@ namespace J2N.IO
          * Class under test for java.nio.Int32Buffer put(java.nio.Int32Buffer)
          */
         [Test]
-        public void TestPutInt32Buffer()
+        public virtual void TestPutInt32Buffer()
         {
             Int32Buffer other = Int32Buffer.Allocate(buf.Capacity);
             try
@@ -660,7 +660,7 @@ namespace J2N.IO
          * Class under test for java.nio.Int32Buffer put(int, int)
          */
         [Test]
-        public void TestPutintint()
+        public virtual void TestPutintint()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -691,7 +691,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestSlice()
+        public virtual void TestSlice()
         {
             assertTrue(buf.Capacity > 5);
             buf.Position=(1);
@@ -725,7 +725,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestToString()
+        public virtual void TestToString()
         {
             String str = buf.ToString();
             assertTrue(str.IndexOf("Int32") >= 0 || str.IndexOf("int") >= 0);
@@ -734,7 +734,7 @@ namespace J2N.IO
             assertTrue(str.IndexOf("" + buf.Capacity) >= 0);
         }
 
-        void loadTestData1(int[] array, int offset, int length)
+        internal void loadTestData1(int[] array, int offset, int length)
         {
             for (int i = 0; i < length; i++)
             {
@@ -742,7 +742,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData2(int[] array, int offset, int length)
+        internal void loadTestData2(int[] array, int offset, int length)
         {
             for (int i = 0; i < length; i++)
             {
@@ -750,7 +750,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData1(Int32Buffer buf)
+        internal void loadTestData1(Int32Buffer buf)
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -759,7 +759,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData2(Int32Buffer buf)
+        internal void loadTestData2(Int32Buffer buf)
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)

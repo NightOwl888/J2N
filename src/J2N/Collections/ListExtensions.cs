@@ -61,6 +61,7 @@ namespace J2N.Collections
         /// <param name="index1">Position of the first element to swap with the element in
         /// <paramref name="index2"/>.</param>
         /// <param name="index2">Position of the other element.</param>
+        /// <exception cref="NotSupportedException">If <paramref name="list"/> is read-only.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index1"/> or <paramref name="index2"/> is greater than <c><paramref name="list"/>.Count</c>.
         /// <para/>
@@ -82,6 +83,8 @@ namespace J2N.Collections
                 throw new ArgumentOutOfRangeException(nameof(index1));
             if (index2 < 0 || index2 > size)
                 throw new ArgumentOutOfRangeException(nameof(index2));
+            if (list.IsReadOnly)
+                throw new NotSupportedException("Collection is read-only.");
 
             T tmp = list[index1];
             list[index1] = list[index2];
@@ -113,9 +116,9 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        private class UnmodifiableList<T> : IList<T>, IEquatable<IList<T>>
+        internal class UnmodifiableList<T> : IList<T>, IEquatable<IList<T>>
         {
-            private readonly IList<T> list;
+            internal readonly IList<T> list; // internal for testing
 
             public UnmodifiableList(IList<T> list)
             {

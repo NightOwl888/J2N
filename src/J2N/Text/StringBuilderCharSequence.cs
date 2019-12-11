@@ -102,7 +102,11 @@ namespace J2N.Text
             if (startIndex + length > Value.Length)
                 throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(Length)}");
 
-            return new StringCharSequence(Value.ToString(startIndex, length));
+            // NOTE: This benchmarked slightly faster than
+            // return new StringCharSequence(Value.ToString(startIndex, length));
+            char[] result = new char[length];
+            Value.CopyTo(startIndex, result, 0, length);
+            return new CharArrayCharSequence(result);
         }
 
         /// <summary>
@@ -121,69 +125,81 @@ namespace J2N.Text
         #region Operator Overloads
 
         /// <summary>
-        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for reference equality.
+        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for equality.
+        /// Two character sequences are considered equal if they have the same characters
+        /// in the same order.
         /// </summary>
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> represent to the same instance; otherwise, <c>false</c>.</returns>
         public static bool operator ==(StringBuilderCharSequence csq1, StringBuilderCharSequence csq2)
         {
-            return csq1.Value == csq2.Value;
+            return csq1.Equals(csq2);
         }
 
         /// <summary>
-        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for reference inequality.
+        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for inequality.
+        /// Two character sequences are considered equal if they have the same characters
+        /// in the same order.
         /// </summary>
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> do not represent to the same instance; otherwise, <c>false</c>.</returns>
         public static bool operator !=(StringBuilderCharSequence csq1, StringBuilderCharSequence csq2)
         {
-            return csq1.Value != csq2.Value;
+            return !(csq1.Value == csq2.Value);
         }
 
         /// <summary>
-        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for reference equality.
+        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for equality.
+        /// Two character sequences are considered equal if they have the same characters
+        /// in the same order.
         /// </summary>
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> represent to the same instance; otherwise, <c>false</c>.</returns>
         public static bool operator ==(StringBuilderCharSequence csq1, StringBuilder csq2)
         {
-            return csq1.Value == csq2;
+            return csq1.Equals(csq2);
         }
 
         /// <summary>
-        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for reference inequality.
+        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for inequality.
+        /// Two character sequences are considered equal if they have the same characters
+        /// in the same order.
         /// </summary>
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> do not represent to the same instance; otherwise, <c>false</c>.</returns>
         public static bool operator !=(StringBuilderCharSequence csq1, StringBuilder csq2)
         {
-            return csq1.Value != csq2;
+            return !(csq1 == csq2);
         }
 
         /// <summary>
-        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for reference equality.
+        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for equality.
+        /// Two character sequences are considered equal if they have the same characters
+        /// in the same order.
         /// </summary>
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> represent to the same instance; otherwise, <c>false</c>.</returns>
         public static bool operator ==(StringBuilder csq1, StringBuilderCharSequence csq2)
         {
-            return csq1 == csq2.Value;
+            return csq2.Equals(csq1);
         }
 
         /// <summary>
-        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for reference inequality.
+        /// Compares <paramref name="csq1"/> and <paramref name="csq2"/> for inequality.
+        /// Two character sequences are considered equal if they have the same characters
+        /// in the same order.
         /// </summary>
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> do not represent to the same instance; otherwise, <c>false</c>.</returns>
         public static bool operator !=(StringBuilder csq1, StringBuilderCharSequence csq2)
         {
-            return csq1 != csq2.Value;
+            return !(csq1 == csq2);
         }
 
         #endregion
@@ -199,9 +215,17 @@ namespace J2N.Text
         {
             if (this.Value == null)
                 return other == null || !other.HasValue;
+            if (other == null)
+                return false;
 
-            int len = this.Value.Length;
-            if (len != other.Length) return false;
+            int len = other.Length;
+            if (len != this.Value.Length) return false;
+
+            if (other is StringBuilderCharSequence stringBuilderCharSequence)
+                return this.Equals(stringBuilderCharSequence.Value);
+            if (other is StringBuffer stringBuffer)
+                return stringBuffer.Equals(this.Value);
+
             for (int i = 0; i < len; i++)
             {
                 if (!this.Value[i].Equals(other[i])) return false;
@@ -248,6 +272,9 @@ namespace J2N.Text
         {
             if (other == null)
                 return false;
+            if (other == null)
+                return false;
+
             int len = this.Value.Length;
             if (len != other.Length) return false;
             for (int i = 0; i < len; i++)
@@ -278,6 +305,8 @@ namespace J2N.Text
         {
             if (this.Value == null)
                 return other == null;
+            if (other == null)
+                return false;
 
             int len = this.Value.Length;
             if (len != other.Length) return false;

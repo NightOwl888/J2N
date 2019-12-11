@@ -37,7 +37,7 @@ namespace J2N.IO
         // *** Added for .NET ***
 
         [Test]
-        public void TestWrap()
+        public virtual void TestWrap()
         {
             string s = "A test string to test with.";
             char[] ca = s.ToCharArray();
@@ -67,7 +67,7 @@ namespace J2N.IO
 
 
         [Test]
-        public void TestArray()
+        public virtual void TestArray()
         {
             char[] array = buf.Array;
             assertContentEquals(buf, array, buf.ArrayOffset, buf.Capacity);
@@ -86,7 +86,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestArrayOffset()
+        public virtual void TestArrayOffset()
         {
             char[] array = buf.Array;
             assertContentEquals(buf, array, buf.ArrayOffset, buf.Capacity);
@@ -105,7 +105,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAsReadOnlyBuffer()
+        public virtual void TestAsReadOnlyBuffer()
         {
             buf.Clear();
             buf.Mark();
@@ -157,7 +157,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestCompact()
+        public virtual void TestCompact()
         {
             // case: buffer is full
             buf.Clear();
@@ -219,7 +219,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestCompareTo()
+        public virtual void TestCompareTo()
         {
             // compare to self
             assertEquals(0, buf.CompareTo(buf));
@@ -247,7 +247,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestDuplicate()
+        public virtual void TestDuplicate()
         {
             // mark the position 0
             buf.Clear();
@@ -312,7 +312,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestEquals()
+        public virtual void TestEquals()
         {
             // equal to self
             assertTrue(buf.Equals(buf));
@@ -339,7 +339,7 @@ namespace J2N.IO
          * Class under test for char get()
          */
         [Test]
-        public void TestGet()
+        public virtual void TestGet()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -362,7 +362,7 @@ namespace J2N.IO
          * Class under test for java.nio.CharBuffer get(char[])
          */
         [Test]
-        public void TestGetcharArray()
+        public virtual void TestGetcharArray()
         {
             char[] array = new char[1];
             buf.Clear();
@@ -388,7 +388,7 @@ namespace J2N.IO
          * Class under test for java.nio.CharBuffer get(char[], int, int)
          */
         [Test]
-        public void TestGetcharArrayintint()
+        public virtual void TestGetcharArrayintint()
         {
             buf.Clear();
             char[] array = new char[buf.Capacity];
@@ -481,7 +481,7 @@ namespace J2N.IO
          * Class under test for char get(int)
          */
         [Test]
-        public void TestGetint()
+        public virtual void TestGetint()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -510,7 +510,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestHashCode()
+        public virtual void TestHashCode()
         {
             buf.Clear();
             loadTestData1(buf);
@@ -526,7 +526,7 @@ namespace J2N.IO
          * Class under test for java.nio.CharBuffer put(char)
          */
         [Test]
-        public void TestPutchar()
+        public virtual void TestPutchar()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -551,7 +551,7 @@ namespace J2N.IO
          * Class under test for java.nio.CharBuffer put(char[])
          */
         [Test]
-        public void TestPutcharArray()
+        public virtual void TestPutcharArray()
         {
             char[] array = new char[1];
 
@@ -588,7 +588,7 @@ namespace J2N.IO
          * Class under test for java.nio.CharBuffer put(char[], int, int)
          */
         [Test]
-        public void TestPutcharArrayintint()
+        public virtual void TestPutcharArrayintint()
         {
             buf.Clear();
             char[] array = new char[buf.Capacity];
@@ -689,7 +689,7 @@ namespace J2N.IO
          * Class under test for java.nio.CharBuffer put(java.nio.CharBuffer)
          */
         [Test]
-        public void TestPutCharBuffer()
+        public virtual void TestPutCharBuffer()
         {
             CharBuffer other = CharBuffer.Allocate(buf.Capacity);
 
@@ -745,7 +745,7 @@ namespace J2N.IO
          * Class under test for java.nio.CharBuffer put(int, char)
          */
         [Test]
-        public void TestPutintchar()
+        public virtual void TestPutintchar()
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -776,7 +776,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestSlice()
+        public virtual void TestSlice()
         {
             assertTrue(buf.Capacity > 5);
             buf.Position = (1);
@@ -810,7 +810,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestToString()
+        public virtual void TestToString()
         {
             String expected = "";
             for (int i = buf.Position; i < buf.Limit; i++)
@@ -822,7 +822,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestCharAt()
+        public virtual void TestCharAt()
         {
             for (int i = 0; i < buf.Remaining; i++)
             {
@@ -849,13 +849,13 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestLength()
+        public virtual void TestLength()
         {
             assertEquals(buf.Length, buf.Remaining);
         }
 
         [Test]
-        public void TestSubSequence()
+        public virtual void TestSubSequence()
         {
             try
             {
@@ -906,7 +906,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestPutString()
+        public virtual void TestPutString()
         {
             String str = " ";
 
@@ -940,7 +940,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestPutStringintint()
+        public virtual void TestPutStringintint()
         {
             buf.Clear();
             String str = new string(new char[buf.Capacity]);
@@ -1027,7 +1027,7 @@ namespace J2N.IO
             assertSame(ret, buf);
         }
 
-        void loadTestData1(char[] array, int offset, int length)
+        internal void loadTestData1(char[] array, int offset, int length)
         {
             for (int i = 0; i < length; i++)
             {
@@ -1035,7 +1035,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData2(char[] array, int offset, int length)
+        internal void loadTestData2(char[] array, int offset, int length)
         {
             for (int i = 0; i < length; i++)
             {
@@ -1043,7 +1043,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData1(CharBuffer buf)
+        internal void loadTestData1(CharBuffer buf)
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -1052,7 +1052,7 @@ namespace J2N.IO
             }
         }
 
-        void loadTestData2(CharBuffer buf)
+        internal void loadTestData2(CharBuffer buf)
         {
             buf.Clear();
             for (int i = 0; i < buf.Capacity; i++)
@@ -1091,7 +1091,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendSelf()
+        public virtual void TestAppendSelf()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             CharBuffer cb2 = cb.Duplicate();
@@ -1119,7 +1119,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendOverFlow()
+        public virtual void TestAppendOverFlow()
         {
             CharBuffer cb = CharBuffer.Allocate(1);
             ICharSequence cs = "String".ToCharSequence();
@@ -1154,7 +1154,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestReadOnlyMap()
+        public virtual void TestReadOnlyMap()
         {
             CharBuffer cb = CharBuffer.Wrap("ABCDE").AsReadOnlyBuffer();
             ICharSequence cs = "String".ToCharSequence();
@@ -1189,7 +1189,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendCNormal()
+        public virtual void TestAppendCNormal()
         {
             CharBuffer cb = CharBuffer.Allocate(2);
             cb.Put('A');
@@ -1200,7 +1200,7 @@ namespace J2N.IO
         // *** Added for .NET ***
 
         [Test]
-        public void TestAppendCharArrayNormal()
+        public virtual void TestAppendCharArrayNormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1211,7 +1211,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendCharArrayIINormal()
+        public virtual void TestAppendCharArrayIINormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1223,7 +1223,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendCharArrayII_IllegalArgument()
+        public virtual void TestAppendCharArrayII_IllegalArgument()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Append("String".ToCharArray(), 0, 0 - 0); // J2N: end - start
@@ -1276,7 +1276,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendStringBuilderNormal()
+        public virtual void TestAppendStringBuilderNormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1287,7 +1287,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendStringBuilderIINormal()
+        public virtual void TestAppendStringBuilderIINormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1299,7 +1299,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendStringBuilderII_IllegalArgument()
+        public virtual void TestAppendStringBuilderII_IllegalArgument()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Append(new StringBuilder("String"), 0, 0 - 0); // J2N: end - start
@@ -1352,7 +1352,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendStringNormal()
+        public virtual void TestAppendStringNormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1363,7 +1363,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendStringIINormal()
+        public virtual void TestAppendStringIINormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1375,7 +1375,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendStringII_IllegalArgument()
+        public virtual void TestAppendStringII_IllegalArgument()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Append("String", 0, 0 - 0); // J2N: end - start
@@ -1431,7 +1431,7 @@ namespace J2N.IO
 
 
         [Test]
-        public void TestAppendCharSequenceNormal()
+        public virtual void TestAppendCharSequenceNormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1442,7 +1442,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendCharSequenceIINormal()
+        public virtual void TestAppendCharSequenceIINormal()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
@@ -1454,7 +1454,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestAppendCharSequenceII_IllegalArgument()
+        public virtual void TestAppendCharSequenceII_IllegalArgument()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Append("String".ToCharSequence(), 0, 0 - 0); // J2N: end - start
@@ -1507,7 +1507,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestReadCharBuffer()
+        public virtual void TestReadCharBuffer()
         {
             CharBuffer source = CharBuffer.Wrap("String");
             CharBuffer target = CharBuffer.Allocate(10);
@@ -1529,7 +1529,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestReadReadOnly()
+        public virtual void TestReadReadOnly()
         {
             CharBuffer source = CharBuffer.Wrap("String");
             CharBuffer target = CharBuffer.Allocate(10).AsReadOnlyBuffer();
@@ -1548,7 +1548,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestReadOverflow()
+        public virtual void TestReadOverflow()
         {
             CharBuffer source = CharBuffer.Wrap("String");
             CharBuffer target = CharBuffer.Allocate(1);
@@ -1558,7 +1558,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestReadSelf()
+        public virtual void TestReadSelf()
         {
             CharBuffer source = CharBuffer.Wrap("abuffer");
             try
@@ -1573,7 +1573,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestRead_scenario1()
+        public virtual void TestRead_scenario1()
         {
             char[]
             charArray = new char[] { 'a', 'b' };
@@ -1592,7 +1592,7 @@ namespace J2N.IO
         }
 
         [Test]
-        public void TestRead_scenario2()
+        public virtual void TestRead_scenario2()
         {
             CharBuffer charBufferA = CharBuffer.Allocate(0);
             CharBuffer allocateBuffer = CharBuffer.Allocate(1);
@@ -1605,19 +1605,19 @@ namespace J2N.IO
         }
 
         //[Test]
-        //public void TestIsDirect() // J2N: IsDirect not supported
+        //public virtual void TestIsDirect() // J2N: IsDirect not supported
         //{
         //    assertFalse(buf.IsDirect);
         //}
 
         [Test]
-        public void TestHasArray()
+        public virtual void TestHasArray()
         {
             assertTrue(buf.HasArray);
         }
 
         [Test]
-        public void TestOrder()
+        public virtual void TestOrder()
         {
             assertEquals(ByteOrder.NativeOrder, buf.Order);
         }

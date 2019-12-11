@@ -246,14 +246,14 @@ namespace J2N.IO
             ck(b, b.GetInt64(), long.MaxValue);
             output.Write(" long");
 
-            ck(b, (long)b.GetSingle(), 1);
-            ck(b, (long)b.GetSingle(), unchecked((long)float.MinValue));
-            ck(b, (long)b.GetSingle(), unchecked((long)float.MaxValue));
+            ck(b, b.GetSingle(), 1);
+            ck(b, b.GetSingle(), float.MinValue);
+            ck(b, b.GetSingle(), float.MaxValue);
             output.Write(" float");
 
-            ck(b, (long)b.GetDouble(), 1);
-            ck(b, (long)b.GetDouble(), unchecked((long)double.MinValue));
-            ck(b, (long)b.GetDouble(), unchecked((long)double.MaxValue));
+            ck(b, b.GetDouble(), 1);
+            ck(b, b.GetDouble(), double.MinValue);
+            ck(b, b.GetDouble(), double.MaxValue);
             output.Write(" double");
 
             output.WriteLine();

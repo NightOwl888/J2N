@@ -1576,6 +1576,32 @@ namespace J2N.Collections
                     .Cardinality);
         }
 
+#if FEATURE_SERIALIZABLE
+        [Test]
+        public void Test_Serialization()
+        {
+            var target = new BitSet();
+            target.Set(5);
+            target.Set(7);
+            target.Set(9);
+
+            var clone = Clone(target);
+
+            assertNotSame(target, clone);
+            assertNotSame(target.bits, clone.bits);
+
+            assertTrue(target.Get(5));
+            assertFalse(target.Get(6));
+            assertTrue(target.Get(7));
+            assertFalse(target.Get(8));
+            assertTrue(target.Get(9));
+
+            assertEquals(target.Count, clone.Count);
+            assertEquals(target.Length, clone.Length);
+            assertEquals(target.Cardinality, clone.Cardinality);
+        }
+#endif
+
         public override void SetUp()
         {
 
@@ -1948,7 +1974,7 @@ namespace J2N.Collections
                     BitSet b2 = new BitSet(256);
 
                     // Set some random bits in first set and remember them
-                    int nextBitToSet = 0;
+                    //int nextBitToSet = 0;
                     for (int x = 0; x < 10; x++)
                         b1.Set(generator.Next(255));
 
@@ -1986,7 +2012,7 @@ namespace J2N.Collections
                     BitSet b2 = new BitSet(256);
 
                     // Set some random bits in first set and remember them
-                    int nextBitToSet = 0;
+                    //int nextBitToSet = 0;
                     for (int x = 0; x < 10; x++)
                         b1.Set(generator.Next(255));
 
@@ -2053,7 +2079,7 @@ namespace J2N.Collections
                     b3.Or(b2);
 
                     // Verify the set bits of b3 from the history
-                    int historyIndex = 0;
+                    //int historyIndex = 0;
                     for (int x = 0; x < 20; x++)
                     {
                         if (!b3.Get(history[x]))
@@ -2086,7 +2112,7 @@ namespace J2N.Collections
                     BitSet b2 = new BitSet(256);
 
                     // Set some random bits in first set and remember them
-                    int nextBitToSet = 0;
+                    //int nextBitToSet = 0;
                     for (int x = 0; x < 10; x++)
                         b1.Set(generator.Next(255));
 

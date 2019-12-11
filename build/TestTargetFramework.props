@@ -12,7 +12,7 @@
     <!-- Allow the build script to pass in the test frameworks to build for.
       This overrides the above TargetFramework setting. 
       TODO: Due to a parsing bug, we cannot pass a string with a ; to dotnet msbuild, so passing true as a workaround -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">netcoreapp2.0;netcoreapp1.0;net451</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">netcoreapp3.0;netcoreapp2.2;netcoreapp2.0;netcoreapp1.0;net451</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>
   
