@@ -4,51 +4,51 @@ using System.Threading;
 namespace J2N.Threading.Atomic
 {
     /// <summary>
-    /// An <see cref="int"/> value that may be updated atomically. An
-    /// <see cref="AtomicInt32"/> is used in applications such as atomically
-    /// incremented counters, and cannot be used as a replacement for an
-    /// <see cref="int"/>. However, this class does
+    /// A <see cref="long"/> value that may be updated atomically.
+    /// An <see cref="AtomicInt64"/> is used in applications such as atomically
+    /// incremented sequence numbers, and cannot be used as a replacement
+    /// for a <see cref="System.Int64"/>. However, this class does
     /// implement implicit conversion to <see cref="long"/>, so it can
     /// be utilized with language features, tools and utilities that deal
     /// with numerical operations.
     /// <para/>
-    /// NOTE: This was AtomicInteger in the JDK
+    /// NOTE: This was AtomicLong in the JDK
     /// </summary>
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class AtomicInt32 : IEquatable<AtomicInt32>, IEquatable<int>, IFormattable, IConvertible
+    public class AtomicInt64 : IEquatable<AtomicInt64>, IEquatable<long>, IFormattable, IConvertible
     {
-        private int _value;
+        private long value;
 
         /// <summary>
-        /// Creates a new <see cref="AtomicInt32"/> with the default inital value, <c>0</c>.
+        /// Creates a new <see cref="AtomicInt64"/> with the default inital value, <c>0</c>.
         /// </summary>
-        public AtomicInt32()
+        public AtomicInt64()
             : this(0)
         { }
 
         /// <summary>
-        /// Creates a new <see cref="AtomicInt32"/> with the given initial <paramref name="value"/>.
+        /// Creates a new <see cref="AtomicInt64"/> with the given initial <paramref name="value"/>.
         /// </summary>
-        /// <param name="value">The initial value.</param>
-        public AtomicInt32(int value)
+        /// <param name="value">The inital value.</param>
+        public AtomicInt64(long value)
         {
-            _value = value;
+            this.value = value;
         }
 
         /// <summary>
         /// Gets or sets the current value. Note that these operations can be done
-        /// implicitly by setting the <see cref="AtomicInt32"/> to an <see cref="int"/>.
+        /// implicitly by setting the <see cref="AtomicInt64"/> to a <see cref="long"/>.
         /// <code>
-        /// AtomicInt32 aint = new AtomicInt32(4);
-        /// int x = aint;
+        /// AtomicInt64 along = new AtomicInt64(4);
+        /// long x = along;
         /// </code>
         /// </summary>
-        public int Value // Port Note: This is a replacement for Get() and Set()
+        public long Value // Port Note: This is a replacement for Get() and Set()
         {
-            get => this._value;  // read operations atomic in 64 bit
-            set => Interlocked.Exchange(ref this._value, value);
+            get => this.value; // read operations atomic in 64 bit
+            set => Interlocked.Exchange(ref this.value, value);
         }
 
         /// <summary>
@@ -56,9 +56,9 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="newValue">The new value.</param>
         /// <returns>The previous value.</returns>
-        public int GetAndSet(int newValue)
+        public long GetAndSet(int newValue)
         {
-            return Interlocked.Exchange(ref _value, newValue);
+            return Interlocked.Exchange(ref value, newValue);
         }
 
         /// <summary>
@@ -69,9 +69,9 @@ namespace J2N.Threading.Atomic
         /// <param name="update">The new value that will be set if the current value equals the expected value.</param>
         /// <returns><c>true</c> if successful. A <c>false</c> return value indicates that the actual value
         /// was not equal to the expected value.</returns>
-        public bool CompareAndSet(int expect, int update)
+        public bool CompareAndSet(long expect, long update)
         {
-            int rc = Interlocked.CompareExchange(ref _value, update, expect);
+            long rc = Interlocked.CompareExchange(ref value, update, expect);
             return rc == expect;
         }
 
@@ -79,18 +79,18 @@ namespace J2N.Threading.Atomic
         /// Atomically increments by one the current value.
         /// </summary>
         /// <returns>The previous value, before the increment.</returns>
-        public int GetAndIncrement()
+        public long GetAndIncrement()
         {
-            return Interlocked.Increment(ref _value) - 1;
+            return Interlocked.Increment(ref value) - 1;
         }
 
         /// <summary>
         /// Atomically decrements by one the current value.
         /// </summary>
         /// <returns>The previous value, before the decrement.</returns>
-        public int GetAndDecrement()
+        public long GetAndDecrement()
         {
-            return Interlocked.Decrement(ref _value) + 1;
+            return Interlocked.Decrement(ref value) + 1;
         }
 
         /// <summary>
@@ -98,27 +98,27 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="value">The value to add.</param>
         /// <returns>The previous value, before the addition.</returns>
-        public int GetAndAdd(int value)
+        public long GetAndAdd(long value)
         {
-            return Interlocked.Add(ref this._value, value) - value;
+            return Interlocked.Add(ref this.value, value) - value;
         }
 
         /// <summary>
         /// Atomically increments by one the current value.
         /// </summary>
         /// <returns>The updated value.</returns>
-        public int IncrementAndGet()
+        public long IncrementAndGet()
         {
-            return Interlocked.Increment(ref _value);
+            return Interlocked.Increment(ref value);
         }
 
         /// <summary>
         /// Atomically decrements by one the current value.
         /// </summary>
         /// <returns>The updated value.</returns>
-        public int DecrementAndGet()
+        public long DecrementAndGet()
         {
-            return Interlocked.Decrement(ref _value);
+            return Interlocked.Decrement(ref value);
         }
 
         /// <summary>
@@ -126,43 +126,43 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="value">The value to add.</param>
         /// <returns>The updated value.</returns>
-        public int AddAndGet(int value)
+        public long AddAndGet(long value)
         {
-            return Interlocked.Add(ref this._value, value);
+            return Interlocked.Add(ref this.value, value);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="AtomicInt32"/> is equal to the current <see cref="AtomicInt32"/>.
+        /// Determines whether the specified <see cref="AtomicInt64"/> is equal to the current <see cref="AtomicInt64"/>.
         /// </summary>
-        /// <param name="other">The <see cref="AtomicInt32"/> to compare with the current <see cref="AtomicInt32"/>.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt32"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(AtomicInt32 other)
+        /// <param name="other">The <see cref="AtomicInt64"/> to compare with the current <see cref="AtomicInt64"/>.</param>
+        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt64"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(AtomicInt64 other)
         {
             return Value == other.Value;
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="int"/> is equal to the current <see cref="AtomicInt32"/>.
+        /// Determines whether the specified <see cref="long"/> is equal to the current <see cref="AtomicInt64"/>.
         /// </summary>
-        /// <param name="other">The <see cref="int"/> to compare with the current <see cref="AtomicInt32"/>.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt32"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(int other)
+        /// <param name="other">The <see cref="long"/> to compare with the current <see cref="AtomicInt64"/>.</param>
+        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt64"/>; otherwise, <c>false</c>.</returns>
+        public bool Equals(long other)
         {
             return Value == other;
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="AtomicInt32"/>.
+        /// Determines whether the specified <see cref="object"/> is equal to the current <see cref="AtomicInt64"/>.
         /// <para/>
-        /// If <paramref name="other"/> is a <see cref="AtomicInt32"/>, the comparison is not done atomically.
+        /// If <paramref name="other"/> is a <see cref="AtomicInt64"/>, the comparison is not done atomically.
         /// </summary>
-        /// <param name="other">The <see cref="object"/> to compare with the current <see cref="AtomicInt32"/>.</param>
-        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt32"/>; otherwise, <c>false</c>.</returns>
+        /// <param name="other">The <see cref="object"/> to compare with the current <see cref="AtomicInt64"/>.</param>
+        /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt64"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object other)
         {
-            if (other is AtomicInt32 ai)
+            if (other is AtomicInt64 ai)
                 return Equals(ai);
-            if (other is int i)
+            if (other is long i)
                 return Equals(i);
             return false;
         }
@@ -194,7 +194,7 @@ namespace J2N.Threading.Atomic
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <returns>The string representation of the value of this instance as specified
         /// by <paramref name="format"/>.</returns>
-        public string ToString(string format)
+        public virtual string ToString(string format)
         {
             return Value.ToString(format);
         }
@@ -205,7 +205,7 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by <paramref name="provider"/>.</returns>
-        public string ToString(IFormatProvider provider)
+        public virtual string ToString(IFormatProvider provider)
         {
             return Value.ToString(provider);
         }
@@ -218,7 +218,7 @@ namespace J2N.Threading.Atomic
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by
         /// <paramref name="format"/> and <paramref name="provider"/>.</returns>
-        public string ToString(string format, IFormatProvider provider)
+        public virtual string ToString(string format, IFormatProvider provider)
         {
             return Value.ToString(format, provider);
         }
@@ -245,9 +245,9 @@ namespace J2N.Threading.Atomic
 
         short IConvertible.ToInt16(IFormatProvider provider) => Convert.ToInt16(Value);
 
-        int IConvertible.ToInt32(IFormatProvider provider) => Value;
+        int IConvertible.ToInt32(IFormatProvider provider) => Convert.ToInt32(Value);
 
-        long IConvertible.ToInt64(IFormatProvider provider) => Convert.ToInt64(Value);
+        long IConvertible.ToInt64(IFormatProvider provider) => Value;
 
         sbyte IConvertible.ToSByte(IFormatProvider provider) => Convert.ToSByte(Value);
 
@@ -266,12 +266,12 @@ namespace J2N.Threading.Atomic
         #region Operator Overrides
 
         /// <summary>
-        /// Implicitly converts an <see cref="AtomicInt32"/> to an <see cref="int"/>.
+        /// Implicitly converts an <see cref="AtomicInt64"/> to a <see cref="long"/>.
         /// </summary>
-        /// <param name="atomicInt32">The <see cref="AtomicInt32"/> to convert.</param>
-        public static implicit operator int(AtomicInt32 atomicInt32)
+        /// <param name="atomicInt64">The <see cref="AtomicInt64"/> to convert.</param>
+        public static implicit operator long(AtomicInt64 atomicInt64)
         {
-            return atomicInt32.Value;
+            return atomicInt64.Value;
         }
 
         /// <summary>
@@ -280,7 +280,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicInt32 a1, AtomicInt32 a2)
+        public static bool operator ==(AtomicInt64 a1, AtomicInt64 a2)
         {
             return a1.Value == a2.Value;
         }
@@ -291,7 +291,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicInt32 a1, AtomicInt32 a2)
+        public static bool operator !=(AtomicInt64 a1, AtomicInt64 a2)
         {
             return !(a1 == a2);
         }
@@ -302,7 +302,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicInt32 a1, int a2)
+        public static bool operator ==(AtomicInt64 a1, long a2)
         {
             return a1.Value == a2;
         }
@@ -313,7 +313,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicInt32 a1, int a2)
+        public static bool operator !=(AtomicInt64 a1, long a2)
         {
             return !(a1 == a2);
         }
@@ -324,7 +324,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(int a1, AtomicInt32 a2)
+        public static bool operator ==(long a1, AtomicInt64 a2)
         {
             return a1 == a2.Value;
         }
@@ -335,7 +335,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(int a1, AtomicInt32 a2)
+        public static bool operator !=(long a1, AtomicInt64 a2)
         {
             return !(a1 == a2);
         }
@@ -346,7 +346,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicInt32 a1, int? a2)
+        public static bool operator ==(AtomicInt64 a1, long? a2)
         {
             return a1.Value == a2.GetValueOrDefault();
         }
@@ -357,7 +357,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicInt32 a1, int? a2)
+        public static bool operator !=(AtomicInt64 a1, long? a2)
         {
             return !(a1 == a2);
         }
@@ -368,7 +368,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(int? a1, AtomicInt32 a2)
+        public static bool operator ==(long? a1, AtomicInt64 a2)
         {
             return a1.GetValueOrDefault() == a2.Value;
         }
@@ -379,7 +379,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(int? a1, AtomicInt32 a2)
+        public static bool operator !=(long? a1, AtomicInt64 a2)
         {
             return !(a1 == a2);
         }
