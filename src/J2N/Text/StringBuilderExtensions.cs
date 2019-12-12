@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace J2N.Text
@@ -442,6 +444,7 @@ namespace J2N.Text
         /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
         /// <returns>The index of the specified character, or <c>-1</c> if the character isn't found.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less than 0 (zero) or greater than the length of this <see cref="StringBuilder"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static int IndexOf(this StringBuilder text, string value, int startIndex, StringComparison comparisonType)
         {
@@ -449,19 +452,32 @@ namespace J2N.Text
                 throw new ArgumentNullException(nameof(text));
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
+            if (startIndex < 0 || startIndex > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
 
+            if (value.Length == 0)
+                return 0;
+
+            switch (comparisonType)
+            {
+                case StringComparison.Ordinal:
+                    return IndexOfOrdinal(text, value, startIndex);
+
+                case StringComparison.OrdinalIgnoreCase:
+                    return IndexOfOrdinalIgnoreCase(text, value, startIndex);
+
+                default:
+                    return text.ToString().IndexOf(value, startIndex, comparisonType);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int IndexOfOrdinal(StringBuilder text, string value, int startIndex)
+        {
             int length = value.Length;
             if (length == 0)
                 return 0;
             int textLength = text.Length;
-
-            // Tradeoff: materializing the string is generally faster,
-            // but also requires additional RAM. So, if the string is going
-            // to take up more than 16KB, we index into the StringBuilder
-            // rather than a string.
-            if (textLength <= 16384 || comparisonType != StringComparison.Ordinal)
-                return text.ToString().IndexOf(value, comparisonType);
-
             int maxSearchLength = (textLength - length) + 1;
             char firstChar = value[0];
             int index;
@@ -477,7 +493,38 @@ namespace J2N.Text
                         return i;
                 }
             }
+            return -1;
+        }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int IndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
+        {
+            int length = value.Length;
+            if (length == 0)
+                return 0;
+            int textLength = text.Length;
+            int maxSearchLength = (textLength - length) + 1;
+            char firstChar = value[0], c1, c2;
+            var textInfo = CultureInfo.InvariantCulture.TextInfo;
+            int index;
+            for (int i = startIndex; i < maxSearchLength; ++i)
+            {
+                if (text[i] == firstChar)
+                {
+                    index = 1;
+                    while ((index < length) &&
+                        ((c1 = text[i + index]) == (c2 = value[index]) ||
+                        textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
+                        // Required for unicode that we test both cases
+                        textInfo.ToLower(c1) == textInfo.ToLower(c2)))
+                    {
+                        ++index;
+                    }
+
+                    if (index == length)
+                        return i;
+                }
+            }
             return -1;
         }
 
@@ -791,6 +838,7 @@ namespace J2N.Text
         /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
         /// <returns>The index of the specified character, <c>-1</c> if the character isn't found.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less than 0 (zero) or greater than the length of this <see cref="StringBuilder"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static int LastIndexOf(this StringBuilder text, string value, int startIndex, StringComparison comparisonType)
         {
@@ -798,26 +846,37 @@ namespace J2N.Text
                 throw new ArgumentNullException(nameof(text));
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
+            if (startIndex < 0 || startIndex > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(startIndex));
 
+            if (value.Length == 0)
+                return text.Length;
+
+            switch (comparisonType)
+            {
+                case StringComparison.Ordinal:
+                    return LastIndexOfOrdinal(text, value, startIndex);
+                case StringComparison.OrdinalIgnoreCase:
+                    return LastIndexOfOrdinalIgnoreCase(text, value, startIndex);
+                default:
+                    return text.ToString().LastIndexOf(value, startIndex, comparisonType);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int LastIndexOfOrdinal(StringBuilder text, string value, int startIndex)
+        {
             int textLength = text.Length;
-
-            // Tradeoff: materializing the string is generally faster,
-            // but also requires additional RAM. So, if the string is going
-            // to take up more than 16KB, we index into the StringBuilder
-            // rather than a string.
-            if (textLength <= 16384 || comparisonType != StringComparison.Ordinal)
-                return text.ToString().LastIndexOf(value, comparisonType);
-
             int subCount = value.Length;
+
             if (subCount <= textLength && startIndex >= 0)
             {
                 if (subCount > 0)
                 {
                     if (startIndex > textLength - subCount)
                     {
-                        startIndex = textLength - subCount; // count and subCount are both
+                        startIndex = textLength - subCount; // count and subCount are both >= 1
                     }
-                    // >= 1
                     // TODO optimize charAt to direct array access
                     char firstChar = value[0];
                     while (true)
@@ -837,8 +896,61 @@ namespace J2N.Text
                             return -1;
                         }
                         int o1 = i, o2 = 0;
-                        while (++o2 < subCount
-                                && text[++o1] == value[o2])
+                        while (++o2 < subCount && text[++o1] == value[o2])
+                        {
+                            // Intentionally empty
+                        }
+                        if (o2 == subCount)
+                        {
+                            return i;
+                        }
+                        startIndex = i - 1;
+                    }
+                }
+                return startIndex < textLength ? startIndex : textLength;
+            }
+            return -1;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int LastIndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
+        {
+            int textLength = text.Length;
+            int subCount = value.Length;
+
+            if (subCount <= textLength && startIndex >= 0)
+            {
+                if (subCount > 0)
+                {
+                    if (startIndex > textLength - subCount)
+                    {
+                        startIndex = textLength - subCount; // count and subCount are both >= 1
+                    }
+                    // TODO optimize charAt to direct array access
+                    char firstChar = value[0], c1, c2;
+                    var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                    while (true)
+                    {
+                        int i = startIndex;
+                        bool found = false;
+                        for (; i >= 0; --i)
+                        {
+                            if (text[i] == firstChar)
+                            {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found)
+                        {
+                            return -1;
+                        }
+                        int o1 = i, o2 = 0;
+                        while (++o2 < subCount && 
+                            ((c1 = text[++o1]) == (c2 = value[o2]) ||
+                            textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
+                            // Required for unicode that we test both cases
+                            textInfo.ToLower(c1) == textInfo.ToLower(c2)))
                         {
                             // Intentionally empty
                         }
