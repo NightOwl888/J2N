@@ -475,6 +475,8 @@ namespace J2N.Text
             {
                 if (x == null || !x.HasValue)
                     return y == null || !y.HasValue;
+                if (y == null)
+                    return false;
 
                 int len = x.Length;
                 if (len != y.Length) return false;
@@ -489,6 +491,8 @@ namespace J2N.Text
             {
                 if (x == null || !x.HasValue)
                     return y == null;
+                if (y == null)
+                    return false;
 
                 int len = x.Length;
                 if (len != y.Length) return false;
@@ -503,6 +507,8 @@ namespace J2N.Text
             {
                 if (x == null || !x.HasValue)
                     return y == null;
+                if (y == null)
+                    return false;
 
                 // NOTE: This benchmarked to be faster than looping through the StringBuilder
                 return EqualsImpl(x, y.ToString());
@@ -516,7 +522,7 @@ namespace J2N.Text
                 return EqualsImpl(x, y);
             }
 
-            public static bool EqualsImpl(ICharSequence x, string y)
+            private static bool EqualsImpl(ICharSequence x, string y)
             {
                 int len = x.Length;
                 if (len != y.Length) return false;
