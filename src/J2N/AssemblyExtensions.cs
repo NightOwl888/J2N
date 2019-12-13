@@ -11,7 +11,7 @@ namespace J2N
     /// </summary>
     public static class AssemblyExtensions
     {
-        private static ConcurrentDictionary<TypeAndResource, string> resourceCache = new ConcurrentDictionary<TypeAndResource, string>();
+        private static readonly ConcurrentDictionary<TypeAndResource, string> resourceCache = new ConcurrentDictionary<TypeAndResource, string>();
 
         /// <summary>
         /// Aggressively searches for a resource and, if found, returns an open <see cref="Stream"/>
@@ -37,7 +37,7 @@ namespace J2N
         /// <param name="type">A type in the same namespace as the resource.</param>
         /// <param name="name">The resource name to locate.</param>
         /// <returns>An open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="assembly"/> or <paramref name="type"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="assembly"/>, <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
         /// <seealso cref="TypeExtensions.FindAndGetManifestResourceStream(Type, string)"/>
         public static Stream FindAndGetManifestResourceStream(this Assembly assembly, Type type, string name)
         {
@@ -45,6 +45,8 @@ namespace J2N
                 throw new ArgumentNullException(nameof(assembly));
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
 
             string resourceName = FindResource(assembly, type, name);
             if (string.IsNullOrEmpty(resourceName))
@@ -78,13 +80,15 @@ namespace J2N
         /// <param name="type">A type in the same namespace as the resource.</param>
         /// <param name="name">The resource name to locate.</param>
         /// <returns>The resource, if found; if not found, returns <c>null</c>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="assembly"/> or <paramref name="type"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="assembly"/>, <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string FindResource(this Assembly assembly, Type type, string name)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
 
             TypeAndResource key = new TypeAndResource(type, name);
             if (!resourceCache.TryGetValue(key, out string resourceName))

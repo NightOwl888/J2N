@@ -27,6 +27,8 @@ namespace J2N
         {
             if (target == null)
                 throw new ArgumentNullException(nameof(target));
+            if (interfaceType == null)
+                return false;
 
             return target.GetTypeInfo().IsGenericType && target.GetGenericTypeDefinition().GetInterfaces().Any(
                 x => x.GetTypeInfo().IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())
@@ -56,11 +58,13 @@ namespace J2N
         /// <param name="type">A type in the same namespace as the resource.</param>
         /// <param name="name">The resource name to locate.</param>
         /// <returns>an open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="type"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static Stream FindAndGetManifestResourceStream(this Type type, string name)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
 
             return AssemblyExtensions.FindAndGetManifestResourceStream(type.GetTypeInfo().Assembly, type, name);
         }
@@ -87,11 +91,13 @@ namespace J2N
         /// <param name="type">A type in the same namespace as the resource.</param>
         /// <param name="name">The resource name to locate.</param>
         /// <returns>The resource, if found; if not found, returns <c>null</c>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="type"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string FindResource(this Type type, string name)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
 
             return AssemblyExtensions.FindResource(type.GetTypeInfo().Assembly, type, name);
         }
