@@ -358,14 +358,14 @@ namespace J2N.Text
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="startIndex"/> is greater than or equal to <see cref="StringBuilder.Length"/>.
+        /// <paramref name="startIndex"/> is greater than <see cref="StringBuilder.Length"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static StringBuilder Delete(this StringBuilder text, int startIndex, int count)
         {
             if (text == null)
                 throw new ArgumentNullException(nameof(text));
-            if (startIndex < 0 || startIndex >= text.Length)
+            if (startIndex < 0 || startIndex > text.Length)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
