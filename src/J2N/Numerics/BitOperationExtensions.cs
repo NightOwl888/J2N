@@ -80,12 +80,13 @@ namespace J2N.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LeadingZeroCount(this int value)
         {
+            if (value == 0)
+                return 32;
+
 #if FEATURE_NUMERICBITOPERATIONS
             return System.Numerics.BitOperations.LeadingZeroCount((uint)value);
 #else
             // Hacker's Delight, Figure 5-6
-            if (value == 0)
-                return 32;
             value |= value >> 1;
             value |= value >> 2;
             value |= value >> 4;
@@ -117,12 +118,13 @@ namespace J2N.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LeadingZeroCount(this long value)
         {
+            if (value == 0)
+                return 64;
+
 #if FEATURE_NUMERICBITOPERATIONS
             return System.Numerics.BitOperations.LeadingZeroCount((ulong)value);
 #else
             // Hacker's Delight, Figure 5-6
-            if (value == 0)
-                return 64;
             value |= value >> 1;
             value |= value >> 2;
             value |= value >> 4;
@@ -144,8 +146,8 @@ namespace J2N.Numerics
         /// one-bits in its two's complement representation, in other words if it is
         /// equal to zero.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns>the number of zero bits following the lowest-order ("rightmost")
+        /// <param name="value">The <see cref="int"/> to examine.</param>
+        /// <returns>The number of zero bits following the lowest-order ("rightmost")
         /// one-bit in the two's complement binary representation of the
         /// specified <paramref name="value"/>, or 32 if the value is equal
         /// to zero.</returns>
