@@ -1,0 +1,53 @@
+﻿using NUnit.Framework;
+using System.Collections.Generic;
+using System.Globalization;
+
+namespace J2N.Text
+{
+    public class TestStringFormatter : TestCase
+    {
+        // Note: Other StringFormatter tests are currently done by proxy through
+        // TestArrays.
+
+        [Test]
+        public void TestFormatCollections()
+        {
+            var set = new HashSet<IDictionary<string, string>>
+            {
+                new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+            };
+            var setExpected = "[{1=one, 2=two, 3=three}, {4=four, 5=five, 6=six}, {7=seven, 8=eight, 9=nine}]";
+
+            Assert.AreEqual(setExpected, string.Format(StringFormatter.InvariantCulture, "{0}", set));
+
+            var map = new Dictionary<string, IDictionary<int, double>>
+            {
+                { "first", new Dictionary<int, double> { { 1, 1.23 }, { 2, 2.23 }, { 3, 3.23 } } },
+                { "second", new Dictionary<int, double> { { 4, 1.24 }, { 5, 2.24 }, { 6, 3.24 } } },
+                { "third", new Dictionary<int, double> { { 7, 1.25 }, { 8, 2.25 }, { 9, 3.25 } } },
+            };
+            var mapExpectedPortuguese = "{first={1=1,23, 2=2,23, 3=3,23}, second={4=1,24, 5=2,24, 6=3,24}, third={7=1,25, 8=2,25, 9=3,25}}";
+            var mapExpectedUSEnglish = "{first={1=1.23, 2=2.23, 3=3.23}, second={4=1.24, 5=2.24, 6=3.24}, third={7=1.25, 8=2.25, 9=3.25}}";
+
+            Assert.AreEqual(mapExpectedPortuguese, string.Format(new StringFormatter(new CultureInfo("pt")), "{0}", map));
+            Assert.AreEqual(mapExpectedUSEnglish, string.Format(new StringFormatter(new CultureInfo("en-US")), "{0}", map));
+
+            var array = new List<Dictionary<string, string>>[]
+            {
+                new List<Dictionary<string, string>> {
+                    new Dictionary<string, string> { { "foo", "bar" }, { "foobar", "barfoo" } }
+                },
+                new List<Dictionary<string, string>> {
+                    new Dictionary<string, string> { { "orange", "yellow" }, { "red", "black" } },
+                    new Dictionary<string, string> { { "rain", "snow" }, { "sleet", "sunshine" } }
+                },
+            };
+            var arrayExpected = "[[{foo=bar, foobar=barfoo}], [{orange=yellow, red=black}, {rain=snow, sleet=sunshine}]]";
+
+            // NOTE: The cast to object here is required in order to force string.Format to call the right overload.
+            Assert.AreEqual(arrayExpected, string.Format(StringFormatter.InvariantCulture, "{0}", (object)array));
+        }
+    }
+}

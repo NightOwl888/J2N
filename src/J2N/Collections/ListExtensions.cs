@@ -1,4 +1,6 @@
-﻿using System;
+﻿using J2N.Collections.Generic;
+using J2N.Text;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -95,6 +97,28 @@ namespace J2N.Collections
         /// Returns a wrapper on the specified list which throws an
         /// <see cref="NotSupportedException"/> whenever an attempt is made to
         /// modify the list.
+        /// <para/>
+        /// Usage Note: By default, the returned collection uses <see cref="StringFormatter.CurrentCulture"/>
+        /// in the <see cref="Object.ToString()"/> method. To exactly match Java, call the
+        /// <see cref="ToUnmodifiableList{T}(IList{T}, IFormatProvider)"/> overload and pass
+        /// <see cref="StringFormatter.InvariantCulture"/>.
+        /// <para/>
+        /// The structural equality method that is used depends on the collection that is passed in:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         If the collection implements <see cref="IStructuralEquatable"/>, it is assumed
+        ///         that all nested types (such as collections) also implement <see cref="IStructuralEquatable"/>,
+        ///         and <see cref="ListEqualityComparer{T}.Default"/> comparison is used.
+        ///     </description></item>
+        ///     <item><description>
+        ///         If the collection does not implement <see cref="IStructuralEquatable"/>, it is assumed
+        ///         that no nested types (such as collections) implement <see cref="IStructuralEquatable"/>,
+        ///         and <see cref="ListEqualityComparer{T}.Aggressive"/> comparison is used.
+        ///     </description></item>
+        /// </list>
+        /// While aggressive structural comparision patches the built-in .NET collections so the will structually
+        /// compare each other, it involves some reflection and dynamic conversion that makes it slower than
+        /// if types implement <see cref="IStructuralEquatable"/>.
         /// </summary>
         /// <typeparam name="T">The element type.</typeparam>
         /// <param name="list">The list to wrap in an unmodifiable list.</param>
@@ -105,10 +129,57 @@ namespace J2N.Collections
         /// <seealso cref="SetExtensions.ToUnmodifiableSet{T}(ISet{T})"/>
         public static IList<T> ToUnmodifiableList<T>(this IList<T> list)
         {
+            return ToUnmodifiableList(list, StringFormatter.CurrentCulture);
+        }
+
+        /// <summary>
+        /// Returns a wrapper on the specified list which throws an
+        /// <see cref="NotSupportedException"/> whenever an attempt is made to
+        /// modify the list.
+        /// <para/>
+        /// Usage Note: To exactly match Java behavior in <see cref="Object.ToString()"/> of the nested collection,
+        /// pass <see cref="StringFormatter.InvariantCulture"/>.
+        /// <para/>
+        /// The structural equality method that is used depends on the collection that is passed in:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         If the collection implements <see cref="IStructuralEquatable"/>, it is assumed
+        ///         that all nested types (such as collections) also implement <see cref="IStructuralEquatable"/>,
+        ///         and <see cref="ListEqualityComparer{T}.Default"/> comparison is used.
+        ///     </description></item>
+        ///     <item><description>
+        ///         If the collection does not implement <see cref="IStructuralEquatable"/>, it is assumed
+        ///         that no nested types (such as collections) implement <see cref="IStructuralEquatable"/>,
+        ///         and <see cref="ListEqualityComparer{T}.Aggressive"/> comparison is used.
+        ///     </description></item>
+        /// </list>
+        /// While aggressive structural comparision patches the built-in .NET collections so the will structually
+        /// compare each other, it involves some reflection and dynamic conversion that makes it slower than
+        /// if types implement <see cref="IStructuralEquatable"/>.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="list">The list to wrap in an unmodifiable list.</param>
+        /// <param name="toStringFormatProvider">An object that provides formatting rules for the default <see cref="object.ToString()"/> method of the collection.</param>
+        /// <returns>An unmodifiable <see cref="IList{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="list"/> or <paramref name="toStringFormatProvider"/> is <c>null</c>.</exception>
+        /// <seealso cref="CollectionExtensions.ToUnmodifiableCollection{T}(ICollection{T}, IFormatProvider)"/>
+        /// <seealso cref="DictionaryExtensions.ToUnmodifiableDictionary{TKey, TValue}(IDictionary{TKey, TValue}, IFormatProvider)"/>
+        /// <seealso cref="SetExtensions.ToUnmodifiableSet{T}(ISet{T}, IFormatProvider)"/>
+        public static IList<T> ToUnmodifiableList<T>(this IList<T> list, IFormatProvider toStringFormatProvider)
+        {
             if (list == null)
                 throw new ArgumentNullException(nameof(list));
+            if (toStringFormatProvider == null)
+                throw new ArgumentNullException(nameof(toStringFormatProvider));
 
-            return new UnmodifiableList<T>(list);
+            // We assume that if the passed in collection is IStructuralEquatable, the end user took care of ensuring that
+            // all nested collections also implement IStructuralEquatable. Otherwise, we assume that none of them are,
+            // and use aggressive comparing.
+            var comparer = list is IStructuralEquatable ?
+                ListEqualityComparer<T>.Default :
+                ListEqualityComparer<T>.Aggressive;
+
+            return new UnmodifiableList<T>(list, comparer, toStringFormatProvider);
         }
 
         #region Nested Type: UnmodifiableList<T>
@@ -116,13 +187,17 @@ namespace J2N.Collections
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class UnmodifiableList<T> : IList<T>, IEquatable<IList<T>>
+        internal class UnmodifiableList<T> : IList<T>, IStructuralEquatable
         {
             internal readonly IList<T> list; // internal for testing
+            private readonly ListEqualityComparer<T> structuralEqualityComparer;
+            private readonly IFormatProvider toStringFormatProvider;
 
-            public UnmodifiableList(IList<T> list)
+            public UnmodifiableList(IList<T> list, ListEqualityComparer<T> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
             {
                 this.list = list ?? throw new ArgumentNullException(nameof(list));
+                this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
+                this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
             }
 
             public T this[int index]
@@ -171,30 +246,39 @@ namespace J2N.Collections
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
 
-            public bool Equals(IList<T> other)
+            public bool Equals(object other, IEqualityComparer comparer)
             {
-                if (other == null)
-                    return false;
+                if (list is IStructuralEquatable se)
+                    return se.Equals(other, comparer);
+                if (other is IList<T> otherList)
+                    return structuralEqualityComparer.Equals(list, otherList);
+                return false;
+            }
 
-                return CollectionUtil.Equals(list, other);
+            public int GetHashCode(IEqualityComparer comparer)
+            {
+                if (list is IStructuralEquatable se)
+                    return se.GetHashCode(comparer);
+                return structuralEqualityComparer.GetHashCode(list);
             }
 
             public override bool Equals(object obj)
             {
-                if (!(obj is IList<T>))
+                if (obj == null)
                     return false;
-
-                return CollectionUtil.Equals(list, obj as IList<T>);
+                if (obj is IList<T> other)
+                    return structuralEqualityComparer.Equals(list, other);
+                return false;
             }
 
             public override int GetHashCode()
             {
-                return CollectionUtil.GetHashCode(list);
+                return structuralEqualityComparer.GetHashCode(list);
             }
 
             public override string ToString()
             {
-                return CollectionUtil.ToString(this);
+                return string.Format(toStringFormatProvider, "{0}", list);
             }
         }
 

@@ -1,8 +1,8 @@
-﻿using J2N.Globalization;
+﻿using J2N.Collections.Generic;
 using J2N.Text;
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Reflection;
 using System.Text;
 
@@ -12,7 +12,7 @@ namespace J2N.Collections
     /// Static methods for assisting with making .NET collections check for equality and print
     /// strings the same way they are done in Java.
     /// </summary>
-    public static class CollectionUtil
+    internal static class CollectionUtil
     {
         /// <summary>
         /// The same implementation of Equals from Java's AbstractList
@@ -27,49 +27,7 @@ namespace J2N.Collections
         /// </summary>
         public static bool Equals<T>(IList<T> listA, IList<T> listB)
         {
-            if (object.ReferenceEquals(listA, listB))
-            {
-                return true;
-            }
-
-            bool isValueType = typeof(T).GetTypeInfo().IsValueType;
-            if (!isValueType)
-            {
-                if (listA == null)
-                {
-                    return listB == null;
-                }
-                else if (listB == null)
-                {
-                    return false;
-                }
-            }
-
-            if (listA.Count != listB.Count)
-            {
-                return false;
-            }
-
-            using (IEnumerator<T> eA = listA.GetEnumerator())
-            {
-                using (IEnumerator<T> eB = listB.GetEnumerator())
-                {
-                    while (eA.MoveNext() && eB.MoveNext())
-                    {
-                        T o1 = eA.Current;
-                        T o2 = eB.Current;
-
-                        if (isValueType ?
-                            !EqualityComparer<T>.Default.Equals(o1, o2) :
-                            (!(o1 == null ? o2 == null : Equals(o1, o2))))
-                        {
-                            return false;
-                        }
-                    }
-
-                    return (!(eA.MoveNext() || eB.MoveNext()));
-                }
-            }
+            return ListEqualityComparer<T>.Aggressive.Equals(listA, listB);
         }
 
         /// <summary>
@@ -85,50 +43,7 @@ namespace J2N.Collections
         /// </summary>
         public static bool Equals<T>(ISet<T> setA, ISet<T> setB)
         {
-            if (object.ReferenceEquals(setA, setB))
-            {
-                return true;
-            }
-
-            bool isValueType = typeof(T).GetTypeInfo().IsValueType;
-            if (!isValueType)
-            {
-                if (setA == null)
-                {
-                    return setB == null;
-                }
-                else if (setB == null)
-                {
-                    return false;
-                }
-            }
-
-            if (setA.Count != setB.Count)
-            {
-                return false;
-            }
-
-            // same operation as containsAll()
-            foreach (T eB in setB)
-            {
-                bool contains = false;
-                foreach (T eA in setA)
-                {
-                    if (isValueType ?
-                        EqualityComparer<T>.Default.Equals(eA, eB) :
-                        Equals(eA, eB))
-                    {
-                        contains = true;
-                        break;
-                    }
-                }
-                if (!contains)
-                {
-                    return false;
-                }
-            }
-
-            return true;
+            return SetEqualityComparer<T>.Aggressive.Equals(setA, setB);
         }
 
         /// <summary>
@@ -144,55 +59,7 @@ namespace J2N.Collections
         /// </summary>
         public static bool Equals<TKey, TValue>(IDictionary<TKey, TValue> dictionaryA, IDictionary<TKey, TValue> dictionaryB)
         {
-            if (object.ReferenceEquals(dictionaryA, dictionaryB))
-            {
-                return true;
-            }
-
-            bool isValueType = typeof(TValue).GetTypeInfo().IsValueType;
-            if (!isValueType)
-            {
-                if (dictionaryA == null)
-                {
-                    return dictionaryB == null;
-                }
-                else if (dictionaryB == null)
-                {
-                    return false;
-                }
-            }
-
-            if (dictionaryA.Count != dictionaryB.Count)
-            {
-                return false;
-            }
-
-            using (var i = dictionaryB.GetEnumerator())
-            {
-                while (i.MoveNext())
-                {
-                    KeyValuePair<TKey, TValue> e = i.Current;
-                    TKey keyB = e.Key;
-                    TValue valueB = e.Value;
-                    if (valueB == null)
-                    {
-                        if (!(dictionaryA.ContainsKey(keyB)))
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        if (!dictionaryA.TryGetValue(keyB, out TValue valueA) || 
-                            (isValueType ? !EqualityComparer<TValue>.Default.Equals(valueA, valueB) : !Equals(valueA, valueB)))
-                        {
-                            return false;
-                        }
-                    }
-                }
-            }
-
-            return true;
+            return DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionaryA, dictionaryB);
         }
 
         /// <summary>
@@ -205,42 +72,54 @@ namespace J2N.Collections
         new public static bool Equals(object objA, object objB)
         {
             if (objA == null)
-            {
                 return objB == null;
-            }
             else if (objB == null)
-            {
                 return false;
-            }
 
             Type tA = objA.GetType();
             Type tB = objB.GetType();
+            if (objA is Array arrayA && arrayA.Rank == 1 && objB is Array arrayB && arrayB.Rank == 1)
+            {
+                Type elementType = tA.GetElementType();
+                if (elementType.GetTypeInfo().IsPrimitive)
+                    return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).Equals(objA, objB);
+
+                var eA = arrayA.GetEnumerator();
+                var eB = arrayB.GetEnumerator();
+                while (eA.MoveNext() && eB.MoveNext())
+                {
+                    // Recursively check each element in the array
+                    if (!Equals(eA.Current, eB.Current))
+                        return false;
+                }
+
+                return (!(eA.MoveNext() || eB.MoveNext()));
+            }
+            else if (objA is IStructuralEquatable seObj)
+                return seObj.Equals(objB, StructuralEqualityComparer.Aggressive);
             if (tA.GetTypeInfo().IsGenericType)
             {
                 bool shouldReturn = false;
 
                 if (tA.ImplementsGenericInterface(typeof(IList<>)))
                 {
-                    if (!(tB.GetTypeInfo().IsGenericType && tB.ImplementsGenericInterface(typeof(IList<>))))
-                    {
+                    if (!tB.ImplementsGenericInterface(typeof(IList<>)))
                         return false; // type mismatch - must be a list
-                    }
+
                     shouldReturn = true;
                 }
                 else if (tA.ImplementsGenericInterface(typeof(ISet<>)))
                 {
-                    if (!(tB.GetTypeInfo().IsGenericType && tB.ImplementsGenericInterface(typeof(ISet<>))))
-                    {
+                    if (!tB.ImplementsGenericInterface(typeof(ISet<>)))
                         return false; // type mismatch - must be a set
-                    }
+
                     shouldReturn = true;
                 }
                 else if (tA.ImplementsGenericInterface(typeof(IDictionary<,>)))
                 {
-                    if (!(tB.GetTypeInfo().IsGenericType && tB.ImplementsGenericInterface(typeof(IDictionary<,>))))
-                    {
+                    if (!tB.ImplementsGenericInterface(typeof(IDictionary<,>)))
                         return false; // type mismatch - must be a dictionary
-                    }
+
                     shouldReturn = true;
                 }
 
@@ -252,7 +131,7 @@ namespace J2N.Collections
                 }
             }
 
-            return objA.Equals(objB);
+            return EqualityComparer<object>.Default.Equals(objA, objB);
         }
 
         /// <summary>
@@ -268,15 +147,7 @@ namespace J2N.Collections
         /// </summary>
         public static int GetHashCode<T>(IList<T> list)
         {
-            int hashCode = 1;
-            bool isValueType = typeof(T).GetTypeInfo().IsValueType;
-            foreach (T e in list)
-            {
-                hashCode = 31 * hashCode +
-                    (isValueType ? EqualityComparer<T>.Default.GetHashCode(e) : (e == null ? 0 : GetHashCode(e)));
-            }
-
-            return hashCode;
+            return ListEqualityComparer<T>.Aggressive.GetHashCode(list);
         }
 
         /// <summary>
@@ -292,24 +163,7 @@ namespace J2N.Collections
         /// </summary>
         public static int GetHashCode<T>(ISet<T> set)
         {
-            int h = 0;
-            bool isValueType = typeof(T).GetTypeInfo().IsValueType;
-            using (var i = set.GetEnumerator())
-            {
-                while (i.MoveNext())
-                {
-                    T obj = i.Current;
-                    if (isValueType)
-                    {
-                        h += EqualityComparer<T>.Default.GetHashCode(obj);
-                    }
-                    else if (obj != null)
-                    {
-                        h += GetHashCode(obj);
-                    }
-                }
-            }
-            return h;
+            return SetEqualityComparer<T>.Aggressive.GetHashCode(set);
         }
 
         /// <summary>
@@ -325,21 +179,7 @@ namespace J2N.Collections
         /// </summary>
         public static int GetHashCode<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
         {
-            int h = 0;
-            bool keyIsValueType = typeof(TKey).GetTypeInfo().IsValueType;
-            bool valueIsValueType = typeof(TValue).GetTypeInfo().IsValueType;
-            using (var i = dictionary.GetEnumerator())
-            {
-                while (i.MoveNext())
-                {
-                    TKey key = i.Current.Key;
-                    TValue value = i.Current.Value;
-                    int keyHash = (keyIsValueType ? EqualityComparer<TKey>.Default.GetHashCode(key) : (key == null ? int.MaxValue : GetHashCode(key)));
-                    int valueHash = (valueIsValueType ? EqualityComparer<TValue>.Default.GetHashCode(value) : (value == null ? int.MaxValue : GetHashCode(value)));
-                    h += keyHash ^ valueHash;
-                }
-            }
-            return h;
+            return DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);
         }
 
         /// <summary>
@@ -358,21 +198,44 @@ namespace J2N.Collections
         public static int GetHashCode(object obj)
         {
             if (obj == null)
-            {
                 return 0; // 0 for null
-            }
 
-            Type t = obj.GetType();
-            if (t.GetTypeInfo().IsGenericType
+            TypeInfo t = obj.GetType().GetTypeInfo();
+            if (obj is Array array && array.Rank == 1)
+            {
+                Type elementType = t.GetElementType();
+                if (elementType.GetTypeInfo().IsPrimitive)
+                    return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).GetHashCode(obj);
+
+                int hashCode = 1, elementHashCode;
+                foreach (var element in array)
+                {
+                    elementHashCode = 0;
+                    if (element != null)
+                    {
+                        // Handle nested arrays.
+                        if (element is IStructuralEquatable eStructuralEquatable)
+                            elementHashCode = eStructuralEquatable.GetHashCode(StructuralEqualityComparer.Aggressive);
+
+                        elementHashCode = EqualityComparer<object>.Default.GetHashCode(element);
+                    }
+
+                    hashCode = 31 * hashCode + elementHashCode;
+                }
+                return hashCode;
+            }
+            else if (obj is IStructuralEquatable seObj)
+                return seObj.GetHashCode(StructuralEqualityComparer.Aggressive);
+            else if (t.IsGenericType
                 && (t.ImplementsGenericInterface(typeof(IList<>))
                 || t.ImplementsGenericInterface(typeof(ISet<>))
                 || t.ImplementsGenericInterface(typeof(IDictionary<,>))))
             {
-                dynamic genericType = Convert.ChangeType(obj, t);
+                dynamic genericType = Convert.ChangeType(obj, obj.GetType());
                 return GetHashCode(genericType);
             }
-
-            return obj.GetHashCode();
+            
+            return EqualityComparer<object>.Default.GetHashCode(obj);
         }
 
         /// <summary>
@@ -381,13 +244,21 @@ namespace J2N.Collections
         /// </summary>
         public static string ToString<T>(ICollection<T> collection)
         {
+            return ToString<T>(collection, StringFormatter.CurrentCulture);
+        }
+
+        /// <summary>
+        /// This is the same implementation of ToString from Java's AbstractCollection
+        /// (the default implementation for all sets and lists), plus the ability
+        /// to specify culture for formatting of nested numbers and dates. Note that
+        /// this overload will change the culture of the current thread.
+        /// </summary>
+        public static string ToString<T>(ICollection<T> collection, IFormatProvider provider)
+        {
             if (collection == null) return "null";
             if (collection.Count == 0)
-            {
                 return "[]";
-            }
 
-            bool isValueType = typeof(T).GetTypeInfo().IsValueType;
             using (var it = collection.GetEnumerator())
             {
                 StringBuilder sb = new StringBuilder();
@@ -396,7 +267,7 @@ namespace J2N.Collections
                 while (true)
                 {
                     T e = it.Current;
-                    sb.Append(object.ReferenceEquals(e, collection) ? "(this Collection)" : (isValueType ? string.Format(new StringFormatter(), "{0}", e) : ToString(e)));
+                    sb.Append(object.ReferenceEquals(e, collection) ? "(this Collection)" : string.Format(provider, "{0}", e));
                     if (!it.MoveNext())
                     {
                         return sb.Append(']').ToString();
@@ -407,33 +278,26 @@ namespace J2N.Collections
         }
 
         /// <summary>
-        /// This is the same implementation of ToString from Java's AbstractCollection
-        /// (the default implementation for all sets and lists), plus the ability
-        /// to specify culture for formatting of nested numbers and dates. Note that
-        /// this overload will change the culture of the current thread.
-        /// </summary>
-        public static string ToString<T>(ICollection<T> collection, CultureInfo culture)
-        {
-            using (var context = new CultureContext(culture))
-            {
-                return ToString(collection);
-            }
-        }
-
-        /// <summary>
         /// This is the same implementation of ToString from Java's AbstractMap
         /// (the default implementation for all dictionaries)
         /// </summary>
         public static string ToString<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
         {
+            return ToString<TKey, TValue>(dictionary, StringFormatter.CurrentCulture);
+        }
+
+        /// <summary>
+        /// This is the same implementation of ToString from Java's AbstractMap
+        /// (the default implementation for all dictionaries), plus the ability
+        /// to specify culture for formatting of nested numbers and dates. Note that
+        /// this overload will change the culture of the current thread.
+        /// </summary>
+        public static string ToString<TKey, TValue>(IDictionary<TKey, TValue> dictionary, IFormatProvider provider)
+        {
             if (dictionary == null) return "null";
             if (dictionary.Count == 0)
-            {
                 return "{}";
-            }
 
-            bool keyIsValueType = typeof(TKey).GetTypeInfo().IsValueType;
-            bool valueIsValueType = typeof(TValue).GetTypeInfo().IsValueType;
             using (var i = dictionary.GetEnumerator())
             {
                 StringBuilder sb = new StringBuilder();
@@ -444,9 +308,9 @@ namespace J2N.Collections
                     KeyValuePair<TKey, TValue> e = i.Current;
                     TKey key = e.Key;
                     TValue value = e.Value;
-                    sb.Append(object.ReferenceEquals(key, dictionary) ? "(this Dictionary)" : (keyIsValueType ? string.Format(new StringFormatter(), "{0}", key) : ToString(key)));
+                    sb.Append(ReferenceEquals(key, dictionary) ? "(this Dictionary)" : string.Format(provider, "{0}", key));
                     sb.Append('=');
-                    sb.Append(object.ReferenceEquals(value, dictionary) ? "(this Dictionary)" : (valueIsValueType ? string.Format(new StringFormatter(), "{0}", value) : ToString(value)));
+                    sb.Append(ReferenceEquals(value, dictionary) ? "(this Dictionary)" : string.Format(provider, "{0}", value));
                     if (!i.MoveNext())
                     {
                         return sb.Append('}').ToString();
@@ -457,36 +321,12 @@ namespace J2N.Collections
         }
 
         /// <summary>
-        /// This is the same implementation of ToString from Java's AbstractMap
-        /// (the default implementation for all dictionaries), plus the ability
-        /// to specify culture for formatting of nested numbers and dates. Note that
-        /// this overload will change the culture of the current thread.
-        /// </summary>
-        public static string ToString<TKey, TValue>(IDictionary<TKey, TValue> dictionary, CultureInfo culture)
-        {
-            using (var context = new CultureContext(culture))
-            {
-                return ToString(dictionary);
-            }
-        }
-
-        /// <summary>
         /// This is a helper method that assists with recursively building
         /// a string of the current collection and all nested collections.
         /// </summary>
         public static string ToString(object obj)
         {
-            if (obj == null) return "null";
-            Type t = obj.GetType();
-            if (t.GetTypeInfo().IsGenericType
-                && (t.ImplementsGenericInterface(typeof(ICollection<>)))
-                || t.ImplementsGenericInterface(typeof(IDictionary<,>)))
-            {
-                dynamic genericType = Convert.ChangeType(obj, t);
-                return ToString(genericType);
-            }
-
-            return obj.ToString();
+            return ToString(obj, StringFormatter.CurrentCulture);
         }
 
         /// <summary>
@@ -495,12 +335,24 @@ namespace J2N.Collections
         /// to specify culture for formatting of nested numbers and dates. Note that
         /// this overload will change the culture of the current thread.
         /// </summary>
-        public static string ToString(object obj, CultureInfo culture)
+        public static string ToString(object obj, IFormatProvider provider)
         {
-            using (var context = new CultureContext(culture))
+            if (obj == null) return "null";
+            Type t = obj.GetType();
+            if (t.GetTypeInfo().IsGenericType
+                && (t.ImplementsGenericInterface(typeof(ICollection<>)))
+                || t.ImplementsGenericInterface(typeof(IDictionary<,>)))
             {
-                return ToString(obj);
+                return ToStringImpl(obj, t, provider);
             }
+
+            return obj.ToString();
+        }
+
+        public static string ToStringImpl(object obj, Type type, IFormatProvider provider)
+        {
+            dynamic genericType = Convert.ChangeType(obj, type);
+            return ToString(genericType, provider);
         }
     }
 }

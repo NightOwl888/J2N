@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using J2N.Text;
+using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -98,6 +99,7 @@ namespace J2N.Collections
             }
 #endif
         }
+
 
         /**
          * @tests java.util.Collections#unmodifiableList(java.util.List)

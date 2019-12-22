@@ -4,7 +4,7 @@ using System.Collections.Generic;
 namespace J2N
 {
     /// <summary>
-    /// Provides a <see cref="Default"/> property that uses natural equality rules similar to those in Java.
+    /// Provides comparers that use natural equality rules similar to those in Java.
     /// </summary>
     /// <typeparam name="T">The type of objects to compare.</typeparam>
     public static class EqualityComparer<T> //: IEqualityComparer<T>, IEqualityComparer //IComparer<T>
@@ -21,9 +21,9 @@ namespace J2N
         ///     </description></item>
         /// </list>
         /// </summary>
-        public static IEqualityComparer<T> Default { get; } = LoadDefaultEqualityComparer();
+        public static IEqualityComparer<T> Default { get; } = LoadDefault();
 
-        private static IEqualityComparer<T> LoadDefaultEqualityComparer()
+        private static IEqualityComparer<T> LoadDefault()
         {
             Type genericClosingType = typeof(T);
 
@@ -32,8 +32,8 @@ namespace J2N
                 return (IEqualityComparer<T>)new DoubleComparer();
             else if (typeof(float).Equals(genericClosingType))
                 return (IEqualityComparer<T>)new SingleComparer();
-            //else if (typeof(string).Equals(genericClosingType))
-            //    return (IEqualityComparer<T>)StringComparer.Ordinal;
+            else if (typeof(string).Equals(genericClosingType))
+                return (IEqualityComparer<T>)StringComparer.Ordinal;
 
             return System.Collections.Generic.EqualityComparer<T>.Default;
         }
@@ -45,8 +45,8 @@ namespace J2N
             /// </summary>
             private int CompareZero(double x, double y)
             {
-                long a = BitConversion.DoubleToRawInt64Bits(x);
-                long b = BitConversion.DoubleToRawInt64Bits(y);
+                long a = BitConversion.DoubleToInt64Bits(x);
+                long b = BitConversion.DoubleToInt64Bits(y);
                 if (a > b)
                     return 1;
                 else if (a < b)
@@ -57,7 +57,10 @@ namespace J2N
 
             public int Compare(double x, double y)
             {
-                if (x != 0 || y != 0)
+                if (double.IsNaN(x) && double.IsNaN(y))
+                    return 0;
+
+                if (x != 0 && y != 0)
                     return x.CompareTo(y);
 
                 return CompareZero(x, y);
@@ -65,7 +68,10 @@ namespace J2N
 
             public override bool Equals(double x, double y)
             {
-                if (x != 0 || y != 0)
+                if (double.IsNaN(x) && double.IsNaN(y))
+                    return true;
+
+                if (x != 0 && y != 0)
                     return x.Equals(y);
 
                 return CompareZero(x, y) == 0;
@@ -73,11 +79,12 @@ namespace J2N
 
             public override int GetHashCode(double obj)
             {
-                if (obj != 0)
+                if (obj != 0 && !double.IsNaN(obj))
                     return obj.GetHashCode();
 
-                // Make positive zero and negative zero have differnt hash codes
-                return BitConversion.DoubleToRawInt64Bits(obj).GetHashCode();
+                // Make positive zero and negative zero have differnt hash codes,
+                // and NaN always have the same hash code
+                return BitConversion.DoubleToInt64Bits(obj).GetHashCode();
             }
         }
 
@@ -88,8 +95,8 @@ namespace J2N
             /// </summary>
             private int CompareZero(float x, float y)
             {
-                long a = BitConversion.SingleToRawInt32Bits(x);
-                long b = BitConversion.SingleToRawInt32Bits(y);
+                long a = BitConversion.SingleToInt32Bits(x);
+                long b = BitConversion.SingleToInt32Bits(y);
                 if (a > b)
                     return 1;
                 else if (a < b)
@@ -100,7 +107,10 @@ namespace J2N
 
             public int Compare(float x, float y)
             {
-                if (x != 0 || y != 0)
+                if (float.IsNaN(x) && float.IsNaN(y))
+                    return 0;
+
+                if (x != 0 && y != 0)
                     return x.CompareTo(y);
 
                 return CompareZero(x, y);
@@ -108,7 +118,10 @@ namespace J2N
 
             public override bool Equals(float x, float y)
             {
-                if (x != 0 || y != 0)
+                if (float.IsNaN(x) && float.IsNaN(y))
+                    return true;
+
+                if (x != 0 && y != 0)
                     return x.Equals(y);
 
                 return CompareZero(x, y) == 0;
@@ -116,11 +129,12 @@ namespace J2N
 
             public override int GetHashCode(float obj)
             {
-                if (obj != 0)
+                if (obj != 0 && !float.IsNaN(obj))
                     return obj.GetHashCode();
 
-                // Make positive zero and negative zero have differnt hash codes
-                return BitConversion.SingleToRawInt32Bits(obj).GetHashCode();
+                // Make positive zero and negative zero have differnt hash codes,
+                // and NaN always have the same hash code
+                return BitConversion.SingleToInt32Bits(obj).GetHashCode();
             }
         }
     }

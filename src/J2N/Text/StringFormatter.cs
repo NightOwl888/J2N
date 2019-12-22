@@ -1,4 +1,6 @@
-﻿using System;
+﻿using J2N.Collections;
+using System;
+using System.Collections.Generic;
 using System.Globalization;
 
 namespace J2N.Text
@@ -13,12 +15,32 @@ namespace J2N.Text
     ///     <item><description><see cref="bool"/> values are lowercased to <c>true</c> and <c>false</c>, rather than the default .NET <c>True</c> and <c>False</c>.</description></item>
     /// </list>
     /// </summary>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
     public class StringFormatter : IFormatProvider, ICustomFormatter
     {
-        private const float FloatNegativeZero = -0.0f;
-        private const double DoubleNegativeZero = -0.0d;
+        /// <summary>
+        /// Gets a <see cref="StringFormatter"/> that uses the culture from the current thread to format values.
+        /// </summary>
+        public static StringFormatter CurrentCulture { get; } = new StringFormatter(CultureInfo.CurrentCulture);
 
-        private readonly CultureInfo culture;
+        /// <summary>
+        /// Gets a <see cref="StringFormatter"/> that uses the UI culture from the current thread to format values.
+        /// </summary>
+        public static StringFormatter CurrentUICulture { get; } = new StringFormatter(CultureInfo.CurrentUICulture);
+
+        /// <summary>
+        /// Gets a <see cref="StringFormatter"/> that uses the invariant culture to format values.
+        /// This is the default setting in Java.
+        /// </summary>
+        public static StringFormatter InvariantCulture { get; } = new StringFormatter(CultureInfo.InvariantCulture);
+
+        private readonly char[] cultureSymbol; // For deserialization
+#if FEATURE_SERIALIZABLE
+        [NonSerialized]
+#endif
+        private CultureInfo culture;
 
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/>.
@@ -30,11 +52,12 @@ namespace J2N.Text
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/> with the specified <paramref name="culture"/>.
         /// </summary>
-        /// <param name="culture">A <see cref="CultureInfo"/> that specifies the rules that will be used for formatting.
+        /// <param name="culture">A <see cref="CultureInfo"/> that specifies the culture-specific rules that will be used for formatting.
         /// If <c>null</c>, the <see cref="CultureInfo.CurrentCulture"/> will be used.</param>
         public StringFormatter(CultureInfo culture)
         {
             this.culture = culture ?? CultureInfo.CurrentCulture;
+            this.cultureSymbol = this.culture.Name.ToCharArray(); // For deserialization
         }
 
         /// <summary>
@@ -57,6 +80,7 @@ namespace J2N.Text
         ///     <item><description><see cref="float"/> and <see cref="double"/> negative zeros are displayed with the same rules as the
         ///         current culture's <see cref="NumberFormatInfo.NumberNegativePattern"/> and <see cref="NumberFormatInfo.NegativeSign"/>.</description></item>
         ///     <item><description><see cref="bool"/> values are lowercased to <c>"true"</c> and <c>"false"</c>, rather than the default .NET "True" and "False".</description></item>
+        ///     <item><description><see cref="ICollection{T}"/> and <see cref="IDictionary{TKey, TValue}"/> types are formatted to include all of their element values.</description></item>
         /// </list>
         /// </summary>
         /// <param name="format">The format. To utilize this formatter, use <c>"{0}"</c> or <c>"{0:J}"</c>, otherwise it will be bypassed.</param>
@@ -68,21 +92,39 @@ namespace J2N.Text
             if (!this.Equals(formatProvider))
                 return null;
 
-            // Set default format specifier             
+            // Set default format specifier
             if (string.IsNullOrEmpty(format))
                 format = "J";
 
             if (!(format == "J" || format == "j"))
                 return null;
 
-            if (arg is double d)
-                return FormatDouble(d, culture.NumberFormat);
+            if (arg is null)
+                return "null";
+            else if (arg is double d)
+                return FormatDouble(d, GetNumberFormatInfo(culture));
             else if (arg is float f)
-                return FormatSingle(f, culture.NumberFormat);
+                return FormatSingle(f, GetNumberFormatInfo(culture));
             else if (arg is bool b)
                 return FormatBoolean(b);
 
+            var argType = arg.GetType();
+            if (argType.IsArray ||
+                argType.ImplementsGenericInterface(typeof(ICollection<>)) ||
+                argType.ImplementsGenericInterface(typeof(IDictionary<,>)))
+            {
+                return CollectionUtil.ToStringImpl(arg, argType, this);
+            }
+
             return null;
+        }
+
+        private NumberFormatInfo GetNumberFormatInfo(IFormatProvider provider)
+        {
+            var formatter = provider.GetFormat(typeof(NumberFormatInfo));
+            if (formatter is NumberFormatInfo nfi)
+                return nfi;
+            throw new FormatException("No number format provider was found");
         }
 
         private static string FormatNegativeZero(NumberFormatInfo numberFormat)
@@ -147,5 +189,14 @@ namespace J2N.Text
         {
             return b ? "true" : "false";
         }
+
+#if FEATURE_SERIALIZABLE
+        [System.Runtime.Serialization.OnDeserialized]
+        internal void OnDeserializedMethod(System.Runtime.Serialization.StreamingContext context)
+        {
+            this.culture = new CultureInfo(new string(this.cultureSymbol));
+        }
+#endif
+
     }
 }
