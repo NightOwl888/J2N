@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -14,6 +15,12 @@ namespace J2N.Collections
 #endif
     public abstract class ArrayEqualityComparer<T> : System.Collections.Generic.EqualityComparer<T>
     {
+        /// <summary>
+        /// Hidden default property that doesn't apply to this class.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public new static IEqualityComparer<T> Default { get; }
+
         /// <summary>
         /// Gets a structural equality comparer for the specified generic array type with comparison rules similar
         /// to the JDK's Arrays class.
