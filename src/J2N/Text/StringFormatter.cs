@@ -65,7 +65,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="formatType">The format type that is requested.</param>
         /// <returns>The requested format provider, or <c>null</c> if it is not applicable.</returns>
-        public object GetFormat(Type formatType)
+        public virtual object GetFormat(Type formatType)
         {
             if (typeof(ICustomFormatter).Equals(formatType))
                 return this;
@@ -87,7 +87,7 @@ namespace J2N.Text
         /// <param name="arg">The object to format.</param>
         /// <param name="formatProvider">The format provider.</param>
         /// <returns>A string representing the formatted value, or <c>null</c> when this formatter is not applicable.</returns>
-        public string Format(string format, object arg, IFormatProvider formatProvider)
+        public virtual string Format(string format, object arg, IFormatProvider formatProvider)
         {
             if (!this.Equals(formatProvider))
                 return null;
