@@ -1859,5 +1859,78 @@ namespace J2N
         {
             return (char)((c << 8) | (c >> 8));
         }
+
+        // J2N NOTE: Harmony didn't implement ToUpper or ToLower, but they
+        // are required by Lucene.Net
+
+        /// <summary>
+        /// Converts the character (Unicode code point) argument to
+        /// lowercase using the current culture.
+        /// </summary>
+        /// <param name="codePoint">The character (Unicode code point) to be converted.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+        public static int ToLower(int codePoint) => ToLower(codePoint, CultureInfo.CurrentCulture);
+
+        /// <summary>
+        /// Converts the character (Unicode code point) argument to
+        /// lowercase using the specified <paramref name="culture"/>.
+        /// </summary>
+        /// <param name="codePoint">The character (Unicode code point) to be converted.</param>
+        /// <param name="culture">An object that specifies culture-specific casing rules.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
+        public static int ToLower(int codePoint, CultureInfo culture)
+        {
+            if (culture == null)
+                throw new ArgumentNullException(nameof(culture));
+            if (!IsValidCodePoint(codePoint))
+                throw new ArgumentException($"{codePoint} is not a valid code point.");
+
+            // Fast path - convert using char if not a surrogate pair
+            if (CharCount(codePoint) == 1)
+                return culture.TextInfo.ToLower((char)codePoint);
+                
+            var str = culture.TextInfo.ToLower(char.ConvertFromUtf32(codePoint));
+            return CodePointAt(str, 0);
+        }
+
+        /// <summary>
+        /// Converts the character (Unicode code point) argument to
+        /// uppercase using the current culture.
+        /// </summary>
+        /// <param name="codePoint">The character (Unicode code point) to be converted.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+        public static int ToUpper(int codePoint) => ToUpper(codePoint, CultureInfo.CurrentCulture);
+
+        /// <summary>
+        /// Converts the character (Unicode code point) argument to
+        /// uppercase using the specified <paramref name="culture"/>.
+        /// </summary>
+        /// <param name="codePoint">The character (Unicode code point) to be converted.</param>
+        /// <param name="culture">An object that specifies culture-specific casing rules.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
+        public static int ToUpper(int codePoint, CultureInfo culture)
+        {
+            if (culture == null)
+                throw new ArgumentNullException(nameof(culture));
+            if (!IsValidCodePoint(codePoint))
+                throw new ArgumentException($"{codePoint} is not a valid code point.");
+
+            // Fast path - convert using char if not a surrogate pair
+            if (CharCount(codePoint) == 1)
+                return culture.TextInfo.ToUpper((char)codePoint);
+
+            var str = culture.TextInfo.ToUpper(char.ConvertFromUtf32(codePoint));
+            return CodePointAt(str, 0);
+        }
     }
 }
