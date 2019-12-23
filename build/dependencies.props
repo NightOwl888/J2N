@@ -2,7 +2,7 @@
   <PropertyGroup Label="NuGet Package Reference Versions">
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
-    <NerdBankGitVersioningPackageReferenceVersion>[2.3.183]</NerdBankGitVersioningPackageReferenceVersion>
+    <NerdBankGitVersioningPackageReferenceVersion>[3.0.28]</NerdBankGitVersioningPackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.12.0</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>
