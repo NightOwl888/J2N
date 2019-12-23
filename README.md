@@ -8,9 +8,11 @@ J2N is a library that helps bridge the gap between .NET and Java.
 * Java-like behaviors
 * .NET-like APIs
 * Be the defacto library to use when porting from Java to .NET
-* Provide high quality components that can be used in a wide range of .NET applications
+* Provide high quality, high performance components that can be used in a wide range of .NET applications
 
-Basically, if you are looking for a "JDK.NET", this is about as close as you can get. While we recommend using purely .NET components where possible, there are some Java features that have no .NET counterpart or the .NET counterpart is lacking behaviors that are not easy to reproduce without reinventing the wheel. Even if you prefer to reinvent the wheel, you may still need a Java-like component to compare your component against in tests.
+Basically, if you are looking for a "JDK.NET", this is about as close as you can get. While we recommend using purely .NET components where possible when porting from Java, there are some Java features that have no .NET counterpart or the .NET counterpart is lacking behaviors that are not easy to reproduce without reinventing the wheel. Even if you prefer to reinvent the wheel by designing your own ".NETified" component, you may still need a Java-like component to compare your component against in tests.
+
+That is why we created J2N.
 
 ### Our Focus
 
@@ -21,9 +23,9 @@ Basically, if you are looking for a "JDK.NET", this is about as close as you can
 5. **Localization:** Bridge the gap between .NET's culture-aware and Java's culture-neutral defaults.
 
 
-### Status: Alpha
+### Status: Beta
 
-Much of what is here has been tested pretty thoroughly already, however, we are adding additional components, polishing the APIs, adding complete API docs, adding tests, fixing bugs, benchmarking performance, and refactoring components to be more .NET-like. As a result, APIs are not currently stable between releases.
+Much of what is here has been tested pretty thoroughly already and the APIs are pretty stable, however, we are still adding additional components and getting it ready for use in production.
 
 ## NuGet
 
