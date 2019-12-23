@@ -13,6 +13,7 @@ namespace J2N
         /// <typeparam name="T">The type array element.</typeparam>
         /// <param name="array">The array to be filled.</param>
         /// <param name="value">The value to be set to all of the elements of the array.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static void Fill<T>(this T[] array, T value)
         {
             if (array == null)
@@ -34,8 +35,15 @@ namespace J2N
         /// <param name="startIndex">The index of the first element (inclusive) to be filled with the specified <paramref name="value"/>.</param>
         /// <param name="length">The number of elements to set to the specified <paramref name="value"/>.</param>
         /// <param name="value">The value to be set to the specified elements of the array.</param>
-        /// 
-        public static void Fill<T>(T[] array, int startIndex, int length, T value)
+        /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> > <paramref name="length"/> indicates a position outside of the bounds of the <paramref name="array"/>.
+        /// </exception>
+        public static void Fill<T>(this T[] array, int startIndex, int length, T value)
         {
             if (array == null)
                 throw new ArgumentNullException(nameof(array));
