@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace J2N
+namespace J2N.Collections.Generic
 {
     /// <summary>
     /// Provides comparers that use natural equality rules similar to those in Java.
@@ -38,7 +38,7 @@ namespace J2N
             return System.Collections.Generic.EqualityComparer<T>.Default;
         }
 
-        private class DoubleComparer : System.Collections.Generic.EqualityComparer<double>, IComparer<double>
+        internal class DoubleComparer : System.Collections.Generic.EqualityComparer<double>, IComparer<double>
         {
             /// <summary>
             /// Accounts for signed zero (.NET does not, but Java does)
@@ -88,7 +88,7 @@ namespace J2N
             }
         }
 
-        private class SingleComparer : System.Collections.Generic.EqualityComparer<float>, IComparer<float>
+        internal class SingleComparer : System.Collections.Generic.EqualityComparer<float>, IComparer<float>
         {
             /// <summary>
             /// Accounts for signed zero (.NET does not, but Java does)
