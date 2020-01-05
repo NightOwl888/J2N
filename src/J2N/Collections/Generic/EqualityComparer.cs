@@ -17,7 +17,11 @@ namespace J2N.Collections.Generic
         ///         two separate numbers, as opposed to the default .NET behavior that considers them equal.
         ///     </description></item>
         ///     <item><description>
-        ///         <see cref="string"/> uses culture-insesitive equality comparison using <see cref="StringComparer.Ordinal"/>.
+        ///         <see cref="double"/> and <see cref="float"/> are compared for NaN (not a number) equality. All NaN values are considered equal,
+        ///         which differs from the default .NET behavior, where NaN is never equal to NaN.
+        ///     </description></item>
+        ///     <item><description>
+        ///         <see cref="string"/> uses culture-insensitive equality comparison using <see cref="StringComparer.Ordinal"/>.
         ///     </description></item>
         /// </list>
         /// </summary>
