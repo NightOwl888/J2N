@@ -77,7 +77,8 @@ namespace J2N.Collections.Generic
         /// the JDK's AbstactSet class. Two sets are considered equal if they contain
         /// the same elements (in any order).
         /// <para/>
-        /// This method is similar in behavior to <see cref="HashSet{T}.SetEquals(IEnumerable{T})"/>.
+        /// This method is similar in behavior to <see cref="System.Collections.Generic.HashSet{T}.SetEquals(IEnumerable{T})"/>,
+        /// with the exception that both collections must implement <see cref="ISet{T}"/> in order to be equal.
         /// </summary>
         /// <param name="setA">The first set to compare.</param>
         /// <param name="setB">The second set to compare.</param>
@@ -143,7 +144,8 @@ namespace J2N.Collections.Generic
         /// the JDK's AbstactSet class. Two sets are considered equal if they contain
         /// the same elements (in any order).
         /// <para/>
-        /// This method is similar in behavior to <see cref="HashSet{T}.SetEquals(IEnumerable{T})"/>.
+        /// This method is similar in behavior to <see cref="System.Collections.Generic.HashSet{T}.SetEquals(IEnumerable{T})"/>,
+        /// with the exception that both collections must implement <see cref="ISet{T}"/> in order to be equal.
         /// </summary>
         /// <param name="a">The first set to compare.</param>
         /// <param name="b">The second set to compare.</param>

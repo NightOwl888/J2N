@@ -220,7 +220,7 @@ namespace J2N.Collections
 
                     for (int i = 0; i < array1.Length; i++)
                     {
-                        if (!J2N.EqualityComparer<T1>.Default.Equals(array1[i], array2[i]))
+                        if (!J2N.Collections.Generic.EqualityComparer<T1>.Default.Equals(array1[i], array2[i]))
                         {
                             return false;
                         }
@@ -244,7 +244,7 @@ namespace J2N.Collections
                     foreach (var element in array)
                     {
                         // the hash code value is determined by the default equality comparer
-                        hashCode = 31 * hashCode + J2N.EqualityComparer<T1>.Default.GetHashCode(element);
+                        hashCode = 31 * hashCode + J2N.Collections.Generic.EqualityComparer<T1>.Default.GetHashCode(element);
                     }
                     return hashCode;
                 }
