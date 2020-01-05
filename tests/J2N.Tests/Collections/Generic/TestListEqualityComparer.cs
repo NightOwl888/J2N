@@ -292,35 +292,35 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestEqualityListDeep_IStructuralEquatable_Aggressive()
         {
-            var deepControl = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Aggressive)
+            var deepControl = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
-            var deepEqual = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Aggressive)
+            var deepEqual = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
             var deepEqualDifferentType = new IDictionary<string, string>[]
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
-            var deepEqualDifferentOrder = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Aggressive)
+            var deepEqualDifferentOrder = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
             };
-            var deepLevel1EqualLevel2Unequal = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Aggressive)
+            var deepLevel1EqualLevel2Unequal = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Aggressive) { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
             };
 
             Assert.AreEqual(ListEqualityComparer<IDictionary<string, string>>.Aggressive.GetHashCode(deepControl), ListEqualityComparer<IDictionary<string, string>>.Aggressive.GetHashCode(deepControl));
@@ -334,35 +334,35 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestEqualityListDeep_IStructuralEquatable_Default()
         {
-            var deepControl = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Default)
+            var deepControl = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
-            var deepEqual = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Default)
+            var deepEqual = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
             var deepEqualDifferentType = new IDictionary<string, string>[]
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
-            var deepEqualDifferentOrder = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Default)
+            var deepEqualDifferentOrder = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
             };
-            var deepLevel1EqualLevel2Unequal = new StructuralEquatableList<IDictionary<string, string>>(ListEqualityComparer<IDictionary<string, string>>.Default)
+            var deepLevel1EqualLevel2Unequal = new StructuralEquatableList<IDictionary<string, string>>
             {
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new StructuralEquatableDictionary<string, string>(DictionaryEqualityComparer<string, string>.Default) { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
+                new StructuralEquatableDictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new StructuralEquatableDictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new StructuralEquatableDictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
             };
 
             Assert.AreEqual(ListEqualityComparer<IDictionary<string, string>>.Default.GetHashCode(deepControl), ListEqualityComparer<IDictionary<string, string>>.Default.GetHashCode(deepControl));
