@@ -556,7 +556,7 @@ namespace J2N.Text
 
 
 
-#if FEATURE_READONLYMEMORY
+#if FEATURE_STRINGBUILDER_GETCHUNKS
         internal StringBuilder.ChunkEnumerator GetChunks() // J2N TODO: API: Make public (need to evaluate whether we need our own implementation of ChunkEnumerator and how to synchronize)
         {
             return builder.GetChunks();
@@ -686,7 +686,7 @@ namespace J2N.Text
 
             lock (syncRoot)
             {
-#if FEATURE_READONLYMEMORY
+#if FEATURE_STRINGBUILDER_GETCHUNKS
                 foreach (ReadOnlyMemory<char> chunk in value.GetChunks())
                     builder.Append(chunk);
 #else
@@ -748,7 +748,7 @@ namespace J2N.Text
 
             lock (syncRoot)
             {
-#if FEATURE_READONLYMEMORY
+#if FEATURE_STRINGBUILDER_GETCHUNKS
                 foreach (ReadOnlyMemory<char> chunk in value.GetChunks())
                     builder.Append(chunk);
 #else
