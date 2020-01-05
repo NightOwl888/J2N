@@ -1431,15 +1431,15 @@ namespace J2N.Text
         }
 #endif
 
-        ///**
-        // * @tests serialization/deserialization compatibility with RI.
-        // */
-        //[Test]
-        //public void TestSerializationCompatibility()
-        //{
+        /////**
+        //// * @tests serialization/deserialization compatibility with RI.
+        //// */
+        ////[Test]
+        ////public void TestSerializationCompatibility()
+        ////{
 
-        //    SerializationTest.verifyGolden(this, new StringBuffer("0123456789"),
-        //                STRING_BUFFER_COMPARATOR);
-        //}
+        ////    SerializationTest.verifyGolden(this, new StringBuffer("0123456789"),
+        ////                STRING_BUFFER_COMPARATOR);
+        ////}
     }
 }

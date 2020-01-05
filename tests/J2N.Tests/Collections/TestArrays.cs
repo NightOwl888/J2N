@@ -173,56 +173,56 @@ namespace J2N.Collections
             assertEquals("[fixture, null, fixture]", Arrays.ToString(new Object[] { "fixture", null, "fixture" }));
         }
 
-        ///**
-        // * @tests java.util.Arrays#deepToString(Object[])
-        // */
-        //public void Test_deepToString_System_Object()
-        //{
-        //    assertEquals("null", Arrays.deepToString((Object[])null));
-        //    assertEquals("[]", Arrays.deepToString(new Object[] { }));
-        //    assertEquals("[fixture]", Arrays.deepToString(new Object[] { "fixture" }));
-        //    assertEquals("[fixture, null]", Arrays.deepToString(new Object[] { "fixture", null }));
-        //    assertEquals("[fixture, null, fixture]", Arrays.deepToString(new Object[] { "fixture", null, "fixture" }));
+        /////**
+        //// * @tests java.util.Arrays#deepToString(Object[])
+        //// */
+        ////public void Test_deepToString_System_Object()
+        ////{
+        ////    assertEquals("null", Arrays.deepToString((Object[])null));
+        ////    assertEquals("[]", Arrays.deepToString(new Object[] { }));
+        ////    assertEquals("[fixture]", Arrays.deepToString(new Object[] { "fixture" }));
+        ////    assertEquals("[fixture, null]", Arrays.deepToString(new Object[] { "fixture", null }));
+        ////    assertEquals("[fixture, null, fixture]", Arrays.deepToString(new Object[] { "fixture", null, "fixture" }));
 
-        //    Object[] fixture = new Object[1];
-        //    fixture[0] = fixture;
-        //    assertEquals("[[...]]", Arrays.deepToString(fixture));
+        ////    Object[] fixture = new Object[1];
+        ////    fixture[0] = fixture;
+        ////    assertEquals("[[...]]", Arrays.deepToString(fixture));
 
-        //    fixture = new Object[2];
-        //    fixture[0] = "fixture";
-        //    fixture[1] = fixture;
-        //    assertEquals("[fixture, [...]]", Arrays.DeepToString(fixture));
+        ////    fixture = new Object[2];
+        ////    fixture[0] = "fixture";
+        ////    fixture[1] = fixture;
+        ////    assertEquals("[fixture, [...]]", Arrays.DeepToString(fixture));
 
-        //    fixture = new Object[10];
-        //    fixture[0] = new bool[] { true, false };
-        //    fixture[1] = new byte[] { 0, 1 };
-        //    fixture[2] = new char[] { 'a', 'b' };
-        //    fixture[3] = new double[] { 0.0D, 1.0D };
-        //    fixture[4] = new float[] { 0.0F, 1.0F };
-        //    fixture[5] = new int[] { 0, 1 };
-        //    fixture[6] = new long[] { 0L, 1L };
-        //    fixture[7] = new short[] { 0, 1 };
-        //    fixture[8] = fixture[0];
-        //    fixture[9] = new Object[9];
-        //    ((Object[])fixture[9])[0] = fixture;
-        //    ((Object[])fixture[9])[1] = fixture[1];
-        //    ((Object[])fixture[9])[2] = fixture[2];
-        //    ((Object[])fixture[9])[3] = fixture[3];
-        //    ((Object[])fixture[9])[4] = fixture[4];
-        //    ((Object[])fixture[9])[5] = fixture[5];
-        //    ((Object[])fixture[9])[6] = fixture[6];
-        //    ((Object[])fixture[9])[7] = fixture[7];
-        //    Object[] innerFixture = new Object[4];
-        //    innerFixture[0] = "innerFixture0";
-        //    innerFixture[1] = innerFixture;
-        //    innerFixture[2] = fixture;
-        //    innerFixture[3] = "innerFixture3";
-        //    ((Object[])fixture[9])[8] = innerFixture;
+        ////    fixture = new Object[10];
+        ////    fixture[0] = new bool[] { true, false };
+        ////    fixture[1] = new byte[] { 0, 1 };
+        ////    fixture[2] = new char[] { 'a', 'b' };
+        ////    fixture[3] = new double[] { 0.0D, 1.0D };
+        ////    fixture[4] = new float[] { 0.0F, 1.0F };
+        ////    fixture[5] = new int[] { 0, 1 };
+        ////    fixture[6] = new long[] { 0L, 1L };
+        ////    fixture[7] = new short[] { 0, 1 };
+        ////    fixture[8] = fixture[0];
+        ////    fixture[9] = new Object[9];
+        ////    ((Object[])fixture[9])[0] = fixture;
+        ////    ((Object[])fixture[9])[1] = fixture[1];
+        ////    ((Object[])fixture[9])[2] = fixture[2];
+        ////    ((Object[])fixture[9])[3] = fixture[3];
+        ////    ((Object[])fixture[9])[4] = fixture[4];
+        ////    ((Object[])fixture[9])[5] = fixture[5];
+        ////    ((Object[])fixture[9])[6] = fixture[6];
+        ////    ((Object[])fixture[9])[7] = fixture[7];
+        ////    Object[] innerFixture = new Object[4];
+        ////    innerFixture[0] = "innerFixture0";
+        ////    innerFixture[1] = innerFixture;
+        ////    innerFixture[2] = fixture;
+        ////    innerFixture[3] = "innerFixture3";
+        ////    ((Object[])fixture[9])[8] = innerFixture;
 
-        //    String expected = "[[true, false], [0, 1], [a, b], [0.0, 1.0], [0.0, 1.0], [0, 1], [0, 1], [0, 1], [true, false], [[...], [0, 1], [a, b], [0.0, 1.0], [0.0, 1.0], [0, 1], [0, 1], [0, 1], [innerFixture0, [...], [...], innerFixture3]]]";
+        ////    String expected = "[[true, false], [0, 1], [a, b], [0.0, 1.0], [0.0, 1.0], [0, 1], [0, 1], [0, 1], [true, false], [[...], [0, 1], [a, b], [0.0, 1.0], [0.0, 1.0], [0, 1], [0, 1], [0, 1], [innerFixture0, [...], [...], innerFixture3]]]";
 
-        //    assertEquals(expected, Arrays.DeepToString(fixture));
-        //}
+        ////    assertEquals(expected, Arrays.DeepToString(fixture));
+        ////}
 
         /**
          * @tests java.util.Arrays#deepEquals(Object[], Object[])      

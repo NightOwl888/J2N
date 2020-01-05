@@ -315,18 +315,18 @@ namespace J2N.Text
                     "more stuff", testBuffer.ToString());
         }
 
-        ///**
-        // * @tests java.lang.StringBuffer#deleteCharAt(int)
-        // */
-        //[Test]
-        //public void Test_deleteCharAtI()
-        //{
-        //    // Test for method java.lang.StringBuffer
-        //    // java.lang.StringBuffer.deleteCharAt(int)
-        //    testBuffer.deleteCharAt(3);
-        //    assertEquals("Deleted incorrect char",
-        //            "Thi is a test buffer", testBuffer.ToString());
-        //}
+        /////**
+        //// * @tests java.lang.StringBuffer#deleteCharAt(int)
+        //// */
+        ////[Test]
+        ////public void Test_deleteCharAtI()
+        ////{
+        ////    // Test for method java.lang.StringBuffer
+        ////    // java.lang.StringBuffer.deleteCharAt(int)
+        ////    testBuffer.deleteCharAt(3);
+        ////    assertEquals("Deleted incorrect char",
+        ////            "Thi is a test buffer", testBuffer.ToString());
+        ////}
 
         /**
          * @tests java.lang.StringBuffer#ensureCapacity(int)
