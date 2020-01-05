@@ -131,7 +131,7 @@ namespace J2N.Collections
                 }
             }
 
-            return EqualityComparer<object>.Default.Equals(objA, objB);
+            return J2N.Collections.Generic.EqualityComparer<object>.Default.Equals(objA, objB);
         }
 
         /// <summary>
@@ -217,7 +217,7 @@ namespace J2N.Collections
                         if (element is IStructuralEquatable eStructuralEquatable)
                             elementHashCode = eStructuralEquatable.GetHashCode(StructuralEqualityComparer.Aggressive);
 
-                        elementHashCode = EqualityComparer<object>.Default.GetHashCode(element);
+                        elementHashCode = J2N.Collections.Generic.EqualityComparer<object>.Default.GetHashCode(element);
                     }
 
                     hashCode = 31 * hashCode + elementHashCode;
@@ -235,17 +235,30 @@ namespace J2N.Collections
                 return GetHashCode(genericType);
             }
             
-            return EqualityComparer<object>.Default.GetHashCode(obj);
+            return J2N.Collections.Generic.EqualityComparer<object>.Default.GetHashCode(obj);
         }
+
+        ///// <summary>
+        ///// This is the same implementation of ToString from Java's AbstractCollection
+        ///// (the default implementation for all sets and lists)
+        ///// </summary>
+        //public static string ToString<T>(ICollection<T> collection)
+        //{
+        //    return ToString<T>(collection, StringFormatter.CurrentCulture);
+        //}
 
         /// <summary>
         /// This is the same implementation of ToString from Java's AbstractCollection
         /// (the default implementation for all sets and lists)
+        /// <para/>
+        /// This overload is intended to be called from within collections to bypass the
+        /// reflection/dynamic conversion of working out whether we are a collection type.
         /// </summary>
-        public static string ToString<T>(ICollection<T> collection)
+        public static string ToString<T>(IFormatProvider provider, string format, ICollection<T> collection)
         {
-            return ToString<T>(collection, StringFormatter.CurrentCulture);
+            return string.Format(provider, format, ToString(collection, provider));
         }
+
 
         /// <summary>
         /// This is the same implementation of ToString from Java's AbstractCollection
@@ -267,7 +280,11 @@ namespace J2N.Collections
                 while (true)
                 {
                     T e = it.Current;
-                    sb.Append(object.ReferenceEquals(e, collection) ? "(this Collection)" : string.Format(provider, "{0}", e));
+                    sb.Append(object.ReferenceEquals(e, collection) ? 
+                        "(this Collection)" : 
+                        (e is IStructuralFormattable formattable ? 
+                            formattable.ToString("{0}", provider) : 
+                            string.Format(provider, "{0}", e)));
                     if (!it.MoveNext())
                     {
                         return sb.Append(']').ToString();
@@ -277,13 +294,25 @@ namespace J2N.Collections
             }
         }
 
+        ///// <summary>
+        ///// This is the same implementation of ToString from Java's AbstractMap
+        ///// (the default implementation for all dictionaries)
+        ///// </summary>
+        //public static string ToString<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
+        //{
+        //    return ToString<TKey, TValue>(dictionary, StringFormatter.CurrentCulture);
+        //}
+
         /// <summary>
         /// This is the same implementation of ToString from Java's AbstractMap
         /// (the default implementation for all dictionaries)
+        /// <para/>
+        /// This overload is intended to be called from within dictionaries to bypass the
+        /// reflection/dynamic conversion of working out whether we are a dictionary type.
         /// </summary>
-        public static string ToString<TKey, TValue>(IDictionary<TKey, TValue> dictionary)
+        public static string ToString<TKey, TValue>(IFormatProvider provider, string format, IDictionary<TKey, TValue> dictionary)
         {
-            return ToString<TKey, TValue>(dictionary, StringFormatter.CurrentCulture);
+            return string.Format(provider, format, ToString(dictionary, provider));
         }
 
         /// <summary>
@@ -308,9 +337,17 @@ namespace J2N.Collections
                     KeyValuePair<TKey, TValue> e = i.Current;
                     TKey key = e.Key;
                     TValue value = e.Value;
-                    sb.Append(ReferenceEquals(key, dictionary) ? "(this Dictionary)" : string.Format(provider, "{0}", key));
+                    sb.Append(ReferenceEquals(key, dictionary) ? 
+                        "(this Dictionary)" : 
+                        (key is IStructuralFormattable formattableKey ?
+                            formattableKey.ToString("{0}", provider) :
+                            string.Format(provider, "{0}", key)));
                     sb.Append('=');
-                    sb.Append(ReferenceEquals(value, dictionary) ? "(this Dictionary)" : string.Format(provider, "{0}", value));
+                    sb.Append(ReferenceEquals(value, dictionary) ?
+                        "(this Dictionary)" :
+                        (value is IStructuralFormattable formattableValue ?
+                            formattableValue.ToString("{0}", provider) :
+                            string.Format(provider, "{0}", value)));
                     if (!i.MoveNext())
                     {
                         return sb.Append('}').ToString();

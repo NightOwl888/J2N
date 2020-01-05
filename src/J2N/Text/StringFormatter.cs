@@ -162,6 +162,8 @@ namespace J2N.Text
                 return FormatSingle(f, GetNumberFormatInfo(Culture));
             else if (arg is bool b)
                 return FormatBoolean(b);
+            else if (arg is IStructuralFormattable sf)
+                return sf.ToString(format, this);
 
             var argType = arg.GetType();
             if (argType.IsArray ||
