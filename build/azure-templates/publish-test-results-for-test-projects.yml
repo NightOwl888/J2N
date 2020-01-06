@@ -53,3 +53,11 @@ steps:
     testResultsFormat: '${{ parameters.testResultsFormat }}'
     testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
     testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Tests.xUnit'
+    osName: '${{ parameters.osName }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
