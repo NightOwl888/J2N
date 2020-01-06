@@ -31,7 +31,7 @@ namespace J2N.Collections
         public void TestEqualsTypeMismatch()
         {
             var list = new List<int> { 1, 2, 3, 4, 5 };
-            var set = new HashSet<int> { 1, 2, 3, 4, 5 };
+            var set = new System.Collections.Generic.HashSet<int> { 1, 2, 3, 4, 5 };
             var dictionary = new Dictionary<int, int> { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } };
             var array = new int[] { 1, 2, 3, 4, 5 };
 
@@ -202,7 +202,7 @@ namespace J2N.Collections
         }
 
 
-        private class MockHashSet<T> : HashSet<T>
+        private class MockHashSet<T> : System.Collections.Generic.HashSet<T>
         {
             public override int GetHashCode()
             {
@@ -218,13 +218,13 @@ namespace J2N.Collections
         [Test]
         public void TestEqualitySet()
         {
-            var control = new HashSet<IDictionary<string, string>>
+            var control = new System.Collections.Generic.HashSet<IDictionary<string, string>>
                     {
                         new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
                         new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
                         new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                     };
-            var equal = new HashSet<IDictionary<string, string>>
+            var equal = new System.Collections.Generic.HashSet<IDictionary<string, string>>
                     {
                         new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
                         new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
@@ -236,13 +236,13 @@ namespace J2N.Collections
                         new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
                         new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                     };
-            var equalDifferentOrder = new HashSet<IDictionary<string, string>>
+            var equalDifferentOrder = new System.Collections.Generic.HashSet<IDictionary<string, string>>
                     {
                         new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                         new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
                         new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
                     };
-            var level1EqualLevel2Unequal = new HashSet<IDictionary<string, string>>
+            var level1EqualLevel2Unequal = new System.Collections.Generic.HashSet<IDictionary<string, string>>
                     {
                         new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
                         new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
@@ -269,7 +269,7 @@ namespace J2N.Collections
         [Test]
         public void TestToString()
         {
-            var set = new HashSet<IDictionary<string, string>>
+            var set = new J2N.Collections.Generic.HashSet<IDictionary<string, string>>
             {
                 new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
                 new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
@@ -278,6 +278,18 @@ namespace J2N.Collections
             var setExpected = "[{1=one, 2=two, 3=three}, {4=four, 5=five, 6=six}, {7=seven, 8=eight, 9=nine}]";
 
             Assert.AreEqual(setExpected, CollectionUtil.ToString(set, StringFormatter.InvariantCulture));
+
+
+            var set2 = new J2N.Collections.Generic.HashSet<ISet<string>>
+            {
+                new J2N.Collections.Generic.HashSet<string> { "1", "2", "3" },
+                new J2N.Collections.Generic.HashSet<string> { "4", "5", "6" },
+                new System.Collections.Generic.HashSet<string> { "7", "8", "9" },
+            };
+            var set2Expected = "[[1, 2, 3], [4, 5, 6], [7, 8, 9]]";
+
+            Assert.AreEqual(set2Expected, CollectionUtil.ToString(set2, StringFormatter.InvariantCulture));
+
 
             var map = new Dictionary<string, IDictionary<int, double>>
             {
