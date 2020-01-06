@@ -1,34 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="$(SolutionDir)/build/TestTargetFramework.props" />
+  <Import Project="$(SolutionDir)/build/TestReferences.Common.targets" />
   
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.2' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-  
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD;FEATURE_SERIALIZABLE;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE;FEATURE_SERIALIZABLE_EXCEPTIONS;FEATURE_SERIALIZABLE_RANDOM;FEATURE_SERIALIZABLE_STRINGS;FEATURE_THREADINTERRUPT;FEATURE_THREADABORT;FEATURE_THREADYIELD;FEATURE_THREADPRIORITY</DefineConstants>
-    <DebugType>full</DebugType>
   </PropertyGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">
@@ -47,7 +23,7 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>

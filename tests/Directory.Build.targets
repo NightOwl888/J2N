@@ -1,5 +1,5 @@
 <Project>
-  <Import Project="$(SolutionDir)/build/TestReferences.Common.targets" />
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
   <PropertyGroup>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
