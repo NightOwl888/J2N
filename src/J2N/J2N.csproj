@@ -5,6 +5,7 @@
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <WarningsAsErrors>NU1605;1591</WarningsAsErrors>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet Package Settings">
