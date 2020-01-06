@@ -31,6 +31,7 @@ namespace J2N.Collections.Tests
         {
             HashSet,
             SortedSet,
+            LinkedHashSet,
             List,
             Queue,
             Lazy,

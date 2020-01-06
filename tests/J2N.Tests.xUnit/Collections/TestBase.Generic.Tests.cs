@@ -105,6 +105,9 @@ namespace J2N.Collections.Tests
                     return CreateQueue(enumerableToMatchTo, count, numberOfMatchingElements, numberOfDuplicateElements);
                 case EnumerableType.Lazy:
                     return CreateLazyEnumerable(enumerableToMatchTo, count, numberOfMatchingElements, numberOfDuplicateElements);
+                case EnumerableType.LinkedHashSet:
+                    Debug.Assert(numberOfDuplicateElements == 0, "Can not create a LinkedHashSet with duplicate elements - numberOfDuplicateElements must be zero");
+                    return CreateLinkedHashSet(enumerableToMatchTo, count, numberOfMatchingElements);
                 default:
                     Debug.Assert(false, "Check that the 'EnumerableType' Enum returns only types that are special-cased in the CreateEnumerable function within the Iset_Generic_Tests class");
                     return null;
@@ -260,6 +263,48 @@ namespace J2N.Collections.Tests
         protected IEnumerable<T> CreateSortedSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
             J2N.Collections.Generic.SortedSet<T> set = new J2N.Collections.Generic.SortedSet<T>(GetIComparer());
+            int seed = 528;
+            List<T> match = null;
+
+            // Add Matching elements
+            if (enumerableToMatchTo != null)
+            {
+                match = enumerableToMatchTo.ToList();
+                for (int i = 0; i < numberOfMatchingElements; i++)
+                    set.Add(match[i]);
+            }
+
+            // Add elements to reach the desired count
+            while (set.Count < count)
+            {
+                T toAdd = CreateT(seed++);
+                while (set.Contains(toAdd) || (match != null && match.Contains(toAdd, GetIEqualityComparer()))) // Don't want any unexpectedly duplicate values
+                    toAdd = CreateT(seed++);
+                set.Add(toAdd);
+            }
+
+            // Validate that the Enumerable fits the guidelines as expected
+            Debug.Assert(set.Count == count);
+            if (match != null)
+            {
+                int actualMatchingCount = 0;
+                foreach (T lookingFor in match)
+                    actualMatchingCount += set.Contains(lookingFor) ? 1 : 0;
+                Assert.Equal(numberOfMatchingElements, actualMatchingCount);
+            }
+
+            return set;
+        }
+
+        /// <summary>
+        /// Helper function to create a LinkedHashSet fulfilling the given specific parameters. The function will
+        /// create an LinkedHashSet using the Comparer constructor and then add values
+        /// to it until it is full. It will begin by adding the desired number of matching,
+        /// followed by random (deterministic) elements until the desired count is reached.
+        /// </summary>
+        protected IEnumerable<T> CreateLinkedHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
+        {
+            J2N.Collections.Generic.LinkedHashSet<T> set = new J2N.Collections.Generic.LinkedHashSet<T>(GetIEqualityComparer());
             int seed = 528;
             List<T> match = null;
 
