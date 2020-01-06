@@ -10,6 +10,7 @@
     <SystemReflectionTypeExtensionsPackageReferenceVersion>4.4.0</SystemReflectionTypeExtensionsPackageReferenceVersion>
     <SystemResourcesResourceManagerPackageReferenceVersion>4.3.0</SystemResourcesResourceManagerPackageReferenceVersion>
     <SystemRuntimePackageReferenceVersion>4.3.0</SystemRuntimePackageReferenceVersion>
+    <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>4.3.0</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
     <SystemThreadingThreadPackageReferenceVersion>4.3.0</SystemThreadingThreadPackageReferenceVersion>
   </PropertyGroup>
