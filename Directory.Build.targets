@@ -24,6 +24,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HASHSET_CAPACITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_HASHSET_CREATESETCOMPARER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HASHSET_ENSURECAPACITY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HASHSET_TRYGETVALUE</DefineConstants>
 

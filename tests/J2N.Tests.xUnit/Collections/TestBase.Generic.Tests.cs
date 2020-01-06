@@ -217,7 +217,7 @@ namespace J2N.Collections.Tests
         /// </summary>
         protected IEnumerable<T> CreateHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
-            HashSet<T> set = new HashSet<T>(GetIEqualityComparer());
+            J2N.Collections.Generic.HashSet<T> set = new J2N.Collections.Generic.HashSet<T>(GetIEqualityComparer());
             int seed = 528;
             List<T> match = null;
 
