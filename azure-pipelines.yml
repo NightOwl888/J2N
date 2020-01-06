@@ -17,7 +17,7 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 
 variables:
 - name: TestTargetFrameworks
-  value: 'netcoreapp3.0;netcoreapp2.2;netcoreapp2.0;netcoreapp1.0;net451'
+  value: 'netcoreapp3.0;netcoreapp2.2;netcoreapp2.0;netcoreapp1.0;net461'
 - name: BinaryArtifactName
   value: 'testbinaries'
 - name: NuGetArtifactName
@@ -176,16 +176,16 @@ stages:
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
 
-  - job: Test_net451
+  - job: Test_net461
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    displayName: 'Test net451 on Windows'
+    displayName: 'Test net461 on Windows'
     pool:
       vmImage: 'windows-2019'
     steps:
     - template: 'build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net451'
+        testTargetFrameworks: 'net461'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
 
