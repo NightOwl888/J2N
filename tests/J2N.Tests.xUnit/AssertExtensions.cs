@@ -17,7 +17,7 @@ namespace J2N
     {
         private static bool IsFullFramework => 
 #if FEATURE_RUNTIMEINFORMATION
-            RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework");
+            RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #else
             true;
 #endif

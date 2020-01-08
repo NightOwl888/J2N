@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections
 {
@@ -12,7 +13,7 @@ namespace J2N.Collections
     {
         // NOTE: For Aggressive mode to work right, all collections it uses (including this one)
         // must be declared public.
-        public class HashMap<TKey, TValue> : Dictionary<TKey, TValue>
+        public class HashMap<TKey, TValue> : System.Collections.Generic.Dictionary<TKey, TValue>
         {
             public override bool Equals(object obj)
             {
@@ -30,9 +31,9 @@ namespace J2N.Collections
         [Test]
         public void TestEqualsTypeMismatch()
         {
-            var list = new List<int> { 1, 2, 3, 4, 5 };
-            var set = new System.Collections.Generic.HashSet<int> { 1, 2, 3, 4, 5 };
-            var dictionary = new Dictionary<int, int> { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } };
+            var list = new SCG.List<int> { 1, 2, 3, 4, 5 };
+            var set = new SCG.HashSet<int> { 1, 2, 3, 4, 5 };
+            var dictionary = new SCG.Dictionary<int, int> { { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 } };
             var array = new int[] { 1, 2, 3, 4, 5 };
 
             Assert.IsFalse(CollectionUtil.Equals(list, set));
@@ -46,41 +47,41 @@ namespace J2N.Collections
         [Test]
         public void TestEqualityDictionary()
         {
-            var control = new Dictionary<string, IDictionary<HashMap<long, double>, string>>
+            var control = new SCG.Dictionary<string, IDictionary<HashMap<long, double>, string>>
                     {
-                        { "a", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
-                        { "z", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
-                        { "r", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
-                        { "t", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
+                        { "a", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
+                        { "z", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
+                        { "r", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
+                        { "t", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
                     };
-            var equal = new Dictionary<string, IDictionary<HashMap<long, double>, string>>
+            var equal = new SCG.Dictionary<string, IDictionary<HashMap<long, double>, string>>
                     {
-                        { "a", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
-                        { "z", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
-                        { "r", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
-                        { "t", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
+                        { "a", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
+                        { "z", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
+                        { "r", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
+                        { "t", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
                     };
             var equalDifferentType = new HashMap<string, IDictionary<HashMap<long, double>, string>>
                     {
-                        { "a", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
-                        { "z", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
-                        { "r", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
-                        { "t", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
+                        { "a", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
+                        { "z", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
+                        { "r", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
+                        { "t", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
                     };
-            var equalDifferentOrder = new Dictionary<string, IDictionary<HashMap<long, double>, string>>
+            var equalDifferentOrder = new SCG.Dictionary<string, IDictionary<HashMap<long, double>, string>>
                     {
-                        { "r", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
-                        { "t", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
-                        { "a", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
-                        { "z", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
+                        { "r", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
+                        { "t", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
+                        { "a", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88 } }, "qwerty" } } },
+                        { "z", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
                     };
 
-            var level1EqualLevel2EqualLevel3Unequal = new Dictionary<string, IDictionary<HashMap<long, double>, string>>
+            var level1EqualLevel2EqualLevel3Unequal = new SCG.Dictionary<string, IDictionary<HashMap<long, double>, string>>
                     {
-                        { "a", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88.1 } }, "qwerty" } } },
-                        { "z", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
-                        { "r", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
-                        { "t", new Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
+                        { "a", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 123, 9.87 }, { 80, 88.1 } }, "qwerty" } } },
+                        { "z", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 456, 9.86 }, { 81, 88 } }, "hexagon" } } },
+                        { "r", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 789, 9.85 }, { 82, 88 } }, "parasite" } } },
+                        { "t", new SCG.Dictionary<HashMap<long, double>, string> { { new HashMap<long, double> { { 101, 9.84 }, { 83, 88 } }, "octopus" } } },
                     };
 
             Assert.AreEqual(CollectionUtil.GetHashCode(control), CollectionUtil.GetHashCode(control));
@@ -102,35 +103,35 @@ namespace J2N.Collections
         [Test]
         public void TestEqualityList()
         {
-            var control = new List<IDictionary<string, string>>
+            var control = new SCG.List<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                     };
-            var equal = new List<IDictionary<string, string>>
+            var equal = new SCG.List<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                     };
             var equalDifferentType = new IDictionary<string, string>[]
             {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
-            var equalDifferentOrder = new List<IDictionary<string, string>>
+            var equalDifferentOrder = new SCG.List<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
                     };
-            var level1EqualLevel2Unequal = new List<IDictionary<string, string>>
+            var level1EqualLevel2Unequal = new SCG.List<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
                     };
 
             Assert.AreEqual(CollectionUtil.GetHashCode(control), CollectionUtil.GetHashCode(control));
@@ -153,35 +154,35 @@ namespace J2N.Collections
         [Test]
         public void TestEqualityListSimple()
         {
-            var control = new List<IList<string>>
+            var control = new SCG.List<IList<string>>
                     {
-                        new List<string> { "one",  "two",  "three" },
-                        new List<string> { "four",  "five", "six" } ,
-                        new List<string> { "seven", "eight", "nine" },
+                        new SCG.List<string> { "one",  "two",  "three" },
+                        new SCG.List<string> { "four",  "five", "six" } ,
+                        new SCG.List<string> { "seven", "eight", "nine" },
                     };
-            var equal = new List<IList<string>>
+            var equal = new SCG.List<IList<string>>
                     {
-                        new List<string> { "one",  "two",  "three" },
-                        new List<string> { "four",  "five", "six" } ,
-                        new List<string> { "seven", "eight", "nine" },
+                        new SCG.List<string> { "one",  "two",  "three" },
+                        new SCG.List<string> { "four",  "five", "six" } ,
+                        new SCG.List<string> { "seven", "eight", "nine" },
                     };
             var equalDifferentType = new IList<string>[]
             {
-                        new List<string> { "one",  "two",  "three" },
-                        new List<string> { "four",  "five", "six" } ,
-                        new List<string> { "seven", "eight", "nine" },
+                        new SCG.List<string> { "one",  "two",  "three" },
+                        new SCG.List<string> { "four",  "five", "six" } ,
+                        new SCG.List<string> { "seven", "eight", "nine" },
             };
-            var equalDifferentOrder = new List<IList<string>>
+            var equalDifferentOrder = new SCG.List<IList<string>>
                     {
-                        new List<string> { "four",  "five", "six" } ,
-                        new List<string> { "seven", "eight", "nine" },
-                        new List<string> { "one",  "two",  "three" },
+                        new SCG.List<string> { "four",  "five", "six" } ,
+                        new SCG.List<string> { "seven", "eight", "nine" },
+                        new SCG.List<string> { "one",  "two",  "three" },
                     };
-            var level1EqualLevel2Unequal = new List<IList<string>>
+            var level1EqualLevel2Unequal = new SCG.List<IList<string>>
                     {
-                        new List<string> { "one",  "two",  "three" },
-                        new List<string> { "four",  "five", "six" } ,
-                        new List<string> { "seven", "eight", "nine-nine" },
+                        new SCG.List<string> { "one",  "two",  "three" },
+                        new SCG.List<string> { "four",  "five", "six" } ,
+                        new SCG.List<string> { "seven", "eight", "nine-nine" },
                     };
 
             Assert.AreEqual(CollectionUtil.GetHashCode(control), CollectionUtil.GetHashCode(control));
@@ -202,7 +203,7 @@ namespace J2N.Collections
         }
 
 
-        private class MockHashSet<T> : System.Collections.Generic.HashSet<T>
+        private class MockHashSet<T> : SCG.HashSet<T>
         {
             public override int GetHashCode()
             {
@@ -218,35 +219,35 @@ namespace J2N.Collections
         [Test]
         public void TestEqualitySet()
         {
-            var control = new System.Collections.Generic.HashSet<IDictionary<string, string>>
+            var control = new SCG.HashSet<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                     };
-            var equal = new System.Collections.Generic.HashSet<IDictionary<string, string>>
+            var equal = new SCG.HashSet<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                     };
             var equalDifferentType = new MockHashSet<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
                     };
-            var equalDifferentOrder = new System.Collections.Generic.HashSet<IDictionary<string, string>>
+            var equalDifferentOrder = new SCG.HashSet<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
                     };
-            var level1EqualLevel2Unequal = new System.Collections.Generic.HashSet<IDictionary<string, string>>
+            var level1EqualLevel2Unequal = new SCG.HashSet<IDictionary<string, string>>
                     {
-                        new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                        new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                        new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
+                        new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                        new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                        new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine99" } },
                     };
 
             Assert.AreEqual(CollectionUtil.GetHashCode(control), CollectionUtil.GetHashCode(control));
@@ -271,9 +272,9 @@ namespace J2N.Collections
         {
             var set = new J2N.Collections.Generic.HashSet<IDictionary<string, string>>
             {
-                new Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
-                new Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
-                new Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
+                new SCG.Dictionary<string, string> { { "1", "one" }, { "2", "two" }, { "3", "three" } },
+                new SCG.Dictionary<string, string> { { "4", "four" }, { "5", "five" }, { "6", "six" } },
+                new SCG.Dictionary<string, string> { { "7", "seven" }, { "8", "eight" }, { "9", "nine" } },
             };
             var setExpected = "[{1=one, 2=two, 3=three}, {4=four, 5=five, 6=six}, {7=seven, 8=eight, 9=nine}]";
 
@@ -291,11 +292,11 @@ namespace J2N.Collections
             Assert.AreEqual(set2Expected, CollectionUtil.ToString(set2, StringFormatter.InvariantCulture));
 
 
-            var map = new Dictionary<string, IDictionary<int, double>>
+            var map = new SCG.Dictionary<string, IDictionary<int, double>>
             {
-                { "first", new Dictionary<int, double> { { 1, 1.23 }, { 2, 2.23 }, { 3, 3.23 } } },
-                { "second", new Dictionary<int, double> { { 4, 1.24 }, { 5, 2.24 }, { 6, 3.24 } } },
-                { "third", new Dictionary<int, double> { { 7, 1.25 }, { 8, 2.25 }, { 9, 3.25 } } },
+                { "first", new SCG.Dictionary<int, double> { { 1, 1.23 }, { 2, 2.23 }, { 3, 3.23 } } },
+                { "second", new SCG.Dictionary<int, double> { { 4, 1.24 }, { 5, 2.24 }, { 6, 3.24 } } },
+                { "third", new SCG.Dictionary<int, double> { { 7, 1.25 }, { 8, 2.25 }, { 9, 3.25 } } },
             };
             var mapExpectedPortuguese = "{first={1=1,23, 2=2,23, 3=3,23}, second={4=1,24, 5=2,24, 6=3,24}, third={7=1,25, 8=2,25, 9=3,25}}";
             var mapExpectedUSEnglish = "{first={1=1.23, 2=2.23, 3=3.23}, second={4=1.24, 5=2.24, 6=3.24}, third={7=1.25, 8=2.25, 9=3.25}}";
@@ -303,14 +304,14 @@ namespace J2N.Collections
             Assert.AreEqual(mapExpectedPortuguese, CollectionUtil.ToString(map, new StringFormatter(new CultureInfo("pt"))));
             Assert.AreEqual(mapExpectedUSEnglish, CollectionUtil.ToString(map, new StringFormatter(new CultureInfo("en-US"))));
 
-            var array = new List<Dictionary<string, string>>[]
+            var array = new SCG.List<SCG.Dictionary<string, string>>[]
             {
-                new List<Dictionary<string, string>> {
-                    new Dictionary<string, string> { { "foo", "bar" }, { "foobar", "barfoo" } }
+                new SCG.List<SCG.Dictionary<string, string>> {
+                    new SCG.Dictionary<string, string> { { "foo", "bar" }, { "foobar", "barfoo" } }
                 },
-                new List<Dictionary<string, string>> {
-                    new Dictionary<string, string> { { "orange", "yellow" }, { "red", "black" } },
-                    new Dictionary<string, string> { { "rain", "snow" }, { "sleet", "sunshine" } }
+                new SCG.List<SCG.Dictionary<string, string>> {
+                    new SCG.Dictionary<string, string> { { "orange", "yellow" }, { "red", "black" } },
+                    new SCG.Dictionary<string, string> { { "rain", "snow" }, { "sleet", "sunshine" } }
                 },
             };
             var arrayExpected = "[[{foo=bar, foobar=barfoo}], [{orange=yellow, red=black}, {rain=snow, sleet=sunshine}]]";

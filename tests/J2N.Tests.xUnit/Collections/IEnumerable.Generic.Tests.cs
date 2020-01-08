@@ -385,6 +385,8 @@ namespace J2N.Collections.Tests
             });
         }
 
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_MoveNext_ModifiedBeforeEnumeration_Succeeds(int count)
@@ -404,6 +406,8 @@ namespace J2N.Collections.Tests
                 }
             });
         }
+
+#endif
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -431,6 +435,8 @@ namespace J2N.Collections.Tests
             });
         }
 
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_MoveNext_ModifiedDuringEnumeration_Succeeds(int count)
@@ -449,6 +455,8 @@ namespace J2N.Collections.Tests
                 }
             });
         }
+
+#endif
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -475,6 +483,8 @@ namespace J2N.Collections.Tests
             });
         }
 
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_MoveNext_ModifiedAfterEnumeration_Succeeds(int count)
@@ -493,6 +503,8 @@ namespace J2N.Collections.Tests
                 }
             });
         }
+
+#endif
 
         [Fact]
         public void IEnumerable_Generic_Enumerator_MoveNextHitsAllItems()
@@ -696,6 +708,8 @@ namespace J2N.Collections.Tests
             });
         }
 
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_Reset_ModifiedBeforeEnumeration_Succeeds(int count)
@@ -712,6 +726,8 @@ namespace J2N.Collections.Tests
                 }
             });
         }
+
+#endif
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -739,6 +755,8 @@ namespace J2N.Collections.Tests
             });
         }
 
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_Reset_ModifiedDuringEnumeration_Succeeds(int count)
@@ -757,6 +775,8 @@ namespace J2N.Collections.Tests
                 }
             });
         }
+
+#endif
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -783,6 +803,8 @@ namespace J2N.Collections.Tests
             });
         }
 
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void IEnumerable_Generic_Enumerator_Reset_ModifiedAfterEnumeration_Succeeds(int count)
@@ -801,6 +823,8 @@ namespace J2N.Collections.Tests
                 }
             });
         }
+
+#endif
 
         [Fact]
         public void IEnumerable_Generic_Enumerator_Reset()

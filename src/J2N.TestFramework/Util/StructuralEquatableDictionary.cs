@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace J2N.Util
 {
-    public class StructuralEquatableDictionary<TKey, TValue> : Dictionary<TKey, TValue>, IStructuralEquatable
+    public class StructuralEquatableDictionary<TKey, TValue> : System.Collections.Generic.Dictionary<TKey, TValue>, IStructuralEquatable
     {
 
         public bool Equals(object other, IEqualityComparer comparer)

@@ -21,6 +21,8 @@
     <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
     
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_ENSURECAPACITY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_REMOVE_OUTVALUE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HASHSET_CAPACITY</DefineConstants>
