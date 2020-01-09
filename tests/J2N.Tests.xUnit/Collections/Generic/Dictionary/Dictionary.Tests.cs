@@ -2,9 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using J2N.Collections.Generic;
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using SCG = System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -19,9 +20,16 @@ namespace J2N.Collections.Tests
             return new Dictionary<string, string>();
         }
 
+        // This is only valid for .NET Standard 2.1+
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         protected override ModifyOperation ModifyEnumeratorThrows => PlatformDetection.IsFullFramework ? base.ModifyEnumeratorThrows : ModifyOperation.Add | ModifyOperation.Insert;
 
         protected override ModifyOperation ModifyEnumeratorAllowed => PlatformDetection.IsFullFramework ? base.ModifyEnumeratorAllowed : ModifyOperation.Remove | ModifyOperation.Clear;
+
+#endif
+
+        protected override bool NullAllowed => true;
 
         /// <summary>
         /// Creates an object that is dependent on the seed given. The object may be either
@@ -122,8 +130,6 @@ namespace J2N.Collections.Tests
             }
         }
 
-#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
-
         [Fact]
         public void Clear_OnEmptyCollection_DoesNotInvalidateEnumerator()
         {
@@ -138,8 +144,6 @@ namespace J2N.Collections.Tests
             }
         }
 
-#endif
-
         #endregion
 
         #region ICollection tests
@@ -149,7 +153,7 @@ namespace J2N.Collections.Tests
         public void ICollection_NonGeneric_CopyTo_ArrayOfIncorrectKeyValuePairType(int count)
         {
             ICollection collection = NonGenericICollectionFactory(count);
-            KeyValuePair<string, int>[] array = new KeyValuePair<string, int>[count * 3 / 2];
+            SCG.KeyValuePair<string, int>[] array = new SCG.KeyValuePair<string, int>[count * 3 / 2];
             AssertExtensions.Throws<ArgumentException>(null, () => collection.CopyTo(array, 0));
         }
 
@@ -158,7 +162,7 @@ namespace J2N.Collections.Tests
         public void ICollection_NonGeneric_CopyTo_ArrayOfCorrectKeyValuePairType(int count)
         {
             ICollection collection = NonGenericICollectionFactory(count);
-            KeyValuePair<string, string>[] array = new KeyValuePair<string, string>[count];
+            SCG.KeyValuePair<string, string>[] array = new SCG.KeyValuePair<string, string>[count];
             collection.CopyTo(array, 0);
             int i = 0;
             foreach (object obj in collection)
@@ -173,9 +177,9 @@ namespace J2N.Collections.Tests
         [Fact]
         public void CopyConstructorExceptions()
         {
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new Dictionary<int, int>((IDictionary<int, int>)null));
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new Dictionary<int, int>((IDictionary<int, int>)null, null));
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new Dictionary<int, int>((IDictionary<int, int>)null, EqualityComparer<int>.Default));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new Dictionary<int, int>((SCG.IDictionary<int, int>)null));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new Dictionary<int, int>((SCG.IDictionary<int, int>)null, null));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new Dictionary<int, int>((SCG.IDictionary<int, int>)null, EqualityComparer<int>.Default));
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new Dictionary<int, int>(new NegativeCountDictionary<int, int>()));
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new Dictionary<int, int>(new NegativeCountDictionary<int, int>(), null));
@@ -189,7 +193,7 @@ namespace J2N.Collections.Tests
         public void ICollection_NonGeneric_CopyTo_NonContiguousDictionary(int count)
         {
             ICollection collection = (ICollection)CreateDictionary(count, k => k.ToString());
-            KeyValuePair<string, string>[] array = new KeyValuePair<string, string>[count];
+            SCG.KeyValuePair<string, string>[] array = new SCG.KeyValuePair<string, string>[count];
             collection.CopyTo(array, 0);
             int i = 0;
             foreach (object obj in collection)
@@ -202,11 +206,11 @@ namespace J2N.Collections.Tests
         [InlineData(101)]
         public void ICollection_Generic_CopyTo_NonContiguousDictionary(int count)
         {
-            ICollection<KeyValuePair<string, string>> collection = CreateDictionary(count, k => k.ToString());
-            KeyValuePair<string, string>[] array = new KeyValuePair<string, string>[count];
+            SCG.ICollection<SCG.KeyValuePair<string, string>> collection = CreateDictionary(count, k => k.ToString());
+            SCG.KeyValuePair<string, string>[] array = new SCG.KeyValuePair<string, string>[count];
             collection.CopyTo(array, 0);
             int i = 0;
-            foreach (KeyValuePair<string, string> obj in collection)
+            foreach (SCG.KeyValuePair<string, string> obj in collection)
                 Assert.Equal(array[i++], obj);
         }
 
@@ -216,11 +220,11 @@ namespace J2N.Collections.Tests
         [InlineData(101)]
         public void IDictionary_Generic_CopyTo_NonContiguousDictionary(int count)
         {
-            IDictionary<string, string> collection = CreateDictionary(count, k => k.ToString());
-            KeyValuePair<string, string>[] array = new KeyValuePair<string, string>[count];
+            SCG.IDictionary<string, string> collection = CreateDictionary(count, k => k.ToString());
+            SCG.KeyValuePair<string, string>[] array = new SCG.KeyValuePair<string, string>[count];
             collection.CopyTo(array, 0);
             int i = 0;
-            foreach (KeyValuePair<string, string> obj in collection)
+            foreach (SCG.KeyValuePair<string, string> obj in collection)
                 Assert.Equal(array[i++], obj);
         }
 
@@ -234,12 +238,12 @@ namespace J2N.Collections.Tests
             string[] array = new string[count];
             collection.Keys.CopyTo(array, 0);
             int i = 0;
-            foreach (KeyValuePair<string, string> obj in collection)
+            foreach (SCG.KeyValuePair<string, string> obj in collection)
                 Assert.Equal(array[i++], obj.Key);
 
             collection.Values.CopyTo(array, 0);
             i = 0;
-            foreach (KeyValuePair<string, string> obj in collection)
+            foreach (SCG.KeyValuePair<string, string> obj in collection)
                 Assert.Equal(array[i++], obj.Key);
         }
 
@@ -264,7 +268,6 @@ namespace J2N.Collections.Tests
             }
         }
 
-#if FEATURE_DICTIONARY_TRYADD
         [Fact]
         public void TryAdd_ItemAlreadyExists_DoesNotInvalidateEnumerator()
         {
@@ -276,52 +279,51 @@ namespace J2N.Collections.Tests
 
             Assert.True(valuesEnum.MoveNext());
         }
-#endif
 
         [Theory]
         [MemberData(nameof(CopyConstructorInt32Data))]
-        public void CopyConstructorInt32(int size, Func<int, int> keyValueSelector, Func<IDictionary<int, int>, IDictionary<int, int>> dictionarySelector)
+        public void CopyConstructorInt32(int size, Func<int, int> keyValueSelector, Func<SCG.IDictionary<int, int>, SCG.IDictionary<int, int>> dictionarySelector)
         {
             TestCopyConstructor(size, keyValueSelector, dictionarySelector);
         }
 
-        public static IEnumerable<object[]> CopyConstructorInt32Data
+        public static SCG.IEnumerable<object[]> CopyConstructorInt32Data
         {
             get { return GetCopyConstructorData(i => i); }
         }
 
         [Theory]
         [MemberData(nameof(CopyConstructorStringData))]
-        public void CopyConstructorString(int size, Func<int, string> keyValueSelector, Func<IDictionary<string, string>, IDictionary<string, string>> dictionarySelector)
+        public void CopyConstructorString(int size, Func<int, string> keyValueSelector, Func<SCG.IDictionary<string, string>, SCG.IDictionary<string, string>> dictionarySelector)
         {
             TestCopyConstructor(size, keyValueSelector, dictionarySelector);
         }
 
-        public static IEnumerable<object[]> CopyConstructorStringData
+        public static SCG.IEnumerable<object[]> CopyConstructorStringData
         {
             get { return GetCopyConstructorData(i => i.ToString()); }
         }
 
-        private static void TestCopyConstructor<T>(int size, Func<int, T> keyValueSelector, Func<IDictionary<T, T>, IDictionary<T, T>> dictionarySelector)
+        private static void TestCopyConstructor<T>(int size, Func<int, T> keyValueSelector, Func<SCG.IDictionary<T, T>, SCG.IDictionary<T, T>> dictionarySelector)
         {
-            IDictionary<T, T> expected = CreateDictionary(size, keyValueSelector);
-            IDictionary<T, T> input = dictionarySelector(CreateDictionary(size, keyValueSelector));
+            SCG.IDictionary<T, T> expected = CreateDictionary(size, keyValueSelector);
+            SCG.IDictionary<T, T> input = dictionarySelector(CreateDictionary(size, keyValueSelector));
 
             Assert.Equal(expected, new Dictionary<T, T>(input));
         }
 
         [Theory]
         [MemberData(nameof(CopyConstructorInt32ComparerData))]
-        public void CopyConstructorInt32Comparer(int size, Func<int, int> keyValueSelector, Func<IDictionary<int, int>, IDictionary<int, int>> dictionarySelector, IEqualityComparer<int> comparer)
+        public void CopyConstructorInt32Comparer(int size, Func<int, int> keyValueSelector, Func<SCG.IDictionary<int, int>, SCG.IDictionary<int, int>> dictionarySelector, SCG.IEqualityComparer<int> comparer)
         {
             TestCopyConstructor(size, keyValueSelector, dictionarySelector, comparer);
         }
 
-        public static IEnumerable<object[]> CopyConstructorInt32ComparerData
+        public static SCG.IEnumerable<object[]> CopyConstructorInt32ComparerData
         {
             get
             {
-                var comparers = new IEqualityComparer<int>[]
+                var comparers = new SCG.IEqualityComparer<int>[]
                 {
                     null,
                     EqualityComparer<int>.Default
@@ -333,7 +335,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(CopyConstructorStringComparerData))]
-        public void CopyConstructorStringComparer(int size, Func<int, string> keyValueSelector, Func<IDictionary<string, string>, IDictionary<string, string>> dictionarySelector, IEqualityComparer<string> comparer)
+        public void CopyConstructorStringComparer(int size, Func<int, string> keyValueSelector, Func<SCG.IDictionary<string, string>, SCG.IDictionary<string, string>> dictionarySelector, SCG.IEqualityComparer<string> comparer)
         {
             TestCopyConstructor(size, keyValueSelector, dictionarySelector, comparer);
         }
@@ -345,11 +347,11 @@ namespace J2N.Collections.Tests
             AssertExtensions.Throws<ArgumentException>(null, () => new Dictionary<string, int>(source, StringComparer.OrdinalIgnoreCase));
         }
 
-        public static IEnumerable<object[]> CopyConstructorStringComparerData
+        public static SCG.IEnumerable<object[]> CopyConstructorStringComparerData
         {
             get
             {
-                var comparers = new IEqualityComparer<string>[]
+                var comparers = new SCG.IEqualityComparer<string>[]
                 {
                     null,
                     EqualityComparer<string>.Default,
@@ -361,17 +363,17 @@ namespace J2N.Collections.Tests
             }
         }
 
-        private static void TestCopyConstructor<T>(int size, Func<int, T> keyValueSelector, Func<IDictionary<T, T>, IDictionary<T, T>> dictionarySelector, IEqualityComparer<T> comparer)
+        private static void TestCopyConstructor<T>(int size, Func<int, T> keyValueSelector, Func<SCG.IDictionary<T, T>, SCG.IDictionary<T, T>> dictionarySelector, SCG.IEqualityComparer<T> comparer)
         {
-            IDictionary<T, T> expected = CreateDictionary(size, keyValueSelector, comparer);
-            IDictionary<T, T> input = dictionarySelector(CreateDictionary(size, keyValueSelector, comparer));
+            SCG.IDictionary<T, T> expected = CreateDictionary(size, keyValueSelector, comparer);
+            SCG.IDictionary<T, T> input = dictionarySelector(CreateDictionary(size, keyValueSelector, comparer));
 
             Assert.Equal(expected, new Dictionary<T, T>(input, comparer));
         }
 
-        private static IEnumerable<object[]> GetCopyConstructorData<T>(Func<int, T> keyValueSelector, IEqualityComparer<T>[] comparers = null)
+        private static SCG.IEnumerable<object[]> GetCopyConstructorData<T>(Func<int, T> keyValueSelector, SCG.IEqualityComparer<T>[] comparers = null)
         {
-            var dictionarySelectors = new Func<IDictionary<T, T>, IDictionary<T, T>>[]
+            var dictionarySelectors = new Func<SCG.IDictionary<T, T>, SCG.IDictionary<T, T>>[]
             {
                 d => d,
                 d => new DictionarySubclass<T, T>(d),
@@ -380,13 +382,13 @@ namespace J2N.Collections.Tests
 
             var sizes = new int[] { 0, 1, 2, 3 };
 
-            foreach (Func<IDictionary<T, T>, IDictionary<T, T>> dictionarySelector in dictionarySelectors)
+            foreach (Func<SCG.IDictionary<T, T>, SCG.IDictionary<T, T>> dictionarySelector in dictionarySelectors)
             {
                 foreach (int size in sizes)
                 {
                     if (comparers != null)
                     {
-                        foreach (IEqualityComparer<T> comparer in comparers)
+                        foreach (SCG.IEqualityComparer<T> comparer in comparers)
                         {
                             yield return new object[] { size, keyValueSelector, dictionarySelector, comparer };
                         }
@@ -399,9 +401,10 @@ namespace J2N.Collections.Tests
             }
         }
 
-        private static IDictionary<T, T> CreateDictionary<T>(int size, Func<int, T> keyValueSelector, IEqualityComparer<T> comparer = null)
+        private static SCG.IDictionary<T, T> CreateDictionary<T>(int size, Func<int, T> keyValueSelector, SCG.IEqualityComparer<T> comparer = null)
         {
-            Dictionary<T, T> dict = Enumerable.Range(0, size + 1).ToDictionary(keyValueSelector, keyValueSelector, comparer);
+            SCG.Dictionary<T, T> temp = Enumerable.Range(0, size + 1).ToDictionary(keyValueSelector, keyValueSelector, comparer);
+            J2N.Collections.Generic.Dictionary<T, T> dict = new Dictionary<T, T>(temp, comparer);
             // Remove first item to reduce Count to size and alter the contiguity of the dictionary
             dict.Remove(keyValueSelector(0));
             return dict;
@@ -413,7 +416,7 @@ namespace J2N.Collections.Tests
         {
             // Strings switch between randomized and non-randomized comparers,
             // however this should never be observable externally.
-            //TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<string>.Default); // J2N TODO: Fix this test
+            TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<string>.Default, "System.OrdinalComparer");
             // OrdinalCaseSensitiveComparer is internal and (de)serializes as OrdinalComparer
             TestComparerSerialization(StringComparer.Ordinal, "System.OrdinalComparer");
             // OrdinalIgnoreCaseComparer is internal and (de)serializes as OrdinalComparer
@@ -429,7 +432,7 @@ namespace J2N.Collections.Tests
             TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<object>.Default);
         }
 
-        private static void TestComparerSerialization<T>(IEqualityComparer<T> equalityComparer, string internalTypeName = null)
+        private static void TestComparerSerialization<T>(SCG.IEqualityComparer<T> equalityComparer, string internalTypeName = null)
         {
             var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
             var s = new MemoryStream();
@@ -457,7 +460,7 @@ namespace J2N.Collections.Tests
 
         private sealed class DictionarySubclass<TKey, TValue> : Dictionary<TKey, TValue>
         {
-            public DictionarySubclass(IDictionary<TKey, TValue> dictionary)
+            public DictionarySubclass(SCG.IDictionary<TKey, TValue> dictionary)
             {
                 foreach (var pair in dictionary)
                 {
@@ -469,22 +472,22 @@ namespace J2N.Collections.Tests
         /// <summary>
         /// An incorrectly implemented dictionary that returns -1 from Count.
         /// </summary>
-        private sealed class NegativeCountDictionary<TKey, TValue> : IDictionary<TKey, TValue>
+        private sealed class NegativeCountDictionary<TKey, TValue> : SCG.IDictionary<TKey, TValue>
         {
             public int Count { get { return -1; } }
 
             public TValue this[TKey key] { get { throw new NotImplementedException(); } set { throw new NotImplementedException(); } }
             public bool IsReadOnly { get { throw new NotImplementedException(); } }
-            public ICollection<TKey> Keys { get { throw new NotImplementedException(); } }
-            public ICollection<TValue> Values { get { throw new NotImplementedException(); } }
-            public void Add(KeyValuePair<TKey, TValue> item) { throw new NotImplementedException(); }
+            public SCG.ICollection<TKey> Keys { get { throw new NotImplementedException(); } }
+            public SCG.ICollection<TValue> Values { get { throw new NotImplementedException(); } }
+            public void Add(SCG.KeyValuePair<TKey, TValue> item) { throw new NotImplementedException(); }
             public void Add(TKey key, TValue value) { throw new NotImplementedException(); }
             public void Clear() { throw new NotImplementedException(); }
-            public bool Contains(KeyValuePair<TKey, TValue> item) { throw new NotImplementedException(); }
+            public bool Contains(SCG.KeyValuePair<TKey, TValue> item) { throw new NotImplementedException(); }
             public bool ContainsKey(TKey key) { throw new NotImplementedException(); }
-            public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) { throw new NotImplementedException(); }
-            public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() { throw new NotImplementedException(); }
-            public bool Remove(KeyValuePair<TKey, TValue> item) { throw new NotImplementedException(); }
+            public void CopyTo(SCG.KeyValuePair<TKey, TValue>[] array, int arrayIndex) { throw new NotImplementedException(); }
+            public SCG.IEnumerator<SCG.KeyValuePair<TKey, TValue>> GetEnumerator() { throw new NotImplementedException(); }
+            public bool Remove(SCG.KeyValuePair<TKey, TValue> item) { throw new NotImplementedException(); }
             public bool Remove(TKey key) { throw new NotImplementedException(); }
             public bool TryGetValue(TKey key, out TValue value) { throw new NotImplementedException(); }
             IEnumerator IEnumerable.GetEnumerator() { throw new NotImplementedException(); }

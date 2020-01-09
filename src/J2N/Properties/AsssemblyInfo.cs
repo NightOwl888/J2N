@@ -6,3 +6,4 @@ using System.Runtime.CompilerServices;
 
 [assembly: InternalsVisibleTo("J2N.Benchmarks, PublicKey=" + AssemblyKeys.PublicKey)]
 [assembly: InternalsVisibleTo("J2N.Tests, PublicKey=" + AssemblyKeys.PublicKey)]
+[assembly: InternalsVisibleTo("J2N.Tests.xUnit, PublicKey=" + AssemblyKeys.PublicKey)]

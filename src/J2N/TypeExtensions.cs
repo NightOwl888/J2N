@@ -109,11 +109,11 @@ namespace J2N
         /// <param name="type">The type to check.</param>
         /// <returns><c>true</c> if a type is either a reference type
         /// or is a <see cref="Nullable{T}"/> type; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="type"/> is <c>null</c>.</exception>
         internal static bool IsNullableType(this Type type)
         {
-            // Abort if no type supplied
             if (type == null)
-                return false;
+                throw new ArgumentNullException(nameof(type));
 
             // If this is not a value type, it is a reference type, so it is automatically nullable
             //  (NOTE: All forms of Nullable<T> are value types)

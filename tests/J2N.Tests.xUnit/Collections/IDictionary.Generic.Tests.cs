@@ -778,11 +778,7 @@ namespace J2N.Collections.Tests
             {
                 IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
                 TKey missingKey = default(TKey);
-#if FEATURE_DICTIONARY_TRYADD
                 dictionary.TryAdd(missingKey, CreateTValue(5341));
-#else
-                dictionary[missingKey] = CreateTValue(5341);
-#endif
                 Assert.True(dictionary.Remove(missingKey));
             }
         }
@@ -812,11 +808,7 @@ namespace J2N.Collections.Tests
                 TKey missingKey = GetNewKey(dictionary);
                 TValue value = CreateTValue(5123);
                 TValue outValue;
-#if FEATURE_DICTIONARY_TRYADD
                 dictionary.TryAdd(missingKey, value);
-#else
-                dictionary[missingKey] = value;
-#endif
                 Assert.True(dictionary.TryGetValue(missingKey, out outValue));
                 Assert.Equal(value, outValue);
             }
@@ -851,11 +843,7 @@ namespace J2N.Collections.Tests
                 TKey missingKey = default(TKey);
                 TValue value = CreateTValue(5123);
                 TValue outValue;
-#if FEATURE_DICTIONARY_TRYADD
                 dictionary.TryAdd(missingKey, value);
-#else
-                dictionary[missingKey] = value;
-#endif
                 Assert.True(dictionary.TryGetValue(missingKey, out outValue));
                 Assert.Equal(value, outValue);
             }

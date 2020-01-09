@@ -16,9 +16,13 @@ namespace J2N.Collections.Tests
     /// </summary>
     public abstract class Dictionary_Generic_Tests<TKey, TValue> : IDictionary_Generic_Tests<TKey, TValue>
     {
+#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+
         protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert;
 
         protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Remove | ModifyOperation.Clear;
+
+#endif
 
         #region IDictionary<TKey, TValue Helper Methods
 
@@ -222,65 +226,69 @@ namespace J2N.Collections.Tests
                 Dictionary<TKey, TValue> dictionary = (Dictionary<TKey, TValue>)(GenericIDictionaryFactory(count));
                 TKey missingKey = default(TKey);
                 TValue value;
-
                 dictionary.TryAdd(missingKey, default(TValue));
                 Assert.True(dictionary.Remove(missingKey, out value));
             }
         }
 
-#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
-
         [Fact]
         public void Dictionary_Generic_Remove_RemoveFirstEnumerationContinues()
         {
-            Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
-            using (var enumerator = dict.GetEnumerator())
+            if (ModifyEnumeratorAllowed.HasFlag(ModifyOperation.Remove))
             {
-                enumerator.MoveNext();
-                TKey key = enumerator.Current.Key;
-                enumerator.MoveNext();
-                dict.Remove(key);
-                Assert.True(enumerator.MoveNext());
-                Assert.False(enumerator.MoveNext());
+                Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
+                using (var enumerator = dict.GetEnumerator())
+                {
+                    enumerator.MoveNext();
+                    TKey key = enumerator.Current.Key;
+                    enumerator.MoveNext();
+                    dict.Remove(key);
+                    Assert.True(enumerator.MoveNext());
+                    Assert.False(enumerator.MoveNext());
+                }
             }
         }
 
         [Fact]
         public void Dictionary_Generic_Remove_RemoveCurrentEnumerationContinues()
         {
-            Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
-            using (var enumerator = dict.GetEnumerator())
+            if (ModifyEnumeratorAllowed.HasFlag(ModifyOperation.Remove))
             {
-                enumerator.MoveNext();
-                enumerator.MoveNext();
-                dict.Remove(enumerator.Current.Key);
-                Assert.True(enumerator.MoveNext());
-                Assert.False(enumerator.MoveNext());
+                Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
+                using (var enumerator = dict.GetEnumerator())
+                {
+                    enumerator.MoveNext();
+                    enumerator.MoveNext();
+                    dict.Remove(enumerator.Current.Key);
+                    Assert.True(enumerator.MoveNext());
+                    Assert.False(enumerator.MoveNext());
+                }
             }
         }
 
         [Fact]
         public void Dictionary_Generic_Remove_RemoveLastEnumerationFinishes()
         {
-            Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
-            TKey key = default;
-            using (var enumerator = dict.GetEnumerator())
+            if (ModifyEnumeratorAllowed.HasFlag(ModifyOperation.Remove))
             {
-                while (enumerator.MoveNext())
+                Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
+                TKey key = default;
+                using (var enumerator = dict.GetEnumerator())
                 {
-                    key = enumerator.Current.Key;
+                    while (enumerator.MoveNext())
+                    {
+                        key = enumerator.Current.Key;
+                    }
+                }
+                using (var enumerator = dict.GetEnumerator())
+                {
+                    enumerator.MoveNext();
+                    enumerator.MoveNext();
+                    dict.Remove(key);
+                    Assert.False(enumerator.MoveNext());
                 }
             }
-            using (var enumerator = dict.GetEnumerator())
-            {
-                enumerator.MoveNext();
-                enumerator.MoveNext();
-                dict.Remove(key);
-                Assert.False(enumerator.MoveNext());
-            }
         }
-
-#endif
 
         #endregion
 
