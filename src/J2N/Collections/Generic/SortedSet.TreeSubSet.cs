@@ -7,28 +7,34 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
 
 namespace J2N.Collections.Generic
 {
+    using SR = J2N.Resources.Strings;
+
     public partial class SortedSet<T>
     {
         /// <summary>
         /// This class represents a subset view into the tree. Any changes to this view
         /// are reflected in the actual tree. It uses the comparer of the underlying tree.
         /// </summary>
+#if FEATURE_SERIALIZABLE
+        [Serializable]
+#endif
         internal sealed class TreeSubSet : SortedSet<T>
 #if FEATURE_SERIALIZABLE
             , ISerializable, IDeserializationCallback
 #endif
         {
-            private readonly SortedSet<T> _underlying;
-            /*[MaybeNull, AllowNull]*/
-            private readonly T _min;
-            /*[MaybeNull, AllowNull]*/
-            private readonly T _max;
+            private SortedSet<T> _underlying;
+            [MaybeNull, AllowNull]
+            private T _min;
+            [MaybeNull, AllowNull]
+            private T _max;
             // keeps track of whether the count variable is up to date
             // up to date -> _countVersion = _underlying.version
             // not up to date -> _countVersion < _underlying.version
@@ -37,7 +43,7 @@ namespace J2N.Collections.Generic
             // for instance, you could allow this subset to be defined for i > 10. The set will throw if
             // anything <= 10 is added, but there is no upper bound. These features Head(), Tail(), were punted
             // in the spec, and are not available, but the framework is there to make them available at some point.
-            private readonly bool _lBoundActive, _uBoundActive;
+            private bool _lBoundActive, _uBoundActive;
             // used to see if the count is out of date
 
 #if DEBUG
@@ -47,7 +53,7 @@ namespace J2N.Collections.Generic
             }
 #endif
 
-            public TreeSubSet(SortedSet<T> Underlying, /*[AllowNull]*/ T Min, /*[AllowNull]*/ T Max, bool lowerBoundActive, bool upperBoundActive)
+            public TreeSubSet(SortedSet<T> Underlying, [AllowNull] T Min, [AllowNull] T Max, bool lowerBoundActive, bool upperBoundActive)
                 : base(Underlying.Comparer)
             {
                 _underlying = Underlying;
@@ -60,6 +66,15 @@ namespace J2N.Collections.Generic
                 version = -1;
                 _countVersion = -1;
             }
+
+#if FEATURE_SERIALIZABLE
+            [SuppressMessage("Microsoft.Usage", "CA2236:CallBaseClassMethodsOnISerializableTypes", Justification = "special case TreeSubSet serialization")]
+            private TreeSubSet(SerializationInfo info, StreamingContext context)
+            {
+                siInfo = info;
+                OnDeserializationImpl(info);
+            }
+#endif
 
             internal override bool AddIfNotPresent(T item)
             {
@@ -376,15 +391,64 @@ namespace J2N.Collections.Generic
 
             protected override void GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                throw new PlatformNotSupportedException(); // J2N TODO: Serialization, where supported
+                if (info == null)
+                    throw new ArgumentNullException(nameof(info));
+
+                info.AddValue(maxName, _max, typeof(T));
+                info.AddValue(minName, _min, typeof(T));
+                info.AddValue(lBoundActiveName, _lBoundActive);
+                info.AddValue(uBoundActiveName, _uBoundActive);
+                base.GetObjectData(info, context);
             }
 
-            void IDeserializationCallback.OnDeserialization(object sender)
+            void IDeserializationCallback.OnDeserialization(object sender) => OnDeserialization(sender);
+
+            protected override void OnDeserialization(object sender)
             {
-                throw new PlatformNotSupportedException(); // J2N TODO: Serialization, where supported
+                OnDeserializationImpl(sender);
             }
 
-            protected override void OnDeserialization(object sender) => throw new PlatformNotSupportedException(); // J2N TODO: Serialization, where supported
+            private void OnDeserializationImpl(object sender)
+            {
+                if (siInfo == null)
+                {
+                    throw new SerializationException(SR.Serialization_InvalidOnDeser);
+                }
+
+                comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>));
+                int savedCount = siInfo.GetInt32(CountName);
+                _max = (T)siInfo.GetValue(maxName, typeof(T));
+                _min = (T)siInfo.GetValue(minName, typeof(T));
+                _lBoundActive = siInfo.GetBoolean(lBoundActiveName);
+                _uBoundActive = siInfo.GetBoolean(uBoundActiveName);
+                _underlying = new SortedSet<T>();
+
+                if (savedCount != 0)
+                {
+                    T[] items = (T[])siInfo.GetValue(ItemsName, typeof(T[]));
+
+                    if (items == null)
+                    {
+                        throw new SerializationException(SR.Serialization_MissingValues);
+                    }
+
+                    for (int i = 0; i < items.Length; i++)
+                    {
+                        _underlying.Add(items[i]);
+                    }
+                }
+                _underlying.version = siInfo.GetInt32(VersionName);
+                count = _underlying.count;
+                version = _underlying.version - 1;
+                VersionCheck(); //this should update the count to be right and update root to be right
+
+                if (count != savedCount)
+                {
+                    throw new SerializationException(SR.Serialization_MismatchedCount);
+                }
+                siInfo = null;
+
+            }
 #endif
         }
     }

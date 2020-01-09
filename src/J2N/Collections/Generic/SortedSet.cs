@@ -93,13 +93,25 @@ namespace J2N.Collections.Generic
         private int version;
 
 #if FEATURE_SERIALIZABLE
-        private SerializationInfo siInfo; // A temporary variable which we need during deserialization.
-#endif
-
         private const string ComparerName = "Comparer"; // Do not rename (binary serialization)
         private const string CountName = "Count"; // Do not rename (binary serialization)
         private const string ItemsName = "Items"; // Do not rename (binary serialization)
         private const string VersionName = "Version"; // Do not rename (binary serialization)
+        //needed for enumerator
+        private const string TreeName = "Tree";
+        private const string NodeValueName = "Item";
+        private const string EnumStartName = "EnumStarted";
+        private const string ReverseName = "Reverse";
+        private const string EnumVersionName = "EnumVersion";
+
+        //needed for TreeSubset
+        private const string minName = "Min";
+        private const string maxName = "Max";
+        private const string lBoundActiveName = "lBoundActive";
+        private const string uBoundActiveName = "uBoundActive";
+
+        private SerializationInfo siInfo; //A temporary variable which we need during deserialization. 
+#endif
 
         internal const int StackAllocThreshold = 100;
 
@@ -210,7 +222,10 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This constructor is called during deserialization to reconstitute an object that is transmitted over a stream.
         /// </remarks>
-        protected SortedSet(SerializationInfo info, StreamingContext context) => siInfo = info;
+        protected SortedSet(SerializationInfo info, StreamingContext context)
+        {
+            siInfo = info;
+        }
 #endif
 
         #endregion
@@ -2354,13 +2369,18 @@ namespace J2N.Collections.Generic
             , ISerializable, IDeserializationCallback
 #endif
         {
-            private readonly SortedSet<T> _tree;
-            private readonly int _version;
+            private SortedSet<T> _tree;
+            private int _version;
 
-            private readonly Stack<Node> _stack;
+            private Stack<Node> _stack;
             private Node _current;
+            static readonly Node dummyNode = new Node(default, NodeColor.Red);
 
-            private readonly bool _reverse;
+            private bool _reverse;
+
+#if FEATURE_SERIALIZABLE
+            private SerializationInfo _siInfo;
+#endif
 
             internal Enumerator(SortedSet<T> set)
                 : this(set, reverse: false)
@@ -2377,25 +2397,63 @@ namespace J2N.Collections.Generic
                 _stack = new Stack<Node>(2 * (int)Log2(set.TotalCount() + 1));
                 _current = null;
                 _reverse = reverse;
+#if FEATURE_SERIALIZABLE
+                _siInfo = null;
+#endif
 
                 Initialize();
             }
 
 #if FEATURE_SERIALIZABLE
 
-            private Enumerator(SerializationInfo serializationInfo, StreamingContext streamingContext)
+            private Enumerator(SerializationInfo info, StreamingContext context)
             {
-                throw new PlatformNotSupportedException(); // J2N TODO: Serialization
+                _tree = null;
+                _version = -1;
+                _current = null;
+                _reverse = false;
+                _stack = null;
+                _siInfo = info;
             }
 
             void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                throw new PlatformNotSupportedException(); // J2N TODO: Serialization
+                if (info == null)
+                {
+                    throw new ArgumentNullException(nameof(info));
+                }
+                info.AddValue(TreeName, _tree, typeof(SortedSet<T>));
+                info.AddValue(EnumVersionName, _version);
+                info.AddValue(ReverseName, _reverse);
+                info.AddValue(EnumStartName, !NotStartedOrEnded);
+                info.AddValue(NodeValueName, (_current == null ? dummyNode.Item : _current.Item), typeof(T));
+
             }
 
             void IDeserializationCallback.OnDeserialization(object sender)
             {
-                throw new PlatformNotSupportedException(); // J2N TODO: Serialization
+                if (_siInfo == null)
+                {
+                    throw new SerializationException(SR.Serialization_InvalidOnDeser);
+                }
+
+                _tree = (SortedSet<T>)_siInfo.GetValue(TreeName, typeof(SortedSet<T>));
+                _version = _siInfo.GetInt32(EnumVersionName);
+                _reverse = _siInfo.GetBoolean(ReverseName);
+                bool EnumStarted = _siInfo.GetBoolean(EnumStartName);
+                _stack = new Stack<Node>(2 * Log2(_tree.Count + 1));
+                _current = null;
+                if (EnumStarted)
+                {
+                    T item = (T)_siInfo.GetValue(NodeValueName, typeof(T));
+                    Initialize();
+                    //go until it reaches the value we want
+                    while (this.MoveNext())
+                    {
+                        if (_tree.Comparer.Compare(this.Current, item) == 0)
+                            break;
+                    }
+                }
             }
 #endif
 
@@ -2450,7 +2508,6 @@ namespace J2N.Collections.Generic
                 if (_version != _tree.version)
                 {
                     throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
-                    //throw new InvalidOperationException("Failed version check");
                 }
 
                 if (_stack.Count == 0)
@@ -2535,7 +2592,6 @@ namespace J2N.Collections.Generic
                     if (_current == null)
                     {
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
-                        //throw new InvalidOperationException("The current value is undefined");
                     }
 
                     return _current.Item;
@@ -2549,7 +2605,6 @@ namespace J2N.Collections.Generic
                 if (_version != _tree.version)
                 {
                     throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
-                    //throw new InvalidOperationException("Failed version check");
                 }
 
                 _stack.Clear();
