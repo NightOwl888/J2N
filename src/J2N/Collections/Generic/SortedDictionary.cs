@@ -48,8 +48,8 @@ namespace J2N.Collections.Generic
     /// method uses the current culture by default to behave like other components in .NET. To exactly match Java's culture-neutral behavior,
     /// call <c>ToString(StringFormatter.InvariantCulture)</c>.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+    /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
     [DebuggerDisplay("Count = {Count}")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
@@ -243,7 +243,7 @@ namespace J2N.Collections.Generic
         /// the old value. In contrast, the <see cref="Add(TKey, TValue)"/> method does not modify existing elements.
         /// <para/>
         /// Unlike the <see cref="System.Collections.Generic.SortedDictionary{TKey, TValue}"/>, both keys and values can
-        /// be <c>null</c> a key can be null if either <see cref="Nullable{T}"/> or a reference type.
+        /// be <c>null</c> if either <see cref="Nullable{T}"/> or a reference type.
         /// <para/>
         /// The C# language uses the <see cref="this"/> keyword to define the indexers instead of implementing the
         /// <c>Item[TKey]</c> property. Visual Basic implements <c>Item[TKey]</c> as a default property, which provides
@@ -264,7 +264,7 @@ namespace J2N.Collections.Generic
                 TreeSet<KeyValuePair<TKey, TValue>>.Node node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default));
                 if (node == null)
                 {
-                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, string.Format(StringFormatter.CurrentCulture, "{0}", key)));
+                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
                 }
 
                 return node.Item.Value;
@@ -448,6 +448,28 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool ContainsValue(TValue value)
         {
+            // NOTE: We do this check here to override the .NET default equality comparer
+            // with J2N's version
+            return ContainsValue(value, EqualityComparer<TValue>.Default);
+        }
+
+        /// <summary>
+        /// Determines whether the <see cref="SortedDictionary{TKey, TValue}"/> contains a specific value
+        /// as determined by the provided <paramref name="valueComparer"/>.
+        /// </summary>
+        /// <param name="value">The value to locate in the <see cref="SortedDictionary{TKey, TValue}"/>.
+        /// The value can be <c>null</c> for reference types.</param>
+        /// <param name="valueComparer">The <see cref="IEqualityComparer{TValue}"/> to use
+        /// to test each value for equality.</param>
+        /// <returns><c>true</c> if the <see cref="SortedDictionary{TKey, TValue}"/> contains an element
+        /// with the specified value; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method performs a linear search; therefore, the average execution time
+        /// is proportional to <see cref="Count"/>. That is, this method is an O(<c>n</c>) operation,
+        /// where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
+        public bool ContainsValue(TValue value, IEqualityComparer<TValue> valueComparer) // Overload added so end user can override J2N's equality comparer
+        {
             bool found = false;
             if (value == null)
             {
@@ -463,7 +485,6 @@ namespace J2N.Collections.Generic
             }
             else
             {
-                IEqualityComparer<TValue> valueComparer = EqualityComparer<TValue>.Default;
                 _set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node)
                 {
                     if (valueComparer.Equals(node.Item.Value, value))
@@ -570,13 +591,78 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
+        /// Removes the element with the specified key from the <see cref="SortedDictionary{TKey, TValue}"/>.
+        /// If the element exists, the associated <paramref name="value"/> is output after it is removed.
+        /// </summary>
+        /// <param name="key">The key of the element to remove.</param>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><c>true</c> if the element is successfully removed; otherwise, <c>false</c>.
+        /// This method also returns <c>false</c> if key is not found in the <see cref="SortedDictionary{TKey, TValue}"/>.</returns>
+        /// <remarks>
+        /// If the <see cref="SortedDictionary{TKey, TValue}"/> does not contain an element with the specified key, the
+        /// <see cref="SortedDictionary{TKey, TValue}"/> remains unchanged. No exception is thrown.
+        /// </remarks>
+        // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
+        // It is redefined here to ensure we have it in prior platforms.
+        public bool Remove(TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (TryGetValue(key, out value))
+            {
+                _set.Remove(new KeyValuePair<TKey, TValue>(key, default));
+                return true;
+            }
+
+            value = default!;
+            return false;
+        }
+
+        /// <summary>
+        /// Attempts to add the specified key and value to the dictionary.
+        /// </summary>
+        /// <param name="key">The key of the element to add. It can be <c>null</c>.</param>
+        /// <param name="value">The value of the element to add. It can be <c>null</c>.</param>
+        /// <returns><c>true</c> if the key/value pair was added to the dictionary successfully; otherwise, <c>false</c>.</returns>
+        /// <remarks>Unlike the <see cref="Add(TKey, TValue)"/> method, this method doesn't throw an exception
+        /// if the element with the given key exists in the dictionary. Unlike the Dictionary indexer, <see cref="TryAdd(TKey, TValue)"/>
+        /// doesn't override the element if the element with the given key exists in the dictionary. If the key already exists,
+        /// <see cref="TryAdd(TKey, TValue)"/> does nothing and returns <c>false</c>.</remarks>
+        // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
+        // It is redefined here to ensure we have it in prior platforms.
+        public bool TryAdd(TKey key, TValue value)
+        {
+            if (!ContainsKey(key))
+            {
+                Add(key, value);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Gets the value associated with the specified key.
         /// </summary>
         /// <param name="key">The key of the value to get.</param>
         /// <param name="value">When this method returns, the value associated with the specified key,
         /// if the key is found; otherwise, the default value for the type of the <paramref name="value"/> parameter.</param>
-        /// <returns></returns>
-        public bool TryGetValue(TKey key, /*[MaybeNullWhen(false)]*/ out TValue value)
+        /// <returns><c>true</c> if the <see cref="SortedDictionary{TKey, TValue}"/> contains an element with the
+        /// specified key; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method combines the functionality of the <see cref="ContainsKey(TKey)"/> method
+        /// and the <see cref="this[TKey]"/> property.
+        /// <para/>
+        /// If the key is not found, then the <paramref name="value"/> parameter gets the appropriate
+        /// default value for the type <typeparamref name="TValue"/>; for example, 0 (zero) for
+        /// integer types, <c>false</c> for Boolean types, and <c>null</c> for reference types.
+        /// <para/>
+        /// Use the <see cref="TryGetValue(TKey, out TValue)"/> method if your code frequently
+        /// attempts to access keys that are not in the dictionary. Using this method is more
+        /// efficient than catching the <see cref="KeyNotFoundException"/> thrown by the
+        /// <see cref="this[TKey]"/> property.
+        /// <para/>
+        /// This method approaches an O(1) operation.
+        /// </remarks>
+        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             //if (key == null) // J2N: Making key nullable
             //{
@@ -624,8 +710,7 @@ namespace J2N.Collections.Generic
             {
                 if (IsCompatibleKey(key))
                 {
-                    TValue value;
-                    if (TryGetValue((TKey)key, out value))
+                    if (TryGetValue((TKey)key, out TValue value))
                     {
                         return value;
                     }
@@ -674,10 +759,10 @@ namespace J2N.Collections.Generic
             //}
 
             // J2N: Only throw if the generic closing type is not nullable
-            if (key == null && !typeof(TKey).IsNullableType())
+            if (key is null && !typeof(TKey).IsNullableType())
                 throw new ArgumentNullException(nameof(key));
 
-            if (value == null && !typeof(TValue).IsNullableType())
+            if (value is null && !typeof(TValue).IsNullableType())
                 throw new ArgumentNullException(nameof(value));
 
             try
@@ -714,8 +799,8 @@ namespace J2N.Collections.Generic
             //{
             //    throw new ArgumentNullException(nameof(key));
             //}
-            if (key == null && !(default(TKey) == null))
-                return false;
+            if (key is null)
+                return typeof(TKey).IsNullableType();
 
             return (key is TKey);
         }
@@ -733,15 +818,9 @@ namespace J2N.Collections.Generic
             }
         }
 
-        bool ICollection.IsSynchronized
-        {
-            get { return false; }
-        }
+        bool ICollection.IsSynchronized => false;
 
-        object ICollection.SyncRoot
-        {
-            get { return ((ICollection)_set).SyncRoot; }
-        }
+        object ICollection.SyncRoot => ((ICollection)_set).SyncRoot;
 
         IEnumerator IEnumerable.GetEnumerator()
         {
@@ -1186,19 +1265,11 @@ namespace J2N.Collections.Generic
             public void CopyTo(TKey[] array, int index)
             {
                 if (array == null)
-                {
                     throw new ArgumentNullException(nameof(array));
-                }
-
                 if (index < 0)
-                {
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                }
-
                 if (array.Length - index < Count)
-                {
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
-                }
 
                 _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Key; return true; });
             }
@@ -1206,29 +1277,15 @@ namespace J2N.Collections.Generic
             void ICollection.CopyTo(Array array, int index)
             {
                 if (array == null)
-                {
                     throw new ArgumentNullException(nameof(array));
-                }
-
                 if (array.Rank != 1)
-                {
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
-                }
-
                 if (array.GetLowerBound(0) != 0)
-                {
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
-                }
-
                 if (index < 0)
-                {
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                }
-
                 if (array.Length - index < _dictionary.Count)
-                {
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
-                }
 
                 TKey[] keys = array as TKey[];
                 if (keys != null)
@@ -1283,15 +1340,9 @@ namespace J2N.Collections.Generic
                 throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
             }
 
-            bool ICollection.IsSynchronized
-            {
-                get { return false; }
-            }
+            bool ICollection.IsSynchronized => false;
 
-            object ICollection.SyncRoot
-            {
-                get { return ((ICollection)_dictionary).SyncRoot; }
-            }
+            object ICollection.SyncRoot => ((ICollection)_dictionary).SyncRoot;
 
             /// <summary>
             /// Enumerates the elements of a <see cref="KeyCollection"/>.
@@ -1545,19 +1596,11 @@ namespace J2N.Collections.Generic
             public void CopyTo(TValue[] array, int index)
             {
                 if (array == null)
-                {
                     throw new ArgumentNullException(nameof(array));
-                }
-
                 if (index < 0)
-                {
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                }
-
                 if (array.Length - index < Count)
-                {
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
-                }
 
                 _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Value; return true; });
             }

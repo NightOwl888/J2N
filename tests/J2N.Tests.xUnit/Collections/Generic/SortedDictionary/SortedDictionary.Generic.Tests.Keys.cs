@@ -59,7 +59,7 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_Generic_Tests_Keys_AsICollection : ICollection_NonGeneric_Tests
     {
-        protected override bool NullAllowed => false;
+        protected override bool NullAllowed => true;
         protected override bool DuplicateValuesAllowed => false;
         protected override bool IsReadOnly => true;
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
