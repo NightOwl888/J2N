@@ -163,7 +163,7 @@ namespace J2N.Text
             else if (arg is bool b)
                 return FormatBoolean(b);
             else if (arg is IStructuralFormattable sf)
-                return sf.ToString(format, this);
+                return sf.ToString("{0}", this);
 
             var argType = arg.GetType();
             if (argType.IsArray ||
