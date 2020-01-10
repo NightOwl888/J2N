@@ -52,9 +52,9 @@ namespace J2N.Collections
         /// <returns><c>true</c> if both objects are structurally equivalent; otherwise, <c>false</c>.</returns>
         public new virtual bool Equals(object x, object y)
         {
-            if (x == null)
-                return y == null;
-            if (y == null)
+            if (x is null)
+                return y is null;
+            if (y is null)
                 return false;
 
             // Handle nested arrays.
@@ -171,7 +171,7 @@ namespace J2N.Collections
                 if (element != null)
                 {
                     // Handle nested arrays.
-                    if (element is Array nestedArray)
+                    if (element is Array nestedArray && nestedArray.Rank == 1)
                         elementHashCode = GetArrayHashCode(nestedArray);
 
                     // Handle nested collections (that implement IStructuralEquatable)

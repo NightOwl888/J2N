@@ -94,9 +94,9 @@ namespace J2N.Collections.Generic
             if (ReferenceEquals(dictionaryA, dictionaryB))
                 return true;
 
-            if (dictionaryA == null)
-                return dictionaryB == null;
-            else if (dictionaryB == null)
+            if (dictionaryA is null)
+                return dictionaryB is null;
+            else if (dictionaryB is null)
                 return false;
 
             if (dictionaryA.Count != dictionaryB.Count)

@@ -85,19 +85,16 @@ namespace J2N.Collections.Generic
             if (ReferenceEquals(listA, listB))
                 return true;
 
-            if (!TIsValueType)
-            {
-                if (listA == null)
-                    return listB == null;
-                else if (listB == null)
-                    return false;
-            }
+            if (listA is null)
+                return listB is null;
+            else if (listB is null)
+                return false;
 
             if (listA.Count != listB.Count)
                 return false;
 
-            using (IEnumerator<T> eA = listA.GetEnumerator())
-            using (IEnumerator<T> eB = listB.GetEnumerator())
+            using IEnumerator<T> eA = listA.GetEnumerator();
+            using IEnumerator<T> eB = listB.GetEnumerator();
             {
                 while (eA.MoveNext() && eB.MoveNext())
                 {

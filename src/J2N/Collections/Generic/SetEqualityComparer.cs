@@ -88,13 +88,10 @@ namespace J2N.Collections.Generic
             if (ReferenceEquals(setA, setB))
                 return true;
 
-            if (!TIsValueType)
-            {
-                if (setA == null)
-                    return setB == null;
-                else if (setB == null)
-                    return false;
-            }
+            if (setA is null)
+                return setB is null;
+            else if (setB is null)
+                return false;
 
             if (setA.Count != setB.Count)
                 return false;

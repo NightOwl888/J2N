@@ -71,9 +71,9 @@ namespace J2N.Collections
         /// </summary>
         new public static bool Equals(object objA, object objB)
         {
-            if (objA == null)
-                return objB == null;
-            else if (objB == null)
+            if (objA is null)
+                return objB is null;
+            else if (objB is null)
                 return false;
 
             Type tA = objA.GetType();
