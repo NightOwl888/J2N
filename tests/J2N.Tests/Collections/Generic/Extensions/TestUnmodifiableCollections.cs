@@ -1,11 +1,9 @@
-﻿using J2N.Text;
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace J2N.Collections
+namespace J2N.Collections.Generic.Extensions
 {
     public class TestUnmodifiableCollections : TestCase
     {

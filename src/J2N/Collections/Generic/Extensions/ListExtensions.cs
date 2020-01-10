@@ -1,10 +1,9 @@
-﻿using J2N.Collections.Generic;
-using J2N.Text;
+﻿using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace J2N.Collections
+namespace J2N.Collections.Generic.Extensions
 {
     /// <summary>
     /// Extensions to the <see cref="IList{T}"/> interface.

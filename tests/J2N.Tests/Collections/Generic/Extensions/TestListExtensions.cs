@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace J2N.Collections
+namespace J2N.Collections.Generic.Extensions
 {
     public class TestListExtensions : TestCase
     {
