@@ -80,6 +80,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
     public partial class SortedSet<T> : ISet<T>, ICollection<T>, ICollection, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE

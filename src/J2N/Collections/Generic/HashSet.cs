@@ -37,6 +37,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
     public class HashSet<T> : System.Collections.Generic.HashSet<T>, IStructuralEquatable, IStructuralFormattable
     {

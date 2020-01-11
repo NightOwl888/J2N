@@ -50,6 +50,7 @@ namespace J2N.Collections.Generic
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
@@ -1160,6 +1161,7 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedDictionary{TKey, TValue}"/> continue to be reflected in the
         /// <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>.
         /// </remarks>
+        [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
         public sealed class KeyCollection : ICollection<TKey>, ICollection, IReadOnlyCollection<TKey>
@@ -1492,6 +1494,7 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedDictionary{TKey, TValue}"/> continue to be reflected in the
         /// <see cref="SortedDictionary{TKey, TValue}.ValueCollection"/>.
         /// </remarks>
+        [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
         public sealed class ValueCollection : ICollection<TValue>, ICollection, IReadOnlyCollection<TValue>

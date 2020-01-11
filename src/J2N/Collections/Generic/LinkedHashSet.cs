@@ -29,6 +29,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
     public class LinkedHashSet<T> : ICollection<T>, ISet<T>, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE

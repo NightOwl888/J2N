@@ -41,6 +41,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
     public class List<T> : IList<T>, IList, IReadOnlyList<T>, IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE

@@ -52,6 +52,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
     public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
@@ -1264,6 +1265,8 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
+        [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
+        [DebuggerDisplay("Count = {Count}")]
         internal sealed class KeyCollection : ICollection<TKey>, ICollection
         {
             private readonly LinkedDictionary<TKey, TValue> dictionary;
@@ -1424,6 +1427,8 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
+        [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
+        [DebuggerDisplay("Count = {Count}")]
         internal sealed class ValueCollection : ICollection<TValue>, ICollection
         {
             private readonly LinkedDictionary<TKey, TValue> dictionary;
