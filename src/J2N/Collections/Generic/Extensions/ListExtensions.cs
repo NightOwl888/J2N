@@ -2,9 +2,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace J2N.Collections.Generic.Extensions
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Extensions to the <see cref="IList{T}"/> interface.
     /// </summary>
@@ -42,7 +45,7 @@ namespace J2N.Collections.Generic.Extensions
             if (random == null)
                 throw new ArgumentNullException(nameof(random));
             if (list.IsReadOnly)
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
 
             for (int i = list.Count - 1; i > 0; i--)
             {
@@ -85,12 +88,38 @@ namespace J2N.Collections.Generic.Extensions
             if (index2 < 0 || index2 > size)
                 throw new ArgumentOutOfRangeException(nameof(index2));
             if (list.IsReadOnly)
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
 
             T tmp = list[index1];
             list[index1] = list[index2];
             list[index2] = tmp;
         }
+
+        // J2N TODO: API - if we make this public, it will match .NET's API.
+        // It would also make sense to add an AsReadOnly() extension method to
+        // ICollection<T>, IDictionary<TKey, TValue> and ISet<T>. This is a breaking change,
+        // though, so need to work this in at the appropriate time.
+
+        // Downside: Since the AsReadOnly() method is a concrete method of SCG.List<T> and there
+        // is also an AsReadOnly() method for array types, this
+        // extension method won't work for those cases. Need to consider the right approach.
+        // Perhaps we should make an overload that can be used in those cases, such as AsReadOnly(bool structurallyComparable)?
+        // Whatever we decide, the ToList() and ToArray() methods from LINQ also need a similar solution.
+        internal static UnmodifiableList<T> AsReadOnly<T>(this IList<T> list)
+        {
+            if (list == null)
+                throw new ArgumentNullException(nameof(list));
+
+            // We assume that if the passed in collection is IStructuralEquatable, the end user took care of ensuring that
+            // all nested collections also implement IStructuralEquatable. Otherwise, we assume that none of them are,
+            // and use aggressive comparing.
+            var comparer = list is IStructuralEquatable ?
+                ListEqualityComparer<T>.Default :
+                ListEqualityComparer<T>.Aggressive;
+
+            return new UnmodifiableList<T>(list, comparer, StringFormatter.CurrentCulture);
+        }
+
 
         /// <summary>
         /// Returns a wrapper on the specified list which throws an
@@ -186,79 +215,34 @@ namespace J2N.Collections.Generic.Extensions
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class UnmodifiableList<T> : IList<T>, IStructuralEquatable
+        internal class UnmodifiableList<T> : ReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
         {
-            internal readonly IList<T> list; // internal for testing
             private readonly ListEqualityComparer<T> structuralEqualityComparer;
             private readonly IFormatProvider toStringFormatProvider;
 
             public UnmodifiableList(IList<T> list, ListEqualityComparer<T> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
+                : base(list)
             {
-                this.list = list ?? throw new ArgumentNullException(nameof(list));
                 this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
                 this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
             }
 
-            public T this[int index]
-            {
-                get => list[index];
-                set => throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public int Count => list.Count;
-
-            public bool IsReadOnly => true;
-
-            public void Add(T item)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public void Clear()
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public bool Contains(T item) => list.Contains(item);
-
-            public void CopyTo(T[] array, int arrayIndex) => list.CopyTo(array, arrayIndex);
-
-            public IEnumerator<T> GetEnumerator() => list.GetEnumerator();
-
-            public int IndexOf(T item) => list.IndexOf(item);
-
-            public void Insert(int index, T item)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public bool Remove(T item)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public void RemoveAt(int index)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
+            internal IList<T> List => base.Items; // for testing
 
             public bool Equals(object other, IEqualityComparer comparer)
             {
-                if (list is IStructuralEquatable se)
+                if (Items is IStructuralEquatable se)
                     return se.Equals(other, comparer);
                 if (other is IList<T> otherList)
-                    return structuralEqualityComparer.Equals(list, otherList);
+                    return structuralEqualityComparer.Equals(Items, otherList);
                 return false;
             }
 
             public int GetHashCode(IEqualityComparer comparer)
             {
-                if (list is IStructuralEquatable se)
+                if (Items is IStructuralEquatable se)
                     return se.GetHashCode(comparer);
-                return structuralEqualityComparer.GetHashCode(list);
+                return structuralEqualityComparer.GetHashCode(Items);
             }
 
             public override bool Equals(object obj)
@@ -266,18 +250,25 @@ namespace J2N.Collections.Generic.Extensions
                 if (obj == null)
                     return false;
                 if (obj is IList<T> other)
-                    return structuralEqualityComparer.Equals(list, other);
+                    return structuralEqualityComparer.Equals(Items, other);
                 return false;
             }
 
             public override int GetHashCode()
             {
-                return structuralEqualityComparer.GetHashCode(list);
+                return structuralEqualityComparer.GetHashCode(Items);
             }
 
             public override string ToString()
             {
-                return string.Format(toStringFormatProvider, "{0}", list);
+                return ToString("{0}", toStringFormatProvider);
+            }
+
+            public string ToString(string format, IFormatProvider provider)
+            {
+                if (Items is IStructuralFormattable formattable)
+                    return formattable.ToString(format, provider);
+                return CollectionUtil.ToString(provider, format, Items);
             }
         }
 

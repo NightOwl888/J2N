@@ -5,6 +5,8 @@ using System.Collections.Generic;
 
 namespace J2N.Collections.Generic.Extensions
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Extensions to the <see cref="ISet{T}"/> interface.
     /// </summary>
@@ -104,7 +106,7 @@ namespace J2N.Collections.Generic.Extensions
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class UnmodifiableSet<T> : ISet<T>, IStructuralEquatable
+        internal class UnmodifiableSet<T> : ISet<T>, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
         {
             internal readonly ISet<T> set; // internal for testing
             private readonly SetEqualityComparer<T> structuralEqualityComparer;
@@ -117,32 +119,32 @@ namespace J2N.Collections.Generic.Extensions
             }
             public int Count => set.Count;
 
-            public bool IsReadOnly => true;
+            bool ICollection<T>.IsReadOnly => true;
 
-            public void Add(T item)
+            void ICollection<T>.Add(T item)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
-            public void Clear()
+            void ICollection<T>.Clear()
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             public bool Contains(T item) => set.Contains(item);
 
             public void CopyTo(T[] array, int arrayIndex) => set.CopyTo(array, arrayIndex);
 
-            public void ExceptWith(IEnumerable<T> other)
+            void ISet<T>.ExceptWith(IEnumerable<T> other)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             public IEnumerator<T> GetEnumerator() => set.GetEnumerator();
 
-            public void IntersectWith(IEnumerable<T> other)
+            void ISet<T>.IntersectWith(IEnumerable<T> other)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             public bool IsProperSubsetOf(IEnumerable<T> other) => set.IsProperSubsetOf(other);
@@ -157,24 +159,24 @@ namespace J2N.Collections.Generic.Extensions
 
             public bool Remove(T item)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             public bool SetEquals(IEnumerable<T> other) => set.SetEquals(other);
 
-            public void SymmetricExceptWith(IEnumerable<T> other)
+            void ISet<T>.SymmetricExceptWith(IEnumerable<T> other)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
-            public void UnionWith(IEnumerable<T> other)
+            void ISet<T>.UnionWith(IEnumerable<T> other)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             bool ISet<T>.Add(T item)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -212,6 +214,13 @@ namespace J2N.Collections.Generic.Extensions
             public override string ToString()
             {
                 return string.Format(toStringFormatProvider, "{0}", set);
+            }
+
+            public string ToString(string format, IFormatProvider provider)
+            {
+                if (set is IStructuralFormattable formattable)
+                    return formattable.ToString(format, provider);
+                return CollectionUtil.ToString(provider, format, set);
             }
         }
 

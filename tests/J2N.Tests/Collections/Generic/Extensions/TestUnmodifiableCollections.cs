@@ -191,7 +191,7 @@ namespace J2N.Collections.Generic.Extensions
             var clone = Clone(col);
 
             assertNotSame(col, clone);
-            assertNotSame(col.list, clone.list);
+            assertNotSame(col.List, clone.List);
             assertEquals(col.Count, clone.Count);
 
             using (var it1 = col.GetEnumerator())
@@ -309,7 +309,7 @@ namespace J2N.Collections.Generic.Extensions
             var clone = Clone(col);
 
             assertNotSame(col, clone);
-            assertNotSame(col.dictionary, clone.dictionary);
+            assertNotSame(col.Dictionary, clone.Dictionary);
             assertEquals(col.Count, clone.Count);
 
             using (var it1 = col.GetEnumerator())

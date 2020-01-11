@@ -2,9 +2,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace J2N.Collections.Generic.Extensions
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Extensions to the <see cref="ICollection{T}"/> interface.
     /// </summary>
@@ -104,11 +107,16 @@ namespace J2N.Collections.Generic.Extensions
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class UnmodifiableCollection<T> : ICollection<T>, IStructuralEquatable
+        internal class UnmodifiableCollection<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection, IStructuralEquatable, IStructuralFormattable
         {
             internal readonly ICollection<T> collection; // internal for testing
             private readonly StructuralEqualityComparer structuralEqualityComparer;
             private readonly IFormatProvider toStringFormatProvider;
+
+#if FEATURE_SERIALIZABLE
+            [NonSerialized]
+#endif
+            private object syncRoot;
 
             public UnmodifiableCollection(ICollection<T> collection, StructuralEqualityComparer structuralEqualityComparer, IFormatProvider toStringFormatProvider)
             {
@@ -121,25 +129,104 @@ namespace J2N.Collections.Generic.Extensions
 
             public bool IsReadOnly => true;
 
-            public void Add(T item)
+            object ICollection.SyncRoot
             {
-                throw new NotSupportedException("Collection is read-only.");
+                get
+                {
+                    if (syncRoot == null)
+                    {
+                        if (collection is ICollection col)
+                            syncRoot = col.SyncRoot;
+                        System.Threading.Interlocked.CompareExchange<object>(ref syncRoot, new object(), null);
+                    }
+                    return syncRoot;
+                }
             }
 
-            public void Clear()
+            bool ICollection.IsSynchronized
             {
-                throw new NotSupportedException("Collection is read-only.");
+                get
+                {
+                    if (collection is ICollection col)
+                        return col.IsSynchronized;
+                    return false;
+                }
+            }
+
+            void ICollection<T>.Add(T item)
+            {
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
+            }
+
+            void ICollection<T>.Clear()
+            {
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             public bool Contains(T item) => collection.Contains(item);
 
             public void CopyTo(T[] array, int arrayIndex) => collection.CopyTo(array, arrayIndex);
 
+            void ICollection.CopyTo(Array array, int arrayIndex)
+            {
+                if (array == null)
+                    throw new ArgumentNullException(nameof(array));
+                if (array.Rank != 1)
+                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                if (array.GetLowerBound(0) != 0)
+                    throw new ArgumentException(SR.Arg_NonZeroLowerBound);
+                if (arrayIndex < 0)
+                    throw new ArgumentOutOfRangeException(nameof(arrayIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                if (array.Length - arrayIndex < Count)
+                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+
+                if (array is T[] items)
+                {
+                    collection.CopyTo(items, arrayIndex);
+                }
+                else
+                {
+                    //
+                    // Catch the obvious case assignment will fail.
+                    // We can found all possible problems by doing the check though.
+                    // For example, if the element type of the Array is derived from T,
+                    // we can't figure out if we can successfully copy the element beforehand.
+                    //
+                    TypeInfo targetType = array.GetType().GetElementType().GetTypeInfo();
+                    TypeInfo sourceType = typeof(T).GetTypeInfo();
+                    if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
+                    {
+                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    }
+
+                    //
+                    // We can't cast array of value type to object[], so we don't support 
+                    // widening of primitive types here.
+                    //
+                    if (!(array is object[] objects))
+                    {
+                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    }
+
+                    try
+                    {
+                        foreach (var item in collection)
+                        {
+                            objects[arrayIndex++] = item;
+                        }
+                    }
+                    catch (ArrayTypeMismatchException)
+                    {
+                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    }
+                }
+            }
+
             public IEnumerator<T> GetEnumerator() => collection.GetEnumerator();
 
-            public bool Remove(T item)
+            bool ICollection<T>.Remove(T item)
             {
-                throw new NotSupportedException("Collection is read-only.");
+                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -173,7 +260,14 @@ namespace J2N.Collections.Generic.Extensions
 
             public override string ToString()
             {
-                return string.Format(toStringFormatProvider, "{0}", collection);
+                return ToString("{0}", toStringFormatProvider);
+            }
+
+            public string ToString(string format, IFormatProvider provider)
+            {
+                if (collection is IStructuralFormattable formattable)
+                    return formattable.ToString(format, provider);
+                return CollectionUtil.ToString(provider, format, collection);
             }
         }
 

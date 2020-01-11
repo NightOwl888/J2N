@@ -332,6 +332,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Collection is read-only..
+        /// </summary>
+        internal static string NotSupported_ReadOnlyCollection {
+            get {
+                return ResourceManager.GetString("NotSupported_ReadOnlyCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This operation is not supported on SortedList nested types because they require modifying the original SortedList..
         /// </summary>
         internal static string NotSupported_SortedListNestedWrite {

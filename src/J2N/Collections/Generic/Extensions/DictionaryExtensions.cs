@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -104,88 +105,34 @@ namespace J2N.Collections.Generic.Extensions
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal class UnmodifiableDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IStructuralEquatable
+        internal class UnmodifiableDictionary<TKey, TValue> : ReadOnlyDictionary<TKey, TValue>, IStructuralEquatable, IStructuralFormattable
         {
-            internal readonly IDictionary<TKey, TValue> dictionary; // internal for testing
             private readonly DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer;
             private readonly IFormatProvider toStringFormatProvider;
 
             public UnmodifiableDictionary(IDictionary<TKey, TValue> dictionary, DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
+                : base(dictionary)
             {
-                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
                 this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
                 this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
             }
 
-            public void Add(TKey key, TValue value)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public bool ContainsKey(TKey key)
-            {
-                return dictionary.ContainsKey(key);
-            }
-
-            public ICollection<TKey> Keys => dictionary.Keys;
-
-            public bool Remove(TKey key)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public bool TryGetValue(TKey key, out TValue value) => dictionary.TryGetValue(key, out value);
-
-            public ICollection<TValue> Values => dictionary.Values;
-
-            public TValue this[TKey key]
-            {
-                get => dictionary[key];
-                set => throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public void Add(KeyValuePair<TKey, TValue> item)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public void Clear()
-            {
-                throw new NotSupportedException("Collection is read-only."); ;
-            }
-
-            public bool Contains(KeyValuePair<TKey, TValue> item) => dictionary.Contains(item);
-
-            public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) => dictionary.CopyTo(array, arrayIndex);
-
-            public int Count => dictionary.Count;
-
-            public bool IsReadOnly => true;
-
-            public bool Remove(KeyValuePair<TKey, TValue> item)
-            {
-                throw new NotSupportedException("Collection is read-only.");
-            }
-
-            public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => dictionary.GetEnumerator();
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
+            internal new IDictionary<TKey, TValue> Dictionary => base.Dictionary; // For testing
 
             public bool Equals(object other, IEqualityComparer comparer)
             {
-                if (dictionary is IStructuralEquatable se)
+                if (Dictionary is IStructuralEquatable se)
                     return se.Equals(other, comparer);
                 if (other is IDictionary<TKey, TValue> otherDictionary)
-                    return structuralEqualityComparer.Equals(dictionary, otherDictionary);
+                    return structuralEqualityComparer.Equals(Dictionary, otherDictionary);
                 return false;
             }
 
             public int GetHashCode(IEqualityComparer comparer)
             {
-                if (dictionary is IStructuralEquatable se)
+                if (Dictionary is IStructuralEquatable se)
                     return se.GetHashCode(comparer);
-                return structuralEqualityComparer.GetHashCode(dictionary);
+                return structuralEqualityComparer.GetHashCode(Dictionary);
             }
 
             public override bool Equals(object obj)
@@ -193,18 +140,25 @@ namespace J2N.Collections.Generic.Extensions
                 if (obj == null)
                     return false;
                 if (obj is IDictionary<TKey, TValue> other)
-                    return structuralEqualityComparer.Equals(dictionary, other);
+                    return structuralEqualityComparer.Equals(Dictionary, other);
                 return false;
             }
 
             public override int GetHashCode()
             {
-                return structuralEqualityComparer.GetHashCode(dictionary);
+                return structuralEqualityComparer.GetHashCode(Dictionary);
             }
 
             public override string ToString()
             {
-                return string.Format(toStringFormatProvider, "{0}", dictionary);
+                return ToString("{0}", toStringFormatProvider);
+            }
+
+            public string ToString(string format, IFormatProvider provider)
+            {
+                if (Dictionary is IStructuralFormattable formattable)
+                    return formattable.ToString(format, provider);
+                return CollectionUtil.ToString(provider, format, Dictionary);
             }
         }
 
