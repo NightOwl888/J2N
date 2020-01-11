@@ -25,6 +25,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
+        [DebuggerDisplay("Count = {Count}")]
         internal sealed class TreeSubSet : SortedSet<T>
 #if FEATURE_SERIALIZABLE
             , ISerializable, IDeserializationCallback

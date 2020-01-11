@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 #nullable enable
 
 namespace J2N.Collections.Generic
@@ -36,6 +37,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerDisplay("Count = {Count}")]
     public class HashSet<T> : System.Collections.Generic.HashSet<T>, IStructuralEquatable, IStructuralFormattable
     {
         #region Constructors

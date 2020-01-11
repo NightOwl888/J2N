@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using SCG = System.Collections.Generic;
 #nullable enable
 
@@ -28,6 +29,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerDisplay("Count = {Count}")]
     public class LinkedHashSet<T> : ICollection<T>, ISet<T>, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
         , System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
