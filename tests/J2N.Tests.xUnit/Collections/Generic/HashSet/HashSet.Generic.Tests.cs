@@ -295,13 +295,13 @@ namespace J2N.Collections.Tests
                 new HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var comparerSet1 = new HashSet<HashSet<T>>(System.Collections.Generic.HashSet<T>.CreateSetComparer())
+            var comparerSet1 = new HashSet<HashSet<T>>(HashSet<T>.CreateSetComparer())
             {
                 new HashSet<T> { objects[0], objects[1], objects[2] },
                 new HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var comparerSet2 = new HashSet<HashSet<T>>(System.Collections.Generic.HashSet<T>.CreateSetComparer())
+            var comparerSet2 = new HashSet<HashSet<T>>(HashSet<T>.CreateSetComparer())
             {
                 new HashSet<T> { objects[3], objects[4], objects[5] },
                 new HashSet<T> { objects[0], objects[1], objects[2] }
@@ -329,14 +329,14 @@ namespace J2N.Collections.Tests
                 new HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var comparerSet = new HashSet<HashSet<T>>(System.Collections.Generic.HashSet<T>.CreateSetComparer())
+            var comparerSet = new HashSet<HashSet<T>>(HashSet<T>.CreateSetComparer())
             {
                 new HashSet<T> { objects[0], objects[1], objects[2] },
                 new HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
             Assert.True(noComparerSet.SequenceEqual(set)); // Unlike the .NET HashSet, ours is structurally equatable by default
-            Assert.True(noComparerSet.SequenceEqual(set, System.Collections.Generic.HashSet<T>.CreateSetComparer()));
+            Assert.True(noComparerSet.SequenceEqual(set, HashSet<T>.CreateSetComparer()));
             Assert.True(comparerSet.SequenceEqual(set)); // Unlike the .NET HashSet, ours is structurally equatable by default
         }
 
