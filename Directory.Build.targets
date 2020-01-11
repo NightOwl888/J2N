@@ -44,6 +44,7 @@
 
     <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CONTRACTBLOCKS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CONVERTER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_INTERNALCALL</DefineConstants>
 
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.

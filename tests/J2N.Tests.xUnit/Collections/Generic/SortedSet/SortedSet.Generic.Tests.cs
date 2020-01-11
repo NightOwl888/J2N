@@ -95,7 +95,7 @@ namespace J2N.Collections.Tests
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
             if (setLength > 0)
             {
-                SCG.List<T> expected = set.ToList();
+                List<T> expected = set.ToList();
                 expected.Sort(GetIComparer());
                 Assert.Equal(expected[0], set.Min);
                 Assert.Equal(expected[setLength - 1], set.Max);
@@ -249,7 +249,7 @@ namespace J2N.Collections.Tests
         public void SortedSet_Generic_SetIsProperlySortedAccordingToComparer(int setLength)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-            SCG.List<T> expected = set.ToList();
+            List<T> expected = set.ToList();
             expected.Sort(GetIComparer());
             int expectedIndex = 0;
             foreach (T value in set)
@@ -261,7 +261,7 @@ namespace J2N.Collections.Tests
         public void SortedSet_Generic_ReverseSetIsProperlySortedAccordingToComparer(int setLength)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-            SCG.List<T> expected = set.ToList();
+            List<T> expected = set.ToList();
             expected.Sort(GetIComparer());
             expected.Reverse();
             int expectedIndex = 0;
@@ -295,7 +295,7 @@ namespace J2N.Collections.Tests
         public void SortedSet_Generic_CopyTo_WithoutIndex(int setLength)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-            SCG.List<T> expected = set.ToList();
+            List<T> expected = set.ToList();
             expected.Sort(GetIComparer());
             T[] actual = new T[setLength];
             set.CopyTo(actual);
@@ -307,7 +307,7 @@ namespace J2N.Collections.Tests
         public void SortedSet_Generic_CopyTo_WithValidFullCount(int setLength)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-            SCG.List<T> expected = set.ToList();
+            List<T> expected = set.ToList();
             expected.Sort(GetIComparer());
             T[] actual = new T[setLength];
             set.CopyTo(actual, 0, setLength);

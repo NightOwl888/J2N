@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -16,7 +17,7 @@ namespace J2N.Collections.Tests
         protected override bool DefaultValueAllowed => false;
         protected override bool DuplicateValuesAllowed => false;
         protected override bool IsReadOnly => true;
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
         protected override ICollection<string> GenericICollectionFactory()
         {
             return new LinkedDictionary<string, string>().Keys;
@@ -99,7 +100,7 @@ namespace J2N.Collections.Tests
             Debug.Assert(false);
         }
 
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]

@@ -1,12 +1,12 @@
 ﻿using J2N.Collections.Generic;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Text;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Util
 {
-    public class StructuralEquatableList<T> : List<T>, IStructuralEquatable
+    public class StructuralEquatableList<T> : SCG.List<T>, IStructuralEquatable
     {
         public bool Equals(object other, IEqualityComparer comparer)
         {

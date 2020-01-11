@@ -2,10 +2,12 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using J2N.Collections.Generic;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using SCG = System.Collections.Generic;
+
 
 namespace J2N.Collections.Tests
 {
@@ -18,9 +20,9 @@ namespace J2N.Collections.Tests
 
         protected override bool DefaultValueWhenNotAllowed_Throws { get { return false; } }
 
-        protected override IDictionary<TKey, TValue> GenericIDictionaryFactory()
+        protected override SCG.IDictionary<TKey, TValue> GenericIDictionaryFactory()
         {
-            return new J2N.Collections.Generic.SortedDictionary<TKey, TValue>();
+            return new SortedDictionary<TKey, TValue>();
         }
 
         #endregion
@@ -31,9 +33,9 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_Constructor_IComparer(int count)
         {
-            IComparer<TKey> comparer = GetKeyIComparer();
-            IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
-            J2N.Collections.Generic.SortedDictionary<TKey, TValue> copied = new J2N.Collections.Generic.SortedDictionary<TKey, TValue>(source, comparer);
+            SCG.IComparer<TKey> comparer = GetKeyIComparer();
+            SCG.IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
+            SortedDictionary<TKey, TValue> copied = new SortedDictionary<TKey, TValue>(source, comparer);
             Assert.Equal(source, copied);
             Assert.Equal(comparer, copied.Comparer);
         }
@@ -42,23 +44,23 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_Constructor_IDictionary(int count)
         {
-            IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
-            IDictionary<TKey, TValue> copied = new J2N.Collections.Generic.SortedDictionary<TKey, TValue>(source);
+            SCG.IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
+            SCG.IDictionary<TKey, TValue> copied = new SortedDictionary<TKey, TValue>(source);
             Assert.Equal(source, copied);
         }
 
         [Fact]
         public void SortedDictionary_Generic_Constructor_NullIDictionary_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => new J2N.Collections.Generic.SortedDictionary<TKey, TValue>((IDictionary<TKey, TValue>)null));
+            Assert.Throws<ArgumentNullException>(() => new SortedDictionary<TKey, TValue>((SCG.IDictionary<TKey, TValue>)null));
         }
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_Constructor_IDictionary_IComparer(int count)
         {
-            IComparer<TKey> comparer = GetKeyIComparer();
-            IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
+            SCG.IComparer<TKey> comparer = GetKeyIComparer();
+            SCG.IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
             SortedDictionary<TKey, TValue> copied = new SortedDictionary<TKey, TValue>(source, comparer);
             Assert.Equal(source, copied);
             Assert.Equal(comparer, copied.Comparer);
@@ -72,7 +74,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_ContainsValue_NotPresent(int count)
         {
-            J2N.Collections.Generic.SortedDictionary<TKey, TValue> dictionary = (J2N.Collections.Generic.SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
             int seed = 4315;
             TValue notPresent = CreateTValue(seed++);
             while (dictionary.Values.Contains(notPresent))
@@ -84,9 +86,9 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_ContainsValue_Present(int count)
         {
-            J2N.Collections.Generic.SortedDictionary<TKey, TValue> dictionary = (J2N.Collections.Generic.SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
             int seed = 4315;
-            KeyValuePair<TKey, TValue> notPresent = CreateT(seed++);
+            SCG.KeyValuePair<TKey, TValue> notPresent = CreateT(seed++);
             while (dictionary.Contains(notPresent))
                 notPresent = CreateT(seed++);
             dictionary.Add(notPresent.Key, notPresent.Value);
@@ -97,7 +99,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_ContainsValue_DefaultValueNotPresent(int count)
         {
-            J2N.Collections.Generic.SortedDictionary<TKey, TValue> dictionary = (J2N.Collections.Generic.SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
             Assert.False(dictionary.ContainsValue(default(TValue)));
         }
 
@@ -105,7 +107,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_ContainsValue_DefaultValuePresent(int count)
         {
-            J2N.Collections.Generic.SortedDictionary<TKey, TValue> dictionary = (J2N.Collections.Generic.SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
             int seed = 4315;
             TKey notPresent = CreateTKey(seed++);
             while (dictionary.ContainsKey(notPresent))
@@ -122,11 +124,11 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_DictionaryIsProperlySortedAccordingToComparer(int setLength)
         {
-            J2N.Collections.Generic.SortedDictionary<TKey, TValue> set = (J2N.Collections.Generic.SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
-            List<KeyValuePair<TKey, TValue>> expected = set.ToList();
+            SortedDictionary<TKey, TValue> set = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
+            List<SCG.KeyValuePair<TKey, TValue>> expected = set.ToList();
             expected.Sort(GetIComparer());
             int expectedIndex = 0;
-            foreach (KeyValuePair<TKey, TValue> value in set)
+            foreach (SCG.KeyValuePair<TKey, TValue> value in set)
                 Assert.Equal(expected[expectedIndex++], value);
         }
 
@@ -138,9 +140,9 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void IReadOnlyDictionary_Generic_Keys_ContainsAllCorrectKeys(int count)
         {
-            IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
-            IEnumerable<TKey> expected = dictionary.Select((pair) => pair.Key);
-            IEnumerable<TKey> keys = ((IReadOnlyDictionary<TKey, TValue>)dictionary).Keys;
+            SCG.IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
+            SCG.IEnumerable<TKey> expected = dictionary.Select((pair) => pair.Key);
+            SCG.IEnumerable<TKey> keys = ((SCG.IReadOnlyDictionary<TKey, TValue>)dictionary).Keys;
             Assert.True(expected.SequenceEqual(keys));
         }
 
@@ -148,9 +150,9 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void IReadOnlyDictionary_Generic_Values_ContainsAllCorrectValues(int count)
         {
-            IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
-            IEnumerable<TValue> expected = dictionary.Select((pair) => pair.Value);
-            IEnumerable<TValue> values = ((IReadOnlyDictionary<TKey, TValue>)dictionary).Values;
+            SCG.IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
+            SCG.IEnumerable<TValue> expected = dictionary.Select((pair) => pair.Value);
+            SCG.IEnumerable<TValue> values = ((SCG.IReadOnlyDictionary<TKey, TValue>)dictionary).Values;
             Assert.True(expected.SequenceEqual(values));
         }
 

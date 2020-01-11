@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Xunit;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -125,7 +126,7 @@ namespace J2N.Collections.Tests
             Queue<T> queue = new Queue<T>(count);
             int seed = 528;
             int duplicateAdded = 0;
-            List<T> match = null;
+            JCG.List<T> match = null;
 
             // Enqueue Matching elements
             if (enumerableToMatchTo != null)
@@ -171,10 +172,10 @@ namespace J2N.Collections.Tests
         /// </summary>
         protected IEnumerable<T> CreateList(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
-            List<T> list = new List<T>(count);
+            JCG.List<T> list = new JCG.List<T>(count);
             int seed = 528;
             int duplicateAdded = 0;
-            List<T> match = null;
+            JCG.List<T> match = null;
 
             // Add Matching elements
             if (enumerableToMatchTo != null)
@@ -220,9 +221,9 @@ namespace J2N.Collections.Tests
         /// </summary>
         protected IEnumerable<T> CreateHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
-            J2N.Collections.Generic.HashSet<T> set = new J2N.Collections.Generic.HashSet<T>(GetIEqualityComparer());
+            JCG.HashSet<T> set = new JCG.HashSet<T>(GetIEqualityComparer());
             int seed = 528;
-            List<T> match = null;
+            JCG.List<T> match = null;
 
             // Add Matching elements
             if (enumerableToMatchTo != null)
@@ -262,9 +263,9 @@ namespace J2N.Collections.Tests
         /// </summary>
         protected IEnumerable<T> CreateSortedSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
-            J2N.Collections.Generic.SortedSet<T> set = new J2N.Collections.Generic.SortedSet<T>(GetIComparer());
+            JCG.SortedSet<T> set = new JCG.SortedSet<T>(GetIComparer());
             int seed = 528;
-            List<T> match = null;
+            JCG.List<T> match = null;
 
             // Add Matching elements
             if (enumerableToMatchTo != null)
@@ -304,9 +305,9 @@ namespace J2N.Collections.Tests
         /// </summary>
         protected IEnumerable<T> CreateLinkedHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
-            J2N.Collections.Generic.LinkedHashSet<T> set = new J2N.Collections.Generic.LinkedHashSet<T>(GetIEqualityComparer());
+            JCG.LinkedHashSet<T> set = new JCG.LinkedHashSet<T>(GetIEqualityComparer());
             int seed = 528;
-            List<T> match = null;
+            JCG.List<T> match = null;
 
             // Add Matching elements
             if (enumerableToMatchTo != null)

@@ -94,7 +94,7 @@ namespace J2N.Collections.Tests
         public void LinkedHashSet_Generic_Constructor_LinkedHashSet_SparselyFilled(int count)
         {
             LinkedHashSet<T> source = (LinkedHashSet<T>)CreateEnumerable(EnumerableType.LinkedHashSet, null, count, 0, 0);
-            SCG.List<T> sourceElements = source.ToList();
+            List<T> sourceElements = source.ToList();
             foreach (int i in NonSquares(count))
                 source.Remove(sourceElements[i]);// Unevenly spaced survivors increases chance of catching any spacing-related bugs.
 
@@ -184,7 +184,7 @@ namespace J2N.Collections.Tests
         public void LinkedHashSet_Generic_TrimExcess_Repeatedly(int setLength)
         {
             LinkedHashSet<T> set = (LinkedHashSet<T>)GenericISetFactory(setLength);
-            SCG.List<T> expected = set.ToList();
+            List<T> expected = set.ToList();
             set.TrimExcess();
             set.TrimExcess();
             set.TrimExcess();
@@ -198,7 +198,7 @@ namespace J2N.Collections.Tests
             if (setLength > 0)
             {
                 LinkedHashSet<T> set = (LinkedHashSet<T>)GenericISetFactory(setLength);
-                SCG.List<T> expected = set.ToList();
+                List<T> expected = set.ToList();
                 T elementToRemove = set.ElementAt(0);
 
                 set.TrimExcess();

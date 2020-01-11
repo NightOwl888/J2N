@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -241,7 +242,7 @@ namespace J2N.Collections.Tests
             {
                 int seed = 840;
                 ICollection<T> collection = GenericICollectionFactory(count);
-                List<T> items = collection.ToList();
+                JCG.List<T> items = collection.ToList();
                 T toAdd = CreateT(seed++);
                 while (collection.Contains(toAdd))
                     toAdd = CreateT(seed++);
@@ -265,7 +266,7 @@ namespace J2N.Collections.Tests
             if (!IsReadOnly && !AddRemoveClear_ThrowsNotSupported)
             {
                 ICollection<T> collection = GenericICollectionFactory(count);
-                List<T> itemsToRemove = collection.ToList();
+                JCG.List<T> itemsToRemove = collection.ToList();
                 for (int i = 0; i < count; i++)
                     collection.Remove(collection.ElementAt(0));
                 collection.Add(CreateT(254));

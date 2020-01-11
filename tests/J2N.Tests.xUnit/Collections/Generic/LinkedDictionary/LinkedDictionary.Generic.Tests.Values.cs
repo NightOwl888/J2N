@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -16,7 +17,7 @@ namespace J2N.Collections.Tests
         protected override bool DefaultValueAllowed => true;
         protected override bool DuplicateValuesAllowed => true;
         protected override bool IsReadOnly => true;
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
 
         protected override ICollection<string> GenericICollectionFactory()
         {
@@ -68,7 +69,7 @@ namespace J2N.Collections.Tests
         protected override bool IsReadOnly => true;
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
         protected override Type ICollection_NonGeneric_CopyTo_ArrayOfEnumType_ThrowType => typeof(ArgumentException);
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
         protected override bool SupportsSerialization => false;
 
         protected override Type ICollection_NonGeneric_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
