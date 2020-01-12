@@ -36,7 +36,10 @@ namespace J2N.Collections.Generic
         , System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
 #endif
     {
-        private readonly SCG.HashSet<T> hashSet;
+#if FEATURE_SERIALIZABLE
+        [NonSerialized]
+#endif
+        private readonly HashSet<T> hashSet;
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
@@ -54,9 +57,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        public LinkedHashSet() : this(EqualityComparer<T>.Default) { }
-
-#if FEATURE_HASHSET_CAPACITY
+        public LinkedHashSet() : this((IEqualityComparer<T>?)null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkedHashSet{T}"/> class that is empty, but has reserved
@@ -67,8 +68,7 @@ namespace J2N.Collections.Generic
         /// Since resizes are relatively expensive (require rehashing), this attempts to minimize the need
         /// to resize by setting the initial capacity based on the value of the <paramref name="capacity"/>.
         /// </remarks>
-        public LinkedHashSet(int capacity) : this(capacity, EqualityComparer<T>.Default) { }
-#endif
+        public LinkedHashSet(int capacity) : this(capacity, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkedHashSet{T}"/> class that uses <see cref="EqualityComparer{T}.Default"/>
@@ -86,7 +86,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in the <paramref name="collection"/> parameter.
         /// </remarks>
-        public LinkedHashSet(IEnumerable<T> collection) : this(collection, EqualityComparer<T>.Default) { }
+        public LinkedHashSet(IEnumerable<T> collection) : this(collection, null) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkedHashSet{T}"/> class that is empty and uses the
@@ -102,10 +102,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public LinkedHashSet(IEqualityComparer<T>? comparer)
         {
-            hashSet = new SCG.HashSet<T>(comparer ?? EqualityComparer<T>.Default);
+            hashSet = new HashSet<T>(comparer ?? EqualityComparer<T>.Default);
         }
-
-#if FEATURE_HASHSET_CAPACITY
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkedHashSet{T}"/> class that uses the specified equality comparer
@@ -118,9 +116,8 @@ namespace J2N.Collections.Generic
         /// by setting the initial capacity based on the value of the <paramref name="capacity"/>.</remarks>
         public LinkedHashSet(int capacity, IEqualityComparer<T>? comparer)
         {
-            hashSet = new SCG.HashSet<T>(capacity, comparer);
+            hashSet = new HashSet<T>(capacity, comparer);
         }
-#endif
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LinkedHashSet{T}"/> class that uses the specified equality comparer for the set type,
@@ -141,7 +138,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public LinkedHashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
         {
-            hashSet = new SCG.HashSet<T>(collection, comparer);
+            hashSet = new HashSet<T>(collection, comparer);
         }
 
 #if FEATURE_SERIALIZABLE
@@ -165,7 +162,7 @@ namespace J2N.Collections.Generic
 
 #if FEATURE_SERIALIZABLE
         [Serializable]
-        private class HashSetWrapper : SCG.HashSet<T>
+        private class HashSetWrapper : HashSet<T>
         {
             public HashSetWrapper(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
         }
@@ -228,10 +225,24 @@ namespace J2N.Collections.Generic
         public void CopyTo(T[] array, int arrayIndex, int count)
             => hashSet.CopyTo(array, arrayIndex, count);
 
-        // CreateSetComparer() omitted because we are implementing IStructuralEquatable
-        // which can compare the current set type as well as any other type that implements it.
-
-#if FEATURE_HASHSET_ENSURECAPACITY
+        /// <summary>
+        /// Returns an <see cref="IEqualityComparer"/> object that can be used
+        /// for equality testing of a <see cref="LinkedHashSet{T}"/> object
+        /// as well as any nested objects that implement <see cref="IStructuralEquatable"/>.
+        /// <para/>
+        /// Usage Note: This is exactly the same as <see cref="SetEqualityComparer{T}.Default"/>.
+        /// It is included here to cover the <see cref="SCG.HashSet{T}"/> API.
+        /// </summary>
+        /// <returns>An <see cref="IEqualityComparer"/> object that can be used for deep
+        /// equality testing of the <see cref="LinkedHashSet{T}"/> object.</returns>
+        /// <remarks>
+        /// The <see cref="IEqualityComparer"/> object checks for equality for multiple levels.
+        /// Nested reference types that implement <see cref="IStructuralEquatable"/> are also compared.
+        /// </remarks>
+        public static IEqualityComparer<ISet<T>> CreateSetComparer()
+        {
+            return SetEqualityComparer<T>.Default;
+        }
 
         /// <summary>
         /// Ensures that this hash set can hold the specified number of elements without growing.
@@ -241,7 +252,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public int EnsureCapacity(int capacity)
             => hashSet.EnsureCapacity(capacity);
-#endif
+
 #if FEATURE_SERIALIZABLE
 
         /// <summary>
@@ -313,8 +324,6 @@ namespace J2N.Collections.Generic
             requiresTrimExcess = false;
         }
 
-#if FEATURE_HASHSET_TRYGETVALUE
-
         /// <summary>
         /// Searches the set for a given value and returns the equal value it finds, if any.
         /// </summary>
@@ -330,7 +339,6 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool TryGetValue(T equalValue, out T actualValue)
             => hashSet.TryGetValue(equalValue, out actualValue);
-#endif
 
         #endregion
 
@@ -465,7 +473,7 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an enumerator that iterates through a <see cref="LinkedHashSet{T}"/> object.
         /// </summary>
-        /// <returns>A <see cref="SCG.HashSet{T}.Enumerator"/> object for the <see cref="LinkedHashSet{T}"/> object.</returns>
+        /// <returns>An <see cref="IEnumerator{T}"/> object for the <see cref="LinkedHashSet{T}"/> object.</returns>
         /// <remarks>
         /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
         /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
@@ -473,24 +481,24 @@ namespace J2N.Collections.Generic
         /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
         /// <para/>
         /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
-        /// <see cref="SCG.HashSet{T}.Enumerator.Current"/> property is undefined. Therefore, you must call the
-        /// <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/> method to advance the enumerator to the first element
-        /// of the collection before reading the value of <see cref="SCG.HashSet{T}.Enumerator.Current"/>.
+        /// <see cref="IEnumerator{T}.Current"/> property is undefined. Therefore, you must call the
+        /// <see cref="IEnumerator.MoveNext()"/> method to advance the enumerator to the first element
+        /// of the collection before reading the value of <see cref="IEnumerator{T}.Current"/>.
         /// <para/>
-        /// The <see cref="SCG.HashSet{T}.Enumerator.Current"/> property returns the same object until
-        /// <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/> is called. <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/>
-        /// sets <see cref="SCG.HashSet{T}.Enumerator.Current"/> to the next element.
+        /// The <see cref="IEnumerator{T}.Current"/> property returns the same object until
+        /// <see cref="IEnumerator.MoveNext()"/> is called. <see cref="IEnumerator.MoveNext()"/>
+        /// sets <see cref="IEnumerator{T}.Current"/> to the next element.
         /// <para/>
-        /// If <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/> passes the end of the collection, the enumerator is
-        /// positioned after the last element in the collection and <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/>
-        /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/>
-        /// also return <c>false</c>. If the last call to <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/> returned <c>false</c>,
-        /// <see cref="SCG.HashSet{T}.Enumerator.Current"/> is undefined. You cannot set <see cref="SCG.HashSet{T}.Enumerator.Current"/>
+        /// If <see cref="IEnumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+        /// positioned after the last element in the collection and <see cref="IEnumerator.MoveNext()"/>
+        /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="IEnumerator.MoveNext()"/>
+        /// also return <c>false</c>. If the last call to <see cref="IEnumerator.MoveNext()"/> returned <c>false</c>,
+        /// <see cref="IEnumerator{T}.Current"/> is undefined. You cannot set <see cref="IEnumerator{T}.Current"/>
         /// to the first element of the collection again; you must create a new enumerator object instead.
         /// <para/>
         /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
         /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
-        /// to <see cref="SCG.HashSet{T}.Enumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+        /// to <see cref="IEnumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
         /// <see cref="InvalidOperationException"/>.
         /// <para/>
         /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is

@@ -31,8 +31,6 @@ namespace J2N.Collections.Generic
             assertEquals("Created incorrect LinkedHashSet", 0, hs2.Count);
         }
 
-#if FEATURE_HASHSET_CAPACITY
-
         /**
          * @tests java.util.LinkedHashSet#LinkedHashSet(int)
          */
@@ -54,27 +52,25 @@ namespace J2N.Collections.Generic
                     "Failed to throw IllegalArgumentException for capacity < 0");
         }
 
-#endif
-
-        ///**
-        // * @tests java.util.LinkedHashSet#LinkedHashSet(int, float)
-        // */[Test]
-        //public void Test_ConstructorIF()
-        //{
-        //    // Test for method java.util.LinkedHashSet(int, float)
-        //    LinkedHashSet<object> hs2 = new LinkedHashSet<object>(5/*, (float)0.5*/);
-        //    assertEquals("Created incorrect LinkedHashSet", 0, hs2.size());
-        //    try
-        //    {
-        //        new LinkedHashSet<object>(0, 0);
-        //    }
-        //    catch (ArgumentException e)
-        //    {
-        //        return;
-        //    }
-        //    fail(
-        //            "Failed to throw IllegalArgumentException for initial load factor <= 0");
-        //}
+        /////**
+        //// * @tests java.util.LinkedHashSet#LinkedHashSet(int, float)
+        //// */[Test]
+        ////public void Test_ConstructorIF()
+        ////{
+        ////    // Test for method java.util.LinkedHashSet(int, float)
+        ////    LinkedHashSet<object> hs2 = new LinkedHashSet<object>(5/*, (float)0.5*/);
+        ////    assertEquals("Created incorrect LinkedHashSet", 0, hs2.size());
+        ////    try
+        ////    {
+        ////        new LinkedHashSet<object>(0, 0);
+        ////    }
+        ////    catch (ArgumentException e)
+        ////    {
+        ////        return;
+        ////    }
+        ////    fail(
+        ////            "Failed to throw IllegalArgumentException for initial load factor <= 0");
+        ////}
 
         /**
          * @tests java.util.LinkedHashSet#LinkedHashSet(java.util.Collection)

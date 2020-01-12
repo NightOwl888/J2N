@@ -6,6 +6,7 @@ using J2N.Collections.Generic;
 using System;
 using System.Collections;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 using SCG = System.Collections.Generic;
 
@@ -276,8 +277,6 @@ namespace J2N.Collections.Tests
 
         #region CreateSetComparer
 
-#if FEATURE_HASHSET_CREATESETCOMPARER
-
         [Fact]
         public void SetComparer_SetEqualsTests()
         {
@@ -340,8 +339,6 @@ namespace J2N.Collections.Tests
             Assert.True(comparerSet.SequenceEqual(set)); // Unlike the .NET LinkedHashSet, ours is structurally equatable by default
         }
 
-#endif
-
         #endregion
 
         [Fact]
@@ -351,8 +348,6 @@ namespace J2N.Collections.Tests
             SCG.ISet<T> iset = (set as SCG.ISet<T>);
             Assert.NotNull(iset);
         }
-
-#if FEATURE_HASHSET_CAPACITY
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -429,11 +424,7 @@ namespace J2N.Collections.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new LinkedHashSet<T>(int.MinValue, comparer));
         }
 
-#endif
-
         #region TryGetValue
-
-#if FEATURE_HASHSET_TRYGETVALUE
 
         [Fact]
         public void LinkedHashSet_Generic_TryGetValue_Contains()
@@ -444,7 +435,7 @@ namespace J2N.Collections.Tests
             T actualValue;
             Assert.True(set.TryGetValue(equalValue, out actualValue));
             Assert.Equal(value, actualValue);
-            if (!typeof(T).IsValueType)
+            if (!typeof(T).GetTypeInfo().IsValueType)
             {
                 Assert.Same((object)value, (object)actualValue);
             }
@@ -459,7 +450,7 @@ namespace J2N.Collections.Tests
             T actualValue = CreateT(2);
             Assert.True(set.TryGetValue(equalValue, out actualValue));
             Assert.Equal(value, actualValue);
-            if (!typeof(T).IsValueType)
+            if (!typeof(T).GetTypeInfo().IsValueType)
             {
                 Assert.Same((object)value, (object)actualValue);
             }
@@ -487,13 +478,9 @@ namespace J2N.Collections.Tests
             Assert.Equal(default(T), actualValue);
         }
 
-#endif
-
         #endregion
 
         #region EnsureCapacity
-
-#if FEATURE_HASHSET_ENSURECAPACITY
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -625,34 +612,26 @@ namespace J2N.Collections.Tests
             Assert.Equal(17, set.EnsureCapacity(13));
         }
 
-        // J2N TODO: This test is failing. Since we are subclassing and have confirmed that
-        // the capacity is definitely passed in the constructor, this seems to be a problem
-        // with the LinkedHashSet on .NET Core 3.x. Since we don't use this feature, we are
-        // ignoring this failure for now.
-        //[Theory]
-        //[InlineData(2)]
-        //[InlineData(10)]
-        //public void EnsureCapacity_Generic_GrowCapacityWithFreeList(int setLength)
-        //{
-        //    LinkedHashSet<T> set = (LinkedHashSet<T>)GenericISetFactory(setLength);
+        [Theory]
+        [InlineData(2)]
+        [InlineData(10)]
+        public void EnsureCapacity_Generic_GrowCapacityWithFreeList(int setLength)
+        {
+            LinkedHashSet<T> set = (LinkedHashSet<T>)GenericISetFactory(setLength);
 
-        //    // Remove the first element to ensure we have a free list.
-        //    Assert.True(set.Remove(set.ElementAt(0)));
+            // Remove the first element to ensure we have a free list.
+            Assert.True(set.Remove(set.ElementAt(0)));
 
-        //    int currentCapacity = set.EnsureCapacity(0);
-        //    Assert.True(currentCapacity > 0);
+            int currentCapacity = set.EnsureCapacity(0);
+            Assert.True(currentCapacity > 0);
 
-        //    int newCapacity = set.EnsureCapacity(currentCapacity + 1);
-        //    Assert.True(newCapacity > currentCapacity);
-        //}
-
-#endif
+            int newCapacity = set.EnsureCapacity(currentCapacity + 1);
+            Assert.True(newCapacity > currentCapacity);
+        }
 
         #endregion
 
         #region Remove
-
-#if FEATURE_HASHSET_CAPACITY
 
         [Theory]
         [MemberData(nameof(ValidPositiveCollectionSizes))]
@@ -673,8 +652,6 @@ namespace J2N.Collections.Tests
             Assert.InRange(c.EqualsCalls, 1, int.MaxValue);
             Assert.InRange(c.GetHashCodeCalls, 1, int.MaxValue);
         }
-
-#endif
 
         #endregion
     }
