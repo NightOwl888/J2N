@@ -1058,7 +1058,7 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    return ((Enumerator)_treeEnum).NotStartedOrEnded;
+                    return ((SortedSet<KeyValuePair<TKey, TValue>>.Enumerator)_treeEnum).NotStartedOrEnded;
                 }
             }
 
