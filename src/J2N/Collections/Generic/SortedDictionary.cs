@@ -216,13 +216,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
         /// <summary>
         /// Gets or sets the value associated with the specified key. The key may be <c>null</c>.
@@ -329,7 +323,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public KeyCollection Keys
+        public ICollection<TKey> Keys
         {
             get
             {
@@ -358,7 +352,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public ValueCollection Values
+        public ICollection<TValue> Values
         {
             get
             {
@@ -983,7 +977,7 @@ namespace J2N.Collections.Generic
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
         public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
         {
-            private TreeSet<KeyValuePair<TKey, TValue>>.Enumerator _treeEnum;
+            private IEnumerator<KeyValuePair<TKey, TValue>> _treeEnum;
             private readonly int _getEnumeratorRetType;  // What should Enumerator.Current return?
 
             internal const int KeyValuePair = 1;
@@ -1064,7 +1058,7 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    return _treeEnum.NotStartedOrEnded;
+                    return ((Enumerator)_treeEnum).NotStartedOrEnded;
                 }
             }
 
@@ -1164,7 +1158,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public sealed class KeyCollection : ICollection<TKey>, ICollection, IReadOnlyCollection<TKey>
+        internal sealed class KeyCollection : ICollection<TKey>, ICollection, IReadOnlyCollection<TKey>
         {
             private readonly SortedDictionary<TKey, TValue> _dictionary;
 
@@ -1230,7 +1224,7 @@ namespace J2N.Collections.Generic
             /// <para/>
             /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
             /// </remarks>
-            public Enumerator GetEnumerator()
+            public IEnumerator<TKey> GetEnumerator()
             {
                 return new Enumerator(_dictionary);
             }
@@ -1385,7 +1379,7 @@ namespace J2N.Collections.Generic
             /// </remarks>
             [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
             [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-            public struct Enumerator : IEnumerator<TKey>, IEnumerator
+            internal struct Enumerator : IEnumerator<TKey>, IEnumerator
             {
                 private SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
 
@@ -1497,7 +1491,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public sealed class ValueCollection : ICollection<TValue>, ICollection, IReadOnlyCollection<TValue>
+        internal sealed class ValueCollection : ICollection<TValue>, ICollection, IReadOnlyCollection<TValue>
         {
             private readonly SortedDictionary<TKey, TValue> _dictionary;
 
@@ -1563,7 +1557,7 @@ namespace J2N.Collections.Generic
             /// <para/>
             /// This method is an O(1) operation.
             /// </remarks>
-            public Enumerator GetEnumerator()
+            public IEnumerator<TValue> GetEnumerator()
             {
                 return new Enumerator(_dictionary);
             }
@@ -1735,7 +1729,7 @@ namespace J2N.Collections.Generic
             /// </remarks>
             [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
             [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-            public struct Enumerator : IEnumerator<TValue>, IEnumerator
+            internal struct Enumerator : IEnumerator<TValue>, IEnumerator
             {
                 private SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
 
