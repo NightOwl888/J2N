@@ -10,7 +10,6 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     using SR = J2N.Resources.Strings;
 
     /// <summary>
@@ -302,9 +301,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Remove all items from this set. This clears the elements but not the underlying
-        /// buckets and slots array. Follow this call by TrimExcess to release these.
+        /// Removes all elements from a <see cref="HashSet{T}"/> object.
         /// </summary>
+        /// <remarks>
+        /// <see cref="Count"/> is set to zero and references to other objects from elements of the
+        /// collection are also released. The capacity remains unchanged until a call to <see cref="TrimExcess()"/> is made.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void Clear()
         {
             if (_lastIndex > 0)
@@ -323,10 +327,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this hashset contains the item
+        /// Determines whether a <see cref="HashSet{T}"/> object contains the specified element.
         /// </summary>
-        /// <param name="item">item to check for containment</param>
-        /// <returns>true if item contained; false if not</returns>
+        /// <param name="item">The element to locate in the <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object contains the specified element;
+        /// otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method is an O(1) operation.
+        /// </remarks>
         public bool Contains(T item)
         {
             int[]? buckets = _buckets;
@@ -410,20 +418,40 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Copy items in this hashset to array, starting at arrayIndex
+        /// Copies the elements of a <see cref="HashSet{T}"/> collection to an array.
         /// </summary>
-        /// <param name="array">array to add items to</param>
-        /// <param name="arrayIndex">index to start at</param>
+        /// <param name="array">The one-dimensional array that is the destination of
+        /// the elements copied from the <see cref="HashSet{T}"/> object.
+        /// The array must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="arrayIndex"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="arrayIndex"/> is greater than the length of the destination <paramref name="array"/>.
+        /// </exception>
+        /// <remarks>
+        /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void CopyTo(T[] array, int arrayIndex)
         {
             CopyTo(array, arrayIndex, _count);
         }
 
         /// <summary>
-        /// Remove item from this hashset
+        /// Removes the specified element from a <see cref="HashSet{T}"/> object.
         /// </summary>
-        /// <param name="item">item to remove</param>
-        /// <returns>true if removed; false if not (i.e. if the item wasn't in the HashSet)</returns>
+        /// <param name="item">The element to remove.</param>
+        /// <returns><c>true</c> if the element is successfully found and removed;
+        /// otherwise, <c>false</c>. This method returns <c>false</c> if item is not
+        /// found in the <see cref="HashSet{T}"/> object.</returns>
+        /// <remarks>
+        /// If the <see cref="HashSet{T}"/> object does not contain the specified
+        /// element, the object remains unchanged. No exception is thrown.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
         public bool Remove(T item)
         {
             int hashCode;
@@ -544,19 +572,72 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Number of elements in this hashset
+        /// Gets the number of elements that are contained in a set.
         /// </summary>
+        /// <remarks>
+        /// The capacity of a <see cref="HashSet{T}"/> object is the number of elements that the object can hold.
+        /// A <see cref="HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
+        /// <para/>
+        /// The capacity is always greater than or equal to <see cref="Count"/>. If <see cref="Count"/> exceeds the
+        /// capacity while adding elements, the capacity is set to the first prime number that is greater than
+        /// double the previous capacity.
+        /// <para/>
+        /// Retrieving the value of this property is an O(1) operation.
+        /// </remarks>
         public int Count => _count;
 
         /// <summary>
-        /// Whether this is readonly
+        /// Gets a value indicating whether a collection is read-only.
         /// </summary>
+        /// <remarks>
+        /// Retrieving the value of this property is an O(1) operation.
+        /// </remarks>
         bool ICollection<T>.IsReadOnly => false;
 
-#endregion
+        #endregion
 
-#region IEnumerable methods
+        #region IEnumerable methods
 
+        /// <summary>
+        /// Returns an enumerator that iterates through a <see cref="HashSet{T}"/> object.
+        /// </summary>
+        /// <returns>An <see cref="IEnumerator{T}"/> object for the <see cref="HashSet{T}"/> object.</returns>
+        /// <remarks>
+        /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+        /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
+        /// <para/>
+        /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+        /// <para/>
+        /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
+        /// <see cref="IEnumerator{T}.Current"/> property is undefined. Therefore, you must call the
+        /// <see cref="IEnumerator.MoveNext()"/> method to advance the enumerator to the first element
+        /// of the collection before reading the value of <see cref="IEnumerator{T}.Current"/>.
+        /// <para/>
+        /// The <see cref="IEnumerator{T}.Current"/> property returns the same object until
+        /// <see cref="IEnumerator.MoveNext()"/> is called. <see cref="IEnumerator.MoveNext()"/>
+        /// sets <see cref="IEnumerator{T}.Current"/> to the next element.
+        /// <para/>
+        /// If <see cref="IEnumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+        /// positioned after the last element in the collection and <see cref="IEnumerator.MoveNext()"/>
+        /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="IEnumerator.MoveNext()"/>
+        /// also return <c>false</c>. If the last call to <see cref="IEnumerator.MoveNext()"/> returned <c>false</c>,
+        /// <see cref="IEnumerator{T}.Current"/> is undefined. You cannot set <see cref="IEnumerator{T}.Current"/>
+        /// to the first element of the collection again; you must create a new enumerator object instead.
+        /// <para/>
+        /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+        /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
+        /// to <see cref="IEnumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+        /// <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+        /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+        /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+        /// reading and writing, you must implement your own synchronization.
+        /// <para/>
+        /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
         public IEnumerator<T> GetEnumerator()
         {
             return new Enumerator<T>(this);
@@ -572,12 +653,29 @@ namespace J2N.Collections.Generic
             return new Enumerator<T>(this);
         }
 
-#endregion
+        #endregion
 
-#region ISerializable methods
+        #region ISerializable methods
 
 #if FEATURE_SERIALIZABLE
 
+        /// <summary>
+        /// Implements the <see cref="System.Runtime.Serialization.ISerializable"/> interface and returns the data
+        /// needed to serialize a <see cref="HashSet{T}"/> object.
+        /// </summary>
+        /// <param name="info">A <see cref="System.Runtime.Serialization.SerializationInfo"/> object that contains
+        /// the information required to serialize the <see cref="HashSet{T}"/> object.</param>
+        /// <param name="context">A <see cref="System.Runtime.Serialization.StreamingContext"/> structure that
+        /// contains the source and destination of the serialized stream associated with the <see cref="HashSet{T}"/> object.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="info"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
+        /// <permission cref="System.Security.Permissions.SecurityPermissionAttribute">
+        /// for providing serialization services. Security action: <see cref="System.Security.Permissions.SecurityAction.LinkDemand"/>.
+        /// Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter"/>
+        /// </permission>
+        [System.Security.SecurityCritical]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             if (info == null)
@@ -599,12 +697,24 @@ namespace J2N.Collections.Generic
 
 #endif
 
-#endregion
+        #endregion
 
-#region IDeserializationCallback methods
+        #region IDeserializationCallback methods
 
 #if FEATURE_SERIALIZABLE
 
+        /// <summary>
+        /// Implements the <see cref="System.Runtime.Serialization.ISerializable"/> interface and raises the
+        /// deserialization event when the deserialization is complete.
+        /// </summary>
+        /// <param name="sender">The source of the deserialization event.</param>
+        /// <exception cref="System.Runtime.Serialization.SerializationException">
+        /// The <see cref="System.Runtime.Serialization.SerializationInfo"/> object associated with the
+        /// current <see cref="HashSet{T}"/> object is invalid.
+        /// </exception>
+        /// <remarks>
+        /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public virtual void OnDeserialization(object? sender)
         {
             if (_siInfo == null)
@@ -648,16 +758,24 @@ namespace J2N.Collections.Generic
 
 #endif
 
-#endregion
+        #endregion
 
-#region HashSet methods
+        #region HashSet methods
 
         /// <summary>
-        /// Add item to this HashSet. Returns bool indicating whether item was added (won't be
-        /// added if already present)
+        /// Adds the specified element to a set.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns>true if added, false if already present</returns>
+        /// <param name="item">The element to add to the set.</param>
+        /// <returns><c>true</c> if the element is added to the <see cref="HashSet{T}"/> object;
+        /// <c>false</c> if the element is already present.</returns>
+        /// <remarks>
+        /// If <see cref="Count"/> already equals the capacity of the <see cref="HashSet{T}"/> object,
+        /// the capacity is automatically adjusted to accommodate the new item.
+        /// <para/>
+        /// If <see cref="Count"/> is less than the capacity of the internal array, this method is an
+        /// O(1) operation. If the <see cref="HashSet{T}"/> object must be resized, this method
+        /// becomes an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public bool Add(T item)
         {
             return AddIfNotPresent(item);
@@ -667,7 +785,8 @@ namespace J2N.Collections.Generic
         /// Searches the set for a given value and returns the equal value it finds, if any.
         /// </summary>
         /// <param name="equalValue">The value to search for.</param>
-        /// <param name="actualValue">The value from the set that the search found, or the default value of <typeparamref name="T"/> when the search yielded no match.</param>
+        /// <param name="actualValue">The value from the set that the search found, or the
+        /// default value of <typeparamref name="T"/> when the search yielded no match.</param>
         /// <returns>A value indicating whether the search was successful.</returns>
         /// <remarks>
         /// This can be useful when you want to reuse a previously stored reference instead of
@@ -691,13 +810,15 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Take the union of this HashSet with other. Modifies this set.
-        ///
-        /// Implementation note: GetSuggestedCapacity (to increase capacity in advance avoiding
-        /// multiple resizes ended up not being useful in practice; quickly gets to the
-        /// point where it's a wasteful check.
+        /// Modifies the current <see cref="HashSet{T}"/> object to contain all elements that are present
+        /// in itself, the specified collection, or both.
         /// </summary>
-        /// <param name="other">enumerable with items to add</param>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in the
+        /// <paramref name="other"/> parameter.
+        /// </remarks>
         public void UnionWith(IEnumerable<T> other)
         {
             if (other == null)
@@ -712,19 +833,18 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Takes the intersection of this set with other. Modifies this set.
-        ///
-        /// Implementation Notes:
-        /// We get better perf if other is a hashset using same equality comparer, because we
-        /// get constant contains check in other. Resulting cost is O(n1) to iterate over this.
-        ///
-        /// If we can't go above route, iterate over the other and mark intersection by checking
-        /// contains in this. Then loop over and delete any unmarked elements. Total cost is n2+n1.
-        ///
-        /// Attempts to return early based on counts alone, using the property that the
-        /// intersection of anything with the empty set is the empty set.
+        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are
+        /// present in that object and in the specified collection.
         /// </summary>
-        /// <param name="other">enumerable with items to add </param>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// If the collection represented by the other parameter is a <see cref="HashSet{T}"/> collection with
+        /// the same equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
+        /// is the number of elements in <paramref name="other"/>.
+        /// </remarks>
+        [System.Security.SecurityCritical]
         public void IntersectWith(IEnumerable<T> other)
         {
             if (other == null)
@@ -768,9 +888,15 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Remove items in other from this set. Modifies this set.
+        /// Removes all elements in the specified collection from the current <see cref="HashSet{T}"/> object.
         /// </summary>
-        /// <param name="other">enumerable with items to remove</param>
+        /// <param name="other">The collection of items to remove from the <see cref="HashSet{T}"/> object.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="ExceptWith(IEnumerable{T})"/> method is the equivalent of mathematical set subtraction.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in the <paramref name="other"/> parameter.
+        /// </remarks>
         public void ExceptWith(IEnumerable<T> other)
         {
             if (other == null)
@@ -799,9 +925,18 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Takes symmetric difference (XOR) with other and this set. Modifies this set.
+        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are present either
+        /// in that object or in the specified collection, but not both.
         /// </summary>
-        /// <param name="other">enumerable with items to XOR</param>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// If the other parameter is a <see cref="HashSet{T}"/> collection with the same equality comparer as
+        /// the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// this method is an O(<c>n</c> + <c>m</c>) operation, where n is the number of elements in other and
+        /// <c>m</c> is <see cref="Count"/>.
+        /// </remarks>
+        [System.Security.SecurityCritical]
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
             if (other == null)
@@ -839,19 +974,26 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this is a subset of other.
-        ///
-        /// Implementation Notes:
-        /// The following properties are used up-front to avoid element-wise checks:
-        /// 1. If this is the empty set, then it's a subset of anything, including the empty set
-        /// 2. If other has unique elements according to this equality comparer, and this has more
-        /// elements than other, then it can't be a subset.
-        ///
-        /// Furthermore, if other is a hashset using the same equality comparer, we can use a
-        /// faster element-wise check.
+        /// Determines whether a <see cref="HashSet{T}"/> object is a subset of the specified collection.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns>true if this is a subset of other; false if not</returns>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a subset of <paramref name="other"/>;
+        /// otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// An empty set is a subset of any other collection, including an empty set; therefore, this method returns
+        /// <c>true</c> if the collection represented by the current <see cref="HashSet{T}"/> object is empty,
+        /// even if the <paramref name="other"/> parameter is an empty set.
+        /// <para/>
+        /// This method always returns <c>false</c> if <see cref="Count"/> is greater than the number of
+        /// elements in <paramref name="other"/>.
+        /// <para/>
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
+        /// is the number of elements in other.
+        /// </remarks>
+        [System.Security.SecurityCritical]
         public bool IsSubsetOf(IEnumerable<T> other)
         {
             if (other == null)
@@ -894,20 +1036,26 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this is a proper subset of other (i.e. strictly contained in)
-        ///
-        /// Implementation Notes:
-        /// The following properties are used up-front to avoid element-wise checks:
-        /// 1. If this is the empty set, then it's a proper subset of a set that contains at least
-        /// one element, but it's not a proper subset of the empty set.
-        /// 2. If other has unique elements according to this equality comparer, and this has >=
-        /// the number of elements in other, then this can't be a proper subset.
-        ///
-        /// Furthermore, if other is a hashset using the same equality comparer, we can use a
-        /// faster element-wise check.
+        /// Determines whether a <see cref="HashSet{T}"/> object is a proper subset of the specified collection.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns>true if this is a proper subset of other; false if not</returns>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper subset of <paramref name="other"/>;
+        /// otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// An empty set is a proper subset of any other collection. Therefore, this method returns <c>true</c> if the
+        /// collection represented by the current <see cref="HashSet{T}"/> object is empty unless the other
+        /// parameter is also an empty set.
+        /// <para/>
+        /// This method always returns <c>false</c> if <see cref="Count"/> is greater than or equal to the number of
+        /// elements in <paramref name="other"/>.
+        /// <para/>
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="HashSet{T}"/> object, then this method is an O(n) operation. Otherwise,
+        /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c> is the
+        /// number of elements in other.
+        /// </remarks>
+        [System.Security.SecurityCritical]
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
             if (other == null)
@@ -953,18 +1101,25 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this is a superset of other
-        ///
-        /// Implementation Notes:
-        /// The following properties are used up-front to avoid element-wise checks:
-        /// 1. If other has no elements (it's the empty set), then this is a superset, even if this
-        /// is also the empty set.
-        /// 2. If other has unique elements according to this equality comparer, and this has less
-        /// than the number of elements in other, then this can't be a superset
-        ///
+        /// Determines whether a <see cref="HashSet{T}"/> object is a superset of the specified collection.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns>true if this is a superset of other; false if not</returns>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a superset of <paramref name="other"/>;
+        /// otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// All collections, including the empty set, are supersets of the empty set. Therefore, this method returns
+        /// <c>true</c> if the collection represented by the other parameter is empty, even if the current
+        /// <see cref="HashSet{T}"/> object is empty.
+        /// <para/>
+        /// This method always returns <c>false</c> if <see cref="Count"/> is less than the number of elements
+        /// in <paramref name="other"/>.
+        /// <para/>
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other
+        /// and <c>m</c> is <see cref="Count"/>.
+        /// </remarks>
         public bool IsSupersetOf(IEnumerable<T> other)
         {
             if (other == null)
@@ -1003,25 +1158,23 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this is a proper superset of other (i.e. other strictly contained in this)
-        ///
-        /// Implementation Notes:
-        /// This is slightly more complicated than above because we have to keep track if there
-        /// was at least one element not contained in other.
-        ///
-        /// The following properties are used up-front to avoid element-wise checks:
-        /// 1. If this is the empty set, then it can't be a proper superset of any set, even if
-        /// other is the empty set.
-        /// 2. If other is an empty set and this contains at least 1 element, then this is a proper
-        /// superset.
-        /// 3. If other has unique elements according to this equality comparer, and other's count
-        /// is greater than or equal to this count, then this can't be a proper superset
-        ///
-        /// Furthermore, if other has unique elements according to this equality comparer, we can
-        /// use a faster element-wise check.
+        /// Determines whether a <see cref="HashSet{T}"/> object is a proper superset of the specified collection.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns>true if this is a proper superset of other; false if not</returns>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper superset of other; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// An empty set is a proper superset of any other collection. Therefore, this method returns <c>true</c> if the
+        /// collection represented by the other parameter is empty unless the current <see cref="HashSet{T}"/> collection is also empty.
+        /// <para/>
+        /// This method always returns <c>false</c> if <see cref="Count"/> is less than or equal to the number of elements in other.
+        /// <para/>
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and <c>m</c>
+        /// is <see cref="Count"/>.
+        /// </remarks>
+        [System.Security.SecurityCritical]
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
             if (other == null)
@@ -1067,10 +1220,16 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this set overlaps other (i.e. they share at least one item)
+        /// Determines whether the current <see cref="HashSet{T}"/> object and a specified collection
+        /// share common elements.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns>true if these have at least one common element; false if disjoint</returns>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object and <paramref name="other"/> share
+        /// at least one common element; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in other.
+        /// </remarks>
         public bool Overlaps(IEnumerable<T> other)
         {
             if (other == null)
@@ -1100,11 +1259,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this and other contain the same elements. This is set equality:
-        /// duplicates and order are ignored
+        /// Determines whether a <see cref="HashSet{T}"/> object and the specified collection contain the same elements.
         /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is equal to <paramref name="other"/>;
+        /// otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="SetEquals(IEnumerable{T})"/> method ignores duplicate entries and the order of elements in the
+        /// <paramref name="other"/> parameter.
+        /// <para/>
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and
+        /// <c>m</c> is <see cref="Count"/>.
+        /// </remarks>
+        [System.Security.SecurityCritical]
         public bool SetEquals(IEnumerable<T> other)
         {
             if (other == null)
@@ -1148,37 +1318,67 @@ namespace J2N.Collections.Generic
             }
         }
 
+        /// <summary>
+        /// Copies the elements of a <see cref="HashSet{T}"/> object to an array.
+        /// </summary>
+        /// <param name="array">The one-dimensional array that is the destination of
+        /// the elements copied from the <see cref="HashSet{T}"/> object.
+        /// The array must have zero-based indexing.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void CopyTo(T[] array)
         {
             CopyTo(array, 0, _count);
         }
 
+        /// <summary>
+        /// Copies the specified number of elements of a <see cref="HashSet{T}"/>
+        /// object to an array, starting at the specified array index.
+        /// </summary>
+        /// <param name="array">The one-dimensional array that is the destination of
+        /// the elements copied from the <see cref="HashSet{T}"/> object.
+        /// The array must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <param name="count">The number of elements to copy to <paramref name="array"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="arrayIndex"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="arrayIndex"/> is greater than the length of the destination <paramref name="array"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is greater than the available space from the <paramref name="arrayIndex"/>
+        /// to the end of the destination <paramref name="array"/>.
+        /// </exception>
+        /// <remarks>
+        /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <paramref name="count"/>.
+        /// </remarks>
         public void CopyTo(T[] array, int arrayIndex, int count)
         {
             if (array == null)
-            {
                 throw new ArgumentNullException(nameof(array));
-            }
 
             // check array index valid index into array
             if (arrayIndex < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
 
             // also throw if count less than 0
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
 
             // will array, starting at arrayIndex, be able to hold elements? Note: not
             // checking arrayIndex >= array.Length (consistency with list of allowing
             // count of 0; subsequent check takes care of the rest)
             if (arrayIndex > array.Length || count > array.Length - arrayIndex)
-            {
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
-            }
 
             int numCopied = 0;
             for (int i = 0; i < _lastIndex && numCopied < count; i++)
@@ -1192,10 +1392,13 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Remove elements that match specified predicate. Returns the number of elements removed
+        /// Removes all elements that match the conditions defined by the specified
+        /// predicate from a <see cref="HashSet{T}"/> collection.
         /// </summary>
-        /// <param name="match"></param>
-        /// <returns></returns>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines
+        /// the conditions of the elements to remove.</param>
+        /// <returns>The number of elements that were removed from the
+        /// <see cref="HashSet{T}"/> collection.</returns>
         public int RemoveWhere(Predicate<T> match)
         {
             if (match == null)
@@ -1224,14 +1427,20 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Gets the IEqualityComparer that is used to determine equality of keys for
-        /// the HashSet.
+        /// Gets the <see cref="IEqualityComparer{T}"/> object that is used
+        /// to determine equality for the values in the set.
         /// </summary>
+        /// <remarks>
+        /// Retrieving the value of this property is an O(1) operation.
+        /// </remarks>
         public IEqualityComparer<T> Comparer => _comparer ?? EqualityComparer<T>.Default;
 
         /// <summary>
-        /// Ensures that the hash set can hold up to 'capacity' entries without any further expansion of its backing storage.
+        /// Ensures that this hash set can hold the specified number of elements without growing.
         /// </summary>
+        /// <param name="capacity">The minimum capacity to ensure.</param>
+        /// <returns>The new capacity of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
@@ -1248,16 +1457,17 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Sets the capacity of this list to the size of the list (rounded up to nearest prime),
-        /// unless count is 0, in which case we release references.
-        ///
-        /// This method can be used to minimize a list's memory overhead once it is known that no
-        /// new elements will be added to the list. To completely clear a list and release all
-        /// memory referenced by the list, execute the following statements:
-        ///
-        /// list.Clear();
-        /// list.TrimExcess();
+        /// Sets the capacity of a <see cref="HashSet{T}"/> object to the actual
+        /// number of elements it contains, rounded up to a nearby, implementation-specific value.
         /// </summary>
+        /// <remarks>
+        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="HashSet{T}"/>
+        /// object's memory overhead once it is known that no new elements will be added. To completely
+        /// clear a <see cref="HashSet{T}"/> object and release all memory referenced by it,
+        /// call this method after calling the <see cref="Clear()"/> method.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void TrimExcess()
         {
             Debug.Assert(_count >= 0, "_count is negative");
@@ -1306,14 +1516,24 @@ namespace J2N.Collections.Generic
             }
         }
 
-#endregion
+        #endregion
 
-#region Helper methods
+        #region Helper methods
 
         /// <summary>
-        /// Used for deep equality of HashSet testing
+        /// Returns an <see cref="IEqualityComparer"/> object that can be used
+        /// for equality testing of a <see cref="HashSet{T}"/> object
+        /// as well as any nested objects that implement <see cref="IStructuralEquatable"/>.
+        /// <para/>
+        /// Usage Note: This is exactly the same as <see cref="SetEqualityComparer{T}.Default"/>.
+        /// It is included here to cover the <see cref="SCG.HashSet{T}"/> API.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>An <see cref="IEqualityComparer"/> object that can be used for deep
+        /// equality testing of the <see cref="HashSet{T}"/> object.</returns>
+        /// <remarks>
+        /// The <see cref="IEqualityComparer"/> object checks for equality for multiple levels.
+        /// Nested reference types that implement <see cref="IStructuralEquatable"/> are also compared.
+        /// </remarks>
         public static IEqualityComparer<ISet<T>> CreateSetComparer()
         {
             return SetEqualityComparer<T>.Default;

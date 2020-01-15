@@ -348,8 +348,8 @@ namespace J2N.Collections.Generic
         /// Gets the number of elements that are contained in a set.
         /// </summary>
         /// <remarks>
-        /// The capacity of a <see cref="HashSet{T}"/> object is the number of elements that the object can hold.
-        /// A <see cref="HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
+        /// The capacity of a <see cref="LinkedHashSet{T}"/> object is the number of elements that the object can hold.
+        /// A <see cref="LinkedHashSet{T}"/> object's capacity automatically increases as elements are added to the object.
         /// <para/>
         /// The capacity is always greater than or equal to <see cref="Count"/>. If <see cref="Count"/> exceeds the
         /// capacity while adding elements, the capacity is set to the first prime number that is greater than
