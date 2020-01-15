@@ -4,18 +4,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     using SR = J2N.Resources.Strings;
 
     /// <summary>
     /// Represents a collection of keys and values.
     /// <para/>
-    /// <see cref="Dictionary{TKey, TValue}"/> adds the following features to <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/>:
+    /// <see cref="Dictionary{TKey, TValue}"/> is similar to <see cref="SCG.Dictionary{TKey, TValue}"/>,
+    /// but adds the following features:
     /// <list type="bullet">
     ///     <item><description>
     ///         If <typeparamref name="TKey"/> is <see cref="Nullable{T}"/> or a reference type, the key can be
@@ -37,7 +36,7 @@ namespace J2N.Collections.Generic
     ///     </description></item>
     /// </list>
     /// <para/>
-    /// Usage Note: This class is intended to be a direct replacement for <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/> in order
+    /// Usage Note: This class is intended to be a direct replacement for <see cref="SCG.Dictionary{TKey, TValue}"/> in order
     /// to provide default structural equality and formatting behavior similar to Java. Note that the <see cref="ToString()"/>
     /// method uses the current culture by default to behave like other components in .NET. To exactly match Java's culture-neutral behavior,
     /// call <c>ToString(StringFormatter.InvariantCulture)</c>.
@@ -91,12 +90,105 @@ namespace J2N.Collections.Generic
         private const string VersionName = "Version"; // Do not rename (binary serialization)
 #endif
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty,
+        /// has the default initial capacity, and uses the default equality comparer for the key type.
+        /// </summary>
+        /// <remarks>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the default equality comparer.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are equal.
+        /// This constructor uses J2N's default generic equality comparer, <see cref="EqualityComparer{T}.Default"/>. If type
+        /// <typeparamref name="TKey"/> implements the <see cref="IEquatable{T}"/> generic interface, the default equality
+        /// comparer uses that implementation. Alternatively, you can specify an implementation of the <see cref="IEqualityComparer{T}"/>
+        /// generic interface by using a constructor that accepts a comparer parameter.
+        /// <para/>
+        /// NOTE: If you can estimate the size of the collection, using a constructor that specifies the initial capacity eliminates
+        /// the need to perform a number of resizing operations while adding elements to the <see cref="Dictionary{TKey, TValue}"/>.
+        /// <para/>
+        /// This constructor is an O(1) operation.
+        /// </remarks>
         public Dictionary() : this(0, null) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty, has the specified initial
+        /// capacity, and uses the default equality comparer for the key type.
+        /// </summary>
+        /// <param name="capacity">The initial number of elements that the <see cref="Dictionary{TKey, TValue}"/> can contain.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than 0.</exception>
+        /// <remarks>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the default equality comparer.
+        /// <para/>
+        /// The capacity of a <see cref="Dictionary{TKey, TValue}"/> is the number of elements that can be added to the
+        /// <see cref="Dictionary{TKey, TValue}"/> before resizing is necessary. As elements are added to a <see cref="Dictionary{TKey, TValue}"/>,
+        /// the capacity is automatically increased as required by reallocating the internal array.
+        /// <para/>
+        /// If the size of the collection can be estimated, specifying the initial capacity eliminates the need to perform a number
+        /// of resizing operations while adding elements to the <see cref="Dictionary{TKey, TValue}"/>.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are equal. This
+        /// constructor uses J2N's default generic equality comparer, <see cref="EqualityComparer{T}.Default"/>. If type <typeparamref name="TKey"/>
+        /// implements the <see cref="IEquatable{T}"/> generic interface, the default equality comparer uses that implementation. Alternatively,
+        /// you can specify an implementation of the <see cref="IEqualityComparer{T}"/> generic interface by using a constructor that accepts a
+        /// comparer parameter.
+        /// <para/>
+        /// This constructor is an O(1) operation.
+        /// </remarks>
         public Dictionary(int capacity) : this(capacity, null) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty, has the default
+        /// initial capacity, and uses the specified <see cref="IEqualityComparer{T}"/>.
+        /// </summary>
+        /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> implementation to use when comparing keys, or
+        /// <c>null</c> to use the default <see cref="EqualityComparer{T}"/> for the type of the key.</param>
+        /// <remarks>
+        /// Use this constructor with the case-insensitive string comparers provided by the <see cref="StringComparer"/>
+        /// class to create dictionaries with case-insensitive string keys.
+        /// <para/>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the specified comparer.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are equal.
+        /// If comparer is null, this constructor uses J2N's default generic equality comparer, <see cref="EqualityComparer{T}.Default"/>.
+        /// If type <typeparamref name="TKey"/> implements the <see cref="IEquatable{T}"/> generic interface, the default
+        /// equality comparer uses that implementation.
+        /// <para/>
+        /// If the size of the collection can be estimated, specifying the initial capacity eliminates the need to perform a number
+        /// of resizing operations while adding elements to the <see cref="Dictionary{TKey, TValue}"/>.
+        /// <para/>
+        /// This constructor is an O(1) operation.
+        /// </remarks>
         public Dictionary(IEqualityComparer<TKey> comparer) : this(0, comparer) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty, has the specified
+        /// initial capacity, and uses the specified <see cref="IEqualityComparer{T}"/>.
+        /// </summary>
+        /// <param name="capacity">The initial number of elements that the <see cref="Dictionary{TKey, TValue}"/> can contain.</param>
+        /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> implementation to use when comparing keys, or <c>null</c> to
+        /// use J2N's default <see cref="EqualityComparer{T}"/> for the type of the key.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than 0.</exception>
+        /// <remarks>
+        /// Use this constructor with the case-insensitive string comparers provided by the <see cref="StringComparer"/>
+        /// class to create dictionaries with case-insensitive string keys.
+        /// <para/>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the specified comparer.
+        /// <para/>
+        /// The capacity of a <see cref="Dictionary{TKey, TValue}"/> is the number of elements that can be added to
+        /// the <see cref="Dictionary{TKey, TValue}"/> before resizing is necessary. As elements are added to a
+        /// <see cref="Dictionary{TKey, TValue}"/>, the capacity is automatically increased as required by
+        /// reallocating the internal array.
+        /// <para/>
+        /// If the size of the collection can be estimated, specifying the initial capacity eliminates the need
+        /// to perform a number of resizing operations while adding elements to the <see cref="Dictionary{TKey, TValue}"/>.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are
+        /// equal. If comparer is <c>null</c>, this constructor uses the default generic equality comparer,
+        /// <see cref="EqualityComparer{T}.Default"/>. If type <typeparamref name="TKey"/> implements the <see cref="IEquatable{T}"/>
+        /// generic interface, the default equality comparer uses that implementation.
+        /// <para/>
+        /// This constructor is an O(1) operation.
+        /// </remarks>
         public Dictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
             if (capacity < 0)
@@ -105,8 +197,64 @@ namespace J2N.Collections.Generic
             dictionary = new ConcreteDictionary(capacity, comparer ?? EqualityComparer<TKey>.Default);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that contains elements
+        /// copied from the specified <see cref="IDictionary{TKey, TValue}"/> and uses the default equality comparer
+        /// for the key type.
+        /// </summary>
+        /// <param name="dictionary">The <see cref="IDictionary{TKey, TValue}"/> whose elements are copied to the
+        /// new <see cref="Dictionary{TKey, TValue}"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="dictionary"/> contains one or more duplicate keys.</exception>
+        /// <remarks>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the default equality
+        /// comparer; likewise, every key in the source <paramref name="dictionary"/> must also be unique according to the default
+        /// equality comparer.
+        /// <para/>
+        /// The initial capacity of the new <see cref="Dictionary{TKey, TValue}"/> is large enough to contain all the
+        /// elements in <paramref name="dictionary"/>.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are equal.
+        /// This constructor uses the default generic equality comparer, <see cref="EqualityComparer{T}.Default"/>. If type
+        /// <typeparamref name="TKey"/> implements the <see cref="IEquatable{T}"/> generic interface, the default equality
+        /// comparer uses that implementation. Alternatively, you can specify an implementation of the <see cref="IEqualityComparer{T}"/>
+        /// generic interface by using a constructor that accepts a comparer parameter.
+        /// <para/>
+        /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
+        /// </remarks>
         public Dictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that contains elements copied
+        /// from the specified <see cref="IDictionary{TKey, TValue}"/> and uses the specified <see cref="IEqualityComparer{T}"/>.
+        /// </summary>
+        /// <param name="dictionary">The <see cref="IDictionary{TKey, TValue}"/> whose elements are copied to the new
+        /// <see cref="Dictionary{TKey, TValue}"/>.</param>
+        /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> implementation to use when comparing keys, or <c>null</c>
+        /// to use the default <see cref="EqualityComparer{T}"/> for the type of the key.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="dictionary"/> contains one or more duplicate keys.</exception>
+        /// <remarks>
+        /// Use this constructor with the case-insensitive string comparers provided by the <see cref="StringComparer"/>
+        /// class to create dictionaries with case-insensitive string keys.
+        /// <para/>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the specified comparer;
+        /// likewise, every key in the source <paramref name="dictionary"/> must also be unique according to the specified comparer.
+        /// <para/>
+        /// NOTE: For example, duplicate keys can occur if <paramref name="comparer"/> is one of the case-insensitive string
+        /// comparers provided by the <see cref="StringComparer"/> class and <paramref name="dictionary"/> does not use a
+        /// case-insensitive comparer key.
+        /// <para/>
+        /// The initial capacity of the new <see cref="Dictionary{TKey, TValue}"/> is large enough to contain all the elements in
+        /// <paramref name="dictionary"/>.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are equal.
+        /// If comparer is <c>null</c>, this constructor uses the default generic equality comparer, <see cref="EqualityComparer{T}.Default"/>.
+        /// If type <typeparamref name="TKey"/> implements the <see cref="IEquatable{T}"/> generic interface, the default equality
+        /// comparer uses that implementation.
+        /// <para/>
+        /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
+        /// </remarks>
         public Dictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
             : this(dictionary != null ? dictionary.Count : 0, comparer)
         {
@@ -117,10 +265,66 @@ namespace J2N.Collections.Generic
                 Add(pair.Key, pair.Value);
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that contains elements
+        /// copied from the specified <see cref="IDictionary{TKey, TValue}"/> and uses the default equality comparer
+        /// for the key type.
+        /// </summary>
+        /// <param name="collection">The <see cref="T:IEnumerable{KeyValuePair{TKey, TValue}}"/> whose elements are copied to the
+        /// new <see cref="Dictionary{TKey, TValue}"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="collection"/> contains one or more duplicate keys.</exception>
+        /// <remarks>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the default equality
+        /// comparer; likewise, every key in the source <paramref name="collection"/> must also be unique according to the default
+        /// equality comparer.
+        /// <para/>
+        /// The initial capacity of the new <see cref="Dictionary{TKey, TValue}"/> is large enough to contain all the
+        /// elements in <paramref name="collection"/>.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are equal.
+        /// This constructor uses the default generic equality comparer, <see cref="EqualityComparer{T}.Default"/>. If type
+        /// <typeparamref name="TKey"/> implements the <see cref="IEquatable{T}"/> generic interface, the default equality
+        /// comparer uses that implementation. Alternatively, you can specify an implementation of the <see cref="IEqualityComparer{T}"/>
+        /// generic interface by using a constructor that accepts a comparer parameter.
+        /// <para/>
+        /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="collection"/>.
+        /// </remarks>
         public Dictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection)
             : this(collection, null)
         { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that contains elements copied
+        /// from the specified <see cref="IDictionary{TKey, TValue}"/> and uses the specified <see cref="IEqualityComparer{T}"/>.
+        /// </summary>
+        /// <param name="collection">The <see cref="T:IEnumerable{KeyValuePair{TKey, TValue}}"/> whose elements are copied to the new
+        /// <see cref="Dictionary{TKey, TValue}"/>.</param>
+        /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> implementation to use when comparing keys, or <c>null</c>
+        /// to use the default <see cref="EqualityComparer{T}"/> for the type of the key.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="collection"/> contains one or more duplicate keys.</exception>
+        /// <remarks>
+        /// Use this constructor with the case-insensitive string comparers provided by the <see cref="StringComparer"/>
+        /// class to create dictionaries with case-insensitive string keys.
+        /// <para/>
+        /// Every key in a <see cref="Dictionary{TKey, TValue}"/> must be unique according to the specified comparer;
+        /// likewise, every key in the source <paramref name="collection"/> must also be unique according to the specified comparer.
+        /// <para/>
+        /// NOTE: For example, duplicate keys can occur if <paramref name="comparer"/> is one of the case-insensitive string
+        /// comparers provided by the <see cref="StringComparer"/> class and <paramref name="collection"/> does not use a
+        /// case-insensitive comparer key.
+        /// <para/>
+        /// The initial capacity of the new <see cref="Dictionary{TKey, TValue}"/> is large enough to contain all the elements in
+        /// <paramref name="collection"/>.
+        /// <para/>
+        /// <see cref="Dictionary{TKey, TValue}"/> requires an equality implementation to determine whether keys are equal.
+        /// If comparer is <c>null</c>, this constructor uses the default generic equality comparer, <see cref="EqualityComparer{T}.Default"/>.
+        /// If type <typeparamref name="TKey"/> implements the <see cref="IEquatable{T}"/> generic interface, the default equality
+        /// comparer uses that implementation.
+        /// <para/>
+        /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="collection"/>.
+        /// </remarks>
         public Dictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer)
             : this(collection is ICollection<KeyValuePair<TKey, TValue>> col ? col.Count : 0, comparer)
         {
@@ -153,9 +357,9 @@ namespace J2N.Collections.Generic
             this.dictionary = new ConcreteDictionary(capacity, comparer);
         }
 
-#endif
+        #endif
 
-#region SCG.Dictionary<TKey, TValue> Members
+        #region SCG.Dictionary<TKey, TValue> Members
 
         /// <summary>
         /// Gets the <see cref="IEqualityComparer{T}"/> that is used to determine equality of keys
@@ -376,9 +580,9 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-#endregion SCG.Dictionary<TKey, TValue> Members
+        #endregion SCG.Dictionary<TKey, TValue> Members
 
-#region IDictionary<TKey, TValue> Members
+        #region IDictionary<TKey, TValue> Members
 
         /// <summary>
         /// Gets a collection containing the keys in the <see cref="Dictionary{TKey, TValue}"/>.
@@ -792,9 +996,9 @@ namespace J2N.Collections.Generic
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
-#endregion IDictionary<TKey, TValue> Members
+        #endregion IDictionary<TKey, TValue> Members
 
-#region IDictionary Members
+        #region IDictionary Members
 
         bool IDictionary.IsFixedSize => ((IDictionary)dictionary).IsFixedSize;
 
@@ -1015,9 +1219,9 @@ namespace J2N.Collections.Generic
         public override int GetHashCode()
             => GetHashCode(DictionaryEqualityComparer<TKey, TValue>.Default);
 
-#endregion Structural Equality
+        #endregion Structural Equality
 
-#region ToString
+        #region ToString
 
         /// <summary>
         /// Returns a string that represents the current dictionary using the specified
@@ -1574,13 +1778,13 @@ namespace J2N.Collections.Generic
 
     }
 
-#region Interface: IConcreteDictionary<TKey, TValue>
+    #region Interface: IConcreteDictionary<TKey, TValue>
 
     /// <summary>
     /// Interface to expose all of the members of the concrete <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/> type,
     /// so we can duplicate them in other types without having to cast.
     /// </summary>
-    internal interface IConcreteDictionary<TKey, TValue> : IDictionary<TKey, TValue>//, IDictionary, IReadOnlyDictionary<TKey, TValue>
+    internal interface IConcreteDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
         IEqualityComparer<TKey> Comparer { get; }
 
@@ -1599,6 +1803,6 @@ namespace J2N.Collections.Generic
 
     }
 
-#endregion
+    #endregion
 
 }
