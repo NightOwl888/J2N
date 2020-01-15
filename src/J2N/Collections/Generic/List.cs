@@ -1,4 +1,5 @@
-﻿using J2N.Text;
+﻿using J2N.Collections.ObjectModel;
+using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -244,6 +245,14 @@ namespace J2N.Collections.Generic
 #endif
 
             InsertRange(list.Count, collection);
+        }
+
+        public ReadOnlyList<T> AsReadOnly()
+        {
+#if FEATURE_CONTRACTBLOCKS
+            Contract.Ensures(Contract.Result<ReadOnlyList<T>>() != null);
+#endif
+            return new ReadOnlyList<T>(this);
         }
 
         public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
@@ -671,7 +680,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        void System.Runtime.Serialization.IDeserializationCallback.OnDeserialization(object sender) => OnDeserialization(sender);
+        void System.Runtime.Serialization.IDeserializationCallback.OnDeserialization(object? sender) => OnDeserialization(sender);
 
         /// <summary>
         /// Implements the <see cref="System.Runtime.Serialization.ISerializable"/> interface, and raises the deserialization
@@ -681,7 +690,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="System.Runtime.Serialization.SerializationException">The <see cref="System.Runtime.Serialization.SerializationInfo"/> object associated
         /// with the current <see cref="SortedSet{T}"/> object is invalid.</exception>
         /// <remarks>Calling this method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
-        protected virtual void OnDeserialization(object sender)
+        protected virtual void OnDeserialization(object? sender)
         {
             if (siInfo == null)
             {

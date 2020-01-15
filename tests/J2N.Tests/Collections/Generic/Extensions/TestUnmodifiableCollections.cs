@@ -34,7 +34,7 @@ namespace J2N.Collections.Generic.Extensions
             // Test for method java.util.Collection
             // java.util.Collections.unmodifiableCollection(java.util.Collection)
             bool exception = false;
-            var c = ll.ToUnmodifiableCollection();
+            var c = (IList<object>)ll.AsReadOnly();
             assertTrue("Returned collection is of incorrect size", c.Count == ll.Count);
             var i = ll.GetEnumerator();
             while (i.MoveNext())
@@ -66,7 +66,7 @@ namespace J2N.Collections.Generic.Extensions
             var myCollection = new List<object>();
             myCollection.Add(new int?(20));
             myCollection.Add(null);
-            c = myCollection.ToUnmodifiableCollection();
+            c = myCollection.AsReadOnly();
             assertTrue("Collection should contain null", c.Contains(null));
             assertTrue("Collection should contain Integer(20)", c
                     .Contains(new int?(20)));
@@ -76,15 +76,15 @@ namespace J2N.Collections.Generic.Extensions
             {
                 myCollection.Add(objArray[counter]);
             }
-            new Support_UnmodifiableCollectionTest("", (myCollection).ToUnmodifiableCollection()).RunTest();
+            new Support_UnmodifiableCollectionTest("", (myCollection).AsReadOnly()).RunTest();
 
 #if FEATURE_SERIALIZABLE
             // Serialization
-            var col = (CollectionExtensions.UnmodifiableCollection<object>)myCollection.ToUnmodifiableCollection();
+            var col = myCollection.AsReadOnly();
             var clone = Clone(col);
 
             assertNotSame(col, clone);
-            assertNotSame(col.collection, clone.collection);
+            assertNotSame(col.List, clone.List);
             assertEquals(col.Count, clone.Count);
             
             using (var it1 = col.GetEnumerator())
@@ -110,11 +110,11 @@ namespace J2N.Collections.Generic.Extensions
 
             // test with a Sequential Access List
             bool exception = false;
-            var c = ll.ToUnmodifiableList();
+            var c = (IList<object>)ll.AsReadOnly();
             // Ensure a NPE is thrown if the list is NULL
             try
             {
-                ((IList<object>)null).ToUnmodifiableList();
+                ((IList<object>)null).AsReadOnly();
                 fail("Expected NullPointerException for null list parameter");
             }
             catch (ArgumentNullException e)
@@ -157,7 +157,7 @@ namespace J2N.Collections.Generic.Extensions
             var smallList = new List<object>();
             smallList.Add(null);
             smallList.Add("yoink");
-            c = smallList.ToUnmodifiableList();
+            c = smallList.AsReadOnly();
             assertNull("First element should be null", c[0]);
             assertTrue("List should contain null", c.Contains(null));
             //assertTrue(
@@ -169,7 +169,7 @@ namespace J2N.Collections.Generic.Extensions
             {
                 smallList.Add(objArray[counter]);
             }
-            var myList = smallList.ToUnmodifiableList();
+            var myList = smallList.AsReadOnly();
             assertTrue("List should not contain null", !myList.Contains(null));
             //assertTrue(
             //        "T2. Returned List should implement Random Access interface",
@@ -187,7 +187,7 @@ namespace J2N.Collections.Generic.Extensions
 
 #if FEATURE_SERIALIZABLE
             // Serialization
-            var col = (ListExtensions.UnmodifiableList<object>)smallList.ToUnmodifiableList();
+            var col = smallList.AsReadOnly();
             var clone = Clone(col);
 
             assertNotSame(col, clone);
@@ -214,7 +214,7 @@ namespace J2N.Collections.Generic.Extensions
             // Test for method java.util.Map
             // java.util.Collections.unmodifiableMap(java.util.Map)
             bool exception = false;
-            var c = hm.ToUnmodifiableDictionary();
+            var c = (IDictionary<object, object>)hm.AsReadOnly();
             assertTrue("Returned map is of incorrect size", c.Count == hm.Count);
             var i = hm.Keys.GetEnumerator();
             while (i.MoveNext())
@@ -289,7 +289,7 @@ namespace J2N.Collections.Generic.Extensions
             var smallMap = new Dictionary<object, object>(); // J2N TODO: Need HashDictionary so we can support null keys here
             //smallMap[null] = new long?(30); // J2N TODO: Need HashDictionary so we can support null keys here
             smallMap[new long?(25)] = null;
-            var unmodMap = smallMap.ToUnmodifiableDictionary();
+            var unmodMap = smallMap.AsReadOnly();
 
             assertNull("Trying to use a null value in map failed", unmodMap[new long?(25)]);
             //assertTrue("Trying to use a null key in map failed", unmodMap[null] // J2N TODO: Need HashDictionary so we can support null keys here
@@ -300,12 +300,12 @@ namespace J2N.Collections.Generic.Extensions
             {
                 smallMap[objArray[counter].ToString()] = objArray[counter];
             }
-            unmodMap = smallMap.ToUnmodifiableDictionary();
+            unmodMap = smallMap.AsReadOnly();
             new Support_UnmodifiableMapTest("", unmodMap).RunTest();
 
 #if FEATURE_SERIALIZABLE
             // Serialization
-            var col = (DictionaryExtensions.UnmodifiableDictionary<object, object>)unmodMap;
+            var col = unmodMap;
             var clone = Clone(col);
 
             assertNotSame(col, clone);
@@ -332,7 +332,7 @@ namespace J2N.Collections.Generic.Extensions
             // Test for method java.util.Set
             // java.util.Collections.unmodifiableSet(java.util.Set)
             bool exception = false;
-            var c = s.ToUnmodifiableSet();
+            ISet<object> c = s.AsReadOnly();
             assertTrue("Returned set is of incorrect size", c.Count == s.Count);
             var i = ll.GetEnumerator();
             while (i.MoveNext())
@@ -360,9 +360,9 @@ namespace J2N.Collections.Generic.Extensions
                 // Correct
             }
 
-            var mySet = new HashSet<object>().ToUnmodifiableSet();
+            ISet<object> mySet = new HashSet<object>().AsReadOnly();
             assertTrue("Should not contain null", !mySet.Contains(null));
-            mySet = (new HashSet<object> { null }).ToUnmodifiableSet();
+            mySet = (new HashSet<object> { null }).AsReadOnly();
             assertTrue("Should contain null", mySet.Contains(null));
 
             mySet = new SortedSet<object>();
@@ -370,15 +370,15 @@ namespace J2N.Collections.Generic.Extensions
             {
                 mySet.Add(objArray[counter]);
             }
-            new Support_UnmodifiableCollectionTest("", (mySet).ToUnmodifiableSet()).RunTest();
+            new Support_UnmodifiableCollectionTest("", (mySet).AsReadOnly()).RunTest();
 
 #if FEATURE_SERIALIZABLE
             // Serialization
-            var col = (SetExtensions.UnmodifiableSet<object>)mySet.ToUnmodifiableSet();
+            var col = mySet.AsReadOnly();
             var clone = Clone(col);
 
             assertNotSame(col, clone);
-            assertNotSame(col.set, clone.set);
+            assertNotSame(col.Items, clone.Items);
             assertEquals(col.Count, clone.Count);
 
             assertTrue("UnmodifiableSetTest - Deserialized clone returned incorrect values", 
@@ -397,14 +397,14 @@ namespace J2N.Collections.Generic.Extensions
             var al = new List<object>();
             al.Add("a");
             al.Add("b");
-            var uc = al.ToUnmodifiableCollection();
+            var uc = al.AsReadOnly();
             assertEquals("[a, b]", uc.ToString());
             var m = new Dictionary<string, string>
             {
                 ["one"] = "1",
                 ["two"] = "2"
             };
-            var um = m.ToUnmodifiableDictionary();
+            var um = m.AsReadOnly();
             assertEquals("{one=1, two=2}", um.ToString());
         }
 

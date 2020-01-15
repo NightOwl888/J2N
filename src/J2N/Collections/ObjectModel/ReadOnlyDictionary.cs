@@ -81,7 +81,7 @@ namespace J2N.Collections.ObjectModel
         /// Gets the dictionary that is wrapped by this <see cref="ReadOnlyDictionary{TKey, TValue}"/> object.
         /// </summary>
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-        protected IDictionary<TKey, TValue> Dictionary => dictionary;
+        protected internal IDictionary<TKey, TValue> Dictionary => dictionary;
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         /// <summary>

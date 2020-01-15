@@ -31,7 +31,7 @@ namespace J2N.Collections.ObjectModel
     {
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || typeof(string).Equals(typeof(T));
 
-        internal readonly ISet<T> set; // internal for testing
+        private readonly ISet<T> set;
         private readonly SetEqualityComparer<T> structuralEqualityComparer;
         private readonly IFormatProvider toStringFormatProvider;
 
@@ -63,7 +63,7 @@ namespace J2N.Collections.ObjectModel
         /// <summary>
         /// Returns the <see cref="ISet{T}"/> that the <see cref="ReadOnlySet{T}"/> wraps.
         /// </summary>
-        protected ISet<T> Items => set;
+        protected internal ISet<T> Items => set; // internal for testing
 
         #region ISet<T> Members
 

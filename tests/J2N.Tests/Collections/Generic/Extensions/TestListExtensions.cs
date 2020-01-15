@@ -140,7 +140,7 @@ namespace J2N.Collections.Generic.Extensions
         [Test]
         public void TestShuffle_IsReadOnly()
         {
-            var l = Enumerable.Repeat(false, 100).ToList().ToUnmodifiableList();
+            var l = Enumerable.Repeat(false, 100).ToList().AsReadOnly();
 
             Assert.Throws<NotSupportedException>(() => l.Shuffle());
             Assert.Throws<NotSupportedException>(() => l.Shuffle(Random));
@@ -247,7 +247,7 @@ namespace J2N.Collections.Generic.Extensions
         [Test]
         public void TestSwap_IsReadOnly()
         {
-            var l = Enumerable.Repeat(false, 100).ToList().ToUnmodifiableList();
+            var l = Enumerable.Repeat(false, 100).ToList().AsReadOnly();
 
             Assert.Throws<NotSupportedException>(() => l.Swap(0, 1));
         }
