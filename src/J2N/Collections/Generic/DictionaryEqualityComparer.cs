@@ -15,7 +15,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public abstract class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<IDictionary<TKey, TValue>>, IEqualityComparer
+    public abstract class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<IDictionary<TKey, TValue>>, IEqualityComparer, IDictionaryEqualityComparer
     {
         private static readonly bool TKeyIsValueType = typeof(TKey).GetTypeInfo().IsValueType;
         private static readonly bool TKeyIsObject = typeof(TKey).Equals(typeof(object));
@@ -137,6 +137,9 @@ namespace J2N.Collections.Generic
         /// <returns>The hash code for <paramref name="dictionary"/>.</returns>
         public virtual int GetHashCode(IDictionary<TKey, TValue> dictionary)
         {
+            if (dictionary is null)
+                return 0;
+
             int hashCode = 0;
             using (var i = dictionary.GetEnumerator())
             while (i.MoveNext())
@@ -267,6 +270,17 @@ namespace J2N.Collections.Generic
             return comparer.GetHashCode(dictionary);
         }
 
+        // Hack so we don't need to know the generic closing types
+        bool IDictionaryEqualityComparer.Equals(object dictionary, object other, IEqualityComparer comparer)
+        {
+            return Equals(dictionary as IDictionary<TKey, TValue>, other, comparer);
+        }
+
+        int IDictionaryEqualityComparer.GetHashCode(object dictionary, IEqualityComparer comparer)
+        {
+            return GetHashCode(dictionary as IDictionary<TKey, TValue>, comparer);
+        }
+
 #if FEATURE_SERIALIZABLE
         [System.Runtime.Serialization.OnDeserialized]
         internal void OnDeserializedMethod(System.Runtime.Serialization.StreamingContext context)
@@ -292,5 +306,14 @@ namespace J2N.Collections.Generic
                 : base(StructuralEqualityComparer.Aggressive)
             { }
         }
+    }
+
+    // A simple interface used to identify a dictionary equality comparer without knowing its
+    // generic closing types.
+    internal interface IDictionaryEqualityComparer : IEqualityComparer
+    {
+        bool Equals(object dictionary, object other, IEqualityComparer comparer);
+
+        int GetHashCode(object dictionary, IEqualityComparer comparer);
     }
 }

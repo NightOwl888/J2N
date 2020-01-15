@@ -21,6 +21,13 @@ namespace J2N
 #else
             true;
 #endif
+        private static bool IsNetCore1_X =>
+#if NETCOREAPP1_X
+            true;
+#else
+            false;
+#endif
+
 
         public static void Throws<T>(Action action, string expectedMessage)
               where T : Exception
@@ -39,14 +46,14 @@ namespace J2N
         {
             T exception = Assert.Throws<T>(action);
 
-            if (netFxParamName == null && IsFullFramework)
+            if (netFxParamName == null && (IsFullFramework || IsNetCore1_X))
             {
                 // Param name varies between NETFX versions -- skip checking it
                 return;
             }
 
             string expectedParamName =
-                IsFullFramework ?
+                (IsFullFramework || IsNetCore1_X) ?
                 netFxParamName : netCoreParamName;
 
             Assert.Equal(expectedParamName, exception.ParamName);
@@ -57,14 +64,14 @@ namespace J2N
         {
             T exception = Assert.Throws<T>(testCode);
 
-            if (netFxParamName == null && IsFullFramework)
+            if (netFxParamName == null && (IsFullFramework || IsNetCore1_X))
             {
                 // Param name varies between NETFX versions -- skip checking it
                 return;
             }
 
             string expectedParamName =
-                IsFullFramework ?
+                (IsFullFramework || IsNetCore1_X) ?
                 netFxParamName : netCoreParamName;
 
             Assert.Equal(expectedParamName, exception.ParamName);
