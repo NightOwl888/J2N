@@ -5,7 +5,6 @@ using System.Collections;
 using System.Collections.Generic;
 using SCG = System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 #if FEATURE_CONTRACTBLOCKS
 using System.Diagnostics.Contracts;
 #endif
@@ -19,7 +18,7 @@ namespace J2N.Collections.Generic
     /// <summary>
     /// Represents a strongly typed list of objects that can be accessed by index. Provides methods to search, sort, and manipulate lists.
     /// <para/>
-    /// <see cref="List{T}"/> adds the following features to <see cref="System.Collections.Generic.List{T}"/>:
+    /// <see cref="List{T}"/> is similar to <see cref="System.Collections.Generic.List{T}"/>, but adds the following features:
     /// <list type="bullet">
     ///     <item><description>
     ///         Overrides the <see cref="Equals(object)"/> and <see cref="GetHashCode()"/> methods to compare lists
@@ -154,7 +153,6 @@ namespace J2N.Collections.Generic
         /// Retrieving the value of this property is an O(1) operation; setting the property is an O(<c>n</c>)
         /// operation, where <c>n</c> is the new capacity.
         /// </remarks>
-        // J2N: Providing implementation only to link up XML doc comments properly
         public int Capacity
         {
             get => list.Capacity;
@@ -175,7 +173,6 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Retrieving the value of this property is an O(1) operation.
         /// </remarks>
-        // J2N: Providing implementation only to link up XML doc comments properly
         public int Count => list.Count;
 
 
@@ -205,6 +202,28 @@ namespace J2N.Collections.Generic
             }
         }
 
+        /// <summary>
+        /// Gets or sets the element at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element to get or set.</param>
+        /// <returns>The element at the specified index.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is equal to or greater than <see cref="Count"/>.
+        /// </exception>
+        /// <remarks>
+        /// <see cref="List{T}"/> accepts null as a valid value for reference types and
+        /// allows duplicate elements.
+        /// <para/>
+        /// This property provides the ability to access a specific element in the collection
+        /// by using the following syntax: <c>myCollection[index]</c>.
+        /// <para/>
+        /// Retrieving the value of this property is an O(1) operation; setting the property
+        /// is also an O(1) operation.
+        /// </remarks>
         public T this[int index]
         {
             get => list[index];
@@ -225,6 +244,22 @@ namespace J2N.Collections.Generic
             }
         }
 
+        /// <summary>
+        /// Adds an object to the end of the <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to be added to the end of the <see cref="List{T}"/>.
+        /// The value can be <c>null</c> for reference types.</param>
+        /// <remarks>
+        /// <see cref="List{T}"/> accepts <c>null</c> as a valid value for reference types and allows duplicate elements.
+        /// <para/>
+        /// If <see cref="Count"/> already equals <see cref="Capacity"/>, the capacity of the <see cref="List{T}"/>
+        /// is increased by automatically reallocating the internal array, and the existing elements are copied
+        /// to the new array before the new element is added.
+        /// <para/>
+        /// If <see cref="Count"/> is less than <see cref="Capacity"/>, this method is an O(1) operation. If the
+        /// capacity needs to be increased to accommodate the new element, this method becomes an O(<c>n</c>)
+        /// operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void Add(T item)
         {
             list.Add(item);
@@ -238,6 +273,26 @@ namespace J2N.Collections.Generic
             return result;
         }
 
+        /// <summary>
+        /// Adds the elements of the specified collection to the end of the <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="collection">The collection whose elements should be added to the end of the
+        /// <see cref="List{T}"/>. The collection itself cannot be <c>null</c>, but it can contain elements
+        /// that are <c>null</c>, if type <typeparamref name="T"/> is a reference type.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The order of the elements in the collection is preserved in the <see cref="List{T}"/>.
+        /// <para/>
+        /// If the new <see cref="Count"/> (the current <see cref="Count"/> plus the size of the collection)
+        /// will be greater than <see cref="Capacity"/>, the capacity of the <see cref="List{T}"/> is increased
+        /// by automatically reallocating the internal array to accommodate the new elements, and the existing
+        /// elements are copied to the new array before the new elements are added.
+        /// <para/>
+        /// If the <see cref="List{T}"/> can accommodate the new elements without increasing the <see cref="Capacity"/>,
+        /// this method is an O(<c>n</c>) operation, where <c>n</c> is the number of elements to be added. If the capacity
+        /// needs to be increased to accommodate the new elements, this method becomes an O(<c>n</c> + <c>m</c>) operation,
+        /// where <c>n</c> is the number of elements to be added and <c>m</c> is <see cref="Count"/>.
+        /// </remarks>
         public void AddRange(IEnumerable<T> collection)
         {
 #if FEATURE_CONTRACTBLOCKS
@@ -247,6 +302,17 @@ namespace J2N.Collections.Generic
             InsertRange(list.Count, collection);
         }
 
+        /// <summary>
+        /// Returns a read-only <see cref="ReadOnlyList{T}"/> wrapper for the current collection.
+        /// </summary>
+        /// <returns>An object that acts as a read-only wrapper around the current <see cref="List{T}"/>.</returns>
+        /// <remarks>
+        /// To prevent any modifications to the <see cref="List{T}"/> object, expose it only through this wrapper.
+        /// A <see cref="ReadOnlyList{T}"/> object does not expose methods that modify the collection. However,
+        /// if changes are made to the underlying <see cref="List{T}"/> object, the read-only collection reflects those changes.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
         public ReadOnlyList<T> AsReadOnly()
         {
 #if FEATURE_CONTRACTBLOCKS
@@ -255,37 +321,181 @@ namespace J2N.Collections.Generic
             return new ReadOnlyList<T>(this);
         }
 
+        /// <summary>
+        /// Searches a range of elements in the sorted <see cref="List{T}"/> for an element using
+        /// the specified comparer and returns the zero-based index of the element.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range to search.</param>
+        /// <param name="count">The length of the range to search.</param>
+        /// <param name="item">The object to locate. The value can be <c>null</c> for reference types.</param>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when comparing
+        /// elements, or <c>null</c> to use J2N's default comparer <see cref="Comparer{T}.Default"/>.</param>
+        /// <returns>The zero-based index of item in the sorted <see cref="List{T}"/>, if item is found;
+        /// otherwise, a negative number that is the bitwise complement of the index of the next element
+        /// that is larger than item or, if there is no larger element, the bitwise complement of <see cref="Count"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="index"/> and <paramref name="count"/> do not denote a valid
+        /// range in the <see cref="List{T}"/>.</exception>
+        /// <exception cref="InvalidOperationException"><paramref name="comparer"/> is <c>null</c>, and J2N's default comparer
+        /// <see cref="Comparer{T}.Default"/> cannot find an implementation of the <see cref="IComparable{T}"/> generic interface
+        /// or the <see cref="IComparable"/> interface for type <typeparamref name="T"/>.</exception>
+        /// <remarks>
+        /// The comparer customizes how the elements are compared. For example, you can use a <see cref="CaseInsensitiveComparer"/>
+        /// instance as the comparer to perform case-insensitive string searches.
+        /// <para/>
+        /// If <paramref name="comparer"/> is provided, the elements of the <see cref="List{T}"/> are compared to the specified value using the
+        /// specified <see cref="IComparer{T}"/> implementation.
+        /// <para/>
+        /// If <paramref name="comparer"/> is <c>null</c>, J2N's default comparer <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/>
+        /// implements the <see cref="IComparable{T}"/> generic interface and uses that implementation, if available. If not,
+        /// <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/> implements the <see cref="IComparable"/> interface.
+        /// If type <typeparamref name="T"/> does not implement either interface, <see cref="Comparer{T}.Default"/> throws <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// The <see cref="List{T}"/> must already be sorted according to the comparer implementation; otherwise, the result is incorrect.
+        /// <para/>
+        /// Comparing <c>null</c> with any reference type is allowed and does not generate an exception when using the <see cref="IComparable{T}"/>
+        /// generic interface. When sorting, <c>null</c> is considered to be less than any other object.
+        /// <para/>
+        /// If the <see cref="List{T}"/> contains more than one element with the same value, the method returns only one of the occurrences,
+        /// and it might return any one of the occurrences, not necessarily the first one.
+        /// <para/>
+        /// If the <see cref="List{T}"/> does not contain the specified value, the method returns a negative integer. You can apply
+        /// the bitwise complement operation (~) to this negative integer to get the index of the first element that is larger than
+        /// the search value. When inserting the value into the <see cref="List{T}"/>, this index should be used as the insertion
+        /// point to maintain the sort order.
+        /// <para/>
+        /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
+        /// </remarks>
         public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
         {
             return list.BinarySearch(index, count, item, comparer ?? Comparer<T>.Default);
         }
 
         /// <summary>
-        /// 
+        /// Searches the entire sorted <see cref="List{T}"/> for an element using the default comparer and returns the
+        /// zero-based index of the element.
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <param name="item">The object to locate. The value can be <c>null</c> for reference types.</param>
+        /// <returns>The zero-based index of item in the sorted <see cref="List{T}"/>, if item is found; otherwise,
+        /// a negative number that is the bitwise complement of the index of the next element that is larger than
+        /// item or, if there is no larger element, the bitwise complement of <see cref="Count"/>.</returns>
+        /// <exception cref="InvalidOperationException">The default comparer <see cref="Comparer{T}.Default"/>
+        /// cannot find an implementation of the <see cref="IComparable{T}"/> generic interface or the <see cref="IComparable"/>
+        /// interface for type <typeparamref name="T"/>.</exception>
+        /// <remarks>
+        /// This method uses J2N's default comparer <see cref="Comparer{T}.Default"/> for type <typeparamref name="T"/> to determine
+        /// the order of list elements. The <see cref="Comparer{T}.Default"/> property checks whether type T implements the <see cref="IComparable{T}"/>
+        /// generic interface and uses that implementation, if available. If not, <see cref="Comparer{T}.Default"/> checks whether type
+        /// <typeparamref name="T"/> implements the <see cref="IComparable"/> interface. If type <typeparamref name="T"/> does not implement
+        /// either interface, <see cref="Comparer{T}.Default"/> throws an <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// The <see cref="List{T}"/> must already be sorted according to the comparer implementation; otherwise, the result is incorrect.
+        /// <para/>
+        /// Comparing <c>null</c> with any reference type is allowed and does not generate an exception when using the <see cref="IComparable{T}"/>
+        /// generic interface. When sorting, <c>null</c> is considered to be less than any other object.
+        /// <para/>
+        /// If the <see cref="List{T}"/> contains more than one element with the same value, the method returns only one of the occurrences,
+        /// and it might return any one of the occurrences, not necessarily the first one.
+        /// <para/>
+        /// If the <see cref="List{T}"/> does not contain the specified value, the method returns a negative integer. You can apply the
+        /// bitwise complement operation (~) to this negative integer to get the index of the first element that is larger than the
+        /// search value. When inserting the value into the <see cref="List{T}"/>, this index should be used as the insertion point
+        /// to maintain the sort order.
+        /// <para/>
+        /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
+        /// </remarks>
         public int BinarySearch(T item)
         {
             return BinarySearch(item, null);
         }
+
         /// <summary>
-        /// Testing
+        /// Searches the entire sorted <see cref="List{T}"/> for an element using the specified comparer and
+        /// returns the zero-based index of the element.
         /// </summary>
-        /// <param name="item"></param>
-        /// <param name="comparer"></param>
-        /// <returns></returns>
+        /// <param name="item">The object to locate. The value can be <c>null</c> for reference types.</param>
+        /// <param name="comparer">
+        /// The <see cref="IComparer{T}"/> implementation to use when comparing elements.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <c>null</c> to use the default comparer <see cref="Comparer{T}.Default"/>.
+        /// </param>
+        /// <returns>The zero-based index of item in the sorted <see cref="List{T}"/>, if item is found; otherwise,
+        /// a negative number that is the bitwise complement of the index of the next element that is larger than
+        /// item or, if there is no larger element, the bitwise complement of <see cref="Count"/>.</returns>
+        /// <exception cref="InvalidOperationException"><paramref name="comparer"/> is <c>null</c>, and the default
+        /// comparer <see cref="Comparer{T}.Default"/> cannot find an implementation of the <see cref="IComparable{T}"/>
+        /// generic interface or the <see cref="IComparable"/> interface for type <typeparamref name="T"/>.</exception>
+        /// <remarks>
+        /// The comparer customizes how the elements are compared. For example, you can use a <see cref="CaseInsensitiveComparer"/>
+        /// instance as the comparer to perform case-insensitive string searches.
+        /// <para/>
+        /// If <paramref name="comparer"/> is provided, the elements of the <see cref="List{T}"/> are compared to the specified value using the
+        /// specified <see cref="IComparer{T}"/> implementation.
+        /// <para/>
+        /// If <paramref name="comparer"/> is <c>null</c>, J2N's default comparer <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/>
+        /// implements the <see cref="IComparable{T}"/> generic interface and uses that implementation, if available. If not,
+        /// <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/> implements the <see cref="IComparable"/> interface.
+        /// If type <typeparamref name="T"/> does not implement either interface, <see cref="Comparer{T}.Default"/> throws <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// The <see cref="List{T}"/> must already be sorted according to the comparer implementation; otherwise, the result is incorrect.
+        /// <para/>
+        /// Comparing <c>null</c> with any reference type is allowed and does not generate an exception when using the <see cref="IComparable{T}"/>
+        /// generic interface. When sorting, <c>null</c> is considered to be less than any other object.
+        /// <para/>
+        /// If the <see cref="List{T}"/> contains more than one element with the same value, the method returns only one of the occurrences,
+        /// and it might return any one of the occurrences, not necessarily the first one.
+        /// <para/>
+        /// If the <see cref="List{T}"/> does not contain the specified value, the method returns a negative integer. You can apply
+        /// the bitwise complement operation (~) to this negative integer to get the index of the first element that is larger than
+        /// the search value. When inserting the value into the <see cref="List{T}"/>, this index should be used as the insertion
+        /// point to maintain the sort order.
+        /// <para/>
+        /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
+        /// </remarks>
         public int BinarySearch(T item, IComparer<T>? comparer)
         {
             return list.BinarySearch(item, comparer ?? Comparer<T>.Default);
         }
 
+        /// <summary>
+        /// Removes all elements from the <see cref="List{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// <see cref="Count"/> is set to 0, and references to other objects from elements
+        /// of the collection are also released.
+        /// <para/>
+        /// <see cref="Capacity"/> remains unchanged. To reset the capacity of the <see cref="List{T}"/>, call
+        /// the <see cref="TrimExcess()"/> method or set the <see cref="Capacity"/> property directly. Decreasing
+        /// the capacity reallocates memory and copies all the elements in the <see cref="List{T}"/>. Trimming an
+        /// empty <see cref="List{T}"/> sets the capacity of the <see cref="List{T}"/> to the default capacity.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void Clear()
         {
             list.Clear();
             version++;
         }
 
+        /// <summary>
+        /// Determines whether an element is in the <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
+        /// <returns><c>true</c> if item is found in the <see cref="List{T}"/>; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method determines equality by using the default equality comparer, as defined by the object's implementation of
+        /// the <see cref="IEquatable{T}.Equals(T)"/> method for <typeparamref name="T"/> (the type of values in the list).
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public bool Contains(T item)
             => list.Contains(item);
 
@@ -466,6 +676,29 @@ namespace J2N.Collections.Generic
         public int IndexOf(T item, int index, int count)
             => list.IndexOf(item, index, count);
 
+        /// <summary>
+        /// Inserts an element into the <see cref="List{T}"/> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which <paramref name="item"/> should be inserted.</param>
+        /// <param name="item">The object to insert. The value can be <c>null</c> for reference types.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than <see cref="Count"/>.
+        /// </exception>
+        /// <remarks>
+        /// <see cref="List{T}"/> accepts <c>null</c> as a valid value for reference types and allows duplicate elements.
+        /// <para/>
+        /// If <see cref="Count"/> already equals <see cref="Capacity"/>, the capacity of the <see cref="List{T}"/> is increased
+        /// by automatically reallocating the internal array, and the existing elements are copied to the new array before the
+        /// new element is added.
+        /// <para/>
+        /// If index is equal to <see cref="Count"/>, item is added to the end of <see cref="List{T}"/>.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void Insert(int index, T item)
         {
             list.Insert(index, item);
@@ -557,6 +790,21 @@ namespace J2N.Collections.Generic
         public int LastIndexOf(T item, int index, int count)
             => list.LastIndexOf(item, index, count);
 
+        /// <summary>
+        /// Removes the first occurrence of a specific object from the <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to remove from the <see cref="List{T}"/>. The value can be
+        /// <c>null</c> for reference types.</param>
+        /// <returns><c>true</c> if item is successfully removed; otherwise, <c>false</c>. This method
+        /// also returns <c>false</c> if item was not found in the <see cref="List{T}"/>.</returns>
+        /// <remarks>
+        /// If type <typeparamref name="T"/> implements the <see cref="IEquatable{T}"/> generic interface,
+        /// the equality comparer is the <see cref="IEquatable{T}.Equals(T)"/> method of that interface;
+        /// otherwise, the default equality comparer is <see cref="Object.Equals(object)"/>.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation,
+        /// where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public bool Remove(T item)
         {
             if (list.Remove(item))
@@ -606,28 +854,18 @@ namespace J2N.Collections.Generic
             version++;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Sort()
         {
             list.Sort(Comparer<T>.Default);
             version++;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public void Sort(int index, int count, IComparer<T> comparer)
         {
             list.Sort(index, count, comparer ?? Comparer<T>.Default);
             version++;
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="comparer"></param>
         public void Sort(IComparer<T> comparer)
         {
             list.Sort(comparer ?? Comparer<T>.Default);
