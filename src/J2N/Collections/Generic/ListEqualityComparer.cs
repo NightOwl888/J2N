@@ -114,7 +114,7 @@ namespace J2N.Collections.Generic
         /// <returns>The hash code of <paramref name="list"/>.</returns>
         public virtual int GetHashCode(IList<T> list)
         {
-            if (list == null)
+            if (list is null)
                 return 0;
 
             int hashCode = 1;

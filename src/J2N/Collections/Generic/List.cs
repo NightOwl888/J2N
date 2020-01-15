@@ -692,7 +692,7 @@ namespace J2N.Collections.Generic
 
             if (savedCount != 0)
             {
-                T[] items = (T[])siInfo.GetValue(ItemsName, typeof(T[]));
+                T[]? items = (T[]?)siInfo.GetValue(ItemsName, typeof(T[]));
 
                 if (items == null)
                 {

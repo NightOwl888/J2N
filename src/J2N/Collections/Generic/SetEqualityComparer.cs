@@ -124,7 +124,7 @@ namespace J2N.Collections.Generic
         /// <returns>The hash code of <paramref name="set"/>.</returns>
         public virtual int GetHashCode(ISet<T> set)
         {
-            if (set == null)
+            if (set is null)
                 return 0;
 
             int hashCode = 0;

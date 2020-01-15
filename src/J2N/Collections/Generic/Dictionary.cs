@@ -1007,7 +1007,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current dictionary. The hash code is calculated 
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
@@ -1562,8 +1562,8 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// An adapter class for <see cref="SCG.Dictionary{TKey, TValue}"/> to implement <see cref="IConcreteDictionary{TKey, TValue}"/>,
-        /// which is an interface that is used to share all of the members between <see cref="SCG.Dictionary{TKey, TValue}"/>
-        /// and <see cref="NullableKeyDictionary"/>.
+        /// which is an interface that is used to expose all of the members of <see cref="SCG.Dictionary{TKey, TValue}"/>
+        /// and <see cref="SCG.IDictionary{TKey, TValue}"/>.
         /// </summary>
         internal class ConcreteDictionary : SCG.Dictionary<TKey, TValue>, IConcreteDictionary<TKey, TValue>
         {

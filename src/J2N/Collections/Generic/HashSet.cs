@@ -45,7 +45,7 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    public class HashSet<T> : ICollection<T>, ISet<T>, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
+    public class HashSet<T> : ISet<T>, ICollection<T>, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
         , System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
 #endif
@@ -455,7 +455,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException("SR.InvalidOperation_ConcurrentOperationsNotSupported");
+                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
                             }
                             collisionCount++;
                         }
@@ -477,7 +477,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException("SR.InvalidOperation_ConcurrentOperationsNotSupported");
+                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
                             }
                             collisionCount++;
                         }
@@ -498,7 +498,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException("SR.InvalidOperation_ConcurrentOperationsNotSupported");
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
                         }
                         collisionCount++;
                     }
@@ -2120,7 +2120,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, SetEqualityComparer<T>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current set. The hash code is calculated 
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
