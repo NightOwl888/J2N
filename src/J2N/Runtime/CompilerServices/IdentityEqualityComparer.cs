@@ -20,7 +20,7 @@ namespace J2N.Runtime.CompilerServices
         /// <see cref="IdentityEqualityComparer{T}"/> class.
         /// </summary>
         /// <value>A <see cref="IdentityEqualityComparer{T}"/> instance.</value>
-        public static IdentityEqualityComparer<T> Instance { get; } = new IdentityEqualityComparer<T>();
+        public static IdentityEqualityComparer<T> Default { get; } = new IdentityEqualityComparer<T>();
 
         private IdentityEqualityComparer() { } // Singleton instance only
 
