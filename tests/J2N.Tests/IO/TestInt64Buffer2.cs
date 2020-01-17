@@ -261,7 +261,7 @@ namespace J2N.IO
             b.Put(long.MaxValue);
             b.Put(long.MinValue);
 
-            //long v; // LUCENENET: Not used
+            //long v; // J2N: Not used
             b.Flip();
             ck(b, b.Get(), 0);
             ck(b, b.Get(), (long)-1);
