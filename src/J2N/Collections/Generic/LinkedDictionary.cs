@@ -87,7 +87,7 @@ namespace J2N.Collections.Generic
         private System.Runtime.Serialization.SerializationInfo/*?*/ siInfo; //A temporary variable which we need during deserialization.
 
         // names for serialization
-        private const string ComparerName = "Comparer"; // Do not rename (binary serialization)
+        private const string EqualityComparerName = "EqualityComparer"; // Do not rename (binary serialization)
         private const string CountName = "Count"; // Do not rename (binary serialization) - used to allocate during deserialzation, not actually a field
         private const string KeyValuePairsName = "KeyValuePairs"; // Do not rename (binary serialization)
         private const string VersionName = "Version"; // Do not rename (binary serialization)
@@ -163,7 +163,7 @@ namespace J2N.Collections.Generic
         {
             siInfo = info;
             int capacity = info.GetInt32(CountName);
-            var comparer = (IEqualityComparer<TKey>)siInfo.GetValue(ComparerName, typeof(IEqualityComparer<TKey>));
+            var comparer = (IEqualityComparer<TKey>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<TKey>));
             dictionary = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>(capacity, comparer);
             list = new LinkedList<KeyValuePair<TKey, TValue>>();
         }
@@ -186,7 +186,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public IEqualityComparer<TKey> Comparer => dictionary.Comparer;
+        public IEqualityComparer<TKey> EqualityComparer => dictionary.EqualityComparer;
 
         /// <summary>
         /// Determines whether the <see cref="LinkedDictionary{TKey, TValue}"/> contains a specific value.
@@ -296,7 +296,7 @@ namespace J2N.Collections.Generic
 
             int count = Count;
             info.AddValue(CountName, count);
-            info.AddValue(ComparerName, Comparer, typeof(IEqualityComparer<TKey>));
+            info.AddValue(EqualityComparerName, EqualityComparer, typeof(IEqualityComparer<TKey>));
             info.AddValue(VersionName, version);
 
             if (count > 0)

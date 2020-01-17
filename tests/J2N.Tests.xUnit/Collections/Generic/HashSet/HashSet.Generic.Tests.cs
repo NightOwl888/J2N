@@ -53,9 +53,9 @@ namespace J2N.Collections.Tests
             SCG.IEqualityComparer<T> comparer = GetIEqualityComparer();
             HashSet<T> set = new HashSet<T>(comparer);
             if (comparer == null)
-                Assert.Equal(EqualityComparer<T>.Default, set.Comparer);
+                Assert.Equal(EqualityComparer<T>.Default, set.EqualityComparer);
             else
-                Assert.Equal(comparer, set.Comparer);
+                Assert.Equal(comparer, set.EqualityComparer);
         }
 
         [Fact]
@@ -64,9 +64,9 @@ namespace J2N.Collections.Tests
             SCG.IEqualityComparer<T> comparer = null;
             HashSet<T> set = new HashSet<T>(comparer);
             if (comparer == null)
-                Assert.Equal(EqualityComparer<T>.Default, set.Comparer);
+                Assert.Equal(EqualityComparer<T>.Default, set.EqualityComparer);
             else
-                Assert.Equal(comparer, set.Comparer);
+                Assert.Equal(comparer, set.EqualityComparer);
         }
 
         [Theory]
@@ -397,9 +397,9 @@ namespace J2N.Collections.Tests
             HashSet<T> set = new HashSet<T>(capacity, comparer);
             Assert.Equal(0, set.Count);
             if (comparer == null)
-                Assert.Equal(EqualityComparer<T>.Default, set.Comparer);
+                Assert.Equal(EqualityComparer<T>.Default, set.EqualityComparer);
             else
-                Assert.Equal(comparer, set.Comparer);
+                Assert.Equal(comparer, set.EqualityComparer);
         }
 
         [Theory]

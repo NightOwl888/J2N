@@ -179,7 +179,7 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// Retrieving the value of this property is an O(1) operation.
         /// </remarks>
-        public IEqualityComparer<T> Comparer => hashSet.Comparer;
+        public IEqualityComparer<T> EqualityComparer => hashSet.EqualityComparer;
 
         /// <summary>
         /// Copies the elements of a <see cref="LinkedHashSet{T}"/> object to an array.
@@ -781,7 +781,7 @@ namespace J2N.Collections.Generic
             }
 
             // Use the same comparer for fastest operations
-            var temp = new SCG.HashSet<T>(other, hashSet.Comparer);
+            var temp = new SCG.HashSet<T>(other, hashSet.EqualityComparer);
             temp.ExceptWith(this);
 
             // We separate this into ExceptWith and UnionWith at extra cost to ensure we call TrimExcess()

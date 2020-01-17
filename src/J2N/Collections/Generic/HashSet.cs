@@ -78,7 +78,7 @@ namespace J2N.Collections.Generic
         // constants for serialization
         private const string CapacityName = "Capacity"; // Do not rename (binary serialization)
         private const string ElementsName = "Elements"; // Do not rename (binary serialization)
-        private const string ComparerName = "Comparer"; // Do not rename (binary serialization)
+        private const string EqualityComparerName = "EqualityComparer"; // Do not rename (binary serialization)
         private const string VersionName = "Version"; // Do not rename (binary serialization)
 #endif
 
@@ -684,7 +684,7 @@ namespace J2N.Collections.Generic
             }
 
             info.AddValue(VersionName, _version); // need to serialize version to avoid problems with serializing while enumerating
-            info.AddValue(ComparerName, _comparer ?? EqualityComparer<T>.Default, typeof(IEqualityComparer<T>));
+            info.AddValue(EqualityComparerName, _comparer ?? EqualityComparer<T>.Default, typeof(IEqualityComparer<T>));
             info.AddValue(CapacityName, _buckets == null ? 0 : _buckets.Length);
 
             if (_buckets != null)
@@ -726,7 +726,7 @@ namespace J2N.Collections.Generic
             }
 
             int capacity = _siInfo.GetInt32(CapacityName);
-            _comparer = (IEqualityComparer<T>)_siInfo.GetValue(ComparerName, typeof(IEqualityComparer<T>))!;
+            _comparer = (IEqualityComparer<T>)_siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<T>))!;
             _freeList = -1;
 
             if (capacity != 0)
@@ -1433,7 +1433,7 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// Retrieving the value of this property is an O(1) operation.
         /// </remarks>
-        public IEqualityComparer<T> Comparer => _comparer ?? EqualityComparer<T>.Default;
+        public IEqualityComparer<T> EqualityComparer => _comparer ?? EqualityComparer<T>.Default;
 
         /// <summary>
         /// Ensures that this hash set can hold the specified number of elements without growing.
@@ -2255,11 +2255,11 @@ namespace J2N.Collections.Generic
         private static bool AreEqualityComparersEqual(HashSet<T> set1, IEnumerable<T> set2)
         {
             if (set2 is HashSet<T> hashSet)
-                return set1.Comparer.Equals(hashSet.Comparer);
+                return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
             else if (set2 is LinkedHashSet<T> linkedHashSet)
-                return set1.Comparer.Equals(linkedHashSet.Comparer);
+                return set1.EqualityComparer.Equals(linkedHashSet.EqualityComparer);
             else if (set2 is SCG.HashSet<T> scgHashSet)
-                return set1.Comparer.Equals(scgHashSet.Comparer);
+                return set1.EqualityComparer.Equals(scgHashSet.Comparer);
             return false;
         }
 
@@ -2273,7 +2273,7 @@ namespace J2N.Collections.Generic
         /// <returns></returns>
         private static bool AreEqualityComparersEqual(HashSet<T> set1, HashSet<T> set2)
         {
-            return set1.Comparer.Equals(set2.Comparer);
+            return set1.EqualityComparer.Equals(set2.EqualityComparer);
         }
 
         /// <summary>

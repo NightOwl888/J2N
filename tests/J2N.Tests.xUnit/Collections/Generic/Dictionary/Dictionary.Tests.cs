@@ -439,7 +439,7 @@ namespace J2N.Collections.Tests
 
             var dict = new Dictionary<T, T>(equalityComparer);
 
-            Assert.Same(equalityComparer, dict.Comparer);
+            Assert.Same(equalityComparer, dict.EqualityComparer);
 
             bf.Serialize(s, dict);
             s.Position = 0;
@@ -447,14 +447,14 @@ namespace J2N.Collections.Tests
 
             if (internalTypeName == null)
             {
-                Assert.IsType(equalityComparer.GetType(), dict.Comparer);
+                Assert.IsType(equalityComparer.GetType(), dict.EqualityComparer);
             }
             else
             {
-                Assert.Equal(internalTypeName, dict.Comparer.GetType().ToString());
+                Assert.Equal(internalTypeName, dict.EqualityComparer.GetType().ToString());
             }
 
-            Assert.True(equalityComparer.Equals(dict.Comparer));
+            Assert.True(equalityComparer.Equals(dict.EqualityComparer));
         }
 #endif
 

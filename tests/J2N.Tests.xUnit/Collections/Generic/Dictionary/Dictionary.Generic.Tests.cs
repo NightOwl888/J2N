@@ -54,7 +54,7 @@ namespace J2N.Collections.Tests
             SCG.IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
             Dictionary<TKey, TValue> copied = new Dictionary<TKey, TValue>(source, comparer);
             Assert.Equal(source, copied);
-            Assert.Equal(comparer, copied.Comparer);
+            Assert.Equal(comparer, copied.EqualityComparer);
         }
 
         [Theory]
@@ -65,7 +65,7 @@ namespace J2N.Collections.Tests
             SCG.IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
             Dictionary<TKey, TValue> copied = new Dictionary<TKey, TValue>(source, comparer);
             Assert.Equal(source, copied);
-            Assert.Equal(comparer, copied.Comparer);
+            Assert.Equal(comparer, copied.EqualityComparer);
         }
 
         [Theory]
@@ -83,7 +83,7 @@ namespace J2N.Collections.Tests
             SCG.IEqualityComparer<TKey> comparer = GetKeyIEqualityComparer();
             Dictionary<TKey, TValue> dictionary = new Dictionary<TKey, TValue>(count, comparer);
             Assert.Equal(0, dictionary.Count);
-            Assert.Equal(comparer, dictionary.Comparer);
+            Assert.Equal(comparer, dictionary.EqualityComparer);
         }
 
         #endregion
