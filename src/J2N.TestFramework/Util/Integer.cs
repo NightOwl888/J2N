@@ -25,9 +25,9 @@ namespace J2N.Util
 
         public override bool Equals(object obj)
         {
-            if (obj is Integer)
+            if (obj is Integer integer)
             {
-                return Value.Equals(((Integer)obj).Value);
+                return Value.Equals(integer.Value);
             }
             return Value.Equals(obj);
         }

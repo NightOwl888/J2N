@@ -117,11 +117,17 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ArgumentNull_CollectionDoesntSupportNull" xml:space="preserve">
+    <value>The collection does not support null values.</value>
+  </data>
   <data name="ArgumentOutOfRange_BiggerThanCollection" xml:space="preserve">
     <value>Must be less than or equal to the size of the collection.</value>
   </data>
   <data name="ArgumentOutOfRange_Index" xml:space="preserve">
     <value>Index was out of range. Must be non-negative and less than the size of the collection.</value>
+  </data>
+  <data name="ArgumentOutOfRange_NeedCapacityAtLeast1" xml:space="preserve">
+    <value>capacity must be at least 1.</value>
   </data>
   <data name="ArgumentOutOfRange_NeedNonNegNum" xml:space="preserve">
     <value>Non-negative number required.</value>
@@ -134,6 +140,9 @@
   </data>
   <data name="Argument_ArrayTooLarge" xml:space="preserve">
     <value>The input array length must not exceed Int32.MaxValue / {0}. Otherwise BitArray.Length would exceed Int32.MaxValue.</value>
+  </data>
+  <data name="Argument_CollectionMustNotBeThis" xml:space="preserve">
+    <value>collection must not be the same instance as this.</value>
   </data>
   <data name="Argument_InvalidArrayType" xml:space="preserve">
     <value>Target array type is not compatible with the type of items in the collection.</value>
@@ -176,6 +185,9 @@
   </data>
   <data name="InvalidOperation_CollectionCorrupted" xml:space="preserve">
     <value>Operations that change non-concurrent collections must have exclusive access. A concurrent update was performed on this collection and corrupted its state. The collection's state is no longer correct.</value>
+  </data>
+  <data name="InvalidOperation_ComparerRequired" xml:space="preserve">
+    <value>Either an IComparer&lt;T&gt; must be supplied via a constructor, or the generic closing type must implement IComparable&lt;T&gt;.</value>
   </data>
   <data name="InvalidOperation_ConcurrentOperationsNotSupported" xml:space="preserve">
     <value>Operations that change non-concurrent collections must have exclusive access. A concurrent update was performed on this collection and corrupted its state. The collection's state is no longer correct.</value>

@@ -170,6 +170,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to collection must not be the same instance as this..
+        /// </summary>
+        internal static string Argument_CollectionMustNotBeThis {
+            get {
+                return ResourceManager.GetString("Argument_CollectionMustNotBeThis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target array type is not compatible with the type of items in the collection..
         /// </summary>
         internal static string Argument_InvalidArrayType {
@@ -188,6 +197,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The collection does not support null values..
+        /// </summary>
+        internal static string ArgumentNull_CollectionDoesntSupportNull {
+            get {
+                return ResourceManager.GetString("ArgumentNull_CollectionDoesntSupportNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Must be less than or equal to the size of the collection..
         /// </summary>
         internal static string ArgumentOutOfRange_BiggerThanCollection {
@@ -202,6 +220,15 @@ namespace J2N.Resources {
         internal static string ArgumentOutOfRange_Index {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_Index", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to capacity must be at least 1..
+        /// </summary>
+        internal static string ArgumentOutOfRange_NeedCapacityAtLeast1 {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_NeedCapacityAtLeast1", resourceCulture);
             }
         }
         
@@ -238,6 +265,15 @@ namespace J2N.Resources {
         internal static string InvalidOperation_CollectionCorrupted {
             get {
                 return ResourceManager.GetString("InvalidOperation_CollectionCorrupted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either an IComparer&lt;T&gt; must be supplied via a constructor, or the generic closing type must implement IComparable&lt;T&gt;..
+        /// </summary>
+        internal static string InvalidOperation_ComparerRequired {
+            get {
+                return ResourceManager.GetString("InvalidOperation_ComparerRequired", resourceCulture);
             }
         }
         
