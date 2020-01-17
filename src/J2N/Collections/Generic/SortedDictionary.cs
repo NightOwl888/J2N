@@ -824,6 +824,34 @@ namespace J2N.Collections.Generic
 
         #endregion
 
+        #region Java TreeMap-like Members
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the predecessor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the predecessor of.</param>
+        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predessor, if any.</param>
+        /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result)
+        {
+            return _set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default), out result);
+        }
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the successor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the successor of.</param>
+        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the successor, if any.</param>
+        /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result)
+        {
+            return _set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default), out result);
+        }
+
+        #endregion
+
         #region Structural Equality
 
         /// <summary>

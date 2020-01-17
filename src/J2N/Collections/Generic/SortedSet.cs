@@ -407,6 +407,100 @@ namespace J2N.Collections.Generic
 
         #endregion
 
+        #region Java TreeSet-like Members
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
+        /// is the predecessor of the specified <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the predecessor of.</param>
+        /// <param name="result">The predessor, if any.</param>
+        /// <returns><c>true</c> if a predecessor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+        public bool TryGetPredecessor(T item, out T result)
+        {
+            Node current = root, match = null;
+
+            while (current != null)
+            {
+                int comp = comparer.Compare(item, current.Item);
+
+                if (comp > 0)
+                {
+                    match = current;
+                    current = current.Right;
+                }
+                else if (comp == 0)
+                {
+                    current = current.Left;
+                    while (current != null)
+                    {
+                        match = current;
+                        current = current.Right;
+                    }
+                }
+                else
+                    current = current.Left;
+            }
+
+            if (match == null)
+            {
+                result = default;
+                return false;
+            }
+            else
+            {
+                result = match.Item;
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
+        /// is the sucessor of the specified <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the successor of.</param>
+        /// <param name="result">The successor, if any.</param>
+        /// <returns><c>true</c> if a successor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+        public bool TryGetSuccessor(T item, out T result)
+        {
+            Node current = root, match = null;
+
+            while (current != null)
+            {
+                int comp = comparer.Compare(item, current.Item);
+
+                if (comp < 0)
+                {
+                    match = current;
+                    current = current.Left;
+                }
+                else if (comp == 0)
+                {
+                    current = current.Right;
+                    while (current != null)
+                    {
+                        match = current;
+                        current = current.Left;
+                    }
+                }
+                else
+                    current = current.Right;
+            }
+
+            if (match == null)
+            {
+                result = default;
+                return false;
+            }
+            else
+            {
+                result = match.Item;
+                return true;
+            }
+        }
+
+        #endregion
+
         #region ICollection<T> members
 
         /// <summary>
@@ -968,9 +1062,9 @@ namespace J2N.Collections.Generic
             return -1;
         }
 
-        internal Node FindRange(/*[AllowNull]*/ T from, /*[AllowNull]*/  T to) => FindRange(from, to, lowerBoundActive: true, upperBoundActive: true);
+        internal Node FindRange([AllowNull] T from, [AllowNull]  T to) => FindRange(from, to, lowerBoundActive: true, upperBoundActive: true);
 
-        internal Node FindRange(/*[AllowNull]*/ T from, /*[AllowNull]*/ T to, bool lowerBoundActive, bool upperBoundActive)
+        internal Node FindRange([AllowNull] T from, [AllowNull] T to, bool lowerBoundActive, bool upperBoundActive)
         {
             Node current = root;
             while (current != null)
@@ -1960,7 +2054,7 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
         /// </remarks>
-        public virtual SortedSet<T> GetViewBetween(/*[AllowNull]*/ T lowerValue, /*[AllowNull]*/ T upperValue)
+        public virtual SortedSet<T> GetViewBetween([AllowNull] T lowerValue, [AllowNull] T upperValue)
         {
             if (Comparer.Compare(lowerValue, upperValue) > 0)
             {
