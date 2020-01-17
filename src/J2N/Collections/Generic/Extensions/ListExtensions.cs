@@ -35,7 +35,6 @@ namespace J2N.Collections.Generic.Extensions
         /// </summary>
         /// <typeparam name="T">The element type.</typeparam>
         /// <param name="list">The <see cref="IList{T}"/> to shuffle.</param>
-        /// <exception cref="NotSupportedException">If <paramref name="list"/> is read-only.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="list"/> is <c>null</c>.</exception>
         /// <seealso cref="Shuffle{T}(IList{T}, System.Random)"/>
         public static void Shuffle<T>(this IList<T> list)
@@ -50,7 +49,6 @@ namespace J2N.Collections.Generic.Extensions
         /// <typeparam name="T">The element type.</typeparam>
         /// <param name="list">The <see cref="IList{T}"/> to shuffle.</param>
         /// <param name="random">The random number generator.</param>
-        /// <exception cref="NotSupportedException">If <paramref name="list"/> is read-only.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="list"/> or <paramref name="random"/> is <c>null</c>.</exception>
         /// <seealso cref="Shuffle{T}(IList{T})"/>
         // Method found here http://stackoverflow.com/a/2301091
@@ -61,8 +59,6 @@ namespace J2N.Collections.Generic.Extensions
                 throw new ArgumentNullException(nameof(list));
             if (random == null)
                 throw new ArgumentNullException(nameof(random));
-            if (list.IsReadOnly)
-                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
 
             for (int i = list.Count - 1; i > 0; i--)
             {
@@ -82,7 +78,6 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="index1">Position of the first element to swap with the element in
         /// <paramref name="index2"/>.</param>
         /// <param name="index2">Position of the other element.</param>
-        /// <exception cref="NotSupportedException">If <paramref name="list"/> is read-only.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index1"/> or <paramref name="index2"/> is greater than <c><paramref name="list"/>.Count</c>.
         /// <para/>
@@ -104,8 +99,6 @@ namespace J2N.Collections.Generic.Extensions
                 throw new ArgumentOutOfRangeException(nameof(index1));
             if (index2 < 0 || index2 > size)
                 throw new ArgumentOutOfRangeException(nameof(index2));
-            if (list.IsReadOnly)
-                throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
 
             T tmp = list[index1];
             list[index1] = list[index2];
