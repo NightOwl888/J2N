@@ -318,7 +318,7 @@ namespace J2N.Collections.Generic
                 // clear the elements so that the gc can reclaim the references.
                 // clear only up to _lastIndex for _slots
                 Array.Clear(_slots, 0, _lastIndex);
-                Array.Clear(_buckets, 0, _buckets.Length);
+                Array.Clear(_buckets, 0, _buckets!.Length);
                 _lastIndex = 0;
                 _count = 0;
                 _freeList = -1;
@@ -1874,7 +1874,7 @@ namespace J2N.Collections.Generic
                 if (default(T)! != null) // TODO-NULLABLE: default(T) == null warning (https://github.com/dotnet/roslyn/issues/34757)
                 {
                     // see note at "HashSet" level describing why "- 1" appears in for loop
-                    for (int i = buckets[hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
+                    for (int i = buckets![hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
                     {
                         if (slots[i].hashCode == hashCode && EqualityComparer<T>.Default.Equals(slots[i].value, item))
                         {
@@ -1897,7 +1897,7 @@ namespace J2N.Collections.Generic
                     IEqualityComparer<T> defaultComparer = EqualityComparer<T>.Default;
 
                     // see note at "HashSet" level describing why "- 1" appears in for loop
-                    for (int i = buckets[hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
+                    for (int i = buckets![hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
                     {
                         if (slots[i].hashCode == hashCode && defaultComparer.Equals(slots[i].value, item))
                         {
@@ -1918,7 +1918,7 @@ namespace J2N.Collections.Generic
                 int hashCode = item == null ? 0 : InternalGetHashCode(comparer.GetHashCode(item));
 
                 // see note at "HashSet" level describing why "- 1" appears in for loop
-                for (int i = buckets[hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
+                for (int i = buckets![hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
                 {
                     if (slots[i].hashCode == hashCode && comparer.Equals(slots[i].value, item))
                     {
@@ -2045,7 +2045,7 @@ namespace J2N.Collections.Generic
 
             IEqualityComparer<T>? comparer = _comparer;
             int hashCode = InternalGetHashCode(value, comparer);
-            int bucket = hashCode % _buckets.Length;
+            int bucket = hashCode % _buckets!.Length;
             int collisionCount = 0;
             Slot[] slots = _slots;
             for (int i = _buckets[bucket] - 1; i >= 0; i = slots[i].next)
