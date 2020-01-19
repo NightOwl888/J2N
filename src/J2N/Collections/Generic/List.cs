@@ -8,6 +8,9 @@ using System.Diagnostics;
 #if FEATURE_CONTRACTBLOCKS
 using System.Diagnostics.Contracts;
 #endif
+#if NETSTANDARD1_X
+using CaseInsensitiveComparer = System.StringComparer; // To fixup documentation - this type doesn't exist on .NET Standard 1.x
+#endif
 #nullable enable
 
 namespace J2N.Collections.Generic
