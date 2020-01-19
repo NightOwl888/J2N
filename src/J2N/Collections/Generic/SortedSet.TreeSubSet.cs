@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
@@ -46,6 +47,8 @@ namespace J2N.Collections.Generic
             // anything <= 10 is added, but there is no upper bound. These features Head(), Tail(), were punted
             // in the spec, and are not available, but the framework is there to make them available at some point.
             private bool _lBoundActive, _uBoundActive;
+            private bool _lBoundInclusive, _uBoundInclusive;
+
             // used to see if the count is out of date
 
 #if DEBUG
@@ -55,15 +58,17 @@ namespace J2N.Collections.Generic
             }
 #endif
 
-            public TreeSubSet(SortedSet<T> Underlying, [AllowNull] T Min, [AllowNull] T Max, bool lowerBoundActive, bool upperBoundActive)
+            public TreeSubSet(SortedSet<T> Underlying, [AllowNull] T Min, bool lowerBoundInclusive, [AllowNull] T Max, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
                 : base(Underlying.Comparer)
             {
                 _underlying = Underlying;
                 _min = Min;
                 _max = Max;
+                _lBoundInclusive = lowerBoundInclusive;
+                _uBoundInclusive = upperBoundInclusive;
                 _lBoundActive = lowerBoundActive;
                 _uBoundActive = upperBoundActive;
-                root = _underlying.FindRange(_min, _max, _lBoundActive, _uBoundActive); // root is first element within range
+                root = _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive); // root is first element within range
                 count = 0;
                 version = -1;
                 _countVersion = -1;
@@ -71,7 +76,9 @@ namespace J2N.Collections.Generic
 
 #if FEATURE_SERIALIZABLE
             [SuppressMessage("Microsoft.Usage", "CA2236:CallBaseClassMethodsOnISerializableTypes", Justification = "special case TreeSubSet serialization")]
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
             private TreeSubSet(SerializationInfo info, StreamingContext context)
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
             {
                 siInfo = info;
                 OnDeserializationImpl(info);
@@ -88,7 +95,7 @@ namespace J2N.Collections.Generic
                 bool ret = _underlying.AddIfNotPresent(item);
                 VersionCheck();
 #if DEBUG
-                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max));
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
 #endif
 
                 return ret;
@@ -98,7 +105,7 @@ namespace J2N.Collections.Generic
             {
                 VersionCheck();
 #if DEBUG
-                Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max));
+                Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
 #endif
                 return base.Contains(item);
             }
@@ -113,7 +120,7 @@ namespace J2N.Collections.Generic
                 bool ret = _underlying.Remove(item);
                 VersionCheck();
 #if DEBUG
-                Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max));
+                Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
 #endif
                 return ret;
             }
@@ -140,28 +147,52 @@ namespace J2N.Collections.Generic
 
             internal override bool IsWithinRange(T item)
             {
-                int comp = _lBoundActive ? Comparer.Compare(_min, item) : -1;
-                if (comp > 0)
-                {
-                    return false;
-                }
+                return !IsTooLow(item) && !IsTooHigh(item);
+            }
 
-                comp = _uBoundActive ? Comparer.Compare(_max, item) : 1;
-                return comp >= 0;
+            private bool IsTooHigh(T item)
+            {
+                return IsTooHigh(item, _uBoundInclusive);
+            }
+
+            private bool IsTooHigh(T item, bool upperBoundInclusive)
+            {
+                if (_uBoundActive)
+                {
+                    int c = Comparer.Compare(item, _max);
+                    if (c > 0 || (c == 0 && !upperBoundInclusive))
+                        return true;
+                }
+                return false;
+            }
+
+            private bool IsTooLow(T item)
+            {
+                return IsTooLow(item, _lBoundInclusive);
+            }
+
+            private bool IsTooLow(T item, bool lowerBoundInclusive)
+            {
+                if (_lBoundActive)
+                {
+                    int c = Comparer.Compare(item, _min);
+                    if (c < 0 || (c == 0 && !lowerBoundInclusive))
+                        return true;
+                }
+                return false;
             }
 
             internal override T MinInternal
             {
                 get
                 {
-                    Node current = root;
-                    T result = default;
+                    Node? current = root;
+                    T result = default!;
 
                     while (current != null)
                     {
-
                         int comp = _lBoundActive ? Comparer.Compare(_min, current.Item) : -1;
-                        if (comp == 1)
+                        if (comp > 0 || (comp == 0 && !_lBoundInclusive))
                         {
                             current = current.Right;
                         }
@@ -170,6 +201,11 @@ namespace J2N.Collections.Generic
                             result = current.Item;
                             if (comp == 0)
                             {
+                                if (!_lBoundInclusive)
+                                {
+                                    current = current.Left;
+                                    result = current != null ? current.Item : default;
+                                }
                                 break;
                             }
                             current = current.Left;
@@ -184,13 +220,13 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    Node current = root;
-                    T result = default(T);
+                    Node? current = root;
+                    T result = default!;
 
                     while (current != null)
                     {
                         int comp = _uBoundActive ? Comparer.Compare(_max, current.Item) : 1;
-                        if (comp == -1)
+                        if (comp < 0 || (comp == 0 && !_uBoundInclusive))
                         {
                             current = current.Left;
                         }
@@ -199,6 +235,11 @@ namespace J2N.Collections.Generic
                             result = current.Item;
                             if (comp == 0)
                             {
+                                if (!_uBoundInclusive)
+                                {
+                                    current = current.Right;
+                                    result = current != null ? current.Item : default;
+                                }
                                 break;
                             }
                             current = current.Right;
@@ -221,7 +262,7 @@ namespace J2N.Collections.Generic
                 // The maximum height of a red-black tree is 2*lg(n+1).
                 // See page 264 of "Introduction to algorithms" by Thomas H. Cormen
                 Stack<Node> stack = new Stack<Node>(2 * (int)SortedSet<T>.Log2(count + 1)); // this is not exactly right if count is out of date, but the stack can grow
-                Node current = root;
+                Node? current = root;
                 while (current != null)
                 {
                     if (IsWithinRange(current.Item))
@@ -229,7 +270,7 @@ namespace J2N.Collections.Generic
                         stack.Push(current);
                         current = current.Left;
                     }
-                    else if (_lBoundActive && Comparer.Compare(_min, current.Item) > 0)
+                    else if (IsTooLow(current.Item))
                     {
                         current = current.Right;
                     }
@@ -247,7 +288,7 @@ namespace J2N.Collections.Generic
                         return false;
                     }
 
-                    Node node = current.Right;
+                    Node? node = current.Right;
                     while (node != null)
                     {
                         if (IsWithinRange(node.Item))
@@ -255,7 +296,7 @@ namespace J2N.Collections.Generic
                             stack.Push(node);
                             node = node.Left;
                         }
-                        else if (_lBoundActive && Comparer.Compare(_min, node.Item) > 0)
+                        else if (IsTooLow(node.Item))
                         {
                             node = node.Right;
                         }
@@ -300,7 +341,7 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            internal override SortedSet<T>.Node FindNode(T item)
+            internal override SortedSet<T>.Node? FindNode(T item)
             {
                 if (!IsWithinRange(item))
                 {
@@ -309,7 +350,7 @@ namespace J2N.Collections.Generic
 
                 VersionCheck();
 #if DEBUG
-                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max));
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
 #endif
                 return base.FindNode(item);
             }
@@ -326,7 +367,7 @@ namespace J2N.Collections.Generic
                         return count;
                 }
 #if DEBUG
-                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max));
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
 #endif
                 return -1;
             }
@@ -340,9 +381,9 @@ namespace J2N.Collections.Generic
             private void VersionCheckImpl(bool updateCount)
             {
                 Debug.Assert(_underlying != null);
-                if (version != _underlying.version)
+                if (version != _underlying!.version)
                 {
-                    root = _underlying.FindRange(_min, _max, _lBoundActive, _uBoundActive);
+                    root = _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive);
                     version = _underlying.version;
                 }
 
@@ -360,7 +401,7 @@ namespace J2N.Collections.Generic
             internal override int TotalCount()
             {
                 Debug.Assert(_underlying != null);
-                return _underlying.Count;
+                return _underlying!.Count;
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -368,22 +409,38 @@ namespace J2N.Collections.Generic
             // Cannot increase the bounds of the subset, can only decrease it
             public override SortedSet<T> GetViewBetween(T lowerValue, T upperValue)
             {
-                if (_lBoundActive && Comparer.Compare(_min, lowerValue) > 0)
+                if (IsTooLow(lowerValue))
                 {
                     throw new ArgumentOutOfRangeException(nameof(lowerValue));
                 }
-                if (_uBoundActive && Comparer.Compare(_max, upperValue) < 0)
+                if (IsTooHigh(upperValue))
                 {
                     throw new ArgumentOutOfRangeException(nameof(upperValue));
                 }
                 return (TreeSubSet)_underlying.GetViewBetween(lowerValue, upperValue);
             }
 
+            // This passes functionality down to the underlying tree, clipping edges if necessary
+            // There's nothing gained by having a nested subset. May as well draw it from the base
+            // Cannot increase the bounds of the subset, can only decrease it
+            public override SortedSet<T> GetViewBetween([AllowNull] T lowerValue, bool lowerValueInclusive, [AllowNull] T upperValue, bool upperValueInclusive)
+            {
+                if (IsTooLow(lowerValue, lowerValueInclusive))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(lowerValue));
+                }
+                if (IsTooHigh(upperValue, upperValueInclusive))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(upperValue));
+                }
+                return (TreeSubSet)_underlying.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
+            }
+
 #if DEBUG
             internal override void IntersectWithEnumerable(IEnumerable<T> other)
             {
                 base.IntersectWithEnumerable(other);
-                Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max));
+                Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
             }
 #endif
 
@@ -400,34 +457,38 @@ namespace J2N.Collections.Generic
                 info.AddValue(minName, _min, typeof(T));
                 info.AddValue(lBoundActiveName, _lBoundActive);
                 info.AddValue(uBoundActiveName, _uBoundActive);
+                info.AddValue(lBoundInclusiveName, _lBoundInclusive);
+                info.AddValue(uBoundInclusiveName, _uBoundInclusive);
                 base.GetObjectData(info, context);
             }
 
-            void IDeserializationCallback.OnDeserialization(object sender) => OnDeserialization(sender);
+            void IDeserializationCallback.OnDeserialization(object? sender) => OnDeserialization(sender);
 
-            protected override void OnDeserialization(object sender)
+            protected override void OnDeserialization(object? sender)
             {
                 OnDeserializationImpl(sender);
             }
 
-            private void OnDeserializationImpl(object sender)
+            private void OnDeserializationImpl(object? sender)
             {
                 if (siInfo == null)
                 {
                     throw new SerializationException(SR.Serialization_InvalidOnDeser);
                 }
 
-                comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>));
+                comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
                 int savedCount = siInfo.GetInt32(CountName);
-                _max = (T)siInfo.GetValue(maxName, typeof(T));
-                _min = (T)siInfo.GetValue(minName, typeof(T));
+                _max = (T)siInfo.GetValue(maxName, typeof(T))!;
+                _min = (T)siInfo.GetValue(minName, typeof(T))!;
                 _lBoundActive = siInfo.GetBoolean(lBoundActiveName);
                 _uBoundActive = siInfo.GetBoolean(uBoundActiveName);
+                _lBoundInclusive = siInfo.GetBoolean(lBoundInclusiveName);
+                _uBoundInclusive = siInfo.GetBoolean(uBoundInclusiveName);
                 _underlying = new SortedSet<T>();
 
                 if (savedCount != 0)
                 {
-                    T[] items = (T[])siInfo.GetValue(ItemsName, typeof(T[]));
+                    T[]? items = (T[]?)siInfo.GetValue(ItemsName, typeof(T[]));
 
                     if (items == null)
                     {

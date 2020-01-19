@@ -1,4 +1,6 @@
-﻿using NUnit.Framework;
+﻿using J2N.Util;
+using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
@@ -6,6 +8,7 @@ namespace J2N.Collections.Generic
 {
     public class TestSortedSet : TestCase
     {
+        private int[] objArray = new int[1000];
         private SortedSet<int> tree;
 
         public override void SetUp()
@@ -25,6 +28,16 @@ namespace J2N.Collections.Generic
         {
             for (int i = 0; i < 20; i++)
                 tree.Add(2 * i);
+        }
+
+        private void LoadForGetViewBetween()
+        {
+            for (int i = 0; i < objArray.Length; i++)
+            {
+                int x = new Integer(i);
+                objArray[i] = x;
+                tree.Add(x);
+            }
         }
 
         [Test]
@@ -84,6 +97,48 @@ namespace J2N.Collections.Generic
             {
                 return a > b ? 1 : a < b ? -1 : 0;
             }
+        }
+
+
+        //[Test]
+        //public void TestRange()
+        //{
+        //    var set = new SortedSet<string>(System.StringComparer.Ordinal) { "H", "G", "F", "E", "D", "C", "B", "A" };
+        //    var range = set.GetViewBetween("B", false, "G", false);
+        //    var count = range.Count;
+
+        //}
+
+        /**
+         * @tests java.util.TreeSet#subSet(java.lang.Object, java.lang.Object)
+         */
+        [Test]
+        public void Test_subSetLjava_lang_ObjectLjava_lang_Object()
+        {
+            LoadForGetViewBetween();
+
+            // Test for method java.util.SortedSet
+            // java.util.TreeSet.subSet(java.lang.Object, java.lang.Object)
+            int startPos = objArray.Length / 4;
+            int endPos = 3 * objArray.Length / 4;
+            SortedSet<int> aSubSet = tree.GetViewBetween(objArray[startPos], lowerValueInclusive: true, objArray[endPos], upperValueInclusive: false);
+            assertTrue("Subset has wrong number of elements",
+                    aSubSet.Count == (endPos - startPos));
+            for (int counter = startPos; counter < endPos; counter++)
+                assertTrue("Subset does not contain all the elements it should",
+                        aSubSet.Contains(objArray[counter]));
+
+            int result;
+            try
+            {
+                tree.GetViewBetween(objArray[3], lowerValueInclusive: true, objArray[0], upperValueInclusive: false);
+                result = 0;
+            }
+            catch (ArgumentException e)
+            {
+                result = 1;
+            }
+            assertEquals("end less than start should throw", 1, result);
         }
     }
 }

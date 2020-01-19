@@ -111,6 +111,8 @@ namespace J2N.Collections.Generic
         private const string maxName = "Max";
         private const string lBoundActiveName = "lBoundActive";
         private const string uBoundActiveName = "uBoundActive";
+        private const string lBoundInclusiveName = "lBoundInclusive";
+        private const string uBoundInclusiveName = "uBoundInclusive";
 
         private SerializationInfo siInfo; //A temporary variable which we need during deserialization. 
 #endif
@@ -1062,20 +1064,21 @@ namespace J2N.Collections.Generic
             return -1;
         }
 
-        internal Node FindRange([AllowNull] T from, [AllowNull]  T to) => FindRange(from, to, lowerBoundActive: true, upperBoundActive: true);
+        internal Node FindRange([AllowNull] T from, [AllowNull]  T to) => FindRange(from, to, lowerBoundInclusive: true, upperBoundInclusive: true, lowerBoundActive: true, upperBoundActive: true);
 
-        internal Node FindRange([AllowNull] T from, [AllowNull] T to, bool lowerBoundActive, bool upperBoundActive)
+        internal Node FindRange([AllowNull] T from, [AllowNull] T to, bool lowerBoundInclusive, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
         {
             Node current = root;
             while (current != null)
             {
-                if (lowerBoundActive && comparer.Compare(from, current.Item) > 0)
+                int comp;
+                if (lowerBoundActive && ((comp = comparer.Compare(from, current.Item)) > 0 || !lowerBoundInclusive && comp == 0))
                 {
                     current = current.Right;
                 }
                 else
                 {
-                    if (upperBoundActive && comparer.Compare(to, current.Item) < 0)
+                    if (upperBoundActive && ((comp = comparer.Compare(to, current.Item)) < 0 || !upperBoundInclusive && comp == 0))
                     {
                         current = current.Left;
                     }
@@ -1971,10 +1974,10 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Min"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        //[MaybeNull]
+        [MaybeNull]
         public T Min => MinInternal;
 
-        //[MaybeNull]
+        [MaybeNull]
         internal virtual T MinInternal
         {
             get
@@ -2001,10 +2004,10 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Max"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        //[MaybeNull]
+        [MaybeNull]
         public T Max => MaxInternal;
 
-        //[MaybeNull]
+        [MaybeNull]
         internal virtual T MaxInternal
         {
             get
@@ -2040,6 +2043,10 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
+        /// <para/>
+        /// Usage Note: In Java, the upper bound of TreeSet.subSet() is exclusive. To match the behavior, call
+        /// <see cref="GetViewBetween(T, bool, T, bool)"/>, setting <c>lowerValueInclusive</c> to <c>true</c>
+        /// and <c>upperValueInclusive</c> to <c>false</c>.
         /// </summary>
         /// <param name="lowerValue">The lowest desired value in the view.</param>
         /// <param name="upperValue">The highest desired value in the view.</param>
@@ -2050,7 +2057,7 @@ namespace J2N.Collections.Generic
         /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
         /// <remarks>
         /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
-        /// <paramref name="upperValue"/>, as defined by the comparer. This method does not copy elements from the
+        /// <paramref name="upperValue"/> (inclusive), as defined by the comparer. This method does not copy elements from the
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
         /// </remarks>
@@ -2059,9 +2066,42 @@ namespace J2N.Collections.Generic
             if (Comparer.Compare(lowerValue, upperValue) > 0)
             {
                 throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
-                //throw new ArgumentException($"The {nameof(lowerValue)}: {lowerValue} is greater than {nameof(upperValue)}: {upperValue}");
             }
-            return new TreeSubSet(this, lowerValue, upperValue, true, true);
+            return new TreeSubSet(this, lowerValue, true, upperValue, true, true, true);
+        }
+
+        /// <summary>
+        /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
+        /// <para/>
+        /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="lowerValueInclusive"/>
+        /// set to <c>true</c> and <paramref name="upperValueInclusive"/> set to <c>false</c>.
+        /// </summary>
+        /// <param name="lowerValue">The lowest value in the range for the view.</param>
+        /// <param name="lowerValueInclusive">If <c>true</c>, <paramref name="lowerValue"/> will be included in the range;
+        /// otherwise, it is an exclusive lower bound.</param>
+        /// <param name="upperValue">The highest desired value in the view.</param>
+        /// <param name="upperValueInclusive">If <c>true</c>, <paramref name="upperValue"/> will be included in the range;
+        /// otherwise, it is an exclusive upper bound.</param>
+        /// <returns>A subset view that contains only the values in the specified range.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
+        /// according to the comparer.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
+        /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
+        /// <remarks>
+        /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
+        /// <paramref name="upperValue"/>, as defined by the comparer. Each bound may either be inclusive
+        /// (<c>true</c>) or exclusive (<c>false</c>) depending on the values of <paramref name="lowerValueInclusive"/>
+        /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
+        /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+        /// </remarks>
+        public virtual SortedSet<T> GetViewBetween([AllowNull] T lowerValue, bool lowerValueInclusive, [AllowNull] T upperValue, bool upperValueInclusive)
+        {
+            if (Comparer.Compare(lowerValue, upperValue) > 0)
+            {
+                throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
+            }
+            return new TreeSubSet(this, lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, true, true);
         }
 
 #if DEBUG
@@ -2127,7 +2167,6 @@ namespace J2N.Collections.Generic
             if (siInfo == null)
             {
                 throw new SerializationException(SR.Serialization_InvalidOnDeser);
-                //throw new SerializationException("Deserialization failed.");
             }
 
             comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>));
@@ -2140,7 +2179,6 @@ namespace J2N.Collections.Generic
                 if (items == null)
                 {
                     throw new SerializationException(SR.Serialization_MissingValues);
-                    //throw new SerializationException("Deserialization failed: Missing values");
                 }
 
                 for (int i = 0; i < items.Length; i++)
@@ -2153,7 +2191,6 @@ namespace J2N.Collections.Generic
             if (count != savedCount)
             {
                 throw new SerializationException(SR.Serialization_MismatchedCount);
-                //throw new SerializationException("Deserialization failed: Mismatched count");
             }
 
             siInfo = null;
