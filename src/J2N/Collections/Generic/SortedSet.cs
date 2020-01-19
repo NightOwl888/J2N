@@ -12,6 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 #endif
 using Interlocked = System.Threading.Interlocked;
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
@@ -89,8 +90,8 @@ namespace J2N.Collections.Generic
     {
         #region Local variables/constants
 
-        private Node root;
-        private IComparer<T> comparer = default;
+        private Node? root;
+        private IComparer<T> comparer = default!;
         private int count;
         private int version;
 
@@ -114,7 +115,7 @@ namespace J2N.Collections.Generic
         private const string lBoundInclusiveName = "lBoundInclusive";
         private const string uBoundInclusiveName = "uBoundInclusive";
 
-        private SerializationInfo siInfo; //A temporary variable which we need during deserialization. 
+        private SerializationInfo? siInfo; //A temporary variable which we need during deserialization. 
 #endif
 
         internal const int StackAllocThreshold = 100;
@@ -140,7 +141,7 @@ namespace J2N.Collections.Generic
         /// If <paramref name="comparer"/> does not implement <see cref="IComparable{T}"/>, you must specify
         /// an <see cref="IComparer{T}"/> object to be used.
         /// </remarks>
-        public SortedSet(IComparer<T> comparer)
+        public SortedSet(IComparer<T>? comparer)
         {
             this.comparer = comparer ?? Comparer<T>.Default;
         }
@@ -166,7 +167,7 @@ namespace J2N.Collections.Generic
         /// <param name="collection">The enumerable collection to be copied.</param>
         /// <param name="comparer">The default comparer to use for comparing objects.</param>
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
-        public SortedSet(IEnumerable<T> collection, IComparer<T> comparer)
+        public SortedSet(IEnumerable<T> collection, IComparer<T>? comparer)
             : this(comparer)
         {
             if (collection == null)
@@ -176,14 +177,14 @@ namespace J2N.Collections.Generic
 
             // These are explicit type checks in the mold of HashSet. It would have worked better with
             // something like an ISorted<T> interface. (We could make this work for SortedList.Keys, etc.)
-            SortedSet<T> sortedSet = collection as SortedSet<T>;
+            SortedSet<T>? sortedSet = collection as SortedSet<T>;
             if (sortedSet != null && !(sortedSet is TreeSubSet) && HasEqualComparer(sortedSet))
             {
                 if (sortedSet.Count > 0)
                 {
                     Debug.Assert(sortedSet.root != null);
                     this.count = sortedSet.count;
-                    root = sortedSet.root.DeepClone(this.count);
+                    root = sortedSet.root!.DeepClone(this.count);
                 }
                 return;
             }
@@ -294,7 +295,7 @@ namespace J2N.Collections.Generic
             // want the stack to unnecessarily allocate arrays as it grows.
 
             var stack = new Stack<Node>(2 * (int)Log2(Count + 1));
-            Node current = root;
+            Node? current = root;
 
             while (current != null)
             {
@@ -310,7 +311,7 @@ namespace J2N.Collections.Generic
                     return false;
                 }
 
-                Node node = current.Right;
+                Node? node = current.Right;
                 while (node != null)
                 {
                     stack.Push(node);
@@ -418,9 +419,9 @@ namespace J2N.Collections.Generic
         /// <param name="item">The entry to get the predecessor of.</param>
         /// <param name="result">The predessor, if any.</param>
         /// <returns><c>true</c> if a predecessor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
-        public bool TryGetPredecessor(T item, out T result)
+        public bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
         {
-            Node current = root, match = null;
+            Node? current = root, match = null;
 
             while (current != null)
             {
@@ -446,7 +447,7 @@ namespace J2N.Collections.Generic
 
             if (match == null)
             {
-                result = default;
+                result = default!;
                 return false;
             }
             else
@@ -463,9 +464,9 @@ namespace J2N.Collections.Generic
         /// <param name="item">The entry to get the successor of.</param>
         /// <param name="result">The successor, if any.</param>
         /// <returns><c>true</c> if a successor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
-        public bool TryGetSuccessor(T item, out T result)
+        public bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
         {
-            Node current = root, match = null;
+            Node? current = root, match = null;
 
             while (current != null)
             {
@@ -491,7 +492,7 @@ namespace J2N.Collections.Generic
 
             if (match == null)
             {
-                result = default;
+                result = default!;
                 return false;
             }
             else
@@ -535,10 +536,10 @@ namespace J2N.Collections.Generic
             // Search for a node at bottom to insert the new node.
             // If we can guarantee the node we found is not a 4-node, it would be easy to do insertion.
             // We split 4-nodes along the search path.
-            Node current = root;
-            Node parent = null;
-            Node grandParent = null;
-            Node greatGrandParent = null;
+            Node? current = root;
+            Node? parent = null;
+            Node? grandParent = null;
+            Node? greatGrandParent = null;
 
             // Even if we don't actually add to the set, we may be altering its structure (by doing rotations and such).
             // So update `_version` to disable any instances of Enumerator/TreeSubSet from working on it.
@@ -563,7 +564,7 @@ namespace J2N.Collections.Generic
                     // We could have introduced two consecutive red nodes after split. Fix that by rotation.
                     if (Node.IsNonNullRed(parent))
                     {
-                        InsertionBalance(current, ref parent, grandParent, greatGrandParent);
+                        InsertionBalance(current, ref parent!, grandParent!, greatGrandParent!);
                     }
                 }
 
@@ -578,17 +579,17 @@ namespace J2N.Collections.Generic
             Node node = new Node(item, NodeColor.Red);
             if (order > 0)
             {
-                parent.Right = node;
+                parent!.Right = node;
             }
             else
             {
-                parent.Left = node;
+                parent!.Left = node;
             }
 
             // The new node will be red, so we will need to adjust colors if its parent is also red.
             if (parent.IsRed)
             {
-                InsertionBalance(node, ref parent, grandParent, greatGrandParent);
+                InsertionBalance(node, ref parent!, grandParent!, greatGrandParent!);
             }
 
             // The root node is always black.
@@ -631,11 +632,11 @@ namespace J2N.Collections.Generic
             // and such). So update our version to disable any enumerators/subsets working on it.
             version++;
 
-            Node current = root;
-            Node parent = null;
-            Node grandParent = null;
-            Node match = null;
-            Node parentOfMatch = null;
+            Node? current = root;
+            Node? parent = null;
+            Node? grandParent = null;
+            Node? match = null;
+            Node? parentOfMatch = null;
             bool foundMatch = false;
             while (current != null)
             {
@@ -689,7 +690,7 @@ namespace J2N.Collections.Generic
                         {
                             // `current` is a 2-node and `sibling` is either a 3-node or a 4-node.
                             // We can change the color of `current` to red by some rotation.
-                            Node newGrandParent = parent.Rotate(parent.GetRotation(current, sibling));
+                            Node newGrandParent = parent.Rotate(parent.GetRotation(current, sibling))!;
 
                             newGrandParent.Color = parent.Color;
                             parent.ColorBlack();
@@ -724,7 +725,7 @@ namespace J2N.Collections.Generic
             // Move successor to the matching node position and replace links.
             if (match != null)
             {
-                ReplaceNode(match, parentOfMatch, parent, grandParent);
+                ReplaceNode(match, parentOfMatch!, parent!, grandParent!);
                 --count;
             }
 
@@ -801,27 +802,13 @@ namespace J2N.Collections.Generic
         public void CopyTo(T[] array, int index, int count)
         {
             if (array == null)
-            {
                 throw new ArgumentNullException(nameof(array));
-            }
-
             if (index < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                //throw new ArgumentOutOfRangeException(nameof(index), $"Non-negative number required. Parameter name: {nameof(index)}");
-            }
-
             if (count < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
-                //throw new ArgumentOutOfRangeException(nameof(count), $"Non-negative number required. Parameter name: {nameof(count)}");
-            }
-
             if (count > array.Length - index)
-            {
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
-                //throw new ArgumentException("Destination array is not long enough to copy all the items in the collection. Check array index and length.");
-            }
 
             count += index; // Make `count` the upper bound.
 
@@ -840,46 +827,27 @@ namespace J2N.Collections.Generic
         void ICollection.CopyTo(Array array, int index)
         {
             if (array == null)
-            {
                 throw new ArgumentNullException(nameof(array));
-            }
-
             if (array.Rank != 1)
-            {
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
-                //throw new ArgumentException("Only single dimensional arrays are supported for the requested action.");
-            }
-
             if (array.GetLowerBound(0) != 0)
-            {
                 throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
-                //throw new ArgumentException("The lower bound of target array must be zero.");
-            }
-
             if (index < 0)
-            {
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                //throw new ArgumentOutOfRangeException($"Non-negative number required. Parameter name: {nameof(index)}");
-            }
-
             if (array.Length - index < Count)
-            {
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
-                //throw new ArgumentException("Destination array is not long enough to copy all the items in the collection. Check array index and length.");
-            }
 
-            T[] tarray = array as T[];
+            T[]? tarray = array as T[];
             if (tarray != null)
             {
                 CopyTo(tarray, index);
             }
             else
             {
-                object[] objects = array as object[];
+                object?[]? objects = array as object[];
                 if (objects == null)
                 {
                     throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
-                    //throw new ArgumentException("Invalid array type.");
                 }
 
                 try
@@ -893,7 +861,6 @@ namespace J2N.Collections.Generic
                 catch (ArrayTypeMismatchException)
                 {
                     throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
-                    //throw new ArgumentException("Invalid array type.");
                 }
             }
         }
@@ -933,8 +900,8 @@ namespace J2N.Collections.Generic
             Debug.Assert(parent != null);
             Debug.Assert(grandParent != null);
 
-            bool parentIsOnRight = grandParent.Right == parent;
-            bool currentIsOnRight = parent.Right == current;
+            bool parentIsOnRight = grandParent!.Right == parent;
+            bool currentIsOnRight = parent!.Right == current;
 
             Node newChildOfGreatGrandParent;
             if (parentIsOnRight == currentIsOnRight)
@@ -963,7 +930,7 @@ namespace J2N.Collections.Generic
         /// <param name="parent">The (possibly <c>null</c>) parent.</param>
         /// <param name="child">The child node to replace.</param>
         /// <param name="newChild">The node to replace <paramref name="child"/> with.</param>
-        private void ReplaceChildOrRoot(Node parent, Node child, Node newChild)
+        private void ReplaceChildOrRoot(Node? parent, Node child, Node newChild)
         {
             if (parent != null)
             {
@@ -986,24 +953,24 @@ namespace J2N.Collections.Generic
             {
                 // This node has no successor. This can only happen if the right child of the match is null.
                 Debug.Assert(match.Right == null);
-                successor = match.Left;
+                successor = match.Left!;
             }
             else
             {
                 Debug.Assert(parentOfSuccessor != null);
                 Debug.Assert(successor.Left == null);
-                Debug.Assert((successor.Right == null && successor.IsRed) || (successor.Right.IsRed && successor.IsBlack));
+                Debug.Assert((successor.Right == null && successor.IsRed) || (successor.Right!.IsRed && successor.IsBlack));
 
                 successor.Right?.ColorBlack();
 
                 if (parentOfSuccessor != match)
                 {
                     // Detach the successor from its parent and set its right child.
-                    parentOfSuccessor.Left = successor.Right;
-                    successor.Right = match.Right;
+                    parentOfSuccessor!.Left = successor.Right;
+                    successor.Right = match!.Right;
                 }
 
-                successor.Left = match.Left;
+                successor.Left = match!.Left;
             }
 
             if (successor != null)
@@ -1011,12 +978,12 @@ namespace J2N.Collections.Generic
                 successor.Color = match.Color;
             }
 
-            ReplaceChildOrRoot(parentOfMatch, match, successor);
+            ReplaceChildOrRoot(parentOfMatch, match, successor!);
         }
 
-        internal virtual Node FindNode(T item)
+        internal virtual Node? FindNode(T item)
         {
-            Node current = root;
+            Node? current = root;
             while (current != null)
             {
                 int order = comparer.Compare(item, current.Item);
@@ -1047,7 +1014,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         internal virtual int InternalIndexOf(T item)
         {
-            Node current = root;
+            Node? current = root;
             int count = 0;
             while (current != null)
             {
@@ -1064,11 +1031,11 @@ namespace J2N.Collections.Generic
             return -1;
         }
 
-        internal Node FindRange([AllowNull] T from, [AllowNull]  T to) => FindRange(from, to, lowerBoundInclusive: true, upperBoundInclusive: true, lowerBoundActive: true, upperBoundActive: true);
+        internal Node? FindRange([AllowNull] T from, [AllowNull]  T to) => FindRange(from, to, lowerBoundInclusive: true, upperBoundInclusive: true, lowerBoundActive: true, upperBoundActive: true);
 
-        internal Node FindRange([AllowNull] T from, [AllowNull] T to, bool lowerBoundInclusive, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
+        internal Node? FindRange([AllowNull] T from, [AllowNull] T to, bool lowerBoundInclusive, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
         {
-            Node current = root;
+            Node? current = root;
             while (current != null)
             {
                 int comp;
@@ -1102,7 +1069,7 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an <see cref="IEqualityComparer{T}"/> object, according to a specified comparer, that can be used to create a collection that contains individual sets.
         /// </summary>
-        public static IEqualityComparer<SortedSet<T>> CreateSetComparer(IEqualityComparer<T> memberEqualityComparer)
+        public static IEqualityComparer<SortedSet<T>> CreateSetComparer(IEqualityComparer<T>? memberEqualityComparer)
         {
             return new SortedSetEqualityComparer<T>(memberEqualityComparer);
         }
@@ -1182,8 +1149,8 @@ namespace J2N.Collections.Generic
                 throw new ArgumentNullException(nameof(other));
             }
 
-            SortedSet<T> asSorted = other as SortedSet<T>;
-            TreeSubSet treeSubset = this as TreeSubSet;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
+            TreeSubSet? treeSubset = this as TreeSubSet;
 
             if (treeSubset != null)
                 VersionCheck();
@@ -1252,7 +1219,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        private static Node ConstructRootFromSortedArray(T[] arr, int startIndex, int endIndex, Node redNode)
+        private static Node? ConstructRootFromSortedArray(T[] arr, int startIndex, int endIndex, Node? redNode)
         {
             // You're given a sorted array... say 1 2 3 4 5 6
             // There are 2 cases:
@@ -1348,8 +1315,8 @@ namespace J2N.Collections.Generic
             // HashSet<T> optimizations can't be done until equality comparers and comparers are related
 
             // Technically, this would work as well with an ISorted<T>
-            SortedSet<T> asSorted = other as SortedSet<T>;
-            TreeSubSet treeSubset = this as TreeSubSet;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
+            TreeSubSet? treeSubset = this as TreeSubSet;
 
             if (treeSubset != null)
                 VersionCheck();
@@ -1445,7 +1412,7 @@ namespace J2N.Collections.Generic
                 return;
             }
 
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
 
             if (asSorted != null && HasEqualComparer(asSorted))
             {
@@ -1503,7 +1470,7 @@ namespace J2N.Collections.Generic
                 return;
             }
 
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
 
             if (asSorted != null && HasEqualComparer(asSorted))
             {
@@ -1521,9 +1488,9 @@ namespace J2N.Collections.Generic
         private void SymmetricExceptWithSameComparer(SortedSet<T> other)
         {
             Debug.Assert(other != null);
-            Debug.Assert(HasEqualComparer(other));
+            Debug.Assert(HasEqualComparer(other!));
 
-            foreach (T item in other)
+            foreach (T item in other!)
             {
                 bool result = Contains(item) ? Remove(item) : Add(item);
                 Debug.Assert(result);
@@ -1533,14 +1500,14 @@ namespace J2N.Collections.Generic
         private void SymmetricExceptWithSameComparer(T[] other, int count)
         {
             Debug.Assert(other != null);
-            Debug.Assert(count >= 0 && count <= other.Length);
+            Debug.Assert(count >= 0 && count <= other!.Length);
 
             if (count == 0)
             {
                 return;
             }
 
-            T previous = other[0];
+            T previous = other![0];
             for (int i = 0; i < count; i++)
             {
                 while (i < count && i != 0 && comparer.Compare(other[i], previous) == 0)
@@ -1582,7 +1549,7 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
             {
                 if (Count > asSorted.Count)
@@ -1642,7 +1609,7 @@ namespace J2N.Collections.Generic
             }
 
             // another for sorted sets with the same comparer
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
             {
                 if (Count >= asSorted.Count)
@@ -1686,7 +1653,7 @@ namespace J2N.Collections.Generic
 
             // do it one way for HashSets
             // another for sorted sets with the same comparer
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
             {
                 if (Count < asSorted.Count)
@@ -1735,7 +1702,7 @@ namespace J2N.Collections.Generic
                 return true;
 
             // another way for sorted sets
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
             {
                 if (asSorted.Count >= Count)
@@ -1779,7 +1746,7 @@ namespace J2N.Collections.Generic
                 throw new ArgumentNullException(nameof(other));
             }
 
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
             {
                 IEnumerator<T> mine = GetEnumerator();
@@ -1822,7 +1789,7 @@ namespace J2N.Collections.Generic
             if (other is ICollection<T> c && c.Count == 0)
                 return false;
 
-            SortedSet<T> asSorted = other as SortedSet<T>;
+            SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted) && (comparer.Compare(Min, asSorted.Max) > 0 || comparer.Compare(Max, asSorted.Min) < 0))
             {
                 return false;
@@ -1984,7 +1951,7 @@ namespace J2N.Collections.Generic
             {
                 if (root == null)
                 {
-                    return default;
+                    return default!;
                 }
 
                 Node current = root;
@@ -2014,7 +1981,7 @@ namespace J2N.Collections.Generic
             {
                 if (root == null)
                 {
-                    return default(T);
+                    return default!;
                 }
 
                 Node current = root;
@@ -2147,7 +2114,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        void IDeserializationCallback.OnDeserialization(object sender) => OnDeserialization(sender);
+        void IDeserializationCallback.OnDeserialization(object? sender) => OnDeserialization(sender);
 
         /// <summary>
         /// Implements the <see cref="ISerializable"/> interface, and raises the deserialization
@@ -2157,7 +2124,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="SerializationException">The <see cref="SerializationInfo"/> object associated
         /// with the current <see cref="SortedSet{T}"/> object is invalid.</exception>
         /// <remarks>Calling this method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
-        protected virtual void OnDeserialization(object sender)
+        protected virtual void OnDeserialization(object? sender)
         {
             if (comparer != null)
             {
@@ -2169,12 +2136,12 @@ namespace J2N.Collections.Generic
                 throw new SerializationException(SR.Serialization_InvalidOnDeser);
             }
 
-            comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>));
+            comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
             int savedCount = siInfo.GetInt32(CountName);
 
             if (savedCount != 0)
             {
-                T[] items = (T[])siInfo.GetValue(ItemsName, typeof(T[]));
+                T[]? items = (T[]?)siInfo.GetValue(ItemsName, typeof(T[]));
 
                 if (items == null)
                 {
@@ -2210,17 +2177,17 @@ namespace J2N.Collections.Generic
                 Color = color;
             }
 
-            public static bool IsNonNullBlack(Node node) => node != null && node.IsBlack;
+            public static bool IsNonNullBlack(Node? node) => node != null && node.IsBlack;
 
-            public static bool IsNonNullRed(Node node) => node != null && node.IsRed;
+            public static bool IsNonNullRed(Node? node) => node != null && node.IsRed;
 
-            public static bool IsNullOrBlack(Node node) => node == null || node.IsBlack;
+            public static bool IsNullOrBlack(Node? node) => node == null || node.IsBlack;
 
             public T Item { get; set; }
 
-            public Node Left { get; set; }
+            public Node? Left { get; set; }
 
-            public Node Right { get; set; }
+            public Node? Right { get; set; }
 
             public NodeColor Color { get; set; }
 
@@ -2248,7 +2215,7 @@ namespace J2N.Collections.Generic
                 var newNodes = new Stack<Node>(2 * Log2(count) + 2);
                 Node newRoot = ShallowClone();
 
-                Node originalCurrent = this;
+                Node? originalCurrent = this;
                 Node newCurrent = newRoot;
 
                 while (originalCurrent != null)
@@ -2257,7 +2224,7 @@ namespace J2N.Collections.Generic
                     newNodes.Push(newCurrent);
                     newCurrent.Left = originalCurrent.Left?.ShallowClone();
                     originalCurrent = originalCurrent.Left;
-                    newCurrent = newCurrent.Left;
+                    newCurrent = newCurrent.Left!;
                 }
 
                 while (originalNodes.Count != 0)
@@ -2265,15 +2232,15 @@ namespace J2N.Collections.Generic
                     originalCurrent = originalNodes.Pop();
                     newCurrent = newNodes.Pop();
 
-                    Node originalRight = originalCurrent.Right;
-                    Node newRight = originalRight?.ShallowClone();
+                    Node? originalRight = originalCurrent.Right;
+                    Node? newRight = originalRight?.ShallowClone();
                     newCurrent.Right = newRight;
 
                     while (originalRight != null)
                     {
                         originalNodes.Push(originalRight);
-                        newNodes.Push(newRight);
-                        newRight.Left = originalRight.Left?.ShallowClone();
+                        newNodes.Push(newRight!);
+                        newRight!.Left = originalRight.Left?.ShallowClone();
                         originalRight = originalRight.Left;
                         newRight = newRight.Left;
                     }
@@ -2306,7 +2273,7 @@ namespace J2N.Collections.Generic
                 Debug.Assert(node != null);
                 Debug.Assert(node == Left ^ node == Right);
 
-                return node == Left ? Right : Left;
+                return node == Left ? Right! : Left!;
             }
 
             public Node ShallowClone() => new Node(Item, Color);
@@ -2317,33 +2284,33 @@ namespace J2N.Collections.Generic
                 Debug.Assert(Right != null);
 
                 ColorRed();
-                Left.ColorBlack();
-                Right.ColorBlack();
+                Left!.ColorBlack();
+                Right!.ColorBlack();
             }
 
             /// <summary>
             /// Does a rotation on this tree. May change the color of a grandchild from red to black.
             /// </summary>
-            public Node Rotate(TreeRotation rotation)
+            public Node? Rotate(TreeRotation rotation)
             {
                 Node removeRed;
                 switch (rotation)
                 {
                     case TreeRotation.Right:
-                        removeRed = Left.Left;
+                        removeRed = Left!.Left!;
                         Debug.Assert(removeRed.IsRed);
                         removeRed.ColorBlack();
                         return RotateRight();
                     case TreeRotation.Left:
-                        removeRed = Right.Right;
+                        removeRed = Right!.Right!;
                         Debug.Assert(removeRed.IsRed);
                         removeRed.ColorBlack();
                         return RotateLeft();
                     case TreeRotation.RightLeft:
-                        Debug.Assert(Right.Left.IsRed);
+                        Debug.Assert(Right!.Left!.IsRed);
                         return RotateRightLeft();
                     case TreeRotation.LeftRight:
-                        Debug.Assert(Left.Right.IsRed);
+                        Debug.Assert(Left!.Right!.IsRed);
                         return RotateLeftRight();
                     default:
                         Debug.Fail($"{nameof(rotation)}: {rotation} is not a defined {nameof(TreeRotation)} value.");
@@ -2356,7 +2323,7 @@ namespace J2N.Collections.Generic
             /// </summary>
             public Node RotateLeft()
             {
-                Node child = Right;
+                Node child = Right!;
                 Right = child.Left;
                 child.Left = this;
                 return child;
@@ -2367,8 +2334,8 @@ namespace J2N.Collections.Generic
             /// </summary>
             public Node RotateLeftRight()
             {
-                Node child = Left;
-                Node grandChild = child.Right;
+                Node child = Left!;
+                Node grandChild = child.Right!;
 
                 Left = grandChild.Right;
                 grandChild.Right = this;
@@ -2382,7 +2349,7 @@ namespace J2N.Collections.Generic
             /// </summary>
             public Node RotateRight()
             {
-                Node child = Left;
+                Node child = Left!;
                 Left = child.Right;
                 child.Right = this;
                 return child;
@@ -2393,8 +2360,8 @@ namespace J2N.Collections.Generic
             /// </summary>
             public Node RotateRightLeft()
             {
-                Node child = Right;
-                Node grandChild = child.Left;
+                Node child = Right!;
+                Node grandChild = child.Left!;
 
                 Right = grandChild.Left;
                 grandChild.Left = this;
@@ -2409,8 +2376,8 @@ namespace J2N.Collections.Generic
             public void Merge2Nodes()
             {
                 Debug.Assert(IsRed);
-                Debug.Assert(Left.Is2Node);
-                Debug.Assert(Right.Is2Node);
+                Debug.Assert(Left!.Is2Node);
+                Debug.Assert(Right!.Is2Node);
 
                 // Combine two 2-nodes into a 4-node.
                 ColorBlack();
@@ -2506,13 +2473,13 @@ namespace J2N.Collections.Generic
             private int _version;
 
             private Stack<Node> _stack;
-            private Node _current;
-            static readonly Node dummyNode = new Node(default, NodeColor.Red);
+            private Node? _current;
+            static readonly Node dummyNode = new Node(default!, NodeColor.Red);
 
             private bool _reverse;
 
 #if FEATURE_SERIALIZABLE
-            private SerializationInfo _siInfo;
+            private SerializationInfo? _siInfo;
 #endif
 
             internal Enumerator(SortedSet<T> set)
@@ -2541,11 +2508,11 @@ namespace J2N.Collections.Generic
 
             private Enumerator(SerializationInfo info, StreamingContext context)
             {
-                _tree = null;
+                _tree = null!;
                 _version = -1;
                 _current = null;
                 _reverse = false;
-                _stack = null;
+                _stack = null!;
                 _siInfo = info;
             }
 
@@ -2563,14 +2530,14 @@ namespace J2N.Collections.Generic
 
             }
 
-            void IDeserializationCallback.OnDeserialization(object sender)
+            void IDeserializationCallback.OnDeserialization(object? sender)
             {
                 if (_siInfo == null)
                 {
                     throw new SerializationException(SR.Serialization_InvalidOnDeser);
                 }
 
-                _tree = (SortedSet<T>)_siInfo.GetValue(TreeName, typeof(SortedSet<T>));
+                _tree = (SortedSet<T>)_siInfo.GetValue(TreeName, typeof(SortedSet<T>))!;
                 _version = _siInfo.GetInt32(EnumVersionName);
                 _reverse = _siInfo.GetBoolean(ReverseName);
                 bool EnumStarted = _siInfo.GetBoolean(EnumStartName);
@@ -2578,7 +2545,7 @@ namespace J2N.Collections.Generic
                 _current = null;
                 if (EnumStarted)
                 {
-                    T item = (T)_siInfo.GetValue(NodeValueName, typeof(T));
+                    T item = (T)_siInfo.GetValue(NodeValueName, typeof(T))!;
                     Initialize();
                     //go until it reaches the value we want
                     while (this.MoveNext())
@@ -2593,8 +2560,8 @@ namespace J2N.Collections.Generic
             private void Initialize()
             {
                 _current = null;
-                Node node = _tree.root;
-                Node next = null, other = null;
+                Node? node = _tree.root;
+                Node? next = null, other = null;
                 while (node != null)
                 {
                     next = (_reverse ? node.Right : node.Left);
@@ -2650,8 +2617,8 @@ namespace J2N.Collections.Generic
                 }
 
                 _current = _stack.Pop();
-                Node node = (_reverse ? _current.Left : _current.Right);
-                Node next = null, other = null;
+                Node? node = (_reverse ? _current.Left : _current.Right);
+                Node? next = null, other = null;
                 while (node != null)
                 {
                     next = (_reverse ? node.Right : node.Left);
@@ -2714,11 +2681,11 @@ namespace J2N.Collections.Generic
                     {
                         return _current.Item;
                     }
-                    return default; // Should only happen when accessing Current is undefined behavior
+                    return default!; // Should only happen when accessing Current is undefined behavior
                 }
             }
 
-            object IEnumerator.Current
+            object? IEnumerator.Current
             {
                 get
                 {
@@ -2769,15 +2736,15 @@ namespace J2N.Collections.Generic
         /// a value that has more complete data than the value you currently have, although their
         /// comparer functions indicate they are equal.
         /// </remarks>
-        public bool TryGetValue(T equalValue, /*[MaybeNullWhen(false)]*/ out T actualValue)
+        public bool TryGetValue(T equalValue, [MaybeNullWhen(false)] out T actualValue)
         {
-            Node node = FindNode(equalValue);
+            Node? node = FindNode(equalValue);
             if (node != null)
             {
                 actualValue = node.Item;
                 return true;
             }
-            actualValue = default(T);
+            actualValue = default!;
             return false;
         }
 
@@ -2807,7 +2774,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current set;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        public virtual bool Equals(object other, IEqualityComparer comparer)
+        public virtual bool Equals(object? other, IEqualityComparer comparer)
             => SetEqualityComparer<T>.Equals(this, other, comparer);
 
         /// <summary>
@@ -2829,7 +2796,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if the specified object implements <see cref="ISet{T}"/>
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => Equals(obj, SetEqualityComparer<T>.Default);
 
         /// <summary>
@@ -2858,7 +2825,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// The index of a format item is not zero.
         /// </exception>
-        public virtual string ToString(string format, IFormatProvider formatProvider)
+        public virtual string ToString(string? format, IFormatProvider? formatProvider)
             => CollectionUtil.ToString(formatProvider, format, this);
 
         /// <summary>
