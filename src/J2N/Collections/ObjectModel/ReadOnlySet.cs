@@ -27,13 +27,18 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class ReadOnlySet<T> : ISet<T>, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
+    public class ReadOnlySet<T> : ISet<T>, ICollection, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
     {
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || typeof(string).Equals(typeof(T));
 
         private readonly ISet<T> set;
         private readonly SetEqualityComparer<T> structuralEqualityComparer;
         private readonly IFormatProvider toStringFormatProvider;
+
+#if FEATURE_SERIALIZABLE
+        [NonSerialized]
+#endif
+        private object? syncRoot;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ReadOnlySet{T}"/> class that is a read-only wrapper around the specified set.
@@ -312,6 +317,72 @@ namespace J2N.Collections.ObjectModel
         }
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)set).GetEnumerator();
+
+        #endregion
+
+        #region ICollection Members
+
+        bool ICollection.IsSynchronized
+        {
+            get
+            {
+                if (set is ICollection col)
+                    return col.IsSynchronized;
+                return false;
+            }
+        }
+
+        object ICollection.SyncRoot
+        {
+            get
+            {
+                if (syncRoot == null)
+                {
+                    if (set is ICollection col)
+                        syncRoot = col.SyncRoot;
+                    System.Threading.Interlocked.CompareExchange<object?>(ref syncRoot, new object(), null);
+                }
+                return syncRoot;
+            }
+        }
+
+        void ICollection.CopyTo(Array array, int index)
+        {
+            if (array == null)
+                throw new ArgumentNullException(nameof(array));
+            if (array.Rank != 1)
+                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+            if (array.GetLowerBound(0) != 0)
+                throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (array.Length - index < Count)
+                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+
+            T[]? tarray = array as T[];
+            if (tarray != null)
+            {
+                CopyTo(tarray, index);
+            }
+            else
+            {
+                object?[]? objects = array as object[];
+                if (objects == null)
+                {
+                    throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                }
+
+                try
+                {
+                    foreach (var item in set)
+                        objects[index++] = item;
+                }
+                catch (ArrayTypeMismatchException)
+                {
+                    throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                }
+            }
+        }
 
         #endregion
 
