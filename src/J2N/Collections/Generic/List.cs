@@ -15,7 +15,6 @@ using CaseInsensitiveComparer = System.StringComparer; // To fixup documentation
 
 namespace J2N.Collections.Generic
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     using SR = J2N.Resources.Strings;
 
     /// <summary>
@@ -545,15 +544,90 @@ namespace J2N.Collections.Generic
         }
 #endif
 
+        /// <summary>
+        /// Copies the entire <see cref="List{T}"/> to a compatible one-dimensional array, starting
+        /// at the beginning of the target array.
+        /// </summary>
+        /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination of the
+        /// elements copied from <see cref="List{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The number of elements in the source <see cref="List{T}"/> is greater
+        /// than the number of elements that the destination <paramref name="array"/> can contain.</exception>
+        /// <remarks>
+        /// This method uses <see cref="Array.Copy(Array, int, Array, int, int)"/> to copy the elements.
+        /// <para/>
+        /// The elements are copied to the <see cref="Array"/> in the same order in which the enumerator iterates
+        /// through the <see cref="List{T}"/>.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void CopyTo(T[] array)
             => list.CopyTo(array);
 
         void ICollection.CopyTo(Array array, int arrayIndex)
             => ((ICollection)list).CopyTo(array, arrayIndex);
 
+        /// <summary>
+        /// Copies a range of elements from the <see cref="List{T}"/> to a compatible
+        /// one-dimensional array, starting at the specified index of the target array.
+        /// </summary>
+        /// <param name="index">The zero-based index in the source <see cref="List{T}"/>
+        /// at which copying begins.</param>
+        /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination of the
+        /// elements copied from <see cref="List{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <param name="count">The number of elements to copy.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="arrayIndex"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="index"/> is equal to or greater than the <see cref="Count"/> of the
+        /// source <see cref="List{T}"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The number of elements in the source <see cref="List{T}"/> is greater
+        /// than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses <see cref="Array.Copy(Array, int, Array, int, int)"/> to copy the elements.
+        /// <para/>
+        /// The elements are copied to the <see cref="Array"/> in the same order in which the enumerator iterates
+        /// through the <see cref="List{T}"/>.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <paramref name="count"/>.
+        /// </remarks>
         public void CopyTo(int index, T[] array, int arrayIndex, int count)
             => list.CopyTo(index, array, arrayIndex, count);
 
+        /// <summary>
+        /// Copies the entire <see cref="List{T}"/> to a compatible one-dimensional array, starting at the
+        /// specified index of the target array.
+        /// </summary>
+        /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination of the
+        /// elements copied from <see cref="List{T}"/>. The <see cref="Array"/> must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception>
+        /// <exception cref="ArgumentException">The number of elements in the source <see cref="List{T}"/> is greater
+        /// than the available space from <paramref name="arrayIndex"/> to the end of the destination <paramref name="array"/>.</exception>
+        /// <remarks>
+        /// This method uses <see cref="Array.Copy(Array, int, Array, int, int)"/> to copy the elements.
+        /// <para/>
+        /// The elements are copied to the <see cref="Array"/> in the same order in which the enumerator iterates
+        /// through the <see cref="List{T}"/>.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void CopyTo(T[] array, int arrayIndex)
             => list.CopyTo(array, arrayIndex);
 
@@ -575,9 +649,51 @@ namespace J2N.Collections.Generic
             }
         }
 
+        /// <summary>
+        /// Determines whether the <see cref="List{T}"/> contains elements that match the conditions
+        /// defined by the specified predicate.
+        /// </summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns><c>true</c> if the <see cref="List{T}"/> contains one or more elements that match
+        /// the conditions defined by the specified predicate; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate, moving backward in the <see cref="List{T}"/>, starting with the
+        /// last element and ending with the first element. Processing is stopped when a match is found.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// <see cref="Count"/>.
+        /// </remarks>
         public bool Exists(Predicate<T> match)
             => list.Exists(match);
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the first occurrence within the entire <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The first element that matches the conditions defined by the specified predicate,
+        /// if found; otherwise, the default value for type <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate, moving backward in the <see cref="List{T}"/>, starting with the
+        /// last element and ending with the first element. Processing is stopped when a match is found.
+        /// <para/>
+        /// IMPORTANT: When searching a list containing value types, make sure the default value for the type
+        /// does not satisfy the search predicate. Otherwise, there is no way to distinguish between a default
+        /// value indicating that no match was found and a list element that happens to have the default value
+        /// for the type. If the default value satisfies the search predicate, use the
+        /// <see cref="FindIndex(Predicate{T})"/> method instead.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// <see cref="Count"/>.
+        /// </remarks>
         public T Find(Predicate<T> match)
             => list.Find(match);
 
@@ -590,7 +706,7 @@ namespace J2N.Collections.Generic
         /// defined by the specified predicate, if found; otherwise, an empty <see cref="List{T}"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns true if the object passed
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed
         /// to it matches the conditions defined in the delegate. The elements of the current <see cref="List{T}"/>
         /// are individually passed to the <see cref="Predicate{T}"/> delegate, and the elements that match
         /// the conditions are saved in the returned <see cref="List{T}"/>.
@@ -618,36 +734,315 @@ namespace J2N.Collections.Generic
             return list;
         }
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the zero-based index of the first occurrence within the entire <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The zero-based index of the first occurrence of an element that matches the
+        /// conditions defined by <paramref name="match"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched forward starting at the first element and ending at
+        /// the last element.
+        /// <para/>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate. The delegate has the signature:
+        /// <code>
+        /// public bool methodName(T obj)
+        /// </code>
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// <see cref="Count"/>.
+        /// </remarks>
         public int FindIndex(Predicate<T> match)
             => list.FindIndex(match);
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the zero-based index of the first occurrence within the range of elements in
+        /// the <see cref="List{T}"/> that extends from the specified index to the last element.
+        /// </summary>
+        /// <param name="startIndex">The zero-based starting index of the search.</param>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The zero-based index of the first occurrence of an element that matches the
+        /// conditions defined by <paramref name="match"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is outside the
+        /// range of valid indexes for the <see cref="List{T}"/>.</exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched forward starting at <paramref name="startIndex"/> and ending at
+        /// the last element.
+        /// <para/>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate. The delegate has the signature:
+        /// <code>
+        /// public bool methodName(T obj)
+        /// </code>
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// the number of elements from <paramref name="startIndex"/> to the end of the <see cref="List{T}"/>.
+        /// </remarks>
         public int FindIndex(int startIndex, Predicate<T> match)
             => list.FindIndex(startIndex, match);
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the zero-based index of the first occurrence within the range of elements
+        /// in the <see cref="List{T}"/> that starts at the specified index and contains the specified
+        /// number of elements.
+        /// </summary>
+        /// <param name="startIndex">The zero-based starting index of the search.</param>
+        /// <param name="count">The number of elements in the section to search.</param>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The zero-based index of the first occurrence of an element that matches the
+        /// conditions defined by <paramref name="match"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="List{T}"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <see cref="List{T}"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched forward starting at <paramref name="startIndex"/> and ending at
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> minus 1, if <paramref name="count"/> is greater
+        /// than 0.
+        /// <para/>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate. The delegate has the signature:
+        /// <code>
+        /// public bool methodName(T obj)
+        /// </code>
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// <paramref name="count"/>.
+        /// </remarks>
         public int FindIndex(int startIndex, int count, Predicate<T> match)
             => list.FindIndex(startIndex, count, match);
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the last occurrence within the entire <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The last element that matches the conditions defined by the specified predicate,
+        /// if found; otherwise, the default value for type <typeparamref name="T"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate, moving backward in the <see cref="List{T}"/>, starting with the
+        /// last element and ending with the first element. Processing is stopped when a match is found.
+        /// <para/>
+        /// IMPORTANT: When searching a list containing value types, make sure the default value for the type
+        /// does not satisfy the search predicate. Otherwise, there is no way to distinguish between a default
+        /// value indicating that no match was found and a list element that happens to have the default value
+        /// for the type. If the default value satisfies the search predicate, use the
+        /// <see cref="FindLastIndex(Predicate{T})"/> method instead.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// <see cref="Count"/>.
+        /// </remarks>
         public T FindLast(Predicate<T> match)
             => list.FindLast(match);
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the zero-based index of the last occurrence within the entire <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The zero-based index of the last occurrence of an element that matches the
+        /// conditions defined by <paramref name="match"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched backward starting at the last element and ending at
+        /// the first element.
+        /// <para/>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// <see cref="Count"/>.
+        /// </remarks>
         public int FindLastIndex(Predicate<T> match)
             => list.FindLastIndex(match);
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the zero-based index of the last occurrence within the range of elements in
+        /// the <see cref="List{T}"/> that extends from the first element to the specified index.
+        /// </summary>
+        /// <param name="startIndex">The zero-based starting index of the backward search.</param>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The zero-based index of the last occurrence of an element that matches the
+        /// conditions defined by <paramref name="match"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="List{T}"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched backward starting at <paramref name="startIndex"/> and ending at the first element.
+        /// <para/>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// the number of elements from the beginning of the <see cref="List{T}"/> to <paramref name="startIndex"/>.
+        /// </remarks>
         public int FindLastIndex(int startIndex, Predicate<T> match)
             => list.FindLastIndex(startIndex, match);
 
+        /// <summary>
+        /// Searches for an element that matches the conditions defined by the specified predicate,
+        /// and returns the zero-based index of the last occurrence within the range of elements in
+        /// the <see cref="List{T}"/> that contains the specified number of elements and ends at the
+        /// specified index.
+        /// </summary>
+        /// <param name="startIndex">The zero-based starting index of the backward search.</param>
+        /// <param name="count">The number of elements in the section to search.</param>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the element to search for.</param>
+        /// <returns>The zero-based index of the last occurrence of an element that matches the
+        /// conditions defined by <paramref name="match"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> is outside the range of valid indexes for the <see cref="List{T}"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> and <paramref name="count"/> do not specify a valid section in the <see cref="List{T}"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched backward starting at <paramref name="startIndex"/> and ending at
+        /// <paramref name="startIndex"/> minus <paramref name="count"/> plus 1, if <paramref name="count"/> is greater
+        /// than 0.
+        /// <para/>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed to it matches the
+        /// conditions defined in the delegate. The elements of the current <see cref="List{T}"/> are individually
+        /// passed to the <see cref="Predicate{T}"/> delegate.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
+        /// <paramref name="count"/>.
+        /// </remarks>
         public int FindLastIndex(int startIndex, int count, Predicate<T> match)
             => list.FindLastIndex(startIndex, count, match);
 
+        /// <summary>
+        /// Performs the specified action on each element of the <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="action">The <see cref="Action{T}"/> delegate to perform on
+        /// each element of the <see cref="List{T}"/>.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="action"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException">An element in the collection has been modified.</exception>
+        /// <remarks>
+        /// The <see cref="Action{T}"/> is a delegate to a method that performs an action on the object passed to it.
+        /// The elements of the current <see cref="List{T}"/> are individually passed to the <see cref="Action{T}"/> delegate.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// <para/>
+        /// Modifying the underlying collection in the body of the <see cref="Action{T}"/> delegate is not supported
+        /// and causes undefined behavior.
+        /// </remarks>
         public void ForEach(Action<T> action)
             => list.ForEach(action);
 
+        /// <summary>
+        /// Returns an enumerator that iterates through the <see cref="List{T}"/>.
+        /// </summary>
+        /// <returns>A <see cref="IEnumerator{T}"/> for the <see cref="List{T}"/>.</returns>
+        /// <remarks>
+        /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+        /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
+        /// <para/>
+        /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+        /// <para/>
+        /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
+        /// <see cref="IEnumerator{T}.Current"/> property is undefined. Therefore, you must call the
+        /// <see cref="IEnumerator.MoveNext()"/> method to advance the enumerator to the first element
+        /// of the collection before reading the value of <see cref="IEnumerator{T}.Current"/>.
+        /// <para/>
+        /// The <see cref="IEnumerator{T}.Current"/> property returns the same object until
+        /// <see cref="IEnumerator.MoveNext()"/> is called. <see cref="IEnumerator.MoveNext()"/>
+        /// sets <see cref="IEnumerator{T}.Current"/> to the next element.
+        /// <para/>
+        /// If <see cref="IEnumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+        /// positioned after the last element in the collection and <see cref="IEnumerator.MoveNext()"/>
+        /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="IEnumerator.MoveNext()"/>
+        /// also return <c>false</c>. If the last call to <see cref="IEnumerator.MoveNext()"/> returned <c>false</c>,
+        /// <see cref="IEnumerator{T}.Current"/> is undefined. You cannot set <see cref="IEnumerator{T}.Current"/>
+        /// to the first element of the collection again; you must create a new enumerator object instead.
+        /// <para/>
+        /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+        /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
+        /// to <see cref="IEnumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+        /// <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+        /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+        /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+        /// reading and writing, you must implement your own synchronization.
+        /// <para/>
+        /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
         public IEnumerator<T> GetEnumerator()
             => new Enumerator<T>(this);
 
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
 
+        /// <summary>
+        /// Creates a shallow copy of a range of elements in the source <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="index">The zero-based <see cref="List{T}"/> index at which the range starts.</param>
+        /// <param name="count">The number of elements in the range.</param>
+        /// <returns>A shallow copy of a range of elements in the source <see cref="List{T}"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="index"/> and <paramref name="count"/> do
+        /// not denote a valid range of elements in the <see cref="List{T}"/>.</exception>
+        /// <remarks>
+        /// A shallow copy of a collection of reference types, or a subset of that collection, contains
+        /// only the references to the elements of the collection. The objects themselves are not copied.
+        /// The references in the new list point to the same objects as the references in the original list.
+        /// <para/>
+        /// A shallow copy of a collection of value types, or a subset of that collection, contains the
+        /// elements of the collection. However, if the elements of the collection contain references to
+        /// other objects, those objects are not copied. The references in the elements of the new collection
+        /// point to the same objects as the references in the elements of the original collection.
+        /// <para/>
+        /// In contrast, a deep copy of a collection copies the elements and everything directly or indirectly
+        /// referenced by the elements.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is count.
+        /// </remarks>
         public List<T> GetRange(int index, int count)
         {
             if (index < 0)
@@ -667,15 +1062,83 @@ namespace J2N.Collections.Generic
             return list;
         }
 
+        /// <summary>
+        /// Searches for the specified object and returns the zero-based index of the first occurrence within
+        /// the entire <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
+        /// <returns>The zero-based index of the first occurrence of <paramref name="item"/> within the entire
+        /// <see cref="List{T}"/>, if found; otherwise, -1.</returns>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched forward starting at the first element and ending at
+        /// the last element.
+        /// <para/>
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
+        /// is <see cref="Count"/>.
+        /// </remarks>
         public int IndexOf(T item)
             => list.IndexOf(item);
 
         int IList.IndexOf(object? item)
             => ((IList)list).IndexOf(item);
 
+        /// <summary>
+        /// Searches for the specified object and returns the zero-based index of the first occurrence within
+        /// the range of elements in the <see cref="List{T}"/> that extends from the specified index to the last element.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
+        /// <param name="index">The zero-based starting index of the search. 0 (zero) is valid in an empty list.</param>
+        /// <returns>The zero-based index of the first occurrence of <paramref name="item"/> within the range of elements in the <see cref="List{T}"/>
+        /// that extends from <paramref name="index"/> to the last element, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the range of valid indexes
+        /// for the <see cref="List{T}"/>.</exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched forward starting at <paramref name="index"/> and ending at
+        /// the last element.
+        /// <para/>
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
+        /// is the number of elements from <paramref name="index"/> to the end of the <see cref="List{T}"/>.
+        /// </remarks>
         public int IndexOf(T item, int index)
             => list.IndexOf(item, index);
 
+        /// <summary>
+        /// Searches for the specified object and returns the zero-based index of the first occurrence within
+        /// the range of elements in the <see cref="List{T}"/> that starts at the specified index and contains
+        /// the specified number of elements.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
+        /// <param name="index">The zero-based starting index of the search. 0 (zero) is valid in an empty list.</param>
+        /// <param name="count">The number of elements in the section to search.</param>
+        /// <returns>The zero-based index of the first occurrence of <paramref name="item"/> within the range of elements in the <see cref="List{T}"/>
+        /// that starts at <paramref name="index"/> and contains <paramref name="count"/> number of elements, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is outside the range of valid indexes for the <see cref="List{T}"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> and <paramref name="count"/> do not specify a valid section in the <see cref="List{T}"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched forward starting at <paramref name="index"/> and ending at
+        /// <paramref name="index"/> plus <paramref name="count"/> minus 1, if <paramref name="count"/> is greater than 0.
+        /// <para/>
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
+        /// is <paramref name="count"/>.
+        /// </remarks>
         public int IndexOf(T item, int index, int count)
             => list.IndexOf(item, index, count);
 
@@ -714,6 +1177,36 @@ namespace J2N.Collections.Generic
             version++;
         }
 
+        /// <summary>
+        /// Inserts the elements of a collection into the <see cref="List{T}"/> at the specified index.
+        /// </summary>
+        /// <param name="index">The zero-based index at which the new elements should be inserted.</param>
+        /// <param name="collection">The collection whose elements should be inserted into the <see cref="List{T}"/>.
+        /// The collection itself cannot be <c>null</c>, but it can contain elements that are <c>null</c>, if type
+        /// <typeparamref name="T"/> is a reference type.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than <see cref="Count"/>.
+        /// </exception>
+        /// <remarks>
+        /// <see cref="List{T}"/> accepts <c>null</c> as a valid value for reference types and allows duplicate elements.
+        /// <para/>
+        /// If the new <see cref="Count"/> (the current <see cref="Count"/> plus the size of the collection) will be
+        /// greater than <see cref="Capacity"/>, the capacity of the <see cref="List{T}"/> is increased by automatically
+        /// reallocating the internal array to accommodate the new elements, and the existing elements are copied to the
+        /// new array before the new elements are added.
+        /// <para/>
+        /// If index is equal to <see cref="Count"/>, the elements are added to the end of <see cref="List{T}"/>.
+        /// <para/>
+        /// The order of the elements in the collection is preserved in the <see cref="List{T}"/>.
+        /// <para/>
+        /// This method is an O(<c>n</c> * <c>m</c>) operation, where <c>n</c> is the number of elements to be added and
+        /// <c>m</c> is <see cref="Count"/>.
+        /// </remarks>
         public void InsertRange(int index, IEnumerable<T> collection)
         {
             if (collection == null)
@@ -784,12 +1277,79 @@ namespace J2N.Collections.Generic
             }
         }
 
+        /// <summary>
+        /// Searches for the specified object and returns the zero-based index of the last occurrence within the
+        /// entire <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
+        /// <returns>The zero-based index of the last occurrence of <paramref name="item"/> within the entire
+        /// <see cref="List{T}"/>, if found; otherwise, -1.</returns>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched backward starting at the last element and ending at
+        /// the first element.
+        /// <para/>
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
+        /// is <see cref="Count"/>.
+        /// </remarks>
         public int LastIndexOf(T item)
             => list.LastIndexOf(item);
 
+        /// <summary>
+        /// Searches for the specified object and returns the zero-based index of the last occurrence within the range
+        /// of elements in the <see cref="List{T}"/> that extends from the first element to the specified index.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
+        /// <param name="index">The zero-based starting index of the backward search.</param>
+        /// <returns>The zero-based index of the last occurrence of <paramref name="item"/> within the range of elements in
+        /// the <see cref="List{T}"/> that extends from the first element to <paramref name="index"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the range of valid indexes for the
+        /// <see cref="List{T}"/>.</exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched backward starting at <paramref name="index"/> and ending at
+        /// the first element.
+        /// <para/>
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
+        /// is the number of elements from the beginning of the <see cref="List{T}"/> to <paramref name="index"/>.
+        /// </remarks>
         public int LastIndexOf(T item, int index)
             => list.LastIndexOf(item, index);
 
+        /// <summary>
+        /// Searches for the specified object and returns the zero-based index of the last occurrence within the range
+        /// of elements in the <see cref="List{T}"/> that contains the specified number of elements and ends at the specified index.
+        /// </summary>
+        /// <param name="item">The object to locate in the <see cref="List{T}"/>. The value can be <c>null</c> for reference types.</param>
+        /// <param name="index">The zero-based starting index of the backward search.</param>
+        /// <param name="count">The number of elements in the section to search.</param>
+        /// <returns>The zero-based index of the last occurrence of <paramref name="item"/> within the range of elements in the <see cref="List{T}"/>
+        /// that contains <paramref name="count"/> number of elements and ends at <paramref name="index"/>, if found; otherwise, -1.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is outside the range of valid indexes for the <see cref="List{T}"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> and <paramref name="count"/> do not specify a valid section in the <see cref="List{T}"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="List{T}"/> is searched backward starting at <paramref name="index"/> and ending at
+        /// <paramref name="index"/> minus <paramref name="count"/> plus 1, if <paramref name="count"/> is greater than 0.
+        /// <para/>
+        /// This method determines equality using J2N's default equality comparer <see cref="EqualityComparer{T}.Default"/>
+        /// for <typeparamref name="T"/>, the type of values in the list.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
+        /// is <paramref name="count"/>.
+        /// </remarks>
         public int LastIndexOf(T item, int index, int count)
             => list.LastIndexOf(item, index, count);
 
@@ -824,6 +1384,22 @@ namespace J2N.Collections.Generic
             version++;
         }
 
+        /// <summary>
+        /// Removes all the elements that match the conditions defined by the specified predicate.
+        /// </summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the elements to remove.</param>
+        /// <returns>The number of elements removed from the <see cref="List{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed
+        /// to it matches the conditions defined in the delegate. The elements of the current <see cref="List{T}"/>
+        /// are individually passed to the <see cref="Predicate{T}"/> delegate, and the elements that match
+        /// the conditions are renived from the <see cref="List{T}"/>.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where
+        /// <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public int RemoveAll(Predicate<T> match)
         {
             int removed = list.RemoveAll(match);
@@ -832,12 +1408,51 @@ namespace J2N.Collections.Generic
             return removed;
         }
 
+        /// <summary>
+        /// Removes the element at the specified index of the <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range of elements to remove.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is equal to or greater than <see cref="Count"/>.
+        /// </exception>
+        /// <remarks>
+        /// When you call <see cref="RemoveAt(int)"/> to remove an item, the remaining items in the list
+        /// are renumbered to replace the removed item. For example, if you remove the item at index 3,
+        /// the item at index 4 is moved to the 3 position. In addition, the number of items in the list
+        /// (as represented by the <see cref="Count"/> property) is reduced by 1.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is (<see cref="Count"/> - <paramref name="index"/>).
+        /// </remarks>
         public void RemoveAt(int index)
         {
             list.RemoveAt(index);
             version++;
         }
 
+        /// <summary>
+        /// Removes a range of elements from the <see cref="List{T}"/>.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range of elements to remove.</param>
+        /// <param name="count">The number of elements to remove.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="index"/> and <paramref name="count"/>
+        /// do not denote a valid range of elements in the <see cref="List{T}"/>.</exception>
+        /// <remarks>
+        /// The items are removed and all the elements following them in the <see cref="List{T}"/> have
+        /// their indexes reduced by <paramref name="count"/>.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void RemoveRange(int index, int count)
         {
             list.RemoveRange(index, count);
@@ -845,45 +1460,277 @@ namespace J2N.Collections.Generic
                 version++;
         }
 
+        /// <summary>
+        /// Reverses the order of the elements in the entire <see cref="List{T}"/>.
+        /// </summary>
+        /// <remarks>
+        /// This method uses <see cref="M:Array.Reverse{T}(T[])"/> to reverse the order of the elements.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void Reverse()
         {
             list.Reverse();
             version++;
         }
 
+        /// <summary>
+        /// Reverses the order of the elements in the specified range.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range to reverse.</param>
+        /// <param name="count">The number of elements in the range to reverse.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="index"/> and <paramref name="count"/>
+        /// do not denote a valid range of elements in the <see cref="List{T}"/>.</exception>
+        /// <remarks>
+        /// This method uses <see cref="M:Array.Reverse{T}(T[], int, int)"/> to reverse the order of the elements.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public void Reverse(int index, int count)
         {
             list.Reverse(index, count);
             version++;
         }
 
+        /// <summary>
+        /// Sorts the elements in the entire <see cref="List{T}"/> using J2N's default comparer.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The default comparer <see cref="Comparer{T}.Default"/>
+        /// cannot find an implementation of the <see cref="IComparable{T}"/> generic interface or the <see cref="IComparable"/>
+        /// interface for type <typeparamref name="T"/>.</exception>
+        /// <remarks>
+        /// This method uses J2N's default comparer <see cref="Comparer{T}.Default"/> for type <typeparamref name="T"/> to determine
+        /// the order of list elements. The <see cref="Comparer{T}.Default"/> comparer checks whether
+        /// type <typeparamref name="T"/> implements the <see cref="IComparable{T}"/> generic interface and uses that implementation,
+        /// if available. If not, <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/> implements the
+        /// <see cref="IComparable"/> interface. If type <typeparamref name="T"/> does not implement either interface,
+        /// <see cref="Comparer{T}.Default"/> throws an <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// This method uses <see cref="Array.Sort(Array, int, int, IComparer)"/>, which applies the introspective sort as follows:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         If the partition size is less than or equal to 16 elements, it uses an insertion sort algorithm
+        ///     </description></item>
+        ///     <item><description>
+        ///         If the number of partitions exceeds 2 log <c>n</c>, where <c>n</c> is the range of the input array,
+        ///         it uses a <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a> algorithm.
+        ///     </description></item>
+        ///     <item><description>
+        ///         Otherwise, it uses a Quicksort algorithm.
+        ///     </description></item>
+        /// </list>
+        /// <para/>
+        /// This implementation performs an unstable sort; that is, if two elements are equal, their order might not be preserved.
+        /// In contrast, a stable sort preserves the order of elements that are equal.
+        /// <para/>
+        /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
+        /// case it is an O(<c>n</c><sup>2</sup>) operation.
+        /// </remarks>
         public void Sort()
         {
             list.Sort(Comparer<T>.Default);
             version++;
         }
 
+        /// <summary>
+        /// Sorts the elements in a range of elements in <see cref="List{T}"/> using the specified comparer.
+        /// </summary>
+        /// <param name="index">The zero-based starting index of the range to sort.</param>
+        /// <param name="count">The length of the range to sort.</param>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when comparing elements,
+        /// or <c>null</c> to use J2N's default comparer <see cref="Comparer{T}.Default"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The implementation of <paramref name="comparer"/> caused an error during the sort. For example,
+        /// <paramref name="comparer"/> might not return 0 when comparing an item with itself.
+        /// </exception>
+        /// <exception cref="InvalidOperationException"><paramref name="comparer"/> is <c>null</c>, and J2N's
+        /// default comparer <see cref="Comparer{T}.Default"/> cannot find implementation of the <see cref="IComparable{T}"/>
+        /// generic interface or the <see cref="IComparable"/> interface for type <typeparamref name="T"/>.</exception>
+        /// <remarks>
+        /// If <paramref name="comparer"/> is provided, the elements of the <see cref="List{T}"/> are sorted using the specified
+        /// <see cref="IComparer{T}"/> implementation.
+        /// <para/>
+        /// If <paramref name="comparer"/> is <c>null</c>, the default comparer <see cref="Comparer{T}.Default"/> checks whether
+        /// type <typeparamref name="T"/> implements the <see cref="IComparable{T}"/> generic interface and uses that implementation,
+        /// if available. If not, <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/> implements the
+        /// <see cref="IComparable"/> interface. If type <typeparamref name="T"/> does not implement either interface,
+        /// <see cref="Comparer{T}.Default"/> throws an <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// This method uses <see cref="Array.Sort(Array, int, int, IComparer)"/>, which applies the introspective sort as follows:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         If the partition size is less than or equal to 16 elements, it uses an insertion sort algorithm
+        ///     </description></item>
+        ///     <item><description>
+        ///         If the number of partitions exceeds 2 log <c>n</c>, where <c>n</c> is the range of the input array,
+        ///         it uses a <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a> algorithm.
+        ///     </description></item>
+        ///     <item><description>
+        ///         Otherwise, it uses a Quicksort algorithm.
+        ///     </description></item>
+        /// </list>
+        /// <para/>
+        /// This implementation performs an unstable sort; that is, if two elements are equal, their order might not be preserved.
+        /// In contrast, a stable sort preserves the order of elements that are equal.
+        /// <para/>
+        /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
+        /// case it is an O(<c>n</c><sup>2</sup>) operation.
+        /// </remarks>
         public void Sort(int index, int count, IComparer<T> comparer)
         {
             list.Sort(index, count, comparer ?? Comparer<T>.Default);
             version++;
         }
 
+        /// <summary>
+        /// Sorts the elements in the entire <see cref="List{T}"/> using the specified comparer.
+        /// </summary>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when
+        /// comparing elements, or <c>null</c> to use J2N's default comparer <see cref="Comparer{T}.Default"/>.</param>
+        /// <exception cref="InvalidOperationException"><paramref name="comparer"/> is <c>null</c>, and the default
+        /// comparer <see cref="Comparer{T}.Default"/> cannot find implementation of the <see cref="IComparable{T}"/>
+        /// generic interface or the <see cref="IComparable"/> interface for type <typeparamref name="T"/>.</exception>
+        /// <exception cref="ArgumentException">The implementation of <paramref name="comparer"/> caused an error during
+        /// the sort. For example, <paramref name="comparer"/> might not return 0 when comparing an item with itself.</exception>
+        /// <remarks>
+        /// If <paramref name="comparer"/> is provided, the elements of the <see cref="List{T}"/> are sorted using the specified
+        /// <see cref="IComparer{T}"/>.
+        /// <para/>
+        /// If <paramref name="comparer"/> is <c>null</c>, the default comparer <see cref="Comparer{T}.Default"/> checks whether
+        /// type <typeparamref name="T"/> implements the <see cref="IComparable{T}"/> generic interface and uses that implementation,
+        /// if available. If not, <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/> implements the
+        /// <see cref="IComparable"/> interface. If type <typeparamref name="T"/> does not implement either interface,
+        /// <see cref="Comparer{T}.Default"/> throws an <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// This method uses <see cref="Array.Sort(Array, int, int, IComparer)"/>, which applies the introspective sort as follows:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         If the partition size is less than or equal to 16 elements, it uses an insertion sort algorithm
+        ///     </description></item>
+        ///     <item><description>
+        ///         If the number of partitions exceeds 2 log <c>n</c>, where <c>n</c> is the range of the input array,
+        ///         it uses a <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a> algorithm.
+        ///     </description></item>
+        ///     <item><description>
+        ///         Otherwise, it uses a Quicksort algorithm.
+        ///     </description></item>
+        /// </list>
+        /// <para/>
+        /// This implementation performs an unstable sort; that is, if two elements are equal, their order might not be preserved.
+        /// In contrast, a stable sort preserves the order of elements that are equal.
+        /// <para/>
+        /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
+        /// case it is an O(<c>n</c><sup>2</sup>) operation.
+        /// </remarks>
         public void Sort(IComparer<T> comparer)
         {
             list.Sort(comparer ?? Comparer<T>.Default);
             version++;
         }
 
+        /// <summary>
+        /// Sorts the elements in the entire <see cref="List{T}"/> using the specified <see cref="Comparison{T}"/>.
+        /// </summary>
+        /// <param name="comparison">The <see cref="Comparison{T}"/> to use when comparing elements.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="comparison"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The implementation of <paramref name="comparison"/> caused an error during the sort.
+        /// For example, <paramref name="comparison"/> might not return 0 when comparing an item with itself.</exception>
+        /// <remarks>
+        /// If comparison is provided, the elements of the <see cref="List{T}"/> are sorted using the method represented by the delegate.
+        /// <para/>
+        /// If comparison is <c>null</c>, an <see cref="ArgumentNullException"/> is thrown.
+        /// <para/>
+        /// This method uses <see cref="Array.Sort(Array, int, int)"/>, which applies the introspective sort as follows:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         If the partition size is less than or equal to 16 elements, it uses an insertion sort algorithm
+        ///     </description></item>
+        ///     <item><description>
+        ///         If the number of partitions exceeds 2 log <c>n</c>, where <c>n</c> is the range of the input array,
+        ///         it uses a <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a> algorithm.
+        ///     </description></item>
+        ///     <item><description>
+        ///         Otherwise, it uses a Quicksort algorithm.
+        ///     </description></item>
+        /// </list>
+        /// <para/>
+        /// This implementation performs an unstable sort; that is, if two elements are equal, their order might not be preserved.
+        /// In contrast, a stable sort preserves the order of elements that are equal.
+        /// <para/>
+        /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
+        /// case it is an O(<c>n</c><sup>2</sup>) operation.
+        /// </remarks>
+        /// <seealso cref="Comparison{T}"/>
         public void Sort(Comparison<T> comparison)
             => list.Sort(comparison);
 
+        /// <summary>
+        /// Copies the elements of the <see cref="List{T}"/> to a new array.
+        /// </summary>
+        /// <returns>An array containing copies of the elements of the <see cref="List{T}"/>.</returns>
+        /// <remarks>
+        /// The elements are copied using <see cref="Array.Copy(Array, int, Array, int, int)"/>, which
+        /// is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public T[] ToArray()
             => list.ToArray();
 
+        /// <summary>
+        /// Sets the capacity to the actual number of elements in the <see cref="List{T}"/>, if that
+        /// number is less than a threshold value.
+        /// </summary>
+        /// <remarks>
+        /// This method can be used to minimize a collection's memory overhead if no new elements will
+        /// be added to the collection. The cost of reallocating and copying a large <see cref="List{T}"/>
+        /// can be considerable, however, so the <see cref="TrimExcess()"/> method does nothing if the
+        /// list is at more than 90 percent of capacity. This avoids incurring a large reallocation
+        /// cost for a relatively small gain.
+        /// <para/>
+        /// NOTE: The current threshold of 90 percent might change in future releases.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// <para/>
+        /// To reset a <see cref="List{T}"/> to its initial state, call the <see cref="Clear()"/> method
+        /// before calling the <see cref="TrimExcess()"/> method. Trimming an empty <see cref="List{T}"/> sets the
+        /// capacity of the <see cref="List{T}"/> to the default capacity.
+        /// <para/>
+        /// The capacity can also be set using the <see cref="Capacity"/> property.
+        /// </remarks>
         public void TrimExcess()
             => list.TrimExcess();
 
+        /// <summary>
+        /// Determines whether every element in the <see cref="List{T}"/> matches the
+        /// conditions defined by the specified predicate.
+        /// </summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines
+        /// the conditions to check against the elements.</param>
+        /// <returns><c>true</c> if every element in the <see cref="List{T}"/> matches
+        /// the conditions defined by the specified predicate; otherwise, <c>false</c>.
+        /// If the list has no elements, the return value is <c>true</c>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed
+        /// to it matches the conditions defined in the delegate. The elements of the current <see cref="List{T}"/>
+        /// are individually passed to the <see cref="Predicate{T}"/> delegate, and processing is stopped when the
+        /// delegate returns <c>false</c> for any element. The elements are processed in order, and all calls are
+        /// made on a single thread.
+        /// <para/>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
         public bool TrueForAll(Predicate<T> match)
             => list.TrueForAll(match);
 
