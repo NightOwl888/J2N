@@ -1148,7 +1148,7 @@ namespace J2N.Text
             // From Apache Harmony String class
             if (text == null || (startIndex == 0 && length == text.Length))
             {
-                return text.ToCharSequence();
+                return text.AsCharSequence();
             }
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
@@ -1157,7 +1157,7 @@ namespace J2N.Text
             if (startIndex + length > text.Length)
                 throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(text.Length)}");
 
-            return text.ToString(startIndex, length).ToCharSequence();
+            return text.ToString(startIndex, length).AsCharSequence();
         }
 
         #endregion Subsequence
@@ -1168,7 +1168,7 @@ namespace J2N.Text
         /// Convenience method to wrap a string in a <see cref="StringBuilderCharSequence"/>
         /// so a <see cref="StringBuilder"/> can be used as <see cref="ICharSequence"/> in .NET.
         /// </summary>
-        public static ICharSequence ToCharSequence(this StringBuilder text)
+        public static ICharSequence AsCharSequence(this StringBuilder text)
         {
             return new StringBuilderCharSequence(text);
         }

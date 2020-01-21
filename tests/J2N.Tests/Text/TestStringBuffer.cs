@@ -121,7 +121,7 @@ namespace J2N.Text
 
             assertEquals(string.Empty, new StringBuffer((ICharSequence)null).ToString()); // J2N: To match .NET, a null in the constructor should return string.Empty
 
-            assertEquals("Assert 1: must equal 'abc'.", "abc", new StringBuffer((ICharSequence)"abc".ToCharSequence()).ToString());
+            assertEquals("Assert 1: must equal 'abc'.", "abc", new StringBuffer((ICharSequence)"abc".AsCharSequence()).ToString());
         }
 
         /**
@@ -198,10 +198,10 @@ namespace J2N.Text
         public void Test_Append_ICharSequence()
         {
             StringBuffer sb = new StringBuffer();
-            assertSame(sb, sb.Append((ICharSequence)"ab".ToCharSequence()));
+            assertSame(sb, sb.Append((ICharSequence)"ab".AsCharSequence()));
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append((ICharSequence)"cd".ToCharSequence()));
+            assertSame(sb, sb.Append((ICharSequence)"cd".AsCharSequence()));
             assertEquals("cd", sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append((ICharSequence)null));
@@ -270,16 +270,16 @@ namespace J2N.Text
         public void Test_Append_ICharSequence_Int32_Int32()
         {
             StringBuffer sb = new StringBuffer();
-            assertSame(sb, sb.Append((ICharSequence)"ab".ToCharSequence(), 0, 2 - 0)); // J2N: Corrected 3rd parameter
+            assertSame(sb, sb.Append((ICharSequence)"ab".AsCharSequence(), 0, 2 - 0)); // J2N: Corrected 3rd parameter
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append((ICharSequence)"cd".ToCharSequence(), 0, 2 - 0)); // J2N: Corrected 3rd parameter
+            assertSame(sb, sb.Append((ICharSequence)"cd".AsCharSequence(), 0, 2 - 0)); // J2N: Corrected 3rd parameter
             assertEquals("cd", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append((ICharSequence)"abcd".ToCharSequence(), 0, 2 - 0)); // J2N: Corrected 3rd parameter
+            assertSame(sb, sb.Append((ICharSequence)"abcd".AsCharSequence(), 0, 2 - 0)); // J2N: Corrected 3rd parameter
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append((ICharSequence)"abcd".ToCharSequence(), 2, 4 - 2)); // J2N: Corrected 3rd parameter
+            assertSame(sb, sb.Append((ICharSequence)"abcd".AsCharSequence(), 2, 4 - 2)); // J2N: Corrected 3rd parameter
             assertEquals("cd", sb.ToString());
             sb.Length = (0);
             //assertSame(sb, sb.Append((ICharSequence)null, 0, 2 - 0)); // J2N: Corrected 3rd parameter
@@ -436,17 +436,17 @@ namespace J2N.Text
         {
             string fixture = "0000";
             StringBuffer sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(0, (ICharSequence)"ab".ToCharSequence()));
+            assertSame(sb, sb.Insert(0, (ICharSequence)"ab".AsCharSequence()));
             assertEquals("ab0000", sb.ToString());
             assertEquals(6, sb.Length);
 
             sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(2, (ICharSequence)"ab".ToCharSequence()));
+            assertSame(sb, sb.Insert(2, (ICharSequence)"ab".AsCharSequence()));
             assertEquals("00ab00", sb.ToString());
             assertEquals(6, sb.Length);
 
             sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(4, (ICharSequence)"ab".ToCharSequence()));
+            assertSame(sb, sb.Insert(4, (ICharSequence)"ab".AsCharSequence()));
             assertEquals("0000ab", sb.ToString());
             assertEquals(6, sb.Length);
 
@@ -460,7 +460,7 @@ namespace J2N.Text
             try
             {
                 sb = new StringBuffer(fixture);
-                sb.Insert(-1, (ICharSequence)"ab".ToCharSequence());
+                sb.Insert(-1, (ICharSequence)"ab".AsCharSequence());
                 fail("no IOOBE, negative index");
             }
             catch (ArgumentOutOfRangeException e)
@@ -471,7 +471,7 @@ namespace J2N.Text
             try
             {
                 sb = new StringBuffer(fixture);
-                sb.Insert(5, (ICharSequence)"ab".ToCharSequence());
+                sb.Insert(5, (ICharSequence)"ab".AsCharSequence());
                 fail("no IOOBE, index too large index");
             }
             catch (ArgumentOutOfRangeException e)
@@ -645,32 +645,32 @@ namespace J2N.Text
         {
             string fixture = "0000";
             StringBuffer sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(0, (ICharSequence)"ab".ToCharSequence(), 0, 2 - 0)); // J2N: Corrected 4th parameter
+            assertSame(sb, sb.Insert(0, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0)); // J2N: Corrected 4th parameter
             assertEquals("ab0000", sb.ToString());
             assertEquals(6, sb.Length);
 
             sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(0, (ICharSequence)"ab".ToCharSequence(), 0, 1 - 0)); // J2N: Corrected 4th parameter
+            assertSame(sb, sb.Insert(0, (ICharSequence)"ab".AsCharSequence(), 0, 1 - 0)); // J2N: Corrected 4th parameter
             assertEquals("a0000", sb.ToString());
             assertEquals(5, sb.Length);
 
             sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(2, (ICharSequence)"ab".ToCharSequence(), 0, 2 - 0)); // J2N: Corrected 4th parameter
+            assertSame(sb, sb.Insert(2, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0)); // J2N: Corrected 4th parameter
             assertEquals("00ab00", sb.ToString());
             assertEquals(6, sb.Length);
 
             sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(2, (ICharSequence)"ab".ToCharSequence(), 0, 1 - 0)); // J2N: Corrected 4th parameter
+            assertSame(sb, sb.Insert(2, (ICharSequence)"ab".AsCharSequence(), 0, 1 - 0)); // J2N: Corrected 4th parameter
             assertEquals("00a00", sb.ToString());
             assertEquals(5, sb.Length);
 
             sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(4, (ICharSequence)"ab".ToCharSequence(), 0, 2 - 0)); // J2N: Corrected 4th parameter
+            assertSame(sb, sb.Insert(4, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0)); // J2N: Corrected 4th parameter
             assertEquals("0000ab", sb.ToString());
             assertEquals(6, sb.Length);
 
             sb = new StringBuffer(fixture);
-            assertSame(sb, sb.Insert(4, (ICharSequence)"ab".ToCharSequence(), 0, 1 - 0)); // J2N: Corrected 4th parameter
+            assertSame(sb, sb.Insert(4, (ICharSequence)"ab".AsCharSequence(), 0, 1 - 0)); // J2N: Corrected 4th parameter
             assertEquals("0000a", sb.ToString());
             assertEquals(5, sb.Length);
 
@@ -687,7 +687,7 @@ namespace J2N.Text
             try
             {
                 sb = new StringBuffer(fixture);
-                sb.Insert(-1, (ICharSequence)"ab".ToCharSequence(), 0, 2 - 0); // J2N: Corrected 4th parameter
+                sb.Insert(-1, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0); // J2N: Corrected 4th parameter
                 fail("no IOOBE, negative index");
             }
             catch (ArgumentOutOfRangeException e)
@@ -698,7 +698,7 @@ namespace J2N.Text
             try
             {
                 sb = new StringBuffer(fixture);
-                sb.Insert(5, (ICharSequence)"ab".ToCharSequence(), 0, 2 - 0); // J2N: Corrected 4th parameter
+                sb.Insert(5, (ICharSequence)"ab".AsCharSequence(), 0, 2 - 0); // J2N: Corrected 4th parameter
                 fail("no IOOBE, index too large index");
             }
             catch (ArgumentOutOfRangeException e)
@@ -709,7 +709,7 @@ namespace J2N.Text
             try
             {
                 sb = new StringBuffer(fixture);
-                sb.Insert(5, (ICharSequence)"ab".ToCharSequence(), -1, 2 - -1); // J2N: Corrected 4th parameter
+                sb.Insert(5, (ICharSequence)"ab".AsCharSequence(), -1, 2 - -1); // J2N: Corrected 4th parameter
                 fail("no IOOBE, negative offset");
             }
             catch (ArgumentOutOfRangeException e)
@@ -720,7 +720,7 @@ namespace J2N.Text
             try
             {
                 sb = new StringBuffer(fixture);
-                sb.Insert(5, new char[] { 'a', 'b' }.ToCharSequence(), 0, -1 - 0); // J2N: Corrected 4th parameter
+                sb.Insert(5, new char[] { 'a', 'b' }.AsCharSequence(), 0, -1 - 0); // J2N: Corrected 4th parameter
                 fail("no IOOBE, negative length");
             }
             catch (ArgumentOutOfRangeException e)
@@ -731,7 +731,7 @@ namespace J2N.Text
             try
             {
                 sb = new StringBuffer(fixture);
-                sb.Insert(5, new char[] { 'a', 'b' }.ToCharSequence(), 0, 3 - 0); // J2N: Corrected 4th parameter
+                sb.Insert(5, new char[] { 'a', 'b' }.AsCharSequence(), 0, 3 - 0); // J2N: Corrected 4th parameter
                 fail("no IOOBE, too long");
             }
             catch (ArgumentOutOfRangeException e)

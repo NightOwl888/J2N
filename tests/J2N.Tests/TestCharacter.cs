@@ -136,13 +136,13 @@ namespace J2N
         public void Test_codePointAt_CharSequenceI()
         {
 
-            assertEquals('a', Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 0));
-            assertEquals('b', Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 1));
-            assertEquals('c', Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 2));
+            assertEquals('a', Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 0));
+            assertEquals('b', Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 1));
+            assertEquals('c', Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 2));
             assertEquals(0x10000, Character.CodePointAt(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 0));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 0));
             assertEquals('\uDC00', Character.CodePointAt(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 1));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 1));
 
             try
             {
@@ -155,7 +155,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), -1);
+                Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), -1);
                 fail("No IOOBE, negative index.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -164,7 +164,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 4);
+                Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 4);
                 fail("No IOOBE, index too large.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -396,13 +396,13 @@ namespace J2N
         public void Test_codePointBefore_ICharSequenceI()
         {
 
-            assertEquals('a', Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 1));
-            assertEquals('b', Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 2));
-            assertEquals('c', Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 3));
+            assertEquals('a', Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 1));
+            assertEquals('b', Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 2));
+            assertEquals('c', Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 3));
             assertEquals(0x10000, Character.CodePointBefore(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 2));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 2));
             assertEquals('\uD800', Character.CodePointBefore(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 1));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 1));
 
             try
             {
@@ -415,7 +415,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 0);
+                Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 0);
                 fail("No IOOBE, index below one.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -424,7 +424,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 4);
+                Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 4);
                 fail("No IOOBE, index too large.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -738,13 +738,13 @@ namespace J2N
         [Test]
         public void Test_codePointCount_ICharSequenceII()
         {
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC00".ToCharSequence(), 0, 2 - 0)); // end - start
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC01".ToCharSequence(), 0, 2 - 0)); // end - start
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD801\uDC01".ToCharSequence(), 0, 2 - 0)); // end - start
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uDBFF\uDFFF".ToCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC00".AsCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC01".AsCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD801\uDC01".AsCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uDBFF\uDFFF".AsCharSequence(), 0, 2 - 0)); // end - start
 
-            assertEquals(3, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 0, 4 - 0)); // end - start
-            assertEquals(4, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b\uD800".ToCharSequence(), 0, 5 - 0)); // end - start
+            assertEquals(3, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 0, 4 - 0)); // end - start
+            assertEquals(4, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b\uD800".AsCharSequence(), 0, 5 - 0)); // end - start
 
             try
             {
@@ -757,7 +757,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointCount((ICharSequence)"abc".ToCharSequence(), -1, 1 - -1); // end - start
+                Character.CodePointCount((ICharSequence)"abc".AsCharSequence(), -1, 1 - -1); // end - start
                 fail("No IOOBE, negative start.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -766,7 +766,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointCount((ICharSequence)"abc".ToCharSequence(), 0, 4 - 0); // end - start
+                Character.CodePointCount((ICharSequence)"abc".AsCharSequence(), 0, 4 - 0); // end - start
                 fail("No IOOBE, end greater than length.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -775,7 +775,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointCount((ICharSequence)"abc".ToCharSequence(), 2, 1 - 2); // end - start
+                Character.CodePointCount((ICharSequence)"abc".AsCharSequence(), 2, 1 - 2); // end - start
                 fail("No IOOBE, end greater than start.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -930,28 +930,28 @@ namespace J2N
         [Test]
         public void Test_offsetByCodePoints_ICharSequenceII()
         {
-            int result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 0, 2);
+            int result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 0, 2);
             assertEquals(3, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"abcd".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"abcd".AsCharSequence(), 3, -1);
             assertEquals(2, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 0, 3);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 0, 3);
             assertEquals(4, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 3, -1);
             assertEquals(1, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 3, 0);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 3, 0);
             assertEquals(3, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"\uD800\uDC00bc".ToCharSequence(), 3, 0);
+            result = Character.OffsetByCodePoints((ICharSequence)"\uD800\uDC00bc".AsCharSequence(), 3, 0);
             assertEquals(3, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uDC00bc".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uDC00bc".AsCharSequence(), 3, -1);
             assertEquals(2, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800bc".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800bc".AsCharSequence(), 3, -1);
             assertEquals(2, result);
 
             try
@@ -965,7 +965,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), -1, 1);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), -1, 1);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)
@@ -974,7 +974,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), 4, 1);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), 4, 1);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)
@@ -983,7 +983,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), 1, 3);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), 1, 3);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)
@@ -992,7 +992,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), 1, -2);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), 1, -2);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)

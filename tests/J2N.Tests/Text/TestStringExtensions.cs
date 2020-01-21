@@ -78,7 +78,7 @@ namespace J2N.Text
         {
             // Test for method java.lang.String
             // java.lang.String.contentEquals(CharSequence cs)
-            assertFalse("Incorrect result of compare", "qwerty".ContentEquals("".ToCharSequence()));
+            assertFalse("Incorrect result of compare", "qwerty".ContentEquals("".AsCharSequence()));
         }
 
         /**
@@ -111,8 +111,8 @@ namespace J2N.Text
             // if the target is null and string is not.
             assertFalse(s.ContentEquals((ICharSequence)null));
             assertTrue(((string)null).ContentEquals((ICharSequence)null));
-            assertFalse(((string)null).ContentEquals((ICharSequence)"".ToCharSequence()));
-            assertTrue("".ContentEquals((ICharSequence)"".ToCharSequence()));
+            assertFalse(((string)null).ContentEquals((ICharSequence)"".AsCharSequence()));
+            assertTrue("".ContentEquals((ICharSequence)"".AsCharSequence()));
         }
 
 
@@ -446,9 +446,9 @@ namespace J2N.Text
             String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
 
             assertTrue("identical regions failed comparison", hw1.RegionMatches(2,
-                    hw2.ToCharSequence(), 2, 5, StringComparison.Ordinal));
+                    hw2.AsCharSequence(), 2, 5, StringComparison.Ordinal));
             assertTrue("Different regions returned true", !hw1.RegionMatches(2,
-                    bogusString.ToCharSequence(), 2, 5, StringComparison.Ordinal));
+                    bogusString.AsCharSequence(), 2, 5, StringComparison.Ordinal));
 
             var input = "iiiiiiiiiiiıIiii";
             var test = "İII"; // Turkish capital dotted I test.
@@ -485,13 +485,13 @@ namespace J2N.Text
             String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
 
             assertTrue("identical regions failed comparison", hw1.RegionMatches(
-                    2, hw2.ToCharSequence(), 2, 5, StringComparison.Ordinal));
+                    2, hw2.AsCharSequence(), 2, 5, StringComparison.Ordinal));
             assertTrue("identical regions failed comparison with different cases",
-                    hw1.RegionMatches(2, hw2.ToCharSequence(), 2, 5, StringComparison.OrdinalIgnoreCase));
+                    hw1.RegionMatches(2, hw2.AsCharSequence(), 2, 5, StringComparison.OrdinalIgnoreCase));
             assertTrue("Different regions returned true", !hw1.RegionMatches(
-                    2, bogusString.ToCharSequence(), 2, 5, StringComparison.OrdinalIgnoreCase));
+                    2, bogusString.AsCharSequence(), 2, 5, StringComparison.OrdinalIgnoreCase));
             assertTrue("identical regions failed comparison with different cases",
-                    hw1.RegionMatches(2, hw2.ToCharSequence(), 2, 5, StringComparison.Ordinal));
+                    hw1.RegionMatches(2, hw2.AsCharSequence(), 2, 5, StringComparison.Ordinal));
         }
 
         /**
@@ -709,11 +709,11 @@ namespace J2N.Text
         }
 
         [Test]
-        public void TestToCharSequence()
+        public void TestAsCharSequence()
         {
             string target = "This is a test";
 
-            var result = target.ToCharSequence();
+            var result = target.AsCharSequence();
 
             assertNotNull(result);
             assertEquals(typeof(StringCharSequence), result.GetType());

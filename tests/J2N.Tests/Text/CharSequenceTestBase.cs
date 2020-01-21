@@ -164,28 +164,28 @@ namespace J2N.Text
             Assert.AreEqual(0, target.CompareTo(String1));
             Assert.AreEqual(0, target.CompareTo(new StringBuilder(String1)));
             Assert.AreEqual(0, target.CompareTo(String1.ToCharArray()));
-            Assert.AreEqual(0, target.CompareTo(String1.ToCharSequence()));
+            Assert.AreEqual(0, target.CompareTo(String1.AsCharSequence()));
             Assert.AreEqual(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String1))));
             Assert.AreEqual(0, target.CompareTo(new CharArrayCharSequence(String1.ToCharArray())));
 
             Assert.Greater(0, target.CompareTo(String2));
             Assert.Greater(0, target.CompareTo(new StringBuilder(String2)));
             Assert.Greater(0, target.CompareTo(String2.ToCharArray()));
-            Assert.Greater(0, target.CompareTo(String2.ToCharSequence()));
+            Assert.Greater(0, target.CompareTo(String2.AsCharSequence()));
             Assert.Greater(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String2))));
             Assert.Greater(0, target.CompareTo(new CharArrayCharSequence(String2.ToCharArray())));
 
             Assert.Greater(0, target.CompareTo(String3));
             Assert.Greater(0, target.CompareTo(new StringBuilder(String3)));
             Assert.Greater(0, target.CompareTo(String3.ToCharArray()));
-            Assert.Greater(0, target.CompareTo(String3.ToCharSequence()));
+            Assert.Greater(0, target.CompareTo(String3.AsCharSequence()));
             Assert.Greater(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String3))));
             Assert.Greater(0, target.CompareTo(new CharArrayCharSequence(String3.ToCharArray())));
 
             Assert.Less(0, target.CompareTo(String4));
             Assert.Less(0, target.CompareTo(new StringBuilder(String4)));
             Assert.Less(0, target.CompareTo(String4.ToCharArray()));
-            Assert.Less(0, target.CompareTo(String4.ToCharSequence()));
+            Assert.Less(0, target.CompareTo(String4.AsCharSequence()));
             Assert.Less(0, target.CompareTo(new StringBuilderCharSequence(new StringBuilder(String4))));
             Assert.Less(0, target.CompareTo(new CharArrayCharSequence(String4.ToCharArray())));
 

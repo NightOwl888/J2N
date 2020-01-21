@@ -15,8 +15,8 @@ namespace J2N.Text
         public void TestAppend()
         {
             StringBuilder target = new StringBuilder("This is a test");
-            ICharSequence string1 = ". Text to add.".ToCharSequence();
-            ICharSequence string2 = " Some more text to add.".ToCharSequence();
+            ICharSequence string1 = ". Text to add.".AsCharSequence();
+            ICharSequence string2 = " Some more text to add.".AsCharSequence();
 
             // NOTE: We must use the label, or the compiler will choose the
             // Append(object) overload. That overload works, but is not as efficient
@@ -160,11 +160,11 @@ namespace J2N.Text
         }
 
         [Test]
-        public void TestToCharSequence()
+        public void TestAsCharSequence()
         {
             StringBuilder target = new StringBuilder("This is a test");
 
-            var result = target.ToCharSequence();
+            var result = target.AsCharSequence();
 
             Assert.IsNotNull(result);
             Assert.AreEqual(typeof(StringBuilderCharSequence), result.GetType());
@@ -544,10 +544,10 @@ namespace J2N.Text
         public void Test_Append_ICharSequence()
         {
             StringBuilder sb = new StringBuilder();
-            assertSame(sb, sb.Append("ab".ToCharSequence()));
+            assertSame(sb, sb.Append("ab".AsCharSequence()));
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append("cd".ToCharSequence()));
+            assertSame(sb, sb.Append("cd".AsCharSequence()));
             assertEquals("cd", sb.ToString());
             sb.Length = (0);
             assertSame(sb, sb.Append((ICharSequence)null));
@@ -562,16 +562,16 @@ namespace J2N.Text
         public void Test_Append_ICharSequence_Int32_Int32()
         {
             StringBuilder sb = new StringBuilder();
-            assertSame(sb, sb.Append("ab".ToCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertSame(sb, sb.Append("ab".AsCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append("cd".ToCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertSame(sb, sb.Append("cd".AsCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
             assertEquals("cd", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append("abcd".ToCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertSame(sb, sb.Append("abcd".AsCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append("abcd".ToCharSequence(), 2, 4 - 2)); // J2N: corrected 3rd parameter
+            assertSame(sb, sb.Append("abcd".AsCharSequence(), 2, 4 - 2)); // J2N: corrected 3rd parameter
             assertEquals("cd", sb.ToString());
             sb.Length = (0);
             try
