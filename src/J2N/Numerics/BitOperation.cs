@@ -7,7 +7,7 @@ namespace J2N.Numerics
     /// Extensions to <see cref="int"/> and <see cref="long"/> to perform bitwise
     /// operations.
     /// </summary>
-    public static class BitOperationExtensions
+    public static class BitOperation
     {
         #region BitCount
 
