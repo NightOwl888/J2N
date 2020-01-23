@@ -13,6 +13,7 @@ namespace J2N.Text
     ///     <item><description><see cref="float"/> and <see cref="double"/> negative zeros are displayed with the same rules as the
     ///         current culture's <see cref="NumberFormatInfo.NumberNegativePattern"/> and <see cref="NumberFormatInfo.NegativeSign"/>.</description></item>
     ///     <item><description><see cref="bool"/> values are lowercased to <c>true</c> and <c>false</c>, rather than the default .NET <c>True</c> and <c>False</c>.</description></item>
+    ///     <item><description>Collection and array types are formatted to display their values (and nested collection values).</description></item>
     /// </list>
     /// </summary>
 #if FEATURE_SERIALIZABLE
@@ -23,41 +24,95 @@ namespace J2N.Text
         /// <summary>
         /// Gets a <see cref="StringFormatter"/> that uses the culture from the current thread to format values.
         /// </summary>
-        public static StringFormatter CurrentCulture { get; } = new StringFormatter(CultureInfo.CurrentCulture);
+        public static StringFormatter CurrentCulture { get; } = new StringFormatter(CultureType.CurrentCulture);
 
         /// <summary>
         /// Gets a <see cref="StringFormatter"/> that uses the UI culture from the current thread to format values.
         /// </summary>
-        public static StringFormatter CurrentUICulture { get; } = new StringFormatter(CultureInfo.CurrentUICulture);
+        public static StringFormatter CurrentUICulture { get; } = new StringFormatter(CultureType.CurrentUICulture);
+
+        ///// <summary>
+        ///// Gets a <see cref="StringFormatter"/> that uses the default culture for threads in the current application domain to format values.
+        ///// </summary>
+        //public static StringFormatter DefaultThreadCurrentCulture { get; } = new StringFormatter(CultureType.DefaultThreadCurrentCulture);
+
+        ///// <summary>
+        ///// Gets a <see cref="StringFormatter"/> that uses the default UI culture for threads in the current application domain to format values.
+        ///// </summary>
+        //public static StringFormatter DefaultThreadCurrentUICulture { get; } = new StringFormatter(CultureType.DefaultThreadCurrentUICulture);
 
         /// <summary>
         /// Gets a <see cref="StringFormatter"/> that uses the invariant culture to format values.
         /// This is the default setting in Java.
         /// </summary>
-        public static StringFormatter InvariantCulture { get; } = new StringFormatter(CultureInfo.InvariantCulture);
+        public static StringFormatter InvariantCulture { get; } = new StringFormatter(CultureType.InvariantCulture);
 
         private readonly char[] cultureSymbol; // For deserialization
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private CultureInfo culture;
+        private CultureInfo culture; // not reaonly for deserialization
+        private readonly CultureType cultureType;
 
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/>.
         /// </summary>
         public StringFormatter()
-            : this(null)
+            : this(CultureType.CurrentCulture)
         { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/> with the specified <paramref name="culture"/>.
         /// </summary>
-        /// <param name="culture">A <see cref="CultureInfo"/> that specifies the culture-specific rules that will be used for formatting.
-        /// If <c>null</c>, the <see cref="CultureInfo.CurrentCulture"/> will be used.</param>
+        /// <param name="culture">A <see cref="CultureInfo"/> that specifies the culture-specific rules that will be used for formatting.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
         public StringFormatter(CultureInfo culture)
+            : this(CultureType.CustomCulture)
         {
-            this.culture = culture ?? CultureInfo.CurrentCulture;
+            this.culture = culture ?? throw new ArgumentNullException(nameof(culture));
             this.cultureSymbol = this.culture.Name.ToCharArray(); // For deserialization
+        }
+
+        internal StringFormatter(CultureType cultureType)
+        {
+            this.cultureType = cultureType;
+        }
+
+        /// <summary>
+        /// Gets the culture of the current instance.
+        /// </summary>
+        protected virtual CultureInfo Culture
+        {
+            get
+            {
+                switch (cultureType)
+                {
+                    case CultureType.CustomCulture:
+                        return culture;
+                    case CultureType.InvariantCulture:
+                        return CultureInfo.InvariantCulture;
+                    case CultureType.CurrentCulture:
+                        return CultureInfo.CurrentCulture;
+                    case CultureType.CurrentUICulture:
+                        return CultureInfo.CurrentUICulture;
+                    case CultureType.DefaultThreadCurrentCulture:
+                        return CultureInfo.DefaultThreadCurrentCulture;
+                    case CultureType.DefaultThreadCurrentUICulture:
+                        return CultureInfo.DefaultThreadCurrentUICulture;
+                    default:
+                        return CultureInfo.CurrentCulture;
+                }
+            }
+        }
+
+        internal enum CultureType
+        {
+            CurrentCulture,
+            CurrentUICulture,
+            DefaultThreadCurrentCulture,
+            DefaultThreadCurrentUICulture,
+            InvariantCulture,
+            CustomCulture
         }
 
         /// <summary>
@@ -102,9 +157,9 @@ namespace J2N.Text
             if (arg is null)
                 return "null";
             else if (arg is double d)
-                return FormatDouble(d, GetNumberFormatInfo(culture));
+                return FormatDouble(d, GetNumberFormatInfo(Culture));
             else if (arg is float f)
-                return FormatSingle(f, GetNumberFormatInfo(culture));
+                return FormatSingle(f, GetNumberFormatInfo(Culture));
             else if (arg is bool b)
                 return FormatBoolean(b);
 
@@ -194,7 +249,10 @@ namespace J2N.Text
         [System.Runtime.Serialization.OnDeserialized]
         internal void OnDeserializedMethod(System.Runtime.Serialization.StreamingContext context)
         {
-            this.culture = new CultureInfo(new string(this.cultureSymbol));
+            // We only need to deserialize custom cultures. Note that if it is not a built-in
+            // culture, this will fail.
+            if (cultureType == CultureType.CustomCulture)
+                this.culture = CultureInfo.GetCultureInfo(new string(this.cultureSymbol));
         }
 #endif
 
