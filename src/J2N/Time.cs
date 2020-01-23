@@ -8,6 +8,11 @@ namespace J2N
     public static class Time
     {
         /// <summary>
+        /// The number of milliseconds in one nanosecond.
+        /// </summary>
+        public const long MillisecondsPerNanosecond = 1000000;
+
+        /// <summary>
         /// Returns the current value of the running framework's high-resolution time source, in nanoseconds.
         /// <para/>
         /// This method can only be used to measure elapsed time and is not related to any other notion of system
