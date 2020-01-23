@@ -636,7 +636,7 @@ namespace J2N.IO
             rb.Rewind();
             b.Put(rb);
 
-            // LUCENENET: AllocateDirect not implemented
+            // J2N: AllocateDirect not implemented
 
             // For byte buffers, test both the direct and non-direct cases
             //ByteBuffer ob

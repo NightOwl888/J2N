@@ -72,25 +72,25 @@ namespace J2N.Text
             assertEquals("Incorrect token count returned", 5, st.CountTokens());
         }
 
-        ///**
-        // * @tests java.util.StringTokenizer#hasMoreElements()
-        // */
-        //[Test]
-        //public void test_hasMoreElements()
-        //{
-        //    // Test for method boolean java.util.StringTokenizer.hasMoreElements()
+        /////**
+        //// * @tests java.util.StringTokenizer#hasMoreElements()
+        //// */
+        ////[Test]
+        ////public void test_hasMoreElements()
+        ////{
+        ////    // Test for method boolean java.util.StringTokenizer.hasMoreElements()
 
-        //    StringTokenizer st = new StringTokenizer("This is a test String");
-        //    st.NextToken();
-        //    assertTrue("hasMoreElements returned incorrect value", st
-        //            .hasMoreElements());
-        //    st.NextToken();
-        //    st.NextToken();
-        //    st.NextToken();
-        //    st.NextToken();
-        //    assertTrue("hasMoreElements returned incorrect value", !st
-        //            .hasMoreElements());
-        //}
+        ////    StringTokenizer st = new StringTokenizer("This is a test String");
+        ////    st.NextToken();
+        ////    assertTrue("hasMoreElements returned incorrect value", st
+        ////            .hasMoreElements());
+        ////    st.NextToken();
+        ////    st.NextToken();
+        ////    st.NextToken();
+        ////    st.NextToken();
+        ////    assertTrue("hasMoreElements returned incorrect value", !st
+        ////            .hasMoreElements());
+        ////}
 
         /**
          * @tests java.util.StringTokenizer#hasMoreTokens()
@@ -111,36 +111,36 @@ namespace J2N.Text
                     !st.HasMoreTokens());
         }
 
-        ///**
-        // * @tests java.util.StringTokenizer#nextElement()
-        // */
-        //[Test]
-        //public void test_nextElement()
-        //{
-        //    // Test for method java.lang.Object
-        //    // java.util.StringTokenizer.nextElement()
-        //    StringTokenizer st = new StringTokenizer("This is a test String");
-        //    assertEquals("nextElement returned incorrect value", "This", ((String)st
-        //            .NextToken()));
-        //    assertEquals("nextElement returned incorrect value", "is", ((String)st
-        //            .NextToken()));
-        //    assertEquals("nextElement returned incorrect value", "a", ((String)st
-        //            .NextToken()));
-        //    assertEquals("nextElement returned incorrect value", "test", ((String)st
-        //            .NextToken()));
-        //    assertEquals("nextElement returned incorrect value", "String", ((String)st
-        //            .NextToken()));
-        //    try
-        //    {
-        //        st.NextToken();
-        //        fail(
-        //                "nextElement failed to throw a NoSuchElementException when it should have been out of elements");
-        //    }
-        //    catch (InvalidOperationException e)
-        //    {
-        //        return;
-        //    }
-        //}
+        /////**
+        //// * @tests java.util.StringTokenizer#nextElement()
+        //// */
+        ////[Test]
+        ////public void test_nextElement()
+        ////{
+        ////    // Test for method java.lang.Object
+        ////    // java.util.StringTokenizer.nextElement()
+        ////    StringTokenizer st = new StringTokenizer("This is a test String");
+        ////    assertEquals("nextElement returned incorrect value", "This", ((String)st
+        ////            .NextToken()));
+        ////    assertEquals("nextElement returned incorrect value", "is", ((String)st
+        ////            .NextToken()));
+        ////    assertEquals("nextElement returned incorrect value", "a", ((String)st
+        ////            .NextToken()));
+        ////    assertEquals("nextElement returned incorrect value", "test", ((String)st
+        ////            .NextToken()));
+        ////    assertEquals("nextElement returned incorrect value", "String", ((String)st
+        ////            .NextToken()));
+        ////    try
+        ////    {
+        ////        st.NextToken();
+        ////        fail(
+        ////                "nextElement failed to throw a NoSuchElementException when it should have been out of elements");
+        ////    }
+        ////    catch (InvalidOperationException e)
+        ////    {
+        ////        return;
+        ////    }
+        ////}
 
         /**
          * @tests java.util.StringTokenizer#nextToken()

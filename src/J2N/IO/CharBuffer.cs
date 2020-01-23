@@ -108,7 +108,7 @@ namespace J2N.IO
             if (characterSequence == null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
-            return new CharSequenceAdapter(characterSequence.ToCharSequence()); // J2N TODO: Create StringAdapter?
+            return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringAdapter?
         }
 
         /// <summary>
@@ -148,7 +148,7 @@ namespace J2N.IO
             if ((long)startIndex + (long)length > len)
                 throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(characterSequence.Length)}");
 
-            return new CharSequenceAdapter(characterSequence.ToCharSequence()) // J2N TODO: Create StringAdapter?
+            return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
             {
                 position = startIndex,
                 limit = startIndex + length
@@ -169,7 +169,7 @@ namespace J2N.IO
             if (characterSequence == null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
-            return new CharSequenceAdapter(characterSequence.ToCharSequence()); // J2N TODO: Create StringBuilderAdapter?
+            return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringBuilderAdapter?
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace J2N.IO
             if ((long)startIndex + (long)length > len)
                 throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(characterSequence.Length)}");
 
-            return new CharSequenceAdapter(characterSequence.ToCharSequence()) // J2N TODO: Create StringAdapter?
+            return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
             {
                 position = startIndex,
                 limit = startIndex + length
@@ -1075,7 +1075,7 @@ namespace J2N.IO
         {
             if (value == null)
             {
-                value = "null".ToCharSequence(); //$NON-NLS-1$
+                value = "null".AsCharSequence(); //$NON-NLS-1$
             }
             ICharSequence cs = value.Subsequence(startIndex, count);
             if (cs.Length > 0)

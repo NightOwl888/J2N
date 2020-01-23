@@ -42,7 +42,7 @@ namespace J2N.IO
             string s = "A test string to test with.";
             char[] ca = s.ToCharArray();
             StringBuilder sb = new StringBuilder(s);
-            ICharSequence cs = s.ToCharSequence();
+            ICharSequence cs = s.AsCharSequence();
 
             // Control - char[] was part of the original Java implementation
             // and used length rather than end index. So we will check that our conversion
@@ -1122,7 +1122,7 @@ namespace J2N.IO
         public virtual void TestAppendOverFlow()
         {
             CharBuffer cb = CharBuffer.Allocate(1);
-            ICharSequence cs = "String".ToCharSequence();
+            ICharSequence cs = "String".AsCharSequence();
             cb.Put('A');
             try
             {
@@ -1157,7 +1157,7 @@ namespace J2N.IO
         public virtual void TestReadOnlyMap()
         {
             CharBuffer cb = CharBuffer.Wrap("ABCDE").AsReadOnlyBuffer();
-            ICharSequence cs = "String".ToCharSequence();
+            ICharSequence cs = "String".AsCharSequence();
             try
             {
                 cb.Append('A');
@@ -1435,7 +1435,7 @@ namespace J2N.IO
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
-            assertSame(cb, cb.Append("String".ToCharSequence()));
+            assertSame(cb, cb.Append("String".AsCharSequence()));
             assertEquals("AString", cb.Flip().ToString());
             cb.Append((ICharSequence)null);
             assertEquals("null", cb.Flip().ToString());
@@ -1446,7 +1446,7 @@ namespace J2N.IO
         {
             CharBuffer cb = CharBuffer.Allocate(10);
             cb.Put('A');
-            assertSame(cb, cb.Append("String".ToCharSequence(), 1, 3 - 1)); // J2N: end - start
+            assertSame(cb, cb.Append("String".AsCharSequence(), 1, 3 - 1)); // J2N: end - start
             assertEquals("Atr", cb.Flip().ToString());
 
             cb.Append((ICharSequence)null, 0, 1 - 0); // J2N: end - start
@@ -1457,11 +1457,11 @@ namespace J2N.IO
         public virtual void TestAppendCharSequenceII_IllegalArgument()
         {
             CharBuffer cb = CharBuffer.Allocate(10);
-            cb.Append("String".ToCharSequence(), 0, 0 - 0); // J2N: end - start
-            cb.Append("String".ToCharSequence(), 2, 2 - 2); // J2N: end - start
+            cb.Append("String".AsCharSequence(), 0, 0 - 0); // J2N: end - start
+            cb.Append("String".AsCharSequence(), 2, 2 - 2); // J2N: end - start
             try
             {
-                cb.Append("String".ToCharSequence(), -1, 1 - -1); // J2N: end - start
+                cb.Append("String".AsCharSequence(), -1, 1 - -1); // J2N: end - start
                 fail("should throw IndexOutOfBoundsException.");
             }
             catch (ArgumentOutOfRangeException ex)
@@ -1470,7 +1470,7 @@ namespace J2N.IO
             }
             try
             {
-                cb.Append("String".ToCharSequence(), -1, -1 - -1); // J2N: end - start
+                cb.Append("String".AsCharSequence(), -1, -1 - -1); // J2N: end - start
                 fail("should throw IndexOutOfBoundsException.");
             }
             catch (ArgumentOutOfRangeException ex)
@@ -1479,7 +1479,7 @@ namespace J2N.IO
             }
             try
             {
-                cb.Append("String".ToCharSequence(), 3, 2 - 3); // J2N: end - start
+                cb.Append("String".AsCharSequence(), 3, 2 - 3); // J2N: end - start
                 fail("should throw IndexOutOfBoundsException.");
             }
             catch (ArgumentOutOfRangeException ex)
@@ -1488,7 +1488,7 @@ namespace J2N.IO
             }
             try
             {
-                cb.Append("String".ToCharSequence(), 3, 0 - 3); // J2N: end - start
+                cb.Append("String".AsCharSequence(), 3, 0 - 3); // J2N: end - start
                 fail("should throw IndexOutOfBoundsException.");
             }
             catch (ArgumentOutOfRangeException ex)
@@ -1497,7 +1497,7 @@ namespace J2N.IO
             }
             try
             {
-                cb.Append("String".ToCharSequence(), 3, 110 - 3); // J2N: end - start
+                cb.Append("String".AsCharSequence(), 3, 110 - 3); // J2N: end - start
                 fail("should throw IndexOutOfBoundsException.");
             }
             catch (ArgumentOutOfRangeException ex)

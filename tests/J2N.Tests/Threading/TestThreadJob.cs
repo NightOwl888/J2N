@@ -191,45 +191,45 @@ namespace J2N.Threading
 
         static bool calledMySecurityManager = false;
 
-        ///**
-        // * @tests java.lang.Thread#Thread()
-        // */
-        //[Test]
-        //public void Test_Constructor()
-        //{
-        //    // Test for method java.lang.Thread()
+        /////**
+        //// * @tests java.lang.Thread#Thread()
+        //// */
+        ////[Test]
+        ////public void Test_Constructor()
+        ////{
+        ////    // Test for method java.lang.Thread()
 
-        //    ThreadRun t = new ThreadRun();
-        //    //    SecurityManager m = new SecurityManager() {
-        //    //            @Override
-        //    //            public ThreadGroup getThreadGroup()
-        //    //    {
-        //    //        calledMySecurityManager = true;
-        //    //        return Thread.currentThread().getThreadGroup();
-        //    //    }
+        ////    ThreadRun t = new ThreadRun();
+        ////    //    SecurityManager m = new SecurityManager() {
+        ////    //            @Override
+        ////    //            public ThreadGroup getThreadGroup()
+        ////    //    {
+        ////    //        calledMySecurityManager = true;
+        ////    //        return Thread.currentThread().getThreadGroup();
+        ////    //    }
 
-        //    //    @Override
-        //    //            public void checkPermission(Permission permission)
-        //    //    {
-        //    //        if (permission.getName().equals("setSecurityManager"))
-        //    //        {
-        //    //            return;
-        //    //        }
-        //    //        super.checkPermission(permission);
-        //    //    }
-        //    //};
-        //    //		try {
-        //    //			// To see if it checks Thread creation with our SecurityManager
-        //    //			System.setSecurityManager(m);
-        //    //			t = new Thread();
-        //    //		} finally {
-        //    //			// restore original, no side-effects
-        //    //			System.setSecurityManager(null);
-        //    //		}
-        //    //		assertTrue("Did not call SecurityManager.getThreadGroup ()",
-        //    //                calledMySecurityManager);
-        //    t.Start();
-        //}
+        ////    //    @Override
+        ////    //            public void checkPermission(Permission permission)
+        ////    //    {
+        ////    //        if (permission.getName().equals("setSecurityManager"))
+        ////    //        {
+        ////    //            return;
+        ////    //        }
+        ////    //        super.checkPermission(permission);
+        ////    //    }
+        ////    //};
+        ////    //		try {
+        ////    //			// To see if it checks Thread creation with our SecurityManager
+        ////    //			System.setSecurityManager(m);
+        ////    //			t = new Thread();
+        ////    //		} finally {
+        ////    //			// restore original, no side-effects
+        ////    //			System.setSecurityManager(null);
+        ////    //		}
+        ////    //		assertTrue("Did not call SecurityManager.getThreadGroup ()",
+        ////    //                calledMySecurityManager);
+        ////    t.Start();
+        ////}
 
         /**
          * @tests java.lang.Thread#Thread(java.lang.Runnable)
@@ -271,149 +271,149 @@ namespace J2N.Threading
             t.Start();
         }
 
-        ///**
-        // * @tests java.lang.Thread#Thread(java.lang.ThreadGroup, java.lang.Runnable)
-        // */
-        //[Test]
-        //public void Test_ConstructorLjava_lang_ThreadGroupLjava_lang_Runnable()
-        //{
-        //    // Test for method java.lang.Thread(java.lang.ThreadGroup,
-        //    // java.lang.Runnable)
-        //    ThreadGroup tg = new ThreadGroup("Test Group1");
-        //    st = new Thread(tg, new SimpleThread(1), "SimpleThread2");
-        //    assertTrue("Returned incorrect thread group", st.getThreadGroup() == tg);
-        //    st.start();
-        //    try
-        //    {
-        //        st.join();
-        //    }
-        //    catch (InterruptedException e)
-        //    {
-        //    }
-        //    tg.destroy();
-        //}
+        /////**
+        //// * @tests java.lang.Thread#Thread(java.lang.ThreadGroup, java.lang.Runnable)
+        //// */
+        ////[Test]
+        ////public void Test_ConstructorLjava_lang_ThreadGroupLjava_lang_Runnable()
+        ////{
+        ////    // Test for method java.lang.Thread(java.lang.ThreadGroup,
+        ////    // java.lang.Runnable)
+        ////    ThreadGroup tg = new ThreadGroup("Test Group1");
+        ////    st = new Thread(tg, new SimpleThread(1), "SimpleThread2");
+        ////    assertTrue("Returned incorrect thread group", st.getThreadGroup() == tg);
+        ////    st.start();
+        ////    try
+        ////    {
+        ////        st.join();
+        ////    }
+        ////    catch (InterruptedException e)
+        ////    {
+        ////    }
+        ////    tg.destroy();
+        ////}
 
-        ///**
-        // * @tests java.lang.Thread#Thread(java.lang.ThreadGroup, java.lang.Runnable,
-        // *        java.lang.String)
-        // */
-        //[Test]
-        //public void Test_ConstructorLjava_lang_ThreadGroupLjava_lang_RunnableLjava_lang_String()
-        //{
-        //    // Test for method java.lang.Thread(java.lang.ThreadGroup,
-        //    // java.lang.Runnable, java.lang.String)
-        //    ThreadGroup tg = new ThreadGroup("Test Group2");
-        //    st = new Thread(tg, new SimpleThread(1), "SimpleThread3");
-        //    assertTrue("Constructed incorrect thread", (st.getThreadGroup() == tg)
-        //            && st.getName().equals("SimpleThread3"));
-        //    st.start();
-        //    try
-        //    {
-        //        st.join();
-        //    }
-        //    catch (InterruptedException e)
-        //    {
-        //    }
-        //    tg.destroy();
+        /////**
+        //// * @tests java.lang.Thread#Thread(java.lang.ThreadGroup, java.lang.Runnable,
+        //// *        java.lang.String)
+        //// */
+        ////[Test]
+        ////public void Test_ConstructorLjava_lang_ThreadGroupLjava_lang_RunnableLjava_lang_String()
+        ////{
+        ////    // Test for method java.lang.Thread(java.lang.ThreadGroup,
+        ////    // java.lang.Runnable, java.lang.String)
+        ////    ThreadGroup tg = new ThreadGroup("Test Group2");
+        ////    st = new Thread(tg, new SimpleThread(1), "SimpleThread3");
+        ////    assertTrue("Constructed incorrect thread", (st.getThreadGroup() == tg)
+        ////            && st.getName().equals("SimpleThread3"));
+        ////    st.start();
+        ////    try
+        ////    {
+        ////        st.join();
+        ////    }
+        ////    catch (InterruptedException e)
+        ////    {
+        ////    }
+        ////    tg.destroy();
 
-        //    Runnable r = new Runnable()
-        //    {
+        ////    Runnable r = new Runnable()
+        ////    {
 
-        //            public void run()
-        //    {
-        //    }
-        //};
+        ////            public void run()
+        ////    {
+        ////    }
+        ////};
 
-        //ThreadGroup foo = null;
-        //		try {
-        //			new Thread(foo = new ThreadGroup("foo"), r, null);
-        //// Should not get here
-        //fail("Null cannot be accepted as Thread name");
-        //		} catch (NullPointerException npe) {
-        //			assertTrue("Null cannot be accepted as Thread name", true);
-        //foo.destroy();
-        //		}
+        ////ThreadGroup foo = null;
+        ////		try {
+        ////			new Thread(foo = new ThreadGroup("foo"), r, null);
+        ////// Should not get here
+        ////fail("Null cannot be accepted as Thread name");
+        ////		} catch (NullPointerException npe) {
+        ////			assertTrue("Null cannot be accepted as Thread name", true);
+        ////foo.destroy();
+        ////		}
 
-        //	}
+        ////	}
 
-        //	/**
-        //	 * @tests java.lang.Thread#Thread(java.lang.ThreadGroup, java.lang.String)
-        //	 */
-        //[Test]
-        //	public void Test_ConstructorLjava_lang_ThreadGroupLjava_lang_String()
-        //{
-        //    // Test for method java.lang.Thread(java.lang.ThreadGroup,
-        //    // java.lang.String)
-        //    st = new Thread(new SimpleThread(1), "SimpleThread4");
-        //    assertEquals("Returned incorrect thread name",
-        //            "SimpleThread4", st.getName());
-        //    st.start();
-        //}
+        ////	/**
+        ////	 * @tests java.lang.Thread#Thread(java.lang.ThreadGroup, java.lang.String)
+        ////	 */
+        ////[Test]
+        ////	public void Test_ConstructorLjava_lang_ThreadGroupLjava_lang_String()
+        ////{
+        ////    // Test for method java.lang.Thread(java.lang.ThreadGroup,
+        ////    // java.lang.String)
+        ////    st = new Thread(new SimpleThread(1), "SimpleThread4");
+        ////    assertEquals("Returned incorrect thread name",
+        ////            "SimpleThread4", st.getName());
+        ////    st.start();
+        ////}
 
-        ///**
-        // * @tests java.lang.Thread#activeCount()
-        // */
-        //[Test]
-        //public void Test_activeCount()
-        //{
-        //            // Test for method int java.lang.Thread.activeCount()
-        //            ThreadRun t = new ThreadRun(() => new SimpleThread(10).Run());
-        //    int active = 0;
-        //    lock(t) {
-        //        t.Start();
-        //        active = ThreadRun.ActiveCount;
-        //    }
-        //    assertTrue("Incorrect activeCount for current group: " + active, active > 1);
-        //    try
-        //    {
-        //        t.Join();
-        //    }
-        //    catch (ThreadInterruptedException e)
-        //    {
-        //    }
-        //}
+        /////**
+        //// * @tests java.lang.Thread#activeCount()
+        //// */
+        ////[Test]
+        ////public void Test_activeCount()
+        ////{
+        ////            // Test for method int java.lang.Thread.activeCount()
+        ////            ThreadRun t = new ThreadRun(() => new SimpleThread(10).Run());
+        ////    int active = 0;
+        ////    lock(t) {
+        ////        t.Start();
+        ////        active = ThreadRun.ActiveCount;
+        ////    }
+        ////    assertTrue("Incorrect activeCount for current group: " + active, active > 1);
+        ////    try
+        ////    {
+        ////        t.Join();
+        ////    }
+        ////    catch (ThreadInterruptedException e)
+        ////    {
+        ////    }
+        ////}
 
-        ///**
-        // * @tests java.lang.Thread#checkAccess()
-        // */
-        //[Test]
-        //public void Test_checkAccess()
-        //{
-        //    // Test for method void java.lang.Thread.checkAccess()
-        //    ThreadGroup tg = new ThreadGroup("Test Group3");
-        //    try
-        //    {
-        //        st = new Thread(tg, new SimpleThread(1), "SimpleThread5");
-        //        st.checkAccess();
-        //        assertTrue("CheckAccess passed", true);
-        //    }
-        //    catch (SecurityException e)
-        //    {
-        //        fail("CheckAccess failed : " + e.getMessage());
-        //    }
-        //    st.start();
-        //    try
-        //    {
-        //        st.join();
-        //    }
-        //    catch (InterruptedException e)
-        //    {
-        //    }
-        //    tg.destroy();
-        //}
+        /////**
+        //// * @tests java.lang.Thread#checkAccess()
+        //// */
+        ////[Test]
+        ////public void Test_checkAccess()
+        ////{
+        ////    // Test for method void java.lang.Thread.checkAccess()
+        ////    ThreadGroup tg = new ThreadGroup("Test Group3");
+        ////    try
+        ////    {
+        ////        st = new Thread(tg, new SimpleThread(1), "SimpleThread5");
+        ////        st.checkAccess();
+        ////        assertTrue("CheckAccess passed", true);
+        ////    }
+        ////    catch (SecurityException e)
+        ////    {
+        ////        fail("CheckAccess failed : " + e.getMessage());
+        ////    }
+        ////    st.start();
+        ////    try
+        ////    {
+        ////        st.join();
+        ////    }
+        ////    catch (InterruptedException e)
+        ////    {
+        ////    }
+        ////    tg.destroy();
+        ////}
 
-        ///**
-        // * @tests java.lang.Thread#countStackFrames()
-        // */
-        //[Test]
-        //    public void Test_countStackFrames()
-        //{
-        //    /*
-        //     * Thread.countStackFrames() is unpredictable, so we just test that it
-        //     * doesn't throw an exception.
-        //     */
-        //    Thread.currentThread().countStackFrames();
-        //}
+        /////**
+        //// * @tests java.lang.Thread#countStackFrames()
+        //// */
+        ////[Test]
+        ////    public void Test_countStackFrames()
+        ////{
+        ////    /*
+        ////     * Thread.countStackFrames() is unpredictable, so we just test that it
+        ////     * doesn't throw an exception.
+        ////     */
+        ////    Thread.currentThread().countStackFrames();
+        ////}
 
         /**
          * @tests java.lang.Thread#currentThread()
@@ -424,141 +424,141 @@ namespace J2N.Threading
             assertNotNull(ThreadJob.CurrentThread);
         }
 
-        ///**
-        // * @tests java.lang.Thread#destroy()
-        // */
-        //[Test]
-        //    public void Test_destroy()
-        //{
-        //    try
-        //    {
-        //        new ThreadRun().destroy();
-        //        // FIXME uncomment when IBM VME is updated
-        //        //fail("NoSuchMethodError was not thrown");
-        //    }
-        //    catch (NoSuchMethodError e)
-        //    {
-        //    }
-        //}
+        /////**
+        //// * @tests java.lang.Thread#destroy()
+        //// */
+        ////[Test]
+        ////    public void Test_destroy()
+        ////{
+        ////    try
+        ////    {
+        ////        new ThreadRun().destroy();
+        ////        // FIXME uncomment when IBM VME is updated
+        ////        //fail("NoSuchMethodError was not thrown");
+        ////    }
+        ////    catch (NoSuchMethodError e)
+        ////    {
+        ////    }
+        ////}
 
-        ///**
-        // * @tests java.lang.Thread#enumerate(java.lang.Thread[])
-        // */
-        //[Test]
-        //public void Test_enumerate_Ljava_lang_Thread()
-        //{
-        //        // Test for method int java.lang.Thread.enumerate(java.lang.Thread [])
-        //        // The test has been updated according to HARMONY-1974 JIRA issue.
+        /////**
+        //// * @tests java.lang.Thread#enumerate(java.lang.Thread[])
+        //// */
+        ////[Test]
+        ////public void Test_enumerate_Ljava_lang_Thread()
+        ////{
+        ////        // Test for method int java.lang.Thread.enumerate(java.lang.Thread [])
+        ////        // The test has been updated according to HARMONY-1974 JIRA issue.
 
-        //class MyThread : ThreadRun
-        //        {
-        //    MyThread(ThreadGroup tg, String name) {
-        //        super(tg, name);
-        //    }
+        ////class MyThread : ThreadRun
+        ////        {
+        ////    MyThread(ThreadGroup tg, String name) {
+        ////        super(tg, name);
+        ////    }
 
-        //    boolean failed = false;
-        //    String failMessage = null;
+        ////    boolean failed = false;
+        ////    String failMessage = null;
 
-        //            public void run()
-        //{
-        //    SimpleThread st1 = null;
-        //    SimpleThread st2 = null;
-        //    ThreadGroup mytg = null;
-        //    Thread firstOne = null;
-        //    Thread secondOne = null;
-        //    try
-        //    {
-        //        int arrayLength = 10;
-        //        Thread[] tarray = new Thread[arrayLength];
-        //        st1 = new SimpleThread(-1);
-        //        st2 = new SimpleThread(-1);
-        //        mytg = new ThreadGroup("jp");
-        //        firstOne = new Thread(mytg, st1, "firstOne2");
-        //        secondOne = new Thread(mytg, st2, "secondOne1");
-        //        int count = Thread.enumerate(tarray);
-        //        assertEquals("Incorrect value returned1",
-        //                1, count);
-        //        synchronized(st1) {
-        //            firstOne.start();
-        //            try
-        //            {
-        //                st1.wait();
-        //            }
-        //            catch (InterruptedException e)
-        //            {
-        //            }
-        //        }
-        //        count = Thread.enumerate(tarray);
-        //        assertEquals("Incorrect value returned2",
-        //                2, count);
-        //        synchronized(st2) {
-        //            secondOne.start();
-        //            try
-        //            {
-        //                st2.wait();
-        //            }
-        //            catch (InterruptedException e)
-        //            {
-        //            }
-        //        }
-        //        count = Thread.enumerate(tarray);
-        //        assertEquals("Incorrect value returned3",
-        //                3, count);
-        //    }
-        //    catch (junit.framework.AssertionFailedError e)
-        //    {
-        //        failed = true;
-        //        failMessage = e.getMessage();
-        //    }
-        //    finally
-        //    {
-        //        synchronized(st1) {
-        //            firstOne.interrupt();
-        //        }
-        //        synchronized(st2) {
-        //            secondOne.interrupt();
-        //        }
-        //        try
-        //        {
-        //            firstOne.join();
-        //            secondOne.join();
-        //        }
-        //        catch (InterruptedException e)
-        //        {
-        //        }
-        //        mytg.destroy();
-        //    }
-        //}
-        //        };
+        ////            public void run()
+        ////{
+        ////    SimpleThread st1 = null;
+        ////    SimpleThread st2 = null;
+        ////    ThreadGroup mytg = null;
+        ////    Thread firstOne = null;
+        ////    Thread secondOne = null;
+        ////    try
+        ////    {
+        ////        int arrayLength = 10;
+        ////        Thread[] tarray = new Thread[arrayLength];
+        ////        st1 = new SimpleThread(-1);
+        ////        st2 = new SimpleThread(-1);
+        ////        mytg = new ThreadGroup("jp");
+        ////        firstOne = new Thread(mytg, st1, "firstOne2");
+        ////        secondOne = new Thread(mytg, st2, "secondOne1");
+        ////        int count = Thread.enumerate(tarray);
+        ////        assertEquals("Incorrect value returned1",
+        ////                1, count);
+        ////        synchronized(st1) {
+        ////            firstOne.start();
+        ////            try
+        ////            {
+        ////                st1.wait();
+        ////            }
+        ////            catch (InterruptedException e)
+        ////            {
+        ////            }
+        ////        }
+        ////        count = Thread.enumerate(tarray);
+        ////        assertEquals("Incorrect value returned2",
+        ////                2, count);
+        ////        synchronized(st2) {
+        ////            secondOne.start();
+        ////            try
+        ////            {
+        ////                st2.wait();
+        ////            }
+        ////            catch (InterruptedException e)
+        ////            {
+        ////            }
+        ////        }
+        ////        count = Thread.enumerate(tarray);
+        ////        assertEquals("Incorrect value returned3",
+        ////                3, count);
+        ////    }
+        ////    catch (junit.framework.AssertionFailedError e)
+        ////    {
+        ////        failed = true;
+        ////        failMessage = e.getMessage();
+        ////    }
+        ////    finally
+        ////    {
+        ////        synchronized(st1) {
+        ////            firstOne.interrupt();
+        ////        }
+        ////        synchronized(st2) {
+        ////            secondOne.interrupt();
+        ////        }
+        ////        try
+        ////        {
+        ////            firstOne.join();
+        ////            secondOne.join();
+        ////        }
+        ////        catch (InterruptedException e)
+        ////        {
+        ////        }
+        ////        mytg.destroy();
+        ////    }
+        ////}
+        ////        };
 
-        //        ThreadGroup tg = new ThreadGroup("tg");
-        //MyThread t = new MyThread(tg, "top");
-        //t.start();
-        //        try {
-        //            t.join();
-        //        } catch (InterruptedException e) {
-        //            fail("Unexpected interrupt");
-        //        } finally {
-        //            tg.destroy();
-        //        }
-        //        assertFalse(t.failMessage, t.failed);
-        //    }
+        ////        ThreadGroup tg = new ThreadGroup("tg");
+        ////MyThread t = new MyThread(tg, "top");
+        ////t.start();
+        ////        try {
+        ////            t.join();
+        ////        } catch (InterruptedException e) {
+        ////            fail("Unexpected interrupt");
+        ////        } finally {
+        ////            tg.destroy();
+        ////        }
+        ////        assertFalse(t.failMessage, t.failed);
+        ////    }
 
-        //	/**
-        //	 * @tests java.lang.Thread#getContextClassLoader()
-        //	 */
-        //[Test]
-        //	public void Test_getContextClassLoader()
-        //{
-        //    // Test for method java.lang.ClassLoader
-        //    // java.lang.Thread.getContextClassLoader()
-        //    Thread t = new Thread();
-        //    assertTrue("Incorrect class loader returned",
-        //            t.getContextClassLoader() == Thread.currentThread()
-        //                    .getContextClassLoader());
-        //    t.start();
+        ////	/**
+        ////	 * @tests java.lang.Thread#getContextClassLoader()
+        ////	 */
+        ////[Test]
+        ////	public void Test_getContextClassLoader()
+        ////{
+        ////    // Test for method java.lang.ClassLoader
+        ////    // java.lang.Thread.getContextClassLoader()
+        ////    Thread t = new Thread();
+        ////    assertTrue("Incorrect class loader returned",
+        ////            t.getContextClassLoader() == Thread.currentThread()
+        ////                    .getContextClassLoader());
+        ////    t.start();
 
-        //}
+        ////}
 
         /**
          * @tests java.lang.Thread#getName()
@@ -589,57 +589,57 @@ namespace J2N.Threading
         }
 #endif
 
-        ///**
-        // * @tests java.lang.Thread#getThreadGroup()
-        // */
-        //[Test]
-        //public void Test_getThreadGroup()
-        //{
-        //    // Test for method java.lang.ThreadGroup
-        //    // java.lang.Thread.getThreadGroup()
-        //    ThreadGroup tg = new ThreadGroup("Test Group4");
-        //    st = new Thread(tg, new SimpleThread(1), "SimpleThread8");
-        //    assertTrue("Returned incorrect thread group", st.getThreadGroup() == tg);
-        //    st.start();
-        //    try
-        //    {
-        //        st.join();
-        //    }
-        //    catch (InterruptedException e)
-        //    {
-        //    }
-        //    assertNull("group should be null", st.getThreadGroup());
-        //    assertNotNull("toString() should not be null", st.toString());
-        //    tg.destroy();
+        /////**
+        //// * @tests java.lang.Thread#getThreadGroup()
+        //// */
+        ////[Test]
+        ////public void Test_getThreadGroup()
+        ////{
+        ////    // Test for method java.lang.ThreadGroup
+        ////    // java.lang.Thread.getThreadGroup()
+        ////    ThreadGroup tg = new ThreadGroup("Test Group4");
+        ////    st = new Thread(tg, new SimpleThread(1), "SimpleThread8");
+        ////    assertTrue("Returned incorrect thread group", st.getThreadGroup() == tg);
+        ////    st.start();
+        ////    try
+        ////    {
+        ////        st.join();
+        ////    }
+        ////    catch (InterruptedException e)
+        ////    {
+        ////    }
+        ////    assertNull("group should be null", st.getThreadGroup());
+        ////    assertNotNull("toString() should not be null", st.toString());
+        ////    tg.destroy();
 
-        //    final Object lock = new Object();
-        //    Thread t = new Thread() {
-        //            @Override
-        //            public void run()
-        //    {
-        //        synchronized(lock)
-        //        {
-        //            lock.notifyAll();
-        //        }
-        //    }
-        //};
-        //synchronized(lock)
-        //{
-        //    t.start();
-        //    try
-        //    {
-        //        lock.wait();
-        //    }
-        //    catch (InterruptedException e)
-        //    {
-        //    }
-        //}
-        //int running = 0;
-        //		while (t.isAlive())
-        //			running++;
-        //		ThreadGroup group = t.getThreadGroup();
-        //assertNull("ThreadGroup is not null", group);
-        //	}
+        ////    final Object lock = new Object();
+        ////    Thread t = new Thread() {
+        ////            @Override
+        ////            public void run()
+        ////    {
+        ////        synchronized(lock)
+        ////        {
+        ////            lock.notifyAll();
+        ////        }
+        ////    }
+        ////};
+        ////synchronized(lock)
+        ////{
+        ////    t.start();
+        ////    try
+        ////    {
+        ////        lock.wait();
+        ////    }
+        ////    catch (InterruptedException e)
+        ////    {
+        ////    }
+        ////}
+        ////int running = 0;
+        ////		while (t.isAlive())
+        ////			running++;
+        ////		ThreadGroup group = t.getThreadGroup();
+        ////assertNull("ThreadGroup is not null", group);
+        ////	}
 
         internal class ChildThread1 : ThreadJob
         {
@@ -1341,204 +1341,204 @@ namespace J2N.Threading
 #endif
         }
 
-        ///**
-        // * @tests java.lang.Thread#stop()
-        // */
-        //[Test]
-        //public void Test_stop()
-        //{
-        //    // Test for method void java.lang.Thread.stop()
-        //    try
-        //    {
-        //        var r = new ResSupThread(null);
-        //        lock (r)
-        //        {
-        //            st = new ThreadRun(r, "Interupt Test5");
-        //            st.Start();
-        //            // r.wait();
-        //            Monitor.Wait(r);
-        //        }
+        /////**
+        //// * @tests java.lang.Thread#stop()
+        //// */
+        ////[Test]
+        ////public void Test_stop()
+        ////{
+        ////    // Test for method void java.lang.Thread.stop()
+        ////    try
+        ////    {
+        ////        var r = new ResSupThread(null);
+        ////        lock (r)
+        ////        {
+        ////            st = new ThreadRun(r, "Interupt Test5");
+        ////            st.Start();
+        ////            // r.wait();
+        ////            Monitor.Wait(r);
+        ////        }
 
-        //    }
-        //    catch (ThreadInterruptedException e)
-        //    {
-        //        fail("Unexpected interrupt received");
-        //    }
-        //    st.stop();
+        ////    }
+        ////    catch (ThreadInterruptedException e)
+        ////    {
+        ////        fail("Unexpected interrupt received");
+        ////    }
+        ////    st.stop();
 
-        //    try
-        //    {
-        //        st.Join(10000);
-        //    }
-        //    catch (ThreadInterruptedException e1)
-        //    {
-        //        st.Interrupt();
-        //        fail("Failed to stopThread before 10000 timeout");
-        //    }
-        //    assertTrue("Failed to stopThread", !st.IsAlive);
-        //}
+        ////    try
+        ////    {
+        ////        st.Join(10000);
+        ////    }
+        ////    catch (ThreadInterruptedException e1)
+        ////    {
+        ////        st.Interrupt();
+        ////        fail("Failed to stopThread before 10000 timeout");
+        ////    }
+        ////    assertTrue("Failed to stopThread", !st.IsAlive);
+        ////}
 
-        ///**
-        // * @tests java.lang.Thread#stop()
-        // */
-        //[Test]
-        //    public void Test_stop_subtest0()
-        //{
-        //    Thread t = new Thread("t");
+        /////**
+        //// * @tests java.lang.Thread#stop()
+        //// */
+        ////[Test]
+        ////    public void Test_stop_subtest0()
+        ////{
+        ////    Thread t = new Thread("t");
 
-        //        class MySecurityManager extends SecurityManager
-        //{
+        ////        class MySecurityManager extends SecurityManager
+        ////{
 
-        //            public bool intest = false;
+        ////            public bool intest = false;
 
-        //@Override
-        //            public void checkAccess(Thread t)
-        //{
-        //    if (intest)
-        //    {
-        //        fail("checkAccess called");
-        //    }
-        //}
-        //@Override
-        //            public void checkPermission(Permission permission)
-        //{
-        //    if (permission.getName().equals("setSecurityManager"))
-        //    {
-        //        return;
-        //    }
-        //    super.checkPermission(permission);
-        //}
-        //		}
-        //		MySecurityManager sm = new MySecurityManager();
-        //System.setSecurityManager(sm);
-        //		try {
-        //			sm.intest = true;
-        //			try {
-        //				t.stop();
-        //				// Ignore any SecurityExceptions, may not have stopThread
-        //				// permission
-        //			} catch (SecurityException e) {
-        //			}
-        //			sm.intest = false;
-        //			t.start();
-        //			try {
-        //				t.join(2000);
-        //			} catch (InterruptedException e) {
-        //			}
-        //			sm.intest = true;
-        //			try {
-        //				t.stop();
-        //				// Ignore any SecurityExceptions, may not have stopThread
-        //				// permission
-        //			} catch (SecurityException e) {
-        //			}
-        //			sm.intest = false;
-        //		} finally {
-        //			System.setSecurityManager(null);
-        //		}
-        //	}
+        ////@Override
+        ////            public void checkAccess(Thread t)
+        ////{
+        ////    if (intest)
+        ////    {
+        ////        fail("checkAccess called");
+        ////    }
+        ////}
+        ////@Override
+        ////            public void checkPermission(Permission permission)
+        ////{
+        ////    if (permission.getName().equals("setSecurityManager"))
+        ////    {
+        ////        return;
+        ////    }
+        ////    super.checkPermission(permission);
+        ////}
+        ////		}
+        ////		MySecurityManager sm = new MySecurityManager();
+        ////System.setSecurityManager(sm);
+        ////		try {
+        ////			sm.intest = true;
+        ////			try {
+        ////				t.stop();
+        ////				// Ignore any SecurityExceptions, may not have stopThread
+        ////				// permission
+        ////			} catch (SecurityException e) {
+        ////			}
+        ////			sm.intest = false;
+        ////			t.start();
+        ////			try {
+        ////				t.join(2000);
+        ////			} catch (InterruptedException e) {
+        ////			}
+        ////			sm.intest = true;
+        ////			try {
+        ////				t.stop();
+        ////				// Ignore any SecurityExceptions, may not have stopThread
+        ////				// permission
+        ////			} catch (SecurityException e) {
+        ////			}
+        ////			sm.intest = false;
+        ////		} finally {
+        ////			System.setSecurityManager(null);
+        ////		}
+        ////	}
 
-        //	/**
-        //	 * @tests java.lang.Thread#stop(java.lang.Throwable)
-        //	 */
-        //[Test]
-        //	@SuppressWarnings("deprecation")
-        //    public void Test_stopLjava_lang_Throwable_subtest0()
-        //{
-        //    Thread t = new Thread("t");
+        ////	/**
+        ////	 * @tests java.lang.Thread#stop(java.lang.Throwable)
+        ////	 */
+        ////[Test]
+        ////	@SuppressWarnings("deprecation")
+        ////    public void Test_stopLjava_lang_Throwable_subtest0()
+        ////{
+        ////    Thread t = new Thread("t");
 
-        //        class MySecurityManager extends SecurityManager
-        //{
+        ////        class MySecurityManager extends SecurityManager
+        ////{
 
-        //            public boolean intest = false;
+        ////            public boolean intest = false;
 
-        //public boolean checkAccess = false;
+        ////public boolean checkAccess = false;
 
-        //@Override
-        //            public void checkAccess(Thread t)
-        //{
-        //    if (intest)
-        //    {
-        //        checkAccess = true;
-        //    }
-        //}
-        //@Override
-        //            public void checkPermission(Permission permission)
-        //{
-        //    if (permission.getName().equals("setSecurityManager"))
-        //    {
-        //        return;
-        //    }
-        //    super.checkPermission(permission);
-        //}
-        //		}
-        //		MySecurityManager sm = new MySecurityManager();
-        //System.setSecurityManager(sm);
-        //		try {
-        //			sm.intest = true;
-        //			try {
-        //				t.stop(new ThreadDeath());
-        //				// Ignore any SecurityExceptions, may not have stopThread
-        //				// permission
-        //			} catch (SecurityException e) {
-        //			}
-        //			sm.intest = false;
-        //			assertTrue("no checkAccess 1", sm.checkAccess);
-        //t.start();
-        //			try {
-        //				t.join(2000);
-        //			} catch (InterruptedException e) {
-        //			}
-        //			sm.intest = true;
-        //			sm.checkAccess = false;
-        //			try {
-        //				t.stop(new ThreadDeath());
-        //				// Ignore any SecurityExceptions, may not have stopThread
-        //				// permission
-        //			} catch (SecurityException e) {
-        //			}
-        //			assertTrue("no checkAccess 2", sm.checkAccess);
-        //sm.intest = false;
-        //		} finally {
-        //			System.setSecurityManager(null);
-        //		}
-        //	}
+        ////@Override
+        ////            public void checkAccess(Thread t)
+        ////{
+        ////    if (intest)
+        ////    {
+        ////        checkAccess = true;
+        ////    }
+        ////}
+        ////@Override
+        ////            public void checkPermission(Permission permission)
+        ////{
+        ////    if (permission.getName().equals("setSecurityManager"))
+        ////    {
+        ////        return;
+        ////    }
+        ////    super.checkPermission(permission);
+        ////}
+        ////		}
+        ////		MySecurityManager sm = new MySecurityManager();
+        ////System.setSecurityManager(sm);
+        ////		try {
+        ////			sm.intest = true;
+        ////			try {
+        ////				t.stop(new ThreadDeath());
+        ////				// Ignore any SecurityExceptions, may not have stopThread
+        ////				// permission
+        ////			} catch (SecurityException e) {
+        ////			}
+        ////			sm.intest = false;
+        ////			assertTrue("no checkAccess 1", sm.checkAccess);
+        ////t.start();
+        ////			try {
+        ////				t.join(2000);
+        ////			} catch (InterruptedException e) {
+        ////			}
+        ////			sm.intest = true;
+        ////			sm.checkAccess = false;
+        ////			try {
+        ////				t.stop(new ThreadDeath());
+        ////				// Ignore any SecurityExceptions, may not have stopThread
+        ////				// permission
+        ////			} catch (SecurityException e) {
+        ////			}
+        ////			assertTrue("no checkAccess 2", sm.checkAccess);
+        ////sm.intest = false;
+        ////		} finally {
+        ////			System.setSecurityManager(null);
+        ////		}
+        ////	}
 
-        //	/**
-        //	 * @tests java.lang.Thread#stop(java.lang.Throwable)
-        //	 */
-        //[Test]
-        //	@SuppressWarnings("deprecation")
-        //    public void Test_stopLjava_lang_Throwable()
-        //{
-        //    // Test for method void java.lang.Thread.stop(java.lang.Throwable)
-        //    ResSupThread t = new ResSupThread(Thread.currentThread());
-        //    synchronized(t) {
-        //        st = new Thread(t, "StopThread");
-        //        st.setPriority(Thread.MAX_PRIORITY);
-        //        st.start();
-        //        try
-        //        {
-        //            t.wait();
-        //        }
-        //        catch (InterruptedException e)
-        //        {
-        //        }
-        //    }
-        //    try
-        //    {
-        //        st.stop(new BogusException("Bogus"));
-        //        Thread.sleep(20000);
-        //    }
-        //    catch (InterruptedException e)
-        //    {
-        //        assertTrue("Stopped child with exception not alive", st.isAlive());
-        //        st.interrupt();
-        //        return;
-        //    }
-        //    st.interrupt();
-        //    fail("Stopped child did not throw exception");
-        //}
+        ////	/**
+        ////	 * @tests java.lang.Thread#stop(java.lang.Throwable)
+        ////	 */
+        ////[Test]
+        ////	@SuppressWarnings("deprecation")
+        ////    public void Test_stopLjava_lang_Throwable()
+        ////{
+        ////    // Test for method void java.lang.Thread.stop(java.lang.Throwable)
+        ////    ResSupThread t = new ResSupThread(Thread.currentThread());
+        ////    synchronized(t) {
+        ////        st = new Thread(t, "StopThread");
+        ////        st.setPriority(Thread.MAX_PRIORITY);
+        ////        st.start();
+        ////        try
+        ////        {
+        ////            t.wait();
+        ////        }
+        ////        catch (InterruptedException e)
+        ////        {
+        ////        }
+        ////    }
+        ////    try
+        ////    {
+        ////        st.stop(new BogusException("Bogus"));
+        ////        Thread.sleep(20000);
+        ////    }
+        ////    catch (InterruptedException e)
+        ////    {
+        ////        assertTrue("Stopped child with exception not alive", st.isAlive());
+        ////        st.interrupt();
+        ////        return;
+        ////    }
+        ////    st.interrupt();
+        ////    fail("Stopped child did not throw exception");
+        ////}
 
         private class NotifyThread : ThreadJob
         {
@@ -1657,66 +1657,66 @@ namespace J2N.Threading
             //tg.destroy();
         }
 
-        ///**
-        // * @tests java.lang.Thread#getAllStackTraces()
-        // */
-        //[Test]
-        //public void Test_getAllStackTraces()
-        //{
-        //    IDictionary<Thread, StackTraceElement[]> stMap = Thread.getAllStackTraces();
-        //    assertNotNull(stMap);
-        //    //TODO add security-based tests
-        //}
+        /////**
+        //// * @tests java.lang.Thread#getAllStackTraces()
+        //// */
+        ////[Test]
+        ////public void Test_getAllStackTraces()
+        ////{
+        ////    IDictionary<Thread, StackTraceElement[]> stMap = Thread.getAllStackTraces();
+        ////    assertNotNull(stMap);
+        ////    //TODO add security-based tests
+        ////}
 
-        ///**
-        // * @tests java.lang.Thread#getDefaultUncaughtExceptionHandler
-        // * @tests java.lang.Thread#setDefaultUncaughtExceptionHandler
-        // */
-        //public void Test_get_setDefaultUncaughtExceptionHandler()
-        //{
-        //        class Handler implements UncaughtExceptionHandler
-        //{
-        //            public void uncaughtException(Thread thread, Throwable ex)
-        //{
-        //}
-        //        }
+        /////**
+        //// * @tests java.lang.Thread#getDefaultUncaughtExceptionHandler
+        //// * @tests java.lang.Thread#setDefaultUncaughtExceptionHandler
+        //// */
+        ////public void Test_get_setDefaultUncaughtExceptionHandler()
+        ////{
+        ////        class Handler implements UncaughtExceptionHandler
+        ////{
+        ////            public void uncaughtException(Thread thread, Throwable ex)
+        ////{
+        ////}
+        ////        }
 
-        //        final Handler handler = new Handler();
-        //Thread.setDefaultUncaughtExceptionHandler(handler);
-        //        assertSame(handler, Thread.getDefaultUncaughtExceptionHandler());
+        ////        final Handler handler = new Handler();
+        ////Thread.setDefaultUncaughtExceptionHandler(handler);
+        ////        assertSame(handler, Thread.getDefaultUncaughtExceptionHandler());
 
-        //Thread.setDefaultUncaughtExceptionHandler(null);
-        //        assertNull(Thread.getDefaultUncaughtExceptionHandler());
-        //        //TODO add security-based tests
-        //    }
+        ////Thread.setDefaultUncaughtExceptionHandler(null);
+        ////        assertNull(Thread.getDefaultUncaughtExceptionHandler());
+        ////        //TODO add security-based tests
+        ////    }
 
-        //    /**
-        //     * @tests java.lang.Thread#getStackTrace()
-        //     */
-        //    public void Test_getStackTrace()
-        //{
-        //    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        ////    /**
+        ////     * @tests java.lang.Thread#getStackTrace()
+        ////     */
+        ////    public void Test_getStackTrace()
+        ////{
+        ////    StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
 
-        //    assertNotNull(stackTrace);
+        ////    assertNotNull(stackTrace);
 
-        //stack_trace_loop:
-        //    {
-        //        for (int i = 0; i < stackTrace.length; i++)
-        //        {
-        //            StackTraceElement e = stackTrace[i];
-        //            if (getClass().getName().equals(e.getClassName()))
-        //            {
-        //                if ("test_getStackTrace".equals(e.getMethodName()))
-        //                {
-        //                    break stack_trace_loop;
-        //                }
-        //            }
-        //        }
-        //        fail("class and method not found in stack trace");
-        //    }
+        ////stack_trace_loop:
+        ////    {
+        ////        for (int i = 0; i < stackTrace.length; i++)
+        ////        {
+        ////            StackTraceElement e = stackTrace[i];
+        ////            if (getClass().getName().equals(e.getClassName()))
+        ////            {
+        ////                if ("test_getStackTrace".equals(e.getMethodName()))
+        ////                {
+        ////                    break stack_trace_loop;
+        ////                }
+        ////            }
+        ////        }
+        ////        fail("class and method not found in stack trace");
+        ////    }
 
-        //    //TODO add security-based tests
-        //}
+        ////    //TODO add security-based tests
+        ////}
 
         /**
          * @tests java.lang.Thread#getState()

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.Collections.Generic;
+using System;
 using System.Reflection;
 
 namespace J2N.Collections

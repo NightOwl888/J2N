@@ -15,7 +15,6 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The UTF-16-encoded code unit to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.</exception>
         IAppendable Append(char value);
 
         /// <summary>
@@ -23,7 +22,6 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.</exception>
         IAppendable Append(string value);
 
         /// <summary>
@@ -49,10 +47,6 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
         /// </exception>
         IAppendable Append(string value, int startIndex, int count);
 
@@ -61,7 +55,6 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> that contains the string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.</exception>
         IAppendable Append(StringBuilder value);
 
         /// <summary>
@@ -87,10 +80,6 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
         /// </exception>
         IAppendable Append(StringBuilder value, int startIndex, int count);
 
@@ -99,7 +88,6 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.</exception>
         IAppendable Append(char[] value);
 
         /// <summary>
@@ -125,10 +113,6 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
         /// </exception>
         IAppendable Append(char[] value, int startIndex, int count);
 
@@ -137,7 +121,6 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The <see cref="ICharSequence"/> containing the characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.</exception>
         IAppendable Append(ICharSequence value);
 
         /// <summary>
@@ -163,10 +146,6 @@ namespace J2N.Text
         /// -or-
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
         /// </exception>
         IAppendable Append(ICharSequence value, int startIndex, int count);
     }

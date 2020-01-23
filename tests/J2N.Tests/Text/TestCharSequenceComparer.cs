@@ -67,28 +67,28 @@ namespace J2N.Text
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, String1));
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String1)));
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, String1.ToCharArray()));
-            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, String1.ToCharSequence()));
+            Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, String1.AsCharSequence()));
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String1))));
             Assert.AreEqual(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String1.ToCharArray())));
 
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String2));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String2)));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String2.ToCharArray()));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String2.ToCharSequence()));
+            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String2.AsCharSequence()));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String2))));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String2.ToCharArray())));
 
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String3));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String3)));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String3.ToCharArray()));
-            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String3.ToCharSequence()));
+            Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, String3.AsCharSequence()));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String3))));
             Assert.Greater(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String3.ToCharArray())));
 
             Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, String4));
             Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilder(String4)));
             Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, String4.ToCharArray()));
-            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, String4.ToCharSequence()));
+            Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, String4.AsCharSequence()));
             Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, new StringBuilderCharSequence(new StringBuilder(String4))));
             Assert.Less(0, CharSequenceComparer.Ordinal.Compare(target, new CharArrayCharSequence(String4.ToCharArray())));
 

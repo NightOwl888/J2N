@@ -9,11 +9,11 @@ namespace J2N.Text
     public class TestCharArrayExtensions
     {
         [Test]
-        public void TestToCharSequence()
+        public void TestAsCharSequence()
         {
             char[] target = "This is a test".ToCharArray();
 
-            var result = target.ToCharSequence();
+            var result = target.AsCharSequence();
 
             Assert.IsNotNull(result);
             Assert.AreEqual(typeof(CharArrayCharSequence), result.GetType());

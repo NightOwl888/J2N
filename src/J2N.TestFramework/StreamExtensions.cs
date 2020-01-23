@@ -33,7 +33,6 @@ namespace J2N
 #if NETSTANDARD
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #else
-            // LUCENENET NOTE: On .NET Framework, our only possibilities are Windows or Linux
             PlatformID pid = Environment.OSVersion.Platform;
             return pid == PlatformID.Win32NT || pid == PlatformID.Win32Windows;
 #endif

@@ -107,20 +107,20 @@ namespace J2N.Threading.Atomic
         }
 #endif
 
-        ///**
-        // * repeated weakCompareAndSet succeeds in changing value when equal
-        // * to expected 
-        // */
-        //[Test]
-        //public void TestWeakCompareAndSet()
-        //{
-        //    AtomicReference<Integer> ai = new AtomicReference<Integer>(one);
-        //    while (!ai.weakCompareAndSet(one, two)) ;
-        //    while (!ai.weakCompareAndSet(two, m4)) ;
-        //    assertEquals(m4, ai.get());
-        //    while (!ai.weakCompareAndSet(m4, seven)) ;
-        //    assertEquals(seven, ai.get());
-        //}
+        /////**
+        //// * repeated weakCompareAndSet succeeds in changing value when equal
+        //// * to expected 
+        //// */
+        ////[Test]
+        ////public void TestWeakCompareAndSet()
+        ////{
+        ////    AtomicReference<Integer> ai = new AtomicReference<Integer>(one);
+        ////    while (!ai.weakCompareAndSet(one, two)) ;
+        ////    while (!ai.weakCompareAndSet(two, m4)) ;
+        ////    assertEquals(m4, ai.get());
+        ////    while (!ai.weakCompareAndSet(m4, seven)) ;
+        ////    assertEquals(seven, ai.get());
+        ////}
 
         /**
          * getAndSet returns previous value and sets to given value

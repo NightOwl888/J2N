@@ -185,24 +185,24 @@ namespace J2N.Threading.Atomic
         }
 #endif
 
-        ///**
-        // * repeated weakCompareAndSet succeeds in changing value when equal
-        // * to expected 
-        // */
-        //[Test]
-        //public void TestWeakCompareAndSet()
-        //{
-        //    AtomicReferenceArray<Integer> ai = new AtomicReferenceArray<Integer>(SIZE);
-        //    for (int i = 0; i < SIZE; ++i)
-        //    {
-        //        ai[i] = one;
-        //        while (!ai.WeakCompareAndSet(i, one, two)) ;
-        //        while (!ai.WeakCompareAndSet(i, two, m4)) ;
-        //        assertEquals(m4, ai[i]);
-        //        while (!ai.weakCompareAndSet(i, m4, seven)) ;
-        //        assertEquals(seven, ai[i]);
-        //    }
-        //}
+        /////**
+        //// * repeated weakCompareAndSet succeeds in changing value when equal
+        //// * to expected 
+        //// */
+        ////[Test]
+        ////public void TestWeakCompareAndSet()
+        ////{
+        ////    AtomicReferenceArray<Integer> ai = new AtomicReferenceArray<Integer>(SIZE);
+        ////    for (int i = 0; i < SIZE; ++i)
+        ////    {
+        ////        ai[i] = one;
+        ////        while (!ai.WeakCompareAndSet(i, one, two)) ;
+        ////        while (!ai.WeakCompareAndSet(i, two, m4)) ;
+        ////        assertEquals(m4, ai[i]);
+        ////        while (!ai.weakCompareAndSet(i, m4, seven)) ;
+        ////        assertEquals(seven, ai[i]);
+        ////    }
+        ////}
 
         /**
          * getAndSet returns previous value and sets to given value at given index

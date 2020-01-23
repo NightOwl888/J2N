@@ -136,13 +136,13 @@ namespace J2N
         public void Test_codePointAt_CharSequenceI()
         {
 
-            assertEquals('a', Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 0));
-            assertEquals('b', Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 1));
-            assertEquals('c', Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 2));
+            assertEquals('a', Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 0));
+            assertEquals('b', Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 1));
+            assertEquals('c', Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 2));
             assertEquals(0x10000, Character.CodePointAt(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 0));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 0));
             assertEquals('\uDC00', Character.CodePointAt(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 1));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 1));
 
             try
             {
@@ -155,7 +155,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), -1);
+                Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), -1);
                 fail("No IOOBE, negative index.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -164,7 +164,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointAt((ICharSequence)"abc".ToCharSequence(), 4);
+                Character.CodePointAt((ICharSequence)"abc".AsCharSequence(), 4);
                 fail("No IOOBE, index too large.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -396,13 +396,13 @@ namespace J2N
         public void Test_codePointBefore_ICharSequenceI()
         {
 
-            assertEquals('a', Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 1));
-            assertEquals('b', Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 2));
-            assertEquals('c', Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 3));
+            assertEquals('a', Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 1));
+            assertEquals('b', Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 2));
+            assertEquals('c', Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 3));
             assertEquals(0x10000, Character.CodePointBefore(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 2));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 2));
             assertEquals('\uD800', Character.CodePointBefore(
-                    (ICharSequence)"\uD800\uDC00".ToCharSequence(), 1));
+                    (ICharSequence)"\uD800\uDC00".AsCharSequence(), 1));
 
             try
             {
@@ -415,7 +415,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 0);
+                Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 0);
                 fail("No IOOBE, index below one.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -424,7 +424,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointBefore((ICharSequence)"abc".ToCharSequence(), 4);
+                Character.CodePointBefore((ICharSequence)"abc".AsCharSequence(), 4);
                 fail("No IOOBE, index too large.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -738,13 +738,13 @@ namespace J2N
         [Test]
         public void Test_codePointCount_ICharSequenceII()
         {
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC00".ToCharSequence(), 0, 2 - 0)); // end - start
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC01".ToCharSequence(), 0, 2 - 0)); // end - start
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD801\uDC01".ToCharSequence(), 0, 2 - 0)); // end - start
-            assertEquals(1, Character.CodePointCount((ICharSequence)"\uDBFF\uDFFF".ToCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC00".AsCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD800\uDC01".AsCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uD801\uDC01".AsCharSequence(), 0, 2 - 0)); // end - start
+            assertEquals(1, Character.CodePointCount((ICharSequence)"\uDBFF\uDFFF".AsCharSequence(), 0, 2 - 0)); // end - start
 
-            assertEquals(3, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 0, 4 - 0)); // end - start
-            assertEquals(4, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b\uD800".ToCharSequence(), 0, 5 - 0)); // end - start
+            assertEquals(3, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 0, 4 - 0)); // end - start
+            assertEquals(4, Character.CodePointCount((ICharSequence)"a\uD800\uDC00b\uD800".AsCharSequence(), 0, 5 - 0)); // end - start
 
             try
             {
@@ -757,7 +757,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointCount((ICharSequence)"abc".ToCharSequence(), -1, 1 - -1); // end - start
+                Character.CodePointCount((ICharSequence)"abc".AsCharSequence(), -1, 1 - -1); // end - start
                 fail("No IOOBE, negative start.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -766,7 +766,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointCount((ICharSequence)"abc".ToCharSequence(), 0, 4 - 0); // end - start
+                Character.CodePointCount((ICharSequence)"abc".AsCharSequence(), 0, 4 - 0); // end - start
                 fail("No IOOBE, end greater than length.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -775,7 +775,7 @@ namespace J2N
 
             try
             {
-                Character.CodePointCount((ICharSequence)"abc".ToCharSequence(), 2, 1 - 2); // end - start
+                Character.CodePointCount((ICharSequence)"abc".AsCharSequence(), 2, 1 - 2); // end - start
                 fail("No IOOBE, end greater than start.");
             }
             catch (ArgumentOutOfRangeException e)
@@ -930,28 +930,28 @@ namespace J2N
         [Test]
         public void Test_offsetByCodePoints_ICharSequenceII()
         {
-            int result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 0, 2);
+            int result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 0, 2);
             assertEquals(3, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"abcd".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"abcd".AsCharSequence(), 3, -1);
             assertEquals(2, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 0, 3);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 0, 3);
             assertEquals(4, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 3, -1);
             assertEquals(1, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".ToCharSequence(), 3, 0);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800\uDC00b".AsCharSequence(), 3, 0);
             assertEquals(3, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"\uD800\uDC00bc".ToCharSequence(), 3, 0);
+            result = Character.OffsetByCodePoints((ICharSequence)"\uD800\uDC00bc".AsCharSequence(), 3, 0);
             assertEquals(3, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uDC00bc".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uDC00bc".AsCharSequence(), 3, -1);
             assertEquals(2, result);
 
-            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800bc".ToCharSequence(), 3, -1);
+            result = Character.OffsetByCodePoints((ICharSequence)"a\uD800bc".AsCharSequence(), 3, -1);
             assertEquals(2, result);
 
             try
@@ -965,7 +965,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), -1, 1);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), -1, 1);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)
@@ -974,7 +974,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), 4, 1);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), 4, 1);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)
@@ -983,7 +983,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), 1, 3);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), 1, 3);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)
@@ -992,7 +992,7 @@ namespace J2N
 
             try
             {
-                Character.OffsetByCodePoints((ICharSequence)"abc".ToCharSequence(), 1, -2);
+                Character.OffsetByCodePoints((ICharSequence)"abc".AsCharSequence(), 1, -2);
                 fail();
             }
             catch (ArgumentOutOfRangeException e)
@@ -1350,38 +1350,38 @@ namespace J2N
             }
         }
 
-        ///**
-        // * @tests java.lang.Character#compareTo(Character)
-        // */
-        //[Test]
-        //public void Test_compareToLjava_lang_Byte()
-        //{
-        //    Character min = new Character(Character.MIN_VALUE);
-        //    Character mid = new Character((char)(Character.MAX_VALUE / 2));
-        //    Character max = new Character(Character.MAX_VALUE);
+        /////**
+        //// * @tests java.lang.Character#compareTo(Character)
+        //// */
+        ////[Test]
+        ////public void Test_compareToLjava_lang_Byte()
+        ////{
+        ////    Character min = new Character(Character.MIN_VALUE);
+        ////    Character mid = new Character((char)(Character.MAX_VALUE / 2));
+        ////    Character max = new Character(Character.MAX_VALUE);
 
-        //    assertTrue(max.compareTo(max) == 0);
-        //    assertTrue(min.compareTo(min) == 0);
-        //    assertTrue(mid.compareTo(mid) == 0);
+        ////    assertTrue(max.compareTo(max) == 0);
+        ////    assertTrue(min.compareTo(min) == 0);
+        ////    assertTrue(mid.compareTo(mid) == 0);
 
-        //    assertTrue(max.compareTo(mid) > 0);
-        //    assertTrue(max.compareTo(min) > 0);
+        ////    assertTrue(max.compareTo(mid) > 0);
+        ////    assertTrue(max.compareTo(min) > 0);
 
-        //    assertTrue(mid.compareTo(max) < 0);
-        //    assertTrue(mid.compareTo(min) > 0);
+        ////    assertTrue(mid.compareTo(max) < 0);
+        ////    assertTrue(mid.compareTo(min) > 0);
 
-        //    assertTrue(min.compareTo(mid) < 0);
-        //    assertTrue(min.compareTo(max) < 0);
+        ////    assertTrue(min.compareTo(mid) < 0);
+        ////    assertTrue(min.compareTo(max) < 0);
 
-        //    try
-        //    {
-        //        min.compareTo(null);
-        //        fail("No NPE");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //    }
-        //}
+        ////    try
+        ////    {
+        ////        min.compareTo(null);
+        ////        fail("No NPE");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////    }
+        ////}
 
         [Test]
         public void Test_codePointAt_Invalid()
@@ -1418,44 +1418,44 @@ namespace J2N
             }
         }
 
-        ///**
-        // * @tests java.lang.Character#Character(char)
-        // */
-        //[Test]
-        //public void Test_ConstructorC()
-        //{
-        //    assertEquals("Constructor failed", 'T', new Character('T').charValue());
-        //}
+        /////**
+        //// * @tests java.lang.Character#Character(char)
+        //// */
+        ////[Test]
+        ////public void Test_ConstructorC()
+        ////{
+        ////    assertEquals("Constructor failed", 'T', new Character('T').charValue());
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#charValue()
-        // */
-        //[Test]
-        //public void Test_charValue()
-        //{
-        //    assertEquals("Incorrect char value returned", 'T', new Character('T')
-        //            .charValue());
-        //}
+        /////**
+        //// * @tests java.lang.Character#charValue()
+        //// */
+        ////[Test]
+        ////public void Test_charValue()
+        ////{
+        ////    assertEquals("Incorrect char value returned", 'T', new Character('T')
+        ////            .charValue());
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#compareTo(java.lang.Character)
-        // */
-        //[Test]
-        //public void Test_compareToLjava_lang_Character()
-        //{
-        //    Character c = new Character('c');
-        //    Character x = new Character('c');
-        //    Character y = new Character('b');
-        //    Character z = new Character('d');
+        /////**
+        //// * @tests java.lang.Character#compareTo(java.lang.Character)
+        //// */
+        ////[Test]
+        ////public void Test_compareToLjava_lang_Character()
+        ////{
+        ////    Character c = new Character('c');
+        ////    Character x = new Character('c');
+        ////    Character y = new Character('b');
+        ////    Character z = new Character('d');
 
-        //    assertEquals("Returned false for same Character", 0, c.compareTo(c));
-        //    assertEquals("Returned false for identical Character",
-        //            0, c.compareTo(x));
-        //    assertTrue("Returned other than less than for lesser char", c
-        //            .compareTo(y) > 0);
-        //    assertTrue("Returned other than greater than for greater char", c
-        //            .compareTo(z) < 0);
-        //}
+        ////    assertEquals("Returned false for same Character", 0, c.compareTo(c));
+        ////    assertEquals("Returned false for identical Character",
+        ////            0, c.compareTo(x));
+        ////    assertTrue("Returned other than less than for lesser char", c
+        ////            .compareTo(y) > 0);
+        ////    assertTrue("Returned other than greater than for greater char", c
+        ////            .compareTo(z) < 0);
+        ////}
 
         /**
          * @tests java.lang.Character#digit(char, int)
@@ -1467,36 +1467,36 @@ namespace J2N
             assertEquals("Returned incorrect digit", 15, Character.Digit('F', 16));
         }
 
-        ///**
-        // * @tests java.lang.Character#digit(int, int)
-        // */
-        //[Test]
-        //public void Test_digit_II()
-        //{
-        //    assertEquals(1, Character.Digit((int)'1', 10));
-        //    assertEquals(15, Character.Digit((int)'F', 16));
+        /////**
+        //// * @tests java.lang.Character#digit(int, int)
+        //// */
+        ////[Test]
+        ////public void Test_digit_II()
+        ////{
+        ////    assertEquals(1, Character.Digit((int)'1', 10));
+        ////    assertEquals(15, Character.Digit((int)'F', 16));
 
-        //    assertEquals(-1, Character.Digit(0x0000, 37));
-        //    assertEquals(-1, Character.Digit(0x0045, 10));
+        ////    assertEquals(-1, Character.Digit(0x0000, 37));
+        ////    assertEquals(-1, Character.Digit(0x0045, 10));
 
-        //    assertEquals(10, Character.Digit(0x0041, 20));
-        //    assertEquals(10, Character.Digit(0x0061, 20));
+        ////    assertEquals(10, Character.Digit(0x0041, 20));
+        ////    assertEquals(10, Character.Digit(0x0061, 20));
 
-        //    assertEquals(-1, Character.Digit(0x110000, 20));
-        //}
+        ////    assertEquals(-1, Character.Digit(0x110000, 20));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#equals(java.lang.Object)
-        // */
-        //[Test]
-        //public void Test_equalsLjava_lang_Object()
-        //{
-        //    // Test for method boolean java.lang.Character.equals(java.lang.Object)
-        //    assertTrue("Equality test failed", new Character('A')
-        //            .Equals(new Character('A')));
-        //    assertTrue("Equality test failed", !(new Character('A')
-        //            .Equals(new Character('a'))));
-        //}
+        /////**
+        //// * @tests java.lang.Character#equals(java.lang.Object)
+        //// */
+        ////[Test]
+        ////public void Test_equalsLjava_lang_Object()
+        ////{
+        ////    // Test for method boolean java.lang.Character.equals(java.lang.Object)
+        ////    assertTrue("Equality test failed", new Character('A')
+        ////            .Equals(new Character('A')));
+        ////    assertTrue("Equality test failed", !(new Character('A')
+        ////            .Equals(new Character('a'))));
+        ////}
 
         /**
          * @tests java.lang.Character#forDigit(int, int)
@@ -1543,41 +1543,41 @@ namespace J2N
                     .GetNumericValue('\uff12'));
         }
 
-        ///**
-        // * @tests java.lang.Character#getNumericValue(int)
-        // */
-        //[Test]
-        //public void Test_getNumericValue_I()
-        //{
-        //    assertEquals(1, Character.GetNumericValue((int)'1'));
-        //    assertEquals(15, Character.GetNumericValue((int)'F'));
-        //    assertEquals(-1, Character.GetNumericValue((int)'\u221e'));
-        //    assertEquals(-2, Character.GetNumericValue((int)'\u00be'));
-        //    assertEquals(10000, Character.GetNumericValue((int)'\u2182'));
-        //    assertEquals(2, Character.GetNumericValue((int)'\uff12'));
-        //    assertEquals(-1, Character.GetNumericValue(0xFFFF));
+        /////**
+        //// * @tests java.lang.Character#getNumericValue(int)
+        //// */
+        ////[Test]
+        ////public void Test_getNumericValue_I()
+        ////{
+        ////    assertEquals(1, Character.GetNumericValue((int)'1'));
+        ////    assertEquals(15, Character.GetNumericValue((int)'F'));
+        ////    assertEquals(-1, Character.GetNumericValue((int)'\u221e'));
+        ////    assertEquals(-2, Character.GetNumericValue((int)'\u00be'));
+        ////    assertEquals(10000, Character.GetNumericValue((int)'\u2182'));
+        ////    assertEquals(2, Character.GetNumericValue((int)'\uff12'));
+        ////    assertEquals(-1, Character.GetNumericValue(0xFFFF));
 
-        //    assertEquals(-1, Character.GetNumericValue(0xFFFF));
-        //    assertEquals(0, Character.GetNumericValue(0x1D7CE));
-        //    assertEquals(0, Character.GetNumericValue(0x1D7D8));
-        //    assertEquals(-1, Character.GetNumericValue(0x2F800));
-        //    assertEquals(-1, Character.GetNumericValue(0x10FFFD));
-        //    assertEquals(-1, Character.GetNumericValue(0x110000));
+        ////    assertEquals(-1, Character.GetNumericValue(0xFFFF));
+        ////    assertEquals(0, Character.GetNumericValue(0x1D7CE));
+        ////    assertEquals(0, Character.GetNumericValue(0x1D7D8));
+        ////    assertEquals(-1, Character.GetNumericValue(0x2F800));
+        ////    assertEquals(-1, Character.GetNumericValue(0x10FFFD));
+        ////    assertEquals(-1, Character.GetNumericValue(0x110000));
 
-        //    assertEquals(50, Character.GetNumericValue(0x216C));
+        ////    assertEquals(50, Character.GetNumericValue(0x216C));
 
-        //    assertEquals(10, Character.GetNumericValue(0x0041));
-        //    assertEquals(35, Character.GetNumericValue(0x005A));
-        //    assertEquals(10, Character.GetNumericValue(0x0061));
-        //    assertEquals(35, Character.GetNumericValue(0x007A));
-        //    assertEquals(10, Character.GetNumericValue(0xFF21));
+        ////    assertEquals(10, Character.GetNumericValue(0x0041));
+        ////    assertEquals(35, Character.GetNumericValue(0x005A));
+        ////    assertEquals(10, Character.GetNumericValue(0x0061));
+        ////    assertEquals(35, Character.GetNumericValue(0x007A));
+        ////    assertEquals(10, Character.GetNumericValue(0xFF21));
 
-        //    //FIXME depends on ICU4J
-        //    //assertEquals(35, Character.GetNumericValue(0xFF3A));
+        ////    //FIXME depends on ICU4J
+        ////    //assertEquals(35, Character.GetNumericValue(0xFF3A));
 
-        //    assertEquals(10, Character.GetNumericValue(0xFF41));
-        //    assertEquals(35, Character.GetNumericValue(0xFF5A));
-        //}
+        ////    assertEquals(10, Character.GetNumericValue(0xFF41));
+        ////    assertEquals(35, Character.GetNumericValue(0xFF5A));
+        ////}
 
         /**
          * @tests java.lang.Character#getType(char)
@@ -1718,15 +1718,15 @@ namespace J2N
             assertTrue(Character.GetType(0x203A) == UnicodeCategory.FinalQuotePunctuation);
         }
 
-        ///**
-        // * @tests java.lang.Character#hashCode()
-        // */
-        //[Test]
-        //public void Test_hashCode()
-        //{
-        //    assertEquals("Incorrect hash returned",
-        //            89, new Character('Y').hashCode());
-        //}
+        /////**
+        //// * @tests java.lang.Character#hashCode()
+        //// */
+        ////[Test]
+        ////public void Test_hashCode()
+        ////{
+        ////    assertEquals("Incorrect hash returned",
+        ////            89, new Character('Y').hashCode());
+        ////}
 
         /**
          * @tests java.lang.Character#isDefined(char)
@@ -1856,26 +1856,26 @@ namespace J2N
             assertFalse(Character.IsIdentifierIgnorable(0x110000));
         }
 
-        ///**
-        // * @tests java.lang.Character#isMirrored(char)
-        // */
-        //[Test]
-        //public void Test_isMirrored_C()
-        //{
-        //    assertTrue(Character.IsMirrored('\u0028'));
-        //    assertFalse(Character.IsMirrored('\uFFFF'));
-        //}
+        /////**
+        //// * @tests java.lang.Character#isMirrored(char)
+        //// */
+        ////[Test]
+        ////public void Test_isMirrored_C()
+        ////{
+        ////    assertTrue(Character.IsMirrored('\u0028'));
+        ////    assertFalse(Character.IsMirrored('\uFFFF'));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#isMirrored(int)
-        // */
-        //[Test]
-        //public void Test_isMirrored_I()
-        //{
-        //    assertTrue(Character.IsMirrored(0x0028));
-        //    assertFalse(Character.IsMirrored(0xFFFF));
-        //    assertFalse(Character.IsMirrored(0x110000));
-        //}
+        /////**
+        //// * @tests java.lang.Character#isMirrored(int)
+        //// */
+        ////[Test]
+        ////public void Test_isMirrored_I()
+        ////{
+        ////    assertTrue(Character.IsMirrored(0x0028));
+        ////    assertFalse(Character.IsMirrored(0xFFFF));
+        ////    assertFalse(Character.IsMirrored(0x110000));
+        ////}
 
         /**
          * @tests java.lang.Character#isISOControl(char)
@@ -2453,206 +2453,206 @@ namespace J2N
             }
         }
 
-        ///**
-        // * @tests java.lang.Character#toLowerCase(char)
-        // */
-        //[Test]
-        //public void Test_toLowerCaseC()
-        //{
-        //    assertEquals("Failed to change case", 't', Character.toLowerCase('T'));
-        //}
+        /////**
+        //// * @tests java.lang.Character#toLowerCase(char)
+        //// */
+        ////[Test]
+        ////public void Test_toLowerCaseC()
+        ////{
+        ////    assertEquals("Failed to change case", 't', Character.toLowerCase('T'));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#toLowerCase(int)
-        // */
-        //[Test]
-        //public void Test_toLowerCase_I()
-        //{
-        //    assertEquals('t', Character.toLowerCase((int)'T'));
+        /////**
+        //// * @tests java.lang.Character#toLowerCase(int)
+        //// */
+        ////[Test]
+        ////public void Test_toLowerCase_I()
+        ////{
+        ////    assertEquals('t', Character.toLowerCase((int)'T'));
 
-        //    assertEquals(0x10428, Character.toLowerCase(0x10400));
-        //    assertEquals(0x10428, Character.toLowerCase(0x10428));
+        ////    assertEquals(0x10428, Character.toLowerCase(0x10400));
+        ////    assertEquals(0x10428, Character.toLowerCase(0x10428));
 
-        //    assertEquals(0x1D504, Character.toLowerCase(0x1D504));
-        //    assertEquals(0x10FFFD, Character.toLowerCase(0x10FFFD));
-        //    assertEquals(0x110000, Character.toLowerCase(0x110000));
-        //}
+        ////    assertEquals(0x1D504, Character.toLowerCase(0x1D504));
+        ////    assertEquals(0x10FFFD, Character.toLowerCase(0x10FFFD));
+        ////    assertEquals(0x110000, Character.toLowerCase(0x110000));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#toString()
-        // */
-        //[Test]
-        //public void Test_toString()
-        //{
-        //    assertEquals("Incorrect String returned", "T", new Character('T').toString());
-        //}
+        /////**
+        //// * @tests java.lang.Character#toString()
+        //// */
+        ////[Test]
+        ////public void Test_toString()
+        ////{
+        ////    assertEquals("Incorrect String returned", "T", new Character('T').toString());
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#toTitleCase(char)
-        // */
-        //[Test]
-        //public void Test_toTitleCaseC()
-        //{
-        //    assertEquals("Incorrect title case for a",
-        //            'A', Character.toTitleCase('a'));
-        //    assertEquals("Incorrect title case for A",
-        //            'A', Character.toTitleCase('A'));
-        //    assertEquals("Incorrect title case for 1",
-        //            '1', Character.toTitleCase('1'));
-        //}
+        /////**
+        //// * @tests java.lang.Character#toTitleCase(char)
+        //// */
+        ////[Test]
+        ////public void Test_toTitleCaseC()
+        ////{
+        ////    assertEquals("Incorrect title case for a",
+        ////            'A', Character.toTitleCase('a'));
+        ////    assertEquals("Incorrect title case for A",
+        ////            'A', Character.toTitleCase('A'));
+        ////    assertEquals("Incorrect title case for 1",
+        ////            '1', Character.toTitleCase('1'));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#toTitleCase(int)
-        // */
-        //[Test]
-        //public void Test_toTitleCase_I()
-        //{
-        //    assertEquals('A', Character.toTitleCase((int)'a'));
-        //    assertEquals('A', Character.toTitleCase((int)'A'));
-        //    assertEquals('1', Character.toTitleCase((int)'1'));
+        /////**
+        //// * @tests java.lang.Character#toTitleCase(int)
+        //// */
+        ////[Test]
+        ////public void Test_toTitleCase_I()
+        ////{
+        ////    assertEquals('A', Character.toTitleCase((int)'a'));
+        ////    assertEquals('A', Character.toTitleCase((int)'A'));
+        ////    assertEquals('1', Character.toTitleCase((int)'1'));
 
-        //    assertEquals(0x10400, Character.toTitleCase(0x10428));
-        //    assertEquals(0x10400, Character.toTitleCase(0x10400));
+        ////    assertEquals(0x10400, Character.toTitleCase(0x10428));
+        ////    assertEquals(0x10400, Character.toTitleCase(0x10400));
 
-        //    assertEquals(0x10FFFF, Character.toTitleCase(0x10FFFF));
-        //    assertEquals(0x110000, Character.toTitleCase(0x110000));
-        //}
+        ////    assertEquals(0x10FFFF, Character.toTitleCase(0x10FFFF));
+        ////    assertEquals(0x110000, Character.toTitleCase(0x110000));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#toUpperCase(char)
-        // */
-        //[Test]
-        //public void Test_toUpperCaseC()
-        //{
-        //    // Test for method char java.lang.Character.toUpperCase(char)
-        //    assertEquals("Incorrect upper case for a",
-        //            'A', Character.toUpperCase('a'));
-        //    assertEquals("Incorrect upper case for A",
-        //            'A', Character.toUpperCase('A'));
-        //    assertEquals("Incorrect upper case for 1",
-        //            '1', Character.toUpperCase('1'));
-        //}
+        /////**
+        //// * @tests java.lang.Character#toUpperCase(char)
+        //// */
+        ////[Test]
+        ////public void Test_toUpperCaseC()
+        ////{
+        ////    // Test for method char java.lang.Character.toUpperCase(char)
+        ////    assertEquals("Incorrect upper case for a",
+        ////            'A', Character.toUpperCase('a'));
+        ////    assertEquals("Incorrect upper case for A",
+        ////            'A', Character.toUpperCase('A'));
+        ////    assertEquals("Incorrect upper case for 1",
+        ////            '1', Character.toUpperCase('1'));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#toUpperCase(int)
-        // */
-        //[Test]
-        //public void Test_toUpperCase_I()
-        //{
-        //    assertEquals('A', Character.toUpperCase((int)'a'));
-        //    assertEquals('A', Character.toUpperCase((int)'A'));
-        //    assertEquals('1', Character.toUpperCase((int)'1'));
+        /////**
+        //// * @tests java.lang.Character#toUpperCase(int)
+        //// */
+        ////[Test]
+        ////public void Test_toUpperCase_I()
+        ////{
+        ////    assertEquals('A', Character.toUpperCase((int)'a'));
+        ////    assertEquals('A', Character.toUpperCase((int)'A'));
+        ////    assertEquals('1', Character.toUpperCase((int)'1'));
 
-        //    assertEquals(0x10400, Character.toUpperCase(0x10428));
-        //    assertEquals(0x10400, Character.toUpperCase(0x10400));
+        ////    assertEquals(0x10400, Character.toUpperCase(0x10428));
+        ////    assertEquals(0x10400, Character.toUpperCase(0x10400));
 
-        //    assertEquals(0x10FFFF, Character.toUpperCase(0x10FFFF));
-        //    assertEquals(0x110000, Character.toUpperCase(0x110000));
-        //}
+        ////    assertEquals(0x10FFFF, Character.toUpperCase(0x10FFFF));
+        ////    assertEquals(0x110000, Character.toUpperCase(0x110000));
+        ////}
 
-        ///**
-        // * @tests java.lang.Character#getDirectionality(int)
-        // */
-        //[Test]
-        //public void Test_isDirectionaliy_I()
-        //{
-        //    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
-        //            .getDirectionality(0xFFFE));
-        //    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
-        //            .getDirectionality(0x30000));
-        //    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
-        //            .getDirectionality(0x110000));
-        //    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
-        //            .getDirectionality(-1));
+        /////**
+        //// * @tests java.lang.Character#getDirectionality(int)
+        //// */
+        ////[Test]
+        ////public void Test_isDirectionaliy_I()
+        ////{
+        ////    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
+        ////            .getDirectionality(0xFFFE));
+        ////    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
+        ////            .getDirectionality(0x30000));
+        ////    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
+        ////            .getDirectionality(0x110000));
+        ////    assertEquals(Character.DIRECTIONALITY_UNDEFINED, Character
+        ////            .getDirectionality(-1));
 
-        //    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT, Character
-        //            .getDirectionality(0x0041));
-        //    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT, Character
-        //            .getDirectionality(0x10000));
-        //    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT, Character
-        //            .getDirectionality(0x104A9));
+        ////    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT, Character
+        ////            .getDirectionality(0x0041));
+        ////    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT, Character
+        ////            .getDirectionality(0x10000));
+        ////    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT, Character
+        ////            .getDirectionality(0x104A9));
 
-        //    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT, Character
-        //            .getDirectionality(0xFB4F));
-        //    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT, Character
-        //            .getDirectionality(0x10838));
-        //    // Unicode standard 5.1 changed category of unicode point 0x0600 from AL to AN
-        //    assertEquals(Character.DIRECTIONALITY_ARABIC_NUMBER, Character
-        //            .getDirectionality(0x0600));
-        //    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC, Character
-        //            .getDirectionality(0xFEFC));
+        ////    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT, Character
+        ////            .getDirectionality(0xFB4F));
+        ////    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT, Character
+        ////            .getDirectionality(0x10838));
+        ////    // Unicode standard 5.1 changed category of unicode point 0x0600 from AL to AN
+        ////    assertEquals(Character.DIRECTIONALITY_ARABIC_NUMBER, Character
+        ////            .getDirectionality(0x0600));
+        ////    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT_ARABIC, Character
+        ////            .getDirectionality(0xFEFC));
 
-        //    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER, Character
-        //            .getDirectionality(0x2070));
-        //    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER, Character
-        //            .getDirectionality(0x1D7FF));
+        ////    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER, Character
+        ////            .getDirectionality(0x2070));
+        ////    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER, Character
+        ////            .getDirectionality(0x1D7FF));
 
-        //    //RI fails ,this is non-bug difference between Unicode 4.0 and 4.1
-        //    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR, Character
-        //            .getDirectionality(0x002B));
-        //    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR, Character
-        //            .getDirectionality(0xFF0B));
+        ////    //RI fails ,this is non-bug difference between Unicode 4.0 and 4.1
+        ////    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR, Character
+        ////            .getDirectionality(0x002B));
+        ////    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_SEPARATOR, Character
+        ////            .getDirectionality(0xFF0B));
 
-        //    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR, Character
-        //            .getDirectionality(0x0023));
-        //    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR, Character
-        //            .getDirectionality(0x17DB));
+        ////    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR, Character
+        ////            .getDirectionality(0x0023));
+        ////    assertEquals(Character.DIRECTIONALITY_EUROPEAN_NUMBER_TERMINATOR, Character
+        ////            .getDirectionality(0x17DB));
 
-        //    assertEquals(Character.DIRECTIONALITY_ARABIC_NUMBER, Character
-        //            .getDirectionality(0x0660));
-        //    assertEquals(Character.DIRECTIONALITY_ARABIC_NUMBER, Character
-        //            .getDirectionality(0x066C));
+        ////    assertEquals(Character.DIRECTIONALITY_ARABIC_NUMBER, Character
+        ////            .getDirectionality(0x0660));
+        ////    assertEquals(Character.DIRECTIONALITY_ARABIC_NUMBER, Character
+        ////            .getDirectionality(0x066C));
 
-        //    assertEquals(Character.DIRECTIONALITY_COMMON_NUMBER_SEPARATOR, Character
-        //            .getDirectionality(0x002C));
-        //    assertEquals(Character.DIRECTIONALITY_COMMON_NUMBER_SEPARATOR, Character
-        //            .getDirectionality(0xFF1A));
+        ////    assertEquals(Character.DIRECTIONALITY_COMMON_NUMBER_SEPARATOR, Character
+        ////            .getDirectionality(0x002C));
+        ////    assertEquals(Character.DIRECTIONALITY_COMMON_NUMBER_SEPARATOR, Character
+        ////            .getDirectionality(0xFF1A));
 
-        //    assertEquals(Character.DIRECTIONALITY_NONSPACING_MARK, Character
-        //            .getDirectionality(0x17CE));
-        //    assertEquals(Character.DIRECTIONALITY_NONSPACING_MARK, Character
-        //            .getDirectionality(0xE01DB));
+        ////    assertEquals(Character.DIRECTIONALITY_NONSPACING_MARK, Character
+        ////            .getDirectionality(0x17CE));
+        ////    assertEquals(Character.DIRECTIONALITY_NONSPACING_MARK, Character
+        ////            .getDirectionality(0xE01DB));
 
-        //    assertEquals(Character.DIRECTIONALITY_BOUNDARY_NEUTRAL, Character
-        //            .getDirectionality(0x0000));
-        //    assertEquals(Character.DIRECTIONALITY_BOUNDARY_NEUTRAL, Character
-        //            .getDirectionality(0xE007F));
+        ////    assertEquals(Character.DIRECTIONALITY_BOUNDARY_NEUTRAL, Character
+        ////            .getDirectionality(0x0000));
+        ////    assertEquals(Character.DIRECTIONALITY_BOUNDARY_NEUTRAL, Character
+        ////            .getDirectionality(0xE007F));
 
-        //    assertEquals(Character.DIRECTIONALITY_PARAGRAPH_SEPARATOR, Character
-        //            .getDirectionality(0x000A));
-        //    assertEquals(Character.DIRECTIONALITY_PARAGRAPH_SEPARATOR, Character
-        //            .getDirectionality(0x2029));
+        ////    assertEquals(Character.DIRECTIONALITY_PARAGRAPH_SEPARATOR, Character
+        ////            .getDirectionality(0x000A));
+        ////    assertEquals(Character.DIRECTIONALITY_PARAGRAPH_SEPARATOR, Character
+        ////            .getDirectionality(0x2029));
 
-        //    assertEquals(Character.DIRECTIONALITY_SEGMENT_SEPARATOR, Character
-        //            .getDirectionality(0x0009));
-        //    assertEquals(Character.DIRECTIONALITY_SEGMENT_SEPARATOR, Character
-        //            .getDirectionality(0x001F));
+        ////    assertEquals(Character.DIRECTIONALITY_SEGMENT_SEPARATOR, Character
+        ////            .getDirectionality(0x0009));
+        ////    assertEquals(Character.DIRECTIONALITY_SEGMENT_SEPARATOR, Character
+        ////            .getDirectionality(0x001F));
 
-        //    assertEquals(Character.DIRECTIONALITY_WHITESPACE, Character
-        //            .getDirectionality(0x0020));
-        //    assertEquals(Character.DIRECTIONALITY_WHITESPACE, Character
-        //            .getDirectionality(0x3000));
+        ////    assertEquals(Character.DIRECTIONALITY_WHITESPACE, Character
+        ////            .getDirectionality(0x0020));
+        ////    assertEquals(Character.DIRECTIONALITY_WHITESPACE, Character
+        ////            .getDirectionality(0x3000));
 
-        //    assertEquals(Character.DIRECTIONALITY_OTHER_NEUTRALS, Character
-        //            .getDirectionality(0x2FF0));
-        //    assertEquals(Character.DIRECTIONALITY_OTHER_NEUTRALS, Character
-        //            .getDirectionality(0x1D356));
+        ////    assertEquals(Character.DIRECTIONALITY_OTHER_NEUTRALS, Character
+        ////            .getDirectionality(0x2FF0));
+        ////    assertEquals(Character.DIRECTIONALITY_OTHER_NEUTRALS, Character
+        ////            .getDirectionality(0x1D356));
 
-        //    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT_EMBEDDING, Character
-        //            .getDirectionality(0x202A));
+        ////    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT_EMBEDDING, Character
+        ////            .getDirectionality(0x202A));
 
-        //    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT_OVERRIDE, Character
-        //            .getDirectionality(0x202D));
+        ////    assertEquals(Character.DIRECTIONALITY_LEFT_TO_RIGHT_OVERRIDE, Character
+        ////            .getDirectionality(0x202D));
 
-        //    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING, Character
-        //            .getDirectionality(0x202B));
+        ////    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT_EMBEDDING, Character
+        ////            .getDirectionality(0x202B));
 
-        //    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE, Character
-        //            .getDirectionality(0x202E));
+        ////    assertEquals(Character.DIRECTIONALITY_RIGHT_TO_LEFT_OVERRIDE, Character
+        ////            .getDirectionality(0x202E));
 
-        //    assertEquals(Character.DIRECTIONALITY_POP_DIRECTIONAL_FORMAT, Character
-        //            .getDirectionality(0x202C));
-        //}
+        ////    assertEquals(Character.DIRECTIONALITY_POP_DIRECTIONAL_FORMAT, Character
+        ////            .getDirectionality(0x202C));
+        ////}
 
     }
 }

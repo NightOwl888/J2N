@@ -315,175 +315,175 @@ namespace J2N.IO
 
         // J2N: Not applicable, as we followed the .NET convention of putting a guard clause on the constructor
         // so a null stream is disallowed.
-        ///**
-        // * @tests java.io.DataInputStream#readFully(byte[], int, int)
-        // */
-        //[Test]
-        //public void Test_readFully_BII_NullStream()
-        //{
-        //    DataInputStream @is = new DataInputStream(null);
-        //    byte[] byteArray = new byte[fileString.Length];
+        /////**
+        //// * @tests java.io.DataInputStream#readFully(byte[], int, int)
+        //// */
+        ////[Test]
+        ////public void Test_readFully_BII_NullStream()
+        ////{
+        ////    DataInputStream @is = new DataInputStream(null);
+        ////    byte[] byteArray = new byte[fileString.Length];
 
-        //    try
-        //    {
-        //        @is.ReadFully(byteArray, -1, -1);
-        //        fail("should throw ArgumentOutOfRangeException");
-        //    }
-        //    catch (ArgumentOutOfRangeException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(byteArray, -1, -1);
+        ////        fail("should throw ArgumentOutOfRangeException");
+        ////    }
+        ////    catch (ArgumentOutOfRangeException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(byteArray, 0, -1);
-        //        fail("should throw ArgumentOutOfRangeException");
-        //    }
-        //    catch (ArgumentOutOfRangeException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(byteArray, 0, -1);
+        ////        fail("should throw ArgumentOutOfRangeException");
+        ////    }
+        ////    catch (ArgumentOutOfRangeException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(byteArray, 1, -1);
-        //        fail("should throw ArgumentOutOfRangeException");
-        //    }
-        //    catch (ArgumentOutOfRangeException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(byteArray, 1, -1);
+        ////        fail("should throw ArgumentOutOfRangeException");
+        ////    }
+        ////    catch (ArgumentOutOfRangeException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    @is.ReadFully(byteArray, -1, 0);
-        //    @is.ReadFully(byteArray, 0, 0);
-        //    @is.ReadFully(byteArray, 1, 0);
+        ////    @is.ReadFully(byteArray, -1, 0);
+        ////    @is.ReadFully(byteArray, 0, 0);
+        ////    @is.ReadFully(byteArray, 1, 0);
 
-        //    try
-        //    {
-        //        @is.ReadFully(byteArray, -1, 1);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(byteArray, -1, 1);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(byteArray, 0, 1);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(byteArray, 0, 1);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(byteArray, 1, 1);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(byteArray, 1, 1);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(byteArray, 0, int.MaxValue);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
-        //}
+        ////    try
+        ////    {
+        ////        @is.ReadFully(byteArray, 0, int.MaxValue);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
+        ////}
 
         // J2N: Not applicable, as we followed the .NET convention of putting a guard clause on the constructor
         // so a null stream is disallowed.
-        ///**
-        // * @tests java.io.DataInputStream#readFully(byte[], int, int)
-        // */
-        //[Test]
-        //public void Test_readFully_BII_NullStream_NullArray()
-        //{
-        //    DataInputStream @is = new DataInputStream(null);
-        //    byte[] nullByteArray = null;
+        /////**
+        //// * @tests java.io.DataInputStream#readFully(byte[], int, int)
+        //// */
+        ////[Test]
+        ////public void Test_readFully_BII_NullStream_NullArray()
+        ////{
+        ////    DataInputStream @is = new DataInputStream(null);
+        ////    byte[] nullByteArray = null;
 
-        //    try
-        //    {
-        //        @is.ReadFully(nullByteArray, -1, -1);
-        //        fail("should throw ArgumentOutOfRangeException");
-        //    }
-        //    catch (ArgumentOutOfRangeException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(nullByteArray, -1, -1);
+        ////        fail("should throw ArgumentOutOfRangeException");
+        ////    }
+        ////    catch (ArgumentOutOfRangeException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(nullByteArray, 0, -1);
-        //        fail("should throw ArgumentOutOfRangeException");
-        //    }
-        //    catch (ArgumentOutOfRangeException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(nullByteArray, 0, -1);
+        ////        fail("should throw ArgumentOutOfRangeException");
+        ////    }
+        ////    catch (ArgumentOutOfRangeException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(nullByteArray, 1, -1);
-        //        fail("should throw ArgumentOutOfRangeException");
-        //    }
-        //    catch (ArgumentOutOfRangeException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(nullByteArray, 1, -1);
+        ////        fail("should throw ArgumentOutOfRangeException");
+        ////    }
+        ////    catch (ArgumentOutOfRangeException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    @is.ReadFully(nullByteArray, -1, 0);
-        //    @is.ReadFully(nullByteArray, 0, 0);
-        //    @is.ReadFully(nullByteArray, 1, 0);
+        ////    @is.ReadFully(nullByteArray, -1, 0);
+        ////    @is.ReadFully(nullByteArray, 0, 0);
+        ////    @is.ReadFully(nullByteArray, 1, 0);
 
-        //    try
-        //    {
-        //        @is.ReadFully(nullByteArray, -1, 1);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(nullByteArray, -1, 1);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(nullByteArray, 0, 1);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(nullByteArray, 0, 1);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(nullByteArray, 1, 1);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
+        ////    try
+        ////    {
+        ////        @is.ReadFully(nullByteArray, 1, 1);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
 
-        //    try
-        //    {
-        //        @is.ReadFully(nullByteArray, 0, int.MaxValue);
-        //        fail("should throw ArgumentNullException");
-        //    }
-        //    catch (ArgumentNullException e)
-        //    {
-        //        // expected
-        //    }
-        //}
+        ////    try
+        ////    {
+        ////        @is.ReadFully(nullByteArray, 0, int.MaxValue);
+        ////        fail("should throw ArgumentNullException");
+        ////    }
+        ////    catch (ArgumentNullException e)
+        ////    {
+        ////        // expected
+        ////    }
+        ////}
 
         /**
          * @tests java.io.DataInputStream#readInt()

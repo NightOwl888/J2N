@@ -13,7 +13,7 @@ namespace J2N.Text
         /// so a <see cref="T:char[]"/> can be used as <see cref="ICharSequence"/> in .NET.
         /// </summary>
         /// <param name="text">This <see cref="T:char[]"/>.</param>
-        public static ICharSequence ToCharSequence(this char[] text)
+        public static ICharSequence AsCharSequence(this char[] text)
         {
             return new CharArrayCharSequence(text);
         }
@@ -44,7 +44,7 @@ namespace J2N.Text
             // From Apache Harmony String class
             if (text == null || (startIndex == 0 && length == text.Length))
             {
-                return text.ToCharSequence();
+                return text.AsCharSequence();
             }
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));

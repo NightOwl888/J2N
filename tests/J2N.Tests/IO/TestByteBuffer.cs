@@ -303,7 +303,7 @@ namespace J2N.IO
                 assertTrue(other.CompareTo(buf) < 0);
             }
 
-            // LUCENENET NOTE: AllocateDirect() not supported
+            // J2N: AllocateDirect() not supported
             //assertTrue(ByteBuffer.Wrap(new byte[21]).CompareTo(ByteBuffer.AllocateDirect(21)) == 0);
             assertTrue(ByteBuffer.Wrap(new byte[21]).CompareTo(ByteBuffer.Allocate(21)) == 0);
         }
