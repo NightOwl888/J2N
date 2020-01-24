@@ -640,17 +640,17 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public IEnumerator<T> GetEnumerator()
         {
-            return new Enumerator<T>(this);
+            return new Enumerator(this);
         }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator()
         {
-            return new Enumerator<T>(this);
+            return new Enumerator(this);
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new Enumerator<T>(this);
+            return new Enumerator(this);
         }
 
         #endregion
@@ -2425,14 +2425,14 @@ namespace J2N.Collections.Generic
             internal T value;
         }
 
-        internal struct Enumerator<T1> : IEnumerator<T1>, IEnumerator where T1 : T
+        internal struct Enumerator : IEnumerator<T>, IEnumerator
         {
-            private readonly HashSet<T1> _set;
+            private readonly HashSet<T> _set;
             private int _index;
             private readonly int _version;
-            [AllowNull] private T1 _current;
+            [AllowNull] private T _current;
 
-            internal Enumerator(HashSet<T1> set)
+            internal Enumerator(HashSet<T> set)
             {
                 _set = set;
                 _index = 0;
@@ -2466,7 +2466,7 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            public T1 Current => _current;
+            public T Current => _current;
 
             object? IEnumerator.Current
             {

@@ -1,6 +1,10 @@
 J2N - Java-like Components for .NET
 =========
 
+[![Nuget](https://img.shields.io/nuget/dt/J2N)](https://www.nuget.org/packages/J2N)
+[![Azure DevOps builds (master)](https://img.shields.io/azure-devops/build/NightOwl888/b2719dac-eeb4-46ff-9380-13b45ff0277b/1/master)](https://dev.azure.com/NightOwl888/J2N/_build?definitionId=1&_a=summary)
+[![GitHub](https://img.shields.io/github/license/NightOwl888/J2N)](https://github.com/NightOwl888/J2N/blob/master/LICENSE.txt)
+
 J2N is a library that helps bridge the gap between .NET and Java.
 
 ### Our Goals
@@ -12,12 +16,12 @@ J2N is a library that helps bridge the gap between .NET and Java.
 
 Basically, if you are looking for a "JDK.NET", this is about as close as you can get. While we recommend using purely .NET components where possible when porting from Java, there are some Java features that have no .NET counterpart or the .NET counterpart is lacking behaviors that are not easy to reproduce without reinventing the wheel. Even if you prefer to reinvent the wheel by designing your own ".NETified" component, you may still need a Java-like component to compare your component against in tests.
 
-That is why we created J2N.
+That is why we created J2N. If you like this idea, please be sure to star our repository on GitHub.
 
 ### Our Focus
 
 1. **Text analysis:** code points, normalizing behaviors between different "character sequence" types, tokenizing, etc.
-2. **I/O:** Reading and writing types in both big-endian and little-endian format and providing specialized behaviors for interop with Java-centric file formats.
+2. **I/O:** Reading and writing types in both big-endian and little-endian byte order and providing specialized behaviors for interop with Java-centric file formats.
 3. **Collections:** .NET's cupboard is a little bare when it comes to specialized collections, so we fill in some gaps.
 4. **Equality:** Compare collections for structural equality with behaviors that are specific to each collection family, and provide .NET equality comparers for other types that differ in behavior.
 5. **Localization:** Bridge the gap between .NET's culture-aware and Java's culture-neutral defaults.
@@ -25,7 +29,7 @@ That is why we created J2N.
 
 ### Status: Beta
 
-Much of what is here has been tested pretty thoroughly already and the APIs are pretty stable, however, we are still adding additional components and getting it ready for use in production.
+Much of what is here has been tested pretty thoroughly already and the APIs are pretty stable. We anticipate the beta period to be quite short.
 
 ## NuGet
 

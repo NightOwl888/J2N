@@ -21,10 +21,6 @@ namespace J2N.Collections.Generic
     ///         <c>null</c> without throwing an exception.
     ///     </description></item>
     ///     <item><description>
-    ///         If <typeparamref name="TKey"/> is <see cref="Nullable{T}"/> or a reference type, the key can be
-    ///         <c>null</c> without throwing an exception.
-    ///     </description></item>
-    ///     <item><description>
     ///         Overrides the <see cref="Equals(object)"/> and <see cref="GetHashCode()"/> methods to compare collections
     ///         using structural equality by default. Also, <see cref="IStructuralEquatable"/> is implemented so the
     ///         default behavior can be overridden.
@@ -243,6 +239,11 @@ namespace J2N.Collections.Generic
         /// that is the destination of the elements copied from the current <see cref="LinkedDictionary{TKey, TValue}"/>.
         /// The array must have zero-based indexing.</param>
         /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <exception cref="ArgumentException">The number of elements in the source array is greater
+        /// than the available space from <paramref name="index"/> to the end of the destination array.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero.</exception>
+        /// <remarks>This method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
         {
             if (array == null)
@@ -443,10 +444,10 @@ namespace J2N.Collections.Generic
         #region IEnumerable Members
 
         /// <summary>
-        /// Returns an enumerator that iterates through the <see cref="Dictionary{TKey, TValue}"/>.
+        /// Returns an enumerator that iterates through the <see cref="LinkedDictionary{TKey, TValue}"/>.
         /// </summary>
         /// <returns>A <see cref="IEnumerator{T}"/> for the
-        /// <see cref="Dictionary{TKey, TValue}"/>.</returns>
+        /// <see cref="LinkedDictionary{TKey, TValue}"/>.</returns>
         /// <remarks>
         /// For purposes of enumeration, each item is a <see cref="KeyValuePair{TKey, TValue}"/> structure
         /// representing a value and its key.
@@ -833,7 +834,6 @@ namespace J2N.Collections.Generic
                 // J2N: Only throw if the generic closing type is not nullable
                 if (key is null && !typeof(TKey).IsNullableType())
                     throw new ArgumentNullException(nameof(key));
-
                 if (value is null && !typeof(TValue).IsNullableType())
                     throw new ArgumentNullException(nameof(value));
 
@@ -861,7 +861,6 @@ namespace J2N.Collections.Generic
             // J2N: Only throw if the generic closing type is not nullable
             if (key is null && !typeof(TKey).IsNullableType())
                 throw new ArgumentNullException(nameof(key));
-
             if (value is null && !typeof(TValue).IsNullableType())
                 throw new ArgumentNullException(nameof(value));
 
@@ -922,6 +921,11 @@ namespace J2N.Collections.Generic
             if (array is KeyValuePair<TKey, TValue>[] pairs)
             {
                 CopyTo(pairs, index);
+            }
+            else if (array is DictionaryEntry[] dictEntryArray)
+            {
+                foreach (var item in this)
+                    dictEntryArray[index++] = new DictionaryEntry(item.Key, item.Value);
             }
             else
             {
@@ -1467,6 +1471,24 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
+            /// <summary>
+            /// Copies the <see cref="ValueCollection"/> elements to an existing one-dimensional
+            /// array, starting at the specified array index.
+            /// </summary>
+            /// <param name="array">The one-dimensional array that is the destination of the elements copied from
+            /// the <see cref="ValueCollection"/>. The array must have zero-based indexing.</param>
+            /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+            /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0.</exception>
+            /// <exception cref="ArgumentException">The number of elements in the source <see cref="ValueCollection"/>
+            /// is greater than the available space from <paramref name="index"/> to the end of the destination
+            /// <paramref name="array"/>.</exception>
+            /// <remarks>
+            /// The elements are copied to the array in the same order in which the enumerator iterates through the
+            /// <see cref="ValueCollection"/>.
+            /// <para/>
+            /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+            /// </remarks>
             public void CopyTo(TValue[] array, int index)
             {
                 if (array == null)

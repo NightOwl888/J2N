@@ -501,6 +501,11 @@ namespace J2N.Collections.Generic
         /// that is the destination of the elements copied from the current <see cref="SortedDictionary{TKey, TValue}"/>.
         /// The array must have zero-based indexing.</param>
         /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <exception cref="ArgumentException">The number of elements in the source array is greater
+        /// than the available space from <paramref name="index"/> to the end of the destination array.</exception>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero.</exception>
+        /// <remarks>This method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
         {
             _set.CopyTo(array, index);
@@ -721,10 +726,9 @@ namespace J2N.Collections.Generic
                 //}
 
                 // J2N: Only throw if the generic closing type is not nullable
-                if (key == null && !typeof(TKey).IsNullableType())
+                if (key is null && !typeof(TKey).IsNullableType())
                     throw new ArgumentNullException(nameof(key));
-
-                if (value == null && !typeof(TValue).IsNullableType())
+                if (value is null && !typeof(TValue).IsNullableType())
                     throw new ArgumentNullException(nameof(value));
 
                 try
@@ -756,7 +760,6 @@ namespace J2N.Collections.Generic
             // J2N: Only throw if the generic closing type is not nullable
             if (key is null && !typeof(TKey).IsNullableType())
                 throw new ArgumentNullException(nameof(key));
-
             if (value is null && !typeof(TValue).IsNullableType())
                 throw new ArgumentNullException(nameof(value));
 

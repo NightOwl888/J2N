@@ -1008,7 +1008,7 @@ namespace J2N.Collections.Generic
         /// This method is an O(1) operation.
         /// </remarks>
         public IEnumerator<T> GetEnumerator()
-            => new Enumerator<T>(this);
+            => new Enumerator(this);
 
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
@@ -1927,14 +1927,14 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal struct Enumerator<T1> : IEnumerator<T1>, IEnumerator where T1 : T
+        internal struct Enumerator : IEnumerator<T>, IEnumerator
         {
-            private readonly List<T1> list;
+            private readonly List<T> list;
             private int index;
             private int version;
-            private T1 current;
+            private T current;
 
-            internal Enumerator(List<T1> list)
+            internal Enumerator(List<T> list)
             {
                 this.list = list;
                 index = 0;
@@ -1948,7 +1948,7 @@ namespace J2N.Collections.Generic
 
             public bool MoveNext()
             {
-                List<T1> localList = list;
+                List<T> localList = list;
 
                 if (version == localList.version && ((uint)index < (uint)localList.list.Count))
                 {
@@ -1971,7 +1971,7 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            public T1 Current => current;
+            public T Current => current;
 
             object? IEnumerator.Current
             {

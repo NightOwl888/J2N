@@ -197,6 +197,24 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The key was of an incorrect type for this dictionary..
+        /// </summary>
+        internal static string Argument_TypeOfKeyIncorrect {
+            get {
+                return ResourceManager.GetString("Argument_TypeOfKeyIncorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value was of an incorrect type for this dictionary..
+        /// </summary>
+        internal static string Argument_TypeOfValueIncorrect {
+            get {
+                return ResourceManager.GetString("Argument_TypeOfValueIncorrect", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The collection does not support null values..
         /// </summary>
         internal static string ArgumentNull_CollectionDoesntSupportNull {
@@ -233,6 +251,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to limit must be at least 1..
+        /// </summary>
+        internal static string ArgumentOutOfRange_NeedLimitAtLeast1 {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_NeedLimitAtLeast1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Non-negative number required..
         /// </summary>
         internal static string ArgumentOutOfRange_NeedNonNegNum {
@@ -247,6 +274,15 @@ namespace J2N.Resources {
         internal static string ArgumentOutOfRange_SmallCapacity {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_SmallCapacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The SyncRoot property may not be used for the synchronization of concurrent collections..
+        /// </summary>
+        internal static string ConcurrentCollection_SyncRoot_NotSupported {
+            get {
+                return ResourceManager.GetString("ConcurrentCollection_SyncRoot_NotSupported", resourceCulture);
             }
         }
         
@@ -355,6 +391,24 @@ namespace J2N.Resources {
         internal static string LinkedListNodeIsAttached {
             get {
                 return ResourceManager.GetString("LinkedListNodeIsAttached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The LurchTable internal datastructure appears to be corrupted..
+        /// </summary>
+        internal static string LurchTable_CorruptedData {
+            get {
+                return ResourceManager.GetString("LurchTable_CorruptedData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For an unordered LurchTable (LurchTableOrder.None), the limit must be set to int.MaxValue..
+        /// </summary>
+        internal static string LurchTable_NeedLimitIntMaxValue {
+            get {
+                return ResourceManager.GetString("LurchTable_NeedLimitIntMaxValue", resourceCulture);
             }
         }
         

@@ -129,6 +129,9 @@
   <data name="ArgumentOutOfRange_NeedCapacityAtLeast1" xml:space="preserve">
     <value>capacity must be at least 1.</value>
   </data>
+  <data name="ArgumentOutOfRange_NeedLimitAtLeast1" xml:space="preserve">
+    <value>limit must be at least 1.</value>
+  </data>
   <data name="ArgumentOutOfRange_NeedNonNegNum" xml:space="preserve">
     <value>Non-negative number required.</value>
   </data>
@@ -149,6 +152,12 @@
   </data>
   <data name="Argument_InvalidOffLen" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
+  </data>
+  <data name="Argument_TypeOfKeyIncorrect" xml:space="preserve">
+    <value>The key was of an incorrect type for this dictionary.</value>
+  </data>
+  <data name="Argument_TypeOfValueIncorrect" xml:space="preserve">
+    <value>The value was of an incorrect type for this dictionary.</value>
   </data>
   <data name="Arg_ArrayLengthsDiffer" xml:space="preserve">
     <value>Array lengths must be the same.</value>
@@ -179,6 +188,9 @@
   </data>
   <data name="Arg_WrongType" xml:space="preserve">
     <value>The value '{0}' is not of type '{1}' and cannot be used in this generic collection.</value>
+  </data>
+  <data name="ConcurrentCollection_SyncRoot_NotSupported" xml:space="preserve">
+    <value>The SyncRoot property may not be used for the synchronization of concurrent collections.</value>
   </data>
   <data name="ExternalLinkedListNode" xml:space="preserve">
     <value>The LinkedList node does not belong to current LinkedList.</value>
@@ -215,6 +227,12 @@
   </data>
   <data name="LinkedListNodeIsAttached" xml:space="preserve">
     <value>The LinkedList node already belongs to a LinkedList.</value>
+  </data>
+  <data name="LurchTable_CorruptedData" xml:space="preserve">
+    <value>The LurchTable internal datastructure appears to be corrupted.</value>
+  </data>
+  <data name="LurchTable_NeedLimitIntMaxValue" xml:space="preserve">
+    <value>For an unordered LurchTable (LurchTableOrder.None), the limit must be set to int.MaxValue.</value>
   </data>
   <data name="NotSupported_KeyCollectionSet" xml:space="preserve">
     <value>Mutating a key collection derived from a dictionary is not allowed.</value>
