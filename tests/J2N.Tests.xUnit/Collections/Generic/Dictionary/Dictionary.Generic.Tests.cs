@@ -423,7 +423,7 @@ namespace J2N.Collections.Tests
 
 #endregion
 
-#region TrimExcess
+        #region TrimExcess
 
 #if FEATURE_DICTIONARY_TRIMEXCESS
 
@@ -632,6 +632,6 @@ namespace J2N.Collections.Tests
 
 #endif
 
-#endregion
+        #endregion
     }
 }

@@ -274,7 +274,7 @@ namespace J2N.Collections.Generic
         /// Returned enumerator does not iterate elements in sorted order.</remarks>
         public virtual IEnumerator<T> GetEnumerator()
         {
-            return new Enumerator<T>(this);
+            return new Enumerator(this);
         }
 
         /// <summary>
@@ -439,20 +439,20 @@ namespace J2N.Collections.Generic
 
         void ICollection<T>.Add(T item) => Add(item);
 
-        private struct Enumerator<T1> : IEnumerator<T1> where T1 : T
+        private struct Enumerator : IEnumerator<T>
         {
             private int currentIndex;
-            private T1 current;
-            private readonly PriorityQueue<T1> priorityQueue;
+            private T current;
+            private readonly PriorityQueue<T> priorityQueue;
 
-            public Enumerator(PriorityQueue<T1> priorityQueue)
+            public Enumerator(PriorityQueue<T> priorityQueue)
             {
                 this.priorityQueue = priorityQueue ?? throw new ArgumentNullException(nameof(priorityQueue));
                 currentIndex = -1;
                 current = default!;
             }
 
-            public T1 Current => current;
+            public T Current => current;
 
             object? IEnumerator.Current => current;
 
@@ -730,7 +730,7 @@ namespace J2N.Collections.Generic
         /// Returned enumerator does not iterate elements in sorted order.</remarks>
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return new Enumerator<T>(this);
+            return new Enumerator(this);
         }
 
         #endregion ICollection<T> Members

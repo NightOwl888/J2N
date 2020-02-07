@@ -32,7 +32,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
   displayName: 'Validate Template Parameters'
 
-- task: DotNetCoreInstaller@0
+- task: UseDotNet@2
   displayName: 'Use .NET Core sdk 3.0.101'
   inputs:
     version: 3.0.101

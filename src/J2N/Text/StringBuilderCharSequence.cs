@@ -4,15 +4,25 @@ using System.Text;
 namespace J2N.Text
 {
     /// <summary>
-    /// A wrapper struct that represents a <see cref="System.Text.StringBuilder"/> and implements <see cref="ICharSequence"/>.
+    /// A wrapper class that represents a <see cref="System.Text.StringBuilder"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
-    public struct StringBuilderCharSequence : ICharSequence, IAppendable, 
+    public class StringBuilderCharSequence : ICharSequence, IAppendable, 
         IComparable<ICharSequence>, IComparable,
         IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
         IEquatable<ICharSequence>,
         IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
         IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>
     {
+        /// <summary>
+        /// Initializes a new instance of <see cref="StringBuilderCharSequence"/> with a new backing <see cref="StringBuilder"/>.
+        /// </summary>
+        public StringBuilderCharSequence()
+        {
+            this.Value = new StringBuilder();
+            this.HasValue = true;
+        }
+
+
         /// <summary>
         /// Initializes a new instance of <see cref="StringBuilderCharSequence"/> with the provided <paramref name="value"/>.
         /// </summary>

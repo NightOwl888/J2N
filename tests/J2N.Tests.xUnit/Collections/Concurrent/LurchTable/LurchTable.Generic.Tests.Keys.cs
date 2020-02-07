@@ -3,29 +3,30 @@
 // See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
+using J2N.Collections.Tests;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
-using JCG = J2N.Collections.Generic;
+using SCG = System.Collections.Generic;
 
-namespace J2N.Collections.Tests
+namespace J2N.Collections.Concurrent.Tests
 {
-    public class LinkedDictionary_Generic_Tests_Keys : ICollection_Generic_Tests<string>
+    public class LurchTable_Generic_Tests_Keys : ICollection_Generic_Tests<string>
     {
         protected override bool DefaultValueAllowed => false;
         protected override bool DuplicateValuesAllowed => false;
         protected override bool IsReadOnly => true;
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new SCG.List<ModifyEnumerable>();
         protected override ICollection<string> GenericICollectionFactory()
         {
-            return new LinkedDictionary<string, string>().Keys;
+            return new LurchTable<string, string>().Keys;
         }
 
         protected override ICollection<string> GenericICollectionFactory(int count)
         {
-            LinkedDictionary<string, string> list = new LinkedDictionary<string, string>();
+            LurchTable<string, string> list = new LurchTable<string, string>();
             int seed = 13453;
             for (int i = 0; i < count; i++)
                 list.Add(CreateT(seed++), CreateT(seed++));
@@ -44,16 +45,16 @@ namespace J2N.Collections.Tests
         protected override Type ICollection_Generic_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
 
         [Fact]
-        public void LinkedDictionary_Generic_KeyCollection_Constructor_NullDictionary()
+        public void LurchTable_Generic_KeyCollection_Constructor_NullDictionary()
         {
-            Assert.Throws<ArgumentNullException>(() => new LinkedDictionary<string, string>.KeyCollection(null));
+            Assert.Throws<ArgumentNullException>(() => new LurchTable<string, string>.KeyCollection(null));
         }
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void LinkedDictionary_Generic_KeyCollection_GetEnumerator(int count)
+        public void LurchTable_Generic_KeyCollection_GetEnumerator(int count)
         {
-            LinkedDictionary<string, string> dictionary = new LinkedDictionary<string, string>();
+            LurchTable<string, string> dictionary = new LurchTable<string, string>();
             int seed = 13453;
             while (dictionary.Count < count)
                 dictionary.Add(CreateT(seed++), CreateT(seed++));
@@ -61,7 +62,7 @@ namespace J2N.Collections.Tests
         }
     }
 
-    public class LinkedDictionary_Generic_Tests_Keys_AsICollection : ICollection_NonGeneric_Tests
+    public class LurchTable_Generic_Tests_Keys_AsICollection : ICollection_NonGeneric_Tests
     {
         protected override bool NullAllowed => true;
         protected override bool DuplicateValuesAllowed => false;
@@ -74,16 +75,16 @@ namespace J2N.Collections.Tests
 
         protected override ICollection NonGenericICollectionFactory()
         {
-            return (ICollection)new LinkedDictionary<string, string>().Keys;
+            return new LurchTable<string, string>().Keys;
         }
 
         protected override ICollection NonGenericICollectionFactory(int count)
         {
-            LinkedDictionary<string, string> list = new LinkedDictionary<string, string>();
+            LurchTable<string, string> list = new LurchTable<string, string>();
             int seed = 13453;
             for (int i = 0; i < count; i++)
                 list.Add(CreateT(seed++), CreateT(seed++));
-            return (ICollection)list.Keys;
+            return list.Keys;
         }
 
         private string CreateT(int seed)
@@ -100,11 +101,11 @@ namespace J2N.Collections.Tests
             Debug.Assert(false);
         }
 
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new SCG.List<ModifyEnumerable>();
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void LinkedDictionary_Generic_KeyCollection_CopyTo_ExactlyEnoughSpaceInTypeCorrectArray(int count)
+        public void LurchTable_Generic_KeyCollection_CopyTo_ExactlyEnoughSpaceInTypeCorrectArray(int count)
         {
             ICollection collection = NonGenericICollectionFactory(count);
             string[] array = new string[count];
@@ -115,3 +116,4 @@ namespace J2N.Collections.Tests
         }
     }
 }
+

@@ -1035,7 +1035,6 @@ namespace J2N.Collections.Generic
                 // J2N: Only throw if the generic closing type is not nullable
                 if (!TKeyIsNullable && key is null)
                     throw new ArgumentNullException(nameof(key));
-
                 if (value is null && !typeof(TValue).IsNullableType())
                     throw new ArgumentNullException(nameof(value));
 
@@ -1064,7 +1063,6 @@ namespace J2N.Collections.Generic
             // J2N: Only throw if the generic closing type is not nullable
             if (!TKeyIsNullable && key is null)
                 throw new ArgumentNullException(nameof(key));
-
             if (value is null && !typeof(TValue).IsNullableType())
                 throw new ArgumentNullException(nameof(value));
 

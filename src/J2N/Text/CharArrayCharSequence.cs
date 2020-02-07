@@ -5,9 +5,9 @@ using System.Text;
 namespace J2N.Text
 {
     /// <summary>
-    /// A wrapper struct that represents a <see cref="T:char[]"/> and implements <see cref="ICharSequence"/>.
+    /// A wrapper class that represents a <see cref="T:char[]"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
-    public struct CharArrayCharSequence : ICharSequence,
+    public class CharArrayCharSequence : ICharSequence,
         IComparable<ICharSequence>, IComparable,
         IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
         IEquatable<ICharSequence>,
