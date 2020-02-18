@@ -9,6 +9,19 @@ namespace J2N.Text
     /// </summary>
     public static class StringExtensions
     {
+        #region AsCharSequence
+
+        /// <summary>
+        /// Convenience method to wrap a string in a <see cref="StringCharSequence"/>
+        /// so a <see cref="string"/> can be used as <see cref="ICharSequence"/> in .NET.
+        /// </summary>
+        public static ICharSequence AsCharSequence(this string text)
+        {
+            return new StringCharSequence(text);
+        }
+
+        #endregion AsCharSequence
+
         #region CompareToOrdinal
 
         /// <summary>
@@ -1069,18 +1082,5 @@ namespace J2N.Text
         }
 
         #endregion Subsequence
-
-        #region ToCharSequence
-
-        /// <summary>
-        /// Convenience method to wrap a string in a <see cref="StringCharSequence"/>
-        /// so a <see cref="string"/> can be used as <see cref="ICharSequence"/> in .NET.
-        /// </summary>
-        public static ICharSequence AsCharSequence(this string text)
-        {
-            return new StringCharSequence(text);
-        }
-
-        #endregion ToCharSequence
     }
 }
