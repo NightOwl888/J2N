@@ -193,6 +193,19 @@ namespace J2N.Text
 
         #endregion AppendCodePoint
 
+        #region AsCharSequence
+
+        /// <summary>
+        /// Convenience method to wrap a string in a <see cref="StringBuilderCharSequence"/>
+        /// so a <see cref="StringBuilder"/> can be used as <see cref="ICharSequence"/> in .NET.
+        /// </summary>
+        public static ICharSequence AsCharSequence(this StringBuilder text)
+        {
+            return new StringBuilderCharSequence(text);
+        }
+
+        #endregion AsCharSequence
+
         #region CompareToOrdinal
 
         /// <summary>
@@ -1161,18 +1174,5 @@ namespace J2N.Text
         }
 
         #endregion Subsequence
-
-        #region ToCharSequence
-
-        /// <summary>
-        /// Convenience method to wrap a string in a <see cref="StringBuilderCharSequence"/>
-        /// so a <see cref="StringBuilder"/> can be used as <see cref="ICharSequence"/> in .NET.
-        /// </summary>
-        public static ICharSequence AsCharSequence(this StringBuilder text)
-        {
-            return new StringBuilderCharSequence(text);
-        }
-
-        #endregion
     }
 }
