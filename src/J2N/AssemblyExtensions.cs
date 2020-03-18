@@ -248,8 +248,13 @@ namespace J2N
                 // If resourceName is not null, we have an exact match, don't search
                 if (resourceName == null)
                 {
+#if NET40
+                    string assemblyName = type.Assembly.GetName().Name;
+                    string namespaceName = type.Namespace;
+#else
                     string assemblyName = type.GetTypeInfo().Assembly.GetName().Name;
                     string namespaceName = type.GetTypeInfo().Namespace;
+#endif
 
                     // Search by assembly + namespace
                     string resourceToFind = string.Concat(namespaceName, ".", name);

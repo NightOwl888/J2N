@@ -16,7 +16,11 @@ namespace J2N.Collections.Generic
 #endif
     public abstract class SetEqualityComparer<T> : IEqualityComparer<ISet<T>>, IEqualityComparer
     {
+#if NET40
+        private static readonly bool TIsValueType = typeof(T).IsValueType;
+#else
         private static readonly bool TIsValueType = typeof(T).GetTypeInfo().IsValueType;
+#endif
         private static readonly bool TIsObject = typeof(T).Equals(typeof(object));
 
         private readonly StructuralEqualityComparer structuralEqualityComparer;

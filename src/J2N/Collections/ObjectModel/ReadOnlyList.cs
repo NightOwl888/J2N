@@ -27,7 +27,11 @@ namespace J2N.Collections.ObjectModel
 #endif
     public class ReadOnlyList<T> : System.Collections.ObjectModel.ReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
     {
+#if NET40
+        private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
+#else
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || typeof(string).Equals(typeof(T));
+#endif
 
         private readonly ListEqualityComparer<T> structuralEqualityComparer;
         private readonly IFormatProvider toStringFormatProvider;
@@ -59,7 +63,7 @@ namespace J2N.Collections.ObjectModel
 
         internal IList<T> List => base.Items; // for testing
 
-        #region Structural Equality
+#region Structural Equality
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current list
@@ -104,9 +108,9 @@ namespace J2N.Collections.ObjectModel
         public override int GetHashCode()
             => GetHashCode(structuralEqualityComparer);
 
-        #endregion
+#endregion
 
-        #region ToString
+#region ToString
 
         /// <summary>
         /// Returns a string that represents the current list using the specified
@@ -164,6 +168,6 @@ namespace J2N.Collections.ObjectModel
         public virtual string ToString(string format)
             => ToString(format, toStringFormatProvider);
 
-        #endregion
+#endregion
     }
 }

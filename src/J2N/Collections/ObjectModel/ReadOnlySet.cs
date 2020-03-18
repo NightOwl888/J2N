@@ -29,7 +29,11 @@ namespace J2N.Collections.ObjectModel
 #endif
     public class ReadOnlySet<T> : ISet<T>, ICollection, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
     {
+#if NET40
+        private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
+#else
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || typeof(string).Equals(typeof(T));
+#endif
 
         private readonly ISet<T> set;
         private readonly SetEqualityComparer<T> structuralEqualityComparer;
@@ -70,7 +74,7 @@ namespace J2N.Collections.ObjectModel
         /// </summary>
         protected internal ISet<T> Items => set; // internal for testing
 
-        #region ISet<T> Members
+#region ISet<T> Members
 
         /// <summary>
         /// Gets the number of elements contained in the <see cref="ReadOnlySet{T}"/> instance.
@@ -318,9 +322,9 @@ namespace J2N.Collections.ObjectModel
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)set).GetEnumerator();
 
-        #endregion
+#endregion
 
-        #region ICollection Members
+#region ICollection Members
 
         bool ICollection.IsSynchronized
         {
@@ -384,9 +388,9 @@ namespace J2N.Collections.ObjectModel
             }
         }
 
-        #endregion
+#endregion
 
-        #region Structural Equality
+#region Structural Equality
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
@@ -432,9 +436,9 @@ namespace J2N.Collections.ObjectModel
         public override int GetHashCode()
             => GetHashCode(structuralEqualityComparer);
 
-        #endregion
+#endregion
 
-        #region ToString
+#region ToString
 
         /// <summary>
         /// Returns a string that represents the current set using the specified
@@ -491,6 +495,6 @@ namespace J2N.Collections.ObjectModel
         public virtual string ToString(string format)
             => ToString(format, toStringFormatProvider);
 
-        #endregion
+#endregion
     }
 }

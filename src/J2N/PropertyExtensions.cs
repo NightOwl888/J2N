@@ -429,7 +429,11 @@ namespace J2N
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
 
+#if NET40
+            using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024))
+#else
             using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024, true))
+#endif
                 Store0(properties, sw, null, true);
         }
 
@@ -487,7 +491,11 @@ namespace J2N
             if (comments == null)
                 throw new ArgumentNullException(nameof(comments));
 
+#if NET40
+            using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024))
+#else
             using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024, true))
+#endif
                 Store0(properties, sw, comments, true);
         }
 

@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if NET40
+#else
+
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -30,3 +33,4 @@ namespace J2N
         }
     }
 }
+#endif

@@ -44,8 +44,13 @@ namespace J2N.Threading.Atomic
         /// </summary>
         public T Value
         {
+#if NET40
+            get => value;
+            set => this.value = value;
+#else
             get => Volatile.Read(ref value);
             set => Volatile.Write(ref this.value, value);
+#endif
         }
 
         /// <summary>

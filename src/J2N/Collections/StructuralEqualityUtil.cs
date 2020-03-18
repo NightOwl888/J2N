@@ -36,6 +36,10 @@ namespace J2N.Collections
                 return (valueA, valueB) => valueA == null ? valueB == null : structuralEqualityComparer.Equals(valueA, valueB);
         }
 
+#if NET40
+        internal static bool IsValueType<TElement>(TElement value) => value == null ? false : value.GetType().IsValueType;
+#else
         internal static bool IsValueType<TElement>(TElement value) => value == null ? false : value.GetType().GetTypeInfo().IsValueType;
+#endif
     }
 }
