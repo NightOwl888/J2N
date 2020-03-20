@@ -266,9 +266,9 @@ namespace J2N.Collections.ObjectModel
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)collection).GetEnumerator();
 
-#endregion
+        #endregion
 
-#region Structural Equality
+        #region Structural Equality
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current list
@@ -433,9 +433,9 @@ namespace J2N.Collections.ObjectModel
         public override int GetHashCode()
             => GetHashCode(structuralEqualityComparer);
 
-#endregion
+        #endregion
 
-#region ToString
+        #region ToString
 
         /// <summary>
         /// Returns a string that represents the current collection using the specified
@@ -493,6 +493,6 @@ namespace J2N.Collections.ObjectModel
         public virtual string ToString(string format)
             => ToString(format, toStringFormatProvider);
 
-#endregion
+        #endregion
     }
 }

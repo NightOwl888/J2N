@@ -1,13 +1,15 @@
 ﻿#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 #if NET40
 
+using System;
+
 // https://github.com/dotnet/corefx/blob/48363ac826ccf66fbe31a5dcb1dc2aab9a7dd768/src/Common/src/CoreLib/System/Runtime/CompilerServices/MethodImplOptions.cs
 
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-namespace System.Runtime.CompilerServices
+namespace J2N.Compatibility
 {
     // This Enum matchs the miImpl flags defined in corhdr.h. It is used to specify
     // certain method properties.

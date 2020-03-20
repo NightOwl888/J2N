@@ -1,5 +1,4 @@
-﻿#if NET40
-#else
+﻿#if !NET40
 
 using System;
 using System.Linq;

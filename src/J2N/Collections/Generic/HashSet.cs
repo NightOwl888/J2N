@@ -6,6 +6,10 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SCG = System.Collections.Generic;
+#if NET40
+    using MethodImplOptions = J2N.Compatibility.MethodImplOptions;
+    using MethodImplAttribute = J2N.Compatibility.MethodImplAttribute;
+#endif
 #nullable enable
 
 namespace J2N.Collections.Generic

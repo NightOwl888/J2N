@@ -125,7 +125,7 @@ namespace J2N.Collections.ObjectModel
             }
         }
 
-#region IDictionary<TKey, TValue> Members
+        #region IDictionary<TKey, TValue> Members
 
         /// <summary>
         /// Determines whether the dictionary contains an element that has the specified key.
@@ -184,9 +184,9 @@ namespace J2N.Collections.ObjectModel
         }
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
-#endregion
+        #endregion
 
-#region ICollection<KeyValuePair<TKey, TValue>> Members
+        #region ICollection<KeyValuePair<TKey, TValue>> Members
 
         /// <summary>
         /// Gets the number of items in the dictionary.
@@ -220,9 +220,9 @@ namespace J2N.Collections.ObjectModel
             throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
         }
 
-#endregion
+        #endregion
 
-#region IEnumerable<KeyValuePair<TKey, TValue>> Members
+        #region IEnumerable<KeyValuePair<TKey, TValue>> Members
 
         /// <summary>
         /// Returns an enumerator that iterates through the <see cref="ReadOnlyDictionary{TKey, TValue}"/>.
@@ -233,15 +233,15 @@ namespace J2N.Collections.ObjectModel
             return dictionary.GetEnumerator();
         }
 
-#endregion
+        #endregion
 
-#region IEnumerable Members
+        #region IEnumerable Members
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-#endregion
+        #endregion
 
-#region IDictionary Members
+        #region IDictionary Members
 
         private static bool IsCompatibleKey(object? key)
         {
@@ -373,18 +373,18 @@ namespace J2N.Collections.ObjectModel
             }
         }
 
-#endregion
+        #endregion
 
-#region IReadOnlyDictionary members
+        #region IReadOnlyDictionary members
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
-#endregion IReadOnlyDictionary members
+        #endregion IReadOnlyDictionary members
 
-#region Structural Equality
+        #region Structural Equality
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current dictionary
@@ -492,10 +492,10 @@ namespace J2N.Collections.ObjectModel
         public virtual string ToString(string format)
             => ToString(format, toStringFormatProvider);
 
-#endregion
+        #endregion
 
 
-#region Nested Structure: DictionaryEnumerator
+        #region Nested Structure: DictionaryEnumerator
 
 #if FEATURE_SERIALIZABLE
         [Serializable]
@@ -539,9 +539,9 @@ namespace J2N.Collections.ObjectModel
             }
         }
 
-#endregion
+        #endregion
 
-#region Nested Class: KeyCollection
+        #region Nested Class: KeyCollection
 
         /// <summary>
         /// Represents a read-only collection of the keys of a <see cref="ReadOnlyDictionary{TKey, TValue}"/> object.
@@ -618,9 +618,9 @@ namespace J2N.Collections.ObjectModel
                 throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
-#endregion
+            #endregion
 
-#region IEnumerable<T> Members
+            #region IEnumerable<T> Members
 
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
@@ -633,13 +633,13 @@ namespace J2N.Collections.ObjectModel
 
 #endregion
 
-#region IEnumerable Members
+            #region IEnumerable Members
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-#endregion
+            #endregion
 
-#region ICollection Members
+            #region ICollection Members
 
             void ICollection.CopyTo(Array array, int index)
             {
@@ -667,12 +667,12 @@ namespace J2N.Collections.ObjectModel
                 }
             }
 
-#endregion
+            #endregion
         }
 
-#endregion
+        #endregion
 
-#region Nested Class: ValueCollection
+        #region Nested Class: ValueCollection
 
         /// <summary>
         /// Represents a read-only collection of the values of a <see cref="ReadOnlyDictionary{TKey, TValue}"/> object.
@@ -695,7 +695,7 @@ namespace J2N.Collections.ObjectModel
                 this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
             }
 
-#region ICollection<T> Members
+            #region ICollection<T> Members
 
             void ICollection<TValue>.Add(TValue item)
             {
@@ -749,9 +749,9 @@ namespace J2N.Collections.ObjectModel
                 throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
             }
 
-#endregion
+            #endregion
 
-#region IEnumerable<T> Members
+            #region IEnumerable<T> Members
 
             /// <summary>
             /// Returns an enumerator that iterates through the collection.
@@ -762,15 +762,15 @@ namespace J2N.Collections.ObjectModel
                 return collection.GetEnumerator();
             }
 
-#endregion
+            #endregion
 
-#region IEnumerable Members
+            #region IEnumerable Members
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-#endregion
+            #endregion
 
-#region ICollection Members
+            #region ICollection Members
 
             void ICollection.CopyTo(Array array, int index)
             {
@@ -798,14 +798,14 @@ namespace J2N.Collections.ObjectModel
                 }
             }
 
-#endregion ICollection Members
+            #endregion ICollection Members
         }
 
-#endregion
+        #endregion
 
         internal static class ReadOnlyDictionaryHelpers
         {
-#region Helper method for our KeyCollection and ValueCollection
+            #region Helper method for our KeyCollection and ValueCollection
 
             // Abstracted away to avoid redundant implementations.
             internal static void CopyToNonGenericICollectionHelper<T>(ICollection<T> collection, Array array, int index)
@@ -884,7 +884,7 @@ namespace J2N.Collections.ObjectModel
                 }
             }
 
-#endregion Helper method for our KeyCollection and ValueCollection
+            #endregion Helper method for our KeyCollection and ValueCollection
         }
     }
 }

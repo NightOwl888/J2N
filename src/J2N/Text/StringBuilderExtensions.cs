@@ -2,6 +2,10 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
+#if NET40
+    using MethodImplOptions = J2N.Compatibility.MethodImplOptions;
+    using MethodImplAttribute = J2N.Compatibility.MethodImplAttribute;
+#endif
 
 namespace J2N.Text
 {
