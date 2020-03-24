@@ -88,10 +88,10 @@ namespace J2N.Collections
         {
             Type elementType = arrayX.GetType().GetElementType();
             if (
-#if NET40
-                elementType.IsPrimitive
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                 elementType.GetTypeInfo().IsPrimitive
+#else
+                elementType.IsPrimitive
 #endif
                 && arrayY.GetType().GetElementType().Equals(elementType))
                 return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).Equals(arrayX, arrayY);
@@ -167,10 +167,10 @@ namespace J2N.Collections
         {
             Type elementType = array.GetType().GetElementType();
             if (
-#if NET40
-                elementType.IsPrimitive
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                 elementType.GetTypeInfo().IsPrimitive
+#else
+                elementType.IsPrimitive
 #endif
                 )
                 return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).GetHashCode(array);

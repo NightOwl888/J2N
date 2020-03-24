@@ -29,12 +29,12 @@ namespace J2N.Collections.ObjectModel
     public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, IStructuralEquatable, IStructuralFormattable
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     {
-#if NET40
-        private static readonly bool TKeyIsValueTypeOrStringOrStructuralEquatable = typeof(TKey).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TKey)) || typeof(string).Equals(typeof(TKey));
-        private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TValue)) || typeof(string).Equals(typeof(TValue));
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
         private static readonly bool TKeyIsValueTypeOrStringOrStructuralEquatable = typeof(TKey).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(TKey).GetTypeInfo()) || typeof(string).Equals(typeof(TKey));
         private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(TValue).GetTypeInfo()) || typeof(string).Equals(typeof(TValue));
+#else
+        private static readonly bool TKeyIsValueTypeOrStringOrStructuralEquatable = typeof(TKey).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TKey)) || typeof(string).Equals(typeof(TKey));
+        private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TValue)) || typeof(string).Equals(typeof(TValue));
 #endif
         private static readonly bool TKeyIsNullable = typeof(TKey).IsNullableType();
 

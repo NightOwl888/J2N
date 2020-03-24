@@ -91,18 +91,18 @@ namespace J2N.Collections
             {
                 Type elementType = typeof(T1);
                 if (
-#if NET40
-                    elementType.IsPrimitive
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                     elementType.GetTypeInfo().IsPrimitive
+#else
+                    elementType.IsPrimitive
 #endif
                     )
                     return (IEqualityComparer<T1[]>)GetPrimitiveOneDimensionalArrayEqualityComparer(elementType);
                 else if (
-#if NET40
-                    elementType.IsValueType
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                     elementType.GetTypeInfo().IsValueType
+#else
+                    elementType.IsValueType
 #endif
                     )
                     return new ValueTypeOneDimensionalArrayEqualityComparer();

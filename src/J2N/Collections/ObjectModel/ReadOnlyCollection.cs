@@ -29,10 +29,10 @@ namespace J2N.Collections.ObjectModel
 #endif
     public class ReadOnlyCollection<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection, IStructuralEquatable, IStructuralFormattable
     {
-#if NET40
-        private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || typeof(string).Equals(typeof(T));
+#else
+        private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
 #endif
 
         internal readonly ICollection<T> collection; // internal for testing
@@ -178,16 +178,16 @@ namespace J2N.Collections.ObjectModel
                 // we can't figure out if we can successfully copy the element beforehand.
                 //
 
-#if NET40
-#pragma warning disable CS8604 // Possible null reference argument.
-                Type targetType = array.GetType();
-#pragma warning restore CS8604 // Possible null reference argument.
-                Type sourceType = typeof(T);
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
 #pragma warning disable CS8604 // Possible null reference argument.
                 TypeInfo targetType = array.GetType().GetElementType().GetTypeInfo();
 #pragma warning restore CS8604 // Possible null reference argument.
                 TypeInfo sourceType = typeof(T).GetTypeInfo();
+#else
+#pragma warning disable CS8604 // Possible null reference argument.
+                Type targetType = array.GetType();
+#pragma warning restore CS8604 // Possible null reference argument.
+                Type sourceType = typeof(T);
 #endif
                 if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
                 {

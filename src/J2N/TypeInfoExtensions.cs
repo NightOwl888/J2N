@@ -1,4 +1,4 @@
-﻿#if !NET40
+﻿#if FEATURE_TYPEINFO
 
 using System;
 using System.Linq;

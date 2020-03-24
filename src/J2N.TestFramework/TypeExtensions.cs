@@ -11,10 +11,10 @@ namespace J2N
         /// </summary>
         public static Stream getResourceAsStream(this Type t, string name)
         {
-#if NET40
-            return t.Assembly.FindAndGetManifestResourceStream(t, name);
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
             return t.GetTypeInfo().Assembly.FindAndGetManifestResourceStream(t, name);
+#else
+            return t.Assembly.FindAndGetManifestResourceStream(t, name);
 #endif
         }
     }

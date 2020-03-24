@@ -82,10 +82,10 @@ namespace J2N.Collections
             {
                 Type elementType = tA.GetElementType();
                 if (
-#if NET40
-                    elementType.IsPrimitive
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                     elementType.GetTypeInfo().IsPrimitive
+#else
+                    elementType.IsPrimitive
 #endif
                     )
                     return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).Equals(objA, objB);
@@ -104,10 +104,10 @@ namespace J2N.Collections
             else if (objA is IStructuralEquatable seObj)
                 return seObj.Equals(objB, StructuralEqualityComparer.Aggressive);
             if (
-#if NET40
-                tA.IsGenericType
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                 tA.GetTypeInfo().IsGenericType
+#else
+                tA.IsGenericType
 #endif
                 )
             {
@@ -212,19 +212,19 @@ namespace J2N.Collections
             if (obj == null)
                 return 0; // 0 for null
 
-#if NET40
-            Type t = obj.GetType();
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
             TypeInfo t = obj.GetType().GetTypeInfo();
+#else
+            Type t = obj.GetType();
 #endif
             if (obj is Array array && array.Rank == 1)
             {
                 Type elementType = t.GetElementType();
                 if (
-#if NET40
-                    elementType.IsPrimitive
-#else
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                     elementType.GetTypeInfo().IsPrimitive
+#else
+                    elementType.IsPrimitive
 #endif
                     )
                     return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).GetHashCode(obj);
@@ -399,10 +399,10 @@ namespace J2N.Collections
             if (obj == null) return "null";
             Type t = obj.GetType();
             if (
-#if NET40
-                    t.IsGenericType
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
+                t.GetTypeInfo().IsGenericType
 #else
-                    t.GetTypeInfo().IsGenericType
+                t.IsGenericType
 #endif
                 && (t.ImplementsGenericInterface(typeof(ICollection<>)))
                 || t.ImplementsGenericInterface(typeof(IDictionary<,>)))
