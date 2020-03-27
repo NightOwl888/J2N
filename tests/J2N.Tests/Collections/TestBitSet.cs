@@ -1622,7 +1622,7 @@ namespace J2N.Collections
         public class JDKBSMethods : TestCase
         {
             private static Random generator = new Random();
-            private static bool failure = false;
+            //private static bool failure = false;
 
             //private static void fail(String diagnostic)
             //{
@@ -1740,8 +1740,8 @@ namespace J2N.Collections
             {
                 Console.Error.WriteLine(testName + ": " +
                                    (failCount == 0 ? "Passed" : "Failed(" + failCount + ")"));
-                if (failCount > 0)
-                    failure = true;
+                //if (failCount > 0)
+                //    failure = true;
             }
 
             [Test]

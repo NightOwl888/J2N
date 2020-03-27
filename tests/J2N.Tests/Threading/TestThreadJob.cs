@@ -179,7 +179,7 @@ namespace J2N.Threading
         internal class BogusException : Exception
         {
 
-            private static readonly long serialVersionUID = 1L;
+            //private static readonly long serialVersionUID = 1L;
 
             public BogusException(String s)
                             : base(s)
@@ -187,9 +187,9 @@ namespace J2N.Threading
             }
         }
 
-        ThreadJob st, ct, spinner;
+        ThreadJob st, ct /*, spinner*/;
 
-        static bool calledMySecurityManager = false;
+        ////static bool calledMySecurityManager = false;
 
         /////**
         //// * @tests java.lang.Thread#Thread()
@@ -1784,14 +1784,14 @@ namespace J2N.Threading
             catch (Exception e)
             {
             }
-            try
-            {
-                if (spinner != null)
-                    spinner.Interrupt();
-            }
-            catch (Exception e)
-            {
-            }
+            //try
+            //{
+            //    if (spinner != null)
+            //        spinner.Interrupt();
+            //}
+            //catch (Exception e)
+            //{
+            //}
             try
             {
                 if (ct != null)
@@ -1804,7 +1804,7 @@ namespace J2N.Threading
 
             try
             {
-                spinner = null;
+                //spinner = null;
                 st = null;
                 ct = null;
                 GC.Collect();
