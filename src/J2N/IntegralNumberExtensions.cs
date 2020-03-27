@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-#if NET40
-    using MethodImplOptions = J2N.Compatibility.MethodImplOptions;
-    using MethodImplAttribute = J2N.Compatibility.MethodImplAttribute;
-#endif
 
 namespace J2N
 {
@@ -20,7 +16,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="char"/> to convert</param>
         /// <returns>The binary string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToBinaryString(this char value) => Convert.ToString(value, 2);
 
         /// <summary>
@@ -29,7 +27,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="short"/> to convert</param>
         /// <returns>The binary string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToBinaryString(this short value)
         {
             if (value > 0)
@@ -43,7 +43,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="int"/> to convert</param>
         /// <returns>The binary string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToBinaryString(this int value) => Convert.ToString(value, 2);
 
         /// <summary>
@@ -52,7 +54,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="long"/> to convert</param>
         /// <returns>The binary string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToBinaryString(this long value) => Convert.ToString(value, 2);
 
         #endregion ToBinaryString
@@ -66,7 +70,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="char"/> to convert.</param>
         /// <returns>The hexadecimal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToHexString(this char value) => Convert.ToString(value, 16);
 
         /// <summary>
@@ -76,7 +82,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="short"/> to convert.</param>
         /// <returns>The hexadecimal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToHexString(this short value)
         {
             if (value > 0)
@@ -91,7 +99,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="int"/> to convert.</param>
         /// <returns>The hexadecimal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToHexString(this int value) => Convert.ToString(value, 16);
 
         /// <summary>
@@ -101,7 +111,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="long"/> to convert.</param>
         /// <returns>The hexadecimal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToHexString(this long value) => Convert.ToString(value, 16);
 
         #endregion
@@ -114,7 +126,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="char"/> to convert.</param>
         /// <returns>The octal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToOctalString(this char value) => Convert.ToString(value, 8);
 
         /// <summary>
@@ -123,7 +137,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="short"/> to convert.</param>
         /// <returns>The octal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToOctalString(this short value)
         {
             if (value > 0)
@@ -137,7 +153,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="int"/> to convert.</param>
         /// <returns>The octal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToOctalString(this int value) => Convert.ToString(value, 8);
 
         /// <summary>
@@ -146,7 +164,9 @@ namespace J2N
         /// </summary>
         /// <param name="value">The <see cref="long"/> to convert.</param>
         /// <returns>The octal string representation of <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static string ToOctalString(this long value) => Convert.ToString(value, 8);
 
         #endregion

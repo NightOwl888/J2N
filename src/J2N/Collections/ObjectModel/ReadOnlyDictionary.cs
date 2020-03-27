@@ -26,7 +26,11 @@ namespace J2N.Collections.ObjectModel
     [Serializable]
 #endif
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-    public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, IStructuralEquatable, IStructuralFormattable
+    public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyDictionary<TKey, TValue>,
+#endif
+        IStructuralEquatable, IStructuralFormattable
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     {
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
@@ -375,6 +379,7 @@ namespace J2N.Collections.ObjectModel
 
         #endregion
 
+#if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary members
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
@@ -383,6 +388,7 @@ namespace J2N.Collections.ObjectModel
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         #endregion IReadOnlyDictionary members
+#endif
 
         #region Structural Equality
 
@@ -551,7 +557,10 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        public sealed class KeyCollection : ICollection<TKey>, ICollection, IReadOnlyCollection<TKey>
+        public sealed class KeyCollection : ICollection<TKey>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TKey>
+#endif
         {
             private readonly ICollection<TKey> collection;
 #if FEATURE_SERIALIZABLE
@@ -682,7 +691,10 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        public sealed class ValueCollection : ICollection<TValue>, ICollection, IReadOnlyCollection<TValue>
+        public sealed class ValueCollection : ICollection<TValue>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TValue>
+#endif
         {
             private readonly ICollection<TValue> collection;
 #if FEATURE_SERIALIZABLE

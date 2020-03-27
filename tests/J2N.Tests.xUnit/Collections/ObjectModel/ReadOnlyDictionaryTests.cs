@@ -438,7 +438,7 @@ namespace J2N.Collections.ObjectModel.Tests
     /// </summary>
     public class IReadOnlyDictionary_T_Test<TKey, TValue>
     {
-        private readonly IReadOnlyDictionary<TKey, TValue> _collection;
+        private readonly IDictionary<TKey, TValue> _collection;
         private readonly KeyValuePair<TKey, TValue>[] _expectedItems;
         private readonly Func<KeyValuePair<TKey, TValue>> _generateItem;
 
@@ -446,7 +446,7 @@ namespace J2N.Collections.ObjectModel.Tests
         /// Initializes a new instance of the IReadOnlyDictionary_T_Test.
         /// </summary>
         public IReadOnlyDictionary_T_Test(
-            IReadOnlyDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems,
+            IDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems,
             Func<KeyValuePair<TKey, TValue>> generateItem)
         {
             _collection = collection;
@@ -603,7 +603,7 @@ namespace J2N.Collections.ObjectModel.Tests
         /// <summary>
         /// Verifies that the items in the given collection match the expected items.
         /// </summary>
-        public void VerifyCollection(IReadOnlyDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems)
+        public void VerifyCollection(IDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems)
         {
             // verify that you can get all items in collection.
             Assert.Equal(expectedItems.Length, collection.Count);
@@ -622,7 +622,7 @@ namespace J2N.Collections.ObjectModel.Tests
         /// <summary>
         /// Verifies that the generic enumerator retrieves the correct items.
         /// </summary>
-        private void VerifyGenericEnumerator(IReadOnlyDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems)
+        private void VerifyGenericEnumerator(IDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems)
         {
             IEnumerator<KeyValuePair<TKey, TValue>> enumerator = collection.GetEnumerator();
             int iterations = 0;
@@ -683,7 +683,7 @@ namespace J2N.Collections.ObjectModel.Tests
         /// <summary>
         /// Verifies that the non-generic enumerator retrieves the correct items.
         /// </summary>
-        private void VerifyEnumerator(IReadOnlyDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems)
+        private void VerifyEnumerator(IDictionary<TKey, TValue> collection, KeyValuePair<TKey, TValue>[] expectedItems)
         {
             IEnumerator enumerator = collection.GetEnumerator();
             int iterations = 0;

@@ -74,6 +74,8 @@
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
     
   </PropertyGroup>
   

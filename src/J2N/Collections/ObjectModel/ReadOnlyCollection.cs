@@ -27,7 +27,11 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class ReadOnlyCollection<T> : ICollection<T>, IReadOnlyCollection<T>, ICollection, IStructuralEquatable, IStructuralFormattable
+    public class ReadOnlyCollection<T> : ICollection<T>,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyCollection<T>,
+#endif
+        ICollection, IStructuralEquatable, IStructuralFormattable
     {
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || typeof(string).Equals(typeof(T));

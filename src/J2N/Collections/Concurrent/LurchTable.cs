@@ -20,10 +20,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
-#if NET40
-    using MethodImplOptions = J2N.Compatibility.MethodImplOptions;
-    using MethodImplAttribute = J2N.Compatibility.MethodImplAttribute;
-#endif
 
 namespace J2N.Collections.Concurrent
 {
@@ -61,7 +57,11 @@ namespace J2N.Collections.Concurrent
     /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
-    public class LurchTable<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, IDisposable
+    public class LurchTable<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyDictionary<TKey, TValue>,
+#endif
+        IDisposable
     {
         /// <summary> Method signature for the ItemUpdated event </summary>
         public delegate void ItemUpdatedMethod(KeyValuePair<TKey, TValue> previous, KeyValuePair<TKey, TValue> next);
@@ -1577,7 +1577,10 @@ namespace J2N.Collections.Concurrent
         [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public class KeyCollection : ICollection<TKey>, ICollection, IReadOnlyCollection<TKey>
+        public class KeyCollection : ICollection<TKey>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TKey>
+#endif
         {
             private readonly LurchTable<TKey, TValue> _owner;
 
@@ -1838,7 +1841,9 @@ namespace J2N.Collections.Concurrent
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
+#if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
+#endif
 
         #endregion
 
@@ -1864,7 +1869,10 @@ namespace J2N.Collections.Concurrent
         [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public class ValueCollection : ICollection<TValue>, ICollection, IReadOnlyCollection<TValue>
+        public class ValueCollection : ICollection<TValue>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TValue>
+#endif
         {
             private readonly LurchTable<TKey, TValue> _owner;
 
@@ -2130,7 +2138,9 @@ namespace J2N.Collections.Concurrent
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
+#if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
+#endif
 
         #endregion
 
@@ -2644,13 +2654,17 @@ namespace J2N.Collections.Concurrent
             }
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         private int GetHash(TKey key)
         {
             return (key is null ? 0 : _comparer.GetHashCode(key)) & int.MaxValue;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         private bool KeyEquals(TKey key1, TKey key2)
         {
             if (key1 is null)

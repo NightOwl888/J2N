@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-#if NET40
-    using MethodImplOptions = J2N.Compatibility.MethodImplOptions;
-    using MethodImplAttribute = J2N.Compatibility.MethodImplAttribute;
-#endif
 
 namespace J2N.Numerics
 {
@@ -81,7 +77,9 @@ namespace J2N.Numerics
         /// ("leftmost") one-bit in the two's complement binary representation
         /// of the specified <paramref name="value"/>, or 32 if the value
         /// is equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int LeadingZeroCount(this int value)
         {
             if (value == 0)
@@ -119,7 +117,9 @@ namespace J2N.Numerics
         /// ("leftmost") one-bit in the two's complement binary representation
         /// of the specified <paramref name="value"/>, or 64 if the value
         /// is equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int LeadingZeroCount(this long value)
         {
             if (value == 0)
@@ -155,7 +155,9 @@ namespace J2N.Numerics
         /// one-bit in the two's complement binary representation of the
         /// specified <paramref name="value"/>, or 32 if the value is equal
         /// to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int TrailingZeroCount(this int value)
         {
             if (value == 0)
@@ -179,7 +181,9 @@ namespace J2N.Numerics
         /// one-bit in the two's complement binary representation of the
         /// specified <paramref name="value"/>, or 64 if the value is equal
         /// to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int TrailingZeroCount(this long value)
         {
             if (value == 0)
@@ -206,7 +210,9 @@ namespace J2N.Numerics
         /// <returns>An <see cref="int"/> value with a single one-bit, in the position
         /// of the highest-order one-bit in the specified <paramref name="value"/>, or zero if
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int HighestOneBit(this int value) // Harmony
         {
             value |= (value >> 1);
@@ -228,7 +234,9 @@ namespace J2N.Numerics
         /// <returns>A <see cref="long"/> value with a single one-bit, in the position
         /// of the highest-order one-bit in the specified <paramref name="value"/>, or zero if
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static long HighestOneBit(this long value)
         {
             value |= (value >> 1);
@@ -255,7 +263,9 @@ namespace J2N.Numerics
         /// <returns>An <see cref="int"/> value with a single one-bit, in the position
         /// of the lowest-order one-bit in the specified <paramref name="value"/>, or zero if
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int LowestOneBit(this int value)
         {
             // From Hacker's Delight, Section 2-1
@@ -273,7 +283,9 @@ namespace J2N.Numerics
         /// <returns>A <see cref="long"/> value with a single one-bit, in the position
         /// of the lowest-order one-bit in the specified <paramref name="value"/>, or zero if
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static long LowestOneBit(this long value)
         {
             // From Hacker's Delight, Section 2-1
@@ -379,7 +391,9 @@ namespace J2N.Numerics
         /// <returns>The value obtained by rotating the two's complement binary
         /// representation of the specified <paramref name="value"/> left by the
         /// specified number of bits.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int RotateLeft(this int value, int distance)
         {
             if (distance == 0)
@@ -414,7 +428,9 @@ namespace J2N.Numerics
         /// <returns>The value obtained by rotating the two's complement binary
         /// representation of the specified <paramref name="value"/> left by the
         /// specified number of bits.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static long RotateLeft(this long value, int distance)
         {
             if (distance == 0)
@@ -453,7 +469,9 @@ namespace J2N.Numerics
         /// <returns>The value obtained by rotating the two's complement binary
         /// representation of the specified <paramref name="value"/> right by the
         /// specified number of bits.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int RotateRight(this int value, int distance)
         {
             if (distance == 0)
@@ -488,7 +506,9 @@ namespace J2N.Numerics
         /// <returns>The value obtained by rotating the two's complement binary
         /// representation of the specified <paramref name="value"/> right by the
         /// specified number of bits.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static long RotateRight(this long value, int distance)
         {
             if (distance == 0)
@@ -520,7 +540,9 @@ namespace J2N.Numerics
         /// <param name="bits">Ammount of bits to shift.</param>
         /// <returns>The resulting number from the shift operation as <see cref="int"/>.</returns>
         // See http://stackoverflow.com/a/6625912
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int TripleShift(this byte number, int bits)
         {
             return TripleShift((sbyte)number, bits);
@@ -535,7 +557,9 @@ namespace J2N.Numerics
         /// <param name="bits">Ammount of bits to shift.</param>
         /// <returns>The resulting number from the shift operation as <see cref="int"/>.</returns>
         // See http://stackoverflow.com/a/6625912
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         [CLSCompliant(false)]
         public static int TripleShift(this sbyte number, int bits)
         {
@@ -553,7 +577,9 @@ namespace J2N.Numerics
         /// <param name="bits">Ammount of bits to shift.</param>
         /// <returns>The resulting number from the shift operation as <see cref="int"/>.</returns>
         // See http://stackoverflow.com/a/6625912
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int TripleShift(this char number, int bits)
         {
             if (number >= 0)
@@ -570,7 +596,9 @@ namespace J2N.Numerics
         /// <param name="bits">Ammount of bits to shift.</param>
         /// <returns>The resulting number from the shift operation as <see cref="short"/>.</returns>
         // See http://stackoverflow.com/a/6625912
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int TripleShift(this short number, int bits)
         {
             if (number >= 0)
@@ -587,7 +615,9 @@ namespace J2N.Numerics
         /// <param name="bits">Ammount of bits to shift.</param>
         /// <returns>The resulting number from the shift operation as <see cref="int"/>.</returns>
         // See http://stackoverflow.com/a/6625912
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int TripleShift(this int number, int bits)
         {
             if (number >= 0)
@@ -603,7 +633,9 @@ namespace J2N.Numerics
         /// <param name="number">Number to operate on.</param>
         /// <param name="bits">Ammount of bits to shift.</param>
         /// <returns>The resulting number from the shift operation as <see cref="long"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static long TripleShift(this long number, int bits)
         {
             return (long)((ulong)number >> bits);

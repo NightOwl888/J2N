@@ -55,7 +55,11 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, IStructuralEquatable, IStructuralFormattable
+    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyDictionary<TKey, TValue>,
+#endif
+        IStructuralEquatable, IStructuralFormattable
     {
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
@@ -334,7 +338,9 @@ namespace J2N.Collections.Generic
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
+#if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
+#endif
 
         /// <summary>
         /// Gets a collection containing the values in the <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -363,7 +369,9 @@ namespace J2N.Collections.Generic
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
+#if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
+#endif
 
         /// <summary>
         /// Adds an element with the specified key and value into the <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -1189,7 +1197,10 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        internal sealed class KeyCollection : ICollection<TKey>, ICollection, IReadOnlyCollection<TKey>
+        internal sealed class KeyCollection : ICollection<TKey>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TKey>
+#endif
         {
             private readonly SortedDictionary<TKey, TValue> _dictionary;
 
@@ -1522,7 +1533,10 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        internal sealed class ValueCollection : ICollection<TValue>, ICollection, IReadOnlyCollection<TValue>
+        internal sealed class ValueCollection : ICollection<TValue>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TValue>
+#endif
         {
             private readonly SortedDictionary<TKey, TValue> _dictionary;
 

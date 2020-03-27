@@ -50,7 +50,11 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
-    public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, IStructuralEquatable, IStructuralFormattable
+    public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyDictionary<TKey, TValue>,
+#endif
+        IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
             , System.Runtime.Serialization.ISerializable, System.Runtime.Serialization.IDeserializationCallback
 #endif
@@ -947,6 +951,7 @@ namespace J2N.Collections.Generic
 
         #endregion
 
+#if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary<TKey, TValue> Members
 
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
@@ -954,6 +959,7 @@ namespace J2N.Collections.Generic
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 
         #endregion IReadOnlyDictionary<TKey, TValue> Members
+#endif
 
         #region Structural Equality
 
