@@ -6,7 +6,7 @@ namespace J2N.Text
     /// <summary>
     /// An implementation of <see cref="ICharacterEnumerator"/> for strings.
     /// </summary>
-    public sealed class StringCharacterEnumerator : ICharacterEnumerator
+    internal sealed class StringCharacterEnumerator : ICharacterEnumerator // J2N TODO: API Make this class public when the issues with converting iterator/enumerator are fixed
     {
         private string str;
         private int startIndex, length, position;

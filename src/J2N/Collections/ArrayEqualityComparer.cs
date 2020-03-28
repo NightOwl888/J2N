@@ -90,9 +90,21 @@ namespace J2N.Collections
             private static IEqualityComparer<T1[]> LoadDefault()
             {
                 Type elementType = typeof(T1);
-                if (elementType.GetTypeInfo().IsPrimitive)
+                if (
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
+                    elementType.GetTypeInfo().IsPrimitive
+#else
+                    elementType.IsPrimitive
+#endif
+                    )
                     return (IEqualityComparer<T1[]>)GetPrimitiveOneDimensionalArrayEqualityComparer(elementType);
-                else if (elementType.GetTypeInfo().IsValueType)
+                else if (
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
+                    elementType.GetTypeInfo().IsValueType
+#else
+                    elementType.IsValueType
+#endif
+                    )
                     return new ValueTypeOneDimensionalArrayEqualityComparer();
 
                 return new GenericOneDimensionalArrayEqualityComparer();

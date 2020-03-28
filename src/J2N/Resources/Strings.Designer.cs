@@ -40,7 +40,11 @@ namespace J2N.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("J2N.Resources.Strings", typeof(Strings).GetTypeInfo().Assembly);
+#else
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("J2N.Resources.Strings", typeof(Strings).Assembly);
+#endif
                     resourceMan = temp;
                 }
                 return resourceMan;

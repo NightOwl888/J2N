@@ -44,7 +44,11 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    public class HashSet<T> : ISet<T>, ICollection<T>, IReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
+    public class HashSet<T> : ISet<T>, ICollection<T>,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyCollection<T>,
+#endif
+        IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
         , System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
 #endif
@@ -2282,7 +2286,9 @@ namespace J2N.Collections.Generic
         /// <param name="item"></param>
         /// <param name="comparer"></param>
         /// <returns>hash code</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         private static int InternalGetHashCode(T item, IEqualityComparer<T>? comparer)
         {
             if (item == null)
@@ -2294,7 +2300,9 @@ namespace J2N.Collections.Generic
             return hashCode & Lower31BitMask;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         private int InternalGetHashCode(int hashCode)
         {
             return hashCode & Lower31BitMask;

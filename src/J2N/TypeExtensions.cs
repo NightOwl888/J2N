@@ -30,8 +30,13 @@ namespace J2N
             if (interfaceType == null)
                 return false;
 
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
             return target.GetTypeInfo().IsGenericType && target.GetGenericTypeDefinition().GetInterfaces().Any(
                 x => x.GetTypeInfo().IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())
+#else
+            return target.IsGenericType && target.GetGenericTypeDefinition().GetInterfaces().Any(
+                x => x.IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())
+#endif
             );
         }
 
@@ -66,7 +71,11 @@ namespace J2N
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
             return AssemblyExtensions.FindAndGetManifestResourceStream(type.GetTypeInfo().Assembly, type, name);
+#else
+            return AssemblyExtensions.FindAndGetManifestResourceStream(type.Assembly, type, name);
+#endif
         }
 
         /// <summary>
@@ -99,7 +108,11 @@ namespace J2N
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
             return AssemblyExtensions.FindResource(type.GetTypeInfo().Assembly, type, name);
+#else
+            return AssemblyExtensions.FindResource(type.Assembly, type, name);
+#endif
         }
 
         /// <summary>
@@ -117,7 +130,11 @@ namespace J2N
 
             // If this is not a value type, it is a reference type, so it is automatically nullable
             //  (NOTE: All forms of Nullable<T> are value types)
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
             if (!type.GetTypeInfo().IsValueType)
+#else
+            if (!type.IsValueType)
+#endif
                 return true;
 
             // Report whether type is a form of the Nullable<> type

@@ -358,29 +358,31 @@ namespace J2N.Collections.Concurrent
             Assert.AreEqual("2", data.AddOrUpdate(2, k => "b", (k, v) => k.ToString()));
         }
 
-        struct AddUpdateValue : ICreateOrUpdateValue<int, string>, IRemoveValue<int, string>
-        {
-            public string OldValue;
-            public string Value;
-            public bool CreateValue(int key, out string value)
-            {
-                OldValue = null;
-                value = Value;
-                return Value != null;
-            }
-            public bool UpdateValue(int key, ref string value)
-            {
-                OldValue = value;
-                value = Value;
-                return Value != null;
-            }
-            public bool RemoveValue(int key, string value)
-            {
-                OldValue = value;
-                return value == Value;
-            }
-        }
+        // J2N specific: Removed "atomic interfaces", using only similar APIs to ConcurrentDictionary
+        //struct AddUpdateValue : ICreateOrUpdateValue<int, string>, IRemoveValue<int, string>
+        //{
+        //    public string OldValue;
+        //    public string Value;
+        //    public bool CreateValue(int key, out string value)
+        //    {
+        //        OldValue = null;
+        //        value = Value;
+        //        return Value != null;
+        //    }
+        //    public bool UpdateValue(int key, ref string value)
+        //    {
+        //        OldValue = value;
+        //        value = Value;
+        //        return Value != null;
+        //    }
+        //    public bool RemoveValue(int key, string value)
+        //    {
+        //        OldValue = value;
+        //        return value == Value;
+        //    }
+        //}
 
+        // J2N specific: Removed "atomic interfaces", using only similar APIs to ConcurrentDictionary
         //[Test]
         //public void TestAtomicInterfaces()
         //{

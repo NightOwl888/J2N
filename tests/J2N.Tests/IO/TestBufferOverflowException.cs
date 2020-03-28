@@ -23,14 +23,14 @@ namespace J2N.IO
             assertEquals("testing12", clone.InnerException.Message);
         }
 
-        ///**
-        // * @tests serialization/deserialization compatibility with RI.
-        // */
-        //public void testSerializationCompatibility() 
-        //{
+        /////**
+        //// * @tests serialization/deserialization compatibility with RI.
+        //// */
+        ////public void testSerializationCompatibility() 
+        ////{
 
-        //    SerializationTest.verifyGolden(this, new BufferOverflowException());
-        //}
+        ////    SerializationTest.verifyGolden(this, new BufferOverflowException());
+        ////}
 #endif
 
         /**

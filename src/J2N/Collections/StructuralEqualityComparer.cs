@@ -87,7 +87,13 @@ namespace J2N.Collections
         private bool ArrayEquals(Array arrayX, Array arrayY)
         {
             Type elementType = arrayX.GetType().GetElementType();
-            if (elementType.GetTypeInfo().IsPrimitive && arrayY.GetType().GetElementType().Equals(elementType))
+            if (
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
+                elementType.GetTypeInfo().IsPrimitive
+#else
+                elementType.IsPrimitive
+#endif
+                && arrayY.GetType().GetElementType().Equals(elementType))
                 return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).Equals(arrayX, arrayY);
 
             // Types don't match, or they are object[].
@@ -160,7 +166,13 @@ namespace J2N.Collections
         private int GetArrayHashCode(Array array)
         {
             Type elementType = array.GetType().GetElementType();
-            if (elementType.GetTypeInfo().IsPrimitive)
+            if (
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
+                elementType.GetTypeInfo().IsPrimitive
+#else
+                elementType.IsPrimitive
+#endif
+                )
                 return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).GetHashCode(array);
 
             // Fallback for other array types - enumerate them

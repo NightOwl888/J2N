@@ -1,8 +1,8 @@
-﻿using NUnit.Framework;
-using System;
+﻿#if FEATURE_TYPEINFO
+
+using NUnit.Framework;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace J2N
 {
@@ -20,3 +20,4 @@ namespace J2N
         }
     }
 }
+#endif

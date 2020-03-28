@@ -54,6 +54,7 @@
 
     <DefineConstants>$(DefineConstants);NETSTANDARD1_X</DefineConstants>
     <DefineConstants>$(DefineConstants);NETCOREAPP1_X</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_TYPEEXTENSIONS_GETTYPEINFO</DefineConstants>
 
   </PropertyGroup>
 
@@ -65,6 +66,17 @@
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_STRINGS</DefineConstants>
 
     <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
+
+    <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
+    
   </PropertyGroup>
   
   <PropertyGroup>

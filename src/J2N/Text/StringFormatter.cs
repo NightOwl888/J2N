@@ -95,10 +95,14 @@ namespace J2N.Text
                         return CultureInfo.CurrentCulture;
                     case CultureType.CurrentUICulture:
                         return CultureInfo.CurrentUICulture;
+#if FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE
                     case CultureType.DefaultThreadCurrentCulture:
                         return CultureInfo.DefaultThreadCurrentCulture;
+#endif
+#if FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE
                     case CultureType.DefaultThreadCurrentUICulture:
                         return CultureInfo.DefaultThreadCurrentUICulture;
+#endif
                     default:
                         return CultureInfo.CurrentCulture;
                 }

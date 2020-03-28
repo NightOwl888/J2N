@@ -8,7 +8,7 @@ namespace J2N.Text
     /// iteration starts at the begin index in the group of characters and continues
     /// for the length of the character sequence.
     /// </summary>
-    public interface ICharacterEnumerator : IEnumerator<char>
+    internal interface ICharacterEnumerator : IEnumerator<char> // J2N TODO: API Make this interface public when the issues with converting iterator/enumerator are fixed
 #if FEATURE_CLONEABLE
         ICloneable
 #endif

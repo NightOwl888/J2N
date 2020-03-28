@@ -45,7 +45,11 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    public class List<T> : IList<T>, IList, IReadOnlyList<T>, IStructuralEquatable, IStructuralFormattable
+    public class List<T> : IList<T>, IList,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyList<T>,
+#endif
+        IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
         , System.Runtime.Serialization.ISerializable, System.Runtime.Serialization.IDeserializationCallback
 #endif
