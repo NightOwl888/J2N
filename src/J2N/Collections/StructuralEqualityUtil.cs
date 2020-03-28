@@ -36,6 +36,10 @@ namespace J2N.Collections
                 return (valueA, valueB) => valueA == null ? valueB == null : structuralEqualityComparer.Equals(valueA, valueB);
         }
 
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
         internal static bool IsValueType<TElement>(TElement value) => value == null ? false : value.GetType().GetTypeInfo().IsValueType;
+#else
+        internal static bool IsValueType<TElement>(TElement value) => value == null ? false : value.GetType().IsValueType;
+#endif
     }
 }

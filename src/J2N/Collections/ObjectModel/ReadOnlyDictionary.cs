@@ -26,11 +26,20 @@ namespace J2N.Collections.ObjectModel
     [Serializable]
 #endif
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-    public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, IStructuralEquatable, IStructuralFormattable
+    public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyDictionary<TKey, TValue>,
+#endif
+        IStructuralEquatable, IStructuralFormattable
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     {
+#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
         private static readonly bool TKeyIsValueTypeOrStringOrStructuralEquatable = typeof(TKey).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(TKey).GetTypeInfo()) || typeof(string).Equals(typeof(TKey));
         private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(TValue).GetTypeInfo()) || typeof(string).Equals(typeof(TValue));
+#else
+        private static readonly bool TKeyIsValueTypeOrStringOrStructuralEquatable = typeof(TKey).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TKey)) || typeof(string).Equals(typeof(TKey));
+        private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TValue)) || typeof(string).Equals(typeof(TValue));
+#endif
         private static readonly bool TKeyIsNullable = typeof(TKey).IsNullableType();
 
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
@@ -370,6 +379,7 @@ namespace J2N.Collections.ObjectModel
 
         #endregion
 
+#if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary members
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
@@ -378,6 +388,7 @@ namespace J2N.Collections.ObjectModel
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         #endregion IReadOnlyDictionary members
+#endif
 
         #region Structural Equality
 
@@ -425,9 +436,9 @@ namespace J2N.Collections.ObjectModel
         public override int GetHashCode()
             => GetHashCode(structuralEqualityComparer);
 
-        #endregion
+#endregion
 
-        #region ToString
+#region ToString
 
         /// <summary>
         /// Returns a string that represents the current dictionary using the specified
@@ -546,7 +557,10 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        public sealed class KeyCollection : ICollection<TKey>, ICollection, IReadOnlyCollection<TKey>
+        public sealed class KeyCollection : ICollection<TKey>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TKey>
+#endif
         {
             private readonly ICollection<TKey> collection;
 #if FEATURE_SERIALIZABLE
@@ -559,7 +573,7 @@ namespace J2N.Collections.ObjectModel
                 this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
             }
 
-            #region ICollection<T> Members
+#region ICollection<T> Members
 
             void ICollection<TKey>.Add(TKey item)
             {
@@ -677,7 +691,10 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        public sealed class ValueCollection : ICollection<TValue>, ICollection, IReadOnlyCollection<TValue>
+        public sealed class ValueCollection : ICollection<TValue>, ICollection
+#if FEATURE_IREADONLYCOLLECTIONS
+            , IReadOnlyCollection<TValue>
+#endif
         {
             private readonly ICollection<TValue> collection;
 #if FEATURE_SERIALIZABLE

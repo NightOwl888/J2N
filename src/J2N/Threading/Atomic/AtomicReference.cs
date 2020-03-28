@@ -3,11 +3,17 @@ using System.Threading;
 
 namespace J2N.Threading.Atomic
 {
+#if NET40
+    /// <summary>
+    /// An object reference that may be updated atomically.
+    /// </summary>
+#else
     /// <summary>
     /// An object reference that may be updated atomically.
     /// <para/>
     /// Uses <see cref="Volatile"/> to enforce ordering of writes without any explicit locking.
     /// </summary>
+#endif
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
@@ -44,8 +50,13 @@ namespace J2N.Threading.Atomic
         /// </summary>
         public T Value
         {
+#if NET40
+            get => value;
+            set => this.value = value;
+#else
             get => Volatile.Read(ref value);
             set => Volatile.Write(ref this.value, value);
+#endif
         }
 
         /// <summary>

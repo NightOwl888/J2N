@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if FEATURE_TYPEINFO
+
+using System;
 using System.Linq;
 using System.Reflection;
 
@@ -30,3 +32,4 @@ namespace J2N
         }
     }
 }
+#endif

@@ -44,7 +44,11 @@ namespace J2N.Threading.Atomic
                     this.array[i] = array[i];
                 // Do the last write as volatile
                 T e = array[last];
+#if NET40
+                this.array[last] = e;
+#else
                 Volatile.Write(ref this.array[last], e);
+#endif
             }
         }
 
@@ -60,8 +64,13 @@ namespace J2N.Threading.Atomic
         /// <returns>The current value.</returns>
         public T this[int index]
         {
+#if NET40
+            get => array[index];
+            set => array[index] = value;
+#else
             get => Volatile.Read(ref array[index]);
             set => Volatile.Write(ref array[index], value);
+#endif
         }
 
         /// <summary>
