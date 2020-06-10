@@ -12,6 +12,11 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
+  <!-- Features in .NET Core 3.x only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp3.')) ">
+    <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
+  </PropertyGroup>
+
   <!-- Features in .NET Standard 2.1 and .NET Core 3.x only -->
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) ">
 
