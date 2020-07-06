@@ -4,6 +4,8 @@ using System.Text;
 
 namespace J2N.Collections
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// The <see cref="BitSet"/> class implements a bit field. Each element in a
     /// <see cref="BitSet"/> can be on(1) or off(0). A <see cref="BitSet"/> is created with a
@@ -95,7 +97,7 @@ namespace J2N.Collections
         public BitSet(int nbits)
         {
             if (nbits < 0)
-                throw new ArgumentOutOfRangeException(nameof(nbits), $"{nameof(nbits)} may not be negative");
+                throw new ArgumentOutOfRangeException(nameof(nbits), SR.ArgumentOutOfRange_NeedNonNegNum);
 
             bits = new long[(nbits >> Offset) + ((nbits & RightBits) > 0 ? 1 : 0)];
             actualArrayLength = 0;
@@ -230,7 +232,7 @@ namespace J2N.Collections
         /// <param name="position">The index of the bit to be retrieved.</param>
         /// <returns><c>true</c> if the bit at <paramref name="position"/> is set,
         /// <c>false</c> otherwise.</returns>
-        /// <exception cref="IndexOutOfRangeException">If <paramref name="position"/> is negative.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position"/> is negative.</exception>
         /// <seealso cref="Clear(int)"/>
         /// <seealso cref="Set(int)"/>
         /// <seealso cref="Clear()"/>
@@ -242,8 +244,7 @@ namespace J2N.Collections
         {
             // Negative index specified
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), $"{nameof(position)} may not be negative"); //$NON-NLS-1$
-
+                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
 
             int arrayPos = position >> Offset;
             if (arrayPos < actualArrayLength)
@@ -261,17 +262,17 @@ namespace J2N.Collections
         /// <param name="position1">Beginning position.</param>
         /// <param name="position2">Ending position.</param>
         /// <returns>New bitset of the range specified.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative, or if
-        /// <paramref name="position2"/> is smaller than <paramref name="position1"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
+        /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Get(int)"/>
         public BitSet Get(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), $"{nameof(position1)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), $"{nameof(position2)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentOutOfRangeException("", $"{nameof(position2)} may not be less than {nameof(position1)}.");
+                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             int last = actualArrayLength << Offset;
             if (position1 >= last || position1 == position2)
@@ -348,7 +349,7 @@ namespace J2N.Collections
         public void Set(int position)
         {
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), $"{nameof(position)} may not be negative"); //$NON-NLS-1$
+                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
 
             int len = (position >> Offset) + 1;
             if (len > bits.Length)
@@ -390,17 +391,17 @@ namespace J2N.Collections
         /// </summary>
         /// <param name="position1">Beginning position.</param>
         /// <param name="position2">Ending position.</param>
-        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative, or if
-        /// <paramref name="position2"/> is smaller than <paramref name="position1"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
+        /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Set(int)"/>
         public void Set(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), $"{nameof(position1)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), $"{nameof(position2)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentOutOfRangeException("", $"{nameof(position2)} may not be less than {nameof(position1)}.");
+                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             if (position1 == position2)
             {
@@ -495,7 +496,7 @@ namespace J2N.Collections
         {
             if (position < 0)
                 // Negative index specified
-                throw new ArgumentOutOfRangeException(nameof(position), $"{nameof(position)} may not be negative"); //$NON-NLS-1$
+                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
 
             if (!needClear)
             {
@@ -518,17 +519,17 @@ namespace J2N.Collections
         /// </summary>
         /// <param name="position1">Beginning position.</param>
         /// <param name="position2">Ending position.</param>
-        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative, or if
-        /// <paramref name="position2"/> is smaller than <paramref name="position1"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
+        /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Clear(int)"/>
         public void Clear(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), $"{nameof(position1)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), $"{nameof(position2)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentOutOfRangeException("", $"{nameof(position2)} may not be less than {nameof(position1)}.");
+                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             if (!needClear)
             {
@@ -579,7 +580,7 @@ namespace J2N.Collections
         {
             if (position < 0)
                 // Negative index specified
-                throw new ArgumentOutOfRangeException(nameof(position), $"{nameof(position)} may not be negative"); //$NON-NLS-1$
+                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
 
             int len = (position >> Offset) + 1;
             if (len > bits.Length)
@@ -601,17 +602,17 @@ namespace J2N.Collections
         /// </summary>
         /// <param name="position1">Beginning position.</param>
         /// <param name="position2">Ending position.</param>
-        /// <exception cref="IndexOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative, or if
-        /// <paramref name="position2"/> is smaller than <paramref name="position1"/>.</exception>
+        /// <exception cref="IndexOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
+        /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Flip(int)"/>
         public void Flip(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), $"{nameof(position1)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), $"{nameof(position2)} may not be negative.");
+                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentOutOfRangeException("", $"{nameof(position2)} may not be less than {nameof(position1)}.");
+                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             if (position1 == position2)
             {
@@ -945,7 +946,7 @@ namespace J2N.Collections
         public virtual int NextSetBit(int position)
         {
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), $"{nameof(position)} may not be negative"); //$NON-NLS-1$
+                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
 
             if (position >= actualArrayLength << Offset)
             {
@@ -998,7 +999,7 @@ namespace J2N.Collections
         public virtual int NextClearBit(int position)
         {
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), $"{nameof(position)} may not be negative"); //$NON-NLS-1$
+                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
 
             int length = actualArrayLength;
             int bssize = length << Offset;

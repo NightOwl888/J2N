@@ -5,6 +5,8 @@ using System.Text;
 
 namespace J2N.IO
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// A buffer of chars.
     /// </summary>
@@ -30,7 +32,7 @@ namespace J2N.IO
         public static CharBuffer Allocate(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
 
             return new ReadWriteCharArrayBuffer(capacity);
         }
@@ -79,11 +81,11 @@ namespace J2N.IO
 
             int len = array.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)startIndex + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(array.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             return new ReadWriteCharArrayBuffer(array)
             {
@@ -142,11 +144,11 @@ namespace J2N.IO
 
             int len = characterSequence.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)startIndex + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(characterSequence.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
             {
@@ -203,11 +205,11 @@ namespace J2N.IO
 
             int len = characterSequence.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)startIndex + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(characterSequence.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
             {
@@ -266,11 +268,11 @@ namespace J2N.IO
 
             int len = characterSequence.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)startIndex + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(characterSequence.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             return new CharSequenceAdapter(characterSequence)
             {
@@ -455,7 +457,7 @@ namespace J2N.IO
         public virtual CharBuffer Get(char[] destination)
         {
             if (destination == null)
-                throw new ArgumentOutOfRangeException(nameof(destination));
+                throw new ArgumentNullException(nameof(destination));
 
             return Get(destination, 0, destination.Length);
         }
@@ -487,11 +489,11 @@ namespace J2N.IO
 
             int len = destination.Length;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)offset + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(offset)} + {nameof(length)} > {nameof(destination.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (offset > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length > Remaining)
             {
@@ -643,11 +645,11 @@ namespace J2N.IO
 
             int len = source.Length;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)offset + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(offset)} + {nameof(length)} > {nameof(source.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (offset > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length > Remaining)
             {
@@ -750,11 +752,11 @@ namespace J2N.IO
 
             int len = source.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)startIndex + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)} + {nameof(length)} > {nameof(source.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
             if (length > Remaining)
                 throw new BufferOverflowException();
 

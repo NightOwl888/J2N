@@ -2,6 +2,8 @@
 
 namespace J2N.IO
 {
+    using SR = J2N.Resources.Strings;
+
     /////     <item><description>
     /////         A buffer can be direct or indirect. A direct buffer will try its best to
     /////         take advantage of native memory APIs and it may not stay in the heap,
@@ -86,7 +88,7 @@ namespace J2N.IO
         {
             if (capacity < 0)
             {
-                throw new ArgumentException("Negative capacity: " + capacity);
+                throw new ArgumentOutOfRangeException(nameof(capacity), capacity, SR.ArgumentOutOfRange_NeedNonNegNum);
             }
             this.capacity = this.limit = capacity;
         }

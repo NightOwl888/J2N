@@ -6,6 +6,8 @@ using System.Text;
 
 namespace J2N.Collections
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// A comparer that provides structural equality rules for collections.
     /// </summary>
@@ -69,7 +71,7 @@ namespace J2N.Collections
                 else
                 {
                     // Currently more than 1 dimension is not supported.
-                    throw new ArgumentException("Multiple dimensional arrays are not supported.");
+                    throw new ArgumentException(SR.Arg_Need1DArray);
                 }
 
                 // Arrays not same size are not equal
@@ -118,7 +120,7 @@ namespace J2N.Collections
                     else
                     {
                         // Currently more than 1 dimension is not supported.
-                        throw new ArgumentException("Multiple dimensional arrays are not supported.");
+                        throw new ArgumentException(SR.Arg_Need1DArray);
                     }
 
                     // Arrays not same size are not equal

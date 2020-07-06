@@ -3,6 +3,8 @@ using System.IO;
 
 namespace J2N.IO
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Wraps an existing <see cref="Stream"/> and reads typed data from it.
     /// Typically, this stream has been written by a DataOutputStream. Types that can
@@ -257,13 +259,15 @@ namespace J2N.IO
         public void ReadFully(byte[] buffer, int offset, int length)
         {
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length == 0)
                 return;
             if (buffer == null)
                 throw new ArgumentNullException(nameof(buffer));
-            if (offset < 0 || offset > buffer.Length - length)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(offset)} + {nameof(length)} > {nameof(buffer.Length)}");
+            if (offset < 0)
+                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (offset > buffer.Length - length)
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             while (length > 0)
             {
@@ -503,30 +507,25 @@ namespace J2N.IO
                 else if (((a = @out[s]) & 0xe0) == 0xc0)
                 {
                     if (count >= utfSize)
-                        throw new FormatException(string.Format("Second byte at {0} does not match UTF8 Specification",
-                                count));
+                        throw new FormatException(J2N.SR.Format(SR.Format_InvalidUTFSpec2ndByte, count));
                     int b = buf[count++];
                     if ((b & 0xC0) != 0x80)
-                        throw new FormatException(string.Format("Second byte at {0} does not match UTF8 Specification",
-                                (count - 1)));
+                        throw new FormatException(J2N.SR.Format(SR.Format_InvalidUTFSpec2ndByte, (count - 1)));
                     @out[s++] = (char)(((a & 0x1F) << 6) | (b & 0x3F));
                 }
                 else if ((a & 0xf0) == 0xe0)
                 {
                     if (count + 1 >= utfSize)
-                        throw new FormatException(string.Format("Third byte at {0} does not match UTF8 Specification",
-                                (count + 1)));
+                        throw new FormatException(J2N.SR.Format(SR.Format_InvalidUTFSpec3rdByte, (count + 1)));
                     int b = buf[count++];
                     int c = buf[count++];
                     if (((b & 0xC0) != 0x80) || ((c & 0xC0) != 0x80))
-                        throw new FormatException(string.Format("Second or third byte at {0} does not match UTF8 Specification",
-                                (count - 2)));
+                        throw new FormatException(J2N.SR.Format(SR.Format_InvalidUTFSpec2ndOr3rdByte, (count - 2)));
                     @out[s++] = (char)(((a & 0x0F) << 12) | ((b & 0x3F) << 6) | (c & 0x3F));
                 }
                 else
                 {
-                    throw new FormatException(string.Format("Input at {0} does not match UTF8 Specification",
-                            (count - 1)));
+                    throw new FormatException(J2N.SR.Format(SR.Format_InvalidUTFSpecInput, (count - 1)));
                 }
             }
             return new string(@out, 0, s);

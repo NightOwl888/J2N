@@ -4,6 +4,8 @@ using System.Text;
 
 namespace J2N.Text
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// A wrapper class that represents a <see cref="T:char[]"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
@@ -56,7 +58,7 @@ namespace J2N.Text
             get
             {
                 if (Value == null)
-                    throw new InvalidOperationException($"Cannot index a null {nameof(CharArrayCharSequence)}.");
+                    throw new InvalidOperationException(J2N.SR.Format(SR.InvalidOperation_CannotIndexNullObject, nameof(CharArrayCharSequence)));
                 return Value[index];
             }
         }
@@ -98,11 +100,11 @@ namespace J2N.Text
                 return new CharArrayCharSequence(Value);
             }
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (startIndex + length > Value.Length)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > Value.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             char[] result = new char[length];
             for (int i = 0, j = startIndex; i < length; i++, j++)
@@ -337,14 +339,14 @@ namespace J2N.Text
                 return Equals(other as StringBuilder);
             else if (other is char[])
                 return Equals(other as char[]);
-            else if (other is StringCharSequence)
-                return Equals((StringCharSequence)other);
-            else if (other is CharArrayCharSequence)
-                return Equals((CharArrayCharSequence)other);
-            else if (other is StringBuilderCharSequence)
-                return Equals((StringBuilderCharSequence)other);
-            else if (other is ICharSequence)
-                return Equals((ICharSequence)other);
+            else if (other is StringCharSequence otherString)
+                return Equals(otherString);
+            else if (other is CharArrayCharSequence otherCharArray)
+                return Equals(otherCharArray);
+            else if (other is StringBuilderCharSequence otherStringBuilder)
+                return Equals(otherStringBuilder);
+            else if (other is ICharSequence otherCharSequence)
+                return Equals(otherCharSequence);
 
             return false;
         }

@@ -4,6 +4,8 @@ using System.Text;
 
 namespace J2N.Text
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Extenions to the <see cref="System.String"/> class.
     /// </summary>
@@ -1072,11 +1074,11 @@ namespace J2N.Text
                 return text.AsCharSequence();
             }
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (startIndex + length > text.Length)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(text.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > text.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             return text.Substring(startIndex, length).AsCharSequence();
         }

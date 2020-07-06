@@ -1,8 +1,9 @@
-﻿using J2N.Text;
-using System;
+﻿using System;
 
 namespace J2N.IO
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// <see cref="CharArrayBuffer"/>, <see cref="ReadWriteCharArrayBuffer"/> and <see cref="ReadOnlyCharArrayBuffer"/> compose
     /// the implementation of array based char buffers.
@@ -60,11 +61,11 @@ namespace J2N.IO
 
             int len = destination.Length;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if ((long)offset + (long)length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(offset)} + {nameof(length)} > {nameof(destination.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (offset > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
             if (length > Remaining)
                 throw new BufferUnderflowException();
 
@@ -80,11 +81,11 @@ namespace J2N.IO
         public override sealed CharBuffer Subsequence(int startIndex, int length)
         {
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (startIndex + length > Remaining)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > Remaining - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             CharBuffer result = Duplicate();
             result.Limit = position + startIndex + length;

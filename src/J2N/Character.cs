@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.Text;
+using SR2 = J2N.Resources.Strings;
 
 namespace J2N
 {
@@ -583,7 +584,7 @@ namespace J2N
         public static int ToChars(int codePoint, char[] destination, int destinationIndex)
         {
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException($"'{codePoint}' is not a valid Unicode code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
             if (destinationIndex < 0 || destinationIndex >= destination.Length)
@@ -626,7 +627,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException($"'{codePoint}' is not a valid Unicode code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -671,7 +672,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -719,7 +720,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -767,7 +768,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -815,7 +816,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -1888,7 +1889,7 @@ namespace J2N
             if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException($"{codePoint} is not a valid code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (CharCount(codePoint) == 1)
@@ -1923,7 +1924,7 @@ namespace J2N
             if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException($"{codePoint} is not a valid code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (CharCount(codePoint) == 1)

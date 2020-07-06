@@ -3,6 +3,8 @@ using System.Text;
 
 namespace J2N.Text
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Extensions to <see cref="T:char[]"/> arrays.
     /// </summary>
@@ -47,11 +49,11 @@ namespace J2N.Text
                 return text.AsCharSequence();
             }
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (startIndex + length > text.Length)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(text.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > text.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             char[] result = new char[length];
             for (int i = 0, j = startIndex; i < length; i++, j++)

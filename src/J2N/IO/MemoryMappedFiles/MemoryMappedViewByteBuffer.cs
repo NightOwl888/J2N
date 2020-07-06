@@ -3,6 +3,8 @@ using System.IO.MemoryMappedFiles;
 
 namespace J2N.IO.MemoryMappedFiles
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// A byte buffer whose content is a memory-mapped region of a file.
     /// 
@@ -88,13 +90,11 @@ namespace J2N.IO.MemoryMappedFiles
 
             int len = destination.Length;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (offset + length < 0) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(offset)} + {nameof(length)} < 0");
-            if (offset + length > len)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(offset)} + {nameof(length)} > {nameof(destination.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (offset > len - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
             if (length > Remaining)
                 throw new BufferUnderflowException();
 

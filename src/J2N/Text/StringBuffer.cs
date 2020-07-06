@@ -7,6 +7,8 @@ using System.Text;
 
 namespace J2N.Text
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// A thread-safe, mutable sequence of characters.
     /// A string buffer is like a <see cref="string"/>, but can be modified. At any
@@ -148,11 +150,11 @@ namespace J2N.Text
         public StringBuffer(ICharSequence value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
 #if FEATURE_CONTRACTBLOCKS
             Contract.EndContractBlock();
 #endif
@@ -216,11 +218,11 @@ namespace J2N.Text
         public StringBuffer(StringBuilder value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
 #if FEATURE_CONTRACTBLOCKS
             Contract.EndContractBlock();
 #endif
@@ -284,11 +286,11 @@ namespace J2N.Text
         public StringBuffer(char[] value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
 #if FEATURE_CONTRACTBLOCKS
             Contract.EndContractBlock();
 #endif

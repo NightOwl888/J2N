@@ -4,6 +4,8 @@ using System.Collections.Generic;
 
 namespace J2N.Text
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// The <see cref="StringTokenizer"/> class allows an application to break a string
     /// into tokens by performing code point comparison. The <see cref="StringTokenizer"/>
@@ -218,7 +220,7 @@ namespace J2N.Text
                     return str.Substring(i);
                 }
             }
-            throw new InvalidOperationException("No more elements");
+            throw new InvalidOperationException(SR.InvalidOperation_EnumEnded);
         }
 
         /// <summary>

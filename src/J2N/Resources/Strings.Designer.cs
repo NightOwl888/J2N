@@ -11,8 +11,7 @@
 namespace J2N.Resources {
     using System;
     using System.Reflection;
-
-
+    
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
     /// </summary>
@@ -40,10 +39,11 @@ namespace J2N.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("J2N.Resources.Strings",
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("J2N.Resources.Strings", typeof(Strings).GetTypeInfo().Assembly);
+                        typeof(Strings).GetTypeInfo().Assembly);
 #else
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("J2N.Resources.Strings", typeof(Strings).Assembly);
+                        typeof(Strings).Assembly);
 #endif
                     resourceMan = temp;
                 }
@@ -120,11 +120,29 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The ANSI string passed in could not be converted from the default ANSI code page to Unicode..
+        /// </summary>
+        internal static string Arg_InvalidANSIString {
+            get {
+                return ResourceManager.GetString("Arg_InvalidANSIString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The given key &apos;{0}&apos; was not present in the dictionary..
         /// </summary>
         internal static string Arg_KeyNotFoundWithKey {
             get {
                 return ResourceManager.GetString("Arg_KeyNotFoundWithKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Array was not a one-dimensional array..
+        /// </summary>
+        internal static string Arg_Need1DArray {
+            get {
+                return ResourceManager.GetString("Arg_Need1DArray", resourceCulture);
             }
         }
         
@@ -192,11 +210,38 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a valid Unicode code point..
+        /// </summary>
+        internal static string Argument_InvalidCodePoint {
+            get {
+                return ResourceManager.GetString("Argument_InvalidCodePoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection..
         /// </summary>
         internal static string Argument_InvalidOffLen {
             get {
                 return ResourceManager.GetString("Argument_InvalidOffLen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; cannot be greater than {1}..
+        /// </summary>
+        internal static string Argument_MinMaxValue {
+            get {
+                return ResourceManager.GetString("Argument_MinMaxValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a primitive type..
+        /// </summary>
+        internal static string Argument_MustBePrimitiveType {
+            get {
+                return ResourceManager.GetString("Argument_MustBePrimitiveType", resourceCulture);
             }
         }
         
@@ -242,6 +287,15 @@ namespace J2N.Resources {
         internal static string ArgumentOutOfRange_Index {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_Index", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Index and length must refer to a location within the string..
+        /// </summary>
+        internal static string ArgumentOutOfRange_IndexLength {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_IndexLength", resourceCulture);
             }
         }
         
@@ -296,6 +350,60 @@ namespace J2N.Resources {
         internal static string ExternalLinkedListNode {
             get {
                 return ResourceManager.GetString("ExternalLinkedListNode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Second byte at {0} does not match UTF8 Specification..
+        /// </summary>
+        internal static string Format_InvalidUTFSpec2ndByte {
+            get {
+                return ResourceManager.GetString("Format_InvalidUTFSpec2ndByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Second or third byte at {0} does not match UTF8 Specification..
+        /// </summary>
+        internal static string Format_InvalidUTFSpec2ndOr3rdByte {
+            get {
+                return ResourceManager.GetString("Format_InvalidUTFSpec2ndOr3rdByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Third byte at {0} does not match UTF8 Specification..
+        /// </summary>
+        internal static string Format_InvalidUTFSpec3rdByte {
+            get {
+                return ResourceManager.GetString("Format_InvalidUTFSpec3rdByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input at {0} does not match UTF8 Specification..
+        /// </summary>
+        internal static string Format_InvalidUTFSpecInput {
+            get {
+                return ResourceManager.GetString("Format_InvalidUTFSpecInput", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UTF8 data format too long..
+        /// </summary>
+        internal static string Format_InvalidUTFTooLong {
+            get {
+                return ResourceManager.GetString("Format_InvalidUTFTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot index a null {0}..
+        /// </summary>
+        internal static string InvalidOperation_CannotIndexNullObject {
+            get {
+                return ResourceManager.GetString("InvalidOperation_CannotIndexNullObject", resourceCulture);
             }
         }
         

@@ -7,6 +7,8 @@ using System.Reflection;
 
 namespace J2N.Collections
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Provides comparers that use structural equality rules for arrays similar to those in Java.
     /// </summary>
@@ -69,7 +71,7 @@ namespace J2N.Collections
             if (typeof(UIntPtr).Equals(elementType))
                 return new OneDimensionalArrayEqualityComparer<UIntPtr>.ValueTypeOneDimensionalArrayEqualityComparer();
 
-            throw new ArgumentException($"'{elementType}' is not a primitive type.");
+            throw new ArgumentException(J2N.SR.Format(SR.Argument_MustBePrimitiveType, elementType));
         }
 
 
