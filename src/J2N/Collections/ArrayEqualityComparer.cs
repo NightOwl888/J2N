@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+#nullable enable
 
 namespace J2N.Collections
 {
@@ -19,7 +20,7 @@ namespace J2N.Collections
         /// Hidden default property that doesn't apply to this class.
         /// </summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public new static IEqualityComparer<T> Default { get; }
+        public new static IEqualityComparer<T>? Default { get; }
 
         /// <summary>
         /// Gets a structural equality comparer for the specified generic array type with comparison rules similar
@@ -118,7 +119,7 @@ namespace J2N.Collections
             /// <returns><c>true</c> if both arrays are <c>null</c> or if the arrays have the
             /// same length and the elements at each index in the two arrays are
             /// equal; otherwise, <c>false</c>.</returns>
-            public abstract override bool Equals(/*[AllowNull]*/ T1[] array1, /*[AllowNull]*/ T1[] array2);
+            public abstract override bool Equals([AllowNull] T1[] array1, [AllowNull] T1[] array2);
 
             /// <summary>
             /// Returns a hash code based on the contents of the given array. For any two
@@ -128,7 +129,7 @@ namespace J2N.Collections
             /// </summary>
             /// <param name="array">The array whose hash code to compute.</param>
             /// <returns>The hash code for <paramref name="array"/>.</returns>
-            public abstract override int GetHashCode(/*[AllowNull]*/ T1[] array);
+            public abstract override int GetHashCode([AllowNull] T1[] array);
 
 
             /// <summary>
@@ -148,12 +149,12 @@ namespace J2N.Collections
                 /// <returns><c>true</c> if both arrays are <c>null</c> or if the arrays have the
                 /// same length and the elements at each index in the two arrays are
                 /// equal; otherwise, <c>false</c>.</returns>
-                public override bool Equals(/*[AllowNull]*/ T1[] array1, /*[AllowNull]*/ T1[] array2)
+                public override bool Equals([AllowNull] T1[] array1, [AllowNull] T1[] array2)
                 {
                     if (ReferenceEquals(array1, array2))
                         return true;
-                    int arrayLength = array1.Length;
-                    if (array1 == null || array2 == null || arrayLength != array2.Length)
+
+                    if (array1 == null || array2 == null || array1.Length != array2.Length)
                         return false;
                     T1 e1, e2;
                     for (int i = 0; i < array1.Length; i++)
@@ -171,12 +172,13 @@ namespace J2N.Collections
                 /// <summary>
                 /// Returns a hash code based on the contents of the given array. For any two
                 /// <typeparamref name="T1"/> arrays <c>a</c> and <c>b</c>, if
-                /// <c>Arrays.Equals(b)</c> returns <c>true</c>, it means
-                /// that the return value of <c>Arrays.GetHashCode(a)</c> equals <c>Arrays.GetHashCode(b)</c>.
+                /// <c>GenericOneDimensionalArrayEqualityComparer.Equals(a, b)</c> returns <c>true</c>, it means
+                /// that the return value of <c>GenericOneDimensionalArrayEqualityComparer.GetHashCode(a)</c> equals
+                /// <c>GenericOneDimensionalArrayEqualityComparer.GetHashCode(b)</c>.
                 /// </summary>
                 /// <param name="array">The array whose hash code to compute.</param>
                 /// <returns>The hash code for <paramref name="array"/>.</returns>
-                public override int GetHashCode(/*[AllowNull]*/ T1[] array)
+                public override int GetHashCode([AllowNull] T1[] array)
                 {
                     if (array == null)
                         return 0;
@@ -217,17 +219,17 @@ namespace J2N.Collections
                 /// <summary>
                 /// Compares the two arrays.
                 /// </summary>
-                /// <param name="array1">The first <see cref="short"/> array.</param>
-                /// <param name="array2">The second <see cref="short"/> array.</param>
+                /// <param name="array1">The first <typeparamref name="T1"/> array.</param>
+                /// <param name="array2">The second <typeparamref name="T1"/> array.</param>
                 /// <returns><c>true</c> if both arrays are <c>null</c> or if the arrays have the
                 /// same length and the elements at each index in the two arrays are
                 /// equal; otherwise, <c>false</c>.</returns>
-                public override bool Equals(/*[AllowNull]*/ T1[] array1, /*[AllowNull]*/ T1[] array2)
+                public override bool Equals([AllowNull] T1[] array1, [AllowNull] T1[] array2)
                 {
                     if (ReferenceEquals(array1, array2))
                         return true;
-                    int arrayLength = array1.Length;
-                    if (array1 == null || array2 == null || arrayLength != array2.Length)
+
+                    if (array1 == null || array2 == null || array1.Length != array2.Length)
                         return false;
 
                     for (int i = 0; i < array1.Length; i++)
@@ -242,13 +244,14 @@ namespace J2N.Collections
 
                 /// <summary>
                 /// Returns a hash code based on the contents of the given array. For any two
-                /// <see cref="short"/> arrays <c>a</c> and <c>b</c>, if
-                /// <c>Arrays.Equals(b)</c> returns <c>true</c>, it means
-                /// that the return value of <c>Arrays.GetHashCode(a)</c> equals <c>Arrays.GetHashCode(b)</c>.
+                /// <typeparamref name="T1"/> arrays <c>a</c> and <c>b</c>, if
+                /// <c>ValueTypeOneDimensionalArrayEqualityComparer.Equals(a, b)</c> returns <c>true</c>, it means
+                /// that the return value of <c>ValueTypeOneDimensionalArrayEqualityComparer.GetHashCode(a)</c> equals
+                /// <c>ValueTypeOneDimensionalArrayEqualityComparer.GetHashCode(b)</c>.
                 /// </summary>
                 /// <param name="array">The array whose hash code to compute.</param>
                 /// <returns>The hash code for <paramref name="array"/>.</returns>
-                public override int GetHashCode(/*[AllowNull]*/ T1[] array)
+                public override int GetHashCode([AllowNull] T1[] array)
                 {
                     if (array == null)
                         return 0;
@@ -256,7 +259,7 @@ namespace J2N.Collections
                     foreach (var element in array)
                     {
                         // the hash code value is determined by the default equality comparer
-                        hashCode = 31 * hashCode + J2N.Collections.Generic.EqualityComparer<T1>.Default.GetHashCode(element);
+                        hashCode = 31 * hashCode + J2N.Collections.Generic.EqualityComparer<T1>.Default.GetHashCode(element!);
                     }
                     return hashCode;
                 }
@@ -278,12 +281,12 @@ namespace J2N.Collections
                 /// <returns><c>true</c> if both arrays are <c>null</c> or if the arrays have the
                 /// same length and the elements at each index in the two arrays are
                 /// equal; otherwise, <c>false</c>.</returns>
-                public override bool Equals(/*[AllowNull]*/ string[] array1, /*[AllowNull]*/ string[] array2)
+                public override bool Equals([AllowNull] string[] array1, [AllowNull] string[] array2)
                 {
                     if (ReferenceEquals(array1, array2))
                         return true;
-                    int arrayLength = array1.Length;
-                    if (array1 == null || array2 == null || arrayLength != array2.Length)
+
+                    if (array1 == null || array2 == null || array1.Length != array2.Length)
                         return false;
 
                     for (int i = 0; i < array1.Length; i++)
@@ -299,12 +302,13 @@ namespace J2N.Collections
                 /// <summary>
                 /// Returns a hash code based on the contents of the given array. For any two
                 /// <see cref="string"/> arrays <c>a</c> and <c>b</c>, if
-                /// <c>Arrays.Equals(b)</c> returns <c>true</c>, it means
-                /// that the return value of <c>Arrays.GetHashCode(a)</c> equals <c>Arrays.GetHashCode(b)</c>.
+                /// <c>StringOneDimensionalArrayEqualityComparer.Equals(a, b)</c> returns <c>true</c>, it means
+                /// that the return value of <c>StringOneDimensionalArrayEqualityComparer.GetHashCode(a)</c> equals
+                /// <c>StringOneDimensionalArrayEqualityComparer.GetHashCode(b)</c>.
                 /// </summary>
                 /// <param name="array">The array whose hash code to compute.</param>
                 /// <returns>The hash code for <paramref name="array"/>.</returns>
-                public override int GetHashCode(/*[AllowNull]*/ string[] array)
+                public override int GetHashCode([AllowNull] string[] array)
                 {
                     if (array == null)
                         return 0;

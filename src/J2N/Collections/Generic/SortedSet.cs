@@ -258,7 +258,7 @@ namespace J2N.Collections.Generic
             T max = Max;
             foreach (T item in collection)
             {
-                if (!(comparer.Compare(item, min) < 0 || comparer.Compare(item, max) > 0) && Contains(item))
+                if (!(comparer.Compare(item!, min!) < 0 || comparer.Compare(item!, max!) > 0) && Contains(item))
                 {
                     Remove(item);
                 }
@@ -1043,13 +1043,13 @@ namespace J2N.Collections.Generic
             while (current != null)
             {
                 int comp;
-                if (lowerBoundActive && ((comp = comparer.Compare(from, current.Item)) > 0 || !lowerBoundInclusive && comp == 0))
+                if (lowerBoundActive && ((comp = comparer.Compare(from!, current.Item!)) > 0 || !lowerBoundInclusive && comp == 0))
                 {
                     current = current.Right;
                 }
                 else
                 {
-                    if (upperBoundActive && ((comp = comparer.Compare(to, current.Item)) < 0 || !upperBoundInclusive && comp == 0))
+                    if (upperBoundActive && ((comp = comparer.Compare(to!, current.Item!)) < 0 || !upperBoundInclusive && comp == 0))
                     {
                         current = current.Left;
                     }
@@ -1335,7 +1335,7 @@ namespace J2N.Collections.Generic
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
                 T max = Max;
 
-                while (!mineEnded && !theirsEnded && Comparer.Compare(theirs.Current, max) <= 0)
+                while (!mineEnded && !theirsEnded && Comparer.Compare(theirs.Current!, max!) <= 0)
                 {
                     int comp = Comparer.Compare(mine.Current, theirs.Current);
                     if (comp < 0)
@@ -1421,15 +1421,15 @@ namespace J2N.Collections.Generic
             if (asSorted != null && HasEqualComparer(asSorted))
             {
                 // Outside range, no point in doing anything
-                if (comparer.Compare(asSorted.Max, Min) >= 0 && comparer.Compare(asSorted.Min, Max) <= 0)
+                if (comparer.Compare(asSorted.Max!, Min!) >= 0 && comparer.Compare(asSorted.Min!, Max!) <= 0)
                 {
                     T min = Min;
                     T max = Max;
                     foreach (T item in other)
                     {
-                        if (comparer.Compare(item, min) < 0)
+                        if (comparer.Compare(item!, min!) < 0)
                             continue;
-                        if (comparer.Compare(item, max) > 0)
+                        if (comparer.Compare(item!, max!) > 0)
                             break;
                         Remove(item);
                     }
@@ -1794,7 +1794,7 @@ namespace J2N.Collections.Generic
                 return false;
 
             SortedSet<T>? asSorted = other as SortedSet<T>;
-            if (asSorted != null && HasEqualComparer(asSorted) && (comparer.Compare(Min, asSorted.Max) > 0 || comparer.Compare(Max, asSorted.Min) < 0))
+            if (asSorted != null && HasEqualComparer(asSorted) && (comparer.Compare(Min!, asSorted.Max!) > 0 || comparer.Compare(Max!, asSorted.Min!) < 0))
             {
                 return false;
             }
@@ -2034,7 +2034,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual SortedSet<T> GetViewBetween([AllowNull] T lowerValue, [AllowNull] T upperValue)
         {
-            if (Comparer.Compare(lowerValue, upperValue) > 0)
+            if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
                 throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
             }
@@ -2068,7 +2068,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual SortedSet<T> GetViewBetween([AllowNull] T lowerValue, bool lowerValueInclusive, [AllowNull] T upperValue, bool upperValueInclusive)
         {
-            if (Comparer.Compare(lowerValue, upperValue) > 0)
+            if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
                 throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
             }

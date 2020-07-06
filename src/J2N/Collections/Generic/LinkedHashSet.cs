@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using SCG = System.Collections.Generic;
 #nullable enable
 
@@ -341,8 +342,8 @@ namespace J2N.Collections.Generic
         /// look up a value that has more complete data than the value you currently have,
         /// although their comparer functions indicate they are equal.
         /// </remarks>
-        public bool TryGetValue(T equalValue, out T actualValue)
-            => hashSet.TryGetValue(equalValue, out actualValue);
+        public bool TryGetValue(T equalValue, [MaybeNullWhen(false)] out T actualValue)
+            => hashSet.TryGetValue(equalValue, out actualValue!);
 
         #endregion
 

@@ -5,6 +5,8 @@ using System.Collections;
 using System.Collections.Generic;
 using SCG = System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
 #if FEATURE_CONTRACTBLOCKS
 using System.Diagnostics.Contracts;
 #endif
@@ -266,6 +268,9 @@ namespace J2N.Collections.Generic
         /// capacity needs to be increased to accommodate the new element, this method becomes an O(<c>n</c>)
         /// operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void Add(T item)
         {
             list.Add(item);
@@ -378,6 +383,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
         {
             return list.BinarySearch(index, count, item, comparer ?? Comparer<T>.Default);
@@ -416,6 +424,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public int BinarySearch(T item)
         {
             return BinarySearch(item, null);
@@ -466,6 +477,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public int BinarySearch(T item, IComparer<T>? comparer)
         {
             return list.BinarySearch(item, comparer ?? Comparer<T>.Default);
@@ -485,6 +499,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void Clear()
         {
             list.Clear();
@@ -502,6 +519,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public bool Contains(T item)
             => list.Contains(item);
 
@@ -698,6 +718,7 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
         /// <see cref="Count"/>.
         /// </remarks>
+        [return: MaybeNull]
         public T Find(Predicate<T> match)
             => list.Find(match);
 
@@ -860,6 +881,7 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is
         /// <see cref="Count"/>.
         /// </remarks>
+        [return: MaybeNull]
         public T FindLast(Predicate<T> match)
             => list.FindLast(match);
 
@@ -1083,6 +1105,9 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
         /// is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public int IndexOf(T item)
             => list.IndexOf(item);
 
@@ -1169,6 +1194,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void Insert(int index, T item)
         {
             list.Insert(index, item);
@@ -1298,6 +1326,9 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
         /// is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public int LastIndexOf(T item)
             => list.LastIndexOf(item);
 
@@ -1372,6 +1403,9 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation,
         /// where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public bool Remove(T item)
         {
             if (list.Remove(item))
@@ -1431,6 +1465,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is (<see cref="Count"/> - <paramref name="index"/>).
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void RemoveAt(int index)
         {
             list.RemoveAt(index);
@@ -1472,6 +1509,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void Reverse()
         {
             list.Reverse();
@@ -1537,6 +1577,9 @@ namespace J2N.Collections.Generic
         /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
         /// case it is an O(<c>n</c><sup>2</sup>) operation.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void Sort()
         {
             list.Sort(Comparer<T>.Default);
@@ -1637,6 +1680,9 @@ namespace J2N.Collections.Generic
         /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
         /// case it is an O(<c>n</c><sup>2</sup>) operation.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void Sort(IComparer<T> comparer)
         {
             list.Sort(comparer ?? Comparer<T>.Default);
@@ -1676,6 +1722,9 @@ namespace J2N.Collections.Generic
         /// case it is an O(<c>n</c><sup>2</sup>) operation.
         /// </remarks>
         /// <seealso cref="Comparison{T}"/>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void Sort(Comparison<T> comparison)
             => list.Sort(comparison);
 
@@ -1689,6 +1738,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public T[] ToArray()
             => list.ToArray();
 
@@ -1713,6 +1765,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// The capacity can also be set using the <see cref="Capacity"/> property.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public void TrimExcess()
             => list.TrimExcess();
 
@@ -1935,8 +1990,8 @@ namespace J2N.Collections.Generic
         {
             private readonly List<T> list;
             private int index;
-            private int version;
-            private T current;
+            private readonly int version;
+            [AllowNull, MaybeNull] private T current;
 
             internal Enumerator(List<T> list)
             {

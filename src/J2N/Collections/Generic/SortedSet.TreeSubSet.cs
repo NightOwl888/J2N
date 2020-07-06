@@ -150,32 +150,32 @@ namespace J2N.Collections.Generic
                 return !IsTooLow(item) && !IsTooHigh(item);
             }
 
-            private bool IsTooHigh(T item)
+            private bool IsTooHigh([AllowNull] T item)
             {
                 return IsTooHigh(item, _uBoundInclusive);
             }
 
-            private bool IsTooHigh(T item, bool upperBoundInclusive)
+            private bool IsTooHigh([AllowNull] T item, bool upperBoundInclusive)
             {
                 if (_uBoundActive)
                 {
-                    int c = Comparer.Compare(item, _max);
+                    int c = Comparer.Compare(item!, _max!);
                     if (c > 0 || (c == 0 && !upperBoundInclusive))
                         return true;
                 }
                 return false;
             }
 
-            private bool IsTooLow(T item)
+            private bool IsTooLow([AllowNull] T item)
             {
                 return IsTooLow(item, _lBoundInclusive);
             }
 
-            private bool IsTooLow(T item, bool lowerBoundInclusive)
+            private bool IsTooLow([AllowNull] T item, bool lowerBoundInclusive)
             {
                 if (_lBoundActive)
                 {
-                    int c = Comparer.Compare(item, _min);
+                    int c = Comparer.Compare(item!, _min!);
                     if (c < 0 || (c == 0 && !lowerBoundInclusive))
                         return true;
                 }
@@ -191,7 +191,7 @@ namespace J2N.Collections.Generic
 
                     while (current != null)
                     {
-                        int comp = _lBoundActive ? Comparer.Compare(_min, current.Item) : -1;
+                        int comp = _lBoundActive ? Comparer.Compare(_min!, current.Item!) : -1;
                         if (comp > 0 || (comp == 0 && !_lBoundInclusive))
                         {
                             current = current.Right;
@@ -212,7 +212,7 @@ namespace J2N.Collections.Generic
                         }
                     }
 
-                    return result;
+                    return result!;
                 }
             }
 
@@ -225,7 +225,7 @@ namespace J2N.Collections.Generic
 
                     while (current != null)
                     {
-                        int comp = _uBoundActive ? Comparer.Compare(_max, current.Item) : 1;
+                        int comp = _uBoundActive ? Comparer.Compare(_max!, current.Item!) : 1;
                         if (comp < 0 || (comp == 0 && !_uBoundInclusive))
                         {
                             current = current.Left;
@@ -246,7 +246,7 @@ namespace J2N.Collections.Generic
                         }
                     }
 
-                    return result;
+                    return result!;
                 }
             }
 
@@ -329,11 +329,11 @@ namespace J2N.Collections.Generic
                     {
                         return false;
                     }
-                    if (current.Left != null && (!_lBoundActive || Comparer.Compare(_min, current.Item) < 0))
+                    if (current.Left != null && (!_lBoundActive || Comparer.Compare(_min!, current.Item!) < 0))
                     {
                         processQueue.Enqueue(current.Left);
                     }
-                    if (current.Right != null && (!_uBoundActive || Comparer.Compare(_max, current.Item) > 0))
+                    if (current.Right != null && (!_uBoundActive || Comparer.Compare(_max!, current.Item!) > 0))
                     {
                         processQueue.Enqueue(current.Right);
                     }
@@ -407,7 +407,7 @@ namespace J2N.Collections.Generic
             // This passes functionality down to the underlying tree, clipping edges if necessary
             // There's nothing gained by having a nested subset. May as well draw it from the base
             // Cannot increase the bounds of the subset, can only decrease it
-            public override SortedSet<T> GetViewBetween(T lowerValue, T upperValue)
+            public override SortedSet<T> GetViewBetween([AllowNull] T lowerValue, [AllowNull] T upperValue)
             {
                 if (IsTooLow(lowerValue))
                 {
