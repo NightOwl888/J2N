@@ -298,7 +298,21 @@ namespace J2N.Collections.ObjectModel
             {
                 if (IsCompatibleKey(key))
                 {
-                    return this[(TKey)key];
+                    // Fall out early if the dictionary is empty.
+                    if (dictionary.Count == 0)
+                        return null;
+
+                    // J2N: If the wrapped dictionary supports IDictionary, cascade the call.
+                    // We don't expect a KeyNotFoundException to occur when using IDictionary,
+                    // instead, we should return null.
+                    if (dictionary is IDictionary dict)
+                        return dict[key];
+
+                    // J2N: Patch broken behavior in .NET - IDictionary should return
+                    // null if not found.
+                    var tKey = (TKey)key;
+                    if (dictionary.ContainsKey(tKey))
+                        return this[tKey];
                 }
                 return null;
             }
