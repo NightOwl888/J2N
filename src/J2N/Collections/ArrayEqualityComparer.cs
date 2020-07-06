@@ -163,7 +163,7 @@ namespace J2N.Collections
                     {
                         e1 = array1[i];
                         e2 = array2[i];
-                        if (!(e1 == null ? e2 == null : EqualityComparer<T1>.Default.Equals(e1, e2)))
+                        if (!(e1 == null ? e2 == null : J2N.Collections.Generic.EqualityComparer<T1>.Default.Equals(e1, e2)))
                         {
                             return false;
                         }
@@ -193,13 +193,13 @@ namespace J2N.Collections
                             // NOTE: An array of type object can contain primitive types. So we need to do that
                             // check within the loop.
                             if (element is string eString)
-                                elementHashCode = EqualityComparer<string>.Default.GetHashCode(eString);
+                                elementHashCode = J2N.Collections.Generic.EqualityComparer<string>.Default.GetHashCode(eString);
                             else if (element is float eFloat)
-                                elementHashCode = EqualityComparer<float>.Default.GetHashCode(eFloat);
+                                elementHashCode = J2N.Collections.Generic.EqualityComparer<float>.Default.GetHashCode(eFloat);
                             else if (element is double eDouble)
-                                elementHashCode = EqualityComparer<double>.Default.GetHashCode(eDouble);
+                                elementHashCode = J2N.Collections.Generic.EqualityComparer<double>.Default.GetHashCode(eDouble);
                             else
-                                elementHashCode = EqualityComparer<T1>.Default.GetHashCode(element);
+                                elementHashCode = J2N.Collections.Generic.EqualityComparer<T1>.Default.GetHashCode(element);
                         }
 
                         hashCode = 31 * hashCode + elementHashCode;
