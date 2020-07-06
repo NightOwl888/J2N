@@ -1,5 +1,6 @@
 ﻿using J2N.Numerics;
 using System;
+using System.ComponentModel;
 using System.Text;
 
 namespace J2N.Collections
@@ -240,7 +241,7 @@ namespace J2N.Collections
         /// <seealso cref="Set(int, bool)"/>
         /// <seealso cref="Set(int, int)"/>
         /// <seealso cref="Set(int, int, bool)"/>
-        public bool Get(int position)
+        public virtual bool Get(int position)
         {
             // Negative index specified
             if (position < 0)
@@ -265,7 +266,7 @@ namespace J2N.Collections
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
         /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Get(int)"/>
-        public BitSet Get(int position1, int position2)
+        public virtual BitSet Get(int position1, int position2)
         {
             if (position1 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -346,7 +347,7 @@ namespace J2N.Collections
         /// <seealso cref="Clear(int)"/>
         /// <seealso cref="Clear()"/>
         /// <seealso cref="Clear(int, int)"/>
-        public void Set(int position)
+        public virtual void Set(int position)
         {
             if (position < 0)
                 throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
@@ -373,7 +374,7 @@ namespace J2N.Collections
         /// <param name="value">Value to set the bit.</param>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position"/> is negative.</exception>
         /// <seealso cref="Set(int)"/>
-        public void Set(int position, bool value)
+        public virtual void Set(int position, bool value)
         {
             if (value)
             {
@@ -394,7 +395,7 @@ namespace J2N.Collections
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
         /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Set(int)"/>
-        public void Set(int position1, int position2)
+        public virtual void Set(int position1, int position2)
         {
             if (position1 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -454,7 +455,7 @@ namespace J2N.Collections
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative, or if
         /// <paramref name="position2"/> is smaller than <paramref name="position1"/>.</exception>
         /// <seealso cref="Set(int, int)"/>
-        public void Set(int position1, int position2, bool value)
+        public virtual void Set(int position1, int position2, bool value)
         {
             if (value)
             {
@@ -471,7 +472,7 @@ namespace J2N.Collections
         /// </summary>
         /// <seealso cref="Clear(int)"/>
         /// <seealso cref="Clear(int, int)"/>
-        public void Clear()
+        public virtual void Clear()
         {
             if (needClear)
             {
@@ -492,7 +493,7 @@ namespace J2N.Collections
         /// <param name="position">The index of the bit to clear.</param>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position"/> is negative.</exception>
         /// <seealso cref="Clear(int, int)"/>
-        public void Clear(int position)
+        public virtual void Clear(int position)
         {
             if (position < 0)
                 // Negative index specified
@@ -522,7 +523,7 @@ namespace J2N.Collections
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
         /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Clear(int)"/>
-        public void Clear(int position1, int position2)
+        public virtual void Clear(int position1, int position2)
         {
             if (position1 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -576,7 +577,7 @@ namespace J2N.Collections
         /// <param name="position">The index of the bit to flip.</param>
         /// <exception cref="IndexOutOfRangeException">If <paramref name="position"/> is negative.</exception>
         /// <seealso cref="Flip(int, int)"/>
-        public void Flip(int position)
+        public virtual void Flip(int position)
         {
             if (position < 0)
                 // Negative index specified
@@ -605,7 +606,7 @@ namespace J2N.Collections
         /// <exception cref="IndexOutOfRangeException">If <paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
         /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Flip(int)"/>
-        public void Flip(int position1, int position2)
+        public virtual void Flip(int position1, int position2)
         {
             if (position1 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -658,7 +659,7 @@ namespace J2N.Collections
         /// <returns><c>true</c> if bs intersects with this <see cref="BitSet"/>,
         /// <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="bitSet"/> is <c>null</c>.</exception>
-        public bool Intersects(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
+        public virtual bool Intersects(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
             if (bitSet == null)
                 throw new ArgumentNullException(nameof(bitSet));
@@ -698,7 +699,7 @@ namespace J2N.Collections
         /// <exception cref="ArgumentNullException">If <paramref name="bitSet"/> is <c>null</c>.</exception>
         /// <seealso cref="Or(BitSet)"/>
         /// <seealso cref="Xor(BitSet)"/>
-        public void And(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
+        public virtual void And(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
             if (bitSet == null)
                 throw new ArgumentNullException(nameof(bitSet));
@@ -737,7 +738,7 @@ namespace J2N.Collections
         /// </summary>
         /// <param name="bitSet"><see cref="BitSet"/> to ANDNOT with.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="bitSet"/> is <c>null</c>.</exception>
-        public void AndNot(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
+        public virtual void AndNot(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
             if (bitSet == null)
                 throw new ArgumentNullException(nameof(bitSet));
@@ -769,7 +770,7 @@ namespace J2N.Collections
         /// <exception cref="ArgumentNullException">If <paramref name="bitSet"/> is <c>null</c>.</exception>
         /// <seealso cref="Xor(BitSet)"/>
         /// <seealso cref="And(BitSet)"/>
-        public void Or(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
+        public virtual void Or(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
             if (bitSet == null)
                 throw new ArgumentNullException(nameof(bitSet));
@@ -811,7 +812,7 @@ namespace J2N.Collections
         /// <exception cref="ArgumentNullException">If <paramref name="bitSet"/> is <c>null</c>.</exception>
         /// <seealso cref="Or(BitSet)"/>
         /// <seealso cref="And(BitSet)"/>
-        public void Xor(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
+        public virtual void Xor(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
             if (bitSet == null)
                 throw new ArgumentNullException(nameof(bitSet));
@@ -846,19 +847,24 @@ namespace J2N.Collections
         }
 
         /// <summary>
-        /// Gets the number of bits this <see cref="BitSet"/> has.
+        /// Returns the current capacity in bits (1 greater than the index of the last bit).</summary>
+        /// <seealso cref="Length"/>
+        public virtual int Capacity => bits.Length << Offset;
+
+        /// <summary>
+        /// Deprecated. Gets the number of bits this <see cref="BitSet"/> has.
+        /// <para/>
+        /// Use <see cref="Capacity"/> instead, as the name Count is not very clear what the property is intended for. This property is for compatibility purposes with the JDK bitset.
         /// </summary>
         /// <seealso cref="Length"/>
-        public int Count
-        {
-            get { return bits.Length << Offset; }
-        }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public virtual int Count => bits.Length << Offset;
 
         /// <summary>
         /// Returns the number of bits up to and including the highest bit set.
         /// </summary>
         /// <returns>The length of the <see cref="BitSet"/>.</returns>
-        public int Length
+        public virtual int Length
         {
             get
             {
