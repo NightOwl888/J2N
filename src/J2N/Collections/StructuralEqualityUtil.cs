@@ -1,6 +1,7 @@
 ﻿using J2N.Collections.Generic;
 using System;
 using System.Reflection;
+#nullable enable
 
 namespace J2N.Collections
 {
@@ -15,10 +16,10 @@ namespace J2N.Collections
         internal static Func<T, int> LoadGetHashCodeDelegate<T>(bool isValueType, bool isObject, StructuralEqualityComparer structuralEqualityComparer)
         {
             if (isValueType)
-                return (value) => EqualityComparer<T>.Default.GetHashCode(value);
+                return (value) => EqualityComparer<T>.Default.GetHashCode(value!); // J2N TODO: Note that value can be null here, need to investigate how to override the interface
             if (isObject)
                 return (value) => IsValueType(value) ?
-                    EqualityComparer<T>.Default.GetHashCode(value) :
+                    EqualityComparer<T>.Default.GetHashCode(value!) : // J2N TODO: Note that value can be null here, need to investigate how to override the interface
                     (value == null ? 0 : structuralEqualityComparer.GetHashCode(value));
             else
                 return (value) => value == null ? 0 : structuralEqualityComparer.GetHashCode(value);
@@ -31,15 +32,16 @@ namespace J2N.Collections
             else if (isObject)
                 return (valueA, valueB) => IsValueType(valueA) || IsValueType(valueB) ?
                                 EqualityComparer<T>.Default.Equals(valueA, valueB) :
-                                (valueA == null ? valueB == null : structuralEqualityComparer.Equals(valueA, valueB));
+                                (valueA is null ? valueB is null : structuralEqualityComparer.Equals(valueA, valueB));
             else // Reference type
-                return (valueA, valueB) => valueA == null ? valueB == null : structuralEqualityComparer.Equals(valueA, valueB);
+                return (valueA, valueB) => valueA is null ? valueB is null : structuralEqualityComparer.Equals(valueA, valueB);
         }
 
+        internal static bool IsValueType<TElement>(TElement value) => !(value is null) &&
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-        internal static bool IsValueType<TElement>(TElement value) => value == null ? false : value.GetType().GetTypeInfo().IsValueType;
+            value.GetType().GetTypeInfo().IsValueType;
 #else
-        internal static bool IsValueType<TElement>(TElement value) => value == null ? false : value.GetType().IsValueType;
+            value.GetType().IsValueType;
 #endif
     }
 }

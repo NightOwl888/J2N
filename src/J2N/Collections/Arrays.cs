@@ -1,8 +1,7 @@
 ﻿using J2N.Text;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Text;
+#nullable enable
 
 namespace J2N.Collections
 {
@@ -35,7 +34,7 @@ namespace J2N.Collections
         /// same length and the elements at each index in the two arrays are
         /// equal according to <see cref="IEqualityComparer{T}.Equals(T, T)"/> of
         /// <see cref="EqualityComparer{T}.Default"/>; otherwise, <c>false</c>.</returns>
-        public static bool DeepEquals<T>(T[] arrayA, T[] arrayB)
+        public static bool DeepEquals<T>(T[]? arrayA, T[]? arrayB)
         {
             return StructuralEqualityComparer.Default.Equals(arrayA, arrayB);
         }
@@ -59,9 +58,9 @@ namespace J2N.Collections
         /// <see cref="IList{T}"/>, or <see cref="ISet{T}"/>, its values and any nested collection values
         /// will be compared for equality as well.
         /// </returns>
-        public static bool Equals<T>(T[] arrayA, T[] arrayB)
+        public static bool Equals<T>(T[]? arrayA, T[]? arrayB)
         {
-            return ArrayEqualityComparer<T>.OneDimensional.Equals(arrayA, arrayB);
+            return ArrayEqualityComparer<T>.OneDimensional.Equals(arrayA!, arrayB!);
         }
 
         /// <summary>
@@ -90,7 +89,7 @@ namespace J2N.Collections
         /// <typeparam name="T">The type of array.</typeparam>
         /// <param name="array">The array whose hash code to compute.</param>
         /// <returns>The deep hash code for <paramref name="array"/>.</returns>
-        public static int GetDeepHashCode<T>(T[] array)
+        public static int GetDeepHashCode<T>(T[]? array)
         {
             return StructuralEqualityComparer.Default.GetHashCode(array);
         }
@@ -104,9 +103,9 @@ namespace J2N.Collections
         /// <typeparam name="T">The array element type.</typeparam>
         /// <param name="array">The array whose hash code to compute.</param>
         /// <returns>The hash code for <paramref name="array"/>.</returns>
-        public static int GetHashCode<T>(T[] array)
+        public static int GetHashCode<T>(T[]? array)
         {
-            return ArrayEqualityComparer<T>.OneDimensional.GetHashCode(array);
+            return ArrayEqualityComparer<T>.OneDimensional.GetHashCode(array!); // J2N TODO: array can be null here, but need to override the constraint
         }
 
         // J2N TODO: DeepToString()
@@ -120,7 +119,7 @@ namespace J2N.Collections
         /// </summary>
         /// <typeparam name="T">The type of array element.</typeparam>
         /// <param name="array"></param>
-        public static string ToString<T>(T[] array)
+        public static string ToString<T>(T[]? array)
         {
             if (array == null)
                 return "null"; //$NON-NLS-1$

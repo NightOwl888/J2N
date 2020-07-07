@@ -5,6 +5,7 @@
 // Dependency of SortedSet, SortedDictionary
 
 using System;
+#nullable enable
 
 namespace J2N.Collections.Generic
 {

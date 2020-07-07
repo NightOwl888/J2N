@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
+#nullable enable
 
 namespace J2N.Collections
 {
@@ -52,7 +53,7 @@ namespace J2N.Collections
         /// <param name="x">The first object to compare.</param>
         /// <param name="y">The second dictionary to compare.</param>
         /// <returns><c>true</c> if both objects are structurally equivalent; otherwise, <c>false</c>.</returns>
-        public new virtual bool Equals(object x, object y)
+        public new virtual bool Equals(object? x, object? y)
         {
             if (x is null)
                 return y is null;
@@ -88,15 +89,17 @@ namespace J2N.Collections
 
         private bool ArrayEquals(Array arrayX, Array arrayY)
         {
-            Type elementType = arrayX.GetType().GetElementType();
-            if (
+            Type? elementTypeX = arrayX.GetType().GetElementType();
+            bool isPrimitive = elementTypeX != null &&
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                elementType.GetTypeInfo().IsPrimitive
+                elementTypeX.GetTypeInfo().IsPrimitive;
 #else
-                elementType.IsPrimitive
+                elementTypeX.IsPrimitive;
 #endif
-                && arrayY.GetType().GetElementType().Equals(elementType))
-                return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).Equals(arrayX, arrayY);
+            if (isPrimitive && elementTypeX!.Equals(arrayY.GetType().GetElementType()))
+            {
+                return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementTypeX).Equals(arrayX, arrayY);
+            }
 
             // Types don't match, or they are object[].
             // So, the only option is to enumerate the arrays to compare them.
@@ -147,7 +150,7 @@ namespace J2N.Collections
         /// </summary>
         /// <param name="obj">The object to calculate the hash code for.</param>
         /// <returns>The hash code for <paramref name="obj"/>.</returns>
-        public virtual int GetHashCode(object obj)
+        public virtual int GetHashCode(object? obj)
         {
             if (obj == null) return 0;
 
@@ -167,15 +170,15 @@ namespace J2N.Collections
 
         private int GetArrayHashCode(Array array)
         {
-            Type elementType = array.GetType().GetElementType();
-            if (
+            Type? elementType = array.GetType().GetElementType();
+            bool isPrimitive = elementType != null &&
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                elementType.GetTypeInfo().IsPrimitive
+                elementType.GetTypeInfo().IsPrimitive;
 #else
-                elementType.IsPrimitive
+                elementType.IsPrimitive;
 #endif
-                )
-                return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType).GetHashCode(array);
+            if (isPrimitive)
+                return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).GetHashCode(array);
 
             // Fallback for other array types - enumerate them
             int hashCode = 1, elementHashCode;
@@ -209,7 +212,7 @@ namespace J2N.Collections
         /// <param name="x">The first object to compare.</param>
         /// <param name="y">The second object to compare.</param>
         /// <returns><c>true</c> if the provided objects are equal; otherwise, <c>false</c>.</returns>
-        protected abstract bool UnstructuredEquals(object x, object y);
+        protected abstract bool UnstructuredEquals(object? x, object? y);
 
         /// <summary>
         /// Overridden in a derived class, handles the get hash code of types that are not
@@ -217,7 +220,7 @@ namespace J2N.Collections
         /// </summary>
         /// <param name="obj">The object to provide the hash code for.</param>
         /// <returns>The hash code for <paramref name="obj"/>.</returns>
-        protected abstract int GetUnstructuredHashCode(object obj);
+        protected abstract int GetUnstructuredHashCode(object? obj);
     }
 
 #if FEATURE_SERIALIZABLE
@@ -225,7 +228,7 @@ namespace J2N.Collections
 #endif
     internal class DefaultStructuralEqualityComparer : StructuralEqualityComparer
     {
-        protected override bool UnstructuredEquals(object x, object y)
+        protected override bool UnstructuredEquals(object? x, object? y)
         {
             // Handle non-structured types (ignoring built in .NET collections)
             if (x is double dblX && y is double dblY)
@@ -234,12 +237,14 @@ namespace J2N.Collections
                 return EqualityComparer<float>.Default.Equals(fltX, fltY);
             if (x is string strX && y is string strY)
                 return StringComparer.Ordinal.Equals(strX, strY);
-            return EqualityComparer<object>.Default.Equals(x, y);
+            return EqualityComparer<object>.Default.Equals(x!, y!); // J2N TODO: Note that value can be null here, need to investigate how to override the interface
         }
 
-        protected override int GetUnstructuredHashCode(object obj)
+        protected override int GetUnstructuredHashCode(object? obj)
         {
             // Handle non-structured types (ignoring built in .NET collections)
+            if (obj is null)
+                return 0;
             if (obj is double dbl)
                 return EqualityComparer<double>.Default.GetHashCode(dbl);
             if (obj is float flt)
@@ -261,10 +266,12 @@ namespace J2N.Collections
 #endif
     internal class AggressiveStructuralEqualityComparer : StructuralEqualityComparer
     {
-        protected override int GetUnstructuredHashCode(object obj)
+        protected override int GetUnstructuredHashCode(object? obj)
         {
             if (StructuralEqualityUtil.IsValueType(obj))
             {
+                if (obj is null)
+                    return 0;
                 if (obj is double dbl)
                     return EqualityComparer<double>.Default.GetHashCode(dbl);
                 if (obj is float flt)
@@ -281,7 +288,7 @@ namespace J2N.Collections
             }
         }
 
-        protected override bool UnstructuredEquals(object x, object y)
+        protected override bool UnstructuredEquals(object? x, object? y)
         {
             if (StructuralEqualityUtil.IsValueType(x))
             {
@@ -289,7 +296,7 @@ namespace J2N.Collections
                     return EqualityComparer<double>.Default.Equals(dblX, dblY);
                 if (x is float fltX && y is float fltY)
                     return EqualityComparer<float>.Default.Equals(fltX, fltY);
-                return EqualityComparer<object>.Default.Equals(x, y);
+                return EqualityComparer<object>.Default.Equals(x!, y!); // J2N TODO: Note that value can be null here, need to investigate how to override the interface
             }
             else
             {

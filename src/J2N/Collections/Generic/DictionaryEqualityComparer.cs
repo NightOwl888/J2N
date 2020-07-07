@@ -1,10 +1,16 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
+    // J2N: For some reason, Microsoft decided that no implementation of IDictionary<TKey, TValue> should be allowed to use a null key according
+    // to the nullable constraints. Fortunately, we can ignore this, but it doesn't make for the best user experience, since we allow nulls.
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+
     /// <summary>
     /// Provides comparers that can be used to compare <see cref="IDictionary{TKey, TValue}"/>
     /// implementations for structural equality using rules similar to those
@@ -76,7 +82,9 @@ namespace J2N.Collections.Generic
         /// </summary>
         public static DictionaryEqualityComparer<TKey, TValue> Aggressive { get; } = new AggressiveDictionaryEqualityComparer();
 
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         internal DictionaryEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
             this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
             LoadEqualityDelegates();
@@ -97,7 +105,7 @@ namespace J2N.Collections.Generic
         /// <param name="dictionaryA">The first dictionary to compare.</param>
         /// <param name="dictionaryB">The second dictionary to compare.</param>
         /// <returns><c>true</c> if both dictionaries contain the same mappings; otherwise, <c>false</c>.</returns>
-        public virtual bool Equals(IDictionary<TKey, TValue> dictionaryA, IDictionary<TKey, TValue> dictionaryB)
+        public virtual bool Equals(IDictionary<TKey, TValue>? dictionaryA, IDictionary<TKey, TValue>? dictionaryB)
         {
             if (ReferenceEquals(dictionaryA, dictionaryB))
                 return true;
@@ -143,7 +151,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="dictionary">The dictionary to calculate the hash code for.</param>
         /// <returns>The hash code for <paramref name="dictionary"/>.</returns>
-        public virtual int GetHashCode(IDictionary<TKey, TValue> dictionary)
+        public virtual int GetHashCode(IDictionary<TKey, TValue>? dictionary)
         {
             if (dictionary is null)
                 return 0;
@@ -164,7 +172,7 @@ namespace J2N.Collections.Generic
         /// <param name="a">The first dictionary to compare.</param>
         /// <param name="b">The second dictionary to compare.</param>
         /// <returns><c>true</c> if both objects implement <see cref="IDictionary{TKey, TValue}"/> and contain the same mappings; otherwise, <c>false</c>.</returns>
-        public new bool Equals(object a, object b)
+        public new bool Equals(object? a, object? b)
         {
             if (a is IDictionary<TKey, TValue> dictionaryA && b is IDictionary<TKey, TValue> dictionaryB)
                 return Equals(dictionaryA, dictionaryB);
@@ -185,8 +193,10 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="obj">The dictionary to calculate the hash code for.</param>
         /// <returns>The hash code for <paramref name="obj"/>.</returns>
-        public int GetHashCode(object obj)
+        public int GetHashCode(object? obj)
         {
+            if (obj is null)
+                return 0;
             if (obj is IDictionary<TKey, TValue> dictionary)
                 return GetHashCode(dictionary);
             return EqualityComparer<object>.Default.GetHashCode(obj);
@@ -198,7 +208,7 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The comparer to convert to a <see cref="DictionaryEqualityComparer{TKey, TValue}"/>, if possible.</param>
         /// <param name="equalityComparer">The result <see cref="DictionaryEqualityComparer{TKey, TValue}"/> of the conversion.</param>
         /// <returns><c>true</c> if the conversion was successful; otherwise, <c>false</c>.</returns>
-        public static bool TryGetDictionaryEqualityComparer(IEqualityComparer comparer, out DictionaryEqualityComparer<TKey, TValue> equalityComparer)
+        public static bool TryGetDictionaryEqualityComparer(IEqualityComparer comparer, [MaybeNullWhen(false)] out DictionaryEqualityComparer<TKey, TValue> equalityComparer)
         {
             // StructuralEqualityComparer is too "dumb" to resolve generic collections.
             // This is done on purpose for performance reasons. Dictionaries
@@ -235,7 +245,7 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The comparer that is passed to <see cref="IStructuralEquatable.Equals(object, IEqualityComparer)"/>.</param>
         /// <returns><c>true</c> if the specified dictionaries are equal; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        public static bool Equals(IDictionary<TKey, TValue> dictionary, object other, IEqualityComparer comparer)
+        public static bool Equals(IDictionary<TKey, TValue> dictionary, object? other, IEqualityComparer comparer)
         {
             if (comparer == null)
                 throw new ArgumentNullException(nameof(comparer));
@@ -243,7 +253,7 @@ namespace J2N.Collections.Generic
             if (!(other is IDictionary<TKey, TValue> otherDictionary))
                 return false;
 
-            if (TryGetDictionaryEqualityComparer(comparer, out DictionaryEqualityComparer<TKey, TValue> dictionaryComparer))
+            if (TryGetDictionaryEqualityComparer(comparer, out DictionaryEqualityComparer<TKey, TValue>? dictionaryComparer))
                 return dictionaryComparer.Equals(dictionary, otherDictionary);
 
             // If we got here, we have an unknown comparer type. We assume that it can resolve
@@ -269,7 +279,7 @@ namespace J2N.Collections.Generic
             if (comparer == null)
                 throw new ArgumentNullException(nameof(comparer));
 
-            if (TryGetDictionaryEqualityComparer(comparer, out DictionaryEqualityComparer<TKey, TValue> dictionaryComparer))
+            if (TryGetDictionaryEqualityComparer(comparer, out DictionaryEqualityComparer<TKey, TValue>? dictionaryComparer))
                 return dictionaryComparer.GetHashCode(dictionary);
 
             // If we got here, we have an unknown comparer type. We assume that it can resolve
@@ -281,12 +291,12 @@ namespace J2N.Collections.Generic
         // Hack so we don't need to know the generic closing types
         bool IDictionaryEqualityComparer.Equals(object dictionary, object other, IEqualityComparer comparer)
         {
-            return Equals(dictionary as IDictionary<TKey, TValue>, other, comparer);
+            return Equals((dictionary as IDictionary<TKey, TValue>)!, other, comparer);
         }
 
         int IDictionaryEqualityComparer.GetHashCode(object dictionary, IEqualityComparer comparer)
         {
-            return GetHashCode(dictionary as IDictionary<TKey, TValue>, comparer);
+            return GetHashCode((dictionary as IDictionary<TKey, TValue>)!, comparer);
         }
 
 #if FEATURE_SERIALIZABLE
@@ -315,6 +325,7 @@ namespace J2N.Collections.Generic
             { }
         }
     }
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
     // A simple interface used to identify a dictionary equality comparer without knowing its
     // generic closing types.

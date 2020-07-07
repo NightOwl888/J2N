@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Text;
+#nullable enable
 
 namespace J2N.Collections
 {
@@ -141,17 +142,17 @@ namespace J2N.Collections
         /// <returns>A <see cref="bool"/> indicating whether or not this <see cref="BitSet"/> and
         /// <paramref name="obj"/> are equal.</returns>
         /// <seealso cref="GetHashCode()"/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (this == obj)
             {
                 return true;
             }
-            if (obj is BitSet)
+            if (obj is BitSet other)
             {
-                long[] bsBits = ((BitSet)obj).bits;
-                int length1 = this.actualArrayLength, length2 = ((BitSet)obj).actualArrayLength;
-                if (this.isLengthActual && ((BitSet)obj).isLengthActual
+                long[] bsBits = other.bits;
+                int length1 = this.actualArrayLength, length2 = other.actualArrayLength;
+                if (this.isLengthActual && other.isLengthActual
                         && length1 != length2)
                 {
                     return false;
