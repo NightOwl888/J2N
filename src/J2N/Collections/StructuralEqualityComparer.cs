@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 #nullable enable
 
 namespace J2N.Collections
@@ -232,26 +231,24 @@ namespace J2N.Collections
         {
             // Handle non-structured types (ignoring built in .NET collections)
             if (x is double dblX && y is double dblY)
-                return EqualityComparer<double>.Default.Equals(dblX, dblY);
+                return J2N.Collections.Generic.EqualityComparer<double>.Default.Equals(dblX, dblY);
             if (x is float fltX && y is float fltY)
-                return EqualityComparer<float>.Default.Equals(fltX, fltY);
+                return J2N.Collections.Generic.EqualityComparer<float>.Default.Equals(fltX, fltY);
             if (x is string strX && y is string strY)
                 return StringComparer.Ordinal.Equals(strX, strY);
-            return EqualityComparer<object>.Default.Equals(x!, y!); // J2N TODO: Note that value can be null here, need to investigate how to override the interface
+            return J2N.Collections.Generic.EqualityComparer<object>.Default.Equals(x!, y!); // J2N TODO: Note that value can be null here, need to investigate how to override the interface
         }
 
         protected override int GetUnstructuredHashCode(object? obj)
         {
             // Handle non-structured types (ignoring built in .NET collections)
-            if (obj is null)
-                return 0;
             if (obj is double dbl)
-                return EqualityComparer<double>.Default.GetHashCode(dbl);
+                return J2N.Collections.Generic.EqualityComparer<double>.Default.GetHashCode(dbl);
             if (obj is float flt)
-                return EqualityComparer<float>.Default.GetHashCode(flt);
+                return J2N.Collections.Generic.EqualityComparer<float>.Default.GetHashCode(flt);
             if (obj is string str)
                 return StringComparer.Ordinal.GetHashCode(str);
-            return EqualityComparer<object>.Default.GetHashCode(obj);
+            return J2N.Collections.Generic.EqualityComparer<object>.Default.GetHashCode(obj!);
         }
     }
 
@@ -270,13 +267,11 @@ namespace J2N.Collections
         {
             if (StructuralEqualityUtil.IsValueType(obj))
             {
-                if (obj is null)
-                    return 0;
                 if (obj is double dbl)
-                    return EqualityComparer<double>.Default.GetHashCode(dbl);
+                    return J2N.Collections.Generic.EqualityComparer<double>.Default.GetHashCode(dbl);
                 if (obj is float flt)
-                    return EqualityComparer<float>.Default.GetHashCode(flt);
-                return EqualityComparer<object>.Default.GetHashCode(obj);
+                    return J2N.Collections.Generic.EqualityComparer<float>.Default.GetHashCode(flt);
+                return J2N.Collections.Generic.EqualityComparer<object>.Default.GetHashCode(obj!);
             }
             else
             {
@@ -293,10 +288,10 @@ namespace J2N.Collections
             if (StructuralEqualityUtil.IsValueType(x))
             {
                 if (x is double dblX && y is double dblY)
-                    return EqualityComparer<double>.Default.Equals(dblX, dblY);
+                    return J2N.Collections.Generic.EqualityComparer<double>.Default.Equals(dblX, dblY);
                 if (x is float fltX && y is float fltY)
-                    return EqualityComparer<float>.Default.Equals(fltX, fltY);
-                return EqualityComparer<object>.Default.Equals(x!, y!); // J2N TODO: Note that value can be null here, need to investigate how to override the interface
+                    return J2N.Collections.Generic.EqualityComparer<float>.Default.Equals(fltX, fltY);
+                return J2N.Collections.Generic.EqualityComparer<object>.Default.Equals(x!, y!); // J2N TODO: Note that value can be null here, need to investigate how to override the interface
             }
             else
             {
