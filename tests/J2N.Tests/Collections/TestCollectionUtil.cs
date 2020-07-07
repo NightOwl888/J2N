@@ -4,7 +4,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using SCG = System.Collections.Generic;
 
 namespace J2N.Collections
@@ -571,5 +570,30 @@ namespace J2N.Collections
         //    Assert.AreNotEqual(CollectionUtil.GetHashCode(control, true), CollectionUtil.GetHashCode(level1EqualLevel2Unequal, true));
         //}
 
+        [Test]
+        public void TestStringInterpolationWithList()
+        {
+            var list = new J2N.Collections.Generic.List<string>()
+            {
+                "nothing",
+                "else",
+                "matters"
+            };
+            string actual = $"{list}";
+            assertEquals("[nothing, else, matters]", actual);
+        }
+
+        [Test]
+        public void TestStringInterpolationWithDictionary()
+        {
+            var dictionary = new J2N.Collections.Generic.Dictionary<string, bool>()
+            {
+                ["nothing"] = true,
+                ["else"] = false,
+                ["matters"] = true
+            };
+            string actual = $"{dictionary}";
+            assertEquals("{nothing=true, else=false, matters=true}", actual);
+        }
     }
 }

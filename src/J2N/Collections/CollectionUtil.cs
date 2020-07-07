@@ -14,6 +14,8 @@ namespace J2N.Collections
     /// </summary>
     internal static class CollectionUtil
     {
+        private const string SingleFormatArgument = "{0}";
+
         /// <summary>
         /// The same implementation of Equals from Java's AbstractList
         /// (the default implementation for all lists)
@@ -278,7 +280,7 @@ namespace J2N.Collections
         /// </summary>
         public static string ToString<T>(IFormatProvider provider, string format, ICollection<T> collection)
         {
-            return string.Format(provider, format, ToString(collection, provider));
+            return string.Format(provider, format ?? SingleFormatArgument, ToString(collection, provider));
         }
 
 
@@ -294,6 +296,8 @@ namespace J2N.Collections
             if (collection.Count == 0)
                 return "[]";
 
+            provider ??= StringFormatter.CurrentCulture;
+
             using (var it = collection.GetEnumerator())
             {
                 StringBuilder sb = new StringBuilder();
@@ -305,8 +309,8 @@ namespace J2N.Collections
                     sb.Append(object.ReferenceEquals(e, collection) ? 
                         "(this Collection)" : 
                         (e is IStructuralFormattable formattable ? 
-                            formattable.ToString("{0}", provider) : 
-                            string.Format(provider, "{0}", e)));
+                            formattable.ToString(SingleFormatArgument, provider) : 
+                            string.Format(provider, SingleFormatArgument, e)));
                     if (!it.MoveNext())
                     {
                         return sb.Append(']').ToString();
@@ -334,7 +338,7 @@ namespace J2N.Collections
         /// </summary>
         public static string ToString<TKey, TValue>(IFormatProvider provider, string format, IDictionary<TKey, TValue> dictionary)
         {
-            return string.Format(provider, format, ToString(dictionary, provider));
+            return string.Format(provider, format ?? SingleFormatArgument, ToString(dictionary, provider));
         }
 
         /// <summary>
@@ -349,6 +353,8 @@ namespace J2N.Collections
             if (dictionary.Count == 0)
                 return "{}";
 
+            provider ??= StringFormatter.CurrentCulture;
+
             using (var i = dictionary.GetEnumerator())
             {
                 StringBuilder sb = new StringBuilder();
@@ -362,14 +368,14 @@ namespace J2N.Collections
                     sb.Append(ReferenceEquals(key, dictionary) ? 
                         "(this Dictionary)" : 
                         (key is IStructuralFormattable formattableKey ?
-                            formattableKey.ToString("{0}", provider) :
-                            string.Format(provider, "{0}", key)));
+                            formattableKey.ToString(SingleFormatArgument, provider) :
+                            string.Format(provider, SingleFormatArgument, key)));
                     sb.Append('=');
                     sb.Append(ReferenceEquals(value, dictionary) ?
                         "(this Dictionary)" :
                         (value is IStructuralFormattable formattableValue ?
-                            formattableValue.ToString("{0}", provider) :
-                            string.Format(provider, "{0}", value)));
+                            formattableValue.ToString(SingleFormatArgument, provider) :
+                            string.Format(provider, SingleFormatArgument, value)));
                     if (!i.MoveNext())
                     {
                         return sb.Append('}').ToString();
