@@ -14,7 +14,17 @@ namespace J2N.Collections.Generic
     /// </summary>
     internal static partial class EnumerableHelpers
     {
-        /// <summary>Converts an enumerable to an array using the same logic as List{T}.</summary>
+        private static class EmptyArrayHolder<T>
+        {
+            public static readonly T[] EmptyArray =
+#if FEATURE_ARRAYEMPTY
+                Array.Empty<T>();
+#else
+                new T[0];
+#endif
+        }
+
+        /// <summary>Converts an enumerable to an array using the same logic as <see cref="List{T}"/>.</summary>
         /// <param name="source">The enumerable to convert.</param>
         /// <param name="length">The number of items stored in the resulting array, 0-indexed.</param>
         /// <returns>
@@ -91,11 +101,7 @@ namespace J2N.Collections.Generic
             }
 
             length = 0;
-#if FEATURE_ARRAYEMPTY
-            return Array.Empty<T>();
-#else
-            return new T[0];
-#endif
+            return EmptyArrayHolder<T>.EmptyArray;
         }
     }
 }
