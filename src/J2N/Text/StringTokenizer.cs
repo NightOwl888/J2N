@@ -66,7 +66,7 @@ namespace J2N.Text
     ///         &quot;this is a test with supplementary characters \ud800\ud800\udc00\udc00&quot;,
     ///         &quot; \ud800\udc00&quot;);
     /// while (st.MoveNext()) {
-    ///     println(st.Current);
+    ///     Console.WriteLine(st.Current);
     /// }
     /// </code>
     ///
