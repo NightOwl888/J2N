@@ -14,9 +14,10 @@ namespace J2N.Collections
     /// given size and grows if this size is exceeded. Growth is always rounded to a
     /// 64 bit boundary.
     /// <para/>
-    /// Usage Note: Where possible, it is recommended to use <see cref="System.Collections.BitArray"/>.
-    /// However, there are some members that don't exist on <see cref="System.Collections.BitArray"/>
-    /// which make the use of <see cref="BitSet"/> sometimes necessary.
+    /// Usage Note: <see cref="BitSet"/> is similar to <see cref="System.Collections.BitArray"/>,
+    /// except that it allows automatic growth, similar to using a <see cref="System.Collections.Generic.List{T}"/>
+    /// or <see cref="System.Collections.Generic.HashSet{T}"/>. <see cref="System.Collections.BitArray"/>
+    /// is a fixed length and doesn't automatically grow.
     /// </summary>
 #if FEATURE_SERIALIZABLE
     [Serializable]
