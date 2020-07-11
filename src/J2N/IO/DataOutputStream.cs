@@ -3,6 +3,8 @@ using System.IO;
 
 namespace J2N.IO
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Wraps an existing <see cref="Stream"/> and writes typed data to it.
     /// Typically, this stream can be read in by <see cref="DataInputStream"/>. Types that can be
@@ -364,7 +366,7 @@ namespace J2N.IO
             long utfCount = CountUTFBytes(value);
             if (utfCount > 65535)
             {
-                throw new FormatException("data format too long"); //$NON-NLS-1$
+                throw new FormatException(SR.Format_InvalidUTFTooLong); //$NON-NLS-1$
             }
             byte[] buffer = new byte[(int)utfCount + 2];
             int offset = 0;

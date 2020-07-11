@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace J2N
 {
@@ -27,6 +28,9 @@ namespace J2N
         /// timing mechanism in the .NET framework.
         /// </summary>
         /// <returns>The current value of the current framework's high resolution time source, in nanoseconds.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static long NanoTime()
         {
             return (Stopwatch.GetTimestamp() / Stopwatch.Frequency) * 1000000000;
@@ -42,6 +46,9 @@ namespace J2N
         /// timing mechanism in the .NET framework.
         /// </summary>
         /// <returns>The current value of the current framework's high resolution time source, in milliseconds.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static long CurrentTimeMilliseconds()
         {
             return (Stopwatch.GetTimestamp() / Stopwatch.Frequency) * 1000;

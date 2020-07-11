@@ -1,7 +1,9 @@
 ﻿using J2N.Text;
 using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Text;
+using SR2 = J2N.Resources.Strings;
 
 namespace J2N
 {
@@ -109,6 +111,9 @@ namespace J2N
         /// </summary>
         /// <param name="codePoint">The code point to test.</param>
         /// <returns><c>true</c> if <paramref name="codePoint"/> is a valid Unicode code point; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsValidCodePoint(int codePoint)
         {
             return (MinCodePoint <= codePoint && MaxCodePoint >= codePoint);
@@ -120,6 +125,9 @@ namespace J2N
         /// <param name="codePoint">The code point to test.</param>
         /// <returns><c>true</c> if <paramref name="codePoint"/> is within the supplementary
         /// code point range; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsSupplementaryCodePoint(int codePoint)
         {
             return (MinSupplementaryCodePoint <= codePoint && MaxCodePoint >= codePoint);
@@ -139,6 +147,9 @@ namespace J2N
         /// <param name="codePoint">The code point for which to calculate the number of required
         /// chars.</param>
         /// <returns><c>2</c> if <c><paramref name="codePoint"/> >= 0x10000</c>; <c>1</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int CharCount(int codePoint)
         {
             // A given codepoint can be represented in .NET either by 1 char (up to UTF16),
@@ -160,6 +171,9 @@ namespace J2N
         /// <param name="low">The low surrogate unit.</param>
         /// <returns>The Unicode code point corresponding to the surrogate unit pair.</returns>
         /// <seealso cref="char.IsSurrogatePair(char, char)"/>.
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int ToCodePoint(char high, char low)
         {
             // Optimized form of:
@@ -583,7 +597,7 @@ namespace J2N
         public static int ToChars(int codePoint, char[] destination, int destinationIndex)
         {
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException($"'{codePoint}' is not a valid Unicode code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
             if (destination == null)
                 throw new ArgumentNullException(nameof(destination));
             if (destinationIndex < 0 || destinationIndex >= destination.Length)
@@ -626,7 +640,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException($"'{codePoint}' is not a valid Unicode code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -671,7 +685,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -719,7 +733,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -767,7 +781,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -815,7 +829,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(seq.Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -1421,6 +1435,9 @@ namespace J2N
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if the general Unicode category of the character is
         /// not <see cref="UnicodeCategory.OtherNotAssigned"/>; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsDefined(char c)
         {
             return GetType(c) != UnicodeCategory.OtherNotAssigned;
@@ -1433,6 +1450,9 @@ namespace J2N
         /// <param name="codePoint">The code point to check.</param>
         /// <returns><c>true</c> if the general Unicode category of the code point is
         /// not <see cref="UnicodeCategory.OtherNotAssigned"/>; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsDefined(int codePoint)
         {
             return GetType(codePoint) != UnicodeCategory.OtherNotAssigned;
@@ -1443,6 +1463,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is a digit; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsDigit(char c)
         {
             return char.IsDigit(c);
@@ -1473,6 +1496,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is ignorable; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsIdentifierIgnorable(char c)
         {
             return (c >= 0 && c <= 8) || (c >= 0xe && c <= 0x1b)
@@ -1485,6 +1511,9 @@ namespace J2N
         /// </summary>
         /// <param name="codePoint">The code point to check.</param>
         /// <returns><c>true</c> if <paramref name="codePoint"/> is ignorable; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsIdentifierIgnorable(int codePoint)
         {
             return (codePoint >= 0 && codePoint <= 8) || (codePoint >= 0xe && codePoint <= 0x1b)
@@ -1496,6 +1525,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is an ISO control character; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsISOControl(char c)
         {
             return (c >= 0 && c <= 0x1f) || (c >= 0x7f && c <= 0x9f);
@@ -1506,6 +1538,9 @@ namespace J2N
         /// </summary>
         /// <param name="codePoint">The code point to check.</param>
         /// <returns><c>true</c> if <paramref name="codePoint"/> is an ISO control character; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsISOControl(int codePoint)
         {
             return (codePoint >= 0 && codePoint <= 0x1f) || (codePoint >= 0x7f && codePoint <= 0x9f);
@@ -1527,6 +1562,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is a letter; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsLetter(char c)
         {
             return char.IsLetter(c);
@@ -1557,6 +1595,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is a letter or a digit; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsLetterOrDigit(char c)
         {
             return char.IsLetterOrDigit(c);
@@ -1588,6 +1629,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is a lower case letter; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsLower(char c)
         {
             return char.IsLower(c);
@@ -1794,6 +1838,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is an upper case letter, <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsUpper(char c)
         {
             return char.IsUpper(c);
@@ -1825,6 +1872,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to check.</param>
         /// <returns><c>true</c> if <paramref name="c"/> is a whitespace character, <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsWhiteSpace(char c)
         {
             return char.IsWhiteSpace(c);
@@ -1855,6 +1905,9 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to reverse.</param>
         /// <returns>The character with reordered bytes.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static char ReverseBytes(char c)
         {
             return (char)((c << 8) | (c >> 8));
@@ -1871,6 +1924,9 @@ namespace J2N
         /// <returns>The lowercase equivalent of the character, if any;
         /// otherwise, the character itself.</returns>
         /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int ToLower(int codePoint) => ToLower(codePoint, CultureInfo.CurrentCulture);
 
         /// <summary>
@@ -1888,7 +1944,7 @@ namespace J2N
             if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException($"{codePoint} is not a valid code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (CharCount(codePoint) == 1)
@@ -1906,6 +1962,9 @@ namespace J2N
         /// <returns>The uppercase equivalent of the character, if any;
         /// otherwise, the character itself.</returns>
         /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int ToUpper(int codePoint) => ToUpper(codePoint, CultureInfo.CurrentCulture);
 
         /// <summary>
@@ -1923,7 +1982,7 @@ namespace J2N
             if (culture == null)
                 throw new ArgumentNullException(nameof(culture));
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException($"{codePoint} is not a valid code point.");
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (CharCount(codePoint) == 1)

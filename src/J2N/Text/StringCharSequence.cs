@@ -3,6 +3,8 @@ using System.Text;
 
 namespace J2N.Text
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// A wrapper class that represents a <see cref="string"/> and implements <see cref="ICharSequence"/>.
     /// </summary>
@@ -54,7 +56,7 @@ namespace J2N.Text
             get
             {
                 if (Value == null)
-                    throw new InvalidOperationException($"Cannot index a null {nameof(StringCharSequence)}.");
+                    throw new InvalidOperationException(J2N.SR.Format(SR.InvalidOperation_CannotIndexNullObject, nameof(StringCharSequence)));
                 return Value[index];
             }
         }
@@ -96,11 +98,11 @@ namespace J2N.Text
                 return new StringCharSequence(Value);
             }
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (startIndex + length > Value.Length)
-                throw new ArgumentOutOfRangeException("", $"{nameof(startIndex)} + {nameof(length)} > {nameof(Length)}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > Value.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             return new StringCharSequence(Value.Substring(startIndex, length));
         }

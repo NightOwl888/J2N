@@ -126,6 +126,9 @@
   <data name="ArgumentOutOfRange_Index" xml:space="preserve">
     <value>Index was out of range. Must be non-negative and less than the size of the collection.</value>
   </data>
+  <data name="ArgumentOutOfRange_IndexLength" xml:space="preserve">
+    <value>Index and length must refer to a location within the string.</value>
+  </data>
   <data name="ArgumentOutOfRange_NeedCapacityAtLeast1" xml:space="preserve">
     <value>capacity must be at least 1.</value>
   </data>
@@ -150,8 +153,17 @@
   <data name="Argument_InvalidArrayType" xml:space="preserve">
     <value>Target array type is not compatible with the type of items in the collection.</value>
   </data>
+  <data name="Argument_InvalidCodePoint" xml:space="preserve">
+    <value>'{0}' is not a valid Unicode code point.</value>
+  </data>
   <data name="Argument_InvalidOffLen" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
+  </data>
+  <data name="Argument_MinMaxValue" xml:space="preserve">
+    <value>'{0}' cannot be greater than {1}.</value>
+  </data>
+  <data name="Argument_MustBePrimitiveType" xml:space="preserve">
+    <value>'{0}' is not a primitive type.</value>
   </data>
   <data name="Argument_TypeOfKeyIncorrect" xml:space="preserve">
     <value>The key was of an incorrect type for this dictionary.</value>
@@ -177,8 +189,14 @@
   <data name="Arg_InsufficientSpace" xml:space="preserve">
     <value>Insufficient space in the target location to copy the information.</value>
   </data>
+  <data name="Arg_InvalidANSIString" xml:space="preserve">
+    <value>The ANSI string passed in could not be converted from the default ANSI code page to Unicode.</value>
+  </data>
   <data name="Arg_KeyNotFoundWithKey" xml:space="preserve">
     <value>The given key '{0}' was not present in the dictionary.</value>
+  </data>
+  <data name="Arg_Need1DArray" xml:space="preserve">
+    <value>Array was not a one-dimensional array.</value>
   </data>
   <data name="Arg_NonZeroLowerBound" xml:space="preserve">
     <value>The lower bound of target array must be zero.</value>
@@ -194,6 +212,24 @@
   </data>
   <data name="ExternalLinkedListNode" xml:space="preserve">
     <value>The LinkedList node does not belong to current LinkedList.</value>
+  </data>
+  <data name="Format_InvalidUTFSpec2ndByte" xml:space="preserve">
+    <value>Second byte at {0} does not match UTF8 Specification.</value>
+  </data>
+  <data name="Format_InvalidUTFSpec2ndOr3rdByte" xml:space="preserve">
+    <value>Second or third byte at {0} does not match UTF8 Specification.</value>
+  </data>
+  <data name="Format_InvalidUTFSpec3rdByte" xml:space="preserve">
+    <value>Third byte at {0} does not match UTF8 Specification.</value>
+  </data>
+  <data name="Format_InvalidUTFSpecInput" xml:space="preserve">
+    <value>Input at {0} does not match UTF8 Specification.</value>
+  </data>
+  <data name="Format_InvalidUTFTooLong" xml:space="preserve">
+    <value>UTF8 data format too long.</value>
+  </data>
+  <data name="InvalidOperation_CannotIndexNullObject" xml:space="preserve">
+    <value>Cannot index a null {0}.</value>
   </data>
   <data name="InvalidOperation_CollectionCorrupted" xml:space="preserve">
     <value>Operations that change non-concurrent collections must have exclusive access. A concurrent update was performed on this collection and corrupted its state. The collection's state is no longer correct.</value>

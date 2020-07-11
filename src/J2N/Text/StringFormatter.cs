@@ -182,10 +182,7 @@ namespace J2N.Text
 
         private NumberFormatInfo GetNumberFormatInfo(IFormatProvider provider)
         {
-            var formatter = provider.GetFormat(typeof(NumberFormatInfo));
-            if (formatter is NumberFormatInfo nfi)
-                return nfi;
-            throw new FormatException("No number format provider was found");
+            return provider.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo;
         }
 
         private static string FormatNegativeZero(NumberFormatInfo numberFormat)

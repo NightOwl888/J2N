@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 #if FEATURE_CONTRACTBLOCKS
 using System.Diagnostics.Contracts;
 #endif
@@ -154,10 +155,11 @@ namespace J2N.Collections.ObjectModel
         /// This parameter is passed uninitialized.</param>
         /// <returns><c>true</c> if the object that implements <see cref="ReadOnlyDictionary{TKey, TValue}"/>
         /// contains an element with the specified key; otherwise, <c>false</c>.</returns>
-        public bool TryGetValue(TKey key, out TValue value)
-        {
-            return dictionary.TryGetValue(key, out value);
-        }
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool ReadOnlyDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
+        public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool ReadOnlyDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
+            => dictionary.TryGetValue(key!, out value!);
+
 
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
@@ -168,20 +170,20 @@ namespace J2N.Collections.ObjectModel
         /// </summary>
         /// <param name="key">The key of the element to get.</param>
         /// <returns>The element that has the specified key.</returns>
-        public TValue this[TKey key] => dictionary[key];
+        public TValue this[[AllowNull] TKey key] => dictionary[key];
 
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-        void IDictionary<TKey, TValue>.Add(TKey key, TValue value)
+        void IDictionary<TKey, TValue>.Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
             throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
         }
 
-        bool IDictionary<TKey, TValue>.Remove(TKey key)
+        bool IDictionary<TKey, TValue>.Remove([AllowNull] TKey key)
         {
             throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
         }
 
-        TValue IDictionary<TKey, TValue>.this[TKey key]
+        TValue IDictionary<TKey, TValue>.this[[AllowNull] TKey key]
         {
             get => dictionary[key];
             set => throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
@@ -298,7 +300,21 @@ namespace J2N.Collections.ObjectModel
             {
                 if (IsCompatibleKey(key))
                 {
-                    return this[(TKey)key];
+                    // Fall out early if the dictionary is empty.
+                    if (dictionary.Count == 0)
+                        return null;
+
+                    // J2N: If the wrapped dictionary supports IDictionary, cascade the call.
+                    // We don't expect a KeyNotFoundException to occur when using IDictionary,
+                    // instead, we should return null.
+                    if (dictionary is IDictionary dict)
+                        return dict[key];
+
+                    // J2N: Patch broken behavior in .NET - IDictionary should return
+                    // null if not found.
+                    var tKey = (TKey)key;
+                    if (dictionary.ContainsKey(tKey))
+                        return this[tKey];
                 }
                 return null;
             }
@@ -336,7 +352,8 @@ namespace J2N.Collections.ObjectModel
                 }
                 else
                 {
-                    if (!(array is object[] objects))
+                    object[]? objects = array as object[];
+                    if (objects == null)
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType);
                     }
@@ -511,7 +528,7 @@ namespace J2N.Collections.ObjectModel
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             private readonly IDictionary<TKey, TValue> dictionary;
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-            private IEnumerator<KeyValuePair<TKey, TValue>> enumerator;
+            private readonly IEnumerator<KeyValuePair<TKey, TValue>> enumerator;
 
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             public DictionaryEnumerator(IDictionary<TKey, TValue> dictionary)
@@ -526,9 +543,9 @@ namespace J2N.Collections.ObjectModel
                 => new DictionaryEntry(enumerator.Current.Key, enumerator.Current.Value);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-#pragma warning disable CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
+#pragma warning disable CS8613, CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member.
             public object? Key => enumerator.Current.Key;
-#pragma warning restore CS8613 // Nullability of reference types in return type doesn't match implicitly implemented member.
+#pragma warning restore CS8613, CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member.
 
             public object? Value => enumerator.Current.Value;
 
@@ -870,16 +887,17 @@ namespace J2N.Collections.ObjectModel
                     Type sourceType = typeof(T);
                     if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
 
                     //
                     // We can't cast array of value type to object[], so we don't support 
                     // widening of primitive types here.
                     //
-                    if (!(array is object[] objects))
+                    object?[]? objects = array as object?[];
+                    if (objects == null)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
 
                     try
@@ -891,7 +909,7 @@ namespace J2N.Collections.ObjectModel
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
                 }
             }

@@ -5,6 +5,7 @@
 // Dependency of SortedSet, SortedDictionary
 
 using System.Collections.Generic;
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
@@ -16,7 +17,7 @@ namespace J2N.Collections.Generic
         private readonly IComparer<T> _comparer;
         private readonly IEqualityComparer<T> _memberEqualityComparer;
 
-        public SortedSetEqualityComparer(IEqualityComparer<T> memberEqualityComparer)
+        public SortedSetEqualityComparer(IEqualityComparer<T>? memberEqualityComparer)
             : this(comparer: null, memberEqualityComparer: memberEqualityComparer)
         { }
 
@@ -24,14 +25,14 @@ namespace J2N.Collections.Generic
         /// Create a new SetEqualityComparer, given a comparer for member order and another for member equality (these
         /// must be consistent in their definition of equality)
         /// </summary>
-        private SortedSetEqualityComparer(IComparer<T> comparer, IEqualityComparer<T> memberEqualityComparer)
+        private SortedSetEqualityComparer(IComparer<T>? comparer, IEqualityComparer<T>? memberEqualityComparer)
         {
             _comparer = comparer ?? Comparer<T>.Default;
             _memberEqualityComparer = memberEqualityComparer ?? EqualityComparer<T>.Default;
         }
 
         // Use _comparer to keep equals properties intact; don't want to choose one of the comparers.
-        public bool Equals(SortedSet<T> x, SortedSet<T> y) => SortedSet<T>.SortedSetEquals(x, y, _comparer);
+        public bool Equals(SortedSet<T>? x, SortedSet<T>? y) => SortedSet<T>.SortedSetEquals(x, y, _comparer);
 
         // IMPORTANT: this part uses the fact that GetHashCode() is consistent with the notion of equality in the set.
         public int GetHashCode(SortedSet<T> obj)
@@ -42,7 +43,7 @@ namespace J2N.Collections.Generic
                 foreach (T t in obj)
                 {
                     //hashCode = hashCode ^ (_memberEqualityComparer.GetHashCode(t) & 0x7FFFFFFF); // .NET
-                    hashCode = (hashCode * 31) + _memberEqualityComparer.GetHashCode(t); // Java
+                    hashCode = (hashCode * 31) + _memberEqualityComparer.GetHashCode(t!); // Java
                 }
             }
             // Returns 0 for null sets.
@@ -50,9 +51,9 @@ namespace J2N.Collections.Generic
         }
 
         // Equals method for the comparer itself.
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            SortedSetEqualityComparer<T> comparer = obj as SortedSetEqualityComparer<T>;
+            SortedSetEqualityComparer<T>? comparer = obj as SortedSetEqualityComparer<T>;
             return comparer != null && _comparer == comparer._comparer;
         }
 

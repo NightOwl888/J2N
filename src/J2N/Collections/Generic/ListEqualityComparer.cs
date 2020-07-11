@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
@@ -65,7 +67,9 @@ namespace J2N.Collections.Generic
         /// </summary>
         public static ListEqualityComparer<T> Aggressive { get; } = new AggressiveListEqualityComparer();
 
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         internal ListEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
             this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
             LoadEqualityDelegates();
@@ -85,7 +89,7 @@ namespace J2N.Collections.Generic
         /// <param name="listA">The first list to compare.</param>
         /// <param name="listB">The second list to compare.</param>
         /// <returns><c>true</c> if the specified lists are equal; otherwise, <c>false</c>.</returns>
-        public virtual bool Equals(IList<T> listA, IList<T> listB)
+        public virtual bool Equals(IList<T>? listA, IList<T>? listB)
         {
             if (ReferenceEquals(listA, listB))
                 return true;
@@ -117,7 +121,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="list">The list to calculate the hash code for.</param>
         /// <returns>The hash code of <paramref name="list"/>.</returns>
-        public virtual int GetHashCode(IList<T> list)
+        public virtual int GetHashCode(IList<T>? list)
         {
             if (list is null)
                 return 0;
@@ -138,7 +142,7 @@ namespace J2N.Collections.Generic
         /// <param name="b">The second list to compare.</param>
         /// <returns><c>true</c> if both objects implement <see cref="IList{T}"/>
         /// and they contain the same elements in the same order; otherwise, <c>false</c>.</returns>
-        public new bool Equals(object a, object b)
+        public new bool Equals(object? a, object? b)
         {
             if (a is IList<T> listA && b is IList<T> listB)
                 return Equals(listA, listB);
@@ -151,8 +155,10 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="obj">The list to calculate the hash code for.</param>
         /// <returns>The hash code of <paramref name="obj"/>.</returns>
-        public int GetHashCode(object obj)
+        public int GetHashCode(object? obj)
         {
+            if (obj is null)
+                return 0;
             if (obj is IList<T> list)
                 return GetHashCode(list);
 
@@ -165,7 +171,7 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The comparer to convert to a <see cref="ListEqualityComparer{T}"/>, if possible.</param>
         /// <param name="equalityComparer">The result <see cref="ListEqualityComparer{T}"/> of the conversion.</param>
         /// <returns><c>true</c> if the conversion was successful; otherwise, <c>false</c>.</returns>
-        public static bool TryGetListEqualityComparer(IEqualityComparer comparer, out ListEqualityComparer<T> equalityComparer)
+        public static bool TryGetListEqualityComparer(IEqualityComparer comparer, [MaybeNullWhen(false)] out ListEqualityComparer<T> equalityComparer)
         {
             // StructuralEqualityComparer is too "dumb" to resolve generic collections.
             // This is done on purpose for performance reasons. Lists
@@ -184,7 +190,7 @@ namespace J2N.Collections.Generic
                 equalityComparer = listComparer;
                 return true;
             }
-            equalityComparer = null;
+            equalityComparer = null!;
             return false;
         }
 
@@ -202,7 +208,7 @@ namespace J2N.Collections.Generic
         /// <param name="comparer">The comparer that is passed to <see cref="IStructuralEquatable.Equals(object, IEqualityComparer)"/>.</param>
         /// <returns><c>true</c> if the specified lists are equal; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        public static bool Equals(IList<T> list, object other, IEqualityComparer comparer)
+        public static bool Equals(IList<T> list, object? other, IEqualityComparer comparer)
         {
             if (comparer == null)
                 throw new ArgumentNullException(nameof(comparer));
@@ -210,7 +216,7 @@ namespace J2N.Collections.Generic
             if (!(other is IList<T> otherList))
                 return false;
 
-            if (TryGetListEqualityComparer(comparer, out ListEqualityComparer<T> listComparer))
+            if (TryGetListEqualityComparer(comparer, out ListEqualityComparer<T>? listComparer))
                 return listComparer.Equals(list, otherList);
 
             // If we got here, we have an unknown comparer type. We assume that it can resolve
@@ -236,7 +242,7 @@ namespace J2N.Collections.Generic
             if (comparer == null)
                 throw new ArgumentNullException(nameof(comparer));
 
-            if (TryGetListEqualityComparer(comparer, out ListEqualityComparer<T> listComparer))
+            if (TryGetListEqualityComparer(comparer, out ListEqualityComparer<T>? listComparer))
                 return listComparer.GetHashCode(list);
 
             // If we got here, we have an unknown comparer type. We assume that it can resolve

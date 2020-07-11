@@ -3,6 +3,8 @@ using System.Collections;
 
 namespace J2N.Text
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// An implementation of <see cref="ICharacterEnumerator"/> for strings.
     /// </summary>
@@ -251,11 +253,11 @@ namespace J2N.Text
             if (value == null)
                 throw new ArgumentNullException(nameof(value));
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (length > value.Length - startIndex)
-                throw new ArgumentOutOfRangeException(string.Empty, $"{nameof(startIndex)}: {startIndex} + {nameof(length)}: {length} > {nameof(value.Length)}: {value.Length}");
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > value.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
             if (position < startIndex || position - startIndex > length)
                 throw new ArgumentOutOfRangeException(nameof(position));
 

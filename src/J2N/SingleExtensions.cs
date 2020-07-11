@@ -1,4 +1,6 @@
-﻿namespace J2N
+﻿using System.Runtime.CompilerServices;
+
+namespace J2N
 {
     /// <summary>
     /// Extensions to the <see cref="System.Single"/> class.
@@ -14,6 +16,9 @@
         /// </summary>
         /// <param name="f">This <see cref="float"/>.</param>
         /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsNegativeZero(this float f)
         {
             return (f == 0 && BitConversion.SingleToRawInt32Bits(f) == BitConversion.SingleToRawInt32Bits(NegativeZero));

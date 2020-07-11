@@ -4,7 +4,6 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Text;
 using SCG = System.Collections.Generic;
 
 namespace J2N.Collections
@@ -13,8 +12,17 @@ namespace J2N.Collections
     {
         // NOTE: For Aggressive mode to work right, all collections it uses (including this one)
         // must be declared public.
+#if FEATURE_SERIALIZABLE
+        [Serializable]
+#endif
         public class HashMap<TKey, TValue> : System.Collections.Generic.Dictionary<TKey, TValue>
         {
+
+            public HashMap() { }
+
+#if FEATURE_SERIALIZABLE
+            protected HashMap(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+#endif
             public override bool Equals(object obj)
             {
                 if (obj is IDictionary<TKey, TValue> otherDictionary)
@@ -571,5 +579,30 @@ namespace J2N.Collections
         //    Assert.AreNotEqual(CollectionUtil.GetHashCode(control, true), CollectionUtil.GetHashCode(level1EqualLevel2Unequal, true));
         //}
 
+        [Test]
+        public void TestStringInterpolationWithList()
+        {
+            var list = new J2N.Collections.Generic.List<string>()
+            {
+                "nothing",
+                "else",
+                "matters"
+            };
+            string actual = $"{list}";
+            assertEquals("[nothing, else, matters]", actual);
+        }
+
+        [Test]
+        public void TestStringInterpolationWithDictionary()
+        {
+            var dictionary = new J2N.Collections.Generic.Dictionary<string, bool>()
+            {
+                ["nothing"] = true,
+                ["else"] = false,
+                ["matters"] = true
+            };
+            string actual = $"{dictionary}";
+            assertEquals("{nothing=true, else=false, matters=true}", actual);
+        }
     }
 }

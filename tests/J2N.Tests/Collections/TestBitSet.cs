@@ -339,7 +339,7 @@ namespace J2N.Collections
                 bs.Clear(4, 2);
                 fail("Test4: Attempt to flip with illegal args failed to generate exception");
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentException e)
             {
                 // excepted
             }
@@ -818,7 +818,7 @@ namespace J2N.Collections
                 bs.Flip(4, 2);
                 fail("Test4: Attempt to flip with illegal args failed to generate exception");
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentException e)
             {
                 // correct behavior
             }
@@ -1026,7 +1026,7 @@ namespace J2N.Collections
                 bs.Set(4, 2);
                 fail("Test4: Attempt to flip with illegal args failed to generate exception");
             }
-            catch (ArgumentOutOfRangeException e)
+            catch (ArgumentException e)
             {
                 // Correct behavior
             }

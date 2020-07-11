@@ -12,10 +12,13 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 #endif
 using SCG = System.Collections.Generic;
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
     using SR = J2N.Resources.Strings;
+
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted on the key.
@@ -64,11 +67,11 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private KeyCollection/*?*/ _keys;
+        private KeyCollection? _keys;
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private ValueCollection/*?*/ _values;
+        private ValueCollection? _values;
 
         private readonly TreeSet<KeyValuePair<TKey, TValue>> _set; // Do not rename (binary serialization)
 
@@ -89,7 +92,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        public SortedDictionary() : this((IComparer<TKey>/*?*/)null)
+        public SortedDictionary() : this((IComparer<TKey>?)null)
         {
         }
 
@@ -142,7 +145,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is the number of elements in dictionary.
         /// </remarks>
-        public SortedDictionary(IDictionary<TKey, TValue> dictionary, IComparer<TKey>/*?*/ comparer)
+        public SortedDictionary(IDictionary<TKey, TValue> dictionary, IComparer<TKey>? comparer)
         {
             if (dictionary == null)
             {
@@ -172,7 +175,7 @@ namespace J2N.Collections.Generic
         /// default comparer uses that implementation (except for some types that have been overridden to match Java's
         /// default behavior).
         /// </remarks>
-        public SortedDictionary(IComparer<TKey>/*?*/ comparer)
+        public SortedDictionary(IComparer<TKey>? comparer)
         {
             _set = new TreeSet<KeyValuePair<TKey, TValue>>(new KeyValuePairComparer(comparer));
         }
@@ -188,7 +191,7 @@ namespace J2N.Collections.Generic
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
         {
-            TreeSet<KeyValuePair<TKey, TValue>>.Node/*?*/ node = _set.FindNode(keyValuePair);
+            TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(keyValuePair);
             if (node == null)
             {
                 return false;
@@ -206,7 +209,7 @@ namespace J2N.Collections.Generic
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> keyValuePair)
         {
-            TreeSet<KeyValuePair<TKey, TValue>>.Node/*?*/ node = _set.FindNode(keyValuePair);
+            TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(keyValuePair);
             if (node == null)
             {
                 return false;
@@ -260,7 +263,7 @@ namespace J2N.Collections.Generic
                 //    throw new ArgumentNullException(nameof(key));
                 //}
 
-                TreeSet<KeyValuePair<TKey, TValue>>.Node node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default));
+                TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
                 {
                     throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
@@ -275,7 +278,7 @@ namespace J2N.Collections.Generic
                 //    throw new ArgumentNullException(nameof(key));
                 //}
 
-                TreeSet<KeyValuePair<TKey, TValue>>.Node node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default));
+                TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
                 {
                     _set.Add(new KeyValuePair<TKey, TValue>(key, value));
@@ -432,7 +435,7 @@ namespace J2N.Collections.Generic
             //    throw new ArgumentNullException(nameof(key));
             //}
 
-            return _set.Contains(new KeyValuePair<TKey, TValue>(key, default));
+            return _set.Contains(new KeyValuePair<TKey, TValue>(key, default!));
         }
 
         /// <summary>
@@ -595,7 +598,7 @@ namespace J2N.Collections.Generic
             //    throw new ArgumentNullException(nameof(key));
             //}
 
-            return _set.Remove(new KeyValuePair<TKey, TValue>(key, default));
+            return _set.Remove(new KeyValuePair<TKey, TValue>(key, default!));
         }
 
         /// <summary>
@@ -616,7 +619,7 @@ namespace J2N.Collections.Generic
         {
             if (TryGetValue(key, out value))
             {
-                _set.Remove(new KeyValuePair<TKey, TValue>(key, default));
+                _set.Remove(new KeyValuePair<TKey, TValue>(key, default!));
                 return true;
             }
 
@@ -670,17 +673,19 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method approaches an O(1) operation.
         /// </remarks>
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         {
             //if (key == null) // J2N: Making key nullable
             //{
             //    throw new ArgumentNullException(nameof(key));
             //}
 
-            TreeSet<KeyValuePair<TKey, TValue>>.Node node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default));
+            TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
             if (node == null)
             {
-                value = default;
+                value = default!;
                 return false;
             }
             value = node.Item.Value;
@@ -712,7 +717,7 @@ namespace J2N.Collections.Generic
             get { return (ICollection)Values; }
         }
 
-        object IDictionary.this[object key]
+        object? IDictionary.this[object key]
         {
             get
             {
@@ -741,10 +746,10 @@ namespace J2N.Collections.Generic
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
                     try
                     {
-                        this[tempKey] = (TValue)value;
+                        this[tempKey!] = (TValue)value!;
                     }
                     catch (InvalidCastException)
                     {
@@ -758,7 +763,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        void IDictionary.Add(object key, object value)
+        void IDictionary.Add(object? key, object? value)
         {
             //if (key == null) // J2N: Making key nullable
             //{
@@ -773,11 +778,11 @@ namespace J2N.Collections.Generic
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
-                    Add(tempKey, (TValue)value);
+                    Add(tempKey!, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -790,16 +795,16 @@ namespace J2N.Collections.Generic
             }
         }
 
-        bool IDictionary.Contains(object key)
+        bool IDictionary.Contains(object? key)
         {
             if (IsCompatibleKey(key))
             {
-                return ContainsKey((TKey)key);
+                return ContainsKey((TKey)key!);
             }
             return false;
         }
 
-        private static bool IsCompatibleKey(object key)
+        private static bool IsCompatibleKey(object? key)
         {
             //if (key == null) // J2N: Making key nullable
             //{
@@ -816,11 +821,11 @@ namespace J2N.Collections.Generic
             return new Enumerator(this, Enumerator.DictEntry);
         }
 
-        void IDictionary.Remove(object key)
+        void IDictionary.Remove(object? key)
         {
             if (IsCompatibleKey(key))
             {
-                Remove((TKey)key);
+                Remove((TKey)key!);
             }
         }
 
@@ -846,7 +851,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
         public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result)
         {
-            return _set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default), out result);
+            return _set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
         }
 
         /// <summary>
@@ -858,7 +863,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
         public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result)
         {
-            return _set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default), out result);
+            return _set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
         }
 
         #endregion
@@ -875,7 +880,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current dictionary;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        public virtual bool Equals(object other, IEqualityComparer comparer)
+        public virtual bool Equals(object? other, IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.Equals(this, other, comparer);
 
         /// <summary>
@@ -897,7 +902,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if the specified object implements <see cref="IDictionary{TKey, TValue}"/>
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
 
         /// <summary>
@@ -926,7 +931,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// The index of a format item is not zero.
         /// </exception>
-        public virtual string ToString(string format, IFormatProvider formatProvider)
+        public virtual string ToString(string? format, IFormatProvider? formatProvider)
             => CollectionUtil.ToString(formatProvider, format, this);
 
         /// <summary>
@@ -1123,7 +1128,7 @@ namespace J2N.Collections.Generic
 
                     if (_getEnumeratorRetType == DictEntry)
                     {
-                        return new DictionaryEntry(Current.Key, Current.Value);
+                        return new DictionaryEntry(Current.Key!, Current.Value);
                     }
                     else
                     {
@@ -1132,9 +1137,11 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            object IDictionaryEnumerator.Key
+            object? IDictionaryEnumerator.Key
             {
+#pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
+#pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 {
                     if (NotStartedOrEnded)
                     {
@@ -1145,7 +1152,7 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            object IDictionaryEnumerator.Value
+            object? IDictionaryEnumerator.Value
             {
                 get
                 {
@@ -1167,7 +1174,7 @@ namespace J2N.Collections.Generic
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
                     }
 
-                    return new DictionaryEntry(Current.Key, Current.Value);
+                    return new DictionaryEntry(Current.Key!, Current.Value);
                 }
             }
         }
@@ -1325,7 +1332,7 @@ namespace J2N.Collections.Generic
                 if (array.Length - index < _dictionary.Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
-                TKey[] keys = array as TKey[];
+                TKey[]? keys = array as TKey[];
                 if (keys != null)
                 {
                     CopyTo(keys, index);
@@ -1334,7 +1341,7 @@ namespace J2N.Collections.Generic
                 {
                     try
                     {
-                        object[] objects = (object[])array;
+                        object?[] objects = (object?[])array;
                         _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Key; return true; });
                     }
                     catch (ArrayTypeMismatchException)
@@ -1489,7 +1496,7 @@ namespace J2N.Collections.Generic
                 /// </remarks>
                 public TKey Current => _dictEnum.Current.Key;
 
-                object IEnumerator.Current
+                object? IEnumerator.Current
                 {
                     get
                     {
@@ -1674,7 +1681,7 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
                 }
 
-                TValue[] values = array as TValue[];
+                TValue[]? values = array as TValue[];
                 if (values != null)
                 {
                     CopyTo(values, index);
@@ -1683,7 +1690,7 @@ namespace J2N.Collections.Generic
                 {
                     try
                     {
-                        object[] objects = (object[])array;
+                        object?[] objects = (object?[])array;
                         _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Value; return true; });
                     }
                     catch (ArrayTypeMismatchException)
@@ -1842,7 +1849,7 @@ namespace J2N.Collections.Generic
                 /// </remarks>
                 public TValue Current => _dictEnum.Current.Value;
 
-                object IEnumerator.Current
+                object? IEnumerator.Current
                 {
                     get
                     {
@@ -1875,7 +1882,7 @@ namespace J2N.Collections.Generic
         {
             internal IComparer<TKey> keyComparer; // Do not rename (binary serialization)
 
-            public KeyValuePairComparer(IComparer<TKey> keyComparer)
+            public KeyValuePairComparer(IComparer<TKey>? keyComparer)
             {
                 if (keyComparer == null)
                 {
@@ -1931,4 +1938,6 @@ namespace J2N.Collections.Generic
             return ret;
         }
     }
+
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 }
