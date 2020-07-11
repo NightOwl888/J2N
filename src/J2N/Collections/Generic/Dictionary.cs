@@ -368,7 +368,7 @@ namespace J2N.Collections.Generic
             this.dictionary = new ConcreteDictionary(capacity, comparer);
         }
 
-        #endif
+#endif
 
         #region SCG.Dictionary<TKey, TValue> Members
 
@@ -827,7 +827,7 @@ namespace J2N.Collections.Generic
                     return true;
                 }
 
-                value = default;
+                value = default!;
                 return false;
             }
             return dictionary.TryGetValue(key!, out value);
@@ -1036,7 +1036,7 @@ namespace J2N.Collections.Generic
                         if (hasNullKey)
                             return nullEntry.Value;
                     }
-                    else if (TryGetValue((TKey)key, out TValue value))
+                    else if (TryGetValue((TKey)key!, out TValue value))
                     {
                         return value;
                     }
@@ -1053,7 +1053,7 @@ namespace J2N.Collections.Generic
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
 
                     try
                     {
@@ -1081,11 +1081,11 @@ namespace J2N.Collections.Generic
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
-                    Add(tempKey, (TValue)value);
+                    Add(tempKey, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -1102,7 +1102,7 @@ namespace J2N.Collections.Generic
         {
             if (IsCompatibleKey(key))
             {
-                return ContainsKey((TKey)key);
+                return ContainsKey((TKey)key!);
             }
             return false;
         }
@@ -1752,9 +1752,9 @@ namespace J2N.Collections.Generic
 
             object? IDictionaryEnumerator.Key
             {
-#pragma warning disable CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
-#pragma warning restore CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 {
                     if (index == 0 || (index == dictionary.Count + 1))
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);

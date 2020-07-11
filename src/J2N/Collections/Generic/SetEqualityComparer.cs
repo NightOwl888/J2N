@@ -204,7 +204,7 @@ namespace J2N.Collections.Generic
                 equalityComparer = setComparer;
                 return true;
             }
-            equalityComparer = null;
+            equalityComparer = null!;
             return false;
         }
 

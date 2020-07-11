@@ -190,7 +190,7 @@ namespace J2N.Collections.Generic
                 equalityComparer = listComparer;
                 return true;
             }
-            equalityComparer = null;
+            equalityComparer = null!;
             return false;
         }
 

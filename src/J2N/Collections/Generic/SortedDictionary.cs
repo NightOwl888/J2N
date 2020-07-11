@@ -685,7 +685,7 @@ namespace J2N.Collections.Generic
             TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
             if (node == null)
             {
-                value = default;
+                value = default!;
                 return false;
             }
             value = node.Item.Value;
@@ -746,7 +746,7 @@ namespace J2N.Collections.Generic
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
                     try
                     {
                         this[tempKey!] = (TValue)value!;
@@ -778,7 +778,7 @@ namespace J2N.Collections.Generic
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
@@ -1139,9 +1139,9 @@ namespace J2N.Collections.Generic
 
             object? IDictionaryEnumerator.Key
             {
-#pragma warning disable CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
-#pragma warning restore CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 {
                     if (NotStartedOrEnded)
                     {

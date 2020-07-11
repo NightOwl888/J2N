@@ -227,7 +227,7 @@ namespace J2N.Collections.Generic
                 equalityComparer = dictionaryComparer;
                 return true;
             }
-            equalityComparer = null;
+            equalityComparer = null!;
             return false;
         }
 

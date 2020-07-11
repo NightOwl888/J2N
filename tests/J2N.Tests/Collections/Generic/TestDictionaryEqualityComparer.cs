@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 
 namespace J2N.Collections.Generic
@@ -7,8 +8,17 @@ namespace J2N.Collections.Generic
     {
         // NOTE: For Aggressive mode to work right, all collections it uses (including this one)
         // must be declared public.
+#if FEATURE_SERIALIZABLE
+        [Serializable]
+#endif
         public class HashMap<TKey, TValue> : Dictionary<TKey, TValue>
         {
+            public HashMap() { }
+
+
+#if FEATURE_SERIALIZABLE
+            protected HashMap(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
+#endif
 
             // TODO: Aggressive mode is currently broken for dictionaries - we shouldn't have
             // to override these methods for this to work with collection key types.

@@ -543,9 +543,9 @@ namespace J2N.Collections.ObjectModel
                 => new DictionaryEntry(enumerator.Current.Key, enumerator.Current.Value);
 #pragma warning restore CS8604 // Possible null reference argument.
 
-#pragma warning disable CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member.
+#pragma warning disable CS8613, CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member.
             public object? Key => enumerator.Current.Key;
-#pragma warning restore CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member.
+#pragma warning restore CS8613, CS8766 // Nullability of reference types in return type doesn't match implicitly implemented member.
 
             public object? Value => enumerator.Current.Value;
 
