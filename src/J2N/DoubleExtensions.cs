@@ -1,4 +1,6 @@
-﻿namespace J2N
+﻿using System.Runtime.CompilerServices;
+
+namespace J2N
 {
     /// <summary>
     /// Extensions to the <see cref="System.Double"/> class.
@@ -14,6 +16,9 @@
         /// </summary>
         /// <param name="d">This <see cref="double"/>.</param>
         /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool IsNegativeZero(this double d)
         {
             return (d == 0 && BitConversion.DoubleToRawInt64Bits(d) == BitConversion.DoubleToRawInt64Bits(NegativeZero));
