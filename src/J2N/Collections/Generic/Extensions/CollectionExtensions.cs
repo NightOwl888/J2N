@@ -1,6 +1,8 @@
 ﻿using J2N.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+#nullable enable
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -23,9 +25,39 @@ namespace J2N.Collections.Generic.Extensions
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static ICollection<T> AsReadOnly<T>(this ICollection<T> collection)
         {
             return new ReadOnlyCollection<T>(collection);
+        }
+
+        /// <summary>
+        /// Creates an array from a <see cref="ICollection{T}"/>.
+        /// <para/>
+        /// This is similar to the LINQ <see cref="IEnumerable{T}"/> extension method,
+        /// but since it pre-allocates the exact number of array elements and always
+        /// uses <see cref="ICollection{T}.CopyTo(T[], int)"/>, it is usually much faster.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
+        /// <param name="source">An <see cref="ICollection{T}"/> to create an array from.</param>
+        /// <returns>An array that contains the elements from the input sequence.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static T[] ToArray<T>(this ICollection<T> source)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+
+            int count = source.Count;
+            if (count == 0)
+                return Arrays.Empty<T>();
+
+            var result = new T[count];
+            source.CopyTo(result, 0);
+            return result;
         }
     }
 }
