@@ -164,7 +164,7 @@ namespace Tests.Collections
     //        IList list = GetList(null);
     //        Assert.Throws<ArgumentOutOfRangeException>(
     //            () => list[index]);
-    //        CollectionAssert.Equal(Array.Empty<object>(), list);
+    //        CollectionAssert.Equal(Arrays.Empty<object>(), list);
     //    }
 
     //    [Fact]
