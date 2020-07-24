@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 #nullable enable
 
@@ -30,6 +31,9 @@ namespace J2N.Collections
         /// Note this operation currently only supports <see cref="IList{T}"/>, <see cref="ISet{T}"/>, 
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool Equals<T>(IList<T>? listA, IList<T>? listB)
         {
             return ListEqualityComparer<T>.Aggressive.Equals(listA, listB);
@@ -46,6 +50,9 @@ namespace J2N.Collections
         /// Note this operation currently only supports <see cref="IList{T}"/>, <see cref="ISet{T}"/>, 
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool Equals<T>(ISet<T>? setA, ISet<T>? setB)
         {
             return SetEqualityComparer<T>.Aggressive.Equals(setA, setB);
@@ -62,6 +69,9 @@ namespace J2N.Collections
         /// Note this operation currently only supports <see cref="IList{T}"/>, <see cref="ISet{T}"/>, 
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool Equals<TKey, TValue>(IDictionary<TKey, TValue>? dictionaryA, IDictionary<TKey, TValue>? dictionaryB)
         {
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.Equals(dictionaryA, dictionaryB);
@@ -163,6 +173,9 @@ namespace J2N.Collections
         /// Note this operation currently only supports <see cref="IList{T}"/>, <see cref="ISet{T}"/>, 
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int GetHashCode<T>(IList<T>? list)
         {
             return ListEqualityComparer<T>.Aggressive.GetHashCode(list);
@@ -179,6 +192,9 @@ namespace J2N.Collections
         /// Note this operation currently only supports <see cref="IList{T}"/>, <see cref="ISet{T}"/>, 
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int GetHashCode<T>(ISet<T>? set)
         {
             return SetEqualityComparer<T>.Aggressive.GetHashCode(set);
@@ -195,6 +211,9 @@ namespace J2N.Collections
         /// Note this operation currently only supports <see cref="IList{T}"/>, <see cref="ISet{T}"/>, 
         /// and <see cref="IDictionary{TKey, TValue}"/>.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static int GetHashCode<TKey, TValue>(IDictionary<TKey, TValue>? dictionary)
         {
             return DictionaryEqualityComparer<TKey, TValue>.Aggressive.GetHashCode(dictionary);

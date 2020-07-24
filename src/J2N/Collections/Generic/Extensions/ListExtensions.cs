@@ -1,6 +1,7 @@
 ﻿using J2N.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -25,6 +26,9 @@ namespace J2N.Collections.Generic.Extensions
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static ReadOnlyList<T> AsReadOnly<T>(this IList<T> collection)
         {
             return new ReadOnlyList<T>(collection);
@@ -37,6 +41,9 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="list">The <see cref="IList{T}"/> to shuffle.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="list"/> is <c>null</c>.</exception>
         /// <seealso cref="Shuffle{T}(IList{T}, System.Random)"/>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static void Shuffle<T>(this IList<T> list)
         {
             Shuffle(list, new Random());
