@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+#nullable enable
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -32,6 +33,121 @@ namespace J2N.Collections.Generic.Extensions
         public static ReadOnlyList<T> AsReadOnly<T>(this IList<T> collection)
         {
             return new ReadOnlyList<T>(collection);
+        }
+
+        /// <summary>
+        /// Performs a binary search for the specified element in the specified
+        /// sorted list. The list needs to be already sorted in natural sorting
+        /// order. Searching in an unsorted list has an undefined result. It's also
+        /// undefined which element is found if there are multiple occurrences of the
+        /// same element.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="list">The sorted list to search.</param>
+        /// <param name="item">The element to find.</param>
+        /// <returns>The non-negative index of the element, or a negative index which
+        /// is the <c>-index - 1</c> where the element would be inserted.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int BinarySearch<T>(this IList<T> list, T item)
+            => BinarySearch(list, item, null);
+
+        /// <summary>
+        /// Performs a binary search for the specified element in the specified
+        /// sorted list using the specified comparer. The list needs to be already
+        /// sorted according to the <paramref name="comparer"/> passed. Searching in an unsorted list
+        /// has an undefined result. It's also undefined which element is found if
+        /// there are multiple occurrences of the same element.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="list">The sorted <see cref="IList{T}"/> to search.</param>
+        /// <param name="item">The element to find.</param>
+        /// <param name="comparer">The comparer. If the comparer is <c>null</c> then the
+        /// search uses the objects' natural ordering.</param>
+        /// <returns>the non-negative index of the element, or a negative index which
+        /// is the <c>-index - 1</c> where the element would be inserted.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
+        public static int BinarySearch<T>(this IList<T> list, T item, IComparer<T>? comparer)
+        {
+            if (list == null)
+                throw new ArgumentNullException(nameof(list));
+
+            if (comparer == null)
+            {
+                comparer = J2N.Collections.Generic.Comparer<T>.Default;
+            }
+
+            if (list.Count == 0)
+                return -1;
+
+            int low = 0, mid = list.Count, high = mid - 1, result = -1;
+            while (low <= high)
+            {
+                mid = (low + high) >> 1;
+                if ((result = -comparer.Compare(list[mid], item)) > 0)
+                    low = mid + 1;
+                else if (result == 0)
+                    return mid;
+                else
+                    high = mid - 1;
+            }
+            return -mid - (result < 0 ? 1 : 2);
+        }
+
+        /// <summary>
+        /// Performs a binary search for the specified element in the specified
+        /// sorted list using the specified comparer. The list needs to be already
+        /// sorted according to the <paramref name="comparer"/> passed. Searching in an unsorted list
+        /// has an undefined result. It's also undefined which element is found if
+        /// there are multiple occurrences of the same element.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="list">The sorted <see cref="IList{T}"/> to search.</param>
+        /// <param name="index">The zero-based starting index of the range to search.</param>
+        /// <param name="count">The length of the range to search.</param>
+        /// <param name="item">The element to find.</param>
+        /// <param name="comparer">The comparer. If the comparer is <c>null</c> then the
+        /// search uses the objects' natural ordering.</param>
+        /// <returns>the non-negative index of the element, or a negative index which
+        /// is the <c>-index - 1</c> where the element would be inserted.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
+        public static int BinarySearch<T>(this IList<T> list, int index, int count, T item, IComparer<T>? comparer)
+        {
+            if (list == null)
+                throw new ArgumentNullException(nameof(list));
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (list.Count - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
+            if (comparer == null)
+            {
+                comparer = J2N.Collections.Generic.Comparer<T>.Default;
+            }
+
+            int lo = index;
+            int hi = index + count - 1;
+            while (lo <= hi)
+            {
+                int i = lo + ((hi - lo) >> 1);
+                int order = comparer.Compare(list[i], item);
+
+                if (order == 0) return i;
+                if (order < 0)
+                {
+                    lo = i + 1;
+                }
+                else
+                {
+                    hi = i - 1;
+                }
+            }
+
+            return ~lo;
         }
 
         /// <summary>

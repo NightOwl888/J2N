@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,18 +8,143 @@ namespace J2N.Collections.Generic.Extensions
 {
     public class TestListExtensions : TestCase
     {
-        private IList<object> ll;
+        IList<object> ll;
 
-        private static object[] objArray = LoadObjectArray();
+        IList<IComparable<object>> myReversedLinkedList;
 
-        private static object[] LoadObjectArray()
+        static object[] objArray = LoadObjArray();
+        static IComparable<object>[] myobjArray = LoadMyObjArray();
+
+        private static object[] LoadObjArray()
         {
             var objArray = new object[1000];
             for (int i = 0; i < objArray.Length; i++)
             {
-                objArray[i] = new int?(i);
+                objArray[i] = i;
             }
             return objArray;
+        }
+
+        private static IComparable<object>[] LoadMyObjArray()
+        {
+            var myobjArray = new IComparable<object>[1000];
+            for (int i = 0; i < objArray.Length; i++)
+            {
+                myobjArray[i] = new MyInt(i);
+            }
+            return myobjArray;
+        }
+
+        
+
+        public class ReversedMyIntComparator : IComparer, IComparer<object>
+        {
+
+            public int Compare(Object o1, Object o2)
+            {
+                return -((MyInt)o1).CompareTo((MyInt)o2);
+            }
+
+            new public static int Equals(Object o1, Object o2)
+            {
+                return ((MyInt)o1).CompareTo((MyInt)o2);
+            }
+        }
+
+        internal class MyInt : IComparable<object>
+        {
+            internal int data;
+
+            public MyInt(int value)
+            {
+                data = value;
+            }
+
+            public int CompareTo(object obj)
+            {
+                return data > ((MyInt)obj).data ? 1 : (data < ((MyInt)obj).data ? -1 : 0);
+            }
+        }
+
+        /**
+         * @tests java.util.Collections#binarySearch(java.util.List,
+         *        java.lang.Object)
+         */
+        [Test]
+        public void Test_binarySearchLjava_util_ListLjava_lang_Object()
+        {
+            // Test for method int
+            // java.util.Collections.binarySearch(java.util.List, java.lang.Object)
+            // assumes ll is sorted and has no duplicate keys
+            int llSize = ll.Count;
+            // Ensure a NPE is thrown if the list is NULL
+            IList<IComparable<object>> list = null;
+            try
+            {
+                list.BinarySearch(new MyInt(3));
+                fail("Expected NullPointerException for null list parameter");
+            }
+#pragma warning disable 168
+            catch (ArgumentNullException e)
+#pragma warning restore 168
+            {
+                //Expected
+            }
+            for (int counter = 0; counter < llSize; counter++)
+            {
+                assertEquals("Returned incorrect binary search item position", ll[counter], ll[ll.BinarySearch(ll[counter])]);
+            }
+        }
+
+        /**
+         * @tests java.util.Collections#binarySearch(java.util.List,
+         *        java.lang.Object, java.util.Comparator)
+         */
+        [Test]
+        public void Test_binarySearchLSystem_Collections_Generic_IListLSystem_ObjectLSystem_Collections_Generic_IComparer()
+        {
+            // Test for method int
+            // java.util.Collections.binarySearch(java.util.List, java.lang.Object,
+            // java.util.Comparator)
+            // assumes reversedLinkedList is sorted in reversed order and has no
+            // duplicate keys
+            int rSize = myReversedLinkedList.Count;
+            ReversedMyIntComparator comp = new ReversedMyIntComparator();
+            // Ensure a NPE is thrown if the list is NULL
+            IList<IComparable<object>> list = null;
+            try
+            {
+                //Collections.binarySearch(null, new Object(), comp);
+                list.BinarySearch(new MyInt(3), comp);
+                fail("Expected NullPointerException for null list parameter");
+            }
+#pragma warning disable 168
+            catch (ArgumentNullException e)
+#pragma warning restore 168
+            {
+                //Expected
+            }
+            for (int counter = 0; counter < rSize; counter++)
+            {
+                assertEquals(
+                        "Returned incorrect binary search item position using custom comparator",
+                        myReversedLinkedList[counter], myReversedLinkedList[myReversedLinkedList.BinarySearch(myReversedLinkedList[counter], comp)]);
+            }
+        }
+
+        [Test]
+        public void TestBinarySearch()
+        {
+            IList<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, list.BinarySearch(7));
+            assertEquals(6, list.BinarySearch(7, null));
+        }
+
+        [Test]
+        public void TestBinarySearchInRange()
+        {
+            IList<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, list.BinarySearch(3, 4, 7, null));
         }
 
         /**
@@ -259,23 +385,24 @@ namespace J2N.Collections.Generic.Extensions
          */
         public override void SetUp()
         {
+            base.SetUp();
             ll = new List<object>();
             //myll = new List<object>();
             //s = new HashSet<object>();
             //mys = new HashSet<object>();
             //reversedLinkedList = new LinkedList(); // to be sorted in reverse order
-            //myReversedLinkedList = new LinkedList(); // to be sorted in reverse
+            myReversedLinkedList = new List<IComparable<object>>(); // to be sorted in reverse
             // order
             //hm = new Dictionary<object, object>();
             for (int i = 0; i < objArray.Length; i++)
             {
                 ll.Add(objArray[i]);
-                //myll.Add(myobjArray[i]);
-                //s.Add(objArray[i]);
-                //mys.Add(myobjArray[i]);
-                //reversedLinkedList.Add(objArray[objArray.Length - i - 1]);
-                //myReversedLinkedList.Add(myobjArray[myobjArray.Length - i - 1]);
-                //hm[objArray[i].ToString()] = objArray[i];
+                //myll.add(myobjArray[i]);
+                //s.add(objArray[i]);
+                //mys.add(myobjArray[i]);
+                //reversedLinkedList.add(objArray[objArray.length - i - 1]);
+                myReversedLinkedList.Add(myobjArray[myobjArray.Length - i - 1]);
+                //hm.put(objArray[i].toString(), objArray[i]);
             }
         }
 
