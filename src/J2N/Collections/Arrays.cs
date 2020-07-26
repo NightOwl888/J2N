@@ -132,20 +132,75 @@ namespace J2N.Collections
         /// the array is <c>null</c>, then <c>"null"</c> is returned.
         /// </summary>
         /// <typeparam name="T">The type of array element.</typeparam>
-        /// <param name="array"></param>
+        /// <param name="array">The array to convert.</param>
         public static string ToString<T>(T[]? array)
+            => ToString(array, StringFormatter.CurrentCulture);
+
+        /// <summary>
+        /// Creates a <see cref="string"/> representation of the array passed.
+        /// The result is surrounded by brackets <c>"[]"</c>, each
+        /// element is converted to a <see cref="string"/> via the
+        /// <see cref="StringFormatter.InvariantCulture"/> and separated by <c>", "</c>. If
+        /// the array is <c>null</c>, then <c>"null"</c> is returned.
+        /// </summary>
+        /// <typeparam name="T">The type of array element.</typeparam>
+        /// <param name="array">The array to convert.</param>
+        /// <param name="provider">The format provider. If <c>null</c>, will use <see cref="StringFormatter.CurrentCulture"/></param>
+        public static string ToString<T>(T[]? array, IFormatProvider? provider)
         {
             if (array == null)
                 return "null"; //$NON-NLS-1$
             if (array.Length == 0)
                 return "[]"; //$NON-NLS-1$
+
+            provider ??= StringFormatter.CurrentCulture;
             StringBuilder sb = new StringBuilder(2 + array.Length * 4);
             sb.Append('[');
-            sb.AppendFormat(StringFormatter.InvariantCulture, "{0}", array[0]);
+            sb.AppendFormat(provider, "{0}", array[0]);
             for (int i = 1; i < array.Length; i++)
             {
                 sb.Append(", "); //$NON-NLS-1$
-                sb.AppendFormat(StringFormatter.InvariantCulture, "{0}", array[i]);
+                sb.AppendFormat(provider, "{0}", array[i]);
+            }
+            sb.Append(']');
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Creates a <see cref="string"/> representation of the array passed.
+        /// The result is surrounded by brackets <c>"[]"</c>, each
+        /// element is converted to a <see cref="string"/> via the
+        /// <see cref="StringFormatter.InvariantCulture"/> and separated by <c>", "</c>. If
+        /// the array is <c>null</c>, then <c>"null"</c> is returned.
+        /// </summary>
+        /// <param name="array">The array to convert.</param>
+        public static string ToString(Array? array)
+            => ToString(array, StringFormatter.CurrentCulture);
+
+        /// <summary>
+        /// Creates a <see cref="string"/> representation of the array passed.
+        /// The result is surrounded by brackets <c>"[]"</c>, each
+        /// element is converted to a <see cref="string"/> via the
+        /// <see cref="StringFormatter.InvariantCulture"/> and separated by <c>", "</c>. If
+        /// the array is <c>null</c>, then <c>"null"</c> is returned.
+        /// </summary>
+        /// <param name="array">The array to convert.</param>
+        /// <param name="provider">The format provider. If <c>null</c>, will use <see cref="StringFormatter.CurrentCulture"/></param>
+        public static string ToString(Array? array, IFormatProvider? provider)
+        {
+            if (array == null)
+                return "null"; //$NON-NLS-1$
+            if (array.Length == 0)
+                return "[]"; //$NON-NLS-1$
+
+            provider ??= StringFormatter.CurrentCulture;
+            StringBuilder sb = new StringBuilder(2 + array.Length * 4);
+            sb.Append('[');
+            sb.AppendFormat(provider, "{0}", array.GetValue(0));
+            for (int i = 1; i < array.Length; i++)
+            {
+                sb.Append(", "); //$NON-NLS-1$
+                sb.AppendFormat(provider, "{0}", array.GetValue(i));
             }
             sb.Append(']');
             return sb.ToString();

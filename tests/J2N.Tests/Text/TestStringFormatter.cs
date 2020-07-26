@@ -135,5 +135,13 @@ namespace J2N.Text
             assertEquals("true", string.Format(StringFormatter.InvariantCulture, "{0}", true));
             assertEquals("false", string.Format(StringFormatter.InvariantCulture, "{0}", false));
         }
+
+
+        [Test]
+        public void TestArray()
+        {
+            assertEquals("[1, 2, 3, 4, 5, 6, 7]", string.Format(StringFormatter.InvariantCulture, "{0}", new int[] { 1, 2, 3, 4, 5, 6, 7 }));
+            assertEquals("[1, 2, 3, 4, 5, 6, 7]", string.Format(StringFormatter.InvariantCulture, "{0}", (System.Array)new string[] { "1", "2", "3", "4", "5", "6", "7" }));
+        }
     }
 }
