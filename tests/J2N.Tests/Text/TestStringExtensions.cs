@@ -8,14 +8,14 @@ namespace J2N.Text
 {
     public class TestStringExtensions : TestCase
     {
+#if FEATURE_ENCODINGPROVIDERS
         static TestStringExtensions()
         {
-#if NETSTANDARD
             // Support for 8859-1 and IBM01047 encoding. See: https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider?view=netcore-2.0
             var encodingProvider = System.Text.CodePagesEncodingProvider.Instance;
             System.Text.Encoding.RegisterProvider(encodingProvider);
-#endif
         }
+#endif
 
 
         const string hw1 = "HelloWorld";
@@ -69,6 +69,19 @@ namespace J2N.Text
             Assert.Less(0, target.CompareToOrdinal(new StringBuilderCharSequence(null)));
             Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(null)));
         }
+
+        // This is a compatibility API for < .NET Standard 2.1
+#if !FEATURE_STRING_CONTAINS_CHAR
+        [TestCase("Hello", 'H', true)]
+        [TestCase("Hello", 'Z', false)]
+        [TestCase("Hello", 'e', true)]
+        [TestCase("Hello", 'E', false)]
+        [TestCase("", 'H', false)]
+        public static void Test_Contains_Char(string s, char value, bool expected)
+        {
+            Assert.AreEqual(expected, s.Contains(value));
+        }
+#endif
 
         /**
          * @tests java.lang.String#contentEquals(CharSequence cs)

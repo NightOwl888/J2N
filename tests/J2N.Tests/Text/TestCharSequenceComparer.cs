@@ -36,7 +36,7 @@ namespace J2N.Text
         public virtual void SetUp()
         {
             originalCulture = CultureInfo.CurrentCulture;
-#if !NETSTANDARD
+#if !FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER
             Thread.CurrentThread.CurrentCulture
 #else
             CultureInfo.CurrentCulture
@@ -53,7 +53,7 @@ namespace J2N.Text
         [TearDown]
         public virtual void TearDown()
         {
-#if !NETSTANDARD
+#if !FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER
             Thread.CurrentThread.CurrentCulture
 #else
             CultureInfo.CurrentCulture

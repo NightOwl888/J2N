@@ -10,33 +10,35 @@ namespace J2N
     /// </summary>
     public static class StreamExtensions
     {
+#if FEATURE_FILESTREAM_LOCK
         private static readonly bool IsLinux = LoadIsLinux();
         private static readonly bool IsWindows = LoadIsWindows();
         private static readonly bool IsFileStreamLockingPlatform = IsWindows || IsLinux;
 
         private static bool LoadIsLinux()
         {
-#if NETSTANDARD
+#if FEATURE_RUNTIMEINFORMATION
             return RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
 #else
             // we use integers instead of enum tags because "MacOS"
             // requires 2.0 SP2, 3.0 SP2 or 3.5 SP1.
             // 128 is mono's old platform tag for Unix.
             // Reference: https://stackoverflow.com/a/5117005
-            int id = (int)Environment.OSVersion.Platform;          
+            int id = (int)Environment.OSVersion.Platform;
             return id == 4 || id == 128;
 #endif
         }
 
         private static bool LoadIsWindows()
         {
-#if NETSTANDARD
+#if FEATURE_RUNTIMEINFORMATION
             return RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
 #else
             PlatformID pid = Environment.OSVersion.Platform;
             return pid == PlatformID.Win32NT || pid == PlatformID.Win32Windows;
 #endif
         }
+#endif // FEATURE_FILESTREAM_LOCK
 
         /// <summary>
         /// Writes bytes from the given byte buffer to this <see cref="Stream"/>.
@@ -58,7 +60,7 @@ namespace J2N
 
             const int bufferSize = 8192;
             int written = 0;
-#if !NETSTANDARD1_4
+#if FEATURE_FILESTREAM_LOCK
             long lockPosition = 0;
             long lockLength = 0;
             FileStream fileStream = null;
@@ -72,7 +74,7 @@ namespace J2N
             try
             {
 #endif
-                byte[] buffer = new byte[Math.Min(bufferSize, source.Remaining)];
+            byte[] buffer = new byte[Math.Min(bufferSize, source.Remaining)];
                 while (source.Remaining > 0)
                 {
                     if (buffer.Length > source.Remaining)
@@ -82,7 +84,7 @@ namespace J2N
                     written += buffer.Length;
                 }
 
-#if !NETSTANDARD1_4
+#if FEATURE_FILESTREAM_LOCK
             }
             finally
             {

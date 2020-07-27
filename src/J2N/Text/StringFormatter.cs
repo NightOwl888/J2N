@@ -170,7 +170,11 @@ namespace J2N.Text
                 return sf.ToString("{0}", this);
 
             var argType = arg.GetType();
-            if (argType.IsArray ||
+            if (argType.IsArray)
+            {
+                return Arrays.ToString((Array)arg, this);
+            }
+            else if (
                 argType.ImplementsGenericInterface(typeof(ICollection<>)) ||
                 argType.ImplementsGenericInterface(typeof(IDictionary<,>)))
             {

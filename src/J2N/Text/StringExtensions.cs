@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace J2N.Text
@@ -188,6 +190,34 @@ namespace J2N.Text
 
         #endregion CompareToOrdinal
 
+        #region Contains
+
+        /// <summary>
+        /// Returns a value indicating whether a specified character occurs within this string.
+        /// <para/>
+        /// This overload is missing from the <see cref="string"/> class prior to .NET Standard 2.1,
+        /// so it is being included here for convenience.
+        /// </summary>
+        /// <param name="input">The string in which to seek <paramref name="value"/>.</param>
+        /// <param name="value">The character to seek.</param>
+        /// <returns><c>true</c> if the <paramref name="value"/> parameter occurs within this string; otherwise, <c>false</c>.</returns>
+        /// <remarks>This method performs an ordinal (case-sensitive and culture-insensitive) comparison.</remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
+        public static bool Contains(this string input, char value) // For compatibility with < .NET Standard 2.1
+        {
+            if (input == null)
+                throw new ArgumentNullException(nameof(input));
+
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (input[i] == value)
+                    return true;
+            }
+            return false;
+        }
+
+        #endregion
+
         #region ContentEquals
 
         /// <summary>
@@ -204,6 +234,9 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool ContentEquals(this string text, ICharSequence charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
@@ -223,6 +256,9 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool ContentEquals(this string text, char[] charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
@@ -242,6 +278,9 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool ContentEquals(this string text, StringBuilder charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
@@ -261,6 +300,9 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static bool ContentEquals(this string text, string charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);

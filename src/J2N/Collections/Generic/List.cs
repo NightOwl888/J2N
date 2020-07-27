@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 #if FEATURE_CONTRACTBLOCKS
 using System.Diagnostics.Contracts;
 #endif
-#if NETSTANDARD1_X
+#if !FEATURE_CASEINSENSITIVECOMPARER
 using CaseInsensitiveComparer = System.StringComparer; // To fixup documentation - this type doesn't exist on .NET Standard 1.x
 #endif
 #nullable enable

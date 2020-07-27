@@ -5,10 +5,13 @@
   
   <!-- Features in .NET Standard and .NET Core only (no .NET Framework support) -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) ">
-    <DefineConstants>$(DefineConstants);NETSTANDARD</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_CHARARRAYPOINTERS</DefineConstants>
+
     <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CHARARRAYPOINTERS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_ENCODINGPROVIDERS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEINFORMATION</DefineConstants>
+    
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
@@ -30,24 +33,27 @@
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_REMOVE_OUTVALUE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
-
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STRING_CONTAINS_CHAR</DefineConstants>
+    
   </PropertyGroup>
 
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, and .NET Core 3.x -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) ">
 
+    <DefineConstants>$(DefineConstants);FEATURE_CASEINSENSITIVECOMPARER</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CONTRACTBLOCKS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CONVERTER</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_LCID</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_FILESTREAM_LOCK</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYMAPPEDVIEWACCESSOR_READWRITEARRAY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_INTERNALCALL</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
-    
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADINTERRUPT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADABORT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADYIELD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADPRIORITY</DefineConstants>
-
-    <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_CONTRACTBLOCKS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_CONVERTER</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_INTERNALCALL</DefineConstants>
 
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->
@@ -57,8 +63,6 @@
   <!-- Features in .NET Standard 1.x and .NET Core 1.x -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard1.')) Or $(TargetFramework.StartsWith('netcoreapp1.')) ">
 
-    <DefineConstants>$(DefineConstants);NETSTANDARD1_X</DefineConstants>
-    <DefineConstants>$(DefineConstants);NETCOREAPP1_X</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEEXTENSIONS_GETTYPEINFO</DefineConstants>
 
   </PropertyGroup>
@@ -66,6 +70,7 @@
   <!-- Features in .NET Framework 4.5+ only -->
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
 
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYMAPPEDFILESECURITY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_RANDOM</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_STRINGS</DefineConstants>
@@ -76,11 +81,11 @@
   <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
   <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
 
-    <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
     
   </PropertyGroup>
   

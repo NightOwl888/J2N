@@ -26,7 +26,7 @@ namespace J2N.IO.MemoryMappedFiles
             //using (var fis = MemoryMappedFile.CreateFromFile(tmpFile.FullName))
             using (var fis = new FileStream(tmpFile.FullName, FileMode.Open))
             using (var fc = MemoryMappedFile.CreateFromFile(fis, null, 0, MemoryMappedFileAccess.Read,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, false))
@@ -58,7 +58,7 @@ namespace J2N.IO.MemoryMappedFiles
         {
             using (var fis = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.Read))
             using (var fc = MemoryMappedFile.CreateFromFile(fis, null, 0, MemoryMappedFileAccess.Read,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, false))
@@ -130,7 +130,7 @@ namespace J2N.IO.MemoryMappedFiles
             int initialCapacity = 1;
             using (var fis = new FileStream(emptyFile.FullName, FileMode.Open))
             using (var fc = MemoryMappedFile.CreateFromFile(fis, null, initialCapacity, MemoryMappedFileAccess.ReadWrite,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, false))
@@ -175,7 +175,7 @@ namespace J2N.IO.MemoryMappedFiles
             using (FileStream fileInputStream = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.Read))
             {
                 using (var fileChannelRead = MemoryMappedFile.CreateFromFile(fileInputStream, null, 0, MemoryMappedFileAccess.Read,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, true))
@@ -190,7 +190,7 @@ namespace J2N.IO.MemoryMappedFiles
 
                 //using (FileStream inputStream = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.Read))
                 using (var fileChannelR = MemoryMappedFile.CreateFromFile(fileInputStream, null, 0, MemoryMappedFileAccess.Read,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, false))
@@ -214,7 +214,7 @@ namespace J2N.IO.MemoryMappedFiles
             using (FileStream randomFile = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.ReadWrite))
             {
                 using (var fileChannelReadWrite = MemoryMappedFile.CreateFromFile(randomFile, null, 0, MemoryMappedFileAccess.ReadWrite,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, true))
@@ -231,7 +231,7 @@ namespace J2N.IO.MemoryMappedFiles
 
                 //using (FileStream random = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.ReadWrite))
                 using (var fileChannelRW = MemoryMappedFile.CreateFromFile(randomFile, null, 0, MemoryMappedFileAccess.ReadWrite,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, false))
@@ -335,7 +335,7 @@ namespace J2N.IO.MemoryMappedFiles
             MemoryMappedViewByteBuffer mbb;
             using (var fis = new FileStream(tmp.FullName, FileMode.Open))
             using (var f = MemoryMappedFile.CreateFromFile(fis, null, 100L, MemoryMappedFileAccess.ReadWrite,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                 null,
 #endif
                 HandleInheritability.None, false))
@@ -380,7 +380,7 @@ namespace J2N.IO.MemoryMappedFiles
 
                 using (FileStream fis = new FileStream(blah.FullName, FileMode.Open, FileAccess.Read))
                 using (var fc = MemoryMappedFile.CreateFromFile(fis, null, 0, MemoryMappedFileAccess.Read,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                     null,
 #endif
                     HandleInheritability.None, false))
@@ -403,7 +403,7 @@ namespace J2N.IO.MemoryMappedFiles
 
                 using (FileStream raf = new FileStream(blah.FullName, FileMode.Open, FileAccess.Read))
                 using (var fc = MemoryMappedFile.CreateFromFile(raf, null, 0, MemoryMappedFileAccess.Read,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                     null,
 #endif
                     HandleInheritability.None, false))
@@ -417,7 +417,7 @@ namespace J2N.IO.MemoryMappedFiles
 
                 using (FileStream raf = new FileStream(blah.FullName, FileMode.Open, FileAccess.ReadWrite))
                 using (var fc = MemoryMappedFile.CreateFromFile(raf, null, 0, MemoryMappedFileAccess.ReadWrite,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                     null,
 #endif
                     HandleInheritability.None, false))
@@ -445,7 +445,7 @@ namespace J2N.IO.MemoryMappedFiles
 
                 using (FileStream raf = new FileStream(file.FullName, FileMode.Open, FileAccess.ReadWrite))
                 using (var fc = MemoryMappedFile.CreateFromFile(raf, null, fileSize, MemoryMappedFileAccess.ReadWrite,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                     null,
 #endif
                     HandleInheritability.None, false))
@@ -478,7 +478,7 @@ namespace J2N.IO.MemoryMappedFiles
 
                 using (FileStream raf = new FileStream(file.FullName, FileMode.Open, FileAccess.ReadWrite))
                 using (var fc = MemoryMappedFile.CreateFromFile(raf, null, fileSize, MemoryMappedFileAccess.ReadWrite,
-#if !NETSTANDARD
+#if FEATURE_MEMORYMAPPEDFILESECURITY
                     null,
 #endif
                     HandleInheritability.None, false))

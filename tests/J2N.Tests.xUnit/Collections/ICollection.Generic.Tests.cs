@@ -44,13 +44,7 @@ namespace J2N.Collections.Tests
         protected virtual bool DefaultValueAllowed => true;
         protected virtual IEnumerable<T> InvalidValues => ArrayEmpty;
 
-        // J2N: Hack to ensure this works in .NET Framework
-        protected static readonly T[] ArrayEmpty =
-#if FEATURE_ARRAYEMPTY
-            Array.Empty<T>();
-#else
-            new T[0];
-#endif
+        protected static readonly T[] ArrayEmpty = Arrays.Empty<T>();
 
         protected virtual void AddToCollection(ICollection<T> collection, int numberOfItemsToAdd)
         {

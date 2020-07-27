@@ -173,6 +173,135 @@ namespace J2N.Collections
             assertEquals("[fixture, null, fixture]", Arrays.ToString(new Object[] { "fixture", null, "fixture" }));
         }
 
+
+        // ------------ Tests for Array overloads
+
+        /**
+         * @tests java.util.Arrays#toString(boolean[])
+         */
+        [Test]
+        public void Test_toString_Array_Z()
+        {
+            assertEquals("null", Arrays.ToString((Array)(bool[])null));
+            assertEquals("[]", Arrays.ToString((Array)new bool[] { }));
+            assertEquals("[true]", Arrays.ToString((Array)new bool[] { true }));
+            assertEquals("[true, false]", Arrays.ToString((Array)new bool[] { true, false }));
+            assertEquals("[true, false, true]", Arrays.ToString((Array)new bool[] { true, false, true }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(byte[])
+         */
+        [Test]
+        public void Test_toString_Array_B()
+        {
+            assertEquals("null", Arrays.ToString((Array)(byte[])null));
+            assertEquals("[]", Arrays.ToString((Array)new byte[] { }));
+            assertEquals("[0]", Arrays.ToString((Array)new byte[] { 0 }));
+            assertEquals("[-1, 0]", Arrays.ToString((Array)new sbyte[] { -1, 0 }));
+            assertEquals("[-1, 0, 1]", Arrays.ToString((Array)new sbyte[] { -1, 0, 1 }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(char[])
+         */
+        [Test]
+        public void Test_toString_Array_C()
+        {
+            assertEquals("null", Arrays.ToString((Array)(char[])null));
+            assertEquals("[]", Arrays.ToString((Array)new char[] { }));
+            assertEquals("[a]", Arrays.ToString((Array)new char[] { 'a' }));
+            assertEquals("[a, b]", Arrays.ToString((Array)new char[] { 'a', 'b' }));
+            assertEquals("[a, b, c]", Arrays.ToString((Array)new char[] { 'a', 'b', 'c' }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(double[])
+         */
+        [Test]
+        public void Test_toString_Array_D()
+        {
+            assertEquals("null", Arrays.ToString((Array)(double[])null));
+            assertEquals("[]", Arrays.ToString((Array)new double[] { }));
+            assertEquals("[0.0]", Arrays.ToString((Array)new double[] { 0.0D }));
+            assertEquals("[-1.0, 0.0]", Arrays.ToString((Array)new double[] { -1.0D, 0.0D }));
+            assertEquals("[-1.0, 0.0, 1.0]", Arrays.ToString((Array)new double[] { -1.0D, 0.0D, 1.0D }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(float[])
+         */
+        [Test]
+        public void Test_toString_Array_F()
+        {
+
+
+            assertEquals("null", Arrays.ToString((Array)(float[])null));
+            assertEquals("[]", Arrays.ToString((Array)new float[] { }));
+            assertEquals("[0.0]", Arrays.ToString((Array)new float[] { 0.0F }));
+            assertEquals("[-1.0, 0.0]", Arrays.ToString((Array)new float[] { -1.0F, 0.0F }));
+            assertEquals("[-1.0, 0.0, 1.0]", Arrays.ToString((Array)new float[] { -1.0F, 0.0F, 1.0F }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(int[])
+         */
+        [Test]
+        public void Test_toString_Array_I()
+        {
+            assertEquals("null", Arrays.ToString((Array)(int[])null));
+            assertEquals("[]", Arrays.ToString((Array)new int[] { }));
+            assertEquals("[0]", Arrays.ToString((Array)new int[] { 0 }));
+            assertEquals("[-1, 0]", Arrays.ToString((Array)new int[] { -1, 0 }));
+            assertEquals("[-1, 0, 1]", Arrays.ToString((Array)new int[] { -1, 0, 1 }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(long[])
+         */
+        [Test]
+        public void Test_toString_Array_J()
+        {
+            assertEquals("null", Arrays.ToString((Array)(long[])null));
+            assertEquals("[]", Arrays.ToString((Array)new long[] { }));
+            assertEquals("[0]", Arrays.ToString((Array)new long[] { 0 }));
+            assertEquals("[-1, 0]", Arrays.ToString((Array)new long[] { -1, 0 }));
+            assertEquals("[-1, 0, 1]", Arrays.ToString((Array)new long[] { -1, 0, 1 }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(short[])
+         */
+        [Test]
+        public void Test_toString_Array_S()
+        {
+            assertEquals("null", Arrays.ToString((Array)(short[])null));
+            assertEquals("[]", Arrays.ToString((Array)new short[] { }));
+            assertEquals("[0]", Arrays.ToString((Array)new short[] { 0 }));
+            assertEquals("[-1, 0]", Arrays.ToString((Array)new short[] { -1, 0 }));
+            assertEquals("[-1, 0, 1]", Arrays.ToString((Array)new short[] { -1, 0, 1 }));
+        }
+
+        /**
+         * @tests java.util.Arrays#toString(Object[])
+         */
+        [Test]
+        public void Test_toString_Array_LSystem_Object()
+        {
+            assertEquals("null", Arrays.ToString((Array)(Object[])null));
+            assertEquals("[]", Arrays.ToString((Array)new Object[] { }));
+            assertEquals("[fixture]", Arrays.ToString((Array)new Object[] { "fixture" }));
+            assertEquals("[fixture, null]", Arrays.ToString((Array)new Object[] { "fixture", null }));
+            assertEquals("[fixture, null, fixture]", Arrays.ToString((Array)new Object[] { "fixture", null, "fixture" }));
+        }
+
+
+        // ------------ End tests for Array overloads
+
+
+
+
+
         /////**
         //// * @tests java.util.Arrays#deepToString(Object[])
         //// */

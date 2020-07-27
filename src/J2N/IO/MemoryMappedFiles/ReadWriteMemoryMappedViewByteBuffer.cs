@@ -77,7 +77,7 @@ namespace J2N.IO.MemoryMappedFiles
             return this;
         }
 
-#if !NETSTANDARD1_3
+#if FEATURE_MEMORYMAPPEDVIEWACCESSOR_READWRITEARRAY
         /*
          * Override ByteBuffer.put(byte[], int, int) to improve performance.
          * 

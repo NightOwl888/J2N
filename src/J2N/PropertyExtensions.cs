@@ -15,14 +15,14 @@ namespace J2N
     /// </summary>
     public static class PropertyExtensions
     {
+#if FEATURE_ENCODINGPROVIDERS
         static PropertyExtensions()
         {
-#if NETSTANDARD
             // Support for iso-8859-1 encoding. See: https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider?view=netcore-2.0
             var encodingProvider = CodePagesEncodingProvider.Instance;
             System.Text.Encoding.RegisterProvider(encodingProvider);
-#endif
         }
+#endif
 
 
         /// <summary>

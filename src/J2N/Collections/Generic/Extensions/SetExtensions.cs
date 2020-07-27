@@ -1,6 +1,8 @@
 ﻿using J2N.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+#nullable enable
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -23,6 +25,9 @@ namespace J2N.Collections.Generic.Extensions
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public static ReadOnlySet<T> AsReadOnly<T>(this ISet<T> collection)
         {
             return new ReadOnlySet<T>(collection);
