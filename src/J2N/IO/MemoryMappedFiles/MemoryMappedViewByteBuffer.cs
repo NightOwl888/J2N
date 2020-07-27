@@ -58,7 +58,7 @@ namespace J2N.IO.MemoryMappedFiles
             this.offset = offset;
         }
 
-#if !NETSTANDARD1_3
+#if FEATURE_MEMORYMAPPEDVIEWACCESSOR_READWRITEARRAY
         /// <summary>
         /// Reads bytes from the current position into the specified byte array,
         /// starting at the specified offset, and increases the position by the

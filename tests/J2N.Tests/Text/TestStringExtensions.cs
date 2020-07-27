@@ -8,14 +8,14 @@ namespace J2N.Text
 {
     public class TestStringExtensions : TestCase
     {
+#if FEATURE_ENCODINGPROVIDERS
         static TestStringExtensions()
         {
-#if NETSTANDARD
             // Support for 8859-1 and IBM01047 encoding. See: https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider?view=netcore-2.0
             var encodingProvider = System.Text.CodePagesEncodingProvider.Instance;
             System.Text.Encoding.RegisterProvider(encodingProvider);
-#endif
         }
+#endif
 
 
         const string hw1 = "HelloWorld";

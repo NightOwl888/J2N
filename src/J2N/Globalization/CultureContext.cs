@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+#nullable enable
 
 namespace J2N.Globalization
 {
@@ -19,7 +20,7 @@ namespace J2N.Globalization
     /// </summary>
     public sealed class CultureContext : IDisposable
     {
-#if !NETSTANDARD
+#if FEATURE_CULTUREINFO_LCID
         /// <summary>
         /// Initializes a new instance of <see cref="CultureInfo"/>
         /// based on the culture specified by the <paramref name="culture"/> identifier.
@@ -110,7 +111,7 @@ namespace J2N.Globalization
             this.originalUICulture = CultureInfo.CurrentUICulture;
 
             // Set both the culture and UI culture for this context.
-#if !NETSTANDARD
+#if !FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER
             this.currentThread = System.Threading.Thread.CurrentThread;
             currentThread.CurrentCulture = culture;
             currentThread.CurrentUICulture = uiCulture;
@@ -120,7 +121,7 @@ namespace J2N.Globalization
 #endif
         }
 
-#if !NETSTANDARD
+#if !FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER
         private readonly System.Threading.Thread currentThread;
 #endif
         private readonly CultureInfo originalCulture;
@@ -130,19 +131,13 @@ namespace J2N.Globalization
         /// Gets the original <see cref="CultureInfo.CurrentCulture"/> value that existed on the current
         /// thread when this instance was initialized.
         /// </summary>
-        public CultureInfo OriginalCulture
-        {
-            get { return this.originalCulture; }
-        }
+        public CultureInfo OriginalCulture => originalCulture;
 
         /// <summary>
         /// Gets the original <see cref="CultureInfo.CurrentUICulture"/> value that existed on the current
         /// thread when this instance was initialized.
         /// </summary>
-        public CultureInfo OriginalUICulture
-        {
-            get { return this.originalUICulture; }
-        }
+        public CultureInfo OriginalUICulture => originalUICulture;
 
         /// <summary>
         /// Restores the <see cref="CultureInfo.CurrentCulture"/> and <see cref="CultureInfo.CurrentUICulture"/> to their
@@ -151,7 +146,7 @@ namespace J2N.Globalization
         public void RestoreOriginalCulture()
         {
             // Restore the culture to the way it was before the constructor was called.
-#if !NETSTANDARD
+#if !FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER
             currentThread.CurrentCulture = originalCulture;
             currentThread.CurrentUICulture = originalUICulture;
 #else
