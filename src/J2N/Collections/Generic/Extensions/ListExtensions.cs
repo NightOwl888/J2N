@@ -13,6 +13,8 @@ namespace J2N.Collections.Generic.Extensions
     /// </summary>
     public static class ListExtensions
     {
+        #region AsReadOnly
+
         /// <summary>
         /// Returns a read-only <see cref="IList{T}"/> wrapper for the current collection.
         /// </summary>
@@ -34,6 +36,10 @@ namespace J2N.Collections.Generic.Extensions
         {
             return new ReadOnlyList<T>(collection);
         }
+
+        #endregion
+
+        #region BinarySearch
 
         /// <summary>
         /// Performs a binary search for the specified element in the specified
@@ -150,6 +156,63 @@ namespace J2N.Collections.Generic.Extensions
             return ~lo;
         }
 
+        #endregion
+
+        #region CopyTo
+
+        /// <summary>
+        /// Copies a range of elements from an <see cref="IList{T}"/> starting at the specified source index and pastes
+        /// them to another <see cref="IList{T}"/> starting at the specified destination index. The length and the
+        /// indexes are specified as 32-bit integers.
+        /// </summary>
+        /// <typeparam name="T">The type of elements to copy.</typeparam>
+        /// <param name="source">The <see cref="IList{T}"/> that contains the data to copy.</param>
+        /// <param name="sourceIndex">A 32-bit integer that represents the index in the <paramref name="sourceIndex"/> at which copying begins.</param>
+        /// <param name="destination">The <see cref="IList{T}"/> that receives the data.</param>
+        /// <param name="destinationIndex">A 32-bit integer that represents the index in the <paramref name="destination"/> at which storing begins.</param>
+        /// <param name="length">A 32-bit integer that represents the number of elements to copy.</param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="source"/> is <c>null</c>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="destination"/> is <c>null</c>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/>, <paramref name="destinationIndex"/> or <paramref name="length"/> is less than zero.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="sourceIndex"/> plus <paramref name="length"/> is greater than or equal to the number of items in <paramref name="source"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The number of elements in the source <paramref name="source"/> is greater
+        /// than the available space from <paramref name="destinationIndex"/> plus <paramref name="length"/>.</exception>
+        public static void CopyTo<T>(this IList<T> source, int sourceIndex, IList<T> destination, int destinationIndex, int length)
+        {
+            if (source == null)
+                throw new ArgumentNullException(nameof(source));
+            if (destination == null)
+                throw new ArgumentNullException(nameof(destination));
+            if (sourceIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(sourceIndex), sourceIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (destinationIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(destinationIndex), destinationIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if ((source.Count - sourceIndex < length) || (destination.Count - destinationIndex < length))
+                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+
+            for (int i = sourceIndex, j = 0; j < length; i++, j++)
+            {
+                destination[j + destinationIndex] = source[i];
+            }
+        }
+
+        #endregion
+
+        #region Shuffle
+
         /// <summary>
         /// Moves every element of the list to a random new position in the <paramref name="list"/>.
         /// </summary>
@@ -192,6 +255,10 @@ namespace J2N.Collections.Generic.Extensions
             }
         }
 
+        #endregion
+
+        #region Swap
+
         /// <summary>
         /// Swaps the elements of <paramref name="list"/> at indices <paramref name="index1"/>
         /// and <paramref name="index2"/>.
@@ -227,5 +294,7 @@ namespace J2N.Collections.Generic.Extensions
             list[index1] = list[index2];
             list[index2] = tmp;
         }
+
+        #endregion
     }
 }

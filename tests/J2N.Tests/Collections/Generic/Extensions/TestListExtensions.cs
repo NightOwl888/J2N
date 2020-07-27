@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -145,6 +146,72 @@ namespace J2N.Collections.Generic.Extensions
         {
             IList<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
             assertEquals(6, list.BinarySearch(3, 4, 7, null));
+        }
+
+        /**
+        * @tests java.lang.System#arraycopy(java.lang.Object, int,
+        *        java.lang.Object, int, int)
+        */
+        [Test]
+        public void Test_CopyTo_List_Int32_List_Int32_Int32()
+        {
+            // Test for method void java.lang.System.arraycopy(java.lang.Object,
+            // int, java.lang.Object, int, int)
+            int[] a = new int[20];
+            int[] b = new int[20];
+            int i = 0;
+            while (i < a.Length)
+            {
+                a[i] = i;
+                ++i;
+            }
+            a.CopyTo(0, b, 0, a.Length);
+            //System.arraycopy(a, 0, b, 0, a.length);
+            for (i = 0; i < a.Length; i++)
+                assertTrue("Copied elements incorrectly", a[i].Equals(b[i]));
+
+            /* Non primitive array types don't need to be identical */
+            String[] source1 = new String[] { "element1" };
+            Object[] dest1 = new Object[1];
+            //System.arraycopy(source1, 0, dest1, 0, dest1.length);
+            source1.CopyTo(0, dest1, 0, dest1.Length);
+            assertTrue("Invalid copy 1", dest1[0].Equals(source1[0]));
+
+            char[][] source = new char[][] { new char[] { 'H', 'e', 'l', 'l', 'o' },
+                new char[] { 'W', 'o', 'r', 'l', 'd' } };
+            char[][] dest = new char[2][];
+            //System.arraycopy(source, 0, dest, 0, dest.Length);
+            source.CopyTo(0, dest, 0, dest.Length);
+            assertTrue("Invalid copy 2", dest[0] == source[0]
+                    && dest[1] == source[1]);
+
+            var list = new List<int> { 4, 5, 6, 7, 8 };
+            var list2 = new List<int> { 0, 0, 0, 0, 0 };
+
+            list.CopyTo(0, list2, 0, 4);
+            for (i = 0; i < 4; i++)
+                assertEquals(list[i], list2[i]);
+            assertTrue(list2[4] == 0);
+        }
+
+        [Test]
+        public void Test_CopyTo_Exceptions()
+        {
+            var source = new List<int> { 1, 5, 3, 2 };
+            var dest = new int[4];
+
+            Assert.Throws<ArgumentNullException>(() => ((IList<int>)null).CopyTo(0, dest, 0, 0));
+            Assert.Throws<ArgumentNullException>(() => source.CopyTo(0, null, 0, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.CopyTo(-1, dest, 0, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.CopyTo(0, dest, -1, 0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => source.CopyTo(0, dest, 0, -1));
+            Assert.Throws<ArgumentException>(() => source.CopyTo(1, dest, 0, 4));
+            Assert.DoesNotThrow(() => source.CopyTo(1, dest, 0, 3));
+            Assert.Throws<ArgumentException>(() => source.CopyTo(0, dest, 1, 4));
+            Assert.DoesNotThrow(() => source.CopyTo(0, dest, 1, 3));
+            Assert.DoesNotThrow(() => source.CopyTo(0, dest, 0, 4));
+            Assert.Throws<ArgumentException>(() => source.CopyTo(0, dest, 0, 5));
+            Assert.Throws<ArgumentException>(() => source.CopyTo(4, dest, 0, 1));
         }
 
         /**
