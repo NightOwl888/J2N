@@ -70,6 +70,19 @@ namespace J2N.Text
             Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(null)));
         }
 
+        // This is a compatibility API for < .NET Standard 2.1
+#if !FEATURE_STRING_CONTAINS_CHAR
+        [TestCase("Hello", 'H', true)]
+        [TestCase("Hello", 'Z', false)]
+        [TestCase("Hello", 'e', true)]
+        [TestCase("Hello", 'E', false)]
+        [TestCase("", 'H', false)]
+        public static void Test_Contains_Char(string s, char value, bool expected)
+        {
+            Assert.AreEqual(expected, s.Contains(value));
+        }
+#endif
+
         /**
          * @tests java.lang.String#contentEquals(CharSequence cs)
          */
