@@ -6,11 +6,11 @@
     <RepositoryUrl>https://github.com/NightOwl888/J2N/</RepositoryUrl>
     <PackageProjectUrl>https://github.com/NightOwl888/J2N/</PackageProjectUrl>
     <PackageIconUrl>https://raw.githubusercontent.com/NightOwl888/J2N/master/branding/j2n-icon-100x100.png</PackageIconUrl>
-    <PackageIcon>content\j2n-icon-100x100.png</PackageIcon>
-    <PackageLicenseFile>content\LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>j2n-icon-100x100.png</PackageIcon>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(SolutionDir)LICENSE.txt" Pack="true" PackagePath="content"/>
-    <None Include="$(SolutionDir)branding\j2n-icon-100x100.png" Pack="true" PackagePath="content"/>
+    <None Include="$(SolutionDir)$(PackageLicenseFile)" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+    <None Include="$(SolutionDir)branding\$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)"/>
   </ItemGroup>
 </Project>
