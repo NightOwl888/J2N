@@ -8,7 +8,6 @@ parameters:
   binaryArtifactName: 'testbinaries' # The name of the Azure DevOps build artifact where the test assemblies will be downloaded from. Default 'testbinaries'.
   testResultsArtifactName: 'testresults' # The name of the Azure DevOps build artifact where the test results will be published. Default 'testresults'.
   vsTestPlatform: 'x64' # Target platform architecture used for test execution. Valid values are x86, x64, and ARM.
-  #testBinaryFilesPattern: '**/*.Tests*.dll' # The regex pattern (within $(System.DefaultWorkingDirectory)/**/<TargetFramework>/) where to look for test .dll files, so they can be distinguished from other .dll file types.
   testBinaryFilesPattern: '\.*\.Tests\.?\w*?.dll$' # The regex pattern (within $(System.DefaultWorkingDirectory)/**/<TargetFramework>) where to look for test .dll files, so they can be distinguished from other .dll file types.
   testResultsFileName: 'TestResults.trx' # The name of the file (not path) of the test results. Default 'TestResults.trx'.
   maximumParallelJobs: 8
@@ -33,16 +32,27 @@ steps:
   displayName: 'Validate Template Parameters'
 
 - task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 3.1.404'
+  displayName: 'Use .NET Core sdk 1.1.14'
   inputs:
-    version: 3.1.404
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp3.'))
+    version: 1.1.14
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp1.'))
 
 - task: UseDotNet@2
   displayName: 'Use .NET Core sdk 2.1.811'
   inputs:
     version: 2.1.811
   condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp2.'))
+
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk 3.1.404'
+  inputs:
+    version: 3.1.404
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp3.'))
+
+- task: UseDotNet@2
+  displayName: 'Use .NET sdk 5.0.100'
+  inputs:
+    version: 5.0.100
 
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts: ${{ parameters.binaryArtifactName }}'
@@ -60,36 +70,11 @@ steps:
     $maximumParalellJobs = '${{ parameters.maximumParallelJobs }}'
     $testTargetFrameworks = $testTargetFrameworksString.Split([char]',',[char]';')
     
-    function SeparateVersionDigits([string]$digits) {
-        return (&{ for ($i = 0;$i -lt $digits.Length;$i++) { $digits.Substring($i,1) }}) -join '.'
-    }
-    
-    # Convert $framework (i.e. net461) into format for dotnet vstest (i.e. .NETFramework,Version=4.6.1)
-    function ConvertFrameworkName([string]$framework) {
-        $match = [regex]::Match($framework, '^net(\d+)$') # .NET Framework
-        if ($match.Success) {
-            $ver = SeparateVersionDigits($match.Groups[1].Value)
-            return ".NETFramework,Version=v$($ver)"
-        }
-        $match = [regex]::Match($framework, '^netcoreapp(\d+\.\d+(?:\.\d+)?)$') # .NET Core
-        if ($match.Success) {
-            $ver = $match.Groups[1].Value
-            return ".NETCoreApp,Version=v$($ver)"
-        } 
-        $match = [regex]::Match($framework, '^uap(\d+\.\d+)?$') # Universal Windows Platform
-        if ($match.Success) {
-            $ver = $match.Groups[1].Value
-            $ver = if ([string]::IsNullOrEmpty($ver)) { '10' } else { $ver.Replace('.0','').Replace('.','') }
-            return "FrameworkUap$($ver)"
-        }
-        return $framework
-    }
-    
     function IsSupportedFramework([string]$framework) {
         if ($IsWindows -eq $null) {
             $IsWindows = $env:OS.StartsWith('Win')
         }
-        if (!$IsWindows -and !$framework.StartsWith('netcoreapp')) {
+        if (!$IsWindows -and $framework.StartsWith('net4')) {
             return $false
         }
         return $true
@@ -111,18 +96,17 @@ steps:
             #    $running | Wait-Job -Any | Out-Null
             #}
               
-            $fwork = ConvertFrameworkName($framework)
             $testResultDirectory = "$testResultsArtifactDirectory/$testOSName/$framework/$testName"
             if (!(Test-Path "$testResultDirectory")) {
                 New-Item "$testResultDirectory" -ItemType Directory -Force
             }
     
-            Write-Host "Testing '$testBinary' on framework '$fwork' and outputting test results to '$testResultDirectory/${{ parameters.testResultsFileName }}'..."
-            dotnet vstest "$testBinary" --Framework:"$fwork" --Platform:"$testPlatform" --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --ResultsDirectory:"$testResultDirectory" --Blame  # > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
+            Write-Host "Testing '$testBinary' on framework '$framework' and outputting test results to '$testResultDirectory/${{ parameters.testResultsFileName }}'..."
+            dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini
     
             #$scriptBlock = {
             #    param([string]$testBinary, [string]$fwork, [string]$testPlatform, [string]$testResultDirectory)
-            #    dotnet vstest "$testBinary" --Framework:"$fwork" --Platform:"$testPlatform" --Blame --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --ResultsDirectory:"$testResultDirectory" > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
+            #    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
             #}
     
             # Execute the jobs in parallel
