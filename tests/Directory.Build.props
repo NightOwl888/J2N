@@ -10,5 +10,9 @@
   <PropertyGroup>
     <NoWarn>$(NoWarn);168;612;618;672;809;1701</NoWarn>
   </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>true</IsPublishable>
+  </PropertyGroup>
   
 </Project>
