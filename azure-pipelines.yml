@@ -17,7 +17,7 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 
 variables:
 - name: TestTargetFrameworks
-  value: 'netcoreapp3.0;netcoreapp2.2;netcoreapp2.0;netcoreapp1.0;net461;net452'
+  value: 'netcoreapp3.1;netcoreapp3.0;netcoreapp2.1;netcoreapp1.0;net461;net452'
 - name: BinaryArtifactName
   value: 'testbinaries'
 - name: NuGetArtifactName
@@ -68,6 +68,33 @@ stages:
   displayName: 'Test Stage:'
   jobs:
 
+  - job: Test_netcoreapp3_1
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    strategy:
+      matrix:
+        Windows:
+          osName: 'Windows'
+          imageName: 'windows-2019'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        Linux:
+          osName: 'Linux'
+          imageName: 'ubuntu-16.04'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        macOS:
+          osName: 'macOS'
+          imageName: 'macOS-10.14'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+    displayName: 'Test netcoreapp3.1 on'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - template: 'build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: $(osName)
+        testTargetFrameworks: 'netcoreapp3.1'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: $(maximumAllowedFailures)
+
   - job: Test_netcoreapp3_0
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
     strategy:
@@ -95,7 +122,7 @@ stages:
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
 
-  - job: Test_netcoreapp2_2
+  - job: Test_netcoreapp2_1
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
     strategy:
       matrix:
@@ -111,41 +138,14 @@ stages:
           osName: 'macOS'
           imageName: 'macOS-10.14'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-    displayName: 'Test netcoreapp2.2 on'
+    displayName: 'Test netcoreapp2.1 on'
     pool:
       vmImage: $(imageName)
     steps:
     - template: 'build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
-        testTargetFrameworks: 'netcoreapp2.2'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: $(maximumAllowedFailures)
-
-  - job: Test_netcoreapp2_0
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    strategy:
-      matrix:
-        Windows:
-          osName: 'Windows'
-          imageName: 'windows-2019'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        Linux:
-          osName: 'Linux'
-          imageName: 'ubuntu-16.04'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        macOS:
-          osName: 'macOS'
-          imageName: 'macOS-10.14'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-    displayName: 'Test netcoreapp2.0 on'
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
-      parameters:
-        osName: $(osName)
-        testTargetFrameworks: 'netcoreapp2.0'
+        testTargetFrameworks: 'netcoreapp2.1'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
 

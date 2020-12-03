@@ -33,15 +33,15 @@ steps:
   displayName: 'Validate Template Parameters'
 
 - task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 3.0.101'
+  displayName: 'Use .NET Core sdk 3.1.404'
   inputs:
-    version: 3.0.101
+    version: 3.1.404
   condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp3.'))
 
 - task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 2.2.401'
+  displayName: 'Use .NET Core sdk 2.1.811'
   inputs:
-    version: 2.2.401
+    version: 2.1.811
   condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp2.'))
 
 - task: DownloadBuildArtifacts@0

@@ -12,12 +12,13 @@
     <!-- Allow the build script to pass in the test frameworks to build for.
       This overrides the above TargetFramework setting. 
       TODO: Due to a parsing bug, we cannot pass a string with a ; to dotnet msbuild, so passing true as a workaround -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">netcoreapp3.0;netcoreapp2.2;netcoreapp2.0;netcoreapp1.0;net461;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">netcoreapp3.1;netcoreapp3.0;netcoreapp2.1;netcoreapp1.0;net461;net452</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Label="Mismatched Target Framework (to override the target framework under test)">
     <SetTargetFramework></SetTargetFramework>
+    <SetTargetFramework Condition=" '$(TargetFramework)' == 'netcoreapp3.0' ">TargetFramework=netstandard2.1</SetTargetFramework>
     <SetTargetFramework Condition=" '$(TargetFramework)' == 'net452' ">TargetFramework=net40</SetTargetFramework>
     <SetTargetFramework Condition=" '$(TargetFramework)' == 'net461' ">TargetFramework=net45</SetTargetFramework>
   </PropertyGroup>

@@ -50,9 +50,9 @@ steps:
   displayName: 'Validate Template Parameters'
 
 - task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 3.0.101'
+  displayName: 'Use .NET Core sdk 3.1.404'
   inputs:
-    version: 3.0.101
+    version: 3.1.404
 
   # Runs dotnet build 
 - task: DotNetCoreCLI@2
