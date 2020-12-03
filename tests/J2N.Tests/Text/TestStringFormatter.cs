@@ -104,6 +104,7 @@ namespace J2N.Text
         {
             assertEquals("-0.0", string.Format(StringFormatter.InvariantCulture, "{0}", -0.0f));
             assertEquals("0.0", string.Format(StringFormatter.InvariantCulture, "{0}", 0.0f));
+            assertEquals("-0,0", string.Format(new StringFormatter(new CultureInfo("fr-FR")), "{0}", -0.0f));
         }
 
         [Test]
@@ -111,6 +112,7 @@ namespace J2N.Text
         {
             assertEquals("-0.0", string.Format(StringFormatter.InvariantCulture, "{0}", -0.0d));
             assertEquals("0.0", string.Format(StringFormatter.InvariantCulture, "{0}", 0.0d));
+            assertEquals("-0,0", string.Format(new StringFormatter(new CultureInfo("fr-FR")), "{0}", -0.0d));
         }
 
         [Test]
