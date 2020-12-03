@@ -191,18 +191,19 @@ namespace J2N.Text
 
         private static string FormatNegativeZero(NumberFormatInfo numberFormat)
         {
+            string sep = numberFormat.NumberDecimalSeparator;
             switch (numberFormat.NumberNegativePattern)
             {
                 case 0: // (1,234.00)
-                    return "(0.0)";
+                    return $"(0{sep}0)";
                 case 2: // - 1,234.00
-                    return numberFormat.NegativeSign + " 0.0";
+                    return numberFormat.NegativeSign + $" 0{sep}0";
                 case 3: // 1,234.00-
-                    return "0.0" + numberFormat.NegativeSign;
+                    return $"0{sep}0" + numberFormat.NegativeSign;
                 case 4: // 1,234.00 -
-                    return "0.0 " + numberFormat.NegativeSign;
+                    return $"0{sep}0 " + numberFormat.NegativeSign;
                 default: // (1): -1,234.00
-                    return numberFormat.NegativeSign + "0.0";
+                    return numberFormat.NegativeSign + $"0{sep}0";
             }
         }
 

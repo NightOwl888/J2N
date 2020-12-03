@@ -20,9 +20,6 @@ parameters:
   nugetArtifactName: 'nuget' # The name of the Azure DevOps build artifact where the NuGet assets (.nupkg and .pdb files) will be output. Default 'nuget'.
   binaryArtifactName: 'testbinaries' # The name of the Azure DevOps build artifact where the test assemblies will be output. Default 'testbinaries'.
   solutionFilesConvention: '**/*.sln' # The glob pattern where to look for solution files. Default '**\*.sln'.
-  packableProjectFilesConvention: '**/*.csproj' # The glob pattern (within $(System.DefaultWorkingDirectory)) where to look for project files to pack into .nupkg files for deployment.
-  testProjectFilesConvention: '**/*.Tests*.csproj' # The glob pattern (within $(System.DefaultWorkingDirectory)) where to look for test project files, so they can be distinguished from other project file types.
-  testSymbolFilesConvention: '**/*.Tests.*/**/*.pdb' # The glob pattern (within $(System.DefaultWorkingDirectory)) where to look for test project symbols (.pdb) files, so they can be distinguished from other project file types.
 
 
 steps:
@@ -44,15 +41,12 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.nugetArtifactName }}', 'nugetArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.binaryArtifactName }}', 'binaryArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.solutionFilesConvention }}', 'solutionFilesConvention')
-    EnsureNotNullOrEmpty('${{ parameters.packableProjectFilesConvention }}', 'packableProjectFilesConvention')
-    EnsureNotNullOrEmpty('${{ parameters.testProjectFilesConvention }}', 'testProjectFilesConvention')
-    EnsureNotNullOrEmpty('${{ parameters.testSymbolFilesConvention }}', 'testSymbolFilesConvention')
   displayName: 'Validate Template Parameters'
 
 - task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 3.0.101'
+  displayName: 'Use .NET Core sdk 3.1.404'
   inputs:
-    version: 3.0.101
+    version: 3.1.404
 
   # Runs dotnet build 
 - task: DotNetCoreCLI@2
@@ -61,7 +55,7 @@ steps:
     command: custom
     projects: '${{ parameters.solutionFilesConvention }}'
     custom: build
-    arguments: '--configuration ${{ parameters.buildConfiguration }} --verbosity Detailed /p:Platform="${{ parameters.buildPlatform }}" /p:InformationalVersion="${{ parameters.informationalVersion }}" /p:FileVersion="${{ parameters.fileVersion }}" /p:AssemblyVersion="${{ parameters.assemblyVersion }}" /p:TestAllTargetFrameworks=true /p:PortableDebugTypeOnly=true'
+    arguments: '--configuration ${{ parameters.buildConfiguration }} --verbosity normal /p:Platform="${{ parameters.buildPlatform }}" /p:InformationalVersion="${{ parameters.informationalVersion }}" /p:FileVersion="${{ parameters.fileVersion }}" /p:AssemblyVersion="${{ parameters.assemblyVersion }}" /p:TestAllTargetFrameworks=true /p:PortableDebugTypeOnly=true'
 
   # Packs the project binaries into .nupkg files (NuGet).
   # Note that we are outputting .symbols.nupkg files as well 
@@ -70,11 +64,9 @@ steps:
   displayName: 'dotnet pack'
   inputs:
     command: custom
-    projects: |
-      ${{ parameters.packableProjectFilesConvention }}
-      !${{ parameters.testProjectFilesConvention }}
+    projects: '${{ parameters.solutionFilesConvention }}'
     custom: pack
-    arguments: '--configuration ${{ parameters.buildConfiguration }} --output "$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}" --no-build --verbosity Detailed /p:PackageVersion="${{ parameters.packageVersion }}"'
+    arguments: '--configuration ${{ parameters.buildConfiguration }} --output "$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}" --no-build --verbosity normal /p:PackageVersion="${{ parameters.packageVersion }}"'
 
   # Copy the .pdb files as build artifacts, which will later be used
   # to push to the Azure Artifacts symbol server.
@@ -97,22 +89,17 @@ steps:
   # and project name as part of the folder structure.
 - powershell: |
     $testTargetFrameworksString = "${{ parameters.testTargetFrameworks }}"
-    $testProjectRootDirectory = "$(System.DefaultWorkingDirectory)"
     $outputRoot = "$(Build.ArtifactStagingDirectory)/${{ parameters.binaryArtifactName }}"
     $configuration = "${{ parameters.buildConfiguration }}"
-    $testProjectFilesConvention = "${{ parameters.testProjectFilesConvention }}"
+    $sourcesDirectory = "$(Build.SourcesDirectory)"
     
     $testTargetFrameworks = $testTargetFrameworksString.Split([char]';',[char]',')
     foreach ($framework in $testTargetFrameworks) {
-        $testProjects = Get-ChildItem -Path "$testProjectRootDirectory/$testProjectFilesConvention" -Recurse 
-        foreach ($testProject in $testProjects) {
-            $projectName = [System.IO.Path]::GetFileNameWithoutExtension($testProject)
-            $outputPath = "$outputRoot/$framework/$projectName"
-            Write-Host "Publishing '$testProject' on '$framework' to '$outputPath'..."
-            dotnet publish "$testProject" --output "$outputPath" --framework "$framework" --configuration "$configuration" --no-build --verbosity Detailed /p:TestAllTargetFrameworks=true
-        }
+        $outputPath = "$outputRoot/$framework"
+        Write-Host "Publishing '$framework' to '$outputPath'..."
+        dotnet publish --output "$outputPath" --framework "$framework" --configuration "$configuration" --no-build --no-restore --verbosity normal /p:TestAllTargetFrameworks=true
     }
-  displayName: 'dotnet publish ${{ parameters.testTargetFrameworks }}'
+  displayName: 'dotnet publish'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: ${{ parameters.binaryArtifactName }}'

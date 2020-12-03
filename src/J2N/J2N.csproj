@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet Package Settings">
+    <IsPackable>true</IsPackable>
     <AssemblyTitle>J2N</AssemblyTitle>
     <Description>J2N is a library that helps bridge the gap between .NET and Java. It provides components to assist with porting Java code to .NET, such as collections, adapters, and extensions. It contains some features from Java that also make it generally useful in any .NET application.</Description>
     <!--<PackageTags>$(PackageTags)</PackageTags>-->
