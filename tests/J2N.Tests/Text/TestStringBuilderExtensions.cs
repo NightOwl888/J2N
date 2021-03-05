@@ -818,7 +818,7 @@ namespace J2N.Text
 
             using (var context = new CultureContext("ru-MD"))
             {
-                assertEquals(fixture.IndexOf(searchFor, StringComparison.CurrentCulture), sb.IndexOf(searchFor, 4, StringComparison.CurrentCulture));
+                assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.CurrentCulture), sb.IndexOf(searchFor, 4, StringComparison.CurrentCulture));
                 assertEquals(6, sb.IndexOf(searchFor, 4, StringComparison.Ordinal));
                 assertEquals(6, sb.IndexOf(searchFor, 4, StringComparison.OrdinalIgnoreCase));
             }
@@ -894,7 +894,7 @@ namespace J2N.Text
 
             using (var context = new CultureContext("ru-MD"))
             {
-                assertEquals(fixture.LastIndexOf(searchFor, 20, StringComparison.CurrentCulture), sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCulture));
+                assertEquals(fixture.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCulture), sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCulture));
                 assertEquals(6, sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.Ordinal));
                 assertEquals(6, sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.OrdinalIgnoreCase));
             }

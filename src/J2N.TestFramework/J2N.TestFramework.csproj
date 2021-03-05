@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework></TargetFramework>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.1;netstandard2.0;netstandard1.4;net45;net40</TargetFrameworks>
+    <TargetFrameworks>netcoreapp3.1;netstandard2.1;netstandard2.0;net45;net40</TargetFrameworks>
     <RootNamespace>J2N</RootNamespace>
 
     <IsPackable>false</IsPackable>
@@ -34,10 +34,6 @@
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <DefineConstants>$(DefineConstants);FEATURE_STACKTRACE;FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard1.4' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>
 

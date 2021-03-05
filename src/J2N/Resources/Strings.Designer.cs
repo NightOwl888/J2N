@@ -201,6 +201,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type of argument is not compatible with the generic comparer..
+        /// </summary>
+        internal static string Argument_InvalidArgumentForComparison {
+            get {
+                return ResourceManager.GetString("Argument_InvalidArgumentForComparison", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Target array type is not compatible with the type of items in the collection..
         /// </summary>
         internal static string Argument_InvalidArrayType {

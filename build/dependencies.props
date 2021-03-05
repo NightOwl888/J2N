@@ -2,15 +2,12 @@
   <PropertyGroup Label="NuGet Package Reference Versions">
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
-    <NerdBankGitVersioningPackageReferenceVersion>[3.0.28]</NerdBankGitVersioningPackageReferenceVersion>
+    <NerdBankGitVersioningPackageReferenceVersion>[3.3.37]</NerdBankGitVersioningPackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
-    <NUnitPackageReferenceVersion>3.12.0</NUnitPackageReferenceVersion>
+    <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>
-    <SystemIOMemoryMappedFilesPackageReferenceVersion>4.3.0</SystemIOMemoryMappedFilesPackageReferenceVersion>
-    <SystemReflectionTypeExtensionsPackageReferenceVersion>4.4.0</SystemReflectionTypeExtensionsPackageReferenceVersion>
-    <SystemResourcesResourceManagerPackageReferenceVersion>4.3.0</SystemResourcesResourceManagerPackageReferenceVersion>
-    <SystemRuntimePackageReferenceVersion>4.3.0</SystemRuntimePackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
-    <SystemThreadingThreadPackageReferenceVersion>4.3.0</SystemThreadingThreadPackageReferenceVersion>
+    <XunitPackageReferenceVersion>2.4.1</XunitPackageReferenceVersion>
+    <XunitRunnerVisualStudioPackageReferenceVersion>$(XunitPackageReferenceVersion)</XunitRunnerVisualStudioPackageReferenceVersion>
   </PropertyGroup>
 </Project>

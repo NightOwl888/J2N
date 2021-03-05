@@ -17,7 +17,7 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 
 variables:
 - name: TestTargetFrameworks
-  value: 'netcoreapp3.1;netcoreapp3.0;netcoreapp2.1;netcoreapp1.0;net461;net452'
+  value: 'netcoreapp3.1;netcoreapp3.0;netcoreapp2.1;net461;net452'
 - name: BinaryArtifactName
   value: 'testbinaries'
 - name: NuGetArtifactName
@@ -63,6 +63,38 @@ stages:
         nugetArtifactName: '$(NuGetArtifactName)'
         binaryArtifactName: '$(BinaryArtifactName)'
 
+    - task: NuGetToolInstaller@1
+      displayName: 'Install NuGet'
+
+    - task: NuGetCommand@2
+      inputs:
+        restoreSolution: '$(Build.SourcesDirectory)/J2N.sln'
+        feedsToUse: config
+        nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
+      displayName: 'Restore NuGet packages'
+
+    - task: XamarinAndroid@1
+      inputs:
+        projectFile: '$(Build.SourcesDirectory)/tests/Xamarin/Android/**/*.Tests.MonoAndroid90*.csproj'
+        outputDirectory: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)/MonoAndroid90'
+        configuration: '$(BuildConfiguration)'
+        target: 'SignAndroidPackage'
+      displayName: 'Build XamarinAndroid90'
+
+    - task: XamarinAndroid@1
+      inputs:
+        projectFile: '$(Build.SourcesDirectory)/tests/Xamarin/Android/**/*.Tests.MonoAndroid100*.csproj'
+        outputDirectory: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)/MonoAndroid100'
+        configuration: '$(BuildConfiguration)'
+        target: 'SignAndroidPackage'
+      displayName: 'Build XamarinAndroid100'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: $(BinaryArtifactName)'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)'
+        ArtifactName: '$(BinaryArtifactName)'
+      condition: succeededOrFailed()
 
 - stage: Test_Stage
   displayName: 'Test Stage:'
@@ -149,33 +181,6 @@ stages:
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
 
-  - job: Test_netcoreapp1_0
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    strategy:
-      matrix:
-        Windows:
-          osName: 'Windows'
-          imageName: 'windows-2019'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        Linux:
-          osName: 'Linux'
-          imageName: 'ubuntu-16.04'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        macOS:
-          osName: 'macOS'
-          imageName: 'macOS-10.14'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-    displayName: 'Test netcoreapp1.0 on'
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
-      parameters:
-        osName: $(osName)
-        testTargetFrameworks: 'netcoreapp1.0'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: $(maximumAllowedFailures)
-
   - job: Test_net461
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
     displayName: 'Test net461 on Windows'
@@ -201,6 +206,34 @@ stages:
         testTargetFrameworks: 'net452'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+
+  - job: Test_MonoAndroid90
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    displayName: 'Test MonoAndroid90 on macOS'
+    pool:
+      vmImage: 'macOS-10.15'
+    steps:
+    - template: 'build/azure-templates/run-tests-on-android.yml'
+      parameters:
+        osName: 'Android'
+        androidAbi: 'x86_64'
+        testTargetFrameworks: 'MonoAndroid90'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+
+  - job: Test_MonoAndroid100
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    displayName: 'Test MonoAndroid100 on macOS'
+    pool:
+      vmImage: 'macOS-10.15'
+    steps:
+    - template: 'build/azure-templates/run-tests-on-android.yml'
+      parameters:
+        osName: 'Android'
+        androidAbi: 'x86_64'
+        testTargetFrameworks: 'MonoAndroid100'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
 
 
 - stage: Publish_Stage

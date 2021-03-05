@@ -7,7 +7,7 @@
     <RootNamespace>J2N</RootNamespace>
   </PropertyGroup>
 
-  <ItemGroup Condition="$(TargetFramework.StartsWith('netcoreapp'))">
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('netstandard')) ">
     <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
   </ItemGroup>
 
