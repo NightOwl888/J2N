@@ -21,6 +21,11 @@ namespace J2N.Collections.Tests
 
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
 
+#if FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION
+        protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert;
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Remove | ModifyOperation.Clear;
+#endif
+
         /// <summary>
         /// Returns a set of ModifyEnumerable delegates that modify the enumerable passed to them.
         /// </summary>

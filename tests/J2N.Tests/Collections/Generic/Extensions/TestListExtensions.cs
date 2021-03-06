@@ -85,9 +85,7 @@ namespace J2N.Collections.Generic.Extensions
                 list.BinarySearch(new MyInt(3));
                 fail("Expected NullPointerException for null list parameter");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 //Expected
             }
@@ -119,9 +117,7 @@ namespace J2N.Collections.Generic.Extensions
                 list.BinarySearch(new MyInt(3), comp);
                 fail("Expected NullPointerException for null list parameter");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 //Expected
             }

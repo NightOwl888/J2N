@@ -2,14 +2,20 @@
 
   <PropertyGroup>
     <TargetFramework></TargetFramework>
-    <TargetFrameworks>netcoreapp3.1;netstandard2.1;netstandard2.0;net45;net40</TargetFrameworks>
+    <TargetFrameworks>net5.0;netcoreapp3.1;netstandard2.1;netstandard2.0;net45;net40</TargetFrameworks>
     <RootNamespace>J2N</RootNamespace>
 
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <NoWarn>$(NoWarn);168;612;618;672;809;1591</NoWarn>
+  <PropertyGroup Label="Warnings to be Disabled in Test Projects">
+    <NoWarn Label="The variable 'var' is declared but never used">$(NoWarn);CS0168</NoWarn>
+    <NoWarn Label="'member' is obsolete">$(NoWarn);CS0612;CS0618</NoWarn>
+    <NoWarn Label="Member 'member1' overrides obsolete member 'member2. Add the Obsolete attribute to 'member1'">$(NoWarn);CS0672</NoWarn>
+    <NoWarn Label="Obsolete member 'memberA' overrides non-obsolete member 'memberB'.">$(NoWarn);CS0809</NoWarn>
+    <NoWarn Label="Missing XML comment for publicly visible type or member 'Type_or_Member'">$(NoWarn);CS1591</NoWarn>
+    
+    <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -18,28 +24,7 @@
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
-    <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp3.1' ">
-    <DefineConstants>$(DefineConstants);FEATURE_STACKTRACE;FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-    <DefineConstants>$(DefineConstants);FEATURE_STACKTRACE;FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
-    <DefineConstants>$(DefineConstants);FEATURE_STACKTRACE;FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>portable</DebugType>
-  </PropertyGroup>
-
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
-    <DefineConstants>$(DefineConstants);FEATURE_STACKTRACE;FEATURE_SERIALIZABLE</DefineConstants>
-    <DebugType>full</DebugType>
-  </PropertyGroup>
 
 </Project>

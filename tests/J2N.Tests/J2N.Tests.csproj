@@ -5,6 +5,7 @@
   
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
+    <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('netstandard')) ">

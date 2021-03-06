@@ -773,9 +773,7 @@ namespace J2N.IO
                 // should generate EndOfStreamException.
                 dis.ReadFully(buffer, 0, buffer.Length);
             }
-#pragma warning disable 168
             catch (EndOfStreamException ie)
-#pragma warning restore 168
             {
                 caughtException = true;
             }
@@ -794,9 +792,7 @@ namespace J2N.IO
             {
                 dis.ReadFully(buffer, 0, -20);
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException ie)
-#pragma warning restore 168
             {
                 caughtException = true;
             }
@@ -814,10 +810,7 @@ namespace J2N.IO
             using (MemoryStream pis = new MemoryStream(Encoding.UTF8.GetBytes("\r")))
             {
                 DataInputStream dis = new DataInputStream(pis);
-
-#pragma warning disable 612, 618
                 string line = dis.ReadLine();
-#pragma warning restore 612, 618
                 if (line == null)
                 {
                     fail("Got null, should return empty line");
@@ -847,9 +840,7 @@ namespace J2N.IO
                     if (utfdfe.Message == null)
                         fail("vague exception thrown");
                 }
-#pragma warning disable 168
                 catch (EndOfStreamException eofe)
-#pragma warning restore 168
                 {
                     // These are rare and beyond the scope of the test
                 }
@@ -931,15 +922,11 @@ namespace J2N.IO
                     fail("DataInputStream.skipBytes does not return expected value");
                 }
             }
-#pragma warning disable 168
             catch (EndOfStreamException e)
-#pragma warning restore 168
             {
                 fail("DataInputStream.skipBytes throws unexpected EOFException");
             }
-#pragma warning disable 168
             catch (IOException e)
-#pragma warning restore 168
             {
                 Console.WriteLine("IOException is thrown - possible result");
             }

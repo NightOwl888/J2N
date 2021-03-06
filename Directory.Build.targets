@@ -3,8 +3,8 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
   
-  <!-- Features in .NET Standard and .NET Core only (no .NET Framework support) -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) ">
+  <!-- Features in .NET Standard, .NET Core, and .NET 5.x only (no .NET Framework support) -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CHARARRAYPOINTERS</DefineConstants>
@@ -14,9 +14,17 @@
     
     <DebugType>portable</DebugType>
   </PropertyGroup>
+  
+  <!-- Features in .NET 5.x only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net5.')) ">
+    
+    <DefineConstants>$(DefineConstants);FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_ICU</DefineConstants>
+  
+  </PropertyGroup>
 
-  <!-- Features in .NET Core 3.x only -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp3.')) ">
+  <!-- Features in .NET Core 3.x and .NET 5.x only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
@@ -32,8 +40,8 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Standard 2.1 and .NET Core 3.x only -->
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) ">
+  <!-- Features in .NET Standard 2.1, .NET Core 3.x, and .NET 5.x only -->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
     
@@ -49,8 +57,8 @@
     
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, and .NET Core 3.x -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) ">
+  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, and .NET 5.x -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_CASEINSENSITIVECOMPARER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CONTRACTBLOCKS</DefineConstants>
@@ -62,13 +70,19 @@
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADINTERRUPT</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_THREADABORT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADYIELD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADPRIORITY</DefineConstants>
 
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->
     <DefineConstants Condition=" '$(IncludeICloneable)' == 'true' ">$(DefineConstants);FEATURE_CLONEABLE</DefineConstants>
+  </PropertyGroup>
+  
+  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, and .NET Core 3.x (No .NET 5 support) -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) ">
+
+    <DefineConstants>$(DefineConstants);FEATURE_THREADABORT</DefineConstants>
+    
   </PropertyGroup>
 
   <!-- Features in .NET Standard 1.x and .NET Core 1.x -->

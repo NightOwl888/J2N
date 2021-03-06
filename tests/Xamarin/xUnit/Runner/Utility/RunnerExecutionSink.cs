@@ -63,10 +63,14 @@ namespace Xunit.Runner
             {
                 action();
             }
+#pragma warning disable CS0168 // Variable is declared but never used
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
+#pragma warning restore CS0168 // Variable is declared but never used
             {
                 //logger.LogError(testCase, "Error occured while {0} for test case {1}: {2}", actionDescription, displayName, ex);
             }
+#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         void HandleTestCaseStarting(MessageHandlerArgs<ITestCaseStarting> args)

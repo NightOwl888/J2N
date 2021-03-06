@@ -7,6 +7,7 @@
     <NoWarn Label="Do not use equality check to check for collection size.">$(NoWarn);xUnit2013</NoWarn>
     <NoWarn Label="Do not use typeof() expression to check the exception type.">$(NoWarn);xUnit2015</NoWarn>
     <NoWarn Label="Do not use Contains() to check if a value exists in a collection.">$(NoWarn);xUnit2017</NoWarn>
+    <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

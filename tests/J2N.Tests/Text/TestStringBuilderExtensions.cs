@@ -450,9 +450,7 @@ namespace J2N.Text
                 sb.CodePointCount(-1, 2);
                 fail("No IOOBE for negative begin index.");
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException e)
-#pragma warning restore 168
             {
 
             }
@@ -462,9 +460,7 @@ namespace J2N.Text
                 sb.CodePointCount(0, 4);
                 fail("No IOOBE for end index that's too large.");
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException e)
-#pragma warning restore 168
             {
 
             }
@@ -474,9 +470,7 @@ namespace J2N.Text
                 sb.CodePointCount(3, 2);
                 fail("No IOOBE for begin index larger than end index.");
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException e)
-#pragma warning restore 168
             {
 
             }
@@ -504,9 +498,7 @@ namespace J2N.Text
                 sb.CodePointAt(-1);
                 fail("No IOOBE on negative index.");
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException e)
-#pragma warning restore 168
             {
 
             }
@@ -516,9 +508,7 @@ namespace J2N.Text
                 sb.CodePointAt(sb.Length);
                 fail("No IOOBE on index equal to length.");
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException e)
-#pragma warning restore 168
             {
 
             }
@@ -528,9 +518,7 @@ namespace J2N.Text
                 sb.CodePointAt(sb.Length + 1);
                 fail("No IOOBE on index greater than length.");
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException e)
-#pragma warning restore 168
             {
 
             }
@@ -579,9 +567,7 @@ namespace J2N.Text
                 assertSame(sb, sb.Append((ICharSequence)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0's Append(StringBuilder,int,int) overload) rather than appending the string "null"
                 fail("no NPE");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // Expected
             }
@@ -634,9 +620,7 @@ namespace J2N.Text
                 assertSame(sb, sb.Append((StringBuilder)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0) rather than appending the string "null"
                 fail("no NPE");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // Expected
             }
@@ -665,9 +649,7 @@ namespace J2N.Text
                     sb.IndexOf((string)null, StringComparison.Ordinal);
                     fail("no NPE");
                 }
-#pragma warning disable 168
                 catch (ArgumentNullException e)
-#pragma warning restore 168
                 {
                     // Expected
                 }
@@ -704,9 +686,7 @@ namespace J2N.Text
                     sb.IndexOf((string)null, 0, StringComparison.Ordinal);
                     fail("no NPE");
                 }
-#pragma warning disable 168
                 catch (ArgumentNullException e)
-#pragma warning restore 168
                 {
                     // Expected
                 }

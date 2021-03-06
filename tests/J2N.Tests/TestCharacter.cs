@@ -1629,7 +1629,11 @@ namespace J2N
             assertTrue(Character.GetType((int)'\u2029') == UnicodeCategory.ParagraphSeparator);
 
             assertTrue(Character.GetType(0x9FFF) == UnicodeCategory.OtherNotAssigned);
+#if FEATURE_ICU
+            assertTrue(Character.GetType(0x30000) == UnicodeCategory.OtherLetter); // This character is now defined in .NET 5
+#else
             assertTrue(Character.GetType(0x30000) == UnicodeCategory.OtherNotAssigned);
+#endif
             assertTrue(Character.GetType(0x110000) == UnicodeCategory.OtherNotAssigned);
 
             assertTrue(Character.GetType(0x0041) == UnicodeCategory.UppercaseLetter);
@@ -1749,7 +1753,11 @@ namespace J2N
             assertTrue(Character.IsDefined((int)'\u6039'));
             assertTrue(Character.IsDefined(0x10300));
 
+#if FEATURE_ICU
+            assertTrue(Character.IsDefined(0x30000)); // This character is now defined in .NET 5
+#else
             assertFalse(Character.IsDefined(0x30000));
+#endif
             assertFalse(Character.IsDefined(0x3FFFF));
             assertFalse(Character.IsDefined(0x110000));
         }
