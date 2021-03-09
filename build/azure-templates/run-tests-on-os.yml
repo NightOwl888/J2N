@@ -126,10 +126,8 @@ steps:
     #} until ($running.Count -eq 0)
     
     $global:LASTEXITCODE = 0 # Force the script to continue on error
-  displayName: 'dotnet vstest ${{ parameters.testTargetFrameworks }}'
+  displayName: 'dotnet test ${{ parameters.testTargetFrameworks }}'
   ignoreLASTEXITCODE: true
-  errorActionPreference: 'continue'
-  failOnStderr: false
 
 #- template: 'show-all-files.yml' # Uncomment for debugging
 
