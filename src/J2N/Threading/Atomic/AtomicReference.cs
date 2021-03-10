@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading.Atomic
 {
@@ -19,7 +20,7 @@ namespace J2N.Threading.Atomic
 #endif
     public class AtomicReference<T> where T : class
     {
-        private T value;
+        private T? value;
 
         /// <summary>
         /// Creates a new <see cref="AtomicReference{T}"/> with the given initial <paramref name="value"/>.
@@ -48,7 +49,7 @@ namespace J2N.Threading.Atomic
         /// SomeObject x = aref;
         /// </code>
         /// </summary>
-        public T Value
+        public T? Value
         {
 #if NET40
             get => value;
@@ -67,7 +68,7 @@ namespace J2N.Threading.Atomic
         /// <param name="update">The new value.</param>
         /// <returns><c>true</c> if successful. A <c>false</c> return value indicates that the actual value
         /// was not equal to the expected value.</returns>
-        public bool CompareAndSet(T expect, T update)
+        public bool CompareAndSet(T? expect, T? update)
         {
             var previous = Interlocked.CompareExchange(ref value, update, expect);
             return ReferenceEquals(previous, expect);
@@ -78,7 +79,7 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="value">The new value.</param>
         /// <returns>The previous value.</returns>
-        public T GetAndSet(T value)
+        public T? GetAndSet(T? value)
         {
             return Interlocked.Exchange(ref this.value, value);
         }
@@ -89,7 +90,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The <see cref="string"/> representation of the current value.</returns>
         public override string ToString()
         {
-            return Value.ToString();
+            return Value?.ToString() ?? "null";
         }
 
         #region Operator Overrides
@@ -99,7 +100,7 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="atomicReference">The <see cref="AtomicReference{T}"/> to convert.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator T(AtomicReference<T> atomicReference)
+        public static implicit operator T?(AtomicReference<T> atomicReference)
         {
             return atomicReference.Value;
         }

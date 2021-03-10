@@ -1,6 +1,7 @@
 ﻿using J2N.Numerics;
 using System;
 using SR2 = J2N.Resources.Strings;
+#nullable enable
 
 namespace J2N
 {
@@ -45,7 +46,9 @@ namespace J2N
 #if FEATURE_SERIALIZABLE_RANDOM
         [NonSerialized]
 #endif
+#pragma warning disable IDE0044 // Add readonly modifier
         private object syncRoot = new object(); // Not readonly for serializer
+#pragma warning restore IDE0044 // Add readonly modifier
 
         /// <summary>
         /// The backing field for the user. This is the value the user sets, and

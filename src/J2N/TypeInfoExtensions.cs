@@ -3,6 +3,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
+#nullable enable
 
 namespace J2N
 {
@@ -23,9 +24,14 @@ namespace J2N
         /// <param name="target">This <see cref="TypeInfo"/>.</param>
         /// <param name="interfaceType">The type of generic inteface to check.</param>
         /// <returns><c>true</c> if the type implements the generic interface; otherwise, <c>false</c>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="target"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="target"/> or <paramref name="interfaceType"/> is <c>null</c>.</exception>
         public static bool ImplementsGenericInterface(this TypeInfo target, Type interfaceType)
         {
+            if (target is null)
+                throw new ArgumentNullException(nameof(target));
+            if (interfaceType is null)
+                throw new ArgumentNullException(nameof(interfaceType));
+
             return target.IsGenericType && target.GetGenericTypeDefinition().GetInterfaces().Any(
                 x => x.GetTypeInfo().IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())
             );

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading.Atomic
 {
@@ -82,8 +83,10 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="other">The <see cref="AtomicBoolean"/> to compare with the current <see cref="AtomicBoolean"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicBoolean"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(AtomicBoolean other)
+        public bool Equals(AtomicBoolean? other)
         {
+            if (other is null)
+                return false;
             return Value == other.Value;
         }
 
@@ -104,7 +107,7 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="other">The <see cref="object"/> to compare with the current <see cref="AtomicBoolean"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicBoolean"/>; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other is AtomicBoolean ab)
                 return Equals(ab);

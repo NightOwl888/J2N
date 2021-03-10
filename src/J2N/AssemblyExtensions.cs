@@ -1,9 +1,11 @@
 ﻿using J2N.Collections.Concurrent;
 using J2N.Collections.Generic;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+#nullable enable
 
 namespace J2N
 {
@@ -32,7 +34,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(assembly));
 
             var resourceNames = assembly.GetManifestResourceNames();
-            string assemblyName = assembly.GetName().Name;
+            string assemblyName = assembly.GetName().Name!;
             string baseName = string.IsNullOrEmpty(suffix) ? assemblyName : assemblyName + '.' + suffix;
             int dotIndex = -1;
             do
@@ -78,14 +80,14 @@ namespace J2N
         /// <param name="name">The resource name to locate.</param>
         /// <returns>An open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="assembly"/> or <paramref name="name"/> is <c>null</c>.</exception>
-        public static Stream FindAndGetManifestResourceStream(this Assembly assembly, string name)
+        public static Stream? FindAndGetManifestResourceStream(this Assembly assembly, string name)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            string resourceName = FindResource(assembly, name);
+            string? resourceName = FindResource(assembly, name);
             if (string.IsNullOrEmpty(resourceName))
             {
                 return null;
@@ -120,7 +122,7 @@ namespace J2N
         /// <returns>An open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="assembly"/>, <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
         /// <seealso cref="TypeExtensions.FindAndGetManifestResourceStream(Type, string)"/>
-        public static Stream FindAndGetManifestResourceStream(this Assembly assembly, Type type, string name)
+        public static Stream? FindAndGetManifestResourceStream(this Assembly assembly, Type type, string name)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
@@ -129,7 +131,7 @@ namespace J2N
             if (name == null)
                 throw new ArgumentNullException(nameof(name));
 
-            string resourceName = FindResource(assembly, type, name);
+            string? resourceName = FindResource(assembly, type, name);
             if (string.IsNullOrEmpty(resourceName))
             {
                 return null;
@@ -164,7 +166,7 @@ namespace J2N
         /// <param name="name">The resource name to locate.</param>
         /// <returns>The resource, if found; if not found, returns <c>null</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="assembly"/> or <paramref name="name"/> is <c>null</c>.</exception>
-        public static string FindResource(this Assembly assembly, string name)
+        public static string? FindResource(this Assembly assembly, string name)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
@@ -175,12 +177,12 @@ namespace J2N
             return resourceCache.GetOrAdd(key, (key) =>
             {
                 string[] resourceNames = assembly.GetManifestResourceNames();
-                string resourceName = resourceNames.Where(x => x.Equals(name)).FirstOrDefault();
+                string? resourceName = resourceNames.Where(x => x.Equals(name)).FirstOrDefault();
 
                 // If resourceName is not null, we have an exact match, don't search
                 if (resourceName == null)
                 {
-                    string assemblyName = assembly.GetName().Name;
+                    string assemblyName = assembly.GetName().Name!;
                     int lastDot = assemblyName.LastIndexOf('.');
                     do
                     {
@@ -191,7 +193,7 @@ namespace J2N
                         // Continue searching by removing sections after the . from the assembly name
                         // until we have a match.
                         lastDot = assemblyName.LastIndexOf('.');
-                        assemblyName = lastDot >= 0 ? assemblyName.Substring(0, lastDot) : null;
+                        assemblyName = lastDot >= 0 ? assemblyName.Substring(0, lastDot) : null!;
 
                     } while (assemblyName != null && resourceName == null);
 
@@ -202,7 +204,7 @@ namespace J2N
                     }
                 }
 
-                return resourceName;
+                return resourceName!; // Null return okay
             });
         }
 
@@ -230,7 +232,7 @@ namespace J2N
         /// <param name="name">The resource name to locate.</param>
         /// <returns>The resource, if found; if not found, returns <c>null</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="assembly"/>, <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
-        public static string FindResource(this Assembly assembly, Type type, string name)
+        public static string? FindResource(this Assembly assembly, Type type, string name)
         {
             if (assembly == null)
                 throw new ArgumentNullException(nameof(assembly));
@@ -243,7 +245,7 @@ namespace J2N
             return resourceCache.GetOrAdd(key, (key) =>
             {
                 string[] resourceNames = assembly.GetManifestResourceNames();
-                string resourceName = resourceNames.Where(x => x.Equals(name, StringComparison.Ordinal)).FirstOrDefault();
+                string? resourceName = resourceNames.Where(x => x.Equals(name, StringComparison.Ordinal)).FirstOrDefault();
 
                 // If resourceName is not null, we have an exact match, don't search
                 if (resourceName == null)
@@ -252,20 +254,20 @@ namespace J2N
                     string assemblyName = type.GetTypeInfo().Assembly.GetName().Name;
                     string namespaceName = type.GetTypeInfo().Namespace;
 #else
-                    string assemblyName = type.Assembly.GetName().Name;
-                    string namespaceName = type.Namespace;
+                    string assemblyName = type.Assembly.GetName().Name!;
+                    string namespaceName = type.Namespace!;
 #endif
 
                     // Search by assembly + namespace
                     string resourceToFind = string.Concat(namespaceName, ".", name);
                     if (!TryFindResource(resourceNames, assemblyName, resourceToFind, name, out resourceName))
                     {
-                        string found1 = resourceName;
+                        string? found1 = resourceName;
 
                         // Search by namespace only
                         if (!TryFindResource(resourceNames, null, resourceToFind, name, out resourceName))
                         {
-                            string found2 = resourceName;
+                            string? found2 = resourceName;
 
                             // Search by assembly name only
                             resourceToFind = string.Concat(assemblyName, ".", name);
@@ -277,15 +279,15 @@ namespace J2N
                         }
                     }
                 }
-                return resourceName;
+                return resourceName!; // Null return okay
             });
         }
 
-        private static bool TryFindResource(string[] resourceNames, string prefix, string resourceName, string exactResourceName, out string result)
+        private static bool TryFindResource(string[] resourceNames, [AllowNull, MaybeNull] string prefix, string resourceName, string exactResourceName, [MaybeNullWhen(false)] out string result)
         {
             if (!resourceNames.Contains(resourceName))
             {
-                string nameToFind = null;
+                string? nameToFind = null;
                 while (resourceName.Length > 0 && resourceName.Contains('.') && (!(string.IsNullOrEmpty(prefix)) || resourceName.Equals(exactResourceName, StringComparison.Ordinal)))
                 {
                     nameToFind = string.IsNullOrEmpty(prefix)
@@ -315,16 +317,16 @@ namespace J2N
 
         private struct TypeAndResource : IEquatable<TypeAndResource>
         {
-            private readonly Type type;
+            private readonly Type? type;
             private readonly string name;
 
-            public TypeAndResource(Type type, string name)
+            public TypeAndResource(Type? type, string name)
             {
                 this.type = type;
                 this.name = name;
             }
 
-            public override bool Equals(object obj)
+            public override bool Equals(object? obj)
             {
                 if (obj is TypeAndResource other)
                     return Equals(other);
@@ -334,13 +336,17 @@ namespace J2N
 
             public bool Equals(TypeAndResource other)
             {
+#pragma warning disable CS8604 // Possible null reference argument. We allow null values.
                 return EqualityComparer<Type>.Default.Equals(this.type, other.type) &&
                     EqualityComparer<string>.Default.Equals(this.name, other.name);
+#pragma warning restore CS8604 // Possible null reference argument.
             }
 
             public override int GetHashCode()
             {
+#pragma warning disable CS8604 // Possible null reference argument. We allow null values.
                 return EqualityComparer<Type>.Default.GetHashCode(this.type) ^ EqualityComparer<string>.Default.GetHashCode(this.name);
+#pragma warning restore CS8604 // Possible null reference argument.
             }
         }
     }

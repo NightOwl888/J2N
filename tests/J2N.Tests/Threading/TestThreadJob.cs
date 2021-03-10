@@ -1106,50 +1106,50 @@ namespace J2N.Threading
             th.Start();
         }
 
-        /**
-         * @tests java.lang.Thread#resume()
-         */
-        [Test]
-        [Ignore("TODO: Fix this test")]
-        public void Test_resume()
-        {
-            // Test for method void java.lang.Thread.resume()
-            int orgval;
-            ResSupThread res;
-            Thread t;
-#if FEATURE_THREADINTERRUPT
-            try
-            {
-#endif
-                res = new ResSupThread(Thread.CurrentThread);
-                t = new Thread(() => res.Run());
-                lock (t)
-                {
-                    ct = new ThreadJob(t, "Interrupt Test2");
-                    ct.Start();
-                    //t.wait();
-                    Monitor.Wait(t);
-                }
-                ct.Suspend();
-                // Wait to be sure the suspend has occurred
-                ThreadJob.Sleep(500);
-                orgval = res.getCheckVal();
-                // Wait to be sure the thread is suspended
-                ThreadJob.Sleep(500);
-                assertTrue("Failed to suspend thread", orgval == res.getCheckVal());
-                ct.Resume();
-                // Wait to be sure the resume has occurred.
-                ThreadJob.Sleep(500);
-                assertTrue("Failed to resume thread", orgval != res.getCheckVal());
-#if FEATURE_THREADINTERRUPT
-                ct.Interrupt();
-            }
-            catch (ThreadInterruptedException e)
-            {
-                fail("Unexpected interrupt occurred : " + e.Message);
-            }
-#endif
-        }
+//        /**
+//         * @tests java.lang.Thread#resume()
+//         */
+//        [Test]
+//        [Ignore("TODO: Fix this test")]
+//        public void Test_resume()
+//        {
+//            // Test for method void java.lang.Thread.resume()
+//            int orgval;
+//            ResSupThread res;
+//            Thread t;
+//#if FEATURE_THREADINTERRUPT
+//            try
+//            {
+//#endif
+//                res = new ResSupThread(Thread.CurrentThread);
+//                t = new Thread(() => res.Run());
+//                lock (t)
+//                {
+//                    ct = new ThreadJob(t, "Interrupt Test2");
+//                    ct.Start();
+//                    //t.wait();
+//                    Monitor.Wait(t);
+//                }
+//                ct.Suspend();
+//                // Wait to be sure the suspend has occurred
+//                ThreadJob.Sleep(500);
+//                orgval = res.getCheckVal();
+//                // Wait to be sure the thread is suspended
+//                ThreadJob.Sleep(500);
+//                assertTrue("Failed to suspend thread", orgval == res.getCheckVal());
+//                ct.Resume();
+//                // Wait to be sure the resume has occurred.
+//                ThreadJob.Sleep(500);
+//                assertTrue("Failed to resume thread", orgval != res.getCheckVal());
+//#if FEATURE_THREADINTERRUPT
+//                ct.Interrupt();
+//            }
+//            catch (ThreadInterruptedException e)
+//            {
+//                fail("Unexpected interrupt occurred : " + e.Message);
+//            }
+//#endif
+//        }
 
         private class RunThread //: IRunnable
         {

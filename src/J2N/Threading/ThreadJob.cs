@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading
 {
@@ -34,7 +35,7 @@ namespace J2N.Threading
         /// <summary>
         /// The name of the thread before it is started.
         /// </summary>
-        private string name;
+        private string? name;
 
         /// <summary>
         /// The exception (if any) caught on the running thread
@@ -42,7 +43,7 @@ namespace J2N.Threading
         /// calling <see cref="Join()"/>, <see cref="Join(long)"/>, 
         /// or <see cref="Join(long, int)"/>.
         /// </summary>
-        private Exception exception;
+        private Exception? exception;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadJob"/> class.
@@ -96,12 +97,13 @@ namespace J2N.Threading
 
        
 
-        // Constructor for testing resume
-        internal ThreadJob(Thread thread, string threadName)
-        {
-            this.thread = thread ?? throw new ArgumentNullException(nameof(thread));
-            this.name = threadName;
-        }
+        //// Constructor for testing resume
+        // TODO: Finish implementation
+        //internal ThreadJob(Thread thread, string threadName)
+        //{
+        //    this.thread = thread ?? throw new ArgumentNullException(nameof(thread));
+        //    this.name = threadName;
+        //}
 
         /// <summary>
         /// Safely starts the method passed to <paramref name="start"/> and stores any exception that is
@@ -185,7 +187,7 @@ namespace J2N.Threading
         }
 
         [ThreadStatic]
-        private static ThreadJob thisInstance = null;
+        private static ThreadJob? thisInstance = null;
 
         /// <summary>
         /// Gets the currently running thread as a <see cref="ThreadJob"/>.
@@ -210,7 +212,7 @@ namespace J2N.Threading
         /// Gets or sets the name of the thread.
         /// </summary>
         /// <exception cref="ArgumentNullException">When setting the value to <c>null</c>.</exception>
-        public string Name
+        public string? Name
         {
             get => name;
             set => this.name = value ?? throw new ArgumentNullException(nameof(value));
@@ -298,7 +300,7 @@ namespace J2N.Threading
             if (exception != null)
             {
                 if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"].ToString(), exception);
+                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
                 else
                     throw exception;
             }
@@ -314,7 +316,7 @@ namespace J2N.Threading
             if (exception != null)
             {
                 if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"].ToString(), exception);
+                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
                 else
                     throw exception;
             }
@@ -333,7 +335,7 @@ namespace J2N.Threading
             if (exception != null)
             {
                 if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"].ToString(), exception);
+                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
                 else
                     throw exception;
             }
@@ -495,10 +497,10 @@ namespace J2N.Threading
         /// </summary>
         /// <param name="other">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(Thread other)
+        public bool Equals(Thread? other)
         {
-            if (other == null)
-                return thread == null;
+            if (other is null)
+                return thread is null;
             return this.thread.Equals(other);
         }
 
@@ -507,10 +509,10 @@ namespace J2N.Threading
         /// </summary>
         /// <param name="other">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public bool Equals(ThreadJob other)
+        public bool Equals(ThreadJob? other)
         {
             if (other is null)
-                return thread == null;
+                return thread is null;
             return this.thread.Equals(other);
         }
 
@@ -519,7 +521,7 @@ namespace J2N.Threading
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is ThreadJob other)
                 return this.thread.Equals(other.thread);

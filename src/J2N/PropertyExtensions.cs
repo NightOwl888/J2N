@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
 using SR2 = J2N.Resources.Strings;
 using StringBuffer = System.Text.StringBuilder;
+#nullable enable
 
 namespace J2N
 {
@@ -33,6 +35,7 @@ namespace J2N
         /// key value pairs that correspond to property names and values.</param>
         /// <param name="name">The name of the property.</param>
         /// <returns>The named property value, or <c>false</c> if it can't be found.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static bool GetPropertyAsBoolean(this IDictionary<string, string> properties, string name)
         {
             return GetPropertyAsBoolean(properties, name, false);
@@ -48,8 +51,14 @@ namespace J2N
         /// <param name="defaultValue">The value to use if the property does not exist
         /// or the value cannot be cast to <see cref="bool"/>.</param>
         /// <returns>The named property value, or <paramref name="defaultValue"/> if it can't be found or cannot be converted to a <see cref="bool"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static bool GetPropertyAsBoolean(this IDictionary<string, string> properties, string name, bool defaultValue)
         {
+            if (properties is null)
+                throw new ArgumentNullException(nameof(properties));
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+
             return GetProperty(properties, name, defaultValue,
                 (stringValue) =>
                 {
@@ -67,6 +76,7 @@ namespace J2N
         /// <param name="name">The name of the property.</param>
         /// <returns>The named property value, or <c>0</c> if it can't be found or cannot be
         /// converted to a <see cref="int"/> using the ambient culture.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static int GetPropertyAsInt32(this IDictionary<string, string> properties, string name)
         {
             return GetPropertyAsInt32(properties, name, 0);
@@ -82,6 +92,7 @@ namespace J2N
         /// <param name="name">The name of the property.</param>
         /// <returns>The named property value, or <c>0</c> if it can't be found or cannot be
         /// converted to a <see cref="int"/> using <paramref name="provider"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static int GetPropertyAsInt32(this IDictionary<string, string> properties, IFormatProvider provider, string name)
         {
             return GetPropertyAsInt32(properties, provider, name, 0);
@@ -99,8 +110,14 @@ namespace J2N
         /// be converted to <see cref="int"/> using the ambient culture.</param>
         /// <returns>The named property value, or <paramref name="defaultValue"/> if it can't be found or cannot be
         /// converted to a <see cref="int"/> using the ambient culture.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static int GetPropertyAsInt32(this IDictionary<string, string> properties, string name, int defaultValue)
         {
+            if (properties is null)
+                throw new ArgumentNullException(nameof(properties));
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+
             return GetProperty(properties, name, defaultValue,
                 (stringValue) =>
                 {
@@ -122,8 +139,14 @@ namespace J2N
         /// be converted to <see cref="int"/> using <paramref name="provider"/>.</param>
         /// <returns>The named property value, or <paramref name="defaultValue"/> if it can't be found or cannot be
         /// converted to a <see cref="int"/> using <paramref name="provider"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static int GetPropertyAsInt32(this IDictionary<string, string> properties, IFormatProvider provider, string name, int defaultValue)
         {
+            if (properties is null)
+                throw new ArgumentNullException(nameof(properties));
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
+
             return GetProperty(properties, name, defaultValue,
                 (stringValue) =>
                 {
@@ -137,7 +160,7 @@ namespace J2N
             if (properties == null)
                 throw new ArgumentNullException(nameof(properties));
 
-            if (properties.TryGetValue(key, out string setting))
+            if (properties.TryGetValue(key, out string? setting))
                 return string.IsNullOrEmpty(setting)
                     ? defaultValue
                     : conversionFunction(setting);
@@ -154,12 +177,15 @@ namespace J2N
         /// key value pairs that correspond to property names and values.</param>
         /// <param name="name">The name of the property to find.</param>
         /// <returns>The named property value, or <c>null</c> if it can't be found.</returns>
-        public static string GetProperty(this IDictionary<string, string> properties, string name)
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
+        public static string? GetProperty(this IDictionary<string, string> properties, string name)
         {
-            if (properties == null)
+            if (properties is null)
                 throw new ArgumentNullException(nameof(properties));
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
 
-            return properties.TryGetValue(name, out string value) ? value : null;
+            return properties.TryGetValue(name, out string? value) ? value : null;
         }
 
         /// <summary>
@@ -169,14 +195,17 @@ namespace J2N
         /// <param name="properties">A <see cref="IDictionary{String, String}"/> containing
         /// key value pairs that correspond to property names and values.</param>
         /// <param name="name">The name of the property to find.</param>
-        /// <param name="defaultValue"></param>
+        /// <param name="defaultValue">The value to use if property does not exist.</param>
         /// <returns>The named property value, or <paramref name="defaultValue"/> if it can't be found.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string GetProperty(this IDictionary<string, string> properties, string name, string defaultValue)
         {
-            if (properties == null)
+            if (properties is null)
                 throw new ArgumentNullException(nameof(properties));
+            if (name is null)
+                throw new ArgumentNullException(nameof(name));
 
-            return properties.TryGetValue(name, out string value) ? value : defaultValue;
+            return properties.TryGetValue(name, out string? value) ? (!string.IsNullOrEmpty(value) ? value : defaultValue) : defaultValue;
         }
 
         /// <summary>
@@ -719,13 +748,13 @@ namespace J2N
                 inCharBuf = new char[8192];
             }
 
-            internal byte[] inByteBuf;
-            internal char[] inCharBuf;
+            internal byte[]? inByteBuf;
+            internal char[]? inCharBuf;
             internal char[] lineBuf = new char[1024];
             internal int inLimit = 0;
             internal int inOff = 0;
-            internal Stream inStream;
-            internal TextReader reader;
+            internal Stream? inStream;
+            internal TextReader? reader;
 
             internal int ReadLine()
             {
@@ -743,8 +772,8 @@ namespace J2N
                 {
                     if (inOff >= inLimit)
                     {
-                        inLimit = (inStream == null) ? reader.Read(inCharBuf, 0, inCharBuf.Length)
-                                                  : inStream.Read(inByteBuf, 0, inByteBuf.Length);
+                        inLimit = (inStream is null) ? reader!.Read(inCharBuf!, 0, inCharBuf!.Length)
+                                                  : inStream!.Read(inByteBuf!, 0, inByteBuf!.Length);
                         inOff = 0;
                         if (inLimit <= 0)
                         {
@@ -759,11 +788,11 @@ namespace J2N
                     {
                         //The line below is equivalent to calling a
                         //ISO8859-1 decoder.
-                        c = (char)(0xff & inByteBuf[inOff++]);
+                        c = (char)(0xff & inByteBuf![inOff++]);
                     }
                     else
                     {
-                        c = inCharBuf[inOff++];
+                        c = inCharBuf![inOff++];
                     }
                     if (skipLF)
                     {
@@ -833,9 +862,9 @@ namespace J2N
                         }
                         if (inOff >= inLimit)
                         {
-                            inLimit = (inStream == null)
-                                      ? reader.Read(inCharBuf, 0, inCharBuf.Length)
-                                      : inStream.Read(inByteBuf, 0, inByteBuf.Length);
+                            inLimit = (inStream is null)
+                                      ? reader!.Read(inCharBuf!, 0, inCharBuf!.Length)
+                                      : inStream!.Read(inByteBuf!, 0, inByteBuf!.Length);
                             inOff = 0;
                             if (inLimit <= 0)
                             {
@@ -1072,7 +1101,7 @@ namespace J2N
             bw.WriteLine();
         }
 
-        private static void Store0(IDictionary<string, string> properties, TextWriter bw, string comments, bool escUnicode)
+        private static void Store0(IDictionary<string, string> properties, TextWriter bw, [AllowNull, MaybeNull] string comments, bool escUnicode)
         {
             if (comments != null)
             {
