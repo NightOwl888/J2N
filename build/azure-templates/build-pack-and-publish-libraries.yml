@@ -23,7 +23,7 @@ parameters:
 
 
 steps:
-- powershell: |
+- pwsh: |
     function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
         if ([string]::IsNullOrEmpty($param)) {
             Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
@@ -87,7 +87,7 @@ steps:
   # Loops through each framework in the TestTargetFrameworks variable and
   # publishes the project in the artifact staging directory with the framework
   # and project name as part of the folder structure.
-- powershell: |
+- pwsh: |
     $testTargetFrameworksString = "${{ parameters.testTargetFrameworks }}"
     $outputRoot = "$(Build.ArtifactStagingDirectory)/${{ parameters.binaryArtifactName }}"
     $configuration = "${{ parameters.buildConfiguration }}"

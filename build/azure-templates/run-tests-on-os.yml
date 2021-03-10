@@ -14,7 +14,7 @@ parameters:
   maximumAllowedFailures: 0
 
 steps:
-- powershell: |
+- pwsh: |
     function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
         if ([string]::IsNullOrEmpty($param)) {
             Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
@@ -54,7 +54,7 @@ steps:
     artifactName: ${{ parameters.binaryArtifactName }}
     downloadPath: '$(System.DefaultWorkingDirectory)'
 
-- powershell: |
+- pwsh: |
     $testTargetFrameworksString = '${{ parameters.testTargetFrameworks }}'
     $testBinaryRootDirectory = "$(System.DefaultWorkingDirectory)"
     $testResultsArtifactDirectory = "${{ format('$(Build.ArtifactStagingDirectory)/{0}',parameters.testResultsArtifactName) }}"

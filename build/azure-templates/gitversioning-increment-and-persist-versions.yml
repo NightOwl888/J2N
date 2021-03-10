@@ -17,7 +17,7 @@ parameters:
 
 
 steps:
-- powershell: |
+- pwsh: |
     function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
         if ([string]::IsNullOrEmpty($param)) {
             Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
@@ -40,7 +40,7 @@ steps:
 - script: nbgv cloud --common-vars --all-vars
   displayName: 'Set Version'
 
-- powershell: |
+- pwsh: |
     $environmentVars = Get-ChildItem -path env:* | sort Name
     foreach($var in $environmentVars)
     {
@@ -50,14 +50,14 @@ steps:
     }
   displayName: 'Show all Environment Variables'
 
-- powershell: |
+- pwsh: |
     Write-Host "##vso[task.setvariable variable=InformationalVersion;]$env:NBGV_ASSEMBLYINFORMATIONALVERSION"
     Write-Host "##vso[task.setvariable variable=FileVersion;]$env:NBGV_ASSEMBLYFILEVERSION"
     Write-Host "##vso[task.setvariable variable=AssemblyVersion;]$env:NBGV_ASSEMBLYVERSION"
     Write-Host "##vso[task.setvariable variable=PackageVersion;]$env:NBGV_NUGETPACKAGEVERSION"
   displayName: 'Write Output Parameters'
 
-- powershell: |
+- pwsh: |
     $dir = '$(Build.ArtifactStagingDirectory)/${{ parameters.versionArtifactName }}'
     if (!(Test-Path $dir)) { New-Item -ItemType Directory -Path "$dir" -Force }
     '$(PackageVersion)' | Out-File -FilePath "$dir/${{ parameters.packageVersionFileName }}" -Force
