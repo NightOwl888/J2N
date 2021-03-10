@@ -338,9 +338,7 @@ namespace J2N.IO
             {
                 dfs.Write(data, 0, -5);
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException ie)
-#pragma warning restore 168
             {
                 caughtException = true;
             }
@@ -356,9 +354,7 @@ namespace J2N.IO
             {
                 dfs.Write(data, -2, 5);
             }
-#pragma warning disable 168
             catch (ArgumentOutOfRangeException ie)
-#pragma warning restore 168
             {
                 caughtException = true;
             }
@@ -374,9 +370,7 @@ namespace J2N.IO
             {
                 dfs.Write(data, 6, 5);
             }
-#pragma warning disable 168
             catch (ArgumentException ie)
-#pragma warning restore 168
             {
                 caughtException = true;
             }
@@ -392,9 +386,7 @@ namespace J2N.IO
             {
                 dfs.Write(null, 0, 5);
             }
-#pragma warning disable 168
             catch (ArgumentNullException re)
-#pragma warning restore 168
             {
                 caughtException = true;
             }

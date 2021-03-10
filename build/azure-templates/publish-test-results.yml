@@ -4,12 +4,13 @@ parameters:
   testProjectName: '' # The name of the test project
   framework: '' # The target framework for display purposes.
   osName: '' # The name of the operating system for display purposes.
+  testPlatform: 'x64' # Target platform architecture used for test execution. The allowed values depend on the type of architecture being targeted (x86, x86_64, x64, ARM, etc.).
   testResultsFormat: VSTest # Specify the format of the results files you want to publish. The following formats are supported: JUnit, NUnit, VSTest, XUnit, CTest
   testResultsArtifactName: 'testresults' # The name of the Azure DevOps build artifact where the test results will be published. Default 'testresults'.
   testResultsFileName: 'TestResults.trx' # The name of the file (not path) of the test results. Default 'TestResults.trx'.
 
 steps:
-- powershell: |
+- pwsh: |
     function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
         if ([string]::IsNullOrEmpty($param)) {
             Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
@@ -19,6 +20,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.testProjectName }}', 'testProjectName')
     EnsureNotNullOrEmpty('${{ parameters.framework }}', 'framework')
     EnsureNotNullOrEmpty('${{ parameters.osName }}', 'osName')
+    EnsureNotNullOrEmpty('${{ parameters.testPlatform }}', 'testPlatform')
     EnsureNotNullOrEmpty('${{ parameters.testResultsFormat }}', 'testResultsFormat')
     EnsureNotNullOrEmpty('${{ parameters.testResultsArtifactName }}', 'testResultsArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
@@ -27,45 +29,65 @@ steps:
 #- template: 'show-all-files.yml' # Uncomment for debugging
 
 - pwsh: |
+    $testResultsFormat = "${{ parameters.testResultsFormat }}"
     $testProjectName = "${{ parameters.testProjectName }}"
-    $testResultsFileName = "$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}/${{ parameters.osName }}/${{ parameters.framework }}/${{ parameters.vsTestPlatform }}/$testProjectName/${{ parameters.testResultsFileName }}"
+    $testResultsFileName = "$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}/${{ parameters.osName }}/${{ parameters.framework }}/${{ parameters.testPlatform }}/$testProjectName/${{ parameters.testResultsFileName }}"
     $testResultsFileExists = Test-Path $testResultsFileName
     if ($testResultsFileExists) {
     
         $reader = [System.Xml.XmlReader]::Create($testResultsFileName)
         try {
-            $countersFound = $false
-            $crashed = $false
-            $inRunInfos = $false
-            while ($reader.Read()) {
-                if ($reader.NodeType -eq [System.Xml.XmlNodeType]::Element) {
-                    if (!$countersFound -and $reader.Name -eq 'Counters') {
-                        $failed = $reader.GetAttribute('failed')
-                        $passed = $reader.GetAttribute('passed')
-                        $ignored = (([int]$reader.GetAttribute('total')) - ([int]$reader.GetAttribute('executed'))).ToString()
-                        $testResults = "Tests failed: $failed, passed: $passed, ignored: $ignored"
-                        Write-Host "##vso[task.setvariable variable=TestResults;]$testResults"
-                        # Report a running total of failures
-                        $totalFailures = ([int]$env:TOTALFAILURES + [int]$failed).ToString()
-                        Write-Host "##vso[task.setvariable variable=TotalFailures;]$totalFailures"
-                        $countersFound = $true
-                    }
-                    # Report a crash of the test runner
-                    if ($reader.Name -eq 'RunInfos') {
-                        $inRunInfos = $true
-                    }
-                    if ($inRunInfos -and !$crashed -and $reader.Name -eq 'Text' -and $reader.ReadInnerXml().Contains('Test host process crashed')) {
-                        Write-Host "##vso[task.setvariable variable=HostCrashed;]true"
-                        # Report all of the test projects that crashed
-                        $crashedRuns = "$env:CRASHEDRUNS,$testProjectName".TrimStart(',')
-                        Write-Host "##vso[task.setvariable variable=CrashedRuns;]$crashedRuns"
-                        $crashed = $true
+            if ($testResultsFormat.ToUpperInvariant() -eq 'NUNIT') {
+                $assemblyFound = $false
+                while ($reader.Read()) {
+                    if ($reader.NodeType -eq [System.Xml.XmlNodeType]::Element) {
+                        if (!$assemblyFound -and $reader.Name -eq 'test-suite' `
+                            -and $reader.GetAttribute('type') -eq 'Assembly' `
+                            -and $reader.GetAttribute('name') -eq "$testProjectName.dll") {
+                            $failed = $reader.GetAttribute('failed')
+                            $passed = $reader.GetAttribute('passed')
+                            $ignored = (([int]$reader.GetAttribute('inconclusive')) + ([int]$reader.GetAttribute('skipped'))).ToString()
+                            $assemblyFound = $true
+                        }
                     }
                 }
-                if ($reader.NodeType -eq [System.Xml.XmlNodeType]::EndElement -and $reader.Name -eq 'RunInfos') {
-                    $inRunInfos = $false
+            } else { # VSTest
+                $countersFound = $false
+                $crashed = $false
+                $inRunInfos = $false
+                while ($reader.Read()) {
+                    if ($reader.NodeType -eq [System.Xml.XmlNodeType]::Element) {
+                        if (!$countersFound -and $reader.Name -eq 'Counters') {
+                            $failed = $reader.GetAttribute('failed')
+                            $passed = $reader.GetAttribute('passed')
+                            $ignored = (([int]$reader.GetAttribute('total')) - ([int]$reader.GetAttribute('executed'))).ToString()
+                            $countersFound = $true
+                        }
+                        # Report a crash of the test runner (dotnet test with NUnit runner)
+                        if ($reader.Name -eq 'RunInfos') {
+                            $inRunInfos = $true
+                        }
+                        if ($inRunInfos -and !$crashed -and $reader.Name -eq 'Text' -and $reader.ReadInnerXml().Contains('Test host process crashed')) {
+                            Write-Host "##vso[task.setvariable variable=HostCrashed;]true"
+                            # Report all of the test projects that crashed
+                            $crashedRuns = "$env:CRASHEDRUNS,$testProjectName".TrimStart(',')
+                            Write-Host "##vso[task.setvariable variable=CrashedRuns;]$crashedRuns"
+                            $crashed = $true
+                        }
+                    }
+                    if ($reader.NodeType -eq [System.Xml.XmlNodeType]::EndElement -and $reader.Name -eq 'RunInfos') {
+                        $inRunInfos = $false
+                    }
                 }
             }
+
+            # Build the display string for the title
+            $testResults = "Tests failed: $failed, passed: $passed, ignored: $ignored"
+            Write-Host "##vso[task.setvariable variable=TestResults;]$testResults"
+
+            # Report a running total of failures
+            $totalFailures = ([int]$env:TOTALFAILURES + [int]$failed).ToString()
+            Write-Host "##vso[task.setvariable variable=TotalFailures;]$totalFailures"
         } finally {
             $reader.Dispose()
         }
@@ -76,9 +98,9 @@ steps:
   displayName: 'Parse Test Results File'
 
 - task: PublishTestResults@2
-  displayName: 'Publish Test Results ${{ parameters.testProjectName }},${{ parameters.framework }}'
+  displayName: 'Publish Test Results ${{ parameters.testProjectName }},${{ parameters.framework }},${{ parameters.testPlatform }}'
   inputs:
     testResultsFormat: ${{ parameters.testResultsFormat }}
-    testResultsFiles: '$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}/${{ parameters.osName }}/${{ parameters.framework }}/${{ parameters.testProjectName }}/${{ parameters.testResultsFileName }}'
-    testRunTitle: '${{ parameters.testProjectName }} - ${{ parameters.framework }} - ${{ parameters.osName }} | $(TestResults)'
+    testResultsFiles: '$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}/${{ parameters.osName }}/${{ parameters.framework }}/${{ parameters.testPlatform }}/${{ parameters.testProjectName }}/${{ parameters.testResultsFileName }}'
+    testRunTitle: '${{ parameters.testProjectName }} - ${{ parameters.framework }} - ${{ parameters.testPlatform }} - ${{ parameters.osName }} | $(TestResults)'
   condition: and(succeeded(), eq(variables['TestResultsFileExists'], 'true'))

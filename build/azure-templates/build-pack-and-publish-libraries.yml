@@ -23,7 +23,7 @@ parameters:
 
 
 steps:
-- powershell: |
+- pwsh: |
     function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
         if ([string]::IsNullOrEmpty($param)) {
             Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
@@ -44,9 +44,9 @@ steps:
   displayName: 'Validate Template Parameters'
 
 - task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 3.1.404'
+  displayName: 'Use .NET sdk 5.0.100'
   inputs:
-    version: 3.1.404
+    version: 5.0.100
 
   # Runs dotnet build 
 - task: DotNetCoreCLI@2
@@ -87,7 +87,7 @@ steps:
   # Loops through each framework in the TestTargetFrameworks variable and
   # publishes the project in the artifact staging directory with the framework
   # and project name as part of the folder structure.
-- powershell: |
+- pwsh: |
     $testTargetFrameworksString = "${{ parameters.testTargetFrameworks }}"
     $outputRoot = "$(Build.ArtifactStagingDirectory)/${{ parameters.binaryArtifactName }}"
     $configuration = "${{ parameters.buildConfiguration }}"
@@ -100,10 +100,3 @@ steps:
         dotnet publish --output "$outputPath" --framework "$framework" --configuration "$configuration" --no-build --no-restore --verbosity normal /p:TestAllTargetFrameworks=true
     }
   displayName: 'dotnet publish'
-
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Artifact: ${{ parameters.binaryArtifactName }}'
-  inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.binaryArtifactName }}'
-    ArtifactName: '${{ parameters.binaryArtifactName }}'
-  condition: succeededOrFailed()

@@ -103,7 +103,7 @@ namespace J2N.Collections
                     elementType.IsPrimitive;
 #endif
                 if (isPrimitive)
-                    return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).Equals(objA, objB);
+                    return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).Equals(objA, objB);
 
                 var eA = arrayA.GetEnumerator();
                 var eB = arrayB.GetEnumerator();
@@ -248,7 +248,7 @@ namespace J2N.Collections
                     elementType.IsPrimitive;
 #endif
                 if (isPrimitive)
-                    return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).GetHashCode(obj);
+                    return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).GetHashCode(obj);
 
                 int hashCode = 1, elementHashCode;
                 foreach (var element in array)

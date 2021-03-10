@@ -1,6 +1,12 @@
 <Project>
+  
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
-  <PropertyGroup>
-    <NoWarn>$(NoWarn);1591</NoWarn>
+  
+  <PropertyGroup Label="Warnings to be Disabled in Test Projects">
+    <NoWarn Label="Do not catch general exception types">$(NoWarn);CA1031</NoWarn>
+    
+    <NoWarn Label="The variable 'var' is declared but never used">$(NoWarn);CS0168</NoWarn>
+    <NoWarn Label="Missing XML comment for publicly visible type or member 'Type_or_Member'">$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
+  
 </Project>

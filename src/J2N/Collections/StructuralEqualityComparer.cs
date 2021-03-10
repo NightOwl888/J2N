@@ -97,7 +97,7 @@ namespace J2N.Collections
 #endif
             if (isPrimitive && elementTypeX!.Equals(arrayY.GetType().GetElementType()))
             {
-                return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementTypeX).Equals(arrayX, arrayY);
+                return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementTypeX).Equals(arrayX, arrayY);
             }
 
             // Types don't match, or they are object[].
@@ -177,7 +177,7 @@ namespace J2N.Collections
                 elementType.IsPrimitive;
 #endif
             if (isPrimitive)
-                return ArrayEqualityComparer<object>.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).GetHashCode(array);
+                return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).GetHashCode(array);
 
             // Fallback for other array types - enumerate them
             int hashCode = 1, elementHashCode;

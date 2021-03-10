@@ -1,7 +1,16 @@
 <Project>
-  <ItemGroup Label="Test Project Common References">
+  <!-- Test projects for Xamarin will consume the assembly as .NET Standard, so we need to adjust the dependencies -->
+  <PropertyGroup Condition=" !$(TargetFramework.StartsWith('netstandard')) ">
+    <!-- This version contains the TimeoutAttribute for .NET Core -->
+    <NUnitPackageReferenceVersion>3.12.0</NUnitPackageReferenceVersion>
+  </PropertyGroup>
+
+  <ItemGroup Label="Test Project Common References" Condition=" !$(TargetFramework.StartsWith('netstandard')) ">
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageReferenceVersion)" />
-    <PackageReference Include="NUnit" Version="$(NUnitPackageReferenceVersion)" />
     <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3TestAdapterPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Label="Test Project Common References">
+    <PackageReference Include="NUnit" Version="$(NUnitPackageReferenceVersion)" />
   </ItemGroup>
 </Project>

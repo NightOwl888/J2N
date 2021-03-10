@@ -54,7 +54,7 @@ namespace J2N.IO.MemoryMappedFiles
         }
 
         [Test]
-        public void TestReadOnly()
+        public void TestReadOnly() //"Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423"
         {
             using (var fis = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.Read))
             using (var fc = MemoryMappedFile.CreateFromFile(fis, null, 0, MemoryMappedFileAccess.Read,
@@ -120,7 +120,7 @@ namespace J2N.IO.MemoryMappedFiles
          * @throws IOException
          */
         [Test]
-        public void TestEmptyBuffer()
+        public void TestEmptyBuffer() //"Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423"
         {
             // Map empty file
             //    FileInputStream fis = new FileInputStream(emptyFile);
@@ -321,7 +321,7 @@ namespace J2N.IO.MemoryMappedFiles
 
 
         [Test]
-        public void Test_Position()
+        public void Test_Position() //"Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423"
         {
             var tmp = new FileInfo(Path.GetTempFileName());
 
@@ -437,7 +437,7 @@ namespace J2N.IO.MemoryMappedFiles
             }
 
             [Test]
-            public void TestFlush() // Force.java
+            public void TestFlush() // Force.java //"Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423"
             {
                 long fileSize = Random.Next(3 * 1024 * 1024);
                 int cut = Random.Next((int)fileSize);
@@ -470,7 +470,7 @@ namespace J2N.IO.MemoryMappedFiles
             //}
 
             [Test]
-            public void TestZeroMap()
+            public void TestZeroMap() //"Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423"
             {
                 long fileSize = Random.Next(1024 * 1024);
                 int cut = Random.Next((int)fileSize);

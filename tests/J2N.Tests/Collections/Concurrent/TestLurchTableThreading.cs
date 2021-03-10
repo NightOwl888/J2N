@@ -27,9 +27,9 @@ namespace J2N.Collections.Concurrent
     {
         private const int MAXTHREADS = 8;
         private const int COUNT = 1000;
-        static LurchTable<Guid, T> CreateMap<T>()
+        static LurchTable<HashCollider, T> CreateMap<T>()
         {
-            var ht = new LurchTable<Guid, T>(COUNT, LurchTableOrder.Access);
+            var ht = new LurchTable<HashCollider, T>(COUNT, LurchTableOrder.Access);
             return ht;
         }
 
@@ -67,26 +67,21 @@ namespace J2N.Collections.Concurrent
             Trace.TraceInformation("Execution time: {0}", timer.Elapsed);
         }
 
-        // TODO: For some reason, this logic depends on the underlying
-        // implementation of Guid.NewGuid(), which has changed in .NET Core 2.0.
-        // But the functionality of LurchTable seems unaffected by this change.
-#if !NETCOREAPP
         [Test]
-        public void TestGuidHashCollision()
+        public void TestHashCollision()
         {
-            Guid id1 = Guid.NewGuid();
-            Guid id2 = NextHashCollision(id1);
+            HashCollider id1 = new HashCollider(Guid.NewGuid().GetHashCode(), 0);
+            HashCollider id2 = NextHashCollision(Guid.NewGuid().GetHashCode(), ref id1);
 
             Assert.AreNotEqual(id1, id2);
             Assert.AreEqual(id1.GetHashCode(), id2.GetHashCode());
         }
-#endif
 
         [Test]
         public void TestLimitedInsert()
         {
-            var Map = new LurchTable<Guid, bool>(LurchTableOrder.Access, 1000);
-            var ids = CreateSample(Guid.NewGuid(), 1000000, 0);
+            var Map = new LurchTable<HashCollider, bool>(LurchTableOrder.Access, 1000);
+            var ids = CreateSample(0, 1000000, 0);
 
             Parallel(1, ids,
                      id =>
@@ -103,7 +98,7 @@ namespace J2N.Collections.Concurrent
         public void TestInsert()
         {
             var Map = CreateMap<bool>();
-            var ids = CreateSample(Guid.NewGuid(), COUNT, 4);
+            var ids = CreateSample(0, COUNT, 4);
 
             bool test;
             Parallel(1, ids, id => { Assert.IsTrue(Map.TryAdd(id, true)); });
@@ -117,7 +112,7 @@ namespace J2N.Collections.Concurrent
         public void TestDelete()
         {
             var Map = CreateMap<bool>();
-            var ids = CreateSample(Guid.NewGuid(), COUNT, 4);
+            var ids = CreateSample(0, COUNT, 4);
             foreach (var id in ids)
                 Assert.IsTrue(Map.TryAdd(id, true));
 
@@ -133,7 +128,7 @@ namespace J2N.Collections.Concurrent
         public void TestInsertDelete()
         {
             var Map = CreateMap<bool>();
-            var ids = CreateSample(Guid.NewGuid(), COUNT, 4);
+            var ids = CreateSample(0, COUNT, 4);
 
             bool test;
             Parallel(100, ids, id => { Assert.IsTrue(Map.TryAdd(id, true)); Assert.IsTrue(Map.Remove(id)); });
@@ -147,7 +142,7 @@ namespace J2N.Collections.Concurrent
         public void TestInsertUpdateDelete()
         {
             var Map = CreateMap<bool>();
-            var ids = CreateSample(Guid.NewGuid(), COUNT, 4);
+            var ids = CreateSample(0, COUNT, 4);
 
             bool test;
             Parallel(100, ids, id => { Assert.IsTrue(Map.TryAdd(id, true)); Assert.IsTrue(Map.TryUpdate(id, false, true)); Assert.IsTrue(Map.Remove(id)); });
@@ -164,12 +159,12 @@ namespace J2N.Collections.Concurrent
             int reps = 3;
             Stopwatch timer;
 
-            IDictionary<Guid, TestValue> dict = new ConcurrentDictionary<Guid, TestValue>(new Dictionary<Guid, TestValue>(size));
-            IDictionary<Guid, TestValue> test = new LurchTable<Guid, TestValue>(size);
+            IDictionary<HashCollider, TestValue> dict = new ConcurrentDictionary<HashCollider, TestValue>(new Dictionary<HashCollider, TestValue>(size));
+            IDictionary<HashCollider, TestValue> test = new LurchTable<HashCollider, TestValue>(size);
 
             for (int rep = 0; rep < reps; rep++)
             {
-                var sample = CreateSample(Guid.NewGuid(), size, 1);
+                var sample = CreateSample(0, size, 1);
 
                 timer = Stopwatch.StartNew();
                 Parallel(1, sample, item => dict.Add(item, new TestValue { Id = item, Count = rep }));
@@ -206,66 +201,72 @@ namespace J2N.Collections.Concurrent
 
         struct TestValue
         {
-            public Guid Id;
+            public HashCollider Id;
             public int Count;
         };
 
-        #region Guid Hash Collision Generator
-
-        private static Random random = new Random();
-        private static int iCounter = 0x01010101;
-
-        public static Guid NextHashCollision(Guid guid)
+        internal struct HashCollider : IEquatable<HashCollider>
         {
-            var bytes = guid.ToByteArray();
+            public int Value;
+            public int CollisionValue;
 
-            // Modify bytes 8 & 9 with random number
-            Array.Copy(
-                BitConverter.GetBytes((short)random.Next()),
-                0,
-                bytes,
-                8,
-                2
-            );
+            public HashCollider(int value, int collisionValue)
+            {
+                this.Value = value;
+                this.CollisionValue = collisionValue;
+            }
 
-            // Increment bytes 11, 12, 13, & 14
-            Array.Copy(
-                BitConverter.GetBytes(
-                    BitConverter.ToInt32(bytes, 11) +
-                    Interlocked.Increment(ref iCounter)
-                    ),
-                0,
-                bytes,
-                11,
-                4
-            );
+            public bool Equals(HashCollider other)
+            {
+                return Value.Equals(other.Value);
+            }
 
-            Guid result = new Guid(bytes);
-#if !NETCOREAPP
-            Assert.AreEqual(guid.GetHashCode(), result.GetHashCode());
-#endif
-            return result;
+            public override int GetHashCode()
+            {
+                if (CollisionValue > 0)
+                {
+                    return CollisionValue;
+                }
+                return Value;
+            }
         }
 
-        public static Guid[] CreateSample(Guid seed, int size, double collisions)
+        #region Hash Collision Generator
+
+        // J2N: Refactored this so it doesn't depend on the underlying implementation of Guid, which varies
+        // depending on the platform it is running on.
+
+        private static int hashCollision = 1000000000;
+
+        internal static HashCollider[] CreateSample(int seed, int size, double collisions)
         {
-            var sample = new Guid[size];
+            var sample = new HashCollider[size];
             int count = 0, collis = 0, uix = 0;
             for (int i = 0; i < size; i++)
             {
                 if (collis >= count * collisions)
                 {
-                    sample[uix = i] = Guid.NewGuid();
+                    sample[uix = i] = new HashCollider(value: i, collisionValue: 0);
                     count++;
                 }
                 else
                 {
-                    sample[i] = NextHashCollision(sample[uix]);
+                    sample[i] = NextHashCollision(value: i, collideWith: ref sample[uix]);
                     collis++;
                 }
             }
             return sample;
         }
+
+        internal static HashCollider NextHashCollision(int value, ref HashCollider collideWith)
+        {
+            int collisionValue = Interlocked.Increment(ref hashCollision);
+            collideWith.CollisionValue = collisionValue;
+            var result = new HashCollider(value, collisionValue);
+            Assert.AreEqual(collideWith.GetHashCode(), result.GetHashCode());
+            return result;
+        }
+
         #endregion
     }
 }

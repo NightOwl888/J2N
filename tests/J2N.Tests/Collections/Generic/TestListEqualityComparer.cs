@@ -446,7 +446,7 @@ namespace J2N.Collections.Generic
         /// In Java, negative and positive 0 are two different values, thus not equal
         /// </summary>
         [Test]
-        public void TestEqualityFloatNegiativeZero()
+        public void TestEqualityFloatNegativeZero()
         {
             var list1 = new SCG.List<float> { -0.0f };
             var list2 = new SCG.List<float> { -0.0f };
@@ -482,7 +482,7 @@ namespace J2N.Collections.Generic
         /// In Java, negative and positive 0 are two different values, thus not equal
         /// </summary>
         [Test]
-        public void TestEqualityDoubleNegiativeZero()
+        public void TestEqualityDoubleNegativeZero()
         {
             var list1 = new SCG.List<double> { -0.0d };
             var list2 = new SCG.List<double> { -0.0d };

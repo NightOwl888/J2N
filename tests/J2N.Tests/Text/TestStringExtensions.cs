@@ -452,7 +452,7 @@ namespace J2N.Text
          * @tests java.lang.String#regionMatches(int, java.lang.String, int, int)
          */
         [Test]
-        public void Test_RegionMatches_String_Int32_ICharSequence_Int32_Int32_StringComparison()
+        public void Test_RegionMatches_String_Int32_ICharSequence_Int32_Int32_StringComparison() // Awaits Fix: https://github.com/xamarin/xamarin-android/issues/5425
         {
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
@@ -464,7 +464,7 @@ namespace J2N.Text
                     bogusString.AsCharSequence(), 2, 5, StringComparison.Ordinal));
 
             var input = "iiiiiiiiiiiıIiii";
-            var test = "İII"; // Turkish capital dotted I test.
+            var test = "İII".AsCharSequence(); // Turkish capital dotted I test.
 
             using (var context = new CultureContext("tr"))
             {
@@ -511,7 +511,7 @@ namespace J2N.Text
          * @tests java.lang.String#regionMatches(int, java.lang.String, int, int)
          */
         [Test]
-        public void Test_RegionMatches_String_Int32_CharArray_Int32_Int32_StringComparison()
+        public void Test_RegionMatches_String_Int32_CharArray_Int32_Int32_StringComparison() // Awaits Fix: https://github.com/xamarin/xamarin-android/issues/5425
         {
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
@@ -523,7 +523,7 @@ namespace J2N.Text
                     bogusString.ToCharArray(), 2, 5, StringComparison.Ordinal));
 
             var input = "iiiiiiiiiiiıIiii";
-            var test = "İII"; // Turkish capital dotted I test.
+            var test = "İII".ToCharArray(); // Turkish capital dotted I test.
 
             using (var context = new CultureContext("tr"))
             {
@@ -570,7 +570,7 @@ namespace J2N.Text
          * @tests java.lang.String#regionMatches(int, java.lang.String, int, int)
          */
         [Test]
-        public void Test_RegionMatches_String_Int32_StringBuilder_Int32_Int32_StringComparison()
+        public void Test_RegionMatches_String_Int32_StringBuilder_Int32_Int32_StringComparison() // Awaits Fix: https://github.com/xamarin/xamarin-android/issues/5425
         {
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
@@ -582,7 +582,7 @@ namespace J2N.Text
                     new StringBuilder(bogusString), 2, 5, StringComparison.Ordinal));
 
             var input = "iiiiiiiiiiiıIiii";
-            var test = "İII"; // Turkish capital dotted I test.
+            var test = new StringBuilder("İII"); // Turkish capital dotted I test.
 
             using (var context = new CultureContext("tr"))
             {
@@ -629,7 +629,7 @@ namespace J2N.Text
          * @tests java.lang.String#regionMatches(int, java.lang.String, int, int)
          */
         [Test]
-        public void Test_RegionMatches_String_Int32_String_Int32_Int32_StringComparison()
+        public void Test_RegionMatches_String_Int32_String_Int32_Int32_StringComparison() // Awaits Fix: https://github.com/xamarin/xamarin-android/issues/5425
         {
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)

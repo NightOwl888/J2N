@@ -5,14 +5,17 @@
     Note that the main libraries are multi-targeted, so this has no effect on how they are compiled,
     this setting only affects the test projects. -->
     <!--<TargetFramework>net461</TargetFramework>-->
-    <!--<TargetFramework>netcoreapp1.0</TargetFramework>
-    <TargetFramework>netcoreapp2.0</TargetFramework>-->
+    <!--<TargetFramework>net452</TargetFramework>-->
+    <!--<TargetFramework>netcoreapp2.1</TargetFramework>-->
+    <!--<TargetFramework>netcoreapp3.0</TargetFramework>-->
+    <!--<TargetFramework>netcoreapp3.1</TargetFramework>-->
+    <!--<TargetFramework>net5.0</TargetFramework>-->
     <TestAllTargetFrameworks>true</TestAllTargetFrameworks>
 
     <!-- Allow the build script to pass in the test frameworks to build for.
       This overrides the above TargetFramework setting. 
       TODO: Due to a parsing bug, we cannot pass a string with a ; to dotnet msbuild, so passing true as a workaround -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">netcoreapp3.1;netcoreapp3.0;netcoreapp2.1;netcoreapp1.0;net461;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.1;net461;net452;netstandard2.1;netstandard2.0</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>
 

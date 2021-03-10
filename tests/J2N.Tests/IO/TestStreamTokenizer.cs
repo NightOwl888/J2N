@@ -19,9 +19,7 @@ namespace J2N.IO
         [Test]
         public void Test_ConstructorLSystem_IO_InputStream()
         {
-#pragma warning disable 612, 618
             st = new StreamTokenizer(new MemoryStream(
-#pragma warning restore 612, 618
                 Encoding.UTF8.GetBytes("/comments\n d 8 'h'")));
 
 
@@ -183,9 +181,7 @@ namespace J2N.IO
 
             using (var pin = new MemoryStream(Encoding.UTF8.GetBytes("hello\n\r\r")))
             {
-#pragma warning disable 612, 618
                 StreamTokenizer s = new StreamTokenizer(pin);
-#pragma warning restore 612, 618
                 s.EndOfLineIsSignificant = (true);
 
                 assertTrue("Wrong token 1,1",
@@ -428,10 +424,8 @@ namespace J2N.IO
 
             // Regression test for HARMONY-4070
             byte[] data = new byte[] { (byte)'-' };
-#pragma warning disable 612, 618
             StreamTokenizer tokenizer = new StreamTokenizer(
                     new MemoryStream(data));
-#pragma warning restore 612, 618
             tokenizer.NextToken();
             String result = tokenizer.ToString();
             assertEquals("Token['-'], line 1", result);

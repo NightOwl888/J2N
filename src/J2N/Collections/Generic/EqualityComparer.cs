@@ -100,8 +100,8 @@ namespace J2N.Collections.Generic
             /// </summary>
             private int CompareZero(float x, float y)
             {
-                long a = BitConversion.SingleToInt32Bits(x);
-                long b = BitConversion.SingleToInt32Bits(y);
+                int a = BitConversion.SingleToInt32Bits(x);
+                int b = BitConversion.SingleToInt32Bits(y);
                 if (a > b)
                     return 1;
                 else if (a < b)

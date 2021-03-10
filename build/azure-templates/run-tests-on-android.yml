@@ -1,0 +1,321 @@
+# Downloads test binaries and executes tests using the Android emulator,
+# then uploads the results to Azure DevOps pipelines
+
+parameters:
+  osName: 'Android' # The name of the operating system for display purposes.
+  testTargetFrameworks: 'MonoAndroid90;MonoAndroid100' # A semicolon separated list of target frameworks indicating which frameworks tests will be run on. See: https://docs.microsoft.com/en-us/dotnet/standard/frameworks.
+  binaryArtifactName: 'testbinaries' # The name of the Azure DevOps build artifact where the test assemblies will be downloaded from. Default 'testbinaries'.
+  testResultsArtifactName: 'testresults' # The name of the Azure DevOps build artifact where the test results will be published. Default 'testresults'.
+  androidAbi: 'x86' # Target platform architecture used for test execution. Valid values are x86, x86_64, armeabi-v7a and arm64-v8a.
+  testBinaryFilesPattern: '\.*\.Tests\.Android\.?\w*?-Signed.apk$' # The regex pattern (within $(System.DefaultWorkingDirectory)/**/<TargetFramework>) where to look for test .apk files, so they can be distinguished from other file types.
+  testResultsFileName: 'TestResults.xml' # The name of the file (not path) of the test results. Default 'TestResults.xml'.
+  blameCrashFileName: 'Sequence.txt' # The name of the file (not path) of the blame file 
+  maximumParallelJobs: 8
+  maximumAllowedFailures: 0
+
+steps:
+- powershell: |
+    function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
+        if ([string]::IsNullOrEmpty($param)) {
+            Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
+            Write-Host "##vso[task.complete result=Failed;]"
+        }
+    }
+    EnsureNotNullOrEmpty('${{ parameters.osName }}', 'osName')
+    EnsureNotNullOrEmpty('${{ parameters.testTargetFrameworks }}', 'testTargetFrameworks')
+    EnsureNotNullOrEmpty('${{ parameters.binaryArtifactName }}', 'binaryArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsArtifactName }}', 'testResultsArtifactName')
+    EnsureNotNullOrEmpty('${{ parameters.androidAbi }}', 'androidAbi')
+    EnsureNotNullOrEmpty('${{ parameters.testBinaryFilesPattern }}', 'testBinaryFilesPattern')
+    EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
+    EnsureNotNullOrEmpty('${{ parameters.blameCrashFileName }}', 'blameCrashFileName')
+    EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
+  displayName: 'Validate Template Parameters'
+
+- task: DownloadBuildArtifacts@0
+  displayName: 'Download Build Artifacts: ${{ parameters.binaryArtifactName }}'
+  inputs:
+    artifactName: ${{ parameters.binaryArtifactName }}
+    downloadPath: '$(System.DefaultWorkingDirectory)'
+
+- pwsh: |
+    # Install AVD files
+    echo "y" | & $env:ANDROID_HOME/tools/bin/sdkmanager --install 'system-images;android-29;google_apis;${{ parameters.androidAbi }}'
+  displayName: 'Install Android Emulator'
+
+- pwsh: |
+    # Create emulators
+    [int]$maximumParallelJobs = ${{ parameters.maximumParallelJobs }}
+
+    function Update-HardwareConfiguration {
+        param(
+            [string]$configPath = $(throw "configPath is a required parameter."),
+            [string]$avdid = $(throw "avdid is a required parameter."),
+            [string]$ramSize = '4096',
+            [string]$diskDataPartitionSize = '2G',
+            [string]$sdCardSize = '4G',
+            [string]$vmHeapSize = '512'
+        )
+
+        # Move the file to a temporary location
+        $tempFile = [System.IO.Path]::GetTempFileName()
+        Write-Host "Moving $configPath to $tempFile"
+        Move-Item -Path "$configPath" -Destination "$tempFile" -Force
+
+        $reader = New-Object -TypeName 'System.IO.StreamReader' -ArgumentList @($tempFile,[System.Text.Encoding]::UTF8,$true)
+        try {
+            $reader.Peek() | Out-Null # Get the encoding
+            $writerEncoding = $reader.CurrentEncoding
+            $writer = New-Object -TypeName 'System.IO.StreamWriter' -ArgumentList @($configPath,$writerEncoding)
+            try {
+                $avdid1Line = "AvdId=$avdid"
+                $avdid2Line = "avd.id=$avdid"
+                $avdNameLine = "avd.name=$avdid"
+                $ramSizeLine = "hw.ramSize=$ramSize"
+                $diskDataPartitionSizeLine = "disk.dataPartition.size=$diskDataPartitionSize"
+                $sdCardSizeLine = "sdcard.size=$sdCardSize"
+                $vmHeapSizeLine = "vm.heapSize=$vmHeapSize"
+
+                while (($line = $reader.ReadLine()) -ne $null) {
+                    Write-Host $line
+                    $key,$value = $line.Split('=')
+
+                    if ($key -match 'AvdId') {
+                        $writer.WriteLine($avdid1Line)
+                        $avdid1Hit = $true
+                    } elseif ($key -match 'avd\.id') {
+                        $writer.WriteLine($avdid2Line)
+                        $avdid2Hit = $true
+                    } elseif ($key -match 'avd\.name') {
+                        $writer.WriteLine($avdNameLine)
+                        $avdNameHit = $true
+                    } elseif ($key -match 'hw\.ramSize') {
+                        $writer.WriteLine($ramSizeLine)
+                        $ramSizeHit = $true
+                    } elseif ($key -match 'disk\.dataPartition\.size') {
+                        $writer.WriteLine($diskDataPartitionSizeLine)
+                        $diskDataPartitionSizeHit = $true
+                    } elseif ($key -match 'sdcard\.size') {
+                        $writer.WriteLine($sdCardSizeLine)
+                        $sdCardSizeHit = $true
+                    } elseif ($key -match 'vm\.heapSize') {
+                        $writer.WriteLine($vmHeapSizeLine)
+                        $vmHeapSizeHit = $true
+                    } else {
+                        $writer.WriteLine($line)
+                    }
+                }
+
+                if (!$avdid1Hit) {
+                    $writer.WriteLine($avdid1Line)
+                }
+                if (!$avdid2Hit) {
+                    $writer.WriteLine($avdid2Line)
+                }
+                if (!$avdNameHit) {
+                    $writer.WriteLine($avdNameLine)
+                }
+                if (!$ramSizeHit) {
+                    $writer.WriteLine($ramSizeLine)
+                }
+                if (!$diskDataPartitionSizeHit) {
+                    $writer.WriteLine($diskDataPartitionSizeLine)
+                }
+                if (!$sdCardSizeHit) {
+                    $writer.WriteLine($sdCardSizeLine)
+                }
+                if (!$vmHeapSizeHit) {
+                    $writer.WriteLine($vmHeapSizeLine)
+                }
+            } finally {
+                $writer.Dispose()
+            }
+        } finally {
+            $reader.Dispose()
+        }
+
+        # Clean up
+        Remove-Item -Path "$tempFile" -Force
+    }
+
+    #for ($i = 0; i -lt  )
+    $emulatorName = "xamarin_android_emulator"
+
+    echo "no" | & $env:ANDROID_HOME/tools/bin/avdmanager create avd -n "$emulatorName" -k 'system-images;android-29;google_apis;${{ parameters.androidAbi }}' --abi ${{ parameters.androidAbi }} --force
+
+    & $env:ANDROID_HOME/emulator/emulator -list-avds
+
+    $avdConfig = "$HOME/.android/avd/$emulatorName.avd/config.ini"
+
+    Write-Host ""
+    Write-Host "Current Configuration:"
+    & cat "$avdConfig"
+
+    Write-Host ""
+    Write-Host "Updating Configuration:"
+    Update-HardwareConfiguration "$avdConfig" "$emulatorName"
+
+    Write-Host ""
+    Write-Host "Updated Configuration:"
+    & cat "$avdConfig"
+  displayName: 'Create Emulator Configuration'
+
+- pwsh: |
+    echo "Starting emulator"
+
+    # Start emulator in background
+    & nohup $env:ANDROID_HOME/emulator/emulator -avd xamarin_android_emulator -no-snapshot > /dev/null 2>&1 &
+    & $env:ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
+
+    & $env:ANDROID_HOME/platform-tools/adb devices
+
+    echo "Emulator started"
+    #displayName: 'Start Emulator'
+      
+    #- pwsh: |
+    $testTargetFrameworksString = '${{ parameters.testTargetFrameworks }}'
+    $testBinaryRootDirectory = "$(System.DefaultWorkingDirectory)"
+    $testResultsArtifactDirectory = "${{ format('$(Build.ArtifactStagingDirectory)/{0}',parameters.testResultsArtifactName) }}"
+    $testPlatform = '${{ parameters.androidAbi }}'
+    $testOSName = '${{ parameters.osName }}'
+    $testBinaryFilesPattern = '${{ parameters.testBinaryFilesPattern }}'
+    $maximumParalellJobs = '${{ parameters.maximumParallelJobs }}'
+    $testResultsFileName = '${{ parameters.testResultsFileName }}'
+    $blameCrashFileName = '${{ parameters.blameCrashFileName }}'
+    $testTargetFrameworks = $testTargetFrameworksString.Split([char]',',[char]';')
+
+    function RunTests([string]$framework, [string]$fileRegexPattern) {
+    
+        $testBinaries = Get-ChildItem -Path "$testBinaryRootDirectory" -File -Recurse | Where-Object {$_.FullName -match "$framework"} | Where-Object {$_.FullName -match "$fileRegexPattern"} | Select -ExpandProperty FullName
+        foreach ($testBinary in $testBinaries) {
+            $testName = [System.IO.Path]::GetFileNameWithoutExtension($testBinary)
+            $testName = $testName.Substring(0,$testName.Length-7)
+            $testProjectName = $testName -replace '\.Android', ''
+            Write-Host "Test Name: $testName"
+            Write-Host "Test Project Name: $testProjectName"
+            Write-Host "Test Binary: $testBinary"
+            
+            # Sideload the app
+            & $env:ANDROID_HOME/platform-tools/adb install "$testBinary"
+
+            # Run the tests
+            [array]$cmdOutput = & $env:ANDROID_HOME/platform-tools/adb shell am instrument -w "$testName/app.tests.TestInstrumentation"
+
+            $cmdOutput | ForEach-Object {
+                # Split each pair into key and value
+                $key1,$value1 = $_.Split(':')
+
+                if ($key1 -eq 'INSTRUMENTATION_RESULT') {
+                    $key2,$value2 = $value1.Split('=')
+
+                    Write-Host $key2
+
+                    if ($key2 -match '[nx]unit\d-results-path') {
+                        $testResultsFile = $value2
+                        Write-Host "Test Results File: $testResultsFile"
+                    }
+
+                    if ($key2 -match 'blame-crash-path') {
+                        $blameCrashFile = $value2
+                        Write-Host "Blame Crash File: $blameCrashFile"
+                    }
+                }
+            }
+
+            $testResultDirectory = "$testResultsArtifactDirectory/$testOSName/$framework/$testPlatform/$testProjectName"
+
+            # Make the result directory if it doesn't exist
+            if (!(Test-Path "$testResultDirectory")) {
+                New-Item "$testResultDirectory" -ItemType Directory -Force
+            }
+
+            $blameCrashPath = "$testResultDirectory/$blameCrashFileName"
+            Write-Host "Blame Crash Destination Path: $blameCrashPath"
+
+            # Copy the blame crash file to the host
+            & $env:ANDROID_HOME/platform-tools/adb pull "$blameCrashFile" "$blameCrashPath"
+
+            $crashed = $false
+
+            # Analyze the file to see if all of the lines have a run state.
+            # If not, report that we have a crash of the test runner.
+            foreach ($line in [System.IO.File]::ReadLines("$blameCrashPath")) {
+                if (![string]::IsNullOrEmpty($line) -and !$line.Contains(']')) {
+                    Write-Host "##vso[task.setvariable variable=HostCrashed;]true"
+                    # Report all of the test projects that crashed
+                    $crashedRuns = "$env:CRASHEDRUNS,$testProjectName".TrimStart(',')
+                    Write-Host "##vso[task.setvariable variable=CrashedRuns;]$crashedRuns"
+                    $crashed = $true
+                    break
+                }
+            }
+
+            if (!$crashed) {
+                # Copy the test results file to the host
+                & $env:ANDROID_HOME/platform-tools/adb pull "$testResultsFile" "$testResultDirectory/$testResultsFileName"
+            }
+
+            Write-Host $cmdOutput
+
+            # Uninstall the app
+            & $env:ANDROID_HOME/platform-tools/adb uninstall "$testBinary"
+        }
+    }
+
+    foreach ($framework in $testTargetFrameworks) {
+        RunTests -Framework "$framework" -FileRegexPattern "$testBinaryFilesPattern"
+    }
+
+    $global:LASTEXITCODE = 0 # Force the script to continue on error
+  displayName: 'Run Tests'
+  ignoreLASTEXITCODE: true
+  failOnStderr: false
+
+#- template: 'show-all-files.yml' # Uncomment for debugging
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact: ${{ parameters.testResultsArtifactName }}'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}'
+    ArtifactName: '${{ parameters.testResultsArtifactName }}'
+  condition: succeededOrFailed()
+
+# Due to the fact that it is not possible to loop a task and
+# it would be a ton of work to make a replacement for the
+# Publish Test Results task or the (deprecated) TfsPublisher
+# our only other option is to make a task for every supported
+# platform and project and update it whenever a new platform 
+# is targeted or test project is created in J2N.
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.androidAbi }}'
+    testResultsFormat: 'NUnit'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Tests.xUnit'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.androidAbi }}'
+    testResultsFormat: 'VSTest'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- pwsh: |
+    $failed = $false
+    if ($env:HOSTCRASHED -eq 'true') {
+        Write-Host "##vso[task.logissue type=error;]Test host process(es) crashed:  $($env:CRASHEDRUNS)."
+        $failed = $true
+    }
+    $maximumAllowedFailures = '${{ parameters.maximumAllowedFailures }}'
+    if ([int]$env:TOTALFAILURES -gt [int]$maximumAllowedFailures) {
+        Write-Host "##vso[task.logissue type=error;]Test run failed due to too many failed tests. Maximum failures allowed: $maximumAllowedFailures, total failures: $($env:TOTALFAILURES)."
+        $failed = $true
+    }
+    if ($failed) {
+        Write-Host "##vso[task.complete result=Failed;]"
+    }

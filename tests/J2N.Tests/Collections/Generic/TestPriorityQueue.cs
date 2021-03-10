@@ -168,9 +168,7 @@ namespace J2N.Collections.Generic
                 new PriorityQueue<Object>(0, new MockComparer<Object>());
                 fail("should throw ArgumentException");
             }
-#pragma warning disable 168
             catch (ArgumentException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -180,9 +178,7 @@ namespace J2N.Collections.Generic
                 new PriorityQueue<Object>(-1, new MockComparer<Object>());
                 fail("should throw ArgumentException");
             }
-#pragma warning disable 168
             catch (ArgumentException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -231,9 +227,7 @@ namespace J2N.Collections.Generic
                 new PriorityQueue<Object>(list);
                 fail("should throw ArgumentNullException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -250,9 +244,7 @@ namespace J2N.Collections.Generic
                 new PriorityQueue<Object>(list);
                 fail("should throw InvalidOperationException");
             }
-#pragma warning disable 168
             catch (InvalidOperationException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -327,9 +319,7 @@ namespace J2N.Collections.Generic
                 new PriorityQueue<Integer>((PriorityQueue<Integer>)null);
                 fail("should throw ArgumentNullException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -360,9 +350,7 @@ namespace J2N.Collections.Generic
                 new PriorityQueue<Integer>((SortedSet<Integer>)null);
                 fail("should throw ArgumentNullException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -396,9 +384,7 @@ namespace J2N.Collections.Generic
                 queue.Enqueue(null);
                 fail("should throw ArgumentNullException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -414,9 +400,7 @@ namespace J2N.Collections.Generic
                 queue.Enqueue(new float?(1.3f));
                 fail("should throw InvalidOperationException");
             }
-#pragma warning disable 168
             catch (InvalidOperationException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -428,9 +412,7 @@ namespace J2N.Collections.Generic
                 queue.Enqueue(new Object());
                 fail("should throw InvalidOperationException");
             }
-#pragma warning disable 168
             catch (InvalidOperationException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -628,9 +610,7 @@ namespace J2N.Collections.Generic
                 queue.Add(null);
                 fail("should throw ArgumentNullException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -646,9 +626,7 @@ namespace J2N.Collections.Generic
                 queue.Add(new float?(1.3f));
                 fail("should throw InvalidOperationException");
             }
-#pragma warning disable 168
             catch (InvalidOperationException e)
-#pragma warning restore 168
             {
                 // expected
             }
@@ -660,9 +638,7 @@ namespace J2N.Collections.Generic
                 queue.Add(new Object());
                 fail("should throw InvalidOperationException");
             }
-#pragma warning disable 168
             catch (InvalidOperationException e)
-#pragma warning restore 168
             {
                 // expected
             }

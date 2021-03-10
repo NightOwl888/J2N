@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+#nullable enable
 
 namespace J2N
 {
@@ -25,9 +26,9 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="target"/> is <c>null</c>.</exception>
         public static bool ImplementsGenericInterface(this Type target, Type interfaceType)
         {
-            if (target == null)
+            if (target is null)
                 throw new ArgumentNullException(nameof(target));
-            if (interfaceType == null)
+            if (interfaceType is null)
                 return false;
 
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
@@ -64,11 +65,11 @@ namespace J2N
         /// <param name="name">The resource name to locate.</param>
         /// <returns>an open <see cref="Stream"/> that can be used to read the resource, or <c>null</c> if the resource cannot be found.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
-        public static Stream FindAndGetManifestResourceStream(this Type type, string name)
+        public static Stream? FindAndGetManifestResourceStream(this Type type, string name)
         {
-            if (type == null)
+            if (type is null)
                 throw new ArgumentNullException(nameof(type));
-            if (name == null)
+            if (name is null)
                 throw new ArgumentNullException(nameof(name));
 
 #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
@@ -101,7 +102,7 @@ namespace J2N
         /// <param name="name">The resource name to locate.</param>
         /// <returns>The resource, if found; if not found, returns <c>null</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
-        public static string FindResource(this Type type, string name)
+        public static string? FindResource(this Type type, string name)
         {
             if (type == null)
                 throw new ArgumentNullException(nameof(type));

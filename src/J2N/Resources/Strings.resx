@@ -150,6 +150,9 @@
   <data name="Argument_CollectionMustNotBeThis" xml:space="preserve">
     <value>collection must not be the same instance as this.</value>
   </data>
+  <data name="Argument_InvalidArgumentForComparison" xml:space="preserve">
+    <value>Type of argument is not compatible with the generic comparer.</value>
+  </data>
   <data name="Argument_InvalidArrayType" xml:space="preserve">
     <value>Target array type is not compatible with the type of items in the collection.</value>
   </data>

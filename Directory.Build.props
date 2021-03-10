@@ -1,6 +1,6 @@
 <Project>
   <Import Project="version.props" Condition="Exists('version.props')" />
-  <Import Project="build\dependencies.props" Condition="Exists('build\dependencies.props')" />
+  <Import Project="$(MSBuildThisFileDirectory)/build/dependencies.props" Condition="Exists('$(MSBuildThisFileDirectory)/build/dependencies.props')" />
 
   <PropertyGroup>
     <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
@@ -34,10 +34,4 @@
     <Copyright>Copyright © $(CopyrightYearRange) $(Company)</Copyright>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning">
-      <Version>$(NerdBankGitVersioningPackageReferenceVersion)</Version>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
 </Project>

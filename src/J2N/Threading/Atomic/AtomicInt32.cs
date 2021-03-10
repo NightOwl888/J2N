@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading.Atomic
 {
@@ -136,8 +137,10 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="other">The <see cref="AtomicInt32"/> to compare with the current <see cref="AtomicInt32"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt32"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(AtomicInt32 other)
+        public bool Equals(AtomicInt32? other)
         {
+            if (other is null)
+                return false;
             return Value == other.Value;
         }
 
@@ -158,7 +161,7 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="other">The <see cref="object"/> to compare with the current <see cref="AtomicInt32"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="AtomicInt32"/>; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
             if (other is AtomicInt32 ai)
                 return Equals(ai);
@@ -194,7 +197,7 @@ namespace J2N.Threading.Atomic
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <returns>The string representation of the value of this instance as specified
         /// by <paramref name="format"/>.</returns>
-        public string ToString(string format)
+        public string ToString(string? format)
         {
             return Value.ToString(format);
         }
@@ -205,7 +208,7 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by <paramref name="provider"/>.</returns>
-        public string ToString(IFormatProvider provider)
+        public string ToString(IFormatProvider? provider)
         {
             return Value.ToString(provider);
         }
@@ -218,7 +221,7 @@ namespace J2N.Threading.Atomic
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by
         /// <paramref name="format"/> and <paramref name="provider"/>.</returns>
-        public string ToString(string format, IFormatProvider provider)
+        public string ToString(string? format, IFormatProvider? provider)
         {
             return Value.ToString(format, provider);
         }
@@ -231,35 +234,35 @@ namespace J2N.Threading.Atomic
         /// <returns></returns>
         public TypeCode GetTypeCode() => ((IConvertible)Value).GetTypeCode();
 
-        bool IConvertible.ToBoolean(IFormatProvider provider) => Convert.ToBoolean(Value);
+        bool IConvertible.ToBoolean(IFormatProvider? provider) => Convert.ToBoolean(Value);
 
-        byte IConvertible.ToByte(IFormatProvider provider) => Convert.ToByte(Value);
+        byte IConvertible.ToByte(IFormatProvider? provider) => Convert.ToByte(Value);
 
-        char IConvertible.ToChar(IFormatProvider provider) => Convert.ToChar(Value);
+        char IConvertible.ToChar(IFormatProvider? provider) => Convert.ToChar(Value);
 
-        DateTime IConvertible.ToDateTime(IFormatProvider provider) => Convert.ToDateTime(Value);
+        DateTime IConvertible.ToDateTime(IFormatProvider? provider) => Convert.ToDateTime(Value);
 
-        decimal IConvertible.ToDecimal(IFormatProvider provider) => Convert.ToDecimal(Value);
+        decimal IConvertible.ToDecimal(IFormatProvider? provider) => Convert.ToDecimal(Value);
 
-        double IConvertible.ToDouble(IFormatProvider provider) => Convert.ToDouble(Value);
+        double IConvertible.ToDouble(IFormatProvider? provider) => Convert.ToDouble(Value);
 
-        short IConvertible.ToInt16(IFormatProvider provider) => Convert.ToInt16(Value);
+        short IConvertible.ToInt16(IFormatProvider? provider) => Convert.ToInt16(Value);
 
-        int IConvertible.ToInt32(IFormatProvider provider) => Value;
+        int IConvertible.ToInt32(IFormatProvider? provider) => Value;
 
-        long IConvertible.ToInt64(IFormatProvider provider) => Convert.ToInt64(Value);
+        long IConvertible.ToInt64(IFormatProvider? provider) => Convert.ToInt64(Value);
 
-        sbyte IConvertible.ToSByte(IFormatProvider provider) => Convert.ToSByte(Value);
+        sbyte IConvertible.ToSByte(IFormatProvider? provider) => Convert.ToSByte(Value);
 
-        float IConvertible.ToSingle(IFormatProvider provider) => Convert.ToSingle(Value);
+        float IConvertible.ToSingle(IFormatProvider? provider) => Convert.ToSingle(Value);
 
-        object IConvertible.ToType(Type conversionType, IFormatProvider provider) => ((IConvertible)Value).ToType(conversionType, provider);
+        object IConvertible.ToType(Type conversionType, IFormatProvider? provider) => ((IConvertible)Value).ToType(conversionType, provider);
 
-        ushort IConvertible.ToUInt16(IFormatProvider provider) => Convert.ToUInt16(Value);
+        ushort IConvertible.ToUInt16(IFormatProvider? provider) => Convert.ToUInt16(Value);
 
-        uint IConvertible.ToUInt32(IFormatProvider provider) => Convert.ToUInt32(Value);
+        uint IConvertible.ToUInt32(IFormatProvider? provider) => Convert.ToUInt32(Value);
 
-        ulong IConvertible.ToUInt64(IFormatProvider provider) => Convert.ToUInt64(Value);
+        ulong IConvertible.ToUInt64(IFormatProvider? provider) => Convert.ToUInt64(Value);
 
         #endregion IConvertible Members
 

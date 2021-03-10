@@ -179,9 +179,7 @@ namespace J2N.Text
 //                fail(
 //                        "nextToken failed to throw a NoSuchElementException when it should have been out of elements");
 //            }
-//#pragma warning disable 168
 //            catch (InvalidOperationException e)
-//#pragma warning restore 168
 //            {
 //                return;
 //            }
@@ -249,9 +247,7 @@ namespace J2N.Text
 //                stringTokenizer.HasMoreTokens();
 //                fail("should throw NullPointerException");
 //            }
-//#pragma warning disable 168
 //            catch (ArgumentNullException e)
-//#pragma warning restore 168
 //            {
 //                // Expected
 //            }
@@ -262,9 +258,7 @@ namespace J2N.Text
 //                stringTokenizer.HasMoreTokens();
 //                fail("should throw NullPointerException");
 //            }
-//#pragma warning disable 168
 //            catch (ArgumentNullException e)
-//#pragma warning restore 168
 //            {
 //                // Expected
 //            }
@@ -308,9 +302,7 @@ namespace J2N.Text
                 //stringTokenizer.NextToken();
                 fail("should throw NullPointerException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // Expected
             }
@@ -322,9 +314,7 @@ namespace J2N.Text
                 //stringTokenizer.NextToken();
                 fail("should throw NullPointerException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // Expected
             }
@@ -339,9 +329,7 @@ namespace J2N.Text
                 stringTokenizer.MoveNext(null);
                 fail("should throw NullPointerException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // Expected
             }

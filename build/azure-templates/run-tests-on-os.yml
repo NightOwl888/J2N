@@ -14,7 +14,7 @@ parameters:
   maximumAllowedFailures: 0
 
 steps:
-- powershell: |
+- pwsh: |
     function EnsureNotNullOrEmpty([string]$param, [string]$nameOfParam) {
         if ([string]::IsNullOrEmpty($param)) {
             Write-Host "##vso[task.logissue type=error;]Missing template parameter \"$nameOfParam\""
@@ -30,12 +30,6 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
     EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
   displayName: 'Validate Template Parameters'
-
-- task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 1.1.14'
-  inputs:
-    version: 1.1.14
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp1.'))
 
 - task: UseDotNet@2
   displayName: 'Use .NET Core sdk 2.1.811'
@@ -60,7 +54,7 @@ steps:
     artifactName: ${{ parameters.binaryArtifactName }}
     downloadPath: '$(System.DefaultWorkingDirectory)'
 
-- powershell: |
+- pwsh: |
     $testTargetFrameworksString = '${{ parameters.testTargetFrameworks }}'
     $testBinaryRootDirectory = "$(System.DefaultWorkingDirectory)"
     $testResultsArtifactDirectory = "${{ format('$(Build.ArtifactStagingDirectory)/{0}',parameters.testResultsArtifactName) }}"
@@ -96,17 +90,20 @@ steps:
             #    $running | Wait-Job -Any | Out-Null
             #}
               
-            $testResultDirectory = "$testResultsArtifactDirectory/$testOSName/$framework/$testName"
+            $testResultDirectory = "$testResultsArtifactDirectory/$testOSName/$framework/$testPlatform/$testName"
             if (!(Test-Path "$testResultDirectory")) {
                 New-Item "$testResultDirectory" -ItemType Directory -Force
             }
     
             Write-Host "Testing '$testBinary' on framework '$framework' and outputting test results to '$testResultDirectory/${{ parameters.testResultsFileName }}'..."
-            dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini
+            dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform
     
+
+            $testExpression = "$testExpression -- RunConfiguration.TargetPlatform=$testPlatform"
+
             #$scriptBlock = {
             #    param([string]$testBinary, [string]$fwork, [string]$testPlatform, [string]$testResultDirectory)
-            #    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
+            #    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
             #}
     
             # Execute the jobs in parallel
@@ -129,10 +126,8 @@ steps:
     #} until ($running.Count -eq 0)
     
     $global:LASTEXITCODE = 0 # Force the script to continue on error
-  displayName: 'dotnet vstest ${{ parameters.testTargetFrameworks }}'
+  displayName: 'dotnet test ${{ parameters.testTargetFrameworks }}'
   ignoreLASTEXITCODE: true
-  errorActionPreference: 'continue'
-  failOnStderr: false
 
 #- template: 'show-all-files.yml' # Uncomment for debugging
 
@@ -153,10 +148,20 @@ steps:
 - template: 'publish-test-results-for-test-projects.yml'
   parameters:
     osName: '${{ parameters.osName }}'
+    framework: '${{ parameters.framework }}'
+    testPlatform: '${{ parameters.vsTestPlatform }}'
 
 - pwsh: |
+    $failed = $false
+    if ($env:HOSTCRASHED -eq 'true') {
+        Write-Host "##vso[task.logissue type=error;]Test host process(es) crashed:  $($env:CRASHEDRUNS)."
+        $failed = $true
+    }
     $maximumAllowedFailures = '${{ parameters.maximumAllowedFailures }}'
-    if ([int]$Env:TOTALFAILURES -gt [int]$maximumAllowedFailures) {
-        Write-Host "##vso[task.logissue type=error;]Test run failed due to too many failed tests. Maximum failures allowed: $maximumAllowedFailures, total failures: $($Env:TOTALFAILURES)."
+    if ([int]$env:TOTALFAILURES -gt [int]$maximumAllowedFailures) {
+        Write-Host "##vso[task.logissue type=error;]Test run failed due to too many failed tests. Maximum failures allowed: $maximumAllowedFailures, total failures: $($env:TOTALFAILURES)."
+        $failed = $true
+    }
+    if ($failed) {
         Write-Host "##vso[task.complete result=Failed;]"
     }

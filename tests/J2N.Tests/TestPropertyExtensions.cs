@@ -210,9 +210,7 @@ namespace J2N
                 p.LoadProperties((Stream)null);
                 fail("should throw ArgumentNullException");
             }
-#pragma warning disable 168
             catch (ArgumentNullException e)
-#pragma warning restore 168
             {
                 // Expected
             }
@@ -277,9 +275,7 @@ namespace J2N
                 prop.LoadProperties(new MemoryStream("a=\\u123".getBytes()));
                 fail("should throw ArgumentException");
             }
-#pragma warning disable 168
             catch (ArgumentException e)
-#pragma warning restore 168
             {
                 // Expected
             }

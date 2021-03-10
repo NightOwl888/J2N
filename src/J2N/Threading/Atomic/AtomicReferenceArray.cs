@@ -1,6 +1,7 @@
 ﻿using J2N.Collections;
 using System;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading.Atomic
 {
@@ -62,14 +63,14 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="index">The index.</param>
         /// <returns>The current value.</returns>
-        public T this[int index]
+        public T? this[int index]
         {
 #if NET40
             get => array[index];
-            set => array[index] = value;
+            set => array[index] = value!;
 #else
             get => Volatile.Read(ref array[index]);
-            set => Volatile.Write(ref array[index], value);
+            set => Volatile.Write(ref array[index]!, value);
 #endif
         }
 
