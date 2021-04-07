@@ -130,10 +130,11 @@ namespace J2N.Threading
 
         private bool IsThreadingException(Exception e)
         {
+            // NOTE: We don't swallow ThreadAbortException because we don't want
+            // to interfere with normal operation of the thread.
+            // We also had ThreadInterruptedExcption here once, but Lucene.NET requires
+            // it to be rethrown on the calling thread.
             return
-#if FEATURE_THREADINTERRUPT
-                e.GetType().Equals(typeof(ThreadInterruptedException)) ||
-#endif
 #if FEATURE_THREADABORT
                 e.GetType().Equals(typeof(ThreadAbortException)) ||
 #endif
@@ -456,7 +457,6 @@ namespace J2N.Threading
         /// has a bending interrupt request; othewise, <c>false</c>.</returns>
         public static bool Interrupted()
         {
-
             try
             {
                 Thread.Sleep(0);
