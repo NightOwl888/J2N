@@ -168,6 +168,9 @@
   <data name="Argument_MustBePrimitiveType" xml:space="preserve">
     <value>'{0}' is not a primitive type.</value>
   </data>
+  <data name="Argument_MustNotBeThis" xml:space="preserve">
+    <value>'{0}' must not be the same instance as this.</value>
+  </data>
   <data name="Argument_TypeOfKeyIncorrect" xml:space="preserve">
     <value>The key was of an incorrect type for this dictionary.</value>
   </data>

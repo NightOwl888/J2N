@@ -76,7 +76,7 @@ namespace J2N.IO
 
         public override CharBuffer Put(string source, int startIndex, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;
