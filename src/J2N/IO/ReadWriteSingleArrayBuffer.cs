@@ -81,7 +81,7 @@ namespace J2N.IO
 
         public override SingleBuffer Put(float[] source, int offset, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;
