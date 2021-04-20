@@ -1,4 +1,5 @@
 ﻿using System.IO.MemoryMappedFiles;
+#nullable enable
 
 namespace J2N.IO.MemoryMappedFiles
 {

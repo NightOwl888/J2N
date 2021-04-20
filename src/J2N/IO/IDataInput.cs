@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -108,6 +107,7 @@ namespace J2N.IO
         /// <exception cref="System.IO.EndOfStreamException">If the end of the input is reached before the read
         /// request can be satisfied.</exception>
         /// <exception cref="System.IO.IOException">If an I/O error occurs while reading.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="buffer"/> is <c>null</c>.</exception>
         /// <seealso cref="IDataOutput.Write(byte[])"/>
         /// <seealso cref="IDataOutput.Write(byte[], int, int)"/>
         void ReadFully(byte[] buffer);
@@ -124,6 +124,7 @@ namespace J2N.IO
         /// <exception cref="System.IO.EndOfStreamException">If the end of the input is reached before the read
         /// request can be satisfied.</exception>
         /// <exception cref="System.IO.IOException">If an I/O error occurs while reading.</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="buffer"/> is <c>null</c>.</exception>
         /// <seealso cref="IDataOutput.Write(byte[])"/>
         /// <seealso cref="IDataOutput.Write(byte[], int, int)"/>
         void ReadFully(byte[] buffer, int offset, int count);
@@ -172,12 +173,12 @@ namespace J2N.IO
         /// <c>'\n'</c>, <c>'\r'</c>, <c>"\r\n"</c> or the end of the stream. The string
         /// does not include the newline sequence.
         /// </summary>
-        /// <returns>The contents of the line or null if no characters have been read
+        /// <returns>The contents of the line or <c>null</c> if no characters have been read
         /// before the end of the stream.</returns>
         /// <exception cref="System.IO.EndOfStreamException">If the end of the input is reached before the read
         /// request can be satisfied.</exception>
         /// <exception cref="System.IO.IOException">If an I/O error occurs while reading.</exception>
-        string ReadLine();
+        string? ReadLine();
 
         /// <summary>
         /// Reads a string encoded with <see cref="IDataInput"/> modified UTF-8.

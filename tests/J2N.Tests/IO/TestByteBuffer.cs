@@ -290,6 +290,9 @@ namespace J2N.IO
             // J2N: AllocateDirect() not supported
             //assertTrue(ByteBuffer.Wrap(new byte[21]).CompareTo(ByteBuffer.AllocateDirect(21)) == 0);
             assertTrue(ByteBuffer.Wrap(new byte[21]).CompareTo(ByteBuffer.Allocate(21)) == 0);
+
+            // J2N: Cover null for .NET. See: https://stackoverflow.com/a/4852537
+            assertEquals(1, buf.CompareTo(null));
         }
 
         [Test]

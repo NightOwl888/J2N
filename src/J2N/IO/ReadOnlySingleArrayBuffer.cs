@@ -1,4 +1,6 @@
-﻿namespace J2N.IO
+﻿#nullable enable
+
+namespace J2N.IO
 {
     /// <summary>
     /// <see cref="SingleArrayBuffer"/>, <see cref="ReadWriteSingleArrayBuffer"/> and <see cref="ReadOnlySingleArrayBuffer"/>
