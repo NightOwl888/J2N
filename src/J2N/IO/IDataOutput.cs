@@ -1,4 +1,6 @@
-﻿namespace J2N.IO
+﻿#nullable enable
+
+namespace J2N.IO
 {
     /// <summary>
     /// Defines an interface for classes that are able to write typed data to some

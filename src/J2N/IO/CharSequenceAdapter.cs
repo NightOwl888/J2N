@@ -1,6 +1,7 @@
 ﻿using J2N.Text;
 using System;
 using System.Diagnostics.CodeAnalysis;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -63,7 +64,7 @@ namespace J2N.IO
 
         public override sealed CharBuffer Get(char[] destination, int offset, int length)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             int len = destination.Length;

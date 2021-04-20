@@ -180,6 +180,9 @@ namespace J2N.IO
             other.Limit = (5);
             assertTrue(buf.CompareTo(other) > 0);
             assertTrue(other.CompareTo(buf) < 0);
+
+            // J2N: Cover null for .NET. See: https://stackoverflow.com/a/4852537
+            assertEquals(1, buf.CompareTo(null));
         }
 
         [Test]

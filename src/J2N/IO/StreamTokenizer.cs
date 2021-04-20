@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.Text;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -24,7 +25,7 @@ namespace J2N.IO
         /// Contains a string if the current token is a word 
         /// (<see cref="TokenType"/> == <see cref="TokenType_Word"/>).
         /// </summary>
-        public string StringValue { get; set; }
+        public string? StringValue { get; set; }
 
         /// <summary>
         /// The constant representing the end of the stream.
@@ -82,8 +83,8 @@ namespace J2N.IO
         private bool lastCr;
 
         /// <summary>One of these will have the stream</summary>
-        private readonly Stream inStream;
-        private readonly TextReader inReader;
+        private readonly Stream? inStream;
+        private readonly TextReader? inReader;
         private int peekChar = -2;
 
         /// <summary>
@@ -555,9 +556,9 @@ namespace J2N.IO
         private int Read()
         {
             // Call the read for the appropriate stream
-            if (inStream == null)
+            if (inStream is null)
             {
-                return inReader.Read();
+                return inReader!.Read();
             }
             return inStream.ReadByte();
         }

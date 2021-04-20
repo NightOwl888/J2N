@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -99,7 +100,7 @@ namespace J2N.IO
         /// <seealso cref="DataInputStream.ReadFully(byte[], int, int)"/>
         public virtual void Write(byte[] buffer, int offset, int count)
         {
-            if (buffer == null)
+            if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
             lock (_lock)
@@ -165,7 +166,7 @@ namespace J2N.IO
         /// <seealso cref="DataInputStream.ReadFully(byte[], int, int)"/>
         public void WriteBytes(string value)
         {
-            if (value == null)
+            if (value is null)
                 throw new ArgumentNullException(nameof(value));
 
             lock (_lock)
@@ -214,7 +215,7 @@ namespace J2N.IO
         /// <seealso cref="DataInputStream.ReadChar()"/>
         public void WriteChars(string value)
         {
-            if (value == null)
+            if (value is null)
                 throw new ArgumentNullException(nameof(value));
 
             lock (_lock)
@@ -360,7 +361,7 @@ namespace J2N.IO
         /// <seealso cref="DataInputStream.ReadUTF()"/>
         public void WriteUTF(string value)
         {
-            if (value == null)
+            if (value is null)
                 throw new ArgumentNullException(nameof(value));
 
             long utfCount = CountUTFBytes(value);
@@ -435,7 +436,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="buffer"/> is <c>null</c>.</exception>
         public void Write(byte[] buffer)
         {
-            if (buffer == null)
+            if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
             Write(buffer, 0, buffer.Length);
