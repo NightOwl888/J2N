@@ -1,6 +1,7 @@
 ﻿using J2N.Text;
 using System;
 using System.Diagnostics.CodeAnalysis;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -63,7 +64,7 @@ namespace J2N.IO
 
         public override sealed CharBuffer Get(char[] destination, int offset, int length)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             int len = destination.Length;
@@ -113,7 +114,7 @@ namespace J2N.IO
 
         public override sealed CharBuffer Put(char[] source, int offset, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
             if (offset < 0)
                 throw new ArgumentOutOfRangeException(nameof(offset));
@@ -129,7 +130,7 @@ namespace J2N.IO
 
         public override CharBuffer Put(string source, int startIndex, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
             int len = source.Length;
             if (startIndex < 0)

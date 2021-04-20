@@ -1992,5 +1992,91 @@ namespace J2N
             var str = culture.TextInfo.ToUpper(char.ConvertFromUtf32(codePoint));
             return CodePointAt(str, 0);
         }
+
+        // J2N: Since .NET's string class has no constructor that accepts an array of code points, we have extra helper methods that
+        // allow us to make the conversion. Character seems like the most logical place to do this being that there is no way to dynamically
+        // add a construtor to System.String and this is the place in J2N that deals the most with code points.
+
+        /// <summary>
+        /// Converts an an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// <para/>
+        /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
+        /// the .NET equivalent of that constructor overload, however this overload is provided for convenience and assumes the
+        /// whole array will be converted. <see cref="ToString(int[], int, int)"/> allows conversion of a partial array of code points to a
+        /// <see cref="string"/>.
+        /// </summary>
+        /// <param name="codePoints">An array of UTF-32 code points.</param>
+        /// <returns>A string containing the UTF-16 character equivalent of <paramref name="codePoints"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="codePoints"/> is <c>null</c>.</exception>
+        public static string ToString(int[] codePoints)
+        {
+            if (codePoints is null)
+                throw new ArgumentNullException(nameof(codePoints));
+
+            return ToString(codePoints, 0, codePoints.Length);
+        }
+
+        /// <summary>
+        /// Converts an an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// <para/>
+        /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
+        /// the .NET equivalent of that constructor overload.
+        /// </summary>
+        /// <param name="codePoints">An array of UTF-32 code points.</param>
+        /// <param name="startIndex">The index of the first code point to convert.</param>
+        /// <param name="length">The number of code point elements to to convert to UTF-32 code units and include in the result.</param>
+        /// <returns>A <see cref="string"/> containing the UTF-16 code units that correspond to the specified range of <paramref name="codePoints"/> elements.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within <paramref name="codePoints"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// </exception>
+        /// <exception cref="ArgumentNullException"><paramref name="codePoints"/> is <c>null</c>.</exception>
+        public static string ToString(int[] codePoints, int startIndex, int length)
+        {
+            if (codePoints is null)
+                throw new ArgumentNullException(nameof(codePoints));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR2.ArgumentOutOfRange_NeedNonNegNum);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR2.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > codePoints.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+
+            int countThreashold = 1024; // If the number of chars exceeds this, we count them instead of allocating count * 2
+            
+            int arrayLength = 0;
+            // if we go over the threashold, count the number of 
+            // chars we will need so we can allocate the precise amount of memory
+            if (length > countThreashold)
+            {
+                int end = startIndex + length;
+                for (int j = startIndex; j < end; ++j)
+                {
+                    arrayLength += CharCount(codePoints[j]);
+                }
+            }
+            // If we don't have any characters at this point,
+            // as a last resort, assume each codepoint
+            // is 2 characters (since it cannot be longer than this)
+            if (arrayLength < 1)
+            {
+                arrayLength = length * 2;
+            }
+
+            // Initialize our array to our exact or oversized length.
+            // It is now safe to assume we have enough space for all of the characters.
+            char[] buffer = new char[arrayLength];
+            int totalLength = 0;
+            for (int i = startIndex; i < startIndex + length; i++)
+            {
+                totalLength += ToChars(codePoints[i], buffer, totalLength);
+            }
+            // Size the result to the exact length that is counted as the code points
+            // are converted.
+            return new string(buffer, 0, totalLength);
+        }
     }
 }

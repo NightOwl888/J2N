@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO.MemoryMappedFiles;
+#nullable enable
 
 namespace J2N.IO.MemoryMappedFiles
 {
@@ -88,7 +89,7 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Put(byte[] source, int offset, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;

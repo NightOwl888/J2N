@@ -1,4 +1,5 @@
 ﻿using System;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -81,7 +82,7 @@ namespace J2N.IO
 
         public override Int64Buffer Put(long[] source, int offset, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;

@@ -1,4 +1,6 @@
-﻿namespace J2N.IO
+﻿#nullable enable
+
+namespace J2N.IO
 {
     /// <summary>
     /// <see cref="HeapByteBuffer"/>, <see cref="ReadWriteHeapByteBuffer"/> and <see cref="ReadOnlyHeapByteBuffer"/> compose

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -58,7 +59,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static ByteBuffer Wrap(byte[] array)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
 
             return new ReadWriteHeapByteBuffer(array);
@@ -89,7 +90,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static ByteBuffer Wrap(byte[] array, int startIndex, int length)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
 
             int actualLength = array.Length;
@@ -288,11 +289,9 @@ namespace J2N.IO
         /// equals to <c>other</c>; a positive value if this is greater
         /// than <c>other</c>.
         /// </returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c>.</exception>
-        public virtual int CompareTo(ByteBuffer other)
+        public virtual int CompareTo(ByteBuffer? other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
 
             int compareRemaining = (Remaining < other.Remaining) ? Remaining
                     : other.Remaining;
@@ -343,13 +342,12 @@ namespace J2N.IO
         /// <c>true</c> if this byte buffer is equal to <paramref name="other"/>,
         /// <c>false</c> otherwise.
         /// </returns>
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
-            if (!(other is ByteBuffer) || other == null)
+            if (other is null || !(other is ByteBuffer otherBuffer))
             {
                 return false;
             }
-            ByteBuffer otherBuffer = (ByteBuffer)other;
 
             if (Remaining != otherBuffer.Remaining)
             {
@@ -387,7 +385,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Get(byte[] destination)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             return Get(destination, 0, destination.Length);
@@ -418,7 +416,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Get(byte[] destination, int offset, int length)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             int len = destination.Length;
@@ -692,7 +690,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public ByteBuffer Put(byte[] source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             return Put(source, 0, source.Length);
@@ -725,7 +723,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Put(byte[] source, int offset, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;
@@ -758,10 +756,10 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Put(ByteBuffer source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
-            if (source == this)
-                throw new ArgumentException();
+            if (ReferenceEquals(source, this))
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
             if (source.Remaining > Remaining)
                 throw new BufferOverflowException();
             if (IsReadOnly)

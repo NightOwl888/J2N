@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+#nullable enable
 
 namespace J2N.Runtime.CompilerServices
 {
@@ -25,7 +26,7 @@ namespace J2N.Runtime.CompilerServices
         private IdentityEqualityComparer() { } // Singleton instance only
 
         /// <inheritdoc />
-        public bool Equals(T left, T right)
+        public bool Equals(T? left, T? right)
         {
             return object.ReferenceEquals(left, right);
         }
@@ -37,7 +38,7 @@ namespace J2N.Runtime.CompilerServices
         }
 
         /// <inheritdoc />
-        public new bool Equals(object left, object right)
+        public new bool Equals(object? left, object? right)
         {
             return object.ReferenceEquals(left, right);
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -25,7 +26,7 @@ namespace J2N.IO
         private byte[] buff;
 
         private readonly Stream input;
-        private char[] lineBuffer;
+        private char[]? lineBuffer;
         private readonly bool leaveOpen;
 
         /// <summary>
@@ -84,7 +85,7 @@ namespace J2N.IO
         /// <see cref="IDataOutput.Write(byte[], int, int)"/>
         public int Read(byte[] buffer)
         {
-            if (buffer == null)
+            if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
             return input.Read(buffer, 0, buffer.Length);
@@ -112,7 +113,7 @@ namespace J2N.IO
         /// <see cref="IDataOutput.Write(byte[], int, int)"/>
         public int Read(byte[] buffer, int offset, int length)
         {
-            if (buffer == null)
+            if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
             return input.Read(buffer, offset, length);
@@ -228,7 +229,7 @@ namespace J2N.IO
         /// <seealso cref="IDataOutput.Write(byte[], int, int)"/>
         public void ReadFully(byte[] buffer)
         {
-            if (buffer == null)
+            if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
 
             ReadFully(buffer, 0, buffer.Length);
@@ -262,7 +263,7 @@ namespace J2N.IO
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length == 0)
                 return;
-            if (buffer == null)
+            if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
             if (offset < 0)
                 throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -309,11 +310,11 @@ namespace J2N.IO
         /// read before the end of the source stream has been reached.</returns>
         /// <exception cref="IOException">If a problem occurs while reading from this stream.</exception>
         [Obsolete("Use BufferedReader")]
-        public string ReadLine()
+        public string? ReadLine()
         {
-            char[] buf = lineBuffer;
+            char[]? buf = lineBuffer;
 
-            if (buf == null)
+            if (buf is null)
             {
                 buf = lineBuffer = new char[128];
             }
@@ -351,7 +352,7 @@ namespace J2N.IO
                         {
                             buf = new char[offset + 128];
                             room = buf.Length - offset - 1;
-                            System.Array.Copy(lineBuffer, 0, buf, 0, offset);
+                            System.Array.Copy(lineBuffer!, 0, buf, 0, offset);
                             lineBuffer = buf;
                         }
                         buf[offset++] = (char)c;
@@ -490,7 +491,7 @@ namespace J2N.IO
         /// <seealso cref="DataOutputStream.WriteUTF(string)"/>
         public static string ReadUTF(IDataInput input)
         {
-            if (input == null)
+            if (input is null)
                 throw new ArgumentNullException(nameof(input));
 
             return DecodeUTF(input.ReadUInt16(), input);

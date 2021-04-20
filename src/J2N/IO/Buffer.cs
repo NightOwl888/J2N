@@ -1,4 +1,5 @@
 ﻿using System;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -84,6 +85,7 @@ namespace J2N.IO
         /// Construct a buffer with the specified capacity.
         /// </summary>
         /// <param name="capacity">The capacity of this buffer</param>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="capacity"/> is less than zero.</exception>
         internal Buffer(int capacity)
         {
             if (capacity < 0)
@@ -172,13 +174,13 @@ namespace J2N.IO
         /// </summary>
         /// <param name="newLimit">The new limit value; must be non-negative and no larger than this buffer's capacity</param>
         /// <returns>This buffer</returns>
-        /// <exception cref="ArgumentException">If <paramref name="newLimit"/> is invalid.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newLimit"/> is less than zero or greater than <see cref="Capacity"/>.</exception>
         public Buffer SetLimit(int newLimit)
         {
-            if (newLimit < 0 || newLimit > capacity)
-            {
-                throw new ArgumentException();
-            }
+            if (newLimit < 0)
+                throw new ArgumentOutOfRangeException(nameof(newLimit), newLimit, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (newLimit > capacity)
+                throw new ArgumentOutOfRangeException(nameof(newLimit), newLimit, J2N.SR.Format(SR.Argument_MinMaxValue, nameof(newLimit), nameof(Capacity)));
 
             limit = newLimit;
             if (position > newLimit)
@@ -220,13 +222,13 @@ namespace J2N.IO
         /// </summary>
         /// <param name="newPosition">The new position, must be not negative and not greater than limit.</param>
         /// <returns>This buffer</returns>
-        /// <exception cref="ArgumentException">If <paramref name="newPosition"/> is invalid.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newPosition"/> is less than zero or greater than <see cref="Limit"/>.</exception>
         public Buffer SetPosition(int newPosition)
         {
-            if (newPosition < 0 || newPosition > limit)
-            {
-                throw new ArgumentException();
-            }
+            if (newPosition < 0)
+                throw new ArgumentOutOfRangeException(nameof(newPosition), newPosition, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (newPosition > limit)
+                throw new ArgumentOutOfRangeException(nameof(newPosition), newPosition, J2N.SR.Format(SR.Argument_MinMaxValue, nameof(newPosition), nameof(Limit)));
 
             position = newPosition;
             if ((mark != UnsetMark) && (mark > position))

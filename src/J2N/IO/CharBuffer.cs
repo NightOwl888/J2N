@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -48,7 +49,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(char[] array)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
 
             return Wrap(array, 0, array.Length);
@@ -76,7 +77,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(char[] array, int startIndex, int length)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
 
             int len = array.Length;
@@ -107,7 +108,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(string characterSequence)
         {
-            if (characterSequence == null)
+            if (characterSequence is null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
             return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringAdapter?
@@ -139,7 +140,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(string characterSequence, int startIndex, int length)
         {
-            if (characterSequence == null)
+            if (characterSequence is null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
             int len = characterSequence.Length;
@@ -168,7 +169,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(StringBuilder characterSequence)
         {
-            if (characterSequence == null)
+            if (characterSequence is null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
             return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringBuilderAdapter?
@@ -200,7 +201,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(StringBuilder characterSequence, int startIndex, int length)
         {
-            if (characterSequence == null)
+            if (characterSequence is null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
             int len = characterSequence.Length;
@@ -231,7 +232,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence)
         {
-            if (characterSequence == null)
+            if (characterSequence is null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
             return new CharSequenceAdapter(characterSequence);
@@ -263,7 +264,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence, int startIndex, int length)
         {
-            if (characterSequence == null)
+            if (characterSequence is null)
                 throw new ArgumentNullException(nameof(characterSequence));
 
             int len = characterSequence.Length;
@@ -361,11 +362,9 @@ namespace J2N.IO
         /// <returns>A negative value if this is less than <paramref name="other"/>; 0 if
         /// this equals to <paramref name="other"/>; a positive valie if this is
         /// greater than <paramref name="other"/>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c>.</exception>
-        public virtual int CompareTo(CharBuffer other)
+        public virtual int CompareTo(CharBuffer? other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
 
             int compareRemaining = (Remaining < other.Remaining) ? Remaining
                     : other.Remaining;
@@ -413,13 +412,12 @@ namespace J2N.IO
         /// </summary>
         /// <param name="other">The object to compare with this char buffer.</param>
         /// <returns><c>true</c> if this char buffer is equal to <paramref name="other"/>, <c>false</c> otherwise.</returns>
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
-            if (!(other is CharBuffer))
+            if (other is null || !(other is CharBuffer otherBuffer))
             {
                 return false;
             }
-            CharBuffer otherBuffer = (CharBuffer)other;
 
             if (Remaining != otherBuffer.Remaining)
             {
@@ -456,7 +454,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual CharBuffer Get(char[] destination)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             return Get(destination, 0, destination.Length);
@@ -484,7 +482,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual CharBuffer Get(char[] destination, int offset, int length)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             int len = destination.Length;
@@ -611,7 +609,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public CharBuffer Put(char[] source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             return Put(source, 0, source.Length);
@@ -640,7 +638,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public virtual CharBuffer Put(char[] source, int offset, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;
@@ -675,10 +673,10 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual CharBuffer Put(CharBuffer source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
-            if (source == this)
-                throw new ArgumentException();
+            if (ReferenceEquals(source, this))
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
             if (source.Remaining > Remaining)
                 throw new BufferOverflowException();
             if (IsReadOnly)
@@ -715,7 +713,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public CharBuffer Put(string source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             return Put(source, 0, source.Length);
@@ -747,7 +745,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public virtual CharBuffer Put(string source, int startIndex, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;
@@ -899,7 +897,7 @@ namespace J2N.IO
         public virtual CharBuffer Append(char[] value, int startIndex, int count)
         {
             ICharSequence cs;
-            if (value == null)
+            if (value is null)
                 cs = "null".Subsequence(startIndex, count); //$NON-NLS-1$
             else
                 cs = value.Subsequence(startIndex, count);
@@ -958,7 +956,7 @@ namespace J2N.IO
         public virtual CharBuffer Append(StringBuilder value, int startIndex, int count)
         {
             string cs;
-            if (value == null)
+            if (value is null)
                 cs = "null".Substring(startIndex, count);
             else
                 cs = value.ToString(startIndex, count);
@@ -1017,7 +1015,7 @@ namespace J2N.IO
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
         public virtual CharBuffer Append(string value, int startIndex, int count)
         {
-            if (value == null)
+            if (value is null)
                 value = "null";
 
             string cs = value.Substring(startIndex, count);
@@ -1075,7 +1073,7 @@ namespace J2N.IO
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
         public virtual CharBuffer Append(ICharSequence value, int startIndex, int count)
         {
-            if (value == null)
+            if (value is null)
             {
                 value = "null".AsCharSequence(); //$NON-NLS-1$
             }
@@ -1102,7 +1100,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="target"/> is <c>null</c>.</exception>
         public virtual int Read(CharBuffer target)
         {
-            if (target == null)
+            if (target is null)
                 throw new ArgumentNullException(nameof(target));
 
             int remaining = Remaining;
@@ -1112,7 +1110,7 @@ namespace J2N.IO
                 {
                     return -1;
                 }
-                throw new ArgumentException();
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(target), nameof(target)));
             }
             if (remaining == 0)
             {

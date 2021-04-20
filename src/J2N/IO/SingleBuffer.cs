@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -47,7 +48,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static SingleBuffer Wrap(float[] array)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
 
             return Wrap(array, 0, array.Length);
@@ -74,7 +75,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static SingleBuffer Wrap(float[] array, int startIndex, int length)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -150,11 +151,9 @@ namespace J2N.IO
         /// <returns>a negative value if this is less than <paramref name="other"/>; 0 if this
         /// equals to <paramref name="other"/>; a positive value if this is greater
         /// than <paramref name="other"/>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c>.</exception>
-        public virtual int CompareTo(SingleBuffer other)
+        public virtual int CompareTo(SingleBuffer? other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
 
             int num = Math.Min(Remaining, other.Remaining);
             int pos_this = position;
@@ -194,13 +193,12 @@ namespace J2N.IO
         /// <param name="other">The object to compare with this <see cref="SingleBuffer"/>.</param>
         /// <returns><c>true</c> if this <see cref="SingleBuffer"/> is equal to <paramref name="other"/>,
         /// <c>false</c> otherwise.</returns>
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
-            if (!(other is SingleBuffer))
+            if (other is null || !(other is SingleBuffer otherBuffer))
             {
                 return false;
             }
-            SingleBuffer otherBuffer = (SingleBuffer)other;
 
             if (Remaining != otherBuffer.Remaining)
             {
@@ -241,7 +239,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual SingleBuffer Get(float[] destination)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             return Get(destination, 0, destination.Length);
@@ -269,7 +267,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual SingleBuffer Get(float[] destination, int offset, int length)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             int len = destination.Length;
@@ -385,7 +383,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public SingleBuffer Put(float[] source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             return Put(source, 0, source.Length);
@@ -413,7 +411,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual SingleBuffer Put(float[] source, int offset, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
 
             int len = source.Length;
@@ -446,10 +444,10 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual SingleBuffer Put(SingleBuffer source)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
-            if (source == this)
-                throw new ArgumentException();
+            if (ReferenceEquals(source, this))
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
             if (source.Remaining > Remaining)
                 throw new BufferOverflowException();
             if (IsReadOnly)

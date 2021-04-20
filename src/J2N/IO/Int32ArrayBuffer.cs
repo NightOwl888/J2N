@@ -1,4 +1,5 @@
 ﻿using System;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -54,7 +55,7 @@ namespace J2N.IO
 
         public override sealed Int32Buffer Get(int[] destination, int offset, int length)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             int len = destination.Length;

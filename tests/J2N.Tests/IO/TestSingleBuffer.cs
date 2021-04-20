@@ -163,15 +163,19 @@ namespace J2N.IO
         [Test]
         public virtual void TestCompareTo()
         {
-            try
-            {
-                buf.CompareTo(null);
-                fail("Should throw NPE");
-            }
-            catch (ArgumentNullException e)
-            {
-                // expected
-            }
+            // J2N: Changed the behavior from Java because in .NET CompareTo is supposed to return 1 instead of throwing an exception when passed null
+            //try
+            //{
+            //    buf.CompareTo(null);
+            //    fail("Should throw NPE");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+
+            // J2N: Cover null for .NET. See: https://stackoverflow.com/a/4852537
+            assertEquals(1, buf.CompareTo(null));
 
             // compare to self
             assertEquals(0, buf.CompareTo(buf));
@@ -204,7 +208,6 @@ namespace J2N.IO
                     .CompareTo(fbuffer1));
             assertEquals("Failed less than comparison with NaN entry", -1, fbuffer1 // J2N: Corrected this (Harmony) test to match JDK 7, which expects NaN to be symmetric. This also matches .NET float.CompareTo().
                     .CompareTo(fbuffer3));
-
         }
 
         [Test]

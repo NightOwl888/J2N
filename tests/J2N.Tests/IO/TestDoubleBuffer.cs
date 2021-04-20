@@ -215,6 +215,9 @@ namespace J2N.IO
                     .CompareTo(dbuffer1));
             assertEquals("Failed less than comparison with NaN entry", -1, dbuffer1 // J2N: Corrected this (Harmony) test to match JDK 7, which expects NaN to be symmetric. This also matches .NET double.CompareTo().
                     .CompareTo(dbuffer3));
+
+            // J2N: Cover null for .NET. See: https://stackoverflow.com/a/4852537
+            assertEquals(1, buf.CompareTo(null));
         }
 
         [Test]

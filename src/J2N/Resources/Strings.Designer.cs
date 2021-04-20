@@ -10,7 +10,7 @@
 
 namespace J2N.Resources {
     using System;
-    using System.Reflection;
+    
     
     /// <summary>
     ///   A strongly-typed resource class, for looking up localized strings, etc.
@@ -39,12 +39,7 @@ namespace J2N.Resources {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("J2N.Resources.Strings",
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                        typeof(Strings).GetTypeInfo().Assembly);
-#else
-                        typeof(Strings).Assembly);
-#endif
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("J2N.Resources.Strings", typeof(Strings).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -251,6 +246,15 @@ namespace J2N.Resources {
         internal static string Argument_MustBePrimitiveType {
             get {
                 return ResourceManager.GetString("Argument_MustBePrimitiveType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must not be the same instance as this..
+        /// </summary>
+        internal static string Argument_MustNotBeThis {
+            get {
+                return ResourceManager.GetString("Argument_MustNotBeThis", resourceCulture);
             }
         }
         

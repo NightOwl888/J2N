@@ -1,4 +1,5 @@
 ﻿using System;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -50,7 +51,7 @@ namespace J2N.IO
         /// <seealso cref="ByteBuffer.Get(byte[], int, int)"/>
         public override sealed ByteBuffer Get(byte[] destination, int offset, int length)
         {
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
 
             int len = destination.Length;
@@ -230,7 +231,7 @@ namespace J2N.IO
         protected short LoadInt16(int index)
         {
             int baseOffset = offset + index;
-            short bytes = 0;
+            short bytes; // IDE0059: Unnecessary assignment of a value
             if (order == Endianness.BigEndian)
             {
                 bytes = (short)(backingArray[baseOffset] << 8);

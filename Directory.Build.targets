@@ -1,8 +1,4 @@
 ﻿<Project>
-  <PropertyGroup>
-    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
-  </PropertyGroup>
-  
   <!-- Features in .NET Standard, .NET Core, and .NET 5.x only (no .NET Framework support) -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) ">
 
@@ -68,6 +64,9 @@
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMAPPEDVIEWACCESSOR_READWRITEARRAY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_INTERNALCALL</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
+    
+    <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
+    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADINTERRUPT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADYIELD</DefineConstants>
@@ -97,7 +96,6 @@
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
 
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMAPPEDFILESECURITY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_RANDOM</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_STRINGS</DefineConstants>
 

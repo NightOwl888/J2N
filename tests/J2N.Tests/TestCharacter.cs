@@ -2662,5 +2662,106 @@ namespace J2N
         ////            .getDirectionality(0x202C));
         ////}
 
+
+        // J2N: Tess the static Character.ToString() method to ensure it does the same thing as the Java constructor overload of String.
+        // Basically, just replaced "new String(" with "Character.ToString(".
+        /**
+         * @tests java.lang.String#String(int[],int,int)
+         */
+        [Test]
+        public void TestToString_Int32Array_Int32_Int32() //test_Constructor_III()
+        {
+            assertEquals("HelloWorld", Character.ToString(new int[] { 'H', 'e', 'l', 'l',
+                'o', 'W', 'o', 'r', 'l', 'd' }, 0, 10));
+            assertEquals("Hello", Character.ToString(new int[] { 'H', 'e', 'l', 'l', 'o',
+                'W', 'o', 'r', 'l', 'd' }, 0, 5));
+            assertEquals("World", Character.ToString(new int[] { 'H', 'e', 'l', 'l', 'o',
+                'W', 'o', 'r', 'l', 'd' }, 5, 5));
+            assertEquals("", Character.ToString(new int[] { 'H', 'e', 'l', 'l', 'o', 'W',
+                'o', 'r', 'l', 'd' }, 5, 0));
+
+            assertEquals("\uD800\uDC00", Character.ToString(new int[] { 0x010000 }, 0, 1));
+            assertEquals("\uD800\uDC00a\uDBFF\uDFFF", Character.ToString(new int[] {
+                0x010000, 'a', 0x010FFFF }, 0, 3));
+
+            try
+            {
+                Character.ToString((int[])null, 0, 1);
+                fail("No NPE");
+            }
+            catch (ArgumentNullException e)
+            {
+            }
+
+            try
+            {
+                Character.ToString(new int[] { 'a', 'b' }, -1, 2);
+                fail("No IOOBE, negative offset");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.ToString(new int[] { 'a', 'b' }, 0, -1);
+                fail("No IOOBE, negative count");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.ToString(new int[] { 'a', 'b' }, 0, -1);
+                fail("No IOOBE, negative count");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.ToString(new int[] { 'a', 'b' }, 0, 3);
+                fail("No IOOBE, too large");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+        }
+
+        [Test]
+        public virtual void TestNewString() // From Lucene.NET TestUnicodeUtil
+        {
+            int[] codePoints = new int[] { Character.ToCodePoint(Character.MinHighSurrogate, Character.MaxLowSurrogate), Character.ToCodePoint(Character.MaxHighSurrogate, Character.MinLowSurrogate), Character.MaxHighSurrogate, 'A', -1 };
+
+            string cpString = "" + Character.MinHighSurrogate + Character.MaxLowSurrogate + Character.MaxHighSurrogate + Character.MinLowSurrogate + Character.MaxHighSurrogate + 'A';
+
+            int[][] tests = new int[][] { new int[] { 0, 1, 0, 2 }, new int[] { 0, 2, 0, 4 }, new int[] { 1, 1, 2, 2 }, new int[] { 1, 2, 2, 3 }, new int[] { 1, 3, 2, 4 }, new int[] { 2, 2, 4, 2 }, new int[] { 2, 3, 0, -1 }, new int[] { 4, 5, 0, -1 }, new int[] { 3, -1, 0, -1 } };
+
+            for (int i = 0; i < tests.Length; ++i)
+            {
+                int[] t = tests[i];
+                int s = t[0];
+                int c = t[1];
+                int rs = t[2];
+                int rc = t[3];
+
+                try
+                {
+                    string str = Character.ToString(codePoints, s, c);
+                    Assert.IsFalse(rc == -1);
+                    Assert.AreEqual(cpString.Substring(rs, rc), str);
+                    continue;
+                }
+#pragma warning disable 168, IDE0059
+                catch (ArgumentException e2)
+#pragma warning restore 168, IDE0059
+                {
+                    // Ignored.
+                }
+                Assert.IsTrue(rc == -1);
+            }
+        }
     }
 }

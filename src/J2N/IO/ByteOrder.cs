@@ -1,4 +1,5 @@
 ﻿using System;
+#nullable enable
 
 namespace J2N.IO
 {
@@ -24,7 +25,7 @@ namespace J2N.IO
         private static ByteOrder LoadNativeByteOrder()
         {
             // Read endianness from the current system.
-            return System.BitConverter.IsLittleEndian ? LittleEndian : BigEndian;
+            return BitConverter.IsLittleEndian ? LittleEndian : BigEndian;
         }
 
         private readonly string name;
