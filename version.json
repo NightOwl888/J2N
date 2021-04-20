@@ -6,6 +6,7 @@
   },
   "versionHeightOffset": "-49",
   "publicReleaseRefSpec": [
+    "^refs/heads/main$",
     "^refs/heads/master$",
     "^refs/heads/release/v\\d+(?:\\.\\d+)?(?:\\.\\d+)?$",
     "^refs/tags/v\\d+\\.\\d+"
