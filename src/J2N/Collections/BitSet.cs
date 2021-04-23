@@ -577,7 +577,7 @@ namespace J2N.Collections
         /// <paramref name="position"/> &gt; size.
         /// </summary>
         /// <param name="position">The index of the bit to flip.</param>
-        /// <exception cref="IndexOutOfRangeException">If <paramref name="position"/> is negative.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="position"/> is negative.</exception>
         /// <seealso cref="Flip(int, int)"/>
         public virtual void Flip(int position)
         {
