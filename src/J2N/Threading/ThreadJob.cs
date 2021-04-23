@@ -1,4 +1,7 @@
 ﻿using System;
+#if FEATURE_EXCEPTIONDISPATCHINFO
+using System.Runtime.ExceptionServices;
+#endif
 using System.Threading;
 
 
@@ -290,7 +293,25 @@ namespace J2N.Threading
         /// control logic depends on the specific exception type being thrown. An alternative way to get the original
         /// <see cref="Exception.ToString()"/> message is to use <c>exception.Data["OriginalMessage"].ToString()</c>.
         /// </summary>
+#if FEATURE_EXCEPTIONDISPATCHINFO
+        [Obsolete("This setting no longer has any effect, as we are throwing the exception using ExceptionDispatchInfo so the stack trace is 'always on'.")]
+#endif
         public bool IsDebug { get; set; }
+
+        private void RethrowFirstException()
+        {
+            if (exception != null)
+            {
+#if FEATURE_EXCEPTIONDISPATCHINFO
+                ExceptionDispatchInfo.Capture(exception).Throw();
+#else
+                if (IsDebug)
+                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
+                else
+                    throw exception;
+#endif
+            }
+        }
 
         /// <summary>
         /// Blocks the calling thread until a thread terminates.
@@ -298,13 +319,7 @@ namespace J2N.Threading
         public void Join()
         {
             thread.Join();
-            if (exception != null)
-            {
-                if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
-                else
-                    throw exception;
-            }
+            RethrowFirstException();
         }
 
         /// <summary>
@@ -314,13 +329,7 @@ namespace J2N.Threading
         public void Join(long milliSeconds)
         {
             thread.Join(Convert.ToInt32(milliSeconds));
-            if (exception != null)
-            {
-                if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
-                else
-                    throw exception;
-            }
+            RethrowFirstException();
         }
 
         /// <summary>
@@ -333,13 +342,7 @@ namespace J2N.Threading
             int totalTime = Convert.ToInt32(milliSeconds + (nanoSeconds * 0.000001));
 
             thread.Join(totalTime);
-            if (exception != null)
-            {
-                if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
-                else
-                    throw exception;
-            }
+            RethrowFirstException();
         }
 
         /// <summary>

@@ -6,6 +6,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_CHARARRAYPOINTERS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ENCODINGPROVIDERS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEINFORMATION</DefineConstants>
     
     <DebugType>portable</DebugType>
@@ -110,6 +111,7 @@
 
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
