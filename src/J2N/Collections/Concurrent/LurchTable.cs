@@ -21,6 +21,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
+
 namespace J2N.Collections.Concurrent
 {
     using SR = J2N.Resources.Strings;
@@ -57,7 +58,9 @@ namespace J2N.Collections.Concurrent
     /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     public class LurchTable<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -67,11 +70,11 @@ namespace J2N.Collections.Concurrent
         public delegate void ItemUpdatedMethod(KeyValuePair<TKey, TValue> previous, KeyValuePair<TKey, TValue> next);
 
         /// <summary> Event raised after an item is removed from the collection </summary>
-        public event Action<KeyValuePair<TKey, TValue>> ItemRemoved;
+        public event Action<KeyValuePair<TKey, TValue>>? ItemRemoved;
         /// <summary> Event raised after an item is updated in the collection </summary>
-        public event ItemUpdatedMethod ItemUpdated;
+        public event ItemUpdatedMethod? ItemUpdated;
         /// <summary> Event raised after an item is added to the collection </summary>
-        public event Action<KeyValuePair<TKey, TValue>> ItemAdded;
+        public event Action<KeyValuePair<TKey, TValue>>? ItemAdded;
 
         private const int OverAlloc = 128;
         private const int FreeSlots = 32;
@@ -89,7 +92,7 @@ namespace J2N.Collections.Concurrent
         private int _used, _count;
         private int _allocNext, _freeVersion;
 
-        private object _syncRoot;
+        private object? _syncRoot;
 
         #region Constructors
 
@@ -127,7 +130,7 @@ namespace J2N.Collections.Concurrent
         /// <paramref name="capacity"/> items efficiently with the specified <paramref name="comparer"/>.</summary>
         /// <param name="capacity">The initial allowable number of items before allocation of more memory.</param>
         /// <param name="comparer">The element hash generator for keys, or <c>null</c> to use <see cref="J2N.Collections.Generic.EqualityComparer{TKey}.Default"/>.</param>
-        public LurchTable(int capacity, IEqualityComparer<TKey> comparer)
+        public LurchTable(int capacity, IEqualityComparer<TKey>? comparer)
             : this(capacity, LurchTableOrder.None, int.MaxValue, comparer) { }
 
         /// <summary>Initializes a new instance of <see cref="LurchTable{TKey, TValue}"/> that orders items by
@@ -156,7 +159,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// <paramref name="ordering"/> is <see cref="LurchTableOrder.None"/> and <paramref name="limit"/> is less than <see cref="int.MaxValue"/>.
         /// </exception>
-        public LurchTable(LurchTableOrder ordering, int limit, IEqualityComparer<TKey> comparer)
+        public LurchTable(LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
             : this(limit, ordering, limit, comparer) { }
 
         /// <summary>
@@ -179,7 +182,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// <paramref name="ordering"/> is <see cref="LurchTableOrder.None"/> and <paramref name="limit"/> is less than <see cref="int.MaxValue"/>.
         /// </exception>
-        public LurchTable(int capacity, LurchTableOrder ordering, int limit, IEqualityComparer<TKey> comparer)
+        public LurchTable(int capacity, LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
             : this(capacity, ordering, limit, capacity >> 1, capacity >> 4, capacity >> 8, comparer) { }
 
         /// <summary>
@@ -201,10 +204,12 @@ namespace J2N.Collections.Concurrent
         /// </exception>
         // J2N: Original constructor still used by tests. This constructor didn't provide a straightforward way to put a guard clause on
         // capacity to ensure it is non-negative.
-        internal LurchTable(LurchTableOrder ordering, int limit, int hashSize, int allocSize, int lockSize, IEqualityComparer<TKey> comparer)
+        internal LurchTable(LurchTableOrder ordering, int limit, int hashSize, int allocSize, int lockSize, IEqualityComparer<TKey>? comparer)
             : this(hashSize << 1, ordering, limit, hashSize, allocSize, lockSize, comparer) { }
 
-        private LurchTable(int capacity, LurchTableOrder ordering, int limit, int hashSize, int allocSize, int lockSize, IEqualityComparer<TKey> comparer)
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
+        private LurchTable(int capacity, LurchTableOrder ordering, int limit, int hashSize, int allocSize, int lockSize, IEqualityComparer<TKey>? comparer)
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -266,7 +271,9 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary) : this(dictionary, LurchTableOrder.None, null) { }
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements
@@ -294,7 +301,9 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering) : this(dictionary, ordering, null) { }
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements copied
@@ -327,7 +336,9 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-        public LurchTable(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer) : this(dictionary, LurchTableOrder.None, comparer) { }
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+        public LurchTable(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer) : this(dictionary, LurchTableOrder.None, comparer) { }
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements copied
@@ -361,7 +372,9 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-        public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, IEqualityComparer<TKey> comparer)
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+        public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, IEqualityComparer<TKey>? comparer)
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             : this(dictionary, ordering, int.MaxValue, comparer) { }
 
         /// <summary>
@@ -397,8 +410,10 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-        public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, int limit, IEqualityComparer<TKey> comparer)
-            : this(dictionary != null ? dictionary.Count : 0, ordering, limit, comparer)
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+        public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+            : this(dictionary is null ? 0 : dictionary.Count, ordering, limit, comparer)
         {
             if (dictionary == null)
                 throw new ArgumentNullException(nameof(dictionary));
@@ -492,7 +507,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="collection"/>.
         /// </remarks>
-        public LurchTable(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer) : this(collection, LurchTableOrder.None, comparer) { }
+        public LurchTable(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer) : this(collection, LurchTableOrder.None, comparer) { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements copied
@@ -526,7 +541,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="collection"/>.
         /// </remarks>
-        public LurchTable(IEnumerable<KeyValuePair<TKey, TValue>> collection, LurchTableOrder ordering, IEqualityComparer<TKey> comparer)
+        public LurchTable(IEnumerable<KeyValuePair<TKey, TValue>> collection, LurchTableOrder ordering, IEqualityComparer<TKey>? comparer)
             : this(collection, ordering, int.MaxValue, comparer) { }
 
         /// <summary>
@@ -563,10 +578,10 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="collection"/>.
         /// </remarks>
-        public LurchTable(IEnumerable<KeyValuePair<TKey, TValue>> collection, LurchTableOrder ordering, int limit, IEqualityComparer<TKey> comparer)
+        public LurchTable(IEnumerable<KeyValuePair<TKey, TValue>> collection, LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
             : this(collection is ICollection<KeyValuePair<TKey, TValue>> col ? col.Count : 0, ordering, limit, comparer)
         {
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
 
             CopyConstructorAddRange(collection);
@@ -592,7 +607,7 @@ namespace J2N.Collections.Concurrent
         {
             if (disposing)
             {
-                _entries = null;
+                _entries = null!;
                 _used = _count = 0;
             }
         }
@@ -762,13 +777,13 @@ namespace J2N.Collections.Concurrent
             {
                 if (_syncRoot == null)
                 {
-                    Interlocked.CompareExchange<object/*?*/>(ref _syncRoot, new object(), null);
+                    Interlocked.CompareExchange<object?>(ref _syncRoot, new object(), null);
                 }
                 return _syncRoot;
             }
         }
 
-        object IDictionary.this[object key]
+        object? IDictionary.this[object key]
         {
             get
             {
@@ -795,7 +810,7 @@ namespace J2N.Collections.Concurrent
                     TKey tempKey = (TKey)key;
                     try
                     {
-                        this[tempKey] = (TValue)value;
+                        this[tempKey!] = (TValue)value!;
                     }
                     catch (InvalidCastException)
                     {
@@ -809,7 +824,7 @@ namespace J2N.Collections.Concurrent
             }
         }
 
-        void IDictionary.Add(object key, object value)
+        void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
             if (key is null && !typeof(TKey).IsNullableType())
@@ -823,7 +838,7 @@ namespace J2N.Collections.Concurrent
 
                 try
                 {
-                    Add(tempKey, (TValue)value);
+                    Add(tempKey!, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -878,7 +893,7 @@ namespace J2N.Collections.Concurrent
             else if (array is DictionaryEntry[] dictEntryArray)
             {
                 foreach (var item in this)
-                    dictEntryArray[index++] = new DictionaryEntry(item.Key, item.Value);
+                    dictEntryArray[index++] = new DictionaryEntry(item.Key!, item.Value);
             }
             else
             {
@@ -978,7 +993,9 @@ namespace J2N.Collections.Concurrent
         /// <c>true</c> if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>
         /// contains an element with the specified key; otherwise, <c>false</c>.
         /// </returns>
-        public bool TryGetValue(TKey key, out TValue value)
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
         {
             int hash = GetHash(key);
             return InternalGetValue(hash, key, out value);
@@ -991,9 +1008,9 @@ namespace J2N.Collections.Concurrent
         /// <param name="value">The value of the element to add. The value can be <c>null</c> for reference types.</param>
         /// <exception cref="ArgumentException">An element with the same key already exists
         /// in the <see cref="Dictionary{TKey, TValue}"/>.</exception>
-        public void Add(TKey key, TValue value)
+        public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
-            var info = new AddInfo<TKey, TValue> { Value = value };
+            var info = new AddInfo<TKey, TValue> { Value = value! };
             if (InsertResult.Inserted != Insert(key, ref info))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
         }
@@ -1077,7 +1094,7 @@ namespace J2N.Collections.Concurrent
         /// <c>true</c> if the element is successfully removed; otherwise, <c>false</c>. This method also returns
         /// <c>false</c> if <paramref name="key"/> was not found in the original <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </returns>
-        public bool TryRemove(TKey key, out TValue value)
+        public bool TryRemove(TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             var info = new DelInfo<TKey, TValue>();
             if (Delete(key, ref info))
@@ -1444,7 +1461,7 @@ namespace J2N.Collections.Concurrent
 
                     if (_getEnumeratorRetType == DictEntry)
                     {
-                        return new DictionaryEntry(Current.Key, Current.Value);
+                        return new DictionaryEntry(Current.Key!, Current.Value);
                     }
                     else
                     {
@@ -1503,9 +1520,11 @@ namespace J2N.Collections.Concurrent
                 _state.Init();
             }
 
-            object IDictionaryEnumerator.Key
+            object? IDictionaryEnumerator.Key
             {
+#pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
+#pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 {
                     int index = _state.Current;
                     if (index <= 0)
@@ -1515,7 +1534,7 @@ namespace J2N.Collections.Concurrent
                 }
             }
 
-            object IDictionaryEnumerator.Value
+            object? IDictionaryEnumerator.Value
             {
                 get
                 {
@@ -1535,7 +1554,7 @@ namespace J2N.Collections.Concurrent
                     if (index <= 0)
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
 
-                    return new DictionaryEntry(Current.Key, Current.Value);
+                    return new DictionaryEntry(Current.Key!, Current.Value);
                 }
             }
         }
@@ -1644,19 +1663,20 @@ namespace J2N.Collections.Concurrent
                 if (array.Length - index < _owner.Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
-                TKey[] keys = array as TKey[];
+                TKey[]? keys = array as TKey[];
                 if (keys != null)
                 {
                     CopyTo(keys, index);
                 }
                 else
                 {
-                    if (!(array is object[] objects))
+                    if (!(array is object?[]))
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
                     try
                     {
+                        object?[] objects = (object?[])array;
                         foreach (var item in this)
                             objects[index++] = item;
                     }
@@ -1743,7 +1763,7 @@ namespace J2N.Collections.Concurrent
                     _state.Unlock();
                 }
 
-                object IEnumerator.Current
+                object? IEnumerator.Current
                 {
                     get
                     {
@@ -1831,7 +1851,7 @@ namespace J2N.Collections.Concurrent
             #endregion
         }
 
-        private KeyCollection _keyCollection;
+        private KeyCollection? _keyCollection;
 
         /// <summary>
         /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the
@@ -1839,11 +1859,13 @@ namespace J2N.Collections.Concurrent
         /// </summary>
         public KeyCollection Keys => _keyCollection ?? (_keyCollection = new KeyCollection(this));
 
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
 #if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 #endif
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         #endregion
 
@@ -1952,12 +1974,13 @@ namespace J2N.Collections.Concurrent
                 }
                 else
                 {
-                    if (!(array is object[] objects))
+                    if (!(array is object?[]))
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
                     try
                     {
+                        object?[] objects = (object?[])array;
                         foreach (var entry in this)
                             objects[index++] = entry;
                     }
@@ -2040,7 +2063,7 @@ namespace J2N.Collections.Concurrent
                     _state.Unlock();
                 }
 
-                object IEnumerator.Current
+                object? IEnumerator.Current
                 {
                     get
                     {
@@ -2129,18 +2152,20 @@ namespace J2N.Collections.Concurrent
             #endregion
         }
 
-        private ValueCollection _valueCollection;
+        private ValueCollection? _valueCollection;
 
         /// <summary>
         /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </summary>
         public ValueCollection Values => _valueCollection ?? (_valueCollection = new ValueCollection(this));
 
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
 #if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 #endif
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         #endregion
 
@@ -2224,7 +2249,7 @@ namespace J2N.Collections.Concurrent
         /// </summary>
         /// <returns>False if no item was available</returns>
         /// <exception cref="InvalidOperationException">The table is unordered.</exception>
-        public bool TryDequeue(Predicate<KeyValuePair<TKey, TValue>> predicate, out KeyValuePair<TKey, TValue> value)
+        public bool TryDequeue(Predicate<KeyValuePair<TKey, TValue>>? predicate, out KeyValuePair<TKey, TValue> value)
         {
             if (_ordering == LurchTableOrder.None)
                 throw new InvalidOperationException();
@@ -2312,7 +2337,7 @@ namespace J2N.Collections.Concurrent
 
         private enum InsertResult { Inserted = 1, Updated = 2, Exists = 3, NotFound = 4 }
 
-        private bool InternalGetValue(int hash, TKey key, out TValue value)
+        private bool InternalGetValue(int hash, [AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (_entries == null)
                 throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
@@ -2373,7 +2398,7 @@ namespace J2N.Collections.Concurrent
             return false;
         }
 
-        private InsertResult Insert<T>(TKey key, ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
+        private InsertResult Insert<T>([AllowNull] TKey key, [MaybeNull] ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
         {
             if (_entries == null)
                 throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
@@ -2389,7 +2414,7 @@ namespace J2N.Collections.Concurrent
             return result;
         }
 
-        private InsertResult InternalInsert<T>(int hash, TKey key, out int added, ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
+        private InsertResult InternalInsert<T>(int hash, [AllowNull] TKey key, out int added, ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
         {
             int bucket = hash % _hsize;
             lock (_locks[bucket % _lsize])
@@ -2413,7 +2438,7 @@ namespace J2N.Collections.Concurrent
                                 InternalLink(index);
                             }
 
-                            ItemUpdated?.Invoke(new KeyValuePair<TKey, TValue>(key, original), new KeyValuePair<TKey, TValue>(key, temp));
+                            ItemUpdated?.Invoke(new KeyValuePair<TKey, TValue>(key!, original), new KeyValuePair<TKey, TValue>(key!, temp));
 
                             added = -1;
                             return InsertResult.Updated;
@@ -2437,7 +2462,7 @@ namespace J2N.Collections.Concurrent
                     if (_ordering != LurchTableOrder.None)
                         InternalLink(index);
 
-                    ItemAdded?.Invoke(new KeyValuePair<TKey, TValue>(key, temp));
+                    ItemAdded?.Invoke(new KeyValuePair<TKey, TValue>(key!, temp));
 
                     return InsertResult.Inserted;
                 }
@@ -2641,8 +2666,8 @@ namespace J2N.Collections.Concurrent
 
         private void FreeSlot(ref int index, int ver)
         {
-            _entries[index >> _shift][index & _shiftMask].Key = default;
-            _entries[index >> _shift][index & _shiftMask].Value = default;
+            _entries[index >> _shift][index & _shiftMask].Key = default!;
+            _entries[index >> _shift][index & _shiftMask].Value = default!;
             Interlocked.Exchange(ref _entries[index >> _shift][index & _shiftMask].Link, 0);
 
             int slot = (ver & int.MaxValue) % FreeSlots;
@@ -2657,7 +2682,7 @@ namespace J2N.Collections.Concurrent
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        private int GetHash(TKey key)
+        private int GetHash([AllowNull] TKey key)
         {
             return (key is null ? 0 : _comparer.GetHashCode(key)) & int.MaxValue;
         }
@@ -2665,10 +2690,13 @@ namespace J2N.Collections.Concurrent
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        private bool KeyEquals(TKey key1, TKey key2)
+        private bool KeyEquals([AllowNull] TKey key1, [AllowNull] TKey key2)
         {
             if (key1 is null)
                 return key2 is null;
+            if (key2 is null)
+                return false;
+
             return _comparer.Equals(key1, key2);
         }
 
@@ -2687,13 +2715,13 @@ namespace J2N.Collections.Concurrent
             public int Prev, Next; // insertion/access sequence ordering
             public int Link;
             public int Hash; // hash value of entry's Key
-            public TKey Key; // key of entry
-            public TValue Value; // value of entry
+            [AllowNull] public TKey Key; // key of entry
+            [AllowNull] public TValue Value; // value of entry
         }
 
         private struct EnumState
         {
-            private object _locked;
+            private object? _locked;
             public int Bucket, Current, Next;
             public void Init()
             {
@@ -2737,6 +2765,9 @@ namespace J2N.Collections.Concurrent
             {
                 if (x is null)
                     return y is null;
+                if (y is null)
+                    return false;
+
                 return wrappedComparer.Equals(x, y);
             }
 
@@ -2760,12 +2791,12 @@ namespace J2N.Collections.Concurrent
 
     internal struct DelInfo<TKey, TValue> : IRemoveValue<TKey, TValue>
     {
-        public TValue Value;
-        readonly bool _hasTestValue;
-        readonly TValue _testValue;
-        public KeyValuePredicate<TKey, TValue> Condition;
+        [AllowNull] public TValue Value;
+        private readonly bool _hasTestValue;
+        [AllowNull] private readonly TValue _testValue;
+        [AllowNull] public KeyValuePredicate<TKey, TValue> Condition;
 
-        public DelInfo(TValue expected)
+        public DelInfo([AllowNull] TValue expected)
         {
             Value = default;
             _testValue = expected;
@@ -2773,11 +2804,11 @@ namespace J2N.Collections.Concurrent
             Condition = null;
         }
 
-        public bool RemoveValue(TKey key, TValue value)
+        public bool RemoveValue([AllowNull] TKey key, [AllowNull] TValue value)
         {
             Value = value;
 
-            if (_hasTestValue && !J2N.Collections.Generic.EqualityComparer<TValue>.Default.Equals(_testValue, value))
+            if (_hasTestValue && !J2N.Collections.Generic.EqualityComparer<TValue>.Default.Equals(_testValue, value!))
                 return false;
             if (Condition != null && !Condition(key, value))
                 return false;
@@ -2786,17 +2817,18 @@ namespace J2N.Collections.Concurrent
         }
     }
 
+
     internal struct AddInfo<TKey, TValue> : ICreateOrUpdateValue<TKey, TValue>
     {
         public bool CanUpdate;
-        public TValue Value;
-        public bool CreateValue(TKey key, out TValue value)
+        [AllowNull] public TValue Value;
+        public bool CreateValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             value = Value;
             return true;
         }
 
-        public bool UpdateValue(TKey key, ref TValue value)
+        public bool UpdateValue([AllowNull] TKey key, [AllowNull] ref TValue value)
         {
             if (!CanUpdate)
             {
@@ -2811,19 +2843,19 @@ namespace J2N.Collections.Concurrent
 
     internal struct Add2Info<TKey, TValue> : ICreateOrUpdateValue<TKey, TValue>
     {
-        readonly bool _hasAddValue;
-        readonly TValue _addValue;
-        public TValue Value;
-        public Func<TKey, TValue> Create;
-        public KeyValueUpdate<TKey, TValue> Update;
+        private readonly bool _hasAddValue;
+        [AllowNull] private readonly TValue _addValue;
+        [AllowNull] public TValue Value;
+        [AllowNull] public Func<TKey, TValue> Create;
+        [AllowNull] public KeyValueUpdate<TKey, TValue> Update;
 
-        public Add2Info(TValue addValue) : this()
+        public Add2Info([AllowNull] TValue addValue) : this()
         {
             _hasAddValue = true;
             _addValue = addValue;
         }
 
-        public bool CreateValue(TKey key, out TValue value)
+        public bool CreateValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (_hasAddValue)
             {
@@ -2832,14 +2864,14 @@ namespace J2N.Collections.Concurrent
             }
             if (Create != null)
             {
-                value = Value = Create(key);
+                value = Value = Create(key!);
                 return true;
             }
-            value = Value = default(TValue);
+            value = Value = default;
             return false;
         }
 
-        public bool UpdateValue(TKey key, ref TValue value)
+        public bool UpdateValue([AllowNull] TKey key, [AllowNull] ref TValue value)
         {
             if (Update == null)
             {
@@ -2854,25 +2886,25 @@ namespace J2N.Collections.Concurrent
 
     internal struct UpdateInfo<TKey, TValue> : ICreateOrUpdateValue<TKey, TValue>
     {
-        public TValue Value;
-        readonly bool _hasTestValue;
-        readonly TValue _testValue;
+        [AllowNull] public TValue Value;
+        private readonly bool _hasTestValue;
+        [AllowNull] private readonly TValue _testValue;
 
-        public UpdateInfo(TValue expected)
+        public UpdateInfo([AllowNull] TValue expected)
         {
             Value = default;
             _testValue = expected;
             _hasTestValue = true;
         }
 
-        bool ICreateValue<TKey, TValue>.CreateValue(TKey key, out TValue value)
+        bool ICreateValue<TKey, TValue>.CreateValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             value = default;
             return false;
         }
-        public bool UpdateValue(TKey key, ref TValue value)
+        public bool UpdateValue([AllowNull] TKey key, [AllowNull] ref TValue value)
         {
-            if (_hasTestValue && !J2N.Collections.Generic.EqualityComparer<TValue>.Default.Equals(_testValue, value))
+            if (_hasTestValue && !J2N.Collections.Generic.EqualityComparer<TValue>.Default.Equals(_testValue, value!))
                 return false;
 
             value = Value;
@@ -2925,7 +2957,7 @@ namespace J2N.Collections.Concurrent
         /// <summary>
         /// Constructs the exception from an hresult and message bypassing the message formatting
         /// </summary>
-        protected LurchTableCorruptionException(Exception innerException, int hResult, string message) : base(message, innerException)
+        protected LurchTableCorruptionException(Exception? innerException, int hResult, string message) : base(message, innerException)
         {
             base.HResult = hResult;
         }
@@ -2939,7 +2971,7 @@ namespace J2N.Collections.Concurrent
         /// Initializes a new instance of <see cref="LurchTableCorruptionException"/> with the default message
         /// and original exception.
         /// </summary>
-        public LurchTableCorruptionException(Exception innerException) : this(innerException, -1, SR.LurchTable_CorruptedData) { }
+        public LurchTableCorruptionException(Exception? innerException) : this(innerException, -1, SR.LurchTable_CorruptedData) { }
 
         /// <summary>
         /// If <paramref name="condition"/> is <c>false</c>, throws <see cref="LurchTableCorruptionException"/> with the default message.
@@ -2955,10 +2987,10 @@ namespace J2N.Collections.Concurrent
     #region Delegates
 
     /// <summary> Provides a delegate that performs an atomic update of a key/value pair </summary>
-    public delegate TValue KeyValueUpdate<TKey, TValue>(TKey key, TValue original);
+    public delegate TValue KeyValueUpdate<TKey, TValue>([AllowNull] TKey key, [AllowNull] TValue original);
 
     /// <summary> Provides a delegate that performs a test on key/value pair </summary>
-    public delegate bool KeyValuePredicate<TKey, TValue>(TKey key, TValue original);
+    public delegate bool KeyValuePredicate<TKey, TValue>([AllowNull] TKey key, [AllowNull] TValue original);
 
     #endregion // Delegates
 
@@ -2973,7 +3005,7 @@ namespace J2N.Collections.Concurrent
         /// Called when the key was not found within the dictionary to produce a new value that can be added.
         /// Return true to continue with the insertion, or false to prevent the key/value from being inserted.
         /// </summary>
-        bool CreateValue(TKey key, out TValue value);
+        bool CreateValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value);
     }
 
     /// <summary>
@@ -2985,7 +3017,7 @@ namespace J2N.Collections.Concurrent
         /// Called when the key was found within the dictionary to produce a modified value to update the item
         /// to. Return true to continue with the update, or false to prevent the key/value from being updated.
         /// </summary>
-        bool UpdateValue(TKey key, ref TValue value);
+        bool UpdateValue([AllowNull] TKey key, [MaybeNullWhen(false)] ref TValue value);
     }
 
     /// <summary>

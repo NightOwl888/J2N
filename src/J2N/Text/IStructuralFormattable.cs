@@ -1,6 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
+
 
 namespace J2N.Text
 {
@@ -20,6 +19,6 @@ namespace J2N.Text
         /// Basic) to obtain the numeric format information from the current locale setting
         /// of the operating system.</param>
         /// <returns>The value of the current instance in the specified format.</returns>
-        new string ToString(string format, IFormatProvider formatProvider);
+        new string ToString(string? format, IFormatProvider? formatProvider);
     }
 }

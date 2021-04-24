@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+
 namespace J2N.Collections.Generic
 {
     internal sealed class IDictionaryDebugView<K, V> where K : notnull
@@ -14,7 +15,7 @@ namespace J2N.Collections.Generic
 
         public IDictionaryDebugView(IDictionary<K, V> dictionary)
         {
-            if (dictionary == null)
+            if (dictionary is null)
                 throw new ArgumentNullException(nameof(dictionary));
 
             _dict = dictionary;
@@ -38,7 +39,7 @@ namespace J2N.Collections.Generic
 
         public DictionaryKeyCollectionDebugView(ICollection<TKey> collection)
         {
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
 
             _collection = collection;
@@ -62,7 +63,7 @@ namespace J2N.Collections.Generic
 
         public DictionaryValueCollectionDebugView(ICollection<TValue> collection)
         {
-            if (collection == null)
+            if (collection is null)
                 throw new ArgumentNullException(nameof(collection));
 
             _collection = collection;

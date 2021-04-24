@@ -1,5 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-#nullable enable
+
 
 namespace J2N.IO
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-#nullable enable
+
 
 namespace J2N.IO
 {

@@ -1,7 +1,7 @@
 ﻿using J2N.Numerics;
 using System;
 using SR2 = J2N.Resources.Strings;
-#nullable enable
+
 
 namespace J2N
 {

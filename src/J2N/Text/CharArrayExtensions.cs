@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text;
 
+
 namespace J2N.Text
 {
     using SR = J2N.Resources.Strings;
@@ -15,7 +16,7 @@ namespace J2N.Text
         /// so a <see cref="T:char[]"/> can be used as <see cref="ICharSequence"/> in .NET.
         /// </summary>
         /// <param name="text">This <see cref="T:char[]"/>.</param>
-        public static ICharSequence AsCharSequence(this char[] text)
+        public static ICharSequence AsCharSequence(this char[]? text)
         {
             return new CharArrayCharSequence(text);
         }
@@ -41,10 +42,10 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// </exception>
-        public static ICharSequence Subsequence(this char[] text, int startIndex, int length)
+        public static ICharSequence Subsequence(this char[]? text, int startIndex, int length)
         {
             // From Apache Harmony String class
-            if (text == null || (startIndex == 0 && length == text.Length))
+            if (text is null || (startIndex == 0 && length == text.Length))
             {
                 return text.AsCharSequence();
             }
@@ -80,11 +81,11 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this char[] str, char[] value)
+        public static int CompareToOrdinal(this char[]? str, char[]? value)
         {
             if (object.ReferenceEquals(str, value)) return 0;
-            if (str == null) return -1;
-            if (value == null) return 1;
+            if (str is null) return -1;
+            if (value is null) return 1;
 
             int length = Math.Min(str.Length, value.Length);
             int result;
@@ -117,10 +118,10 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this char[] str, StringBuilder value)
+        public static int CompareToOrdinal(this char[]? str, StringBuilder? value)
         {
-            if (str == null) return -1;
-            if (value == null) return 1;
+            if (str is null) return (value is null) ? 0 : -1;
+            if (value is null) return 1;
 
             // Materialize the string. It is faster to loop through
             // a string than a StringBuilder.
@@ -157,10 +158,10 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this char[] str, string value)
+        public static int CompareToOrdinal(this char[]? str, string? value)
         {
-            if (str == null) return -1;
-            if (value == null) return 1;
+            if (str is null) return (value is null) ? 0 : -1;
+            if (value is null) return 1;
 
             int length = Math.Min(str.Length, value.Length);
             int result;
@@ -193,12 +194,11 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this char[] str, ICharSequence value)
+        public static int CompareToOrdinal(this char[]? str, ICharSequence? value)
         {
             if (value is CharArrayCharSequence && object.ReferenceEquals(str, value)) return 0;
-            if (str == null) return -1;
-            if (value == null) return 1;
-            if (!value.HasValue) return 1;
+            if (str == null) return (value is null || !value.HasValue) ? 0 : -1;
+            if (value == null || !value.HasValue) return 1;
 
             int length = Math.Min(str.Length, value.Length);
             int result;

@@ -2,7 +2,7 @@
 using System;
 using System.ComponentModel;
 using System.Text;
-#nullable enable
+
 
 namespace J2N.Collections
 {

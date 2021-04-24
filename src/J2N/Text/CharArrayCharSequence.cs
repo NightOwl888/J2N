@@ -2,6 +2,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
+
 namespace J2N.Text
 {
     using SR = J2N.Resources.Strings;
@@ -20,7 +21,7 @@ namespace J2N.Text
         /// Initializes a new instance of <see cref="CharArrayCharSequence"/> with the provided <paramref name="value"/>.
         /// </summary>
         /// <param name="value">A <see cref="T:char[]"/> to wrap in a <see cref="ICharSequence"/>. The value may be <c>null</c>.</param>
-        public CharArrayCharSequence(char[] value)
+        public CharArrayCharSequence(char[]? value)
         {
             this.Value = value;
             this.HasValue = (value != null);
@@ -30,7 +31,7 @@ namespace J2N.Text
         /// Gets the current <see cref="T:char[]"/> value.
         /// </summary>
         [SuppressMessage("Microsoft.Performance", "CA1819", Justification = "design requires some writable array properties")]
-        public char[] Value { get; }
+        public char[]? Value { get; }
 
         #region ICharSequence Members
 
@@ -57,7 +58,7 @@ namespace J2N.Text
         {
             get
             {
-                if (Value == null)
+                if (Value is null)
                     throw new InvalidOperationException(J2N.SR.Format(SR.InvalidOperation_CannotIndexNullObject, nameof(CharArrayCharSequence)));
                 return Value[index];
             }
@@ -68,7 +69,7 @@ namespace J2N.Text
         /// </summary>
         public int Length
         {
-            get { return (Value == null) ? 0 : Value.Length; }
+            get { return (Value is null) ? 0 : Value.Length; }
         }
 
         /// <summary>
@@ -95,7 +96,7 @@ namespace J2N.Text
         public ICharSequence Subsequence(int startIndex, int length)
         {
             // From Apache Harmony String class
-            if (Value == null || (startIndex == 0 && length == Value.Length))
+            if (Value is null || (startIndex == 0 && length == Value.Length))
             {
                 return new CharArrayCharSequence(Value);
             }
@@ -120,7 +121,7 @@ namespace J2N.Text
         /// <returns>A string based on this sequence.</returns>
         public override string ToString()
         {
-            return (Value == null) ? string.Empty : new string(Value);
+            return (Value is null) ? string.Empty : new string(Value);
         }
 
         #endregion
@@ -135,8 +136,13 @@ namespace J2N.Text
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> represent to the same instance; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(CharArrayCharSequence csq1, CharArrayCharSequence csq2)
+        public static bool operator ==(CharArrayCharSequence? csq1, CharArrayCharSequence? csq2)
         {
+            if (csq1 is null || !csq1.HasValue)
+                return csq2 is null || !csq2.HasValue;
+            else if (csq2 is null || !csq2.HasValue)
+                return false;
+
             return csq1.Equals(csq2);
         }
 
@@ -148,7 +154,7 @@ namespace J2N.Text
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> do not represent to the same instance; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(CharArrayCharSequence csq1, CharArrayCharSequence csq2)
+        public static bool operator !=(CharArrayCharSequence? csq1, CharArrayCharSequence? csq2)
         {
             return !(csq1 == csq2);
         }
@@ -161,8 +167,13 @@ namespace J2N.Text
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> represent to the same instance; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(CharArrayCharSequence csq1, char[] csq2)
+        public static bool operator ==(CharArrayCharSequence? csq1, char[]? csq2)
         {
+            if (csq1 is null || !csq1.HasValue)
+                return csq2 is null;
+            else if (csq2 is null)
+                return !csq1.HasValue;
+
             return csq1.Equals(csq2);
         }
 
@@ -174,7 +185,7 @@ namespace J2N.Text
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> do not represent to the same instance; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(CharArrayCharSequence csq1, char[] csq2)
+        public static bool operator !=(CharArrayCharSequence? csq1, char[]? csq2)
         {
             return !(csq1 == csq2);
         }
@@ -187,8 +198,13 @@ namespace J2N.Text
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> represent to the same instance; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(char[] csq1, CharArrayCharSequence csq2)
+        public static bool operator ==(char[]? csq1, CharArrayCharSequence? csq2)
         {
+            if (csq1 is null)
+                return csq2 is null || !csq2.HasValue;
+            else if (csq2 is null || !csq2.HasValue)
+                return false;
+
             return csq2.Equals(csq1);
         }
 
@@ -200,7 +216,7 @@ namespace J2N.Text
         /// <param name="csq1">The first sequence.</param>
         /// <param name="csq2">The second sequence.</param>
         /// <returns><c>true</c> if <paramref name="csq1"/> and <paramref name="csq2"/> do not represent to the same instance; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(char[] csq1, CharArrayCharSequence csq2)
+        public static bool operator !=(char[]? csq1, CharArrayCharSequence? csq2)
         {
             return !(csq1 == csq2);
         }
@@ -214,11 +230,11 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">An <see cref="ICharSequence"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(ICharSequence other)
+        public bool Equals(ICharSequence? other)
         {
-            if (this.Value == null)
-                return other == null || !other.HasValue;
-            if (other == null)
+            if (this.Value is null)
+                return other is null || !other.HasValue;
+            if (other is null || !other.HasValue)
                 return false;
 
             int len = other.Length;
@@ -235,8 +251,13 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="CharArrayCharSequence"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(CharArrayCharSequence other)
+        public bool Equals(CharArrayCharSequence? other)
         {
+            if (this.Value is null)
+                return other is null || !other.HasValue;
+            if (other is null || !other.HasValue)
+                return false;
+
             return this.Equals(other.Value);
         }
 
@@ -245,8 +266,13 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="StringBuilderCharSequence"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(StringBuilderCharSequence other)
+        public bool Equals(StringBuilderCharSequence? other)
         {
+            if (this.Value is null)
+                return other is null || !other.HasValue;
+            if (other is null || !other.HasValue)
+                return false;
+
             return this.Equals(other.Value);
         }
 
@@ -255,8 +281,13 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="StringCharSequence"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(StringCharSequence other)
+        public bool Equals(StringCharSequence? other)
         {
+            if (this.Value is null)
+                return other is null || !other.HasValue;
+            if (other is null || !other.HasValue)
+                return false;
+
             return this.Equals(other.Value);
         }
 
@@ -265,11 +296,11 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="string"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(string other)
+        public bool Equals(string? other)
         {
-            if (this.Value == null)
-                return other == null;
-            if (other == null)
+            if (this.Value is null)
+                return other is null;
+            if (other is null)
                 return false;
 
             int len = other.Length;
@@ -286,11 +317,11 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="StringBuilder"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(StringBuilder other)
+        public bool Equals(StringBuilder? other)
         {
-            if (this.Value == null)
-                return other == null;
-            if (other == null)
+            if (this.Value is null)
+                return other is null;
+            if (other is null)
                 return false;
 
             int len = other.Length;
@@ -310,11 +341,11 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">A <see cref="T:char[]"/> to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public bool Equals(char[] other)
+        public bool Equals(char[]? other)
         {
-            if (this.Value == null)
-                return other == null;
-            if (other == null)
+            if (this.Value is null)
+                return other is null;
+            if (other is null)
                 return false;
 
             int len = other.Length;
@@ -331,20 +362,23 @@ namespace J2N.Text
         /// </summary>
         /// <param name="other">An object to compare to the current <see cref="CharArrayCharSequence"/>.</param>
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="CharArrayCharSequence"/>; otherwise, <c>false</c>.</returns>
-        public override bool Equals(object other)
+        public override bool Equals(object? other)
         {
-            if (other is string)
-                return Equals(other as string);
-            else if (other is StringBuilder)
-                return Equals(other as StringBuilder);
-            else if (other is char[])
-                return Equals(other as char[]);
-            else if (other is StringCharSequence otherString)
+            if (other is null)
+                return !HasValue;
+
+            if (other is string otherString)
                 return Equals(otherString);
-            else if (other is CharArrayCharSequence otherCharArray)
-                return Equals(otherCharArray);
-            else if (other is StringBuilderCharSequence otherStringBuilder)
+            else if (other is StringBuilder otherStringBuilder)
                 return Equals(otherStringBuilder);
+            else if (other is char[] otherCharArray)
+                return Equals(otherCharArray);
+            else if (other is StringCharSequence otherStringCharSequence)
+                return Equals(otherStringCharSequence);
+            else if (other is CharArrayCharSequence otherCharArrayCharSequence)
+                return Equals(otherCharArrayCharSequence);
+            else if (other is StringBuilderCharSequence otherStringBuilderCharSequence)
+                return Equals(otherStringBuilderCharSequence);
             else if (other is ICharSequence otherCharSequence)
                 return Equals(otherCharSequence);
 
@@ -379,8 +413,11 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(ICharSequence other)
+        public int CompareTo(ICharSequence? other)
         {
+            if (this.Value is null) return (other is null || !other.HasValue) ? 0 : -1;
+            if (other is null) return 1;
+
             return this.Value.CompareToOrdinal(other);
         }
 
@@ -395,8 +432,11 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(string other)
+        public int CompareTo(string? other)
         {
+            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
+
             return this.Value.CompareToOrdinal(other);
         }
 
@@ -411,8 +451,11 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(StringBuilder other)
+        public int CompareTo(StringBuilder? other)
         {
+            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
+
             return this.Value.CompareToOrdinal(other);
         }
 
@@ -427,8 +470,11 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(char[] other)
+        public int CompareTo(char[]? other)
         {
+            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
+
             return this.Value.CompareToOrdinal(other);
         }
 
@@ -443,10 +489,10 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public int CompareTo(object other)
+        public int CompareTo(object? other)
         {
-            if (this.Value == null) return -1;
-            if (other == null) return 1;
+            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
 
             return this.Value.CompareToOrdinal(other.ToString());
         }

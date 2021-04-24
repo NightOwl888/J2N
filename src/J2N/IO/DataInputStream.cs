@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-#nullable enable
+
 
 namespace J2N.IO
 {

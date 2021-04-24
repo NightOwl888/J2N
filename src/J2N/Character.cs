@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SR2 = J2N.Resources.Strings;
-#nullable enable
+
 
 namespace J2N
 {

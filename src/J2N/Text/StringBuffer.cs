@@ -5,6 +5,7 @@ using System.Diagnostics.Contracts;
 #endif
 using System.Text;
 
+
 namespace J2N.Text
 {
     using SR = J2N.Resources.Strings;
@@ -100,8 +101,8 @@ namespace J2N.Text
         /// <param name="value">The string used to initialize the value of the instance.
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        public StringBuffer(string value)
-            : this(value, (value == null ? 0 : value.Length) + DefaultCapacity)
+        public StringBuffer(string? value)
+            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -111,8 +112,8 @@ namespace J2N.Text
         /// <param name="value">The character sequence used to initialize the value of the instance.
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        public StringBuffer(ICharSequence value)
-            : this(value, (value == null ? 0 : value.Length) + DefaultCapacity)
+        public StringBuffer(ICharSequence? value)
+            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
         { }
 
         // .NET Gaps
@@ -126,8 +127,8 @@ namespace J2N.Text
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
-        public StringBuffer(ICharSequence value, int capacity)
-            : this(value, 0, ((value != null) ? value.Length : 0), capacity)
+        public StringBuffer(ICharSequence? value, int capacity)
+            : this(value, 0, (value is null ? 0 : value.Length), capacity)
         { }
 
         /// <summary>
@@ -147,7 +148,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> plus <paramref name="length"/> is not a position within <paramref name="value"/>.
         /// </exception>
-        public StringBuffer(ICharSequence value, int startIndex, int length, int capacity)
+        public StringBuffer(ICharSequence? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -160,7 +161,7 @@ namespace J2N.Text
 #endif
 
             string stringValue;
-            if (value == null)
+            if (value is null)
             {
                 stringValue = string.Empty;
             }
@@ -181,8 +182,8 @@ namespace J2N.Text
         /// <param name="value">The character sequence used to initialize the value of the instance.
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        public StringBuffer(StringBuilder value)
-            : this(value, (value == null ? 0 : value.Length) + DefaultCapacity)
+        public StringBuffer(StringBuilder? value)
+            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -194,8 +195,8 @@ namespace J2N.Text
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
-        public StringBuffer(StringBuilder value, int capacity)
-            : this(value, 0, ((value != null) ? value.Length : 0), capacity)
+        public StringBuffer(StringBuilder? value, int capacity)
+            : this(value, 0, (value is null ? 0 : value.Length), capacity)
         { }
 
         /// <summary>
@@ -215,7 +216,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> plus <paramref name="length"/> is not a position within <paramref name="value"/>.
         /// </exception>
-        public StringBuffer(StringBuilder value, int startIndex, int length, int capacity)
+        public StringBuffer(StringBuilder? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -228,7 +229,7 @@ namespace J2N.Text
 #endif
 
             string stringValue;
-            if (value == null)
+            if (value is null)
             {
                 stringValue = string.Empty;
             }
@@ -249,8 +250,8 @@ namespace J2N.Text
         /// <param name="value">The character sequence used to initialize the value of the instance.
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
-        public StringBuffer(char[] value)
-            : this(value, (value == null ? 0 : value.Length) + DefaultCapacity)
+        public StringBuffer(char[]? value)
+            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -262,8 +263,8 @@ namespace J2N.Text
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
-        public StringBuffer(char[] value, int capacity)
-            : this(value, 0, ((value != null) ? value.Length : 0), capacity)
+        public StringBuffer(char[]? value, int capacity)
+            : this(value, 0, (value is null ? 0 : value.Length), capacity)
         { }
 
         /// <summary>
@@ -283,7 +284,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> plus <paramref name="length"/> is not a position within <paramref name="value"/>.
         /// </exception>
-        public StringBuffer(char[] value, int startIndex, int length, int capacity)
+        public StringBuffer(char[]? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -296,7 +297,7 @@ namespace J2N.Text
 #endif
 
             string stringValue;
-            if (value == null)
+            if (value is null)
             {
                 stringValue = string.Empty;
             }
@@ -336,8 +337,8 @@ namespace J2N.Text
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
-        public StringBuffer(string value, int capacity)
-            : this(value, 0, ((value != null) ? value.Length : 0), capacity)
+        public StringBuffer(string? value, int capacity)
+            : this(value, 0, (value is null ? 0 : value.Length), capacity)
         { }
 
         /// <summary>
@@ -357,7 +358,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> plus <paramref name="length"/> is not a position within <paramref name="value"/>.
         /// </exception>
-        public StringBuffer(string value, int startIndex, int length, int capacity)
+        public StringBuffer(string? value, int startIndex, int length, int capacity)
         {
             this.builder = new StringBuilder(value, startIndex, length, capacity);
         }
@@ -609,7 +610,7 @@ namespace J2N.Text
         /// <param name="value">The object to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Append(object value)
+        public StringBuffer Append(object? value)
         {
             lock (syncRoot)
             {
@@ -624,7 +625,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Append(string value)
+        public StringBuffer Append(string? value)
         {
             lock (syncRoot)
             {
@@ -660,7 +661,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Append(string value, int startIndex, int count)
+        public StringBuffer Append(string? value, int startIndex, int count)
         {
             lock (syncRoot)
             {
@@ -681,9 +682,9 @@ namespace J2N.Text
         /// <param name="value">The <see cref="StringBuffer"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Append(StringBuffer value)
+        public StringBuffer Append(StringBuffer? value)
         {
-            if (value == null)
+            if (value is null)
                 return this;
 
             lock (syncRoot)
@@ -725,7 +726,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Append(StringBuffer charSequence, int startIndex, int charCount)
+        public StringBuffer Append(StringBuffer? charSequence, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -743,9 +744,9 @@ namespace J2N.Text
         /// <param name="value">The <see cref="StringBuffer"/> to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Append(StringBuilder value)
+        public StringBuffer Append(StringBuilder? value)
         {
-            if (value == null)
+            if (value is null)
                 return this;
 
             lock (syncRoot)
@@ -787,7 +788,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Append(StringBuilder charSequence, int startIndex, int charCount)
+        public StringBuffer Append(StringBuilder? charSequence, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -808,7 +809,7 @@ namespace J2N.Text
         /// <param name="charSequence">The sequence of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Append(ICharSequence charSequence)
+        public StringBuffer Append(ICharSequence? charSequence)
         {
             // Note, synchronization achieved via other invocations
             if (charSequence is StringCharSequence stringCharSequence)
@@ -847,7 +848,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Append(ICharSequence charSequence, int startIndex, int charCount)
+        public StringBuffer Append(ICharSequence? charSequence, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -862,7 +863,7 @@ namespace J2N.Text
         /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Append(char[] value)
+        public StringBuffer Append(char[]? value)
         {
             lock (syncRoot)
             {
@@ -895,7 +896,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Append(char[] value, int startIndex, int charCount)
+        public StringBuffer Append(char[]? value, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -1205,7 +1206,7 @@ namespace J2N.Text
         /// The index of a format item is less than 0 (zero), or greater than or equal to 1 (one).
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(string format, object arg0)
+        public StringBuffer AppendFormat(string format, object? arg0)
         {
             lock (syncRoot)
             {
@@ -1236,7 +1237,7 @@ namespace J2N.Text
         /// The index of a format item is less than 0 (zero), or greater than or equal to 1 (one).
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(IFormatProvider provider, string format, object arg0)
+        public StringBuffer AppendFormat(IFormatProvider? provider, string format, object? arg0)
         {
             lock (syncRoot)
             {
@@ -1265,7 +1266,7 @@ namespace J2N.Text
         /// The index of a format item is less than 0 (zero), or greater than or equal to 2 (two).
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(string format, object arg0, object arg1)
+        public StringBuffer AppendFormat(string format, object? arg0, object? arg1)
         {
             lock (syncRoot)
             {
@@ -1297,7 +1298,7 @@ namespace J2N.Text
         /// The index of a format item is less than 0 (zero), or greater than or equal to 2 (two).
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(IFormatProvider provider, string format, object arg0, object arg1)
+        public StringBuffer AppendFormat(IFormatProvider? provider, string format, object? arg0, object? arg1)
         {
             lock (syncRoot)
             {
@@ -1327,7 +1328,7 @@ namespace J2N.Text
         /// The index of a format item is less than 0 (zero), or greater than or equal to 3 (three).
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(string format, object arg0, object arg1, object arg2)
+        public StringBuffer AppendFormat(string format, object? arg0, object? arg1, object? arg2)
         {
             lock (syncRoot)
             {
@@ -1360,7 +1361,7 @@ namespace J2N.Text
         /// The index of a format item is less than 0 (zero), or greater than or equal to 3 (three).
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(IFormatProvider provider, string format, object arg0, object arg1, object arg2)
+        public StringBuffer AppendFormat(IFormatProvider? provider, string format, object? arg0, object? arg1, object? arg2)
         {
             lock (syncRoot)
             {
@@ -1390,7 +1391,7 @@ namespace J2N.Text
         /// length of the <paramref name="args"/> array.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(string format, params object[] args)
+        public StringBuffer AppendFormat(string format, params object?[] args)
         {
             lock (syncRoot)
             {
@@ -1421,7 +1422,7 @@ namespace J2N.Text
         /// length of the <paramref name="args"/> array.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">The length of the expanded string would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendFormat(IFormatProvider provider, string format, params object[] args)
+        public StringBuffer AppendFormat(IFormatProvider? provider, string format, params object?[] args)
         {
             lock (syncRoot)
             {
@@ -1448,7 +1449,7 @@ namespace J2N.Text
         /// <param name="values">An array that contains the strings to
         /// concatenate and append to the current instance of the string builder.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        public StringBuffer AppendJoin(char separator, params object[] values)
+        public StringBuffer AppendJoin(char separator, params object?[] values)
         {
             lock (syncRoot)
             {
@@ -1468,7 +1469,7 @@ namespace J2N.Text
         /// <param name="values">An array that contains the strings to
         /// concatenate and append to the current instance of the string builder.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        public StringBuffer AppendJoin(char separator, params string[] values)
+        public StringBuffer AppendJoin(char separator, params string?[] values)
         {
             lock (syncRoot)
             {
@@ -1489,7 +1490,7 @@ namespace J2N.Text
         /// <param name="values">An array that contains the strings to
         /// concatenate and append to the current instance of the string builder.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        public StringBuffer AppendJoin(string separator, params object[] values)
+        public StringBuffer AppendJoin(string separator, params object?[] values)
         {
             lock (syncRoot)
             {
@@ -1509,7 +1510,7 @@ namespace J2N.Text
         /// <param name="values">An array that contains the strings to concatenate
         /// and append to the current instance of the string builder.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        public StringBuffer AppendJoin(string separator, params string[] values)
+        public StringBuffer AppendJoin(string separator, params string?[] values)
         {
             lock (syncRoot)
             {
@@ -1549,7 +1550,7 @@ namespace J2N.Text
         /// <param name="values">A collection that contains the objects to concatenate
         /// and append to the current instance of the string builder.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        public StringBuffer AppendJoin<T>(string separator, IEnumerable<T> values)
+        public StringBuffer AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             lock (syncRoot)
             {
@@ -1594,7 +1595,7 @@ namespace J2N.Text
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer AppendLine(string value)
+        public StringBuffer AppendLine(string? value)
         {
             lock (syncRoot)
             {
@@ -1726,9 +1727,9 @@ namespace J2N.Text
         /// <param name="other">An object to compare with this instance, or <c>null</c>.</param>
         /// <returns><c>true</c> if this instance and sb have equal string, <see cref="Capacity"/>,
         /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
-        public bool Equals(StringBuilderCharSequence other)
+        public bool Equals(StringBuilderCharSequence? other)
         {
-            if (!other.HasValue)
+            if (other is null || !other.HasValue)
                 return false;
 
             return Equals(other.Value);
@@ -1740,7 +1741,7 @@ namespace J2N.Text
         /// <param name="other">An object to compare with this instance, or <c>null</c>.</param>
         /// <returns><c>true</c> if this instance and sb have equal string, <see cref="Capacity"/>,
         /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
-        public bool Equals(StringBuilder other)
+        public bool Equals(StringBuilder? other)
         {
             lock (syncRoot)
                 return builder.Equals(other);
@@ -1752,31 +1753,47 @@ namespace J2N.Text
         /// <param name="other">An object to compare with this instance, or <c>null</c>.</param>
         /// <returns><c>true</c> if this instance and sb have equal string, <see cref="Capacity"/>,
         /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
-        public bool Equals(StringBuffer other)
+        public bool Equals(StringBuffer? other)
         {
-            return Equals(other.builder);
+            return Equals(other?.builder);
         }
 
-        ///// <summary>
-        ///// Returns a value indicating whether this instance is equal to a specified object.
-        ///// </summary>
-        ///// <param name="obj">An object to compare with this instance, or <c>null</c>.</param>
-        ///// <returns><c>true</c> if this instance and sb have equal string, <see cref="Capacity"/>,
-        ///// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
-        //public override bool Equals(object obj)
-        //{
-        //    if (obj is StringBuffer stringBuffer)
-        //        return Equals(stringBuffer);
-        //    if (obj is StringBuilder stringBuilder)
-        //        return Equals(stringBuilder);
-        //    if (obj is StringBuilderCharSequence stringBuilder1)
-        //        return Equals(stringBuilder1);
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare with this instance, or <c>null</c>.</param>
+        /// <returns><c>true</c> if this instance and sb have equal string, <see cref="Capacity"/>,
+        /// and <see cref="MaxCapacity"/> values; otherwise, <c>false</c>.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj is null) return false;
 
-        //    lock (syncRoot)
-        //        return builder.Equals(obj);
-        //}
+            if (obj is StringBuffer stringBuffer)
+                return Equals(stringBuffer);
+            if (obj is StringBuilder stringBuilder)
+                return Equals(stringBuilder);
+            if (obj is StringBuilderCharSequence stringBuilder1)
+                return Equals(stringBuilder1);
+
+            lock (syncRoot)
+                return builder.Equals(obj);
+        }
 
         #endregion Equals
+
+        #region GetHashCode
+
+        /// <summary>
+        /// Returns a hash code for the builder.
+        /// </summary>
+        /// <returns>A hash code for the builder.</returns>
+        public override int GetHashCode()
+        {
+            lock (syncRoot)
+                return builder.GetHashCode();
+        }
+
+        #endregion GetHashCode
 
         #region Insert
 
@@ -1870,7 +1887,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, char[] value)
+        public StringBuffer Insert(int index, char[]? value)
         {
             lock (syncRoot)
             {
@@ -1902,7 +1919,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, char[] value, int startIndex, int charCount)
+        public StringBuffer Insert(int index, char[]? value, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -1924,10 +1941,10 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, ICharSequence charSequence)
+        public StringBuffer Insert(int index, ICharSequence? charSequence)
         {
             if (charSequence is StringCharSequence stringCharSequence)
-                return Insert(index, stringCharSequence.Value);
+                return Insert(index, stringCharSequence?.Value);
 
             lock (syncRoot)
             {
@@ -1962,7 +1979,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, ICharSequence charSequence, int startIndex, int charCount)
+        public StringBuffer Insert(int index, ICharSequence? charSequence, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -1984,7 +2001,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, StringBuilder charSequence)
+        public StringBuffer Insert(int index, StringBuilder? charSequence)
         {
             lock (syncRoot)
             {
@@ -2019,7 +2036,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, StringBuilder charSequence, int startIndex, int charCount)
+        public StringBuffer Insert(int index, StringBuilder? charSequence, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -2041,7 +2058,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, string value)
+        public StringBuffer Insert(int index, string? value)
         {
             lock (syncRoot)
             {
@@ -2076,7 +2093,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Insert(int index, string value, int startIndex, int charCount)
+        public StringBuffer Insert(int index, string? value, int startIndex, int charCount)
         {
             lock (syncRoot)
             {
@@ -2094,7 +2111,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the length of this instance.</exception>
         /// <exception cref="OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Insert(int index, string value, int count)
+        public StringBuffer Insert(int index, string? value, int count)
         {
             lock (syncRoot)
             {
@@ -2111,7 +2128,7 @@ namespace J2N.Text
         /// <returns>A reference to this instance after the operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater than the length of this instance.</exception>
         /// <exception cref="OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Insert(int index, object value)
+        public StringBuffer Insert(int index, object? value)
         {
             lock (syncRoot)
             {
@@ -2481,7 +2498,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public StringBuffer Replace(string oldValue, string newValue)
+        public StringBuffer Replace(string oldValue, string? newValue)
         {
             lock (syncRoot)
             {
@@ -2512,7 +2529,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
-        public StringBuffer Replace(string oldValue, string newValue, int startIndex, int count)
+        public StringBuffer Replace(string oldValue, string? newValue, int startIndex, int count)
         {
             lock (syncRoot)
             {
@@ -2621,21 +2638,21 @@ namespace J2N.Text
 
         IAppendable IAppendable.Append(char value) => Append(value);
 
-        IAppendable IAppendable.Append(string value) => Append(value);
+        IAppendable IAppendable.Append(string? value) => Append(value);
 
-        IAppendable IAppendable.Append(string value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(string? value, int startIndex, int count) => Append(value, startIndex, count);
 
-        IAppendable IAppendable.Append(StringBuilder value) => Append(value);
+        IAppendable IAppendable.Append(StringBuilder? value) => Append(value);
 
-        IAppendable IAppendable.Append(StringBuilder value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count) => Append(value, startIndex, count);
 
-        IAppendable IAppendable.Append(char[] value) => Append(value);
+        IAppendable IAppendable.Append(char[]? value) => Append(value);
 
-        IAppendable IAppendable.Append(char[] value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(char[]? value, int startIndex, int count) => Append(value, startIndex, count);
 
-        IAppendable IAppendable.Append(ICharSequence value) => Append(value);
+        IAppendable IAppendable.Append(ICharSequence? value) => Append(value);
 
-        IAppendable IAppendable.Append(ICharSequence value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count) => Append(value, startIndex, count);
 
         #endregion IAppendable Members
 

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-#nullable enable
+
 
 namespace J2N.Text
 {

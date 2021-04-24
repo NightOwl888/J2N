@@ -1,5 +1,6 @@
 ﻿using System;
 
+
 namespace J2N.Text
 {
     /// <summary>

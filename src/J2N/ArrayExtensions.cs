@@ -1,6 +1,6 @@
 ﻿using System;
 using SR2 = J2N.Resources.Strings;
-#nullable enable
+
 
 namespace J2N
 {
@@ -18,7 +18,7 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static void Fill<T>(this T[] array, T value)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
 
             for (int i = 0; i < array.Length; i++)
@@ -47,7 +47,7 @@ namespace J2N
         /// </exception>
         public static void Fill<T>(this T[] array, int startIndex, int length, T value)
         {
-            if (array == null)
+            if (array is null)
                 throw new ArgumentNullException(nameof(array));
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
