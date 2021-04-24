@@ -8,15 +8,8 @@ namespace J2N.Text
 {
     public class TestStringExtensions : TestCase
     {
-#if FEATURE_ENCODINGPROVIDERS
-        static TestStringExtensions()
-        {
-            // Support for 8859-1 and IBM01047 encoding. See: https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider?view=netcore-2.0
-            var encodingProvider = System.Text.CodePagesEncodingProvider.Instance;
-            System.Text.Encoding.RegisterProvider(encodingProvider);
-        }
-#endif
-
+        // Depends on System.Text.Encoding.EncodingProivers being loaded for 8859-1 and IBM01047 encoding.
+        // This is done in Startup.cs.
 
         const string hw1 = "HelloWorld";
         const string hw2 = "HelloWorld";
