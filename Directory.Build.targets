@@ -48,9 +48,12 @@
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_REMOVE_OUTVALUE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CONTAINS_CHAR</DefineConstants>
-    
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPENDJOIN</DefineConstants>
+
   </PropertyGroup>
 
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, and .NET 5.x -->
