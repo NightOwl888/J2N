@@ -132,6 +132,14 @@ namespace J2N.Text
         }
 
         [Test]
+        public void Test_StandardFormat_Double()
+        {
+            assertEquals("22.0000000", string.Format(StringFormatter.InvariantCulture, "{0:F7}", 22d));
+            assertEquals("22.0", string.Format(StringFormatter.InvariantCulture, "{0:N1}", 22d));
+            assertEquals("22.5", string.Format(StringFormatter.InvariantCulture, "{0:N1}", 22.45678d));
+        }
+
+        [Test]
         public void TestBoolean()
         {
             assertEquals("true", string.Format(StringFormatter.InvariantCulture, "{0}", true));

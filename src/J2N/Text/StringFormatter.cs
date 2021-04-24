@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+#nullable enable
 
 namespace J2N.Text
 {
@@ -47,12 +48,12 @@ namespace J2N.Text
         /// </summary>
         public static StringFormatter InvariantCulture { get; } = new StringFormatter(CultureType.InvariantCulture);
 
-        private readonly char[] cultureSymbol; // For deserialization
+        private readonly char[]? cultureSymbol; // For deserialization
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private CultureInfo culture; // not reaonly for deserialization
-        private readonly CultureType cultureType;
+        private CultureInfo? culture; // not readonly for deserialization
+        private readonly CultureType? cultureType;
 
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/>.
@@ -88,7 +89,7 @@ namespace J2N.Text
                 switch (cultureType)
                 {
                     case CultureType.CustomCulture:
-                        return culture;
+                        return culture!;
                     case CultureType.InvariantCulture:
                         return CultureInfo.InvariantCulture;
                     case CultureType.CurrentCulture:
@@ -97,11 +98,11 @@ namespace J2N.Text
                         return CultureInfo.CurrentUICulture;
 #if FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE
                     case CultureType.DefaultThreadCurrentCulture:
-                        return CultureInfo.DefaultThreadCurrentCulture;
+                        return CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.CurrentCulture;
 #endif
 #if FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE
                     case CultureType.DefaultThreadCurrentUICulture:
-                        return CultureInfo.DefaultThreadCurrentUICulture;
+                        return CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.CurrentUICulture;
 #endif
                     default:
                         return CultureInfo.CurrentCulture;
@@ -124,7 +125,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="formatType">The format type that is requested.</param>
         /// <returns>The requested format provider, or <c>null</c> if it is not applicable.</returns>
-        public virtual object GetFormat(Type formatType)
+        public virtual object? GetFormat(Type? formatType)
         {
             if (typeof(ICustomFormatter).Equals(formatType))
                 return this;
@@ -146,17 +147,13 @@ namespace J2N.Text
         /// <param name="arg">The object to format.</param>
         /// <param name="formatProvider">The format provider.</param>
         /// <returns>A string representing the formatted value, or <c>null</c> when this formatter is not applicable.</returns>
-        public virtual string Format(string format, object arg, IFormatProvider formatProvider)
+        public virtual string Format(string? format, object? arg, IFormatProvider? formatProvider)
         {
             if (!this.Equals(formatProvider))
-                return null;
+                return HandleOtherFormats(format, arg, formatProvider);
 
-            // Set default format specifier
-            if (string.IsNullOrEmpty(format))
-                format = "J";
-
-            if (!(format == "J" || format == "j"))
-                return null;
+            if (!(string.IsNullOrEmpty(format) || format == "J" || format == "j"))
+                return HandleOtherFormats(format, arg, formatProvider);
 
             if (arg is null)
                 return "null";
@@ -181,16 +178,33 @@ namespace J2N.Text
                 return CollectionUtil.ToStringImpl(arg, argType, this);
             }
 
-            return null;
+            return HandleOtherFormats(format, arg, formatProvider);
         }
 
-        private NumberFormatInfo GetNumberFormatInfo(IFormatProvider provider)
+        private string HandleOtherFormats(string? format, object? arg, IFormatProvider? formatProvider)
+        {
+            if (formatProvider is ICustomFormatter customFormatter && !(formatProvider is StringFormatter))
+                return customFormatter.Format(format, arg, formatProvider);
+
+            // This is from the Microsoft example: https://docs.microsoft.com/en-us/dotnet/api/system.icustomformatter
+            if (arg is IFormattable formattableArg)
+                return formattableArg.ToString(format ?? "0", formatProvider);
+            else if (arg != null)
+                return arg.ToString() ?? string.Empty;
+            else
+                return string.Empty;
+        }
+
+        private NumberFormatInfo? GetNumberFormatInfo(IFormatProvider provider)
         {
             return provider.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo;
         }
 
-        private static string FormatNegativeZero(NumberFormatInfo numberFormat)
+        private static string FormatNegativeZero(NumberFormatInfo? numberFormat)
         {
+            if (numberFormat is null)
+                numberFormat = CultureInfo.InvariantCulture.NumberFormat; // Default to invariant if we cannot resolve NumberFormatInfo
+
             string sep = numberFormat.NumberDecimalSeparator;
             switch (numberFormat.NumberNegativePattern)
             {
@@ -207,7 +221,7 @@ namespace J2N.Text
             }
         }
 
-        private static string FormatDouble(double d, NumberFormatInfo numberFormat)
+        private static string FormatDouble(double d, NumberFormatInfo? numberFormat)
         {
             if ((long)d == d)
             {
@@ -225,7 +239,7 @@ namespace J2N.Text
             return d.ToString("R", numberFormat);
         }
 
-        private static string FormatSingle(float f, NumberFormatInfo numberFormat)
+        private static string FormatSingle(float f, NumberFormatInfo? numberFormat)
         {
             if ((int)f == f)
             {
@@ -259,8 +273,10 @@ namespace J2N.Text
         {
             // We only need to deserialize custom cultures. Note that if it is not a built-in
             // culture, this will fail.
+            // J2N TODO: On newer .NET platforms, there is an overload that accepts a predefinedOnly parameter
+            // that when set to false allows retrieving made-up cultures. Need to investigate.
             if (cultureType == CultureType.CustomCulture)
-                this.culture = CultureInfo.GetCultureInfo(new string(this.cultureSymbol));
+                this.culture = CultureInfo.GetCultureInfo(new string(this.cultureSymbol!));
         }
 #endif
 
