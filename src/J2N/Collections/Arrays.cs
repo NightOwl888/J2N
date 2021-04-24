@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-#nullable enable
+
 
 namespace J2N.Collections
 {

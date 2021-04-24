@@ -234,6 +234,9 @@
   <data name="Format_InvalidUTFTooLong" xml:space="preserve">
     <value>UTF8 data format too long.</value>
   </data>
+  <data name="InvalidOperation_CannotEditNullObject" xml:space="preserve">
+    <value>Cannot edit a null {0}.</value>
+  </data>
   <data name="InvalidOperation_CannotIndexNullObject" xml:space="preserve">
     <value>Cannot index a null {0}.</value>
   </data>

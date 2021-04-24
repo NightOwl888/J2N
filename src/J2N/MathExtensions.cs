@@ -2,7 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-#nullable enable
+
 
 namespace J2N
 {

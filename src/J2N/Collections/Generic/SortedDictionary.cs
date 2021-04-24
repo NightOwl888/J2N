@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 #endif
 using SCG = System.Collections.Generic;
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {
@@ -674,7 +674,7 @@ namespace J2N.Collections.Generic
         /// This method approaches an O(1) operation.
         /// </remarks>
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
-        public bool TryGetValue(TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         {
             //if (key == null) // J2N: Making key nullable
@@ -682,10 +682,10 @@ namespace J2N.Collections.Generic
             //    throw new ArgumentNullException(nameof(key));
             //}
 
-            TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
+            TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key!, default!));
             if (node == null)
             {
-                value = default!;
+                value = default;
                 return false;
             }
             value = node.Item.Value;
@@ -1339,6 +1339,10 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
+                    if (!(array is object?[]))
+                    {
+                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                    }
                     try
                     {
                         object?[] objects = (object?[])array;
@@ -1688,6 +1692,10 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
+                    if (!(array is object?[]))
+                    {
+                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                    }
                     try
                     {
                         object?[] objects = (object?[])array;

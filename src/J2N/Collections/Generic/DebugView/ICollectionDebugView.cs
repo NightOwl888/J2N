@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
+
 namespace J2N.Collections.Generic
 {
     internal sealed class ICollectionDebugView<T>
@@ -14,7 +15,7 @@ namespace J2N.Collections.Generic
 
         public ICollectionDebugView(ICollection<T> collection)
         {
-            if (collection == null)
+            if (collection is null)
             {
                 throw new ArgumentNullException(nameof(collection));
             }

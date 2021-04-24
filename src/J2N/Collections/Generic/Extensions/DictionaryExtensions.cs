@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-#nullable enable
+
 
 namespace J2N.Collections.Generic.Extensions
 {

@@ -7,7 +7,7 @@ using System.IO;
 using System.Text;
 using SR2 = J2N.Resources.Strings;
 using StringBuffer = System.Text.StringBuilder;
-#nullable enable
+
 
 namespace J2N
 {

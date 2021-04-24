@@ -3,7 +3,7 @@
 using System;
 using System.Linq;
 using System.Reflection;
-#nullable enable
+
 
 namespace J2N
 {

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-#nullable enable
+
 
 namespace J2N.Threading.Atomic
 {

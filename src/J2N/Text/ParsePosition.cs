@@ -1,4 +1,6 @@
-﻿namespace J2N.Text
+﻿
+
+namespace J2N.Text
 {
     /// <summary>
     /// Tracks the current position in a parsed string. In case of an error the error
@@ -26,13 +28,13 @@
         /// <returns><c>true</c> if the specified object is equal to this
         /// <see cref="ParsePosition"/>; <c>false</c> otherwise.</returns>
         /// <seealso cref="GetHashCode()"/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
-            if (!(obj is ParsePosition))
+            if (obj is null) return false;
+            if (!(obj is ParsePosition pos))
             {
                 return false;
             }
-            ParsePosition pos = (ParsePosition)obj;
             return Index == pos.Index
                     && ErrorIndex == pos.ErrorIndex;
         }

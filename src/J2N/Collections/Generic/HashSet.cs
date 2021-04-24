@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SCG = System.Collections.Generic;
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {

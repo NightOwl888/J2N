@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Globalization;
-#nullable enable
+
 
 namespace J2N.Globalization
 {

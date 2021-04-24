@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-#nullable enable
+
 
 namespace J2N.Collections
 {

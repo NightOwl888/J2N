@@ -5,7 +5,7 @@
 using J2N;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-#nullable enable
+
 
 namespace System.Collections
 {

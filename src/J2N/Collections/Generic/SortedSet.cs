@@ -12,7 +12,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 #endif
 using Interlocked = System.Threading.Interlocked;
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {

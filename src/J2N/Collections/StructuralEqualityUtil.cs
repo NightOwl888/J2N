@@ -1,7 +1,7 @@
 ﻿using J2N.Collections.Generic;
 using System;
 using System.Reflection;
-#nullable enable
+
 
 namespace J2N.Collections
 {

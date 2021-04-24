@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {

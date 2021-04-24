@@ -61,6 +61,15 @@ namespace J2N.Text
             Assert.Less(0, target.CompareToOrdinal(new CharArrayCharSequence(null)));
             Assert.Less(0, target.CompareToOrdinal(new StringBuilderCharSequence(null)));
             Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(null)));
+
+            target = null;
+
+            Assert.AreEqual(0, target.CompareToOrdinal((char[])null));
+            Assert.AreEqual(0, target.CompareToOrdinal((StringBuilder)null));
+            Assert.AreEqual(0, target.CompareToOrdinal((string)null));
+            Assert.AreEqual(0, target.CompareToOrdinal(new CharArrayCharSequence(null)));
+            Assert.AreEqual(0, target.CompareToOrdinal(new StringBuilderCharSequence(null)));
+            Assert.AreEqual(0, target.CompareToOrdinal(new StringCharSequence(null)));
         }
 
         // This is a compatibility API for < .NET Standard 2.1
@@ -208,7 +217,7 @@ namespace J2N.Text
             // if the target is null and string is not.
             assertFalse(s.ContentEquals((StringBuilder)null));
             assertTrue(((string)null).ContentEquals((StringBuilder)null));
-            assertFalse(((string)null).ContentEquals((StringBuilder) new StringBuilder("")));
+            assertFalse(((string)null).ContentEquals((StringBuilder)new StringBuilder("")));
             assertTrue("".ContentEquals((StringBuilder)new StringBuilder("")));
         }
 
@@ -638,9 +647,9 @@ namespace J2N.Text
 
             using (var context = new CultureContext("tr"))
             {
-                assertTrue("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in tr culture", 
+                assertTrue("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in tr culture",
                     input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
-                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in tr culture", 
+                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in tr culture",
                     input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
             }
             using (var context = new CultureContext("en"))

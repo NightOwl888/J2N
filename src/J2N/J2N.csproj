@@ -4,7 +4,10 @@
     <TargetFrameworks>net5.0;netcoreapp3.0;netstandard2.1;netstandard2.0;net45;net40</TargetFrameworks>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <WarningsAsErrors>NU1605;1591</WarningsAsErrors>
+
+    <WarningsAsErrors Label="Force all public members to have XML doc comments.">NU1605;1591</WarningsAsErrors>
+
+    <Nullable>enable</Nullable>
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 

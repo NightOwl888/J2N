@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 #endif
 using System.Reflection;
-#nullable enable
+
 
 namespace J2N.Collections.ObjectModel
 {

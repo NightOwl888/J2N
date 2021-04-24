@@ -412,6 +412,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot edit a null {0}..
+        /// </summary>
+        internal static string InvalidOperation_CannotEditNullObject {
+            get {
+                return ResourceManager.GetString("InvalidOperation_CannotEditNullObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot index a null {0}..
         /// </summary>
         internal static string InvalidOperation_CannotIndexNullObject {

@@ -13,7 +13,7 @@ using System.Diagnostics.Contracts;
 #if !FEATURE_CASEINSENSITIVECOMPARER
 using CaseInsensitiveComparer = System.StringComparer; // To fixup documentation - this type doesn't exist on .NET Standard 1.x
 #endif
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {

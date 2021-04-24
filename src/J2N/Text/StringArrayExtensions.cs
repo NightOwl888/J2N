@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 
+
 namespace J2N.Text
 {
     /// <summary>
@@ -32,9 +33,9 @@ namespace J2N.Text
         /// </summary>
         /// <param name="input">This string array.</param>
         /// <returns>The array with any null or empty elements removed from the end.</returns>
-        public static string[] TrimEnd(this string[] input)
+        public static string?[]? TrimEnd(this string?[]? input)
         {
-            if (input == null)
+            if (input is null)
                 return null;
             int end;
             int inputLength = input.Length;

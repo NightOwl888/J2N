@@ -133,6 +133,7 @@ namespace J2N.Text
             this.returnDelimiters = returnDelimiters;
             this.position = 0;
             this.remainingTokens = CountTokens();
+            Current = string.Empty; // J2N specific - don't leave Current null, so we can get by the nullability declaration in IEnumerable<string>
         }
 
         /// <summary>
