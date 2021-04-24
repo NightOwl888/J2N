@@ -17,15 +17,10 @@ namespace J2N
     /// </summary>
     public static class PropertyExtensions
     {
-#if FEATURE_ENCODINGPROVIDERS
-        static PropertyExtensions()
-        {
-            // Support for iso-8859-1 encoding. See: https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider?view=netcore-2.0
-            var encodingProvider = CodePagesEncodingProvider.Instance;
-            System.Text.Encoding.RegisterProvider(encodingProvider);
-        }
-#endif
-
+        // J2N Encoding note: This class requires iso-8859-1, which according to the docs is supported already in .NET Core.
+        // Some other platforms may require a reference to the System.Text.Encoding.CodePages NuGet package and to add the line
+        // System.Text.Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+        // at startup.
 
         /// <summary>
         /// Retrieves the value of a property from the current dictionary
@@ -240,12 +235,16 @@ namespace J2N
             }
         }
 
-
         /// <summary>
         /// Reads a property list (key and element pairs) from the input
         /// <see cref="TextReader"/> in a simple line-oriented format.
         /// <para/>
         /// The file format is compatible with Java properties, so they can easily be written or consumed by .NET.
+        /// <para/>
+        /// Usage Note: This method requires ISO-8859-1 encoding and depending on your platform, you may need
+        /// to register the encoding provider to use it. See
+        /// <a href="https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider">CodePagesEncodingProvider</a>
+        /// for details about registering a provider.
         /// <para/>
         /// Properties are processed in terms of lines. There are two
         /// kinds of line, <i>natural lines</i> and <i>logical lines</i>.
@@ -416,6 +415,11 @@ namespace J2N
         /// <para/>
         /// The file format is compatible with Java properties, so they can easily be written or consumed by .NET.
         /// <para/>
+        /// Usage Note: This method requires ISO-8859-1 encoding and depending on your platform, you may need
+        /// to register the encoding provider to use it. See
+        /// <a href="https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider">CodePagesEncodingProvider</a>
+        /// for details about registering a provider.
+        /// <para/>
         /// This method outputs the properties keys and values in
         /// the same format as specified in
         /// <see cref="SaveProperties(IDictionary{string, string}, TextWriter)"/>,
@@ -474,6 +478,11 @@ namespace J2N
         /// method.
         /// <para/>
         /// The file format is compatible with Java properties, so they can easily be written or consumed by .NET.
+        /// <para/>
+        /// Usage Note: This method requires ISO-8859-1 encoding and depending on your platform, you may need
+        /// to register the encoding provider to use it. See
+        /// <a href="https://docs.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider">CodePagesEncodingProvider</a>
+        /// for details about registering a provider.
         /// <para/>
         /// This method outputs the comments, properties keys and values in
         /// the same format as specified in
