@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup Label="NuGet Package Properties">
     <IsPackable>true</IsPackable>
-    <PackageTags>java;dotnet;charsequence;bytebuffer;collections</PackageTags>
+    <PackageTags>java;dotnet;charsequence;bytebuffer;collections;stringbuffer;linkedhashset;linkedhashmap;comparable;structural-equality;treemap;treeset;stringtokenizer;appendable;contentequals;codepoint;bit-twiddle;lru-cache</PackageTags>
     <Authors>NightOwl888</Authors>
     <RepositoryUrl>https://github.com/NightOwl888/J2N/</RepositoryUrl>
     <PackageProjectUrl>https://github.com/NightOwl888/J2N/</PackageProjectUrl>
