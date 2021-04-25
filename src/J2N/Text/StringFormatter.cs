@@ -150,10 +150,10 @@ namespace J2N.Text
         public virtual string Format(string? format, object? arg, IFormatProvider? formatProvider)
         {
             if (!this.Equals(formatProvider))
-                return HandleOtherFormats(format, arg, formatProvider);
+                return null!; // Not handled by this formatter
 
             if (!(string.IsNullOrEmpty(format) || format == "J" || format == "j"))
-                return HandleOtherFormats(format, arg, formatProvider);
+                return null!; // Not handled by this formatter
 
             if (arg is null)
                 return "null";
@@ -178,21 +178,7 @@ namespace J2N.Text
                 return CollectionUtil.ToStringImpl(arg, argType, this);
             }
 
-            return HandleOtherFormats(format, arg, formatProvider);
-        }
-
-        private string HandleOtherFormats(string? format, object? arg, IFormatProvider? formatProvider)
-        {
-            if (formatProvider is ICustomFormatter customFormatter && !(formatProvider is StringFormatter))
-                return customFormatter.Format(format, arg, formatProvider);
-
-            // This is from the Microsoft example: https://docs.microsoft.com/en-us/dotnet/api/system.icustomformatter
-            if (arg is IFormattable formattableArg)
-                return formattableArg.ToString(format ?? "0", formatProvider);
-            else if (arg != null)
-                return arg.ToString() ?? string.Empty;
-            else
-                return string.Empty;
+            return null!; // Not handled by this formatter
         }
 
         private NumberFormatInfo? GetNumberFormatInfo(IFormatProvider provider)

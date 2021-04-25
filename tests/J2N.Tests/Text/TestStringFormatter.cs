@@ -153,5 +153,25 @@ namespace J2N.Text
             assertEquals("[1, 2, 3, 4, 5, 6, 7]", string.Format(StringFormatter.InvariantCulture, "{0}", new int[] { 1, 2, 3, 4, 5, 6, 7 }));
             assertEquals("[1, 2, 3, 4, 5, 6, 7]", string.Format(StringFormatter.InvariantCulture, "{0}", (System.Array)new string[] { "1", "2", "3", "4", "5", "6", "7" }));
         }
+
+        private enum State
+        {
+            SETREADER, // consumer set a reader input either via ctor or via reset(Reader)
+            RESET, // consumer has called reset()
+            INCREMENT, // consumer is consuming, has called IncrementToken() == true
+            INCREMENT_FALSE, // consumer has called IncrementToken() which returned false
+            END, // consumer has called end() to perform end of stream operations
+            CLOSE // consumer has called close() to release any resources
+        }
+
+        [Test]
+        public void TestEnum()
+        {
+            var state = State.RESET;
+
+            var actual = string.Format(StringFormatter.InvariantCulture, "IncrementToken() called while in wrong state: {0}", state);
+
+            assertEquals("IncrementToken() called while in wrong state: RESET", actual);
+        }
     }
 }
