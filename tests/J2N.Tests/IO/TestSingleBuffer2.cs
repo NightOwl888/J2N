@@ -10,7 +10,7 @@ namespace J2N.IO
     public class TestSingleBuffer2 : BaseBufferTestCase
     {
         private static readonly float[] VALUES = {
-        float.MinValue,
+        float.Epsilon, // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
         (float) -1,
         (float) 0,
         (float) 1,
@@ -263,10 +263,10 @@ namespace J2N.IO
             b.Put((float)-1);
             b.Put((float)1);
             b.Put(float.MaxValue);
-            b.Put(float.MinValue);
+            b.Put(float.Epsilon); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
 
             b.Put(-float.MaxValue);
-            b.Put(-float.MinValue);
+            b.Put(-float.Epsilon); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
             b.Put(float.NegativeInfinity);
             b.Put(float.PositiveInfinity);
             b.Put(float.NaN);
@@ -278,11 +278,11 @@ namespace J2N.IO
             ck(b, b.Get(), (float)-1);
             ck(b, b.Get(), 1);
             ck(b, b.Get(), float.MaxValue);
-            ck(b, b.Get(), float.MinValue);
+            ck(b, b.Get(), float.Epsilon); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
 
 
             ck(b, b.Get(), -float.MaxValue);
-            ck(b, b.Get(), -float.MinValue);
+            ck(b, b.Get(), -float.Epsilon); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
             ck(b, b.Get(), float.NegativeInfinity);
             ck(b, b.Get(), float.PositiveInfinity);
             // J2N TODO: Investigate why this comparison fails in .NET and passes in Java

@@ -16,7 +16,7 @@ namespace J2N.Collections
             double[] d = new double[100];
             double[] x = new double[100];
             ArrayExtensions.Fill(d, double.MaxValue);
-            ArrayExtensions.Fill(x, double.MinValue);
+            ArrayExtensions.Fill(x, double.Epsilon); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
 
             assertTrue("Assert 0: Inequal arrays returned true", !Arrays.Equals(d, x));
 
@@ -41,7 +41,7 @@ namespace J2N.Collections
             float[] d = new float[100];
             float[] x = new float[100];
             ArrayExtensions.Fill(d, float.MaxValue);
-            ArrayExtensions.Fill(x, float.MinValue);
+            ArrayExtensions.Fill(x, float.Epsilon); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
 
             assertTrue("Assert 0: Inequal arrays returned true", !Arrays.Equals(d, x));
 

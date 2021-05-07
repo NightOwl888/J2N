@@ -10,14 +10,14 @@ namespace J2N.IO
     public class TestDoubleBuffer2 : BaseBufferTestCase
     {
         private static readonly double[] VALUES = {
-            Double.MinValue,
+            double.Epsilon, // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
             (double) -1,
             (double) 0,
             (double) 1,
-            Double.MaxValue,
-            Double.NegativeInfinity,
-            Double.PositiveInfinity,
-            Double.NaN,
+            double.MaxValue,
+            double.NegativeInfinity,
+            double.PositiveInfinity,
+            double.NaN,
             (double) -0.0,
         };
 
@@ -262,9 +262,9 @@ namespace J2N.IO
             b.Put((double)-1);
             b.Put((double)1);
             b.Put(double.MaxValue);
-            b.Put(double.MinValue);
+            b.Put(double.Epsilon); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
             b.Put(-double.MaxValue);
-            b.Put(-double.MinValue);
+            b.Put(-double.Epsilon); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
             b.Put(double.NegativeInfinity);
             b.Put(double.PositiveInfinity);
             b.Put(double.NaN);
@@ -277,9 +277,9 @@ namespace J2N.IO
             ck(b, b.Get(), (double)-1);
             ck(b, b.Get(), 1);
             ck(b, b.Get(), double.MaxValue);
-            ck(b, b.Get(), double.MinValue);
+            ck(b, b.Get(), double.Epsilon); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
             ck(b, b.Get(), -double.MaxValue);
-            ck(b, b.Get(), -double.MinValue);
+            ck(b, b.Get(), -double.Epsilon); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
             ck(b, b.Get(), double.NegativeInfinity);
             ck(b, b.Get(), double.PositiveInfinity);
             if (BitConversion.DoubleToRawInt64Bits(v = b.Get())
