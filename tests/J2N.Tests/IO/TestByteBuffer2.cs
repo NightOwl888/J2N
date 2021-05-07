@@ -215,12 +215,12 @@ namespace J2N.IO
             output.Write(" long");
 
             b.PutSingle((float)1);
-            b.PutSingle((float)float.MinValue);
+            b.PutSingle((float)float.Epsilon); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
             b.PutSingle((float)float.MaxValue);
             output.Write(" float");
 
             b.PutDouble((double)1);
-            b.PutDouble((double)double.MinValue);
+            b.PutDouble((double)double.Epsilon); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
             b.PutDouble((double)double.MaxValue);
             output.Write(" double");
 
@@ -247,12 +247,12 @@ namespace J2N.IO
             output.Write(" long");
 
             ck(b, b.GetSingle(), 1);
-            ck(b, b.GetSingle(), float.MinValue);
+            ck(b, b.GetSingle(), float.Epsilon); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
             ck(b, b.GetSingle(), float.MaxValue);
             output.Write(" float");
 
             ck(b, b.GetDouble(), 1);
-            ck(b, b.GetDouble(), double.MinValue);
+            ck(b, b.GetDouble(), double.Epsilon); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
             ck(b, b.GetDouble(), double.MaxValue);
             output.Write(" double");
 

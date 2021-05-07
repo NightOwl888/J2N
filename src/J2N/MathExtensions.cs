@@ -154,7 +154,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If either argument is <see cref="double.NaN"/>, the result is <see cref="double.NaN"/>.</description></item>
         ///     <item><description>If both arguments are signed zeros, a value equivalent to <paramref name="direction"/> is returned.</description></item>
-        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="double.MinValue"/> and <paramref name="direction"/> has a value
+        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="double.Epsilon"/> and <paramref name="direction"/> has a value
         ///         such that the result should have a smaller magnitude, then a zero with the same sign as <paramref name="start"/> is returned.</description></item>
         ///     <item><description>If <paramref name="start"/> is infinite and <paramref name="direction"/> has a value such that the result
         ///     should have a smaller magnitude, <see cref="double.MaxValue"/> with the same sign as <paramref name="start"/> is returned.</description></item>
@@ -245,7 +245,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If either argument is <see cref="float.NaN"/>, the result is <see cref="float.NaN"/>.</description></item>
         ///     <item><description>If both arguments are signed zeros, a value equivalent to <paramref name="direction"/> is returned.</description></item>
-        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="float.MinValue"/> and <paramref name="direction"/> has a value
+        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="float.Epsilon"/> and <paramref name="direction"/> has a value
         ///         such that the result should have a smaller magnitude, then a zero with the same sign as <paramref name="start"/> is returned.</description></item>
         ///     <item><description>If <paramref name="start"/> is infinite and <paramref name="direction"/> has a value such that the result
         ///     should have a smaller magnitude, <see cref="float.MaxValue"/> with the same sign as <paramref name="start"/> is returned.</description></item>
@@ -337,7 +337,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="double.NaN"/>, the result is <see cref="double.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="double.PositiveInfinity"/>, the result is <see cref="double.PositiveInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="double.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="double.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -366,7 +366,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="float.NaN"/>, the result is <see cref="float.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="float.PositiveInfinity"/>, the result is <see cref="float.PositiveInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="float.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="float.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -394,7 +394,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="double.NaN"/>, the result is <see cref="double.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="double.NegativeInfinity"/>, the result is <see cref="double.NegativeInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="double.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="double.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -406,7 +406,7 @@ namespace J2N
             else
             {
                 if (value == 0.0)
-                    return -double.MinValue;
+                    return -double.Epsilon; // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
                 else
                     return BitConversion.Int64BitsToDouble(BitConversion.DoubleToRawInt64Bits(value) +
                                                    ((value > 0.0d) ? -1L : +1L));
@@ -424,7 +424,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="float.NaN"/>, the result is <see cref="float.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="float.NegativeInfinity"/>, the result is <see cref="float.NegativeInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="float.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="float.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -436,7 +436,7 @@ namespace J2N
             else
             {
                 if (value == 0.0f)
-                    return -float.MinValue;
+                    return -float.Epsilon; // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
                 else
                     return BitConversion.Int32BitsToSingle(BitConversion.SingleToRawInt32Bits(value) +
                                                 ((value > 0.0f) ? -1 : +1));
