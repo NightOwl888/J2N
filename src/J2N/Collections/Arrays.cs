@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-
+using SR2 = J2N.Resources.Strings;
 
 namespace J2N.Collections
 {
@@ -270,6 +270,38 @@ namespace J2N.Collections
         //    return array;
         //}
 
+        /// <summary>
+        /// Copies the specified array, truncating or padding with default values for <typeparamref name="T"/> (if necessary) so the
+        /// copy has the specified length. For all indices that are valid in both the original array and the copy,
+        /// the two arrays will contain identical values. For any indices that are valid in the copy but not the
+        /// original, the copy will contain the default value of <typeparamref name="T"/>. Such indices will exist if
+        /// and only if the specified length is greater than that of the original array.
+        /// </summary>
+        /// <typeparam name="T">The type of array.</typeparam>
+        /// <param name="original">The array to copy.</param>
+        /// <param name="newLength">The length of the copy to be returned.</param>
+        /// <returns>A copy of the original array, truncated or padded with zeros to obtain the specified length.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="original"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newLength"/> is less than zero.</exception>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static T[] CopyOf<T>(T[] original, int newLength)
+        {
+            if (original is null)
+                throw new ArgumentNullException(nameof(original));
+            if (newLength < 0)
+                throw new ArgumentOutOfRangeException(nameof(newLength), newLength, SR2.ArgumentOutOfRange_NeedNonNegNum);
+
+            T[] newArray = new T[newLength];
+
+            for (int i = 0; i < Math.Min(original.Length, newLength); i++)
+            {
+                newArray[i] = original[i];
+            }
+
+            return newArray;
+        }
 
         /// <summary>
         /// Returns an empty array.
