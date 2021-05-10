@@ -894,5 +894,13 @@ namespace J2N.Numerics
             }
 
         }
+
+
+        // J2N: Support implicit conversion
+
+        /// <inheritdoc/>
+        public static implicit operator long(Int64 value) => value.value;
+        /// <inheritdoc/>
+        public static implicit operator Int64(long value) => ValueOf(value);
     }
 }
