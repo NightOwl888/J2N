@@ -7,6 +7,7 @@
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>
+    <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8-beta-0001</RandomizedTestingGeneratorsPackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
     <XunitPackageReferenceVersion>2.4.1</XunitPackageReferenceVersion>
     <XunitRunnerVisualStudioPackageReferenceVersion>$(XunitPackageReferenceVersion)</XunitRunnerVisualStudioPackageReferenceVersion>
