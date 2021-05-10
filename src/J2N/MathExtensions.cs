@@ -442,5 +442,31 @@ namespace J2N
                                                 ((value > 0.0f) ? -1 : +1));
             }
         }
+
+        /// <summary>
+        /// Returns a value with the magnitude of <paramref name="x"/> and the sign of <paramref name="y"/>.
+        /// </summary>
+        /// <param name="x">A number whose magnitude is used in the result.</param>
+        /// <param name="y">A number whose sign is the used in the result.</param>
+        /// <returns>A value with the magnitude of <paramref name="x"/> and the sign of <paramref name="y"/>.</returns>
+        public static unsafe double CopySign(this double x, double y) // Cover .NET < .NET Standard 2.1
+        {
+            // This method is required to work for all inputs,
+            // including NaN, so we operate on the raw bits.
+
+            long xbits = BitConversion.DoubleToRawInt64Bits(x);
+            long ybits = BitConversion.DoubleToRawInt64Bits(y);
+
+            // If the sign bits of x and y are not the same,
+            // flip the sign bit of x and return the new value;
+            // otherwise, just return x
+
+            if ((xbits ^ ybits) < 0)
+            {
+                return BitConversion.Int64BitsToDouble(xbits ^ long.MinValue);
+            }
+
+            return x;
+        }
     }
 }
