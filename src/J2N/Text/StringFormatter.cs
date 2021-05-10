@@ -129,6 +129,11 @@ namespace J2N.Text
         {
             if (typeof(ICustomFormatter).Equals(formatType))
                 return this;
+            if (typeof(NumberFormatInfo).Equals(formatType))
+                return GetNumberFormatInfo(Culture);
+            if (typeof(DateTimeFormatInfo).Equals(formatType))
+                return GetDateTimeFormatInfo(Culture);
+
             return null;
         }
 
@@ -186,6 +191,11 @@ namespace J2N.Text
             return provider.GetFormat(typeof(NumberFormatInfo)) as NumberFormatInfo;
         }
 
+        private DateTimeFormatInfo? GetDateTimeFormatInfo(IFormatProvider provider)
+        {
+            return provider.GetFormat(typeof(DateTimeFormatInfo)) as DateTimeFormatInfo;
+        }
+
         private static string FormatNegativeZero(NumberFormatInfo? numberFormat)
         {
             if (numberFormat is null)
@@ -209,6 +219,11 @@ namespace J2N.Text
 
         private static string FormatDouble(double d, NumberFormatInfo? numberFormat)
         {
+            if (numberFormat is null || numberFormat.Equals(CultureInfo.InvariantCulture.NumberFormat))
+            {
+                return J2N.Numerics.FloatingDecimal.ToJavaFormatString(d);
+            }
+
             if ((long)d == d)
             {
                 // Special case: negative zero
@@ -227,6 +242,11 @@ namespace J2N.Text
 
         private static string FormatSingle(float f, NumberFormatInfo? numberFormat)
         {
+            if (numberFormat is null || numberFormat.Equals(CultureInfo.InvariantCulture.NumberFormat))
+            {
+                return J2N.Numerics.FloatingDecimal.ToJavaFormatString(f);
+            }
+
             if ((int)f == f)
             {
                 // Special case: negative zero
