@@ -335,8 +335,9 @@ namespace J2N.Numerics
             if (s == string.Empty)
                 throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
 
-            if (provider is null ||
-                CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
+            provider ??= CultureInfo.CurrentCulture;
+
+            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
                 FloatingDecimal.ParseAsHex(s))
             {
                 return FloatingDecimal.ParseDouble(s); // J2N TODO: Culture
@@ -473,9 +474,10 @@ namespace J2N.Numerics
          */
         public static string ToString(double d, IFormatProvider? provider)
         {
-            if (provider is null || CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
+            provider ??= CultureInfo.CurrentCulture;
+
+            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
             {
-                //return J2N.Numerics.NumberConverter.Convert(f);
                 return FloatingDecimal.ToJavaFormatString(d); // J2N TODO: Culture
             }
 

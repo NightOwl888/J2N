@@ -338,12 +338,15 @@ namespace J2N.Numerics
             if (s is null)
                 return 0.0f;
 
+            provider ??= CultureInfo.CurrentCulture;
+
             s = s.Trim();
             if (s == string.Empty)
                 throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
 
-            if (provider is null ||
-                CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
+            provider ??= CultureInfo.CurrentCulture;
+
+            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
                 ParseAsHex(s))
             {
                 return FloatingDecimal.ParseFloat(s); // J2N TODO: Culture
@@ -445,9 +448,10 @@ namespace J2N.Numerics
             //// to using string.Format with some hacky format conversion in order to support them.
             //return string.Format(provider, "{0}", f);
 
-            if (provider is null || CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
+            provider ??= CultureInfo.CurrentCulture;
+
+            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
             {
-                //return J2N.Numerics.NumberConverter.Convert(f);
                 return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
             }
 
