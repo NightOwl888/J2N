@@ -286,7 +286,7 @@ namespace J2N.Numerics
             if (k > 0)
             {
                 //S = S * TEN_TO_THE[k];
-                S = BigInteger.Pow(TEN, k);
+                S = S * BigInteger.Pow(TEN, k);
             }
             else if (k < 0)
             {
