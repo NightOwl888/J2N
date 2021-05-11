@@ -364,7 +364,7 @@ namespace J2N.Numerics
 
             return result;
 
-            //return FloatingPointParser.ParseFloat(value, provider);
+            //return FloatingPointParser.ParseFloat(s, provider);
 
             //return float.Parse(value, provider); // J2N TODO: Is this right?
             //return org.apache.harmony.luni.util.FloatingPointParser
@@ -452,7 +452,8 @@ namespace J2N.Numerics
 
             if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
             {
-                return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
+                //return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
+                return NumberConverter.Convert(f); // J2N TODO: Culture
             }
 
             return f.ToString(provider);

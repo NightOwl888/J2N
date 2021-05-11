@@ -232,16 +232,23 @@ namespace J2N.Numerics
         #region From bigint.c in Apache Harmony
 
         // From cbigint.c in Apache Harmony
-        private static readonly BigInteger TEN_E1 = 0xA;
-        private static readonly BigInteger TEN_E2 = 0x64;
-        private static readonly BigInteger TEN_E3 = 0x3E8;
-        private static readonly BigInteger TEN_E4 = 0x2710;
-        private static readonly BigInteger TEN_E5 = 0x186A0;
-        private static readonly BigInteger TEN_E6 = 0xF4240;
-        private static readonly BigInteger TEN_E7 = 0x989680;
-        private static readonly BigInteger TEN_E8 = 0x5F5E100;
-        private static readonly BigInteger TEN_E9 = 0x3B9ACA00;
-        private static readonly BigInteger TEN_E19 = 0x8AC7230489E80000;
+        //private ulong HIGH_IN_U64(ulong u64) => u64 >> 32;
+        //private ulong LOW_IN_U64(ulong u64) => u64 & 0x00000000FFFFFFFF;
+
+        //private static readonly BigInteger TEN_E1 = 0xA;
+        //private static readonly BigInteger TEN_E2 = 0x64;
+        //private static readonly BigInteger TEN_E3 = 0x3E8;
+        //private static readonly BigInteger TEN_E4 = 0x2710;
+        //private static readonly BigInteger TEN_E5 = 0x186A0;
+        //private static readonly BigInteger TEN_E6 = 0xF4240;
+        //private static readonly BigInteger TEN_E7 = 0x989680;
+        //private static readonly BigInteger TEN_E8 = 0x5F5E100;
+        //private static readonly BigInteger TEN_E9 = 0x3B9ACA00;
+        //private static readonly BigInteger TEN_E19 = 0x8AC7230489E80000;
+
+        //private BigInteger TIMES_TEN(BigInteger x) => (((x << 3) + ((x) << 1)));
+
+        private static readonly BigInteger TEN = 10; 
 
         private void BigIntDigitGenerator(long f, int e, bool isDenormalized, bool mantissaIsZero, int p)
         {
@@ -251,12 +258,12 @@ namespace J2N.Numerics
                 M = 1L << e;
                 if (!mantissaIsZero)
                 {
-                    R = f << (e + 1);
+                    R = (BigInteger)f << (e + 1);
                     S = 2;
                 }
                 else
                 {
-                    R = f << (e + 2);
+                    R = (BigInteger)f << (e + 2);
                     S = 4;
                 }
             }
@@ -265,24 +272,28 @@ namespace J2N.Numerics
                 M = 1;
                 if (isDenormalized || !mantissaIsZero)
                 {
-                    R = f << 1;
-                    S = 1L << (1 - e);
+                    R = (BigInteger)f << 1;
+                    S = (BigInteger)1L << (1 - e);
                 }
                 else
                 {
-                    R = f << 2;
-                    S = 1L << (2 - e);
+                    R = (BigInteger)f << 2;
+                    S = (BigInteger)1L << (2 - e);
                 }
             }
             int k = (int)Math.Ceiling((e + p - 1) * invLogOfTenBaseTwo - 1e-10);
 
             if (k > 0)
             {
-                S = S * TEN_TO_THE[k];
+                //S = S * TEN_TO_THE[k];
+                S = BigInteger.Pow(TEN, k);
             }
             else if (k < 0)
             {
-                long scale = TEN_TO_THE[-k];
+                //long scale = TEN_TO_THE[-k];
+                //R = R * scale;
+                //M = M == 1 ? scale : M * scale;
+                BigInteger scale = BigInteger.Pow(TEN, -k);
                 R = R * scale;
                 M = M == 1 ? scale : M * scale;
             }
@@ -340,7 +351,7 @@ namespace J2N.Numerics
                 uArray[setCount++] = U + 1;
         }
 
-        //private void long TimesTenToTheEHighPrecision(ref ulong result, long length, int e)
+        //private long TimesTenToTheEHighPrecision(ref ulong result, long length, int e)
         //{
         //    ulong overflow;
         //    int exp10 = e;
@@ -357,6 +368,21 @@ namespace J2N.Numerics
         //     * simpleAappendDecimalDigit() so just pick 10e3 as that point for
         //     * now.
         //     */
+        //}
+
+        //private long SimpleMultiplyHighPrecision64
+
+        //private int SimpleAppendDecimalDigitHighPrecision(ulong[] arg1, long length, ulong digit)
+        //{
+        //    /* assumes digit is less than 32 bits */
+        //    ulong arg;
+        //    long index = 0;
+
+        //    digit <<= 32;
+        //    do
+        //    {
+
+        //    } while (++index < length);
         //}
 
         #endregion
