@@ -24,8 +24,10 @@ namespace J2N.Numerics
 
         private static FDBigInteger mutable(String hex, int offset)
         {
+            // J2N: BigInteger requires a leading zero to signify positive sign
+            hex = hex.StartsWith("0", StringComparison.Ordinal) ? hex : '0' + hex;
 
-            char[] chars = BigInteger.Parse(hex, NumberStyles.HexNumber).ToString().ToCharArray();
+            char[] chars = BigInteger.Parse(hex, NumberStyles.HexNumber).ToString(CultureInfo.InvariantCulture).ToCharArray();
             return new FDBigInteger(0, chars, 0, chars.Length).MultByPow52(0, offset * 32);
         }
 
@@ -83,18 +85,12 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
         public void TestValueOfPow52()
         {
             for (int p5 = 0; p5 <= MAX_P5; p5++)
             {
                 for (int p2 = 0; p2 <= MAX_P2; p2++)
                 {
-                    if (p5 == 1 && p2 == 29)
-                    {
-
-                    }
-
                     TestValueOfPow52(p5, p2);
                 }
             }
@@ -103,11 +99,11 @@ namespace J2N.Numerics
         private static void TestValueOfMulPow52(long value, int p5, int p2)
         {
             //BigInteger bi = BigInteger.valueOf(value & ~LONG_SIGN_MASK);
-            BigInteger bi = value & ~LONG_SIGN_MASK;
+            BigInteger bi = (BigInteger)(value & ~LONG_SIGN_MASK);
             if (value < 0)
             {
                 //bi = bi.SetBit(63);
-                bi |= 1 << 63;
+                bi = bi | (BigInteger)1 << 63; // J2N: The cast to BigInteger here is required to avoid overflow
             }
             check(biPow52(p5, p2) * bi, FDBigInteger.ValueOfMulPow52(value, p5, p2),
                     "valueOfMulPow52(" + value.ToHexString() + "." + p5 + "," + p2 + ")");
@@ -124,7 +120,6 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
         public void TestValueOfMulPow52()
         {
             for (int p5 = 0; p5 <= MAX_P5; p5++)
@@ -152,7 +147,6 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
         public void TestLeftShift()
         {
             TestLeftShift(IMMUTABLE_ZERO, 0, true);
@@ -212,7 +206,6 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
         public void TestQuoRemIteration()
         {
             // IMMUTABLE_TEN18 == 0de0b6b3a7640000
@@ -254,7 +247,6 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
         public void TestCmp()
         {
             TestCmp(mutable("FFFFFFFF", 0), mutable("100000000", 0));
@@ -353,7 +345,6 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
         public void TestMultBy10()
         {
             for (int p5 = 0; p5 <= MAX_P5; p5++)
@@ -380,7 +371,6 @@ namespace J2N.Numerics
             check(bt * biPow52(p5, p2), r, "multByPow52 returns wrong result");
         }
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
         public void TestMultByPow52()
         {
             for (int p5 = 0; p5 <= MAX_P5; p5++)
@@ -411,7 +401,7 @@ namespace J2N.Numerics
             check(biLeft - biRight, diff, "leftInplaceSub returns wrong result");
         }
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
+        [Ignore("J2N: Takes 20 minutes")]
         public void TestLeftInplaceSub()
         {
             for (int p5 = 0; p5 <= MAX_P5; p5++)
@@ -463,7 +453,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore("J2N TODO: Failing due to bad conversion from FDBigInteger to System.Numerics.BigInteger")]
+        [Ignore("J2N: Takes 20 minutes")]
         public void TestRightInplaceSub()
         {
             for (int p5 = 0; p5 <= MAX_P5; p5++)
