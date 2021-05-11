@@ -1629,6 +1629,36 @@ namespace J2N.Numerics
         public BigInteger ToBigInteger()
         {
             byte[] magnitude = new byte[nWords * 4  /*+ 1*/];
+            //for (int i = 0; i < nWords; i++)
+            //{
+            //    int w = data[i];
+            //    //magnitude[magnitude.Length - 4 * i - 1] = (byte)w;
+            //    //magnitude[magnitude.Length - 4 * i - 2] = (byte)(w >> 8);
+            //    //magnitude[magnitude.Length - 4 * i - 3] = (byte)(w >> 16);
+            //    //magnitude[magnitude.Length - 4 * i - 4] = (byte)(w >> 24);
+
+            //    magnitude[magnitude.Length - 4 * i - 1] = (byte)(w >> 24);
+            //    magnitude[magnitude.Length - 4 * i - 2] = (byte)(w >> 16);
+            //    magnitude[magnitude.Length - 4 * i - 3] = (byte)(w >> 8);
+            //    magnitude[magnitude.Length - 4 * i - 4] = (byte)w;
+            //}
+#if FEATURE_READONLYSPAN
+            for (int i = 0; i < nWords; i++)
+            {
+                int w = data[i];
+                magnitude[magnitude.Length - 4 * i - 1] = (byte)w;
+                magnitude[magnitude.Length - 4 * i - 2] = (byte)(w >> 8);
+                magnitude[magnitude.Length - 4 * i - 3] = (byte)(w >> 16);
+                magnitude[magnitude.Length - 4 * i - 4] = (byte)(w >> 24);
+
+                //magnitude[magnitude.Length - 4 * i - 1] = (byte)(w >> 24);
+                //magnitude[magnitude.Length - 4 * i - 2] = (byte)(w >> 16);
+                //magnitude[magnitude.Length - 4 * i - 3] = (byte)(w >> 8);
+                //magnitude[magnitude.Length - 4 * i - 4] = (byte)w;
+            }
+
+            var bi = new BigInteger(new ReadOnlySpan<byte>(magnitude), isUnsigned: true, isBigEndian: true);
+#else
             for (int i = 0; i < nWords; i++)
             {
                 int w = data[i];
@@ -1642,10 +1672,13 @@ namespace J2N.Numerics
                 magnitude[magnitude.Length - 4 * i - 3] = (byte)(w >> 8);
                 magnitude[magnitude.Length - 4 * i - 4] = (byte)w;
             }
+
             //return new BigInteger(magnitude).shiftLeft(offset * 32);
             var bi = new BigInteger(magnitude);
             // Always make sure the sign is positive before returing
             bi = bi < 0 ? bi * -1 : bi;
+#endif
+
             return bi << (offset * 32);
         }
 
