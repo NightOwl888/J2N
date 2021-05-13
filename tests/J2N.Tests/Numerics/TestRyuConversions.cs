@@ -8,45 +8,47 @@ namespace J2N.Numerics {
         private const int NUM_RANDOM_TESTS = 100000;
 
         [Test]
-        public void DecimalOnly() {
+        public void TestDecimalOnly() {
             float f = .123f;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals(".123", s);
+            //assertEquals(".123", s);
+            assertEquals("0.123", s); // Expected behavior of JDK 1.8
         }
 
         [Test]
-        public void SmallNumber() {
+        public void TestSmallNumber() {
             float f = 123.45f;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals("123.45", s);
+            assertEquals("123.45", s); // Expected behavior of JDK 1.8
         }
 
 
         [Test]
-        public void ScientificNotation1() {
+        public void TestScientificNotation1() {
             float f = 1e7f;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals("1.0E7", s);
+            assertEquals("1.0E7", s); // Expected behavior of JDK 1.8
         }
 
         [Test]
-        public void ScientificNotation2() {
+        public void TestScientificNotation2() {
             float f = 1e7f + 1;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals("1.0000001E7", s);
+            assertEquals("1.0000001E7", s); // Expected behavior of JDK 1.8
         }
 
 
         [Test]
-        public void LargestNonScientificNotation() {
+        public void TestLargestNonScientificNotation() {
             float f = 1e7f - 1;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals("9999999", s);
+            //assertEquals("9999999", s);
+            assertEquals("9999999.0", s); // Expected behavior of JDK 1.8
         }
 
         /**
@@ -54,11 +56,11 @@ namespace J2N.Numerics {
          * float to string approach.
          */
         [Test]
-        public void Example1() {
+        public void TestExample1() {
             float f = 12.90898f;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals("12.90898", s);
+            assertEquals("12.90898", s); // Expected behavior of JDK 1.8
         }
 
         /**
@@ -66,11 +68,11 @@ namespace J2N.Numerics {
          * float to string approach.
          */
         [Test]
-        public void Example2() {
+        public void TestExample2() {
             float f = 1.0e19f;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals("1.0E19", s);
+            assertEquals("1.0E19", s); // Expected behavior of JDK 1.8
         }
 
         /**
@@ -78,11 +80,11 @@ namespace J2N.Numerics {
          * float to string approach.
          */
         [Test]
-        public void Example3() {
+        public void TestExample3() {
             float f = 1.0E-36f;
 
             string s = RyuConversion.FloatToString(f);
-            assertEquals("1.0E-36", s);
+            assertEquals("1.0E-36", s); // Expected behavior of JDK 1.8
         }
 
         [Test]
