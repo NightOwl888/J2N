@@ -41,7 +41,7 @@ namespace J2N.Numerics
             "3.4028236E29", "3.4028233E30", "3.4028235E31", "3.4028233E32", "3.4028236E33",
             "3.4028236E34", "3.4028234E35", "3.4028236E36", "3.4028235E37", "3.4028235E38" };
 
-    private static readonly int[] rawBitsFor1_17eN38To38 = { unchecked((int)0x80800000), unchecked((int)0x82200000), unchecked((int)0x83c80000),
+        private static readonly int[] rawBitsFor1_17eN38To38 = { unchecked((int)0x80800000), unchecked((int)0x82200000), unchecked((int)0x83c80000),
             unchecked((int)0x857a0000), unchecked((int)0x871c4000), unchecked((int)0x88c35000), unchecked((int)0x8a742400), unchecked((int)0x8c189680), unchecked((int)0x8dbebc20), unchecked((int)0x8f6e6b28),
             unchecked((int)0x911502f9), unchecked((int)0x92ba43b7), unchecked((int)0x9468d4a5), unchecked((int)0x961184e7), unchecked((int)0x97b5e621), unchecked((int)0x99635fa9), unchecked((int)0x9b0e1bca),
             unchecked((int)0x9cb1a2bc), unchecked((int)0x9e5e0b6b), unchecked((int)0xa00ac723), unchecked((int)0xa1ad78ec), unchecked((int)0xa358d727), unchecked((int)0xa5078678), unchecked((int)0xa6a96816),
@@ -74,7 +74,7 @@ namespace J2N.Numerics
             "-1.1754943E31", "-1.1754944E32", "-1.1754943E33", "-1.1754944E34",
             "-1.1754944E35", "-1.1754944E36", "-1.1754943E37", "-1.1754943E38" };
 
-    private void doTestCompareRawBits(string originalFloatString, int expectedRawBits,
+        private void doTestCompareRawBits(string originalFloatString, int expectedRawBits,
             string expectedString)
         {
             int rawBits;
@@ -851,7 +851,8 @@ namespace J2N.Numerics
         {
             // Regression test for HARMONY-6261
             float f = new Single("2147483648", J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("2.14748365E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Changed from "2.1474836E9" to "2.14748365E9" to match JDK behavior
+            //assertEquals("2.14748365E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Changed from "2.1474836E9" to "2.14748365E9" to match JDK behavior
+            assertEquals("2.1474836E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N TODO: This test should fail to match the JDK, but pass to match Apache Harmony
 
             doTestCompareRawBits("123456790528.000000000000000f", 0x51e5f4c9, "1.2345679E11");
             doTestCompareRawBits("123456790528.000000000000000", 0x51e5f4c9, "1.2345679E11");
