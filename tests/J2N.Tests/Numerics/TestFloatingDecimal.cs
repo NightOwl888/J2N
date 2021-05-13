@@ -202,15 +202,18 @@ namespace J2N.Numerics
             int failures = 0;
 
             double[] d = new double[] {
-            -5.9522650387500933e18, // dtoa() fast path
-            0.872989018674569,      // dtoa() fast iterative - long
-            1.1317400099603851e308  // dtoa() slow iterative
-        };
+                -5.9522650387500933e18, // dtoa() fast path
+                0.872989018674569,      // dtoa() fast iterative - long
+                1.1317400099603851e308  // dtoa() slow iterative
+            };
 
             for (int i = 0; i < d.Length; i++)
             {
                 OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(d[i]);
-                failures += check("testToJavaFormatStringDoubleFixed", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(d[i]));
+                failures += check($"Original value: {d[i].ToHexString()} or {d[i].ToHexString()} hexadecimal", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(d[i]));
+
+                // Check for round-trip
+                assertEquals($"Failed to round trip: {d[i].ToString("R")} or {d[i].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[i]), BitConversion.DoubleToRawInt64Bits(FloatingDecimal.ParseDouble(FloatingDecimal.ToJavaFormatString(d[i]))));
             }
 
             //return failures;
@@ -225,14 +228,17 @@ namespace J2N.Numerics
             for (int i = 0; i < NUM_RANDOM_TESTS; i++)
             {
                 double[] d = new double[] {
-                Random.NextInt64(),
-                Random.NextGaussian(),
-                Random.NextDouble()*double.MaxValue
-            };
+                    Random.NextInt64(),
+                    Random.NextGaussian(),
+                    Random.NextDouble()*double.MaxValue
+                };
                 for (int j = 0; j < d.Length; j++)
                 {
                     OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(d[j]);
-                    failures += check("testToJavaFormatStringDoubleRandom", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(d[j]));
+                    failures += check($"Original value: {d[j].ToHexString()} or {d[j].ToHexString()} hexadecimal", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(d[j]));
+
+                    // Check for round-trip
+                    assertEquals($"Failed to round trip: {d[j].ToString("R")}", BitConversion.DoubleToRawInt64Bits(d[j]), BitConversion.DoubleToRawInt64Bits(FloatingDecimal.ParseDouble(FloatingDecimal.ToJavaFormatString(d[j]))));
                 }
             }
 
@@ -256,15 +262,18 @@ namespace J2N.Numerics
             int failures = 0;
 
             float[] f = new float[] {
-            -9.8784166e8f, // dtoa() fast path
-            0.70443946f,   // dtoa() fast iterative - int
-            1.8254228e37f  // dtoa() slow iterative
-        };
+                -9.8784166e8f, // dtoa() fast path
+                0.70443946f,   // dtoa() fast iterative - int
+                1.8254228e37f  // dtoa() slow iterative
+            };
 
             for (int i = 0; i < f.Length; i++)
             {
                 OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(f[i]);
-                failures += check("testToJavaFormatStringFloatFixed", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(f[i]));
+                failures += check($"Original value: {f[i].ToHexString()} or {f[i].ToHexString()} hexadecimal", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(f[i]));
+
+                // Check for round-trip
+                assertEquals($"Failed to round trip: {f[i].ToString("R")}", BitConversion.SingleToRawInt32Bits(f[i]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(FloatingDecimal.ToJavaFormatString(f[i]))));
             }
 
             //return failures;
@@ -279,14 +288,17 @@ namespace J2N.Numerics
             for (int i = 0; i < NUM_RANDOM_TESTS; i++)
             {
                 float[] f = new float[] {
-                Random.Next(),
-                (float)Random.NextGaussian(),
-                Random.NextSingle()*float.MaxValue
-            };
+                    Random.Next(),
+                    (float)Random.NextGaussian(),
+                    Random.NextSingle()*float.MaxValue
+                };
                 for (int j = 0; j < f.Length; j++)
                 {
                     OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(f[j]);
-                    failures += check("testToJavaFormatStringFloatRandom", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(f[j]));
+                    failures += check($"Original value: {f[j].ToHexString()} or {f[j].ToHexString()} hexadecimal", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(f[j]));
+
+                    // Check for round-trip
+                    assertEquals($"Failed to round trip: {f[j].ToString("R")}", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(FloatingDecimal.ToJavaFormatString(f[j]))));
                 }
             }
 
