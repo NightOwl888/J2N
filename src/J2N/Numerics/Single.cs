@@ -452,7 +452,8 @@ namespace J2N.Numerics
 
             if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
             {
-                return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
+                //return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
+                return RyuConversion.FloatToString(f);
             }
 
             return f.ToString(provider);
