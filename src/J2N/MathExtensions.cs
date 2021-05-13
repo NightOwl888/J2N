@@ -468,19 +468,5 @@ namespace J2N
 
             return x;
         }
-
-        internal static uint DivRem(uint a, uint b, out uint result)
-        {
-            uint div = a / b;
-            result = a - (div * b);
-            return div;
-        }
-
-        internal static ulong DivRem(ulong a, ulong b, out ulong result)
-        {
-            ulong div = a / b;
-            result = a - (div * b);
-            return div;
-        }
     }
 }
