@@ -118,10 +118,11 @@ namespace J2N.Text
         [Test]
         public void TestDecimalPlaces_Float()
         {
-            // J2N TODO: The observed behavior for this test in Java 8 is "13.987755". However, we see
+            // J2N TODO: The observed behavior for this test in Java 8 is "13.987655". However, we see
             // 7 decimal places in Lucene.NET tests. Not sure which is correct, but leaving alone as it works in Lucene.NET now.
             // But need to revisit to find out why the behavior is different between Java 6 (Lucene) and Java 8 (ICU4J) tests.
             //assertEquals("13.9876543", string.Format(StringFormatter.InvariantCulture, "{0}", 13.9876543210987f));
+            assertEquals("13.987655", string.Format(StringFormatter.InvariantCulture, "{0}", 13.9876543210987f));
             assertEquals("22.0", string.Format(StringFormatter.InvariantCulture, "{0}", 22f));
         }
 
