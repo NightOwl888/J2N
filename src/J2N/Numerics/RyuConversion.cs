@@ -438,13 +438,7 @@ namespace J2N.Numerics {
         public static string FloatToString(float f) {
             char[] result = new char[16];
             int count = f2s_buffered_n(f, result);
-
-            char[] chars = new char[count];
-
-            for (int i = 0; i < count; i++) {       //Initially tried using Buffer.BlockCopy but was having issue with it so went with loop.
-                chars[i] = result[i];
-            }
-            return new string(chars);
+            return new string(result, 0, count);
         }
 
         private static uint float_to_bits(float f) {
