@@ -231,6 +231,109 @@ namespace J2N.Numerics
 
         #region From bigint.c in Apache Harmony
 
+        private void BigIntDigitGenerator(long f, int e, bool isDenormalized, bool mantissaIsZero, int p)
+        {
+            BigInteger R, S, M;
+            if (e >= 0)
+            {
+                M = 1L << e;
+                if (!mantissaIsZero)
+                {
+                    R = (BigInteger)f << (e + 1);
+                    S = 2;
+                }
+                else
+                {
+                    R = (BigInteger)f << (e + 2);
+                    S = 4;
+                }
+            }
+            else
+            {
+                M = 1;
+                if (isDenormalized || !mantissaIsZero)
+                {
+                    R = (BigInteger)f << 1;
+                    S = (BigInteger)1L << (1 - e);
+                }
+                else
+                {
+                    R = (BigInteger)f << 2;
+                    S = (BigInteger)1L << (2 - e);
+                }
+            }
+            int k = (int)Math.Ceiling((e + p - 1) * invLogOfTenBaseTwo - 1e-10);
+
+            if (k > 0)
+            {
+                //S = S * TEN_TO_THE[k];
+                S = S * BigInteger.Pow(TEN, k);
+            }
+            else if (k < 0)
+            {
+                //long scale = TEN_TO_THE[-k];
+                //R = R * scale;
+                //M = M == 1 ? scale : M * scale;
+                BigInteger scale = BigInteger.Pow(TEN, -k);
+                R = R * scale;
+                M = M == 1 ? scale : M * scale;
+            }
+
+            if (R + M > S)
+            { // was M_plus
+                firstK = k;
+            }
+            else
+            {
+                firstK = k - 1;
+                R = R * 10;
+                M = M * 10;
+            }
+
+            getCount = setCount = 0; // reset indices
+            bool low, high;
+            int U;
+            BigInteger[] Si = new BigInteger[] { S, S << 1, S << 2, S << 3 };
+            while (true)
+            {
+                // set U to be floor (R / S) and R to be the remainder
+                // using a kind of "binary search" to find the answer.
+                // It's a lot quicker than actually dividing since we know
+                // the answer will be between 0 and 10
+                U = 0;
+                BigInteger remainder;
+                for (int i = 3; i >= 0; i--)
+                {
+                    remainder = R - Si[i];
+                    if (remainder >= 0)
+                    {
+                        R = remainder;
+                        U += 1 << i;
+                    }
+                }
+
+                low = R < M; // was M_minus
+                high = R + M > S; // was M_plus
+
+                if (low || high)
+                    break;
+
+                R = R * 10;
+                M = M * 10;
+                uArray[setCount++] = U;
+            }
+            if (low && !high)
+                uArray[setCount++] = U;
+            else if (high && !low)
+                uArray[setCount++] = U + 1;
+            else if ((R << 1) < S)
+                uArray[setCount++] = U;
+            else
+                uArray[setCount++] = U + 1;
+        }
+
+
+
         // From cbigint.c in Apache Harmony
         private static ulong LOW_IN_U64(ulong u64) => u64 >> 32;
         private static ulong HIGH_IN_U64(ulong u64) => u64 & 0x00000000FFFFFFFF;
@@ -258,183 +361,183 @@ namespace J2N.Numerics
         private const ulong TEN_E9 = 0x3B9ACA00;
         private const ulong TEN_E19 = 0x8AC7230489E80000;
 
-        //private static readonly BigInteger TEN = 10; 
+        private static readonly BigInteger TEN = 10; 
 
-        private void BigIntDigitGenerator(ulong f, int e, bool isDenormalized, bool mantissaIsZero, int p)
-        {
-            int RLength, SLength, TempLength, mplus_Length, mminus_Length;
-            int i;
-            //int high, low, i; // J2N: high, low defined below
-            //int k, firstK, U; // J2N: firstK defined at the class level, k and U defined below
-            //int getCount, setCount; // J2N: Defined at the class level
-            //int[] uArray; // J2N: Defined at the class level
+        //private void BigIntDigitGenerator(float f, int e, bool isDenormalized, bool mantissaIsZero, int p)
+        //{
+        //    int RLength, SLength, TempLength, mplus_Length, mminus_Length;
+        //    int i;
+        //    //int high, low, i; // J2N: high, low defined below
+        //    //int k, firstK, U; // J2N: firstK defined at the class level, k and U defined below
+        //    //int getCount, setCount; // J2N: Defined at the class level
+        //    //int[] uArray; // J2N: Defined at the class level
 
-            // J2N: Omitted j stuff because this is all in scope
+        //    // J2N: Omitted j stuff because this is all in scope
 
-            ulong[] R = new ulong[RM_SIZE], S = new ulong[STemp_SIZE], mplus = new ulong[RM_SIZE], mminus = new ulong[RM_SIZE],
-                Temp = new ulong[STemp_SIZE];
+        //    ulong[] R = new ulong[RM_SIZE], S = new ulong[STemp_SIZE], mplus = new ulong[RM_SIZE], mminus = new ulong[RM_SIZE],
+        //        Temp = new ulong[STemp_SIZE];
 
-            if (e >= 0)
-            {
-                *R = f; // J2N TODO: Not sure how to translate this - R is an array so not sure which element we are supposed to set. In the original code it was a pointer.
-                *mplus = *mminus = 1; // J2N TODO: Not sure how to translate this - R is an array so not sure which element we are supposed to set. In the original code it was a pointer.
-                SimpleShiftLeftHighPrecision(mminus, RM_SIZE, e);
+        //    if (e >= 0)
+        //    {
+        //        *R = f; // J2N TODO: Not sure how to translate this - R is an array so not sure which element we are supposed to set. In the original code it was a pointer.
+        //        *mplus = *mminus = 1; // J2N TODO: Not sure how to translate this - R is an array so not sure which element we are supposed to set. In the original code it was a pointer.
+        //        SimpleShiftLeftHighPrecision(mminus, RM_SIZE, e);
                 
-                if (f != ((ulong)2 << (p - 1)))
-                {
-                    SimpleShiftLeftHighPrecision(R, RM_SIZE, e + 1);
-                    *S = 2;
-                    /*
-                    * m+ = m+ << e results in 1.0e23 to be printed as
-                    * 0.9999999999999999E23
-                    * m+ = m+ << e+1 results in 1.0e23 to be printed as
-                    * 1.0e23 (caused too much rounding)
-                    *      470fffffffffffff = 2.0769187434139308E34
-                    *      4710000000000000 = 2.076918743413931E34
-                    */
-                    SimpleShiftLeftHighPrecision(mplus, RM_SIZE, e);
-                }
-                else
-                {
-                    SimpleShiftLeftHighPrecision(R, RM_SIZE, e + 2);
-                    *S = 4;
-                    SimpleShiftLeftHighPrecision(mplus, RM_SIZE, e + 1);
-                }
-            }
-            else
-            {
-                if (isDenormalized || (f != ((ulong)2 << (p - 1))))
-                {
-                    *R = (ulong)f << 1;
-                    *S = (ulong)1L << (1 - e);
-                    SimpleShiftLeftHighPrecision(S, STemp_SIZE, 1 - e);
-                    *mplus = *mminus = 1;
-                }
-                else
-                {
-                    *R = (ulong)f << 2;
-                    *S = (ulong)1L << (2 - e);
-                    SimpleShiftLeftHighPrecision(S, STemp_SIZE, 2 - e);
-                    *mplus = 2;
-                    *mminus = 1;
-                }
-            }
-            int k = (int)Math.Ceiling((e + p - 1) * invLogOfTenBaseTwo - 1e-10);
+        //        if (f != ((ulong)2 << (p - 1)))
+        //        {
+        //            SimpleShiftLeftHighPrecision(R, RM_SIZE, e + 1);
+        //            *S = 2;
+        //            /*
+        //            * m+ = m+ << e results in 1.0e23 to be printed as
+        //            * 0.9999999999999999E23
+        //            * m+ = m+ << e+1 results in 1.0e23 to be printed as
+        //            * 1.0e23 (caused too much rounding)
+        //            *      470fffffffffffff = 2.0769187434139308E34
+        //            *      4710000000000000 = 2.076918743413931E34
+        //            */
+        //            SimpleShiftLeftHighPrecision(mplus, RM_SIZE, e);
+        //        }
+        //        else
+        //        {
+        //            SimpleShiftLeftHighPrecision(R, RM_SIZE, e + 2);
+        //            *S = 4;
+        //            SimpleShiftLeftHighPrecision(mplus, RM_SIZE, e + 1);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        if (isDenormalized || (f != ((ulong)2 << (p - 1))))
+        //        {
+        //            *R = (ulong)f << 1;
+        //            *S = (ulong)1L << (1 - e);
+        //            SimpleShiftLeftHighPrecision(S, STemp_SIZE, 1 - e);
+        //            *mplus = *mminus = 1;
+        //        }
+        //        else
+        //        {
+        //            *R = (ulong)f << 2;
+        //            *S = (ulong)1L << (2 - e);
+        //            SimpleShiftLeftHighPrecision(S, STemp_SIZE, 2 - e);
+        //            *mplus = 2;
+        //            *mminus = 1;
+        //        }
+        //    }
+        //    int k = (int)Math.Ceiling((e + p - 1) * invLogOfTenBaseTwo - 1e-10);
 
-            if (k > 0)
-            {
-                //// BigInteger code:
-                //S = S * BigInteger.Pow(TEN, k);
+        //    if (k > 0)
+        //    {
+        //        //// BigInteger code:
+        //        //S = S * BigInteger.Pow(TEN, k);
 
-                TimesTenToTheEHighPrecision(S, STemp_SIZE, k);
-            }
-            else if (k < 0)
-            {
-                //// BigInteger code:
-                //R = R * BigInteger.Pow(TEN, -k);
-                //mplus = mplus * BigInteger.Pow(TEN, -k);
-                //mminus = mminus * BigInteger.Pow(TEN, -k);
+        //        TimesTenToTheEHighPrecision(S, STemp_SIZE, k);
+        //    }
+        //    else if (k < 0)
+        //    {
+        //        //// BigInteger code:
+        //        //R = R * BigInteger.Pow(TEN, -k);
+        //        //mplus = mplus * BigInteger.Pow(TEN, -k);
+        //        //mminus = mminus * BigInteger.Pow(TEN, -k);
 
-                TimesTenToTheEHighPrecision(R, RM_SIZE, -k);
-                TimesTenToTheEHighPrecision(mplus, RM_SIZE, -k);
-                TimesTenToTheEHighPrecision(mminus, RM_SIZE, -k);
-            }
+        //        TimesTenToTheEHighPrecision(R, RM_SIZE, -k);
+        //        TimesTenToTheEHighPrecision(mplus, RM_SIZE, -k);
+        //        TimesTenToTheEHighPrecision(mminus, RM_SIZE, -k);
+        //    }
 
-            RLength = mplus_Length = mminus_Length = RM_SIZE;
-            SLength = TempLength = STemp_SIZE;
+        //    RLength = mplus_Length = mminus_Length = RM_SIZE;
+        //    SLength = TempLength = STemp_SIZE;
 
-            if (Temp.Length > RM_SIZE)
-                Temp.Fill<ulong>(0L);
-            Array.Copy(R, Temp, RM_SIZE);
+        //    if (Temp.Length > RM_SIZE)
+        //        Temp.Fill<ulong>(0L);
+        //    Array.Copy(R, Temp, RM_SIZE);
 
-            while (RLength > 1 && R[RLength - 1] == 0)
-                --RLength;
-            while (mplus_Length > 1 && mplus[mplus_Length - 1] == 0)
-                --mplus_Length;
-            while (mminus_Length > 1 && mminus[mminus_Length - 1] == 0)
-                --mminus_Length;
-            while (SLength > 1 && S[SLength - 1] == 0)
-                --SLength;
-            TempLength = (RLength > mplus_Length ? RLength : mplus_Length) + 1;
-            AddHighPrecision(Temp, TempLength, mplus, mplus_Length);
+        //    while (RLength > 1 && R[RLength - 1] == 0)
+        //        --RLength;
+        //    while (mplus_Length > 1 && mplus[mplus_Length - 1] == 0)
+        //        --mplus_Length;
+        //    while (mminus_Length > 1 && mminus[mminus_Length - 1] == 0)
+        //        --mminus_Length;
+        //    while (SLength > 1 && S[SLength - 1] == 0)
+        //        --SLength;
+        //    TempLength = (RLength > mplus_Length ? RLength : mplus_Length) + 1;
+        //    AddHighPrecision(Temp, TempLength, mplus, mplus_Length);
 
-            if (CompareHighPrecision(Temp, TempLength, S, SLength) >= 0)
-            { // was M_plus
-                firstK = k;
-            }
-            else
-            {
-                firstK = k - 1;
-                SimpleAppendDecimalDigitHighPrecision(R, ++RLength, 0);
-                SimpleAppendDecimalDigitHighPrecision(mplus, ++mplus_Length, 0);
-                SimpleAppendDecimalDigitHighPrecision(mminus, ++mminus_Length, 0);
-                while (RLength > 1 && R[RLength - 1] == 0)
-                    --RLength;
-                while (mplus_Length > 1 && mplus[mplus_Length - 1] == 0)
-                    --mplus_Length;
-                while (mminus_Length > 1 && mminus[mminus_Length - 1] == 0)
-                    --mminus_Length;
-            }
+        //    if (CompareHighPrecision(Temp, TempLength, S, SLength) >= 0)
+        //    { // was M_plus
+        //        firstK = k;
+        //    }
+        //    else
+        //    {
+        //        firstK = k - 1;
+        //        SimpleAppendDecimalDigitHighPrecision(R, ++RLength, 0);
+        //        SimpleAppendDecimalDigitHighPrecision(mplus, ++mplus_Length, 0);
+        //        SimpleAppendDecimalDigitHighPrecision(mminus, ++mminus_Length, 0);
+        //        while (RLength > 1 && R[RLength - 1] == 0)
+        //            --RLength;
+        //        while (mplus_Length > 1 && mplus[mplus_Length - 1] == 0)
+        //            --mplus_Length;
+        //        while (mminus_Length > 1 && mminus[mminus_Length - 1] == 0)
+        //            --mminus_Length;
+        //    }
 
-            // J2N: class level variables are already in scope, so we omit the code dealing with that
+        //    // J2N: class level variables are already in scope, so we omit the code dealing with that
 
-            getCount = setCount = 0; // reset indices
+        //    getCount = setCount = 0; // reset indices
 
-            bool low, high;
-            int U;
-            while (true)
-            {
-                U = 0;
-                for (i = 3; i >= 0; --i)
-                {
-                    TempLength = SLength + 1;
-                    Temp[SLength] = 0;
-                    if (Temp.Length > SLength)
-                        Temp.Fill<ulong>(0L);
-                    Array.Copy(S, Temp, SLength);
-                    SimpleShiftLeftHighPrecision(Temp, TempLength, i);
-                    if (CompareHighPrecision(R, RLength, Temp, TempLength) >= 0)
-                    {
-                        SubtractHighPrecision(R, RLength, Temp, TempLength);
-                        U += 1 << i;
-                    }
-                }
+        //    bool low, high;
+        //    int U;
+        //    while (true)
+        //    {
+        //        U = 0;
+        //        for (i = 3; i >= 0; --i)
+        //        {
+        //            TempLength = SLength + 1;
+        //            Temp[SLength] = 0;
+        //            if (Temp.Length > SLength)
+        //                Temp.Fill<ulong>(0L);
+        //            Array.Copy(S, Temp, SLength);
+        //            SimpleShiftLeftHighPrecision(Temp, TempLength, i);
+        //            if (CompareHighPrecision(R, RLength, Temp, TempLength) >= 0)
+        //            {
+        //                SubtractHighPrecision(R, RLength, Temp, TempLength);
+        //                U += 1 << i;
+        //            }
+        //        }
 
-                low = CompareHighPrecision(R, RLength, mminus, mminus_Length) <= 0;
+        //        low = CompareHighPrecision(R, RLength, mminus, mminus_Length) <= 0;
 
-                if (Temp.Length > RLength)
-                    Temp.Fill<ulong>(0L);
-                Array.Copy(R, Temp, RLength);
-                TempLength = (RLength > mplus_Length ? RLength : mplus_Length) + 1;
-                AddHighPrecision(Temp, TempLength, mplus, mplus_Length);
+        //        if (Temp.Length > RLength)
+        //            Temp.Fill<ulong>(0L);
+        //        Array.Copy(R, Temp, RLength);
+        //        TempLength = (RLength > mplus_Length ? RLength : mplus_Length) + 1;
+        //        AddHighPrecision(Temp, TempLength, mplus, mplus_Length);
 
-                high = CompareHighPrecision(Temp, TempLength, S, SLength) >= 0;
+        //        high = CompareHighPrecision(Temp, TempLength, S, SLength) >= 0;
 
-                if (low || high)
-                    break;
+        //        if (low || high)
+        //            break;
 
-                SimpleAppendDecimalDigitHighPrecision(R, ++RLength, 0);
-                SimpleAppendDecimalDigitHighPrecision(mplus, ++mplus_Length, 0);
-                SimpleAppendDecimalDigitHighPrecision(mminus, ++mminus_Length, 0);
-                while (RLength > 1 && R[RLength - 1] == 0)
-                    --RLength;
-                while (mplus_Length > 1 && mplus[mplus_Length - 1] == 0)
-                    --mplus_Length;
-                while (mminus_Length > 1 && mminus[mminus_Length - 1] == 0)
-                    --mminus_Length;
-                uArray[setCount++] = U;
-            }
+        //        SimpleAppendDecimalDigitHighPrecision(R, ++RLength, 0);
+        //        SimpleAppendDecimalDigitHighPrecision(mplus, ++mplus_Length, 0);
+        //        SimpleAppendDecimalDigitHighPrecision(mminus, ++mminus_Length, 0);
+        //        while (RLength > 1 && R[RLength - 1] == 0)
+        //            --RLength;
+        //        while (mplus_Length > 1 && mplus[mplus_Length - 1] == 0)
+        //            --mplus_Length;
+        //        while (mminus_Length > 1 && mminus[mminus_Length - 1] == 0)
+        //            --mminus_Length;
+        //        uArray[setCount++] = U;
+        //    }
 
-            SimpleShiftLeftHighPrecision(R, ++RLength, 1);
-            if (low && !high)
-                uArray[setCount++] = U;
-            else if (high && !low)
-                uArray[setCount++] = U + 1;
-            else if (CompareHighPrecision(R, RLength, S, SLength) < 0)
-                uArray[setCount++] = U;
-            else
-                uArray[setCount++] = U + 1;
-        }
+        //    SimpleShiftLeftHighPrecision(R, ++RLength, 1);
+        //    if (low && !high)
+        //        uArray[setCount++] = U;
+        //    else if (high && !low)
+        //        uArray[setCount++] = U + 1;
+        //    else if (CompareHighPrecision(R, RLength, S, SLength) < 0)
+        //        uArray[setCount++] = U;
+        //    else
+        //        uArray[setCount++] = U + 1;
+        //}
 
         // BigInteger can raise to the power of 10 to the e, but lacks the ability to specify length,
         // so we need to do longhand multiplication.
@@ -621,32 +724,32 @@ namespace J2N.Numerics
             return HIGH_U32(digit);
         }
 
-        private static void SimpleShiftLeftHighPrecision(ulong[] arg1, int length, int arg2)
-        {
-            /* assumes length > 0 */
-            int index, offset;
-            if (arg2 >= 64)
-            {
-                offset = arg2 >> 6;
-                index = length;
+        //private static void SimpleShiftLeftHighPrecision(ulong[] arg1, int length, int arg2)
+        //{
+        //    /* assumes length > 0 */
+        //    int index, offset;
+        //    if (arg2 >= 64)
+        //    {
+        //        offset = arg2 >> 6;
+        //        index = length;
 
-                while (--index - offset >= 0)
-                    arg1[index] = arg1[index - offset];
-                do
-                {
-                    arg1[index] = 0;
-                } while (--index >= 0);
+        //        while (--index - offset >= 0)
+        //            arg1[index] = arg1[index - offset];
+        //        do
+        //        {
+        //            arg1[index] = 0;
+        //        } while (--index >= 0);
 
-                arg2 &= 0x3F;
-            }
-            if (arg2 == 0)
-                return;
-            while (--length > 0)
-            {
-                arg1[length] = arg1[length] << arg2 | arg1[length - 1] >> (64 - arg2);
-            }
-            *arg1 <<= arg2; // J2N TODO: How do we translate this?
-        }
+        //        arg2 &= 0x3F;
+        //    }
+        //    if (arg2 == 0)
+        //        return;
+        //    while (--length > 0)
+        //    {
+        //        arg1[length] = arg1[length] << arg2 | arg1[length - 1] >> (64 - arg2);
+        //    }
+        //    *arg1 <<= arg2; // J2N TODO: How do we translate this?
+        //}
 
         private static int CompareHighPrecision(ulong[] arg1, int length1, ulong[] arg2, int length2)
         {
@@ -672,21 +775,21 @@ namespace J2N.Numerics
             return 0;
         }
 
-        private static bool SimpleAddHighPrecision(ulong[] arg1, int length, ulong arg2)
-        {
-            /* assumes length > 0 */
-            int index = 1;
+        //private static bool SimpleAddHighPrecision(ulong[] arg1, int length, ulong arg2)
+        //{
+        //    /* assumes length > 0 */
+        //    int index = 1;
 
-            *arg1 += arg2; // J2N TODO: How do we translate this?
-            if (arg2 <= *arg1) // J2N TODO: How do we translate this?
-                return false;
-            else if (length == 1)
-                return true;
+        //    *arg1 += arg2; // J2N TODO: How do we translate this?
+        //    if (arg2 <= *arg1) // J2N TODO: How do we translate this?
+        //        return false;
+        //    else if (length == 1)
+        //        return true;
 
-            while (++arg1[index] == 0 && ++index < length) ;
+        //    while (++arg1[index] == 0 && ++index < length) ;
 
-            return index == length;
-        }
+        //    return index == length;
+        //}
 
         private static bool AddHighPrecision(ulong[] arg1, int length1, ulong[] arg2, int length2)
         {
@@ -729,23 +832,23 @@ namespace J2N.Numerics
             return index == length1;
         }
 
-        private static void SubtractHighPrecision(ulong[] arg1, int length1, ulong[] arg2, int length2)
-        {
-            /* assumes arg1 > arg2 */
-            int index;
-            for (index = 0; index < length1; ++index)
-                arg1[index] = ~arg1[index];
-            SimpleAddHighPrecision(arg1, length1, 1);
+        //private static void SubtractHighPrecision(ulong[] arg1, int length1, ulong[] arg2, int length2)
+        //{
+        //    /* assumes arg1 > arg2 */
+        //    int index;
+        //    for (index = 0; index < length1; ++index)
+        //        arg1[index] = ~arg1[index];
+        //    SimpleAddHighPrecision(arg1, length1, 1);
 
-            while (length2 > 0 && arg2[length2 - 1] == 0)
-                --length2;
+        //    while (length2 > 0 && arg2[length2 - 1] == 0)
+        //        --length2;
 
-            AddHighPrecision(arg1, length1, arg2, length2);
+        //    AddHighPrecision(arg1, length1, arg2, length2);
 
-            for (index = 0; index < length1; ++index)
-                arg1[index] = ~arg1[index];
-            SimpleAddHighPrecision(arg1, length1, 1);
-        }
+        //    for (index = 0; index < length1; ++index)
+        //        arg1[index] = ~arg1[index];
+        //    SimpleAddHighPrecision(arg1, length1, 1);
+        //}
 
         #endregion
 
