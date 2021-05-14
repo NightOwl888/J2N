@@ -851,7 +851,8 @@ namespace J2N.Numerics
         {
             // Regression test for HARMONY-6261
             float f = new Single("2147483648", J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("2.14748365E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Changed from "2.1474836E9" to "2.14748365E9" to match JDK behavior
+            //assertEquals("2.14748365E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Changed from "2.1474836E9" to "2.14748365E9" to match JDK behavior
+            assertEquals("2.1474836E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture));
 
             doTestCompareRawBits("123456790528.000000000000000f", 0x51e5f4c9, "1.2345679E11");
             doTestCompareRawBits("123456790528.000000000000000", 0x51e5f4c9, "1.2345679E11");
