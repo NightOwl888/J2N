@@ -246,7 +246,9 @@ namespace J2N.Text
             {
                 //return J2N.Numerics.FloatingDecimal.ToJavaFormatString(f);
                 //return J2N.Numerics.NumberConverter.Convert(f);
-                return J2N.Numerics.RyuConversion.FloatToString(f);
+                //return J2N.Numerics.RyuConversion.FloatToString(f);
+
+                return J2N.Numerics.RyuFloat.FloatToString(f);
             }
 
             if ((int)f == f)

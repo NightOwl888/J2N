@@ -454,7 +454,8 @@ namespace J2N.Numerics
             {
                 //return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
                 //return NumberConverter.Convert(f); // J2N TODO: Culture
-                return RyuConversion.FloatToString(f);
+                //return RyuConversion.FloatToString(f);
+                return RyuFloat.FloatToString(f);
             }
 
             return f.ToString(provider);
@@ -642,7 +643,7 @@ namespace J2N.Numerics
         /// <returns>A hex string representing <paramref name="f"/>.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static string ToHexString(float f)
         {
             return f.ToHexString();
