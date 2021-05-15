@@ -478,7 +478,8 @@ namespace J2N.Numerics
 
             if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
             {
-                return FloatingDecimal.ToJavaFormatString(d); // J2N TODO: Culture
+                //return FloatingDecimal.ToJavaFormatString(d); // J2N TODO: Culture
+                return RyuDouble.DoubleToString(d, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
             }
 
             return d.ToString(provider);
