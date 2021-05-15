@@ -17,6 +17,7 @@
 #endregion
 
 using J2N.Collections;
+using J2N.Numerics;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -239,7 +240,8 @@ namespace J2N.Text
         {
             if (numberFormat is null || numberFormat.Equals(CultureInfo.InvariantCulture.NumberFormat))
             {
-                return J2N.Numerics.FloatingDecimal.ToJavaFormatString(d);
+                //return J2N.Numerics.FloatingDecimal.ToJavaFormatString(d);
+                return RyuDouble.DoubleToString(d, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
             }
 
             if ((long)d == d)
@@ -265,7 +267,7 @@ namespace J2N.Text
                 //return J2N.Numerics.FloatingDecimal.ToJavaFormatString(f);
                 //return J2N.Numerics.RyuConversion.FloatToString(f);
 
-                return J2N.Numerics.RyuFloat.FloatToString(f);
+                return RyuFloat.FloatToString(f, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
             }
 
             if ((int)f == f)

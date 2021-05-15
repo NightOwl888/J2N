@@ -454,7 +454,7 @@ namespace J2N.Numerics
             {
                 //return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
                 //return RyuConversion.FloatToString(f);
-                return RyuFloat.FloatToString(f);
+                return RyuFloat.FloatToString(f, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
             }
 
             return f.ToString(provider);

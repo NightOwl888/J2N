@@ -51,36 +51,35 @@ namespace J2N.Numerics
         // Only for debugging.
         //private static readonly BigInteger[] POW5 = new BigInteger[POS_TABLE_SIZE];
         //private static readonly BigInteger[] POW5_INV = new BigInteger[INV_TABLE_SIZE];
-        private static readonly BigInteger[] POW5 =
-        {
-            1ul,
-            5ul,
-            25ul,
-            125ul,
-            625ul,
-            3125ul,
-            15625ul,
-            78125ul,
-            390625ul,
-            1953125ul,
-            9765625ul,
-            48828125ul,
-            244140625ul,
-            1220703125ul,
-            6103515625ul,
-            30517578125ul,
-            152587890625ul,
-            762939453125ul,
-            3814697265625ul,
-            19073486328125ul,
-            95367431640625ul,
-            476837158203125ul,
-            2384185791015625ul,
-            11920928955078125ul,
-            59604644775390625ul,
-            298023223876953125ul,
-            1490116119384765625ul,
-            7450580596923828125ul,
+        private static readonly BigInteger[] POW5 = new BigInteger[POS_TABLE_SIZE] {
+            BigInteger.Parse("1"),
+            BigInteger.Parse("5"),
+            BigInteger.Parse("25"),
+            BigInteger.Parse("125"),
+            BigInteger.Parse("625"),
+            BigInteger.Parse("3125"),
+            BigInteger.Parse("15625"),
+            BigInteger.Parse("78125"),
+            BigInteger.Parse("390625"),
+            BigInteger.Parse("1953125"),
+            BigInteger.Parse("9765625"),
+            BigInteger.Parse("48828125"),
+            BigInteger.Parse("244140625"),
+            BigInteger.Parse("1220703125"),
+            BigInteger.Parse("6103515625"),
+            BigInteger.Parse("30517578125"),
+            BigInteger.Parse("152587890625"),
+            BigInteger.Parse("762939453125"),
+            BigInteger.Parse("3814697265625"),
+            BigInteger.Parse("19073486328125"),
+            BigInteger.Parse("95367431640625"),
+            BigInteger.Parse("476837158203125"),
+            BigInteger.Parse("2384185791015625"),
+            BigInteger.Parse("11920928955078125"),
+            BigInteger.Parse("59604644775390625"),
+            BigInteger.Parse("298023223876953125"),
+            BigInteger.Parse("1490116119384765625"),
+            BigInteger.Parse("7450580596923828125"),
             BigInteger.Parse("37252902984619140625"),
             BigInteger.Parse("186264514923095703125"),
             BigInteger.Parse("931322574615478515625"),
@@ -102,40 +101,24 @@ namespace J2N.Numerics
             BigInteger.Parse("142108547152020037174224853515625"),
         };
 
-        private static readonly BigInteger[] POW5_INV =
-        {
-            1152921504606846976,
-            8192,
-            8,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            2,
-            };
+        private static readonly BigInteger[] POW5_INV = new BigInteger[INV_TABLE_SIZE] { // J2N: Same as NEG_TABLE_SIZE in RyuDouble
+            BigInteger.Parse("576460752303423489"), BigInteger.Parse("461168601842738791"),
+            BigInteger.Parse("368934881474191033"), BigInteger.Parse("295147905179352826"),
+            BigInteger.Parse("472236648286964522"), BigInteger.Parse("377789318629571618"),
+            BigInteger.Parse("302231454903657294"), BigInteger.Parse("483570327845851670"),
+            BigInteger.Parse("386856262276681336"), BigInteger.Parse("309485009821345069"),
+            BigInteger.Parse("495176015714152110"), BigInteger.Parse("396140812571321688"),
+            BigInteger.Parse("316912650057057351"), BigInteger.Parse("507060240091291761"),
+            BigInteger.Parse("405648192073033409"), BigInteger.Parse("324518553658426727"),
+            BigInteger.Parse("519229685853482763"), BigInteger.Parse("415383748682786211"),
+            BigInteger.Parse("332306998946228969"), BigInteger.Parse("531691198313966350"),
+            BigInteger.Parse("425352958651173080"), BigInteger.Parse("340282366920938464"),
+            BigInteger.Parse("544451787073501542"), BigInteger.Parse("435561429658801234"),
+            BigInteger.Parse("348449143727040987"), BigInteger.Parse("557518629963265579"),
+            BigInteger.Parse("446014903970612463"), BigInteger.Parse("356811923176489971"),
+            BigInteger.Parse("570899077082383953"), BigInteger.Parse("456719261665907162"),
+            BigInteger.Parse("365375409332725730"),
+        };
 #endif
 
 
@@ -249,7 +232,7 @@ namespace J2N.Numerics
             if (float.IsNaN(value)) return "NaN";
             if (value == float.PositiveInfinity) return "Infinity";
             if (value == float.NegativeInfinity) return "-Infinity";
-            int bits = BitConversion.SingleToRawInt32Bits(value);
+            int bits = BitConversion.SingleToRawInt32Bits(value); // J2N: Since we have checked for NaN above, it is quicker to call SingleToRawInt32Bits
             if (bits == 0) return "0.0";
             if (bits == unchecked((int)0x80000000)) return "-0.0";
 
