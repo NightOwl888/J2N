@@ -98,13 +98,13 @@ namespace J2N.Numerics
                 for (int j = 0; j < d.Length; j++)
                 {
                     OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(d[j]);
-                    assertEquals($"Original value: {d[j].ToHexString()} or {d[j].ToHexString()} hexadecimal", ofd.toJavaFormatString(), FloatingDecimal.ToJavaFormatString(d[j]));
+                    //assertEquals($"Original value: {d[j].ToHexString()} or {d[j].ToHexString()} hexadecimal", ofd.toJavaFormatString(), RyuDouble.DoubleToString(d[j]));
 
                     // Check for round-trip
-                    assertEquals($"Failed to round trip: {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]), BitConversion.DoubleToRawInt64Bits(FloatingDecimal.ParseDouble(FloatingDecimal.ToJavaFormatString(d[j]))));
+                    assertEquals($"Failed to round trip: {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]), BitConversion.DoubleToRawInt64Bits(FloatingDecimal.ParseDouble(RyuDouble.DoubleToString(d[j]))));
 
                     // Check for round-trip against .NET
-                    assertEquals($"Failed to round trip (.NET): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]).ToBinaryString(), BitConversion.DoubleToRawInt64Bits(double.Parse(FloatingDecimal.ToJavaFormatString(d[j]), CultureInfo.InvariantCulture)).ToBinaryString());
+                    assertEquals($"Failed to round trip (.NET): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]).ToBinaryString(), BitConversion.DoubleToRawInt64Bits(double.Parse(RyuDouble.DoubleToString(d[j]), CultureInfo.InvariantCulture)).ToBinaryString());
                 }
             }
         }
