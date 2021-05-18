@@ -1407,8 +1407,8 @@ namespace J2N.Numerics
             assertFalse("Doubletest0", posZero.Equals(negZero));
 
             // J2N: .NET specific - testing specific cultures should also parse negative zero correctly
-            Double posZero_de = Double.ValueOf("+0.0", new CultureInfo("de-DE"));
-            Double negZero_de = Double.ValueOf("-0.0", new CultureInfo("de-DE"));
+            Double posZero_de = Double.ValueOf("+0,0", new CultureInfo("de-DE"));
+            Double negZero_de = Double.ValueOf("-0,0", new CultureInfo("de-DE"));
             assertFalse("Doubletest0", posZero_de.Equals(negZero_de));
 
             // Tests for double values by name.

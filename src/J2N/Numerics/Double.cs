@@ -335,23 +335,28 @@ namespace J2N.Numerics
             if (s == string.Empty)
                 throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
 
-            provider ??= CultureInfo.CurrentCulture;
+            //provider ??= CultureInfo.CurrentCulture;
+            var numberFormat = (NumberFormatInfo)(provider?.GetFormat(typeof(NumberFormatInfo)) ?? CultureInfo.CurrentCulture.NumberFormat);
 
-            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
-                FloatingDecimal.ParseAsHex(s))
-            {
-                return FloatingDecimal.ParseDouble(s); // J2N TODO: Culture
-            }
+            //if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
+            //    FloatingDecimal.ParseAsHex(s))
+            //{
+            //    return FloatingDecimal.ParseDouble(s); // J2N TODO: Culture
+            //}
 
             //return FloatingPointParser.ParseDouble(value, provider);
             //return org.apache.harmony.luni.util.FloatingPointParser
             //        .parseDouble(string);
 
-            double result = double.Parse(s, provider); // J2N TODO: For now, fallback to .NET. We should respect the NumberFormatInfo settings in the Java parser/formatter, though.
+            if (FloatingPointParser.ParseAsHex(s))
+                return HexStringParser.ParseDouble(s);
 
-            // .NET doesn't handle negative zero, so we need to do that here
-            if (result == 0d && FloatingDecimal.IsNegative(s, provider))
-                return -0.0d;
+            //double result = double.Parse(s, provider); // J2N TODO: For now, fallback to .NET. We should respect the NumberFormatInfo settings in the Java parser/formatter, though.
+            double result = DotNetNumber.ParseDouble(s, NumberStyles.Float, numberFormat);
+
+            //// .NET doesn't handle negative zero, so we need to do that here
+            //if (result == 0d && FloatingPointParser.IsNegative(s, numberFormat))
+            //    return -0.0d;
 
             return result;
         }
