@@ -109,7 +109,7 @@ namespace J2N.Numerics
                     //assertEquals($"Failed to round trip (.NET): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]).ToBinaryString(), BitConversion.DoubleToRawInt64Bits(double.Parse(RyuDouble.DoubleToString(d[j]), CultureInfo.InvariantCulture)).ToBinaryString());
 
                     // Check for round-trip against J2N.Numerics.Double
-                    assertEquals($"Failed to round trip (.NET parser in J2N): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]).ToBinaryString(), BitConversion.DoubleToRawInt64Bits(Double.ParseDouble(RyuDouble.DoubleToString(d[j]), CultureInfo.InvariantCulture)).ToBinaryString());
+                    assertEquals($"Failed to round trip (.NET parser in J2N): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]), BitConversion.DoubleToRawInt64Bits(Double.ParseDouble(RyuDouble.DoubleToString(d[j]), CultureInfo.InvariantCulture)));
                 }
             }
         }

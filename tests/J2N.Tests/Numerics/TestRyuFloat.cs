@@ -170,11 +170,6 @@ namespace J2N.Numerics
                 };
                 for (int j = 0; j < f.Length; j++)
                 {
-                    //if (FloatingDecimal.ToJavaFormatString(f[j]) != RyuFloat.FloatToString(f[j], RoundingMode.RoundEven))
-                    //{
-
-                    //}
-
                     //assertEquals($"Original value: {f[j].ToString("R")} or {f[j].ToHexString()} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[j]), actual: RyuFloat.FloatToString(f[j], RoundingMode.RoundEven));
 
                     // Check for round-trip

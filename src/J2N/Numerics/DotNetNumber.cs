@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Globalization;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +16,7 @@ namespace J2N.Numerics
     // The Parse methods provided by the numeric classes convert a
     // string to a numeric value. The optional style parameter specifies the
     // permitted style of the numeric string. It must be a combination of bit flags
-    // from the NumberStyles enumeration. The optional info parameter
+    // from the NumberStyle enumeration. The optional info parameter
     // specifies the NumberFormatInfo instance to use when parsing the
     // string. If the info parameter is null or omitted, the numeric
     // formatting information is obtained from the current culture.
@@ -23,7 +24,7 @@ namespace J2N.Numerics
     // Numeric strings produced by the Format methods using the Currency,
     // Decimal, Engineering, Fixed point, General, or Number standard formats
     // (the C, D, E, F, G, and N format specifiers) are guaranteed to be parseable
-    // by the Parse methods if the NumberStyles.Any style is
+    // by the Parse methods if the NumberStyle.Any style is
     // specified. Note, however, that the Parse methods do not accept
     // NaNs or Infinities.
 
@@ -200,7 +201,7 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-        //internal static int ParseInt32(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+        //internal static int ParseInt32(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         //{
         //    ParsingStatus status = TryParseInt32(value, styles, info, out int result);
         //    if (status != ParsingStatus.OK)
@@ -211,7 +212,7 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-        //internal static long ParseInt64(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+        //internal static long ParseInt64(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         //{
         //    ParsingStatus status = TryParseInt64(value, styles, info, out long result);
         //    if (status != ParsingStatus.OK)
@@ -222,7 +223,7 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-        //internal static uint ParseUInt32(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+        //internal static uint ParseUInt32(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         //{
         //    ParsingStatus status = TryParseUInt32(value, styles, info, out uint result);
         //    if (status != ParsingStatus.OK)
@@ -233,7 +234,7 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-        //internal static ulong ParseUInt64(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+        //internal static ulong ParseUInt64(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         //{
         //    ParsingStatus status = TryParseUInt64(value, styles, info, out ulong result);
         //    if (status != ParsingStatus.OK)
@@ -244,12 +245,12 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-        private static unsafe bool TryParseNumber(ref char* str, char* strEnd, NumberStyles styles, ref NumberBuffer number, NumberFormatInfo info)
+        private static unsafe bool TryParseNumber(ref char* str, char* strEnd, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(str != null);
             Debug.Assert(strEnd != null);
             Debug.Assert(str <= strEnd);
-            Debug.Assert((styles & NumberStyles.AllowHexSpecifier) == 0);
+            Debug.Assert((styles & NumberStyle.AllowHexSpecifier) == 0);
 
             const int StateSign = 0x0001;
             const int StateParens = 0x0002;
@@ -270,7 +271,7 @@ namespace J2N.Numerics
             string? currSymbol = null;       // currency symbol from NumberFormatInfo.
 
             bool parsingCurrency = false;
-            if ((styles & NumberStyles.AllowCurrencySymbol) != 0)
+            if ((styles & NumberStyle.AllowCurrencySymbol) != 0)
             {
                 currSymbol = info.CurrencySymbol;
 
@@ -295,14 +296,14 @@ namespace J2N.Numerics
             {
                 // Eat whitespace unless we've found a sign which isn't followed by a currency symbol.
                 // "-Kr 1231.47" is legal but "- 1231.47" is not.
-                if (!IsWhite(ch) || (styles & NumberStyles.AllowLeadingWhite) == 0 || ((state & StateSign) != 0 && ((state & StateCurrency) == 0 && info.NumberNegativePattern != 2)))
+                if (!IsWhite(ch) || (styles & NumberStyle.AllowLeadingWhite) == 0 || ((state & StateSign) != 0 && ((state & StateCurrency) == 0 && info.NumberNegativePattern != 2)))
                 {
-                    if ((((styles & NumberStyles.AllowLeadingSign) != 0) && (state & StateSign) == 0) && ((next = MatchChars(p, strEnd, info.PositiveSign)) != null || ((next = MatchChars(p, strEnd, info.NegativeSign)) != null && (number.IsNegative = true))))
+                    if ((((styles & NumberStyle.AllowLeadingSign) != 0) && (state & StateSign) == 0) && ((next = MatchChars(p, strEnd, info.PositiveSign)) != null || ((next = MatchChars(p, strEnd, info.NegativeSign)) != null && (number.IsNegative = true))))
                     {
                         state |= StateSign;
                         p = next - 1;
                     }
-                    else if (ch == '(' && ((styles & NumberStyles.AllowParentheses) != 0) && ((state & StateSign) == 0))
+                    else if (ch == '(' && ((styles & NumberStyle.AllowParentheses) != 0) && ((state & StateSign) == 0))
                     {
                         state |= StateSign | StateParens;
                         number.IsNegative = true;
@@ -366,12 +367,12 @@ namespace J2N.Numerics
                         number.Scale--;
                     }
                 }
-                else if (((styles & NumberStyles.AllowDecimalPoint) != 0) && ((state & StateDecimal) == 0) && ((next = MatchChars(p, strEnd, decSep)) != null || (parsingCurrency && (state & StateCurrency) == 0) && (next = MatchChars(p, strEnd, info.NumberDecimalSeparator)) != null))
+                else if (((styles & NumberStyle.AllowDecimalPoint) != 0) && ((state & StateDecimal) == 0) && ((next = MatchChars(p, strEnd, decSep)) != null || (parsingCurrency && (state & StateCurrency) == 0) && (next = MatchChars(p, strEnd, info.NumberDecimalSeparator)) != null))
                 {
                     state |= StateDecimal;
                     p = next - 1;
                 }
-                else if (((styles & NumberStyles.AllowThousands) != 0) && ((state & StateDigits) != 0) && ((state & StateDecimal) == 0) && ((next = MatchChars(p, strEnd, groupSep)) != null || (parsingCurrency && (state & StateCurrency) == 0) && (next = MatchChars(p, strEnd, info.NumberGroupSeparator)) != null))
+                else if (((styles & NumberStyle.AllowThousands) != 0) && ((state & StateDigits) != 0) && ((state & StateDecimal) == 0) && ((next = MatchChars(p, strEnd, groupSep)) != null || (parsingCurrency && (state & StateCurrency) == 0) && (next = MatchChars(p, strEnd, info.NumberGroupSeparator)) != null))
                 {
                     p = next - 1;
                 }
@@ -387,7 +388,7 @@ namespace J2N.Numerics
             number.Digits[digEnd] = (byte)('\0');
             if ((state & StateDigits) != 0)
             {
-                if ((ch == 'E' || ch == 'e') && ((styles & NumberStyles.AllowExponent) != 0))
+                if ((ch == 'E' || ch == 'e') && ((styles & NumberStyle.AllowExponent) != 0))
                 {
                     char* temp = p;
                     ch = ++p < strEnd ? *p : '\0';
@@ -430,12 +431,18 @@ namespace J2N.Numerics
                 }
                 while (true)
                 {
-                    if (!IsWhite(ch) || (styles & NumberStyles.AllowTrailingWhite) == 0)
+                    if (!IsWhite(ch) || (styles & NumberStyle.AllowTrailingWhite) == 0)
                     {
-                        if ((styles & NumberStyles.AllowTrailingSign) != 0 && ((state & StateSign) == 0) && ((next = MatchChars(p, strEnd, info.PositiveSign)) != null || (((next = MatchChars(p, strEnd, info.NegativeSign)) != null) && (number.IsNegative = true))))
+                        if ((styles & NumberStyle.AllowTrailingSign) != 0 && ((state & StateSign) == 0) && ((next = MatchChars(p, strEnd, info.PositiveSign)) != null || (((next = MatchChars(p, strEnd, info.NegativeSign)) != null) && (number.IsNegative = true))))
                         {
                             state |= StateSign;
                             p = next - 1;
+                        }
+                        // J2N: We treat a trailing f, F, d, or D as if it were whitespace if the NumberStyle.AllowTrailingFloatType option is specified
+                        else if (((styles & NumberStyle.AllowTrailingFloatType) != 0) && IsFloatTypeSuffix(ch))
+                        {
+                            // skip
+                            ch = ++p < strEnd ? *p : '\0';
                         }
                         else if (ch == ')' && ((state & StateParens) != 0))
                         {
@@ -475,15 +482,15 @@ namespace J2N.Numerics
         }
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //internal static ParsingStatus TryParseInt32(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out int result)
+        //internal static ParsingStatus TryParseInt32(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         //{
-        //    if ((styles & ~NumberStyles.Integer) == 0)
+        //    if ((styles & ~NumberStyle.Integer) == 0)
         //    {
         //        // Optimized path for the common case of anything that's allowed for integer style.
         //        return TryParseInt32IntegerStyle(value, styles, info, out result);
         //    }
 
-        //    if ((styles & NumberStyles.AllowHexSpecifier) != 0)
+        //    if ((styles & NumberStyle.AllowHexSpecifier) != 0)
         //    {
         //        result = 0;
         //        return TryParseUInt32HexNumberStyle(value, styles, out Unsafe.As<int, uint>(ref result));
@@ -492,7 +499,7 @@ namespace J2N.Numerics
         //    return TryParseInt32Number(value, styles, info, out result);
         //}
 
-        //private static unsafe ParsingStatus TryParseInt32Number(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out int result)
+        //private static unsafe ParsingStatus TryParseInt32Number(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         //{
         //    result = 0;
         //    byte* pDigits = stackalloc byte[Int32NumberBufferLength];
@@ -511,10 +518,10 @@ namespace J2N.Numerics
         //    return ParsingStatus.OK;
         //}
 
-        ///// <summary>Parses int limited to styles that make up NumberStyles.Integer.</summary>
-        //internal static ParsingStatus TryParseInt32IntegerStyle(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out int result)
+        ///// <summary>Parses int limited to styles that make up NumberStyle.Integer.</summary>
+        //internal static ParsingStatus TryParseInt32IntegerStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         //{
-        //    Debug.Assert((styles & ~NumberStyles.Integer) == 0, "Only handles subsets of Integer format");
+        //    Debug.Assert((styles & ~NumberStyle.Integer) == 0, "Only handles subsets of Integer format");
 
         //    if (value.IsEmpty)
         //        goto FalseExit;
@@ -523,7 +530,7 @@ namespace J2N.Numerics
         //    int num = value[0];
 
         //    // Skip past any whitespace at the beginning.
-        //    if ((styles & NumberStyles.AllowLeadingWhite) != 0 && IsWhite(num))
+        //    if ((styles & NumberStyle.AllowLeadingWhite) != 0 && IsWhite(num))
         //    {
         //        do
         //        {
@@ -537,7 +544,7 @@ namespace J2N.Numerics
 
         //    // Parse leading sign.
         //    int sign = 1;
-        //    if ((styles & NumberStyles.AllowLeadingSign) != 0)
+        //    if ((styles & NumberStyle.AllowLeadingSign) != 0)
         //    {
         //        if (info.HasInvariantNumberSigns)
         //        {
@@ -665,7 +672,7 @@ namespace J2N.Numerics
         //    // Skip past trailing whitespace, then past trailing zeros, and if anything else remains, fail.
         //    if (IsWhite(num))
         //    {
-        //        if ((styles & NumberStyles.AllowTrailingWhite) == 0)
+        //        if ((styles & NumberStyle.AllowTrailingWhite) == 0)
         //            goto FalseExit;
         //        for (index++; index < value.Length; index++)
         //        {
@@ -682,10 +689,10 @@ namespace J2N.Numerics
         //    goto DoneAtEndButPotentialOverflow;
         //}
 
-        ///// <summary>Parses long inputs limited to styles that make up NumberStyles.Integer.</summary>
-        //internal static ParsingStatus TryParseInt64IntegerStyle(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out long result)
+        ///// <summary>Parses long inputs limited to styles that make up NumberStyle.Integer.</summary>
+        //internal static ParsingStatus TryParseInt64IntegerStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out long result)
         //{
-        //    Debug.Assert((styles & ~NumberStyles.Integer) == 0, "Only handles subsets of Integer format");
+        //    Debug.Assert((styles & ~NumberStyle.Integer) == 0, "Only handles subsets of Integer format");
 
         //    if (value.IsEmpty)
         //        goto FalseExit;
@@ -694,7 +701,7 @@ namespace J2N.Numerics
         //    int num = value[0];
 
         //    // Skip past any whitespace at the beginning.
-        //    if ((styles & NumberStyles.AllowLeadingWhite) != 0 && IsWhite(num))
+        //    if ((styles & NumberStyle.AllowLeadingWhite) != 0 && IsWhite(num))
         //    {
         //        do
         //        {
@@ -708,7 +715,7 @@ namespace J2N.Numerics
 
         //    // Parse leading sign.
         //    int sign = 1;
-        //    if ((styles & NumberStyles.AllowLeadingSign) != 0)
+        //    if ((styles & NumberStyle.AllowLeadingSign) != 0)
         //    {
         //        if (info.HasInvariantNumberSigns)
         //        {
@@ -836,7 +843,7 @@ namespace J2N.Numerics
         //    // Skip past trailing whitespace, then past trailing zeros, and if anything else remains, fail.
         //    if (IsWhite(num))
         //    {
-        //        if ((styles & NumberStyles.AllowTrailingWhite) == 0)
+        //        if ((styles & NumberStyle.AllowTrailingWhite) == 0)
         //            goto FalseExit;
         //        for (index++; index < value.Length; index++)
         //        {
@@ -854,15 +861,15 @@ namespace J2N.Numerics
         //}
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //internal static ParsingStatus TryParseInt64(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out long result)
+        //internal static ParsingStatus TryParseInt64(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out long result)
         //{
-        //    if ((styles & ~NumberStyles.Integer) == 0)
+        //    if ((styles & ~NumberStyle.Integer) == 0)
         //    {
         //        // Optimized path for the common case of anything that's allowed for integer style.
         //        return TryParseInt64IntegerStyle(value, styles, info, out result);
         //    }
 
-        //    if ((styles & NumberStyles.AllowHexSpecifier) != 0)
+        //    if ((styles & NumberStyle.AllowHexSpecifier) != 0)
         //    {
         //        result = 0;
         //        return TryParseUInt64HexNumberStyle(value, styles, out Unsafe.As<long, ulong>(ref result));
@@ -871,7 +878,7 @@ namespace J2N.Numerics
         //    return TryParseInt64Number(value, styles, info, out result);
         //}
 
-        //private static unsafe ParsingStatus TryParseInt64Number(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out long result)
+        //private static unsafe ParsingStatus TryParseInt64Number(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out long result)
         //{
         //    result = 0;
         //    byte* pDigits = stackalloc byte[Int64NumberBufferLength];
@@ -891,15 +898,15 @@ namespace J2N.Numerics
         //}
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //internal static ParsingStatus TryParseUInt32(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out uint result)
+        //internal static ParsingStatus TryParseUInt32(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out uint result)
         //{
-        //    if ((styles & ~NumberStyles.Integer) == 0)
+        //    if ((styles & ~NumberStyle.Integer) == 0)
         //    {
         //        // Optimized path for the common case of anything that's allowed for integer style.
         //        return TryParseUInt32IntegerStyle(value, styles, info, out result);
         //    }
 
-        //    if ((styles & NumberStyles.AllowHexSpecifier) != 0)
+        //    if ((styles & NumberStyle.AllowHexSpecifier) != 0)
         //    {
         //        return TryParseUInt32HexNumberStyle(value, styles, out result);
         //    }
@@ -907,7 +914,7 @@ namespace J2N.Numerics
         //    return TryParseUInt32Number(value, styles, info, out result);
         //}
 
-        //private static unsafe ParsingStatus TryParseUInt32Number(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out uint result)
+        //private static unsafe ParsingStatus TryParseUInt32Number(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out uint result)
         //{
         //    result = 0;
         //    byte* pDigits = stackalloc byte[UInt32NumberBufferLength];
@@ -926,10 +933,10 @@ namespace J2N.Numerics
         //    return ParsingStatus.OK;
         //}
 
-        ///// <summary>Parses uint limited to styles that make up NumberStyles.Integer.</summary>
-        //internal static ParsingStatus TryParseUInt32IntegerStyle(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out uint result)
+        ///// <summary>Parses uint limited to styles that make up NumberStyle.Integer.</summary>
+        //internal static ParsingStatus TryParseUInt32IntegerStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out uint result)
         //{
-        //    Debug.Assert((styles & ~NumberStyles.Integer) == 0, "Only handles subsets of Integer format");
+        //    Debug.Assert((styles & ~NumberStyle.Integer) == 0, "Only handles subsets of Integer format");
 
         //    if (value.IsEmpty)
         //        goto FalseExit;
@@ -938,7 +945,7 @@ namespace J2N.Numerics
         //    int num = value[0];
 
         //    // Skip past any whitespace at the beginning.
-        //    if ((styles & NumberStyles.AllowLeadingWhite) != 0 && IsWhite(num))
+        //    if ((styles & NumberStyle.AllowLeadingWhite) != 0 && IsWhite(num))
         //    {
         //        do
         //        {
@@ -952,7 +959,7 @@ namespace J2N.Numerics
 
         //    // Parse leading sign.
         //    bool overflow = false;
-        //    if ((styles & NumberStyles.AllowLeadingSign) != 0)
+        //    if ((styles & NumberStyle.AllowLeadingSign) != 0)
         //    {
         //        if (info.HasInvariantNumberSigns)
         //        {
@@ -1080,7 +1087,7 @@ namespace J2N.Numerics
         //    // Skip past trailing whitespace, then past trailing zeros, and if anything else remains, fail.
         //    if (IsWhite(num))
         //    {
-        //        if ((styles & NumberStyles.AllowTrailingWhite) == 0)
+        //        if ((styles & NumberStyle.AllowTrailingWhite) == 0)
         //            goto FalseExit;
         //        for (index++; index < value.Length; index++)
         //        {
@@ -1097,10 +1104,10 @@ namespace J2N.Numerics
         //    goto DoneAtEndButPotentialOverflow;
         //}
 
-        ///// <summary>Parses uint limited to styles that make up NumberStyles.HexNumber.</summary>
-        //private static ParsingStatus TryParseUInt32HexNumberStyle(ReadOnlySpan<char> value, NumberStyles styles, out uint result)
+        ///// <summary>Parses uint limited to styles that make up NumberStyle.HexNumber.</summary>
+        //private static ParsingStatus TryParseUInt32HexNumberStyle(ReadOnlySpan<char> value, NumberStyle styles, out uint result)
         //{
-        //    Debug.Assert((styles & ~NumberStyles.HexNumber) == 0, "Only handles subsets of HexNumber format");
+        //    Debug.Assert((styles & ~NumberStyle.HexNumber) == 0, "Only handles subsets of HexNumber format");
 
         //    if (value.IsEmpty)
         //        goto FalseExit;
@@ -1109,7 +1116,7 @@ namespace J2N.Numerics
         //    int num = value[0];
 
         //    // Skip past any whitespace at the beginning.
-        //    if ((styles & NumberStyles.AllowLeadingWhite) != 0 && IsWhite(num))
+        //    if ((styles & NumberStyle.AllowLeadingWhite) != 0 && IsWhite(num))
         //    {
         //        do
         //        {
@@ -1201,7 +1208,7 @@ namespace J2N.Numerics
         //    // Skip past trailing whitespace, then past trailing zeros, and if anything else remains, fail.
         //    if (IsWhite(num))
         //    {
-        //        if ((styles & NumberStyles.AllowTrailingWhite) == 0)
+        //        if ((styles & NumberStyle.AllowTrailingWhite) == 0)
         //            goto FalseExit;
         //        for (index++; index < value.Length; index++)
         //        {
@@ -1219,15 +1226,15 @@ namespace J2N.Numerics
         //}
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //internal static ParsingStatus TryParseUInt64(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out ulong result)
+        //internal static ParsingStatus TryParseUInt64(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out ulong result)
         //{
-        //    if ((styles & ~NumberStyles.Integer) == 0)
+        //    if ((styles & ~NumberStyle.Integer) == 0)
         //    {
         //        // Optimized path for the common case of anything that's allowed for integer style.
         //        return TryParseUInt64IntegerStyle(value, styles, info, out result);
         //    }
 
-        //    if ((styles & NumberStyles.AllowHexSpecifier) != 0)
+        //    if ((styles & NumberStyle.AllowHexSpecifier) != 0)
         //    {
         //        return TryParseUInt64HexNumberStyle(value, styles, out result);
         //    }
@@ -1235,7 +1242,7 @@ namespace J2N.Numerics
         //    return TryParseUInt64Number(value, styles, info, out result);
         //}
 
-        //private static unsafe ParsingStatus TryParseUInt64Number(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out ulong result)
+        //private static unsafe ParsingStatus TryParseUInt64Number(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out ulong result)
         //{
         //    result = 0;
         //    byte* pDigits = stackalloc byte[UInt64NumberBufferLength];
@@ -1254,10 +1261,10 @@ namespace J2N.Numerics
         //    return ParsingStatus.OK;
         //}
 
-        ///// <summary>Parses ulong limited to styles that make up NumberStyles.Integer.</summary>
-        //internal static ParsingStatus TryParseUInt64IntegerStyle(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out ulong result)
+        ///// <summary>Parses ulong limited to styles that make up NumberStyle.Integer.</summary>
+        //internal static ParsingStatus TryParseUInt64IntegerStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out ulong result)
         //{
-        //    Debug.Assert((styles & ~NumberStyles.Integer) == 0, "Only handles subsets of Integer format");
+        //    Debug.Assert((styles & ~NumberStyle.Integer) == 0, "Only handles subsets of Integer format");
 
         //    if (value.IsEmpty)
         //        goto FalseExit;
@@ -1266,7 +1273,7 @@ namespace J2N.Numerics
         //    int num = value[0];
 
         //    // Skip past any whitespace at the beginning.
-        //    if ((styles & NumberStyles.AllowLeadingWhite) != 0 && IsWhite(num))
+        //    if ((styles & NumberStyle.AllowLeadingWhite) != 0 && IsWhite(num))
         //    {
         //        do
         //        {
@@ -1280,7 +1287,7 @@ namespace J2N.Numerics
 
         //    // Parse leading sign.
         //    bool overflow = false;
-        //    if ((styles & NumberStyles.AllowLeadingSign) != 0)
+        //    if ((styles & NumberStyle.AllowLeadingSign) != 0)
         //    {
         //        if (info.HasInvariantNumberSigns)
         //        {
@@ -1408,7 +1415,7 @@ namespace J2N.Numerics
         //    // Skip past trailing whitespace, then past trailing zeros, and if anything else remains, fail.
         //    if (IsWhite(num))
         //    {
-        //        if ((styles & NumberStyles.AllowTrailingWhite) == 0)
+        //        if ((styles & NumberStyle.AllowTrailingWhite) == 0)
         //            goto FalseExit;
         //        for (index++; index < value.Length; index++)
         //        {
@@ -1425,10 +1432,10 @@ namespace J2N.Numerics
         //    goto DoneAtEndButPotentialOverflow;
         //}
 
-        ///// <summary>Parses ulong limited to styles that make up NumberStyles.HexNumber.</summary>
-        //private static ParsingStatus TryParseUInt64HexNumberStyle(ReadOnlySpan<char> value, NumberStyles styles, out ulong result)
+        ///// <summary>Parses ulong limited to styles that make up NumberStyle.HexNumber.</summary>
+        //private static ParsingStatus TryParseUInt64HexNumberStyle(ReadOnlySpan<char> value, NumberStyle styles, out ulong result)
         //{
-        //    Debug.Assert((styles & ~NumberStyles.HexNumber) == 0, "Only handles subsets of HexNumber format");
+        //    Debug.Assert((styles & ~NumberStyle.HexNumber) == 0, "Only handles subsets of HexNumber format");
 
         //    if (value.IsEmpty)
         //        goto FalseExit;
@@ -1437,7 +1444,7 @@ namespace J2N.Numerics
         //    int num = value[0];
 
         //    // Skip past any whitespace at the beginning.
-        //    if ((styles & NumberStyles.AllowLeadingWhite) != 0 && IsWhite(num))
+        //    if ((styles & NumberStyle.AllowLeadingWhite) != 0 && IsWhite(num))
         //    {
         //        do
         //        {
@@ -1529,7 +1536,7 @@ namespace J2N.Numerics
         //    // Skip past trailing whitespace, then past trailing zeros, and if anything else remains, fail.
         //    if (IsWhite(num))
         //    {
-        //        if ((styles & NumberStyles.AllowTrailingWhite) == 0)
+        //        if ((styles & NumberStyle.AllowTrailingWhite) == 0)
         //            goto FalseExit;
         //        for (index++; index < value.Length; index++)
         //        {
@@ -1546,7 +1553,7 @@ namespace J2N.Numerics
         //    goto DoneAtEndButPotentialOverflow;
         //}
 
-        //internal static decimal ParseDecimal(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+        //internal static decimal ParseDecimal(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         //{
         //    ParsingStatus status = TryParseDecimal(value, styles, info, out decimal result);
         //    if (status != ParsingStatus.OK)
@@ -1678,7 +1685,7 @@ namespace J2N.Numerics
         //}
 
 //#if FEATURE_READONLYSPAN
-//        internal static double ParseDouble(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+//        internal static double ParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
 //        {
 //            if (!TryParseDouble(value, styles, info, out double result))
 //            {
@@ -1689,7 +1696,7 @@ namespace J2N.Numerics
 //        }
 //#endif
 
-        internal static double ParseDouble(string value, NumberStyles styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
+        internal static double ParseDouble(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
         {
             if (!TryParseDouble(value, styles, info, out double result))
             {
@@ -1700,7 +1707,7 @@ namespace J2N.Numerics
         }
 
 //#if FEATURE_READONLYSPAN
-//        internal static float ParseSingle(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+//        internal static float ParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
 //        {
 //            if (!TryParseSingle(value, styles, info, out float result))
 //            {
@@ -1711,7 +1718,7 @@ namespace J2N.Numerics
 //        }
 //#endif
 
-        internal static float ParseSingle(string value, NumberStyles styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
+        internal static float ParseSingle(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
         {
             if (!TryParseSingle(value, styles, info, out float result))
             {
@@ -1721,7 +1728,7 @@ namespace J2N.Numerics
             return result;
         }
 
-        //internal static Half ParseHalf(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info)
+        //internal static Half ParseHalf(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         //{
         //    if (!TryParseHalf(value, styles, info, out Half result))
         //    {
@@ -1731,7 +1738,7 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-        //internal static unsafe ParsingStatus TryParseDecimal(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out decimal result)
+        //internal static unsafe ParsingStatus TryParseDecimal(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out decimal result)
         //{
         //    byte* pDigits = stackalloc byte[DecimalNumberBufferLength];
         //    NumberBuffer number = new NumberBuffer(NumberBufferKind.Decimal, pDigits, DecimalNumberBufferLength);
@@ -1752,7 +1759,7 @@ namespace J2N.Numerics
         //}
 
 #if FEATURE_READONLYSPAN
-        internal static unsafe bool TryParseDouble(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out double result)
+        internal static unsafe bool TryParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             byte* pDigits = stackalloc byte[DoubleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, DoubleNumberBufferLength);
@@ -1815,7 +1822,7 @@ namespace J2N.Numerics
         }
 #endif
 
-        internal static unsafe bool TryParseDouble(string value, NumberStyles styles, NumberFormatInfo info, out double result)
+        internal static unsafe bool TryParseDouble(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             byte* pDigits = stackalloc byte[DoubleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, DoubleNumberBufferLength);
@@ -1877,7 +1884,7 @@ namespace J2N.Numerics
             return true;
         }
 
-        //internal static unsafe bool TryParseHalf(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out Half result)
+        //internal static unsafe bool TryParseHalf(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out Half result)
         //{
         //    byte* pDigits = stackalloc byte[HalfNumberBufferLength];
         //    NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, HalfNumberBufferLength);
@@ -1945,7 +1952,7 @@ namespace J2N.Numerics
         //}
 
 #if FEATURE_READONLYSPAN
-        internal static unsafe bool TryParseSingle(ReadOnlySpan<char> value, NumberStyles styles, NumberFormatInfo info, out float result)
+        internal static unsafe bool TryParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             byte* pDigits = stackalloc byte[SingleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, SingleNumberBufferLength);
@@ -2013,7 +2020,7 @@ namespace J2N.Numerics
         }
 #endif
 
-        internal static unsafe bool TryParseSingle(string value, NumberStyles styles, NumberFormatInfo info, out float result)
+        internal static unsafe bool TryParseSingle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             byte* pDigits = stackalloc byte[SingleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, SingleNumberBufferLength);
@@ -2081,7 +2088,7 @@ namespace J2N.Numerics
         }
 
 #if FEATURE_READONLYSPAN
-        internal static unsafe bool TryStringToNumber(ReadOnlySpan<char> value, NumberStyles styles, ref NumberBuffer number, NumberFormatInfo info)
+        internal static unsafe bool TryStringToNumber(ReadOnlySpan<char> value, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
             fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
@@ -2099,7 +2106,7 @@ namespace J2N.Numerics
             return true;
         }
 #endif
-        internal static unsafe bool TryStringToNumber(string value, NumberStyles styles, ref NumberBuffer number, NumberFormatInfo info)
+        internal static unsafe bool TryStringToNumber(string value, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
             fixed (char* stringPointer = value)
@@ -2182,6 +2189,8 @@ namespace J2N.Numerics
         private static bool IsWhite(int ch) => ch == 0x20 || (uint)(ch - 0x09) <= (0x0D - 0x09) ? true : false;
 
         private static bool IsDigit(int ch) => ((uint)ch - '0') <= 9;
+
+        private static bool IsFloatTypeSuffix(int ch) => ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D';
 
         internal enum ParsingStatus
         {

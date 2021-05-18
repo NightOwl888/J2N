@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.Globalization;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -78,19 +79,19 @@ namespace J2N.Numerics
             this.value = value;
         }
 
-        /**
-         * Constructs a new {@code Double} from the specified string.
-         * 
-         * @param string
-         *            the string representation of a double value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a double value.
-         * @see #parseDouble(String)
-         */
-        public Double(string value)
-            : this(ParseDouble(value))
-        {
-        }
+        ///**
+        // * Constructs a new {@code Double} from the specified string.
+        // * 
+        // * @param string
+        // *            the string representation of a double value.
+        // * @throws NumberFormatException
+        // *             if {@code string} can not be decoded into a double value.
+        // * @see #parseDouble(String)
+        // */
+        //public Double(string value)
+        //    : this(ParseDouble(value))
+        //{
+        //}
 
         /**
          * Constructs a new {@code Double} from the specified string.
@@ -103,6 +104,20 @@ namespace J2N.Numerics
          */
         public Double(string value, IFormatProvider? provider)
             : this(ParseDouble(value, provider))
+        {
+        }
+
+        /**
+         * Constructs a new {@code Double} from the specified string.
+         * 
+         * @param string
+         *            the string representation of a double value.
+         * @throws NumberFormatException
+         *             if {@code string} can not be decoded into a double value.
+         * @see #parseDouble(String)
+         */
+        public Double(string value, NumberStyle style, IFormatProvider? provider)
+            : this(ParseDouble(value, style, provider))
         {
         }
 
@@ -306,9 +321,9 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a double value.
          */
-        public static double ParseDouble(string s)
+        public static double ParseDouble(string s, IFormatProvider? provider)
         {
-            return ParseDouble(s, J2N.Text.StringFormatter.CurrentCulture);
+            return ParseDouble(s, NumberStyle.Float, provider);
 
             //return FloatingPointParser.ParseDouble(s, J2N.Text.StringFormatter.CurrentCulture);
             //return org.apache.harmony.luni.util.FloatingPointParser
@@ -325,7 +340,7 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a double value.
          */
-        public static double ParseDouble(string s, IFormatProvider? provider)
+        public static double ParseDouble(string s, NumberStyle style, IFormatProvider? provider)
         {
             // J2N: In .NET we don't throw on null, but return zero to match behavior of built-in parser.
             if (s is null)
@@ -352,7 +367,7 @@ namespace J2N.Numerics
                 return HexStringParser.ParseDouble(s);
 
             //double result = double.Parse(s, provider); // J2N TODO: For now, fallback to .NET. We should respect the NumberFormatInfo settings in the Java parser/formatter, though.
-            double result = DotNetNumber.ParseDouble(s, NumberStyles.Float, numberFormat);
+            double result = DotNetNumber.ParseDouble(s, style, numberFormat);
 
             //// .NET doesn't handle negative zero, so we need to do that here
             //if (result == 0d && FloatingPointParser.IsNegative(s, numberFormat))
@@ -491,22 +506,22 @@ namespace J2N.Numerics
             //return org.apache.harmony.luni.util.NumberConverter.convert(d);
         }
 
-        /**
-         * Parses the specified string as a double value.
-         * 
-         * @param string
-         *            the string representation of a double value.
-         * @return a {@code Double} instance containing the double value represented
-         *         by {@code string}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null}, has a length of zero or
-         *             can not be parsed as a double value.
-         * @see #parseDouble(String)
-         */
-        public static Double ValueOf(string value)
-        {
-            return new Double(ParseDouble(value));
-        }
+        ///**
+        // * Parses the specified string as a double value.
+        // * 
+        // * @param string
+        // *            the string representation of a double value.
+        // * @return a {@code Double} instance containing the double value represented
+        // *         by {@code string}.
+        // * @throws NumberFormatException
+        // *             if {@code string} is {@code null}, has a length of zero or
+        // *             can not be parsed as a double value.
+        // * @see #parseDouble(String)
+        // */
+        //public static Double ValueOf(string value)
+        //{
+        //    return new Double(ParseDouble(value));
+        //}
 
 
         /**
@@ -524,6 +539,23 @@ namespace J2N.Numerics
         public static Double ValueOf(string value, IFormatProvider? provider)
         {
             return new Double(ParseDouble(value, provider));
+        }
+
+        /**
+         * Parses the specified string as a double value.
+         * 
+         * @param string
+         *            the string representation of a double value.
+         * @return a {@code Double} instance containing the double value represented
+         *         by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a double value.
+         * @see #parseDouble(String)
+         */
+        public static Double ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        {
+            return new Double(ParseDouble(value, style, provider));
         }
 
         /**
