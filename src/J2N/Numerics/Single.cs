@@ -344,25 +344,32 @@ namespace J2N.Numerics
             if (s == string.Empty)
                 throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
 
-            provider ??= CultureInfo.CurrentCulture;
+            var numberFormat = (NumberFormatInfo)(provider?.GetFormat(typeof(NumberFormatInfo)) ?? CultureInfo.CurrentCulture.NumberFormat);
 
-            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
-                ParseAsHex(s))
-            {
-                return FloatingDecimal.ParseFloat(s); // J2N TODO: Culture
-            }
+            //provider ??= CultureInfo.CurrentCulture;
+
+            //if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
+            //    ParseAsHex(s))
+            //{
+            //    return FloatingDecimal.ParseFloat(s); // J2N TODO: Culture
+            //}
 
             //return FloatingPointParser.ParseDouble(value, provider);
             //return org.apache.harmony.luni.util.FloatingPointParser
             //        .parseDouble(string);
 
-            float result = float.Parse(s, provider); // J2N TODO: For now, fallback to .NET. We should respect the NumberFormatInfo settings in the Java parser/formatter, though.
+            if (FloatingPointParser.ParseAsHex(s))
+                return HexStringParser.ParseFloat(s);
 
-            // .NET doesn't handle negative zero, so we need to do that here
-            if (result == 0f && FloatingDecimal.IsNegative(s, provider))
-                return -0.0f;
+            return DotNetNumber.ParseSingle(s, NumberStyles.Float, numberFormat);
 
-            return result;
+            //float result = float.Parse(s, provider); // J2N TODO: For now, fallback to .NET. We should respect the NumberFormatInfo settings in the Java parser/formatter, though.
+
+            //// .NET doesn't handle negative zero, so we need to do that here
+            //if (result == 0f && FloatingDecimal.IsNegative(s, provider))
+            //    return -0.0f;
+
+            //return result;
 
             //return FloatingPointParser.ParseFloat(value, provider);
 

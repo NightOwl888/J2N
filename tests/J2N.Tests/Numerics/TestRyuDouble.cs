@@ -104,9 +104,32 @@ namespace J2N.Numerics
                     assertEquals($"Failed to round trip: {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]), BitConversion.DoubleToRawInt64Bits(FloatingDecimal.ParseDouble(RyuDouble.DoubleToString(d[j]))));
 
                     // Check for round-trip against .NET
-                    assertEquals($"Failed to round trip (.NET): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]).ToBinaryString(), BitConversion.DoubleToRawInt64Bits(double.Parse(RyuDouble.DoubleToString(d[j]), CultureInfo.InvariantCulture)).ToBinaryString());
+                    // NOTE: on .NET 5 and .NET Core 3+, round tripping works, however in other versions it is sometimes off by 1 bit.
+
+                    //assertEquals($"Failed to round trip (.NET): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]).ToBinaryString(), BitConversion.DoubleToRawInt64Bits(double.Parse(RyuDouble.DoubleToString(d[j]), CultureInfo.InvariantCulture)).ToBinaryString());
+
+                    // Check for round-trip against J2N.Numerics.Double
+                    assertEquals($"Failed to round trip (.NET parser in J2N): {d[j].ToString("R")} or {d[j].ToHexString()} hexadecimal", BitConversion.DoubleToRawInt64Bits(d[j]).ToBinaryString(), BitConversion.DoubleToRawInt64Bits(Double.ParseDouble(RyuDouble.DoubleToString(d[j]), CultureInfo.InvariantCulture)).ToBinaryString());
                 }
             }
+        }
+
+        [Test]
+        public void TestFixedDoubleRoundTrip()
+        {
+            //double d = 1.1317400099603851e308;
+            //double d = 1.234d;
+            //double d = -6.180646536066727E+18;
+            double d = 1.9189729408694876; // Regression that produced divide by zero exception
+
+            string doubleString = RyuDouble.DoubleToString(d);
+            long expectedBits = BitConversion.DoubleToRawInt64Bits(d);
+
+            // Check for round-trip
+            assertEquals($"Failed to round trip: {d.ToString("R")} or {d.ToHexString()} hexadecimal. The string: {doubleString}", expectedBits, BitConversion.DoubleToRawInt64Bits(FloatingDecimal.ParseDouble(doubleString)));
+
+            // Check for round-trip against J2N.Numerics.Double
+            assertEquals($"Failed to round trip (.NET parser in J2N): {d.ToString("R")} or {d.ToHexString()} hexadecimal. The string: {doubleString}", expectedBits.ToBinaryString(), BitConversion.DoubleToRawInt64Bits(Double.ParseDouble(doubleString, CultureInfo.InvariantCulture)).ToBinaryString());
         }
     }
 }

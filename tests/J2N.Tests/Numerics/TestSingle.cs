@@ -965,8 +965,8 @@ namespace J2N.Numerics
             assertFalse("Floattest0", posZero.Equals(negZero));
 
             // J2N: .NET specific - testing specific cultures should also parse negative zero correctly
-            Single posZero_de = Single.ValueOf("+0.0", new CultureInfo("de-DE"));
-            Single negZero_de = Single.ValueOf("-0.0", new CultureInfo("de-DE"));
+            Single posZero_de = Single.ValueOf("+0,0", new CultureInfo("de-DE"));
+            Single negZero_de = Single.ValueOf("-0,0", new CultureInfo("de-DE"));
             assertFalse("Floattest0", posZero_de.Equals(negZero_de));
 
             assertTrue("Floattest1", 0.0f == -0.0f);
