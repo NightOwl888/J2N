@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.Globalization;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -85,6 +86,20 @@ namespace J2N.Numerics
             this.value = (float)value;
         }
 
+        ///**
+        // * Constructs a new {@code Float} from the specified string.
+        // * 
+        // * @param string
+        // *            the string representation of a float value.
+        // * @throws NumberFormatException
+        // *             if {@code string} can not be decoded into a float value.
+        // * @see #parseFloat(String)
+        // */
+        //public Single(string value)
+        //    : this(ParseSingle(value))
+        //{
+        //}
+
         /**
          * Constructs a new {@code Float} from the specified string.
          * 
@@ -94,8 +109,8 @@ namespace J2N.Numerics
          *             if {@code string} can not be decoded into a float value.
          * @see #parseFloat(String)
          */
-        public Single(string value)
-            : this(ParseSingle(value))
+        public Single(string value, IFormatProvider? provider)
+            : this(ParseSingle(value, NumberStyle.Float, provider))
         {
         }
 
@@ -108,8 +123,8 @@ namespace J2N.Numerics
          *             if {@code string} can not be decoded into a float value.
          * @see #parseFloat(String)
          */
-        public Single(string value, IFormatProvider? provider)
-            : this(ParseSingle(value, provider))
+        public Single(string value, NumberStyle style, IFormatProvider? provider)
+            : this(ParseSingle(value, style, provider))
         {
         }
 
@@ -310,9 +325,9 @@ namespace J2N.Numerics
          * @see #valueOf(String)
          * @since 1.2
          */
-        public static float ParseSingle(string s) // J2N: Rename Parse()
+        public static float ParseSingle(string s, IFormatProvider? provider) // J2N: Rename Parse()
         {
-            return ParseSingle(s, J2N.Text.StringFormatter.CurrentCulture);
+            return ParseSingle(s, NumberStyle.Float, provider);
             //return FloatingPointParser.ParseFloat(value, J2N.Text.StringFormatter.CurrentCulture);
 
             //return float.Parse(value, J2N.Text.StringFormatter.CurrentCulture); // J2N TODO: Is this right?
@@ -332,7 +347,7 @@ namespace J2N.Numerics
          * @see #valueOf(String)
          * @since 1.2
          */
-        public static float ParseSingle(string s, IFormatProvider? provider) // J2N: Rename Parse()
+        public static float ParseSingle(string s, NumberStyle style, IFormatProvider? provider) // J2N: Rename Parse()
         {
             // J2N: In .NET we don't throw on null, but return zero to match behavior of built-in parser.
             if (s is null)
@@ -361,7 +376,8 @@ namespace J2N.Numerics
             if (FloatingPointParser.ParseAsHex(s))
                 return HexStringParser.ParseFloat(s);
 
-            return DotNetNumber.ParseSingle(s, NumberStyles.Float, numberFormat);
+            return DotNetNumber.ParseSingle(s, style, numberFormat);
+            //return FloatingDecimal.ParseFloat(s);
 
             //float result = float.Parse(s, provider); // J2N TODO: For now, fallback to .NET. We should respect the NumberFormatInfo settings in the Java parser/formatter, though.
 
@@ -469,22 +485,22 @@ namespace J2N.Numerics
             //return org.apache.harmony.luni.util.NumberConverter.convert(f);
         }
 
-        /**
-         * Parses the specified string as a float value.
-         * 
-         * @param string
-         *            the string representation of a float value.
-         * @return a {@code Float} instance containing the float value represented
-         *         by {@code string}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null}, has a length of zero or
-         *             can not be parsed as a float value.
-         * @see #parseFloat(String)
-         */
-        public static Single ValueOf(string value)
-        {
-            return ValueOf(ParseSingle(value));
-        }
+        ///**
+        // * Parses the specified string as a float value.
+        // * 
+        // * @param string
+        // *            the string representation of a float value.
+        // * @return a {@code Float} instance containing the float value represented
+        // *         by {@code string}.
+        // * @throws NumberFormatException
+        // *             if {@code string} is {@code null}, has a length of zero or
+        // *             can not be parsed as a float value.
+        // * @see #parseFloat(String)
+        // */
+        //public static Single ValueOf(string value)
+        //{
+        //    return ValueOf(ParseSingle(value));
+        //}
 
         /**
          * Parses the specified string as a float value.
@@ -500,7 +516,25 @@ namespace J2N.Numerics
          */
         public static Single ValueOf(string value, IFormatProvider? provider)
         {
-            return ValueOf(ParseSingle(value, provider));
+            return ValueOf(ParseSingle(value, NumberStyle.Float, provider));
+        }
+
+
+        /**
+         * Parses the specified string as a float value.
+         * 
+         * @param string
+         *            the string representation of a float value.
+         * @return a {@code Float} instance containing the float value represented
+         *         by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a float value.
+         * @see #parseFloat(String)
+         */
+        public static Single ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        {
+            return ValueOf(ParseSingle(value, style, provider));
         }
 
         /**

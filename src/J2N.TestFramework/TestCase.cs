@@ -63,13 +63,15 @@ namespace J2N
         [DebuggerStepThrough]
         public static void assertEquals(long expected, long actual)
         {
-            Assert.AreEqual(expected, actual);
+            if (expected != actual)
+                Assert.AreEqual(expected, actual);
         }
 
         [DebuggerStepThrough]
         public static void assertEquals(string message, long expected, long actual)
         {
-            Assert.AreEqual(expected, actual, message);
+            if (expected != actual)
+                Assert.AreEqual(expected, actual, message);
         }
 
         [DebuggerStepThrough]
