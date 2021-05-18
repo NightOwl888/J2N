@@ -367,6 +367,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Input string was not in a correct format..
+        /// </summary>
+        internal static string Format_InvalidString {
+            get {
+                return ResourceManager.GetString("Format_InvalidString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Second byte at {0} does not match UTF8 Specification..
         /// </summary>
         internal static string Format_InvalidUTFSpec2ndByte {
@@ -579,6 +588,87 @@ namespace J2N.Resources {
         internal static string NotSupported_ValueCollectionSet {
             get {
                 return ResourceManager.GetString("NotSupported_ValueCollectionSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an unsigned byte..
+        /// </summary>
+        internal static string Overflow_Byte {
+            get {
+                return ResourceManager.GetString("Overflow_Byte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a Decimal..
+        /// </summary>
+        internal static string Overflow_Decimal {
+            get {
+                return ResourceManager.GetString("Overflow_Decimal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an Int16..
+        /// </summary>
+        internal static string Overflow_Int16 {
+            get {
+                return ResourceManager.GetString("Overflow_Int16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an Int32..
+        /// </summary>
+        internal static string Overflow_Int32 {
+            get {
+                return ResourceManager.GetString("Overflow_Int32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an Int64..
+        /// </summary>
+        internal static string Overflow_Int64 {
+            get {
+                return ResourceManager.GetString("Overflow_Int64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a signed byte..
+        /// </summary>
+        internal static string Overflow_SByte {
+            get {
+                return ResourceManager.GetString("Overflow_SByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a UInt16..
+        /// </summary>
+        internal static string Overflow_UInt16 {
+            get {
+                return ResourceManager.GetString("Overflow_UInt16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a UInt32..
+        /// </summary>
+        internal static string Overflow_UInt32 {
+            get {
+                return ResourceManager.GetString("Overflow_UInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a UInt64..
+        /// </summary>
+        internal static string Overflow_UInt64 {
+            get {
+                return ResourceManager.GetString("Overflow_UInt64", resourceCulture);
             }
         }
         

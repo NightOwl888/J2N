@@ -219,6 +219,9 @@
   <data name="ExternalLinkedListNode" xml:space="preserve">
     <value>The LinkedList node does not belong to current LinkedList.</value>
   </data>
+  <data name="Format_InvalidString" xml:space="preserve">
+    <value>Input string was not in a correct format.</value>
+  </data>
   <data name="Format_InvalidUTFSpec2ndByte" xml:space="preserve">
     <value>Second byte at {0} does not match UTF8 Specification.</value>
   </data>
@@ -290,6 +293,33 @@
   </data>
   <data name="NotSupported_ValueCollectionSet" xml:space="preserve">
     <value>Mutating a value collection derived from a dictionary is not allowed.</value>
+  </data>
+  <data name="Overflow_Byte" xml:space="preserve">
+    <value>Value was either too large or too small for an unsigned byte.</value>
+  </data>
+  <data name="Overflow_Decimal" xml:space="preserve">
+    <value>Value was either too large or too small for a Decimal.</value>
+  </data>
+  <data name="Overflow_Int16" xml:space="preserve">
+    <value>Value was either too large or too small for an Int16.</value>
+  </data>
+  <data name="Overflow_Int32" xml:space="preserve">
+    <value>Value was either too large or too small for an Int32.</value>
+  </data>
+  <data name="Overflow_Int64" xml:space="preserve">
+    <value>Value was either too large or too small for an Int64.</value>
+  </data>
+  <data name="Overflow_SByte" xml:space="preserve">
+    <value>Value was either too large or too small for a signed byte.</value>
+  </data>
+  <data name="Overflow_UInt16" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt16.</value>
+  </data>
+  <data name="Overflow_UInt32" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt32.</value>
+  </data>
+  <data name="Overflow_UInt64" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt64.</value>
   </data>
   <data name="Serialization_InvalidOnDeser" xml:space="preserve">
     <value>OnDeserialization method was called while the object was not being deserialized.</value>
