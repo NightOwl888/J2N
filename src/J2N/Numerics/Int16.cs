@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using J2N.Globalization;
+using System;
+using System.Globalization;
 
 namespace J2N.Numerics
 {
@@ -44,6 +42,20 @@ namespace J2N.Numerics
         // defined to be "java.lang.Short.TYPE";
 
 
+        ///**
+        // * Constructs a new {@code Short} from the specified string.
+        // *
+        // * @param string
+        // *            the string representation of a short value.
+        // * @throws NumberFormatException
+        // *             if {@code string} can not be decoded into a short value.
+        // * @see #parseShort(String)
+        // */
+        //public Int16(string value)
+        //    : this(Parse(value))
+        //{
+        //}
+
         /**
          * Constructs a new {@code Short} from the specified string.
          *
@@ -53,8 +65,22 @@ namespace J2N.Numerics
          *             if {@code string} can not be decoded into a short value.
          * @see #parseShort(String)
          */
-        public Int16(string value)
-            : this(ParseInt16(value))
+        public Int16(string s, IFormatProvider? provider)
+            : this(Parse(s, provider))
+        {
+        }
+
+        /**
+         * Constructs a new {@code Short} from the specified string.
+         *
+         * @param string
+         *            the string representation of a short value.
+         * @throws NumberFormatException
+         *             if {@code string} can not be decoded into a short value.
+         * @see #parseShort(String)
+         */
+        public Int16(string s, NumberStyle style, IFormatProvider? provider)
+            : this(Parse(s, style, provider))
         {
         }
 
@@ -168,6 +194,22 @@ namespace J2N.Numerics
             return value;
         }
 
+        /////**
+        //// * Parses the specified string as a signed decimal short value. The ASCII
+        //// * character \u002d ('-') is recognized as the minus sign.
+        //// *
+        //// * @param string
+        //// *            the string representation of a short value.
+        //// * @return the primitive short value represented by {@code string}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null}, has a length of zero or
+        //// *             can not be parsed as a short value.
+        //// */
+        ////public static short Parse(string value)
+        ////{
+        ////    return Parse(value, 10);
+        ////}
+
         /**
          * Parses the specified string as a signed decimal short value. The ASCII
          * character \u002d ('-') is recognized as the minus sign.
@@ -179,10 +221,27 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a short value.
          */
-        public static short ParseInt16(string value)
+        public static short Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
-            return ParseInt16(value, 10);
+            return short.Parse(s, provider);
         }
+
+        /**
+         * Parses the specified string as a signed decimal short value. The ASCII
+         * character \u002d ('-') is recognized as the minus sign.
+         *
+         * @param string
+         *            the string representation of a short value.
+         * @return the primitive short value represented by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a short value.
+         */
+        public static short Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
+        {
+            return short.Parse(s, (NumberStyles)style, provider);
+        }
+
 
         /**
          * Parses the specified string as a signed short value using the specified
@@ -200,9 +259,9 @@ namespace J2N.Numerics
          *             {@code radix > Character.MAX_RADIX}, or if {@code string}
          *             can not be parsed as a short value.
          */
-        public static short ParseInt16(string value, int radix)
+        public static short Parse(string s, int radix) // J2N: Renamed from ParseShort()
         {
-            int intValue = Int32.ParseInt32(value, radix);
+            int intValue = Int32.Parse(s, radix);
             short result = (short)intValue;
             if (result == intValue)
             {
@@ -258,6 +317,23 @@ namespace J2N.Numerics
             return Int32.ToString(value, provider);
         }
 
+        ///**
+        // * Parses the specified string as a signed decimal short value.
+        // *
+        // * @param string
+        // *            the string representation of a short value.
+        // * @return a {@code Short} instance containing the short value represented
+        // *         by {@code string}.
+        // * @throws NumberFormatException
+        // *             if {@code string} is {@code null}, has a length of zero or
+        // *             can not be parsed as a short value.
+        // * @see #parseShort(String)
+        // */
+        //public static Int16 ValueOf(string value)
+        //{
+        //    return ValueOf(Parse(value));
+        //}
+
         /**
          * Parses the specified string as a signed decimal short value.
          *
@@ -270,9 +346,26 @@ namespace J2N.Numerics
          *             can not be parsed as a short value.
          * @see #parseShort(String)
          */
-        public static Int16 ValueOf(string value)
+        public static Int16 ValueOf(string value, IFormatProvider? provider)
         {
-            return ValueOf(ParseInt16(value));
+            return ValueOf(Parse(value, provider));
+        }
+
+        /**
+         * Parses the specified string as a signed decimal short value.
+         *
+         * @param string
+         *            the string representation of a short value.
+         * @return a {@code Short} instance containing the short value represented
+         *         by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a short value.
+         * @see #parseShort(String)
+         */
+        public static Int16 ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        {
+            return ValueOf(Parse(value, style, provider));
         }
 
         /**
@@ -294,7 +387,7 @@ namespace J2N.Numerics
          */
         public static Int16 ValueOf(string value, int radix)
         {
-            return ValueOf(ParseInt16(value, radix));
+            return ValueOf(Parse(value, radix));
         }
 
         /**

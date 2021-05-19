@@ -103,7 +103,7 @@ namespace J2N.Numerics
          * @see #parseDouble(String)
          */
         public Double(string value, IFormatProvider? provider)
-            : this(ParseDouble(value, provider))
+            : this(Parse(value, provider))
         {
         }
 
@@ -117,7 +117,7 @@ namespace J2N.Numerics
          * @see #parseDouble(String)
          */
         public Double(string value, NumberStyle style, IFormatProvider? provider)
-            : this(ParseDouble(value, style, provider))
+            : this(Parse(value, style, provider))
         {
         }
 
@@ -321,9 +321,9 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a double value.
          */
-        public static double ParseDouble(string s, IFormatProvider? provider)
+        public static double Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
-            return ParseDouble(s, NumberStyle.Float, provider);
+            return Parse(s, NumberStyle.Float, provider);
 
             //return FloatingPointParser.ParseDouble(s, J2N.Text.StringFormatter.CurrentCulture);
             //return org.apache.harmony.luni.util.FloatingPointParser
@@ -340,7 +340,7 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a double value.
          */
-        public static double ParseDouble(string s, NumberStyle style, IFormatProvider? provider)
+        public static double Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
             // J2N: In .NET we don't throw on null, but return zero to match behavior of built-in parser.
             if (s is null)
@@ -538,7 +538,7 @@ namespace J2N.Numerics
          */
         public static Double ValueOf(string value, IFormatProvider? provider)
         {
-            return new Double(ParseDouble(value, provider));
+            return new Double(Parse(value, provider));
         }
 
         /**
@@ -555,7 +555,7 @@ namespace J2N.Numerics
          */
         public static Double ValueOf(string value, NumberStyle style, IFormatProvider? provider)
         {
-            return new Double(ParseDouble(value, style, provider));
+            return new Double(Parse(value, style, provider));
         }
 
         /**

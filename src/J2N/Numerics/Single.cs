@@ -110,7 +110,7 @@ namespace J2N.Numerics
          * @see #parseFloat(String)
          */
         public Single(string value, IFormatProvider? provider)
-            : this(ParseSingle(value, NumberStyle.Float, provider))
+            : this(Parse(value, NumberStyle.Float, provider))
         {
         }
 
@@ -124,7 +124,7 @@ namespace J2N.Numerics
          * @see #parseFloat(String)
          */
         public Single(string value, NumberStyle style, IFormatProvider? provider)
-            : this(ParseSingle(value, style, provider))
+            : this(Parse(value, style, provider))
         {
         }
 
@@ -325,9 +325,9 @@ namespace J2N.Numerics
          * @see #valueOf(String)
          * @since 1.2
          */
-        public static float ParseSingle(string s, IFormatProvider? provider) // J2N: Rename Parse()
+        public static float Parse(string s, IFormatProvider? provider) // J2N: Rename Parse()
         {
-            return ParseSingle(s, NumberStyle.Float, provider);
+            return Parse(s, NumberStyle.Float, provider);
             //return FloatingPointParser.ParseFloat(value, J2N.Text.StringFormatter.CurrentCulture);
 
             //return float.Parse(value, J2N.Text.StringFormatter.CurrentCulture); // J2N TODO: Is this right?
@@ -347,7 +347,7 @@ namespace J2N.Numerics
          * @see #valueOf(String)
          * @since 1.2
          */
-        public static float ParseSingle(string s, NumberStyle style, IFormatProvider? provider) // J2N: Rename Parse()
+        public static float Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Rename Parse()
         {
             // J2N: In .NET we don't throw on null, but return zero to match behavior of built-in parser.
             if (s is null)
@@ -516,7 +516,7 @@ namespace J2N.Numerics
          */
         public static Single ValueOf(string value, IFormatProvider? provider)
         {
-            return ValueOf(ParseSingle(value, NumberStyle.Float, provider));
+            return ValueOf(Parse(value, NumberStyle.Float, provider));
         }
 
 
@@ -534,7 +534,7 @@ namespace J2N.Numerics
          */
         public static Single ValueOf(string value, NumberStyle style, IFormatProvider? provider)
         {
-            return ValueOf(ParseSingle(value, style, provider));
+            return ValueOf(Parse(value, style, provider));
         }
 
         /**

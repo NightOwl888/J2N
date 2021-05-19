@@ -1,4 +1,6 @@
-﻿using System;
+﻿using J2N.Globalization;
+using System;
+using System.Globalization;
 
 namespace J2N.Numerics
 {
@@ -30,13 +32,13 @@ namespace J2N.Numerics
         ////    // Note: This can't be set to "long.class", since *that* is
         ////    // defined to be "java.lang.Long.TYPE";
 
-        ////    /**
-        ////     * Constant for the number of bits needed to represent a {@code long} in
-        ////     * two's complement form.
-        ////     *
-        ////     * @since 1.5
-        ////     */
-        ////    public static final int SIZE = 64;
+        /**
+         * Constant for the number of bits needed to represent a {@code long} in
+         * two's complement form.
+         *
+         * @since 1.5
+         */
+        public const int SIZE = 64; // J2N TODO: Rename BitCount? The BitCount method will be named PopCount() so there won't be a collision
 
 
         /**
@@ -50,6 +52,21 @@ namespace J2N.Numerics
             this.value = value;
         }
 
+        ///**
+        // * Constructs a new {@code Long} from the specified string.
+        // * 
+        // * @param string
+        // *            the string representation of a long value.
+        // * @throws NumberFormatException
+        // *             if {@code string} can not be decoded into a long value.
+        // * @see #parseLong(String)
+        // */
+        //public Int64(string value)
+        //    : this(Parse(value))
+        //{
+
+        //}
+
         /**
          * Constructs a new {@code Long} from the specified string.
          * 
@@ -59,10 +76,23 @@ namespace J2N.Numerics
          *             if {@code string} can not be decoded into a long value.
          * @see #parseLong(String)
          */
-        public Int64(string value)
-            : this(ParseInt64(value))
+        public Int64(string value, IFormatProvider? provider)
+            : this(Parse(value, provider))
         {
+        }
 
+        /**
+         * Constructs a new {@code Long} from the specified string.
+         * 
+         * @param string
+         *            the string representation of a long value.
+         * @throws NumberFormatException
+         *             if {@code string} can not be decoded into a long value.
+         * @see #parseLong(String)
+         */
+        public Int64(string value, NumberStyle style, IFormatProvider? provider)
+            : this(Parse(value, style, provider))
+        {
         }
 
         /// <inheritdoc/>
@@ -311,6 +341,22 @@ namespace J2N.Numerics
             return value;
         }
 
+        ///**
+        // * Parses the specified string as a signed decimal long value. The ASCII
+        // * character \u002d ('-') is recognized as the minus sign.
+        // * 
+        // * @param string
+        // *            the string representation of a long value.
+        // * @return the primitive long value represented by {@code string}.
+        // * @throws NumberFormatException
+        // *             if {@code string} is {@code null}, has a length of zero or
+        // *             can not be parsed as a long value.
+        // */
+        //public static long Parse(string value) // J2N: Renamed from ParseLong()
+        //{
+        //    return Parse(value, 10);
+        //}
+
         /**
          * Parses the specified string as a signed decimal long value. The ASCII
          * character \u002d ('-') is recognized as the minus sign.
@@ -322,9 +368,25 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a long value.
          */
-        public static long ParseInt64(string value)
+        public static long Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
-            return ParseInt64(value, 10);
+            return Parse(s, NumberStyle.Integer, provider);
+        }
+
+        /**
+         * Parses the specified string as a signed decimal long value. The ASCII
+         * character \u002d ('-') is recognized as the minus sign.
+         * 
+         * @param string
+         *            the string representation of a long value.
+         * @return the primitive long value represented by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a long value.
+         */
+        public static long Parse(string s, NumberStyle style , IFormatProvider? provider) // J2N: Renamed from ParseLong()
+        {
+            return long.Parse(s, (NumberStyles)style, provider); // J2N TODO: AllowTrailingTypeSpecifier
         }
 
         /**
@@ -343,25 +405,25 @@ namespace J2N.Numerics
          *             {@code radix > Character.MAX_RADIX}, or if {@code string}
          *             can not be parsed as a long value.
          */
-        public static long ParseInt64(string value, int radix)
+        public static long Parse(string s, int radix) // J2N: Renamed from ParseLong()
         {
-            if (value is null || radix < Character.MinRadix
+            if (s is null || radix < Character.MinRadix
                     || radix > Character.MaxRadix)
             {
                 throw new FormatException();
             }
-            int length = value.Length, i = 0;
+            int length = s.Length, i = 0;
             if (length == 0)
             {
-                throw new FormatException(value);
+                throw new FormatException(s);
             }
-            bool negative = value[i] == '-';
+            bool negative = s[i] == '-';
             if (negative && ++i == length)
             {
-                throw new FormatException(value);
+                throw new FormatException(s);
             }
 
-            return Parse(value, i, radix, negative);
+            return Parse(s, i, radix, negative);
         }
 
         private static long Parse(string value, int offset, int radix,
@@ -607,6 +669,23 @@ namespace J2N.Numerics
             return new string(buffer, 0, buffer.Length);
         }
 
+        ///**
+        // * Parses the specified string as a signed decimal long value.
+        // * 
+        // * @param string
+        // *            the string representation of a long value.
+        // * @return a {@code Long} instance containing the long value represented by
+        // *         {@code string}.
+        // * @throws NumberFormatException
+        // *             if {@code string} is {@code null}, has a length of zero or
+        // *             can not be parsed as a long value.
+        // * @see #parseLong(String)
+        // */
+        //public static Int64 ValueOf(string value)
+        //{
+        //    return ValueOf(Parse(value));
+        //}
+
         /**
          * Parses the specified string as a signed decimal long value.
          * 
@@ -619,9 +698,26 @@ namespace J2N.Numerics
          *             can not be parsed as a long value.
          * @see #parseLong(String)
          */
-        public static Int64 ValueOf(string value)
+        public static Int64 ValueOf(string value, IFormatProvider? provider)
         {
-            return ValueOf(ParseInt64(value));
+            return ValueOf(Parse(value, provider));
+        }
+
+        /**
+         * Parses the specified string as a signed decimal long value.
+         * 
+         * @param string
+         *            the string representation of a long value.
+         * @return a {@code Long} instance containing the long value represented by
+         *         {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a long value.
+         * @see #parseLong(String)
+         */
+        public static Int64 ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        {
+            return ValueOf(Parse(value, style, provider));
         }
 
         /**
@@ -643,7 +739,7 @@ namespace J2N.Numerics
          */
         public static Int64 ValueOf(string value, int radix)
         {
-            return ValueOf(ParseInt64(value, radix));
+            return ValueOf(Parse(value, radix));
         }
 
         /**

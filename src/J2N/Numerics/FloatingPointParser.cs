@@ -1,6 +1,7 @@
 ﻿using J2N.Text;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -130,11 +131,7 @@ namespace J2N.Numerics
                         throw new FormatException(s);
                 }
                 string strExp = s.Substring(exponent_offset, length - exponent_offset); // J2N: Corrected 2nd parameter
-                try
-                {
-                    e = Int32.ParseInt32(strExp);
-                }
-                catch (FormatException) // J2N TODO: TryParse
+                if (!int.TryParse(strExp, NumberStyles.Integer, CultureInfo.InvariantCulture, out e))
                 {
                     // strExp is not empty, so there are 2 situations the exception be thrown
                     // if the string is invalid we should throw exception, if the actual number

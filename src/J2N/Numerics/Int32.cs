@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using J2N.Globalization;
+using System;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace J2N.Numerics
 {
@@ -11,21 +8,57 @@ namespace J2N.Numerics
     public sealed class Int32 : Number, IComparable<Int32>
     {
         /**
-     * The value which the receiver represents.
-     */
+         * Constant for the number of bits needed to represent a {@code int} in
+         * two's complement form.
+         *
+         * @since 1.5
+         */
+        public const int SIZE = 32; // J2N: Rename BitCount?
+
+        /**
+         * The value which the receiver represents.
+         */
         private readonly int value;
 
 
         /**
- * Constructs a new {@code Integer} with the specified primitive integer
- * value.
- * 
- * @param value
- *            the primitive integer value to store in the new instance.
- */
+         * Constructs a new {@code Integer} with the specified primitive integer
+         * value.
+         * 
+         * @param value
+         *            the primitive integer value to store in the new instance.
+         */
         public Int32(int value)
         {
             this.value = value;
+        }
+
+        ///**
+        // * Constructs a new {@code Integer} from the specified string.
+        // * 
+        // * @param string
+        // *            the string representation of an integer value.
+        // * @throws NumberFormatException
+        // *             if {@code string} can not be decoded into an integer value.
+        // * @see #parseInt(String)
+        // */
+        //public Int32(string value)
+        //    : this(Parse(value))
+        //{
+        //}
+
+        /**
+         * Constructs a new {@code Integer} from the specified string.
+         * 
+         * @param string
+         *            the string representation of an integer value.
+         * @throws NumberFormatException
+         *             if {@code string} can not be decoded into an integer value.
+         * @see #parseInt(String)
+         */
+        public Int32(string value, IFormatProvider? provider)
+            : this(Parse(value, provider))
+        {
         }
 
         /**
@@ -37,8 +70,8 @@ namespace J2N.Numerics
          *             if {@code string} can not be decoded into an integer value.
          * @see #parseInt(String)
          */
-        public Int32(string value)
-            : this(ParseInt32(value))
+        public Int32(string value, NumberStyle style, IFormatProvider? provider)
+            : this(Parse(value, style, provider))
         {
         }
 
@@ -68,18 +101,18 @@ namespace J2N.Numerics
         }
 
         /**
-     * Parses the specified string and returns a {@code Integer} instance if the
-     * string can be decoded into an integer value. The string may be an
-     * optional minus sign "-" followed by a hexadecimal ("0x..." or "#..."),
-     * octal ("0..."), or decimal ("...") representation of an integer.
-     * 
-     * @param string
-     *            a string representation of an integer value.
-     * @return an {@code Integer} containing the value represented by
-     *         {@code string}.
-     * @throws NumberFormatException
-     *             if {@code string} can not be parsed as an integer value.
-     */
+         * Parses the specified string and returns a {@code Integer} instance if the
+         * string can be decoded into an integer value. The string may be an
+         * optional minus sign "-" followed by a hexadecimal ("0x..." or "#..."),
+         * octal ("0..."), or decimal ("...") representation of an integer.
+         * 
+         * @param string
+         *            a string representation of an integer value.
+         * @return an {@code Integer} containing the value represented by
+         *         {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} can not be parsed as an integer value.
+         */
         public static Int32 Decode(string value)
         {
             if (value is null)
@@ -295,21 +328,55 @@ namespace J2N.Numerics
         }
 
 
+        ///**
+        // * Parses the specified string as a signed decimal integer value. The ASCII
+        // * character \u002d ('-') is recognized as the minus sign.
+        // * 
+        // * @param string
+        // *            the string representation of an integer value.
+        // * @return the primitive integer value represented by {@code string}.
+        // * @throws NumberFormatException
+        // *             if {@code string} is {@code null}, has a length of zero or
+        // *             can not be parsed as an integer value.
+        // */
+        //public static int Parse(string value) // J2N: Renamed from ParseInt()
+        //{
+        //    //return Convert.ToInt32(value, 10);
+        //    return Parse(value, 10);
+        //}
+
         /**
-     * Parses the specified string as a signed decimal integer value. The ASCII
-     * character \u002d ('-') is recognized as the minus sign.
-     * 
-     * @param string
-     *            the string representation of an integer value.
-     * @return the primitive integer value represented by {@code string}.
-     * @throws NumberFormatException
-     *             if {@code string} is {@code null}, has a length of zero or
-     *             can not be parsed as an integer value.
-     */
-        public static int ParseInt32(string value) // J2N TODO: Rename Parse() - Int32 seems redundant here
+         * Parses the specified string as a signed decimal integer value. The ASCII
+         * character \u002d ('-') is recognized as the minus sign.
+         * 
+         * @param string
+         *            the string representation of an integer value.
+         * @return the primitive integer value represented by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as an integer value.
+         */
+        public static int Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             //return Convert.ToInt32(value, 10);
-            return ParseInt32(value, 10);
+            return Parse(s, NumberStyle.Integer, provider);
+        }
+
+        /**
+         * Parses the specified string as a signed decimal integer value. The ASCII
+         * character \u002d ('-') is recognized as the minus sign.
+         * 
+         * @param string
+         *            the string representation of an integer value.
+         * @return the primitive integer value represented by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as an integer value.
+         */
+        public static int Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseInt()
+        {
+            //return Convert.ToInt32(value, 10);
+            return int.Parse(s, (NumberStyles)style, provider);
         }
 
         /**
@@ -328,25 +395,25 @@ namespace J2N.Numerics
          *             {@code radix > Character.MAX_RADIX}, or if {@code string}
          *             can not be parsed as an integer value.
          */
-        public static int ParseInt32(string value, int radix) // J2N TODO: Rename Parse() - Int32 seems redundant here
+        public static int Parse(string s, int radix) // J2N: Renamed from ParseInt()
         {
-            if (value == null || radix < Character.MinRadix
+            if (s == null || radix < Character.MinRadix
                     || radix > Character.MaxRadix)
             {
                 throw new FormatException();
             }
-            int length = value.Length, i = 0;
+            int length = s.Length, i = 0;
             if (length == 0)
             {
-                throw new FormatException(value);
+                throw new FormatException(s);
             }
-            bool negative = value[i] == '-';
+            bool negative = s[i] == '-';
             if (negative && ++i == length)
             {
-                throw new FormatException(value);
+                throw new FormatException(s);
             }
 
-            return Parse(value, i, radix, negative);
+            return Parse(s, i, radix, negative);
         }
 
         private static int Parse(string value, int offset, int radix,
@@ -513,14 +580,14 @@ namespace J2N.Numerics
         }
 
         /**
- * Converts the specified integer into its decimal string representation.
- * The returned string is a concatenation of a minus sign if the number is
- * negative and characters from '0' to '9'.
- * 
- * @param value
- *            the integer to convert.
- * @return the decimal string representation of {@code value}.
- */
+         * Converts the specified integer into its decimal string representation.
+         * The returned string is a concatenation of a minus sign if the number is
+         * negative and characters from '0' to '9'.
+         * 
+         * @param value
+         *            the integer to convert.
+         * @return the decimal string representation of {@code value}.
+         */
         public static string ToString(int value)
         {
             return value.ToString(J2N.Text.StringFormatter.CurrentCulture);
@@ -646,19 +713,19 @@ namespace J2N.Numerics
         }
 
         /**
-     * Converts the specified integer into a string representation based on the
-     * specified radix. The returned string is a concatenation of a minus sign
-     * if the number is negative and characters from '0' to '9' and 'a' to 'z',
-     * depending on the radix. If {@code radix} is not in the interval defined
-     * by {@code Character.MIN_RADIX} and {@code Character.MAX_RADIX} then 10 is
-     * used as the base for the conversion.
-     * 
-     * @param i
-     *            the integer to convert.
-     * @param radix
-     *            the base to use for the conversion.
-     * @return the string representation of {@code i}.
-     */
+         * Converts the specified integer into a string representation based on the
+         * specified radix. The returned string is a concatenation of a minus sign
+         * if the number is negative and characters from '0' to '9' and 'a' to 'z',
+         * depending on the radix. If {@code radix} is not in the interval defined
+         * by {@code Character.MIN_RADIX} and {@code Character.MAX_RADIX} then 10 is
+         * used as the base for the conversion.
+         * 
+         * @param i
+         *            the integer to convert.
+         * @param radix
+         *            the base to use for the conversion.
+         * @return the string representation of {@code i}.
+         */
         public static string ToString(int i, int radix) // J2N: Unlike Convert.ToInt32, this supports "fromBase" (radix) up to 36
         {
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
@@ -704,21 +771,56 @@ namespace J2N.Numerics
         }
 
 
+        /////**
+        ////* Parses the specified string as a signed decimal integer value.
+        ////* 
+        ////* @param string
+        ////*            the string representation of an integer value.
+        ////* @return an {@code Integer} instance containing the integer value
+        ////*         represented by {@code string}.
+        ////* @throws NumberFormatException
+        ////*             if {@code string} is {@code null}, has a length of zero or
+        ////*             can not be parsed as an integer value.
+        ////* @see #parseInt(String)
+        ////*/
+        ////public static Int32 ValueOf(string value)
+        ////{
+        ////    return ValueOf(Parse(value));
+        ////}
+        ///
+
         /**
-   * Parses the specified string as a signed decimal integer value.
-   * 
-   * @param string
-   *            the string representation of an integer value.
-   * @return an {@code Integer} instance containing the integer value
-   *         represented by {@code string}.
-   * @throws NumberFormatException
-   *             if {@code string} is {@code null}, has a length of zero or
-   *             can not be parsed as an integer value.
-   * @see #parseInt(String)
-   */
-        public static Int32 ValueOf(string value)
+        * Parses the specified string as a signed decimal integer value.
+        * 
+        * @param string
+        *            the string representation of an integer value.
+        * @return an {@code Integer} instance containing the integer value
+        *         represented by {@code string}.
+        * @throws NumberFormatException
+        *             if {@code string} is {@code null}, has a length of zero or
+        *             can not be parsed as an integer value.
+        * @see #parseInt(String)
+        */
+        public static Int32 ValueOf(string value, IFormatProvider? provider)
         {
-            return ValueOf(ParseInt32(value));
+            return ValueOf(Parse(value, provider));
+        }
+
+        /**
+        * Parses the specified string as a signed decimal integer value.
+        * 
+        * @param string
+        *            the string representation of an integer value.
+        * @return an {@code Integer} instance containing the integer value
+        *         represented by {@code string}.
+        * @throws NumberFormatException
+        *             if {@code string} is {@code null}, has a length of zero or
+        *             can not be parsed as an integer value.
+        * @see #parseInt(String)
+        */
+        public static Int32 ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        {
+            return ValueOf(Parse(value, style, provider));
         }
 
         /**
@@ -740,7 +842,7 @@ namespace J2N.Numerics
          */
         public static Int32 ValueOf(string value, int radix)
         {
-            return ValueOf(ParseInt32(value, radix));
+            return ValueOf(Parse(value, radix));
         }
 
 
@@ -945,17 +1047,17 @@ namespace J2N.Numerics
 
 
         /**
- * Returns a {@code Integer} instance for the specified integer value.
- * <p>
- * If it is not necessary to get a new {@code Integer} instance, it is
- * recommended to use this method instead of the constructor, since it
- * maintains a cache of instances which may result in better performance.
- *
- * @param i
- *            the integer value to store in the instance.
- * @return a {@code Integer} instance containing {@code i}.
- * @since 1.5
- */
+         * Returns a {@code Integer} instance for the specified integer value.
+         * <p>
+         * If it is not necessary to get a new {@code Integer} instance, it is
+         * recommended to use this method instead of the constructor, since it
+         * maintains a cache of instances which may result in better performance.
+         *
+         * @param i
+         *            the integer value to store in the instance.
+         * @return a {@code Integer} instance containing {@code i}.
+         * @since 1.5
+         */
         public static Int32 ValueOf(int i)
         {
             if (i < -128 || i > 127)

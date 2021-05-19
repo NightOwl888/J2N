@@ -1,10 +1,7 @@
 ﻿using J2N.Text;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Globalization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace J2N.Numerics
 {
@@ -148,12 +145,21 @@ namespace J2N.Numerics
                 exponentStr = exponentStr.Substring(1);
             }
 
-            try
+            //try
+            //{
+            //    exponent = expSign * Int64.Parse(exponentStr, CultureInfo.InvariantCulture);
+            //    CheckedAddExponent(EXPONENT_BASE);
+            //}
+            //catch (FormatException)
+            //{
+            //    exponent = expSign * long.MaxValue;
+            //}
+            if (long.TryParse(exponentStr, NumberStyles.Integer, CultureInfo.InvariantCulture, out long tempExponent))
             {
-                exponent = expSign * Int64.ParseInt64(exponentStr);
+                exponent = expSign * tempExponent;
                 CheckedAddExponent(EXPONENT_BASE);
             }
-            catch (FormatException)
+            else
             {
                 exponent = expSign * long.MaxValue;
             }
@@ -199,7 +205,7 @@ namespace J2N.Numerics
                 significand = significand.Substring(0, MAX_SIGNIFICANT_LENGTH);
             }
 
-            mantissa = Int64.ParseInt64(significand, HEX_RADIX);
+            mantissa = Int64.Parse(significand, HEX_RADIX);
 
             if (exponent >= 1)
             {
@@ -350,7 +356,7 @@ namespace J2N.Numerics
             if (strIntegerPart.Length != 0)
             {
                 string leadingNumber2 = strIntegerPart.Substring(0, 1); // J2N: Checked 2nd param
-                return (strIntegerPart.Length - 1) * 4 + CountBitsLength(Int64.ParseInt64(leadingNumber2, HEX_RADIX)) - 1;
+                return (strIntegerPart.Length - 1) * 4 + CountBitsLength(Int64.Parse(leadingNumber2, HEX_RADIX)) - 1;
             }
 
             //If the Integer part is a zero number.
@@ -361,14 +367,14 @@ namespace J2N.Numerics
                 return 0;
             }
             string leadingNumber = strDecimalPart.Substring(i, 1); // J2N: Corrected 2nd parameter
-            return (-i - 1) * 4 + CountBitsLength(Int64.ParseInt64(leadingNumber, HEX_RADIX)) - 1;
+            return (-i - 1) * 4 + CountBitsLength(Int64.Parse(leadingNumber, HEX_RADIX)) - 1;
         }
 
         private int CountBitsLength(long value)
         {
             int leadingZeros = BitOperation.LeadingZeroCount(value);
             //return sizeof(long) - leadingZeros;
-            return 64 - leadingZeros; // J2N TODO: Make constant on Int64
+            return Int64.SIZE - leadingZeros; // J2N TODO: Make constant on Int64
         }
     }
 }
