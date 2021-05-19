@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.Globalization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -51,6 +52,20 @@ namespace J2N.Numerics
             this.value = value;
         }
 
+        ///**
+        // * Constructs a new {@code Byte} from the specified string.
+        // * 
+        // * @param string
+        // *            the string representation of a single byte value.
+        // * @throws NumberFormatException
+        // *             if {@code string} can not be decoded into a byte value.
+        // * @see #parseByte(String)
+        // */
+        //public Byte(string s)
+        //    : this(Parse(s))
+        //{
+        //}
+
         /**
          * Constructs a new {@code Byte} from the specified string.
          * 
@@ -60,8 +75,22 @@ namespace J2N.Numerics
          *             if {@code string} can not be decoded into a byte value.
          * @see #parseByte(String)
          */
-        public Byte(string stringValue)
-            : this(ParseByte(stringValue))
+        public Byte(string s, IFormatProvider? provider)
+            : this(Parse(s, provider))
+        {
+        }
+
+        /**
+         * Constructs a new {@code Byte} from the specified string.
+         * 
+         * @param string
+         *            the string representation of a single byte value.
+         * @throws NumberFormatException
+         *             if {@code string} can not be decoded into a byte value.
+         * @see #parseByte(String)
+         */
+        public Byte(string s, NumberStyle style, IFormatProvider? provider)
+            : this(Parse(s, style, provider))
         {
         }
 
@@ -168,6 +197,29 @@ namespace J2N.Numerics
             return value;
         }
 
+        ///**
+        // * Parses the specified string as a signed decimal byte value. The ASCII
+        // * character \u002d ('-') is recognized as the minus sign.
+        // * 
+        // * @param string
+        // *            the string representation of a single byte value.
+        // * @return the primitive byte value represented by {@code string}.
+        // * @throws NumberFormatException
+        // *             if {@code string} is {@code null}, has a length of zero or
+        // *             can not be parsed as a byte value.
+        // */
+        //public static byte Parse(string value) // J2N: Renamed from ParseByte()
+        //{
+        //    //int intValue = Convert.ToInt32(value, 10); //Int32.ParseInt32(value);
+        //    int intValue = Int32.Parse(value);
+        //    byte result = (byte)intValue;
+        //    if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
+        //    {
+        //        return result;
+        //    }
+        //    throw new FormatException();
+        //}
+
         /**
          * Parses the specified string as a signed decimal byte value. The ASCII
          * character \u002d ('-') is recognized as the minus sign.
@@ -179,10 +231,26 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a byte value.
          */
-        public static byte ParseByte(string value) // J2N TODO: Rename Parse() - Byte seems redundant here
+        public static byte Parse(string value, IFormatProvider? provider) // J2N: Renamed from ParseByte()
+        {
+            return Parse(value, NumberStyle.Integer, provider);
+        }
+
+        /**
+         * Parses the specified string as a signed decimal byte value. The ASCII
+         * character \u002d ('-') is recognized as the minus sign.
+         * 
+         * @param string
+         *            the string representation of a single byte value.
+         * @return the primitive byte value represented by {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a byte value.
+         */
+        public static byte Parse(string value, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseByte()
         {
             //int intValue = Convert.ToInt32(value, 10); //Int32.ParseInt32(value);
-            int intValue = Int32.ParseInt32(value);
+            int intValue = Int32.Parse(value, style, provider);
             byte result = (byte)intValue;
             if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
             {
@@ -207,9 +275,9 @@ namespace J2N.Numerics
          *             {@code radix > Character.MAX_RADIX}, or if {@code string}
          *             can not be parsed as a byte value.
          */
-        public static byte ParseByte(string value, int radix) // J2N TODO: Rename Parse() - Byte seems redundant here
+        public static byte Parse(string value, int radix) // J2N: Renamed from ParseByte()
         {
-            int intValue = Int32.ParseInt32(value, radix);
+            int intValue = Int32.Parse(value, radix);
             byte result = (byte)intValue;
             if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
             {
@@ -263,6 +331,23 @@ namespace J2N.Numerics
             return value.ToString(provider);
         }
 
+        /////**
+        //// * Parses the specified string as a signed decimal byte value.
+        //// * 
+        //// * @param string
+        //// *            the string representation of a single byte value.
+        //// * @return a {@code Byte} instance containing the byte value represented by
+        //// *         {@code string}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null}, has a length of zero or
+        //// *             can not be parsed as a byte value.
+        //// * @see #parseByte(String)
+        //// */
+        ////public static Byte ValueOf(string value)
+        ////{
+        ////    return ValueOf(Parse(value));
+        ////}
+
         /**
          * Parses the specified string as a signed decimal byte value.
          * 
@@ -275,9 +360,26 @@ namespace J2N.Numerics
          *             can not be parsed as a byte value.
          * @see #parseByte(String)
          */
-        public static Byte ValueOf(string value)
+        public static Byte ValueOf(string s, IFormatProvider? provider)
         {
-            return ValueOf(ParseByte(value));
+            return ValueOf(Parse(s, provider));
+        }
+
+        /**
+         * Parses the specified string as a signed decimal byte value.
+         * 
+         * @param string
+         *            the string representation of a single byte value.
+         * @return a {@code Byte} instance containing the byte value represented by
+         *         {@code string}.
+         * @throws NumberFormatException
+         *             if {@code string} is {@code null}, has a length of zero or
+         *             can not be parsed as a byte value.
+         * @see #parseByte(String)
+         */
+        public static Byte ValueOf(string s, NumberStyle style, IFormatProvider? provider)
+        {
+            return ValueOf(Parse(s, style, provider));
         }
 
         /// <summary>
@@ -289,14 +391,14 @@ namespace J2N.Numerics
         /// will be from 0 to 255, so if a negative value is required it is up to the user to
         /// cast to <see cref="sbyte"/>.
         /// </summary>
-        /// <param name="value">The string representation of a single <see cref="byte"/> or <see cref="sbyte"/> value.</param>
+        /// <param name="s">The string representation of a single <see cref="byte"/> or <see cref="sbyte"/> value.</param>
         /// <param name="radix">The radix to use when parsing. This is the same as <c>fromBase</c> in <see cref="Convert.ToInt32(string?, int)"/>,
         /// except the range is expanded from <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/>, whereas <see cref="Convert.ToInt32(string?, int)"/>
         /// only supports 2, 8, 10, or 16.</param>
         /// <returns>A <see cref="Byte"/> instance containing the <see cref="byte"/> value represented by
-        /// <paramref name="value"/> using <paramref name="radix"/>.</returns>
+        /// <paramref name="s"/> using <paramref name="radix"/>.</returns>
         /// <exception cref="FormatException">
-        /// <paramref name="value"/> is <c>null</c> or has a length of zero.
+        /// <paramref name="s"/> is <c>null</c> or has a length of zero.
         /// <para/>
         /// -or-
         /// <para/>
@@ -304,12 +406,12 @@ namespace J2N.Numerics
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="value"/> cannot be parsed as a <see cref="byte"/> or <see cref="sbyte"/> value.
+        /// <paramref name="s"/> cannot be parsed as a <see cref="byte"/> or <see cref="sbyte"/> value.
         /// </exception>
-        /// <seealso cref="ParseByte(string, int)"/>
-        public static Byte ValueOf(string value, int radix) // J2N TODO: Exception handling - throw ArgumentOutOfRangeException and ArgumentNullException? Accept null like Convert.ToInt32() does?
+        /// <seealso cref="Parse(string, int)"/>
+        public static Byte ValueOf(string s, int radix) // J2N TODO: Exception handling - throw ArgumentOutOfRangeException and ArgumentNullException? Accept null like Convert.ToInt32() does?
         {
-            return ValueOf(ParseByte(value, radix));
+            return ValueOf(Parse(s, radix));
         }
 
         /**

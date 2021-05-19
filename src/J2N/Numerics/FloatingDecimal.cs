@@ -2684,12 +2684,7 @@ namespace J2N.Numerics
                 //
                 Group group8 = m.Groups[8];
                 bool positiveExponent = (!group8.Success) || group8.Value.Equals("+", StringComparison.Ordinal);
-                long unsignedRawExponent;
-                try
-                {
-                    unsignedRawExponent = Int32.ParseInt32(m.Groups[9].Value); // J2N TODO: TryParse
-                }
-                catch (FormatException)
+                if (!int.TryParse(m.Groups[9].Value, NumberStyles.Integer, CultureInfo.InvariantCulture, out int unsignedRawExponent))
                 {
                     // At this point, we know the exponent is
                     // syntactically well-formed as a sequence of

@@ -87,7 +87,7 @@ namespace J2N.Numerics
             string expectedString)
         {
             int rawBits;
-            float result = Single.ParseSingle(originalFloatString, style, J2N.Text.StringFormatter.InvariantCulture);
+            float result = Single.Parse(originalFloatString, style, J2N.Text.StringFormatter.InvariantCulture);
             rawBits = Single.SingleToInt32Bits(result);
             assertEquals("Original float(" + originalFloatString + ") Converted float(" + result
                     + ") Expecting:" + Int32.ToHexString(expectedRawBits) + " Got: "
@@ -332,9 +332,9 @@ namespace J2N.Numerics
         public void Test_parseFloatLjava_lang_String()
         {
             assertEquals("Incorrect float returned, expected zero.", 0.0, Single
-                    .ParseSingle("7.0064923216240853546186479164495e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
+                    .Parse("7.0064923216240853546186479164495e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
             assertEquals("Incorrect float returned, expected minimum float.", float.Epsilon, // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
-                    Single.ParseSingle("7.0064923216240853546186479164496e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
+                    Single.Parse("7.0064923216240853546186479164496e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
 
             doTestCompareRawBits(
                     "0.000000000000000000000000000000000000011754942807573642917278829910357665133228589927589904276829631184250030649651730385585324256680905818939208984375",
@@ -460,43 +460,43 @@ namespace J2N.Numerics
         {
             float actual;
 
-            actual = Single.ParseSingle("0x00000000000000000000000000000000000000000.0000000000000000000000000000000000000p0000000000000000000000000000000000", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0x00000000000000000000000000000000000000000.0000000000000000000000000000000000000p0000000000000000000000000000000000", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
 
-            actual = Single.ParseSingle("+0Xfffff.fffffffffffffffffffffffffffffffp+99F", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("+0Xfffff.fffffffffffffffffffffffffffffffp+99F", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 6.64614E35f, actual, 0.0F);
 
-            actual = Single.ParseSingle("-0X.123456789abcdefp+99f", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("-0X.123456789abcdefp+99f", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", -4.5072022E28f, actual, 0.0F);
 
-            actual = Single.ParseSingle("-0X123456789abcdef.p+1f", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("-0X123456789abcdef.p+1f", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", -1.63971062E17f, actual, 0.0F);
 
-            actual = Single.ParseSingle("-0X000000000000000000000000000001abcdef.0000000000000000000000000001abefp00000000000000000000000000000000000000000004f", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("-0X000000000000000000000000000001abcdef.0000000000000000000000000001abefp00000000000000000000000000000000000000000004f", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", -4.48585472E8f, actual, 0.0F);
 
-            actual = Single.ParseSingle("0X0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001234p600f", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0X0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001234p600f", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 5.907252E33f, actual, 0.0F);
 
-            actual = Single.ParseSingle("0x1.p9223372036854775807", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0x1.p9223372036854775807", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
 
-            actual = Single.ParseSingle("0x1.p9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0x1.p9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
 
-            actual = Single.ParseSingle("0x10.p9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0x10.p9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
 
-            actual = Single.ParseSingle("0xabcd.ffffffffp+2000", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0xabcd.ffffffffp+2000", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
 
-            actual = Single.ParseSingle("0x1.p-9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0x1.p-9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
 
-            actual = Single.ParseSingle("0x1.p-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0x1.p-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
 
-            actual = Single.ParseSingle("0x.1p-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Single.Parse("0x.1p-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
         }
 
@@ -523,7 +523,7 @@ namespace J2N.Numerics
                 int part = i * 6;
                 String inputString = "0x" + part + "." + part + "0123456789abcdefp" + part;
 
-                float actual = Single.ParseSingle(inputString, J2N.Text.StringFormatter.InvariantCulture);
+                float actual = Single.Parse(inputString, J2N.Text.StringFormatter.InvariantCulture);
                 float expected = Single.Int32BitsToSingle(expecteds[i]);
 
                 String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
@@ -575,7 +575,7 @@ namespace J2N.Numerics
                 int part = i * 7;
                 String inputString = "0x" + part + "." + part + "0123456789abcdefp-" + part;
 
-                float actual = Single.ParseSingle(inputString, J2N.Text.StringFormatter.InvariantCulture);
+                float actual = Single.Parse(inputString, J2N.Text.StringFormatter.InvariantCulture);
                 float expected = Single.Int32BitsToSingle(expecteds[i]);
 
                 String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
@@ -628,7 +628,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                float actual = Single.ParseSingle(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                float actual = Single.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
                 float expected = Single.Int32BitsToSingle(expecteds[i]);
 
                 String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
@@ -681,7 +681,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                float actual = Single.ParseSingle(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                float actual = Single.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
                 float expected = Single.Int32BitsToSingle(expecteds[i]);
 
                 String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
@@ -734,7 +734,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                float actual = Single.ParseSingle(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                float actual = Single.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
                 float expected = Single.Int32BitsToSingle(expecteds[i]);
 
                 String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
@@ -787,7 +787,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                float actual = Single.ParseSingle(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                float actual = Single.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
                 float expected = Single.Int32BitsToSingle(expecteds[i]);
 
                 String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
@@ -840,7 +840,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                float actual = Single.ParseSingle(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                float actual = Single.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
                 float expected = Single.Int32BitsToSingle(expecteds[i]);
 
                 String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));

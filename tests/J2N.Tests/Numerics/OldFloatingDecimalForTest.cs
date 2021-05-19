@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -2323,7 +2324,7 @@ namespace J2N.Numerics
                 long unsignedRawExponent;
                 try
                 {
-                    unsignedRawExponent = Int32.ParseInt32(m.Groups[9].Value); // J2N TODO: TryParse
+                    unsignedRawExponent = Int32.Parse(m.Groups[9].Value, CultureInfo.InvariantCulture); // J2N TODO: TryParse
                 }
                 catch (FormatException e)
                 {

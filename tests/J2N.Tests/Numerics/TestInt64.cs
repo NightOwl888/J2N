@@ -210,20 +210,20 @@ namespace J2N.Numerics
         {
             // Test for method long java.lang.Long.parseLong(java.lang.String)
 
-            long l = Int64.ParseInt64("89000000005");
+            long l = Int64.Parse("89000000005", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Parsed to incorrect long value", 89000000005L, l);
-            assertEquals("Returned incorrect value for 0", 0, Int64.ParseInt64("0"));
+            assertEquals("Returned incorrect value for 0", 0, Int64.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
             assertTrue("Returned incorrect value for most negative value", Int64
-                    .ParseInt64("-9223372036854775808") == unchecked((long)0x8000000000000000L));
+                    .Parse("-9223372036854775808", J2N.Text.StringFormatter.InvariantCulture) == unchecked((long)0x8000000000000000L));
             assertTrue("Returned incorrect value for most positive value", Int64
-                    .ParseInt64("9223372036854775807") == 0x7fffffffffffffffL);
+                    .Parse("9223372036854775807", J2N.Text.StringFormatter.InvariantCulture) == 0x7fffffffffffffffL);
 
             bool exception = false;
             try
             {
-                Int64.ParseInt64("9223372036854775808");
+                Int64.Parse("9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -233,9 +233,9 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ParseInt64("-9223372036854775809");
+                Int64.Parse("-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -251,31 +251,31 @@ namespace J2N.Numerics
         {
             // Test for method long java.lang.Long.parseLong(java.lang.String, int)
             assertEquals("Returned incorrect value",
-                    100000000L, Int64.ParseInt64("100000000", 10));
-            assertEquals("Returned incorrect value from hex string", 68719476735L, Int64.ParseInt64(
+                    100000000L, Int64.Parse("100000000", 10));
+            assertEquals("Returned incorrect value from hex string", 68719476735L, Int64.Parse(
                     "FFFFFFFFF", 16));
             assertTrue("Returned incorrect value from octal string: "
-                    + Int64.ParseInt64("77777777777"), Int64.ParseInt64("77777777777",
+                    + Int64.Parse("77777777777", J2N.Text.StringFormatter.InvariantCulture), Int64.Parse("77777777777",
                     8) == 8589934591L);
             assertEquals("Returned incorrect value for 0 hex", 0, Int64
-                    .ParseInt64("0", 16));
+                    .Parse("0", 16));
             assertTrue("Returned incorrect value for most negative value hex", Int64
-                    .ParseInt64("-8000000000000000", 16) == unchecked((long)0x8000000000000000L));
+                    .Parse("-8000000000000000", 16) == unchecked((long)0x8000000000000000L));
             assertTrue("Returned incorrect value for most positive value hex", Int64
-                    .ParseInt64("7fffffffffffffff", 16) == 0x7fffffffffffffffL);
-            assertEquals("Returned incorrect value for 0 decimal", 0, Int64.ParseInt64(
+                    .Parse("7fffffffffffffff", 16) == 0x7fffffffffffffffL);
+            assertEquals("Returned incorrect value for 0 decimal", 0, Int64.Parse(
                     "0", 10));
             assertTrue(
                     "Returned incorrect value for most negative value decimal",
-                    Int64.ParseInt64("-9223372036854775808", 10) == unchecked((long)0x8000000000000000L));
+                    Int64.Parse("-9223372036854775808", 10) == unchecked((long)0x8000000000000000L));
             assertTrue(
                     "Returned incorrect value for most positive value decimal",
-                    Int64.ParseInt64("9223372036854775807", 10) == 0x7fffffffffffffffL);
+                    Int64.Parse("9223372036854775807", 10) == 0x7fffffffffffffffL);
 
             bool exception = false;
             try
             {
-                Int64.ParseInt64("999999999999", 8);
+                Int64.Parse("999999999999", 8);
             }
             catch (FormatException e)
             {
@@ -288,7 +288,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ParseInt64("9223372036854775808", 10);
+                Int64.Parse("9223372036854775808", 10);
             }
             catch (FormatException e)
             {
@@ -300,7 +300,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ParseInt64("-9223372036854775809", 10);
+                Int64.Parse("-9223372036854775809", 10);
             }
             catch (FormatException e)
             {
@@ -312,7 +312,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ParseInt64("8000000000000000", 16);
+                Int64.Parse("8000000000000000", 16);
             }
             catch (FormatException e)
             {
@@ -324,7 +324,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ParseInt64("-8000000000000001", 16);
+                Int64.Parse("-8000000000000001", 16);
             }
             catch (FormatException e)
             {
@@ -336,7 +336,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ParseInt64("42325917317067571199", 10);
+                Int64.Parse("42325917317067571199", 10);
             }
             catch (FormatException e)
             {
@@ -464,20 +464,20 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Long
             // java.lang.Long.valueOf(java.lang.String)
-            assertEquals("Returned incorrect value", 100000000L, Int64.ValueOf("100000000")
+            assertEquals("Returned incorrect value", 100000000L, Int64.ValueOf("100000000", J2N.Text.StringFormatter.InvariantCulture)
                     .GetInt64Value());
             assertTrue("Returned incorrect value", Int64.ValueOf(
-                    "9223372036854775807").GetInt64Value() == long.MaxValue);
+                    "9223372036854775807", J2N.Text.StringFormatter.InvariantCulture).GetInt64Value() == long.MaxValue);
             assertTrue("Returned incorrect value", Int64.ValueOf(
-                    "-9223372036854775808").GetInt64Value() == long.MinValue);
+                    "-9223372036854775808", J2N.Text.StringFormatter.InvariantCulture).GetInt64Value() == long.MinValue);
 
             bool exception = false;
             try
             {
                 Int64
-                        .ValueOf("999999999999999999999999999999999999999999999999999999999999");
+                        .ValueOf("999999999999999999999999999999999999999999999999999999999999", J2N.Text.StringFormatter.InvariantCulture);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // correct
                 exception = true;
@@ -488,9 +488,9 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ValueOf("9223372036854775808");
+                Int64.ValueOf("9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // correct
                 exception = true;
@@ -501,9 +501,9 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.ValueOf("-9223372036854775809");
+                Int64.ValueOf("-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // correct
                 exception = true;
@@ -612,37 +612,37 @@ namespace J2N.Numerics
         [Test]
         public void Test_ConstructorLjava_lang_String()
         {
-            assertEquals(new Int64(0), new Int64("0"));
-            assertEquals(new Int64(1), new Int64("1"));
-            assertEquals(new Int64(-1), new Int64("-1"));
+            assertEquals(new Int64(0), new Int64("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(1), new Int64("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(-1), new Int64("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                new Int64("0x1");
+                new Int64("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                new Int64("9.2");
+                new Int64("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                new Int64("");
+                new Int64("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                new Int64(null);
+                new Int64(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with null string.");
             }
-            catch (FormatException e) { }
+            catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
         }
 
         /**
@@ -715,37 +715,37 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String()
         {
-            assertEquals(new Int64(0), Int64.ValueOf("0"));
-            assertEquals(new Int64(1), Int64.ValueOf("1"));
-            assertEquals(new Int64(-1), Int64.ValueOf("-1"));
+            assertEquals(new Int64(0), Int64.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(1), Int64.ValueOf("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(-1), Int64.ValueOf("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                Int64.ValueOf("0x1");
+                Int64.ValueOf("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ValueOf("9.2");
+                Int64.ValueOf("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ValueOf("");
+                Int64.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ValueOf(null);
+                Int64.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with null string.");
             }
-            catch (FormatException e) { }
+            catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
         }
 
         /**
@@ -797,37 +797,37 @@ namespace J2N.Numerics
         [Test]
         public void Test_parseLongLjava_lang_String()
         {
-            assertEquals(0, Int64.ParseInt64("0"));
-            assertEquals(1, Int64.ParseInt64("1"));
-            assertEquals(-1, Int64.ParseInt64("-1"));
+            assertEquals(0, Int64.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(1, Int64.Parse("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(-1, Int64.Parse("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                Int64.ParseInt64("0x1");
+                Int64.Parse("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ParseInt64("9.2");
+                Int64.Parse("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ParseInt64("");
+                Int64.Parse("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ParseInt64(null);
+                Int64.Parse(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with null string.");
             }
-            catch (FormatException e) { }
+            catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
         }
 
         /**
@@ -836,38 +836,38 @@ namespace J2N.Numerics
         [Test]
         public void Test_parseLongLjava_lang_StringJ()
         {
-            assertEquals(0, Int64.ParseInt64("0", 10));
-            assertEquals(1, Int64.ParseInt64("1", 10));
-            assertEquals(-1, Int64.ParseInt64("-1", 10));
+            assertEquals(0, Int64.Parse("0", 10));
+            assertEquals(1, Int64.Parse("1", 10));
+            assertEquals(-1, Int64.Parse("-1", 10));
 
             //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Int64.ParseInt64("1", 2));
-            assertEquals(Character.Digit('F', 16), Int64.ParseInt64("F", 16));
+            assertEquals(Character.Digit('1', 2), Int64.Parse("1", 2));
+            assertEquals(Character.Digit('F', 16), Int64.Parse("F", 16));
 
             try
             {
-                Int64.ParseInt64("0x1", 10);
+                Int64.Parse("0x1", 10);
                 fail("Expected NumberFormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ParseInt64("9.2", 10);
+                Int64.Parse("9.2", 10);
                 fail("Expected NumberFormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ParseInt64("", 10);
+                Int64.Parse("", 10);
                 fail("Expected NumberFormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.ParseInt64(null, 10);
+                Int64.Parse(null, 10);
                 fail("Expected NumberFormatException with null string.");
             }
             catch (FormatException e) { }
