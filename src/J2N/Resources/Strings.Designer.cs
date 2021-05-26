@@ -340,6 +340,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Radix must be greater than or equal to Character.MinRadix and less than or equal to Character.MaxRadix..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Radix {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Radix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to capacity was less than the current size..
         /// </summary>
         internal static string ArgumentOutOfRange_SmallCapacity {
@@ -363,6 +372,24 @@ namespace J2N.Resources {
         internal static string ExternalLinkedListNode {
             get {
                 return ResourceManager.GetString("ExternalLinkedListNode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input string was either empty or contained only whitespace..
+        /// </summary>
+        internal static string Format_EmptyInputString {
+            get {
+                return ResourceManager.GetString("Format_EmptyInputString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Additional non-parsable characters are at the end of the string..
+        /// </summary>
+        internal static string Format_ExtraJunkAtEnd {
+            get {
+                return ResourceManager.GetString("Format_ExtraJunkAtEnd", resourceCulture);
             }
         }
         
@@ -417,6 +444,15 @@ namespace J2N.Resources {
         internal static string Format_InvalidUTFTooLong {
             get {
                 return ResourceManager.GetString("Format_InvalidUTFTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find any recognizable digits..
+        /// </summary>
+        internal static string Format_NoParsibleDigits {
+            get {
+                return ResourceManager.GetString("Format_NoParsibleDigits", resourceCulture);
             }
         }
         
@@ -633,6 +669,15 @@ namespace J2N.Resources {
         internal static string Overflow_Int64 {
             get {
                 return ResourceManager.GetString("Overflow_Int64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The string was being parsed as an unsigned number and could not have a negative sign..
+        /// </summary>
+        internal static string Overflow_NegativeUnsigned {
+            get {
+                return ResourceManager.GetString("Overflow_NegativeUnsigned", resourceCulture);
             }
         }
         
