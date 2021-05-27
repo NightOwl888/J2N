@@ -243,14 +243,17 @@ namespace J2N.Numerics
             {
             }
 
-            try
-            {
-                Byte.ValueOf(null, 10);
-                fail("Expected FormatException with null string.");
-            }
-            catch (FormatException e)
-            {
-            }
+            //try
+            //{
+            //    Byte.ValueOf(null, 10);
+            //    fail("Expected FormatException with null string.");
+            //}
+            //catch (FormatException e)
+            //{
+            //}
+
+            // J2N: Match .NET behavior and return 0 for a null string
+            assertEquals(new Byte(0), Byte.ValueOf(null, 10));
         }
 
         /**
@@ -341,14 +344,17 @@ namespace J2N.Numerics
             {
             }
 
-            try
-            {
-                Byte.Parse(null, 10);
-                fail("Expected FormatException with null string.");
-            }
-            catch (FormatException e)
-            {
-            }
+            //try
+            //{
+            //    Byte.Parse(null, 10);
+            //    fail("Expected FormatException with null string.");
+            //}
+            //catch (FormatException e)
+            //{
+            //}
+
+            // J2N: Match .NET behavior and return 0 for a null string
+            assertEquals(0, Byte.Parse(null, 10));
         }
 
         /**
@@ -714,7 +720,7 @@ namespace J2N.Numerics
                 Byte.Parse("-1000", J2N.Text.StringFormatter.InvariantCulture);
                 fail("No FormatException");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
 
@@ -724,7 +730,7 @@ namespace J2N.Numerics
                 Byte.Parse("256", J2N.Text.StringFormatter.InvariantCulture); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                 fail("No FormatException");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
 
@@ -733,7 +739,7 @@ namespace J2N.Numerics
                 Byte.Parse("-129", J2N.Text.StringFormatter.InvariantCulture);
                 fail("No FormatException");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
         }
@@ -765,7 +771,7 @@ namespace J2N.Numerics
                 Byte.Parse("-1000", 10);
                 fail("Failed to throw exception");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
 
@@ -775,7 +781,7 @@ namespace J2N.Numerics
                 Byte.Parse("256", 10); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                 fail("Failed to throw exception for MAX_VALUE + 1");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
 
@@ -784,7 +790,7 @@ namespace J2N.Numerics
                 Byte.Parse("-129", 10);
                 fail("Failed to throw exception for MIN_VALUE - 1");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
 
@@ -794,16 +800,24 @@ namespace J2N.Numerics
                 Byte.Parse("100", 16); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                 fail("Failed to throw exception for hex MAX_VALUE + 1");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
+
+            assertEquals(1, Byte.Parse("1", 16));
+            assertEquals(-1, (sbyte)Byte.Parse("-1", 16));
+
+            assertEquals(sbyte.MaxValue, Byte.Parse("7f", 16));
+            assertEquals(-128, (sbyte)Byte.Parse("-80", 16)); // Special case: In Java, we allow the negative sign for the smallest negative number
+            assertEquals(-128, (sbyte)Byte.Parse("80", 16));  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
+            assertEquals(-127, (sbyte)Byte.Parse("81", 16));
 
             try
             {
                 Byte.Parse("-81", 16);
                 fail("Failed to throw exception for hex MIN_VALUE + 1");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
         }
@@ -858,7 +872,7 @@ namespace J2N.Numerics
                 Byte.ValueOf("256", J2N.Text.StringFormatter.InvariantCulture); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                 fail("Failed to throw exception when passes value > byte");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
         }
@@ -883,7 +897,7 @@ namespace J2N.Numerics
                 Byte.ValueOf("256", 10); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                 fail("Failed to throw exception when passes value > byte");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
             }
         }

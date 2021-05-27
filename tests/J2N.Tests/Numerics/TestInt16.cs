@@ -242,7 +242,7 @@ namespace J2N.Numerics
             {
                 Int16.Parse("10000000000", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -256,7 +256,7 @@ namespace J2N.Numerics
             {
                 Int16.Parse("32768", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -268,31 +268,40 @@ namespace J2N.Numerics
             {
                 Int16.Parse("-32769", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
             }
             assertTrue("Failed to throw exception for MIN_VALUE - 1", exception);
 
-            exception = false;
-            try
-            {
-                Int16.Parse("8000", 16);
-            }
-            catch (FormatException e)
-            {
-                // Correct
-                exception = true;
-            }
-            assertTrue("Failed to throw exception for hex MAX_VALUE + 1", exception);
+            // J2N: MinValue is a special case and must allow both a positive and negative version to be compatible
+            // with both .NET and Java
+            //exception = false;
+            //try
+            //{
+            //    Int16.Parse("8000", 16);
+            //}
+            //catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+            //{
+            //    // Correct
+            //    exception = true;
+            //}
+            //assertTrue("Failed to throw exception for hex MAX_VALUE + 1", exception);
+
+            assertEquals(1, Int16.Parse("1", 16));
+            assertEquals(-1, Int16.Parse("ffff", 16));
+            assertEquals(32767, Int16.Parse("7fff", 16));
+            assertEquals(-32768, Int16.Parse("-8000", 16)); // Special case: In Java, we allow the negative sign for the smallest negative number
+            assertEquals(-32768, Int16.Parse("8000", 16));  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
+            assertEquals(-32767, Int16.Parse("8001", 16));
 
             exception = false;
             try
             {
                 Int16.Parse("-8001", 16);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -393,7 +402,7 @@ namespace J2N.Numerics
             {
                 Int16.ValueOf("10000000000", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 return;
@@ -609,12 +618,15 @@ namespace J2N.Numerics
             }
             catch (FormatException e) { }
 
-            try
-            {
-                Int16.ValueOf(null, 10);
-                fail("Expected FormatException with null string.");
-            }
-            catch (FormatException e) { }
+            //try
+            //{
+            //    Int16.ValueOf(null, 10);
+            //    fail("Expected FormatException with null string.");
+            //}
+            //catch (FormatException e) { }
+
+            // J2N: Match .NET behavior where null will result in 0
+            assertEquals(0, Int16.ValueOf(null, 10));
         }
 
         /**
@@ -691,12 +703,15 @@ namespace J2N.Numerics
             }
             catch (FormatException e) { }
 
-            try
-            {
-                Int16.Parse(null, 10);
-                fail("Expected FormatException with null string.");
-            }
-            catch (FormatException e) { }
+            //try
+            //{
+            //    Int16.Parse(null, 10);
+            //    fail("Expected FormatException with null string.");
+            //}
+            //catch (FormatException e) { }
+
+            // J2N: Match .NET behavior where null will result in 0
+            assertEquals(0, Int16.Parse(null, 10));
         }
 
         /**
