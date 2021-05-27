@@ -104,7 +104,11 @@ namespace J2N.Numerics
             }
 
             int grabNumbersStart = i;
-            long result = GrabLongs(radix, s, ref i, end, (flags & TreatAsUnsigned) != 0);
+            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned, out long result))
+            {
+                DotNetNumber.ThrowOverflowException(isUnsigned ? TypeCode.UInt64 : TypeCode.Int64);
+            }
 
             // Check if they passed us a string with no parsable digits.
             if (i == grabNumbersStart)
@@ -210,7 +214,17 @@ namespace J2N.Numerics
             }
 
             int grabNumbersStart = i;
-            int result = GrabInts(radix, s, ref i, end, (flags & TreatAsUnsigned) != 0);
+            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned, out int result))
+            {
+                TypeCode typeCode = isUnsigned ? TypeCode.UInt32 : TypeCode.Int32;
+                if ((flags & TreatAsI1) != 0)
+                    typeCode = isUnsigned ? TypeCode.Byte : TypeCode.SByte;
+                if ((flags & TreatAsI2) != 0)
+                    typeCode = isUnsigned ? TypeCode.UInt16 : TypeCode.Int16;
+                
+                DotNetNumber.ThrowOverflowException(typeCode);
+            }
 
             // Check if they passed us a string with no parsable digits.
             if (i == grabNumbersStart)
@@ -563,9 +577,9 @@ namespace J2N.Numerics
             i = localIndex;
         }
 
-        private static long GrabLongs(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned)
+        private static bool TryGrabLongs(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out long result)
         {
-            ulong result = 0;
+            ulong unsignedResult = 0;
             ulong maxVal;
 
             // Allow all non-decimal numbers to set the sign bit.
@@ -579,28 +593,25 @@ namespace J2N.Numerics
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
                     // Check for overflows - this is sufficient & correct.
-                    if (result > maxVal || ((long)result) < 0)
+                    if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
                     {
-                        DotNetNumber.ThrowOverflowException(TypeCode.Int64);
+                        result = default;
+                        return false;
                     }
 
-                    result = result * (ulong)radix + (ulong)value;
+                    unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
                     i++;
                 }
 
-                if ((long)result < 0 && result != 0x8000000000000000)
+                if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
                 {
-                    DotNetNumber.ThrowOverflowException(TypeCode.Int64);
+                    result = default;
+                    return false;
                 }
             }
             else
             {
-                //Debug.Assert(radix == 2 || radix == 8 || radix == 10 || radix == 16);
-                //maxVal =
-                //    radix == 10 ? 0xffffffffffffffff / 10 :
-                //    radix == 16 ? 0xffffffffffffffff / 16 :
-                //    radix == 8 ? 0xffffffffffffffff / 8 :
-                //    0xffffffffffffffff / 2;
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
                 maxVal = 0xffffffffffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
@@ -609,29 +620,32 @@ namespace J2N.Numerics
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
                     // Check for overflows - this is sufficient & correct.
-                    if (result > maxVal)
+                    if (unsignedResult > maxVal)
                     {
-                        DotNetNumber.ThrowOverflowException(TypeCode.UInt64);
+                        result = default;
+                        return false;
                     }
 
-                    ulong temp = result * (ulong)radix + (ulong)value;
+                    ulong temp = unsignedResult * (ulong)radix + (ulong)value;
 
-                    if (temp < result) // this means overflow as well
+                    if (temp < unsignedResult) // this means overflow as well
                     {
-                        DotNetNumber.ThrowOverflowException(TypeCode.UInt64);
+                        result = default;
+                        return false;
                     }
 
-                    result = temp;
+                    unsignedResult = temp;
                     i++;
                 }
             }
 
-            return (long)result;
+            result = (long)unsignedResult;
+            return true;
         }
 
-        private static int GrabInts(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned)
+        private static bool TryGrabInts(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out int result)
         {
-            uint result = 0;
+            uint unsignedResult = 0;
             uint maxVal;
 
             // Allow all non-decimal numbers to set the sign bit.
@@ -645,26 +659,23 @@ namespace J2N.Numerics
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
                     // Check for overflows - this is sufficient & correct.
-                    if (result > maxVal || (int)result < 0)
+                    if (unsignedResult > maxVal || (int)unsignedResult < 0)
                     {
-                        DotNetNumber.ThrowOverflowException(TypeCode.Int32);
+                        result = default;
+                        return false;
                     }
-                    result = result * (uint)radix + (uint)value;
+                    unsignedResult = unsignedResult * (uint)radix + (uint)value;
                     i++;
                 }
-                if ((int)result < 0 && result != 0x80000000)
+                if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
                 {
-                    DotNetNumber.ThrowOverflowException(TypeCode.Int32);
+                    result = default;
+                    return false;
                 }
             }
             else
             {
-                //Debug.Assert(radix == 2 || radix == 8 || radix == 10 || radix == 16);
-                //maxVal =
-                //    radix == 10 ? 0xffffffff / 10 :
-                //    radix == 16 ? 0xffffffff / 16 :
-                //    radix == 8 ? 0xffffffff / 8 :
-                //    0xffffffff / 2;
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
                 maxVal = 0xffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
@@ -673,24 +684,27 @@ namespace J2N.Numerics
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
                     // Check for overflows - this is sufficient & correct.
-                    if (result > maxVal)
+                    if (unsignedResult > maxVal)
                     {
-                        DotNetNumber.ThrowOverflowException(TypeCode.UInt32);
+                        result = default;
+                        return false;
                     }
 
-                    uint temp = result * (uint)radix + (uint)value;
+                    uint temp = unsignedResult * (uint)radix + (uint)value;
 
-                    if (temp < result) // this means overflow as well
+                    if (temp < unsignedResult) // this means overflow as well
                     {
-                        DotNetNumber.ThrowOverflowException(TypeCode.UInt32);
+                        result = default;
+                        return false;
                     }
 
-                    result = temp;
+                    unsignedResult = temp;
                     i++;
                 }
             }
 
-            return (int)result;
+            result = (int)unsignedResult;
+            return true;
         }
 
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
