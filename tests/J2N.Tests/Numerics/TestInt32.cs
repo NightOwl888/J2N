@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -449,7 +450,7 @@ namespace J2N.Numerics
             {
                 Int32.Parse("2147483648", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -461,31 +462,40 @@ namespace J2N.Numerics
             {
                 Int32.Parse("-2147483649", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
             }
             assertTrue("Failed to throw exception for MIN_VALUE - 1", exception);
 
-            exception = false;
-            try
-            {
-                Int32.Parse("80000000", 16);
-            }
-            catch (FormatException e)
-            {
-                // Correct
-                exception = true;
-            }
-            assertTrue("Failed to throw exception for hex MAX_VALUE + 1", exception);
+            // J2N: MinValue is a special case and must allow both a positive and negative version to be compatible
+            // with both .NET and Java
+            //exception = false;
+            //try
+            //{
+            //    Int32.Parse("80000000", 16);
+            //}
+            //catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+            //{
+            //    // Correct
+            //    exception = true;
+            //}
+            //assertTrue("Failed to throw exception for hex MAX_VALUE + 1", exception);
+
+            assertEquals(1, Int32.Parse("1", 16));
+            assertEquals(-1, Int32.Parse("ffffffff", 16));
+            assertEquals(2147483647, Int32.Parse("7fffffff", 16));
+            assertEquals(-2147483648, Int32.Parse("-80000000", 16)); // Special case: In Java, we allow the negative sign for the smallest negative number
+            assertEquals(-2147483648, Int32.Parse("80000000", 16));  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
+            assertEquals(-2147483647, Int32.Parse("80000001", 16));
 
             exception = false;
             try
             {
                 Int32.Parse("-80000001", 16);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -497,7 +507,7 @@ namespace J2N.Numerics
             {
                 Int32.Parse("9999999999", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -738,7 +748,7 @@ namespace J2N.Numerics
             {
                 Int32.ValueOf("2147483648", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -750,7 +760,7 @@ namespace J2N.Numerics
             {
                 Int32.ValueOf("-2147483649", 10);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -762,7 +772,7 @@ namespace J2N.Numerics
             {
                 Int32.ValueOf("80000000", 16);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -775,7 +785,7 @@ namespace J2N.Numerics
             {
                 Int32.ValueOf("-80000001", 16);
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -995,12 +1005,15 @@ namespace J2N.Numerics
             }
             catch (FormatException e) { }
 
-            try
-            {
-                Int32.ValueOf(null, 10);
-                fail("Expected FormatException with null string.");
-            }
-            catch (FormatException e) { }
+            //try
+            //{
+            //    Int32.ValueOf(null, 10);
+            //    fail("Expected FormatException with null string.");
+            //}
+            //catch (FormatException e) { }
+
+            // J2N: Match .NET behavior and return 0 for a null string
+            assertEquals(0, Int32.ValueOf(null, 10));
         }
 
         /**
@@ -1077,12 +1090,15 @@ namespace J2N.Numerics
             }
             catch (FormatException e) { }
 
-            try
-            {
-                Int32.Parse(null, 10);
-                fail("Expected FormatException with null string.");
-            }
-            catch (FormatException e) { }
+            //try
+            //{
+            //    Int32.Parse(null, 10);
+            //    fail("Expected FormatException with null string.");
+            //}
+            //catch (FormatException e) { }
+
+            // J2N: Match .NET behavior where null will result in 0
+            assertEquals(0, Int32.Parse(null, 10));
         }
 
         /**
@@ -1422,6 +1438,422 @@ namespace J2N.Numerics
             for (int i = 1; i <= 127; i++)
             {
                 assertEquals(1, Int32.Signum(i));
+            }
+        }
+
+        public class JDK8 : TestCase
+        {
+            [TestCase(+100, "+100")]
+            [TestCase(-100, "-100")]
+
+            [TestCase(0, "+0")]
+            [TestCase(0, "-0")]
+            [TestCase(0, "+00000")]
+            [TestCase(0, "-00000")]
+
+            [TestCase(0, "0")]
+            [TestCase(1, "1")]
+            [TestCase(9, "9")]
+
+            public void TestParse_String_Int32(int expected, string value)
+            {
+                var actual = Int32.Parse(value, NumberFormatInfo.InvariantInfo);
+                assertEquals($"Int32.Parse(string, IFormatProvider) failed. String: \"{value}\" Result: {actual}", expected, actual);
+            }
+
+            [TestCase(typeof(FormatException), "")]
+            [TestCase(typeof(FormatException), "\u0000")]
+            [TestCase(typeof(FormatException), "\u002f")]
+            [TestCase(typeof(FormatException), "+")]
+            [TestCase(typeof(FormatException), "-")]
+            [TestCase(typeof(FormatException), "++")]
+            [TestCase(typeof(FormatException), "+-")]
+            [TestCase(typeof(FormatException), "-+")]
+            [TestCase(typeof(FormatException), "--")]
+            [TestCase(typeof(FormatException), "++100")]
+            [TestCase(typeof(FormatException), "--100")]
+            [TestCase(typeof(FormatException), "+-6")]
+            [TestCase(typeof(FormatException), "-+6")]
+            [TestCase(typeof(FormatException), "*100")]
+            public void TestParse_String_Int32_ForException(Type expectedExceptionType, string value)
+            {
+                Assert.Throws(expectedExceptionType, () => Int32.Parse(value, NumberFormatInfo.InvariantInfo));
+            }
+
+            [TestCase(0, "test-00000", 4, 10 - 4, 10)]
+            [TestCase(-12345, "test-12345", 4, 10 - 4, 10)]
+            [TestCase(12345, "xx12345yy", 2, 7 - 2, 10)]
+            [TestCase(15, "xxFyy", 2, 3 - 2, 16)]
+
+            [TestCase(12345, "xx1234567yy", 2, 5, 10)]
+
+            public void TestParse_String_Int32_Int32_Int32(int expected, string value, int startIndex, int length, int radix)
+            {
+                var actual = Int32.Parse(value, startIndex, length, radix);
+                assertEquals($"Int32.Parse(string, int, int, int) failed. Expected: {expected} String: \"{value}\", startIndex: {startIndex}, length: {length} radix: {radix} Result: {actual}", expected, actual);
+            }
+
+            [TestCase(typeof(FormatException), "", 0, 0 - 0, 10)] // J2N: .NET throws ArgumentOutOfRangeException rather than FormatException in this case, but since it is inconsistent with int.Parse() we are going with FormatException.
+            [TestCase(typeof(FormatException), "+-6", 0, 3 - 0, 10)]
+            [TestCase(typeof(FormatException), "1000000", 7, 7 - 7, 10)] // J2N: .NET throws ArgumentOutOfRangeException rather than FormatException in this case, but since it is inconsistent with int.Parse() we are going with FormatException.
+            [TestCase(typeof(ArgumentOutOfRangeException), "1000000", 0, 2 - 0, Character.MaxRadix + 1)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "1000000", 0, 2 - 0, Character.MinRadix - 1)]
+
+            [TestCase(typeof(ArgumentOutOfRangeException), "", 1, 1 - 1, 10)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "1000000", 10, 4 - 10, 10)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "1000000", 10, 2 - 10, Character.MaxRadix + 1)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "1000000", 10, 2 - 10, Character.MinRadix - 1)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "1000000", -1, 2 - -1, Character.MaxRadix + 1)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "1000000", -1, 2 - -1, Character.MinRadix - 1)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "-1", 0, 3 - 0, 10)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "-1", 2, 3 - 2, 10)]
+            [TestCase(typeof(ArgumentOutOfRangeException), "-1", -1, 2 - -1, 10)]
+
+            [TestCase(typeof(ArgumentNullException), null, 0, 1 - 0, 10)]
+            [TestCase(typeof(ArgumentNullException), null, -1, 0 - -1, 100)]
+            [TestCase(typeof(ArgumentNullException), null, 0, 0 - 0, 10)]
+            [TestCase(typeof(ArgumentNullException), null, 0, -1 - 0, 10)]
+            [TestCase(typeof(ArgumentNullException), null, -1, -1 - -1, -1)]
+
+            [TestCase(typeof(FormatException), "xx  34567yy", 2, 5, 10)] // spaces in range are not allowed
+            public void TestParse_String_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int startIndex, int length, int radix)
+            {
+                Assert.Throws(expectedExceptionType, () => Int32.Parse(value, startIndex, length, radix));
+            }
+
+
+            public static IEnumerable<TestCaseData> UnsignedIntTestCases
+            {
+                get
+                {
+                    yield return new TestCaseData((uint)0, 2, "0", 0);
+                    yield return new TestCaseData((uint)0, 3, "0", 0);
+                    yield return new TestCaseData((uint)0, 4, "0", 0);
+                    yield return new TestCaseData((uint)0, 5, "0", 0);
+                    yield return new TestCaseData((uint)0, 6, "0", 0);
+                    yield return new TestCaseData((uint)0, 7, "0", 0);
+                    yield return new TestCaseData((uint)0, 8, "0", 0);
+                    yield return new TestCaseData((uint)0, 9, "0", 0);
+                    yield return new TestCaseData((uint)0, 10, "0", 0);
+                    yield return new TestCaseData((uint)0, 11, "0", 0);
+                    yield return new TestCaseData((uint)0, 12, "0", 0);
+                    yield return new TestCaseData((uint)0, 13, "0", 0);
+                    yield return new TestCaseData((uint)0, 14, "0", 0);
+                    yield return new TestCaseData((uint)0, 15, "0", 0);
+                    yield return new TestCaseData((uint)0, 16, "0", 0);
+                    yield return new TestCaseData((uint)0, 17, "0", 0);
+                    yield return new TestCaseData((uint)0, 18, "0", 0);
+                    yield return new TestCaseData((uint)0, 19, "0", 0);
+                    yield return new TestCaseData((uint)0, 20, "0", 0);
+                    yield return new TestCaseData((uint)0, 21, "0", 0);
+                    yield return new TestCaseData((uint)0, 22, "0", 0);
+                    yield return new TestCaseData((uint)0, 23, "0", 0);
+                    yield return new TestCaseData((uint)0, 24, "0", 0);
+                    yield return new TestCaseData((uint)0, 25, "0", 0);
+                    yield return new TestCaseData((uint)0, 26, "0", 0);
+                    yield return new TestCaseData((uint)0, 27, "0", 0);
+                    yield return new TestCaseData((uint)0, 28, "0", 0);
+                    yield return new TestCaseData((uint)0, 29, "0", 0);
+                    yield return new TestCaseData((uint)0, 30, "0", 0);
+                    yield return new TestCaseData((uint)0, 31, "0", 0);
+                    yield return new TestCaseData((uint)0, 32, "0", 0);
+                    yield return new TestCaseData((uint)0, 33, "0", 0);
+                    yield return new TestCaseData((uint)0, 34, "0", 0);
+                    yield return new TestCaseData((uint)0, 35, "0", 0);
+                    yield return new TestCaseData((uint)0, 36, "0", 0);
+
+                    yield return new TestCaseData((uint)1, 2, "1", 1);
+                    yield return new TestCaseData((uint)1, 3, "1", 1);
+                    yield return new TestCaseData((uint)1, 4, "1", 1);
+                    yield return new TestCaseData((uint)1, 5, "1", 1);
+                    yield return new TestCaseData((uint)1, 6, "1", 1);
+                    yield return new TestCaseData((uint)1, 7, "1", 1);
+                    yield return new TestCaseData((uint)1, 8, "1", 1);
+                    yield return new TestCaseData((uint)1, 9, "1", 1);
+                    yield return new TestCaseData((uint)1, 10, "1", 1);
+                    yield return new TestCaseData((uint)1, 11, "1", 1);
+                    yield return new TestCaseData((uint)1, 12, "1", 1);
+                    yield return new TestCaseData((uint)1, 13, "1", 1);
+                    yield return new TestCaseData((uint)1, 14, "1", 1);
+                    yield return new TestCaseData((uint)1, 15, "1", 1);
+                    yield return new TestCaseData((uint)1, 16, "1", 1);
+                    yield return new TestCaseData((uint)1, 17, "1", 1);
+                    yield return new TestCaseData((uint)1, 18, "1", 1);
+                    yield return new TestCaseData((uint)1, 19, "1", 1);
+                    yield return new TestCaseData((uint)1, 20, "1", 1);
+                    yield return new TestCaseData((uint)1, 21, "1", 1);
+                    yield return new TestCaseData((uint)1, 22, "1", 1);
+                    yield return new TestCaseData((uint)1, 23, "1", 1);
+                    yield return new TestCaseData((uint)1, 24, "1", 1);
+                    yield return new TestCaseData((uint)1, 25, "1", 1);
+                    yield return new TestCaseData((uint)1, 26, "1", 1);
+                    yield return new TestCaseData((uint)1, 27, "1", 1);
+                    yield return new TestCaseData((uint)1, 28, "1", 1);
+                    yield return new TestCaseData((uint)1, 29, "1", 1);
+                    yield return new TestCaseData((uint)1, 30, "1", 1);
+                    yield return new TestCaseData((uint)1, 31, "1", 1);
+                    yield return new TestCaseData((uint)1, 32, "1", 1);
+                    yield return new TestCaseData((uint)1, 33, "1", 1);
+                    yield return new TestCaseData((uint)1, 34, "1", 1);
+                    yield return new TestCaseData((uint)1, 35, "1", 1);
+                    yield return new TestCaseData((uint)1, 36, "1", 1);
+
+                    yield return new TestCaseData((uint)10, 2, "1010", 10);
+                    yield return new TestCaseData((uint)10, 3, "101", 10);
+                    yield return new TestCaseData((uint)10, 4, "22", 10);
+                    yield return new TestCaseData((uint)10, 5, "20", 10);
+                    yield return new TestCaseData((uint)10, 6, "14", 10);
+                    yield return new TestCaseData((uint)10, 7, "13", 10);
+                    yield return new TestCaseData((uint)10, 8, "12", 10);
+                    yield return new TestCaseData((uint)10, 9, "11", 10);
+                    yield return new TestCaseData((uint)10, 10, "10", 10);
+                    yield return new TestCaseData((uint)10, 11, "a", 10);
+                    yield return new TestCaseData((uint)10, 12, "a", 10);
+                    yield return new TestCaseData((uint)10, 13, "a", 10);
+                    yield return new TestCaseData((uint)10, 14, "a", 10);
+                    yield return new TestCaseData((uint)10, 15, "a", 10);
+                    yield return new TestCaseData((uint)10, 16, "a", 10);
+                    yield return new TestCaseData((uint)10, 17, "a", 10);
+                    yield return new TestCaseData((uint)10, 18, "a", 10);
+                    yield return new TestCaseData((uint)10, 19, "a", 10);
+                    yield return new TestCaseData((uint)10, 20, "a", 10);
+                    yield return new TestCaseData((uint)10, 21, "a", 10);
+                    yield return new TestCaseData((uint)10, 22, "a", 10);
+                    yield return new TestCaseData((uint)10, 23, "a", 10);
+                    yield return new TestCaseData((uint)10, 24, "a", 10);
+                    yield return new TestCaseData((uint)10, 25, "a", 10);
+                    yield return new TestCaseData((uint)10, 26, "a", 10);
+                    yield return new TestCaseData((uint)10, 27, "a", 10);
+                    yield return new TestCaseData((uint)10, 28, "a", 10);
+                    yield return new TestCaseData((uint)10, 29, "a", 10);
+                    yield return new TestCaseData((uint)10, 30, "a", 10);
+                    yield return new TestCaseData((uint)10, 31, "a", 10);
+                    yield return new TestCaseData((uint)10, 32, "a", 10);
+                    yield return new TestCaseData((uint)10, 33, "a", 10);
+                    yield return new TestCaseData((uint)10, 34, "a", 10);
+                    yield return new TestCaseData((uint)10, 35, "a", 10);
+                    yield return new TestCaseData((uint)10, 36, "a", 10);
+
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 2, "1111111111111111111111111111110", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 3, "12112122212110202100", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 4, "1333333333333332", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 5, "13344223434041", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 6, "553032005530", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 7, "104134211160", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 8, "17777777776", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 9, "5478773670", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 10, "2147483646", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 11, "a02220280", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 12, "4bb2308a6", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 13, "282ba4aa9", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 14, "1652ca930", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 15, "c87e66b6", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 16, "7ffffffe", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 17, "53g7f547", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 18, "3928g3h0", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 19, "27c57h31", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 20, "1db1f926", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 21, "140h2d90", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 22, "ikf5bf0", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 23, "ebelf94", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 24, "b5gge56", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 25, "8jmdnkl", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 26, "6oj8iom", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 27, "5ehnck9", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 28, "4clm98e", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 29, "3hk7986", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 30, "2sb6cs6", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 31, "2d09uc0", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 32, "1vvvvvu", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 33, "1lsqtl0", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 34, "1d8xqro", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 35, "15v22ul", 2147483646);
+                    yield return new TestCaseData((uint)int.MaxValue - 1, 36, "zik0zi", 2147483646);
+
+                    yield return new TestCaseData((uint)int.MaxValue, 2, "1111111111111111111111111111111", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 3, "12112122212110202101", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 4, "1333333333333333", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 5, "13344223434042", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 6, "553032005531", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 7, "104134211161", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 8, "17777777777", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 9, "5478773671", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 10, "2147483647", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 11, "a02220281", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 12, "4bb2308a7", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 13, "282ba4aaa", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 14, "1652ca931", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 15, "c87e66b7", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 16, "7fffffff", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 17, "53g7f548", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 18, "3928g3h1", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 19, "27c57h32", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 20, "1db1f927", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 21, "140h2d91", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 22, "ikf5bf1", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 23, "ebelf95", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 24, "b5gge57", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 25, "8jmdnkm", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 26, "6oj8ion", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 27, "5ehncka", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 28, "4clm98f", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 29, "3hk7987", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 30, "2sb6cs7", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 31, "2d09uc1", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 32, "1vvvvvv", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 33, "1lsqtl1", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 34, "1d8xqrp", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 35, "15v22um", 2147483647);
+                    yield return new TestCaseData((uint)int.MaxValue, 36, "zik0zj", 2147483647);
+
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 2, "10000000000000000000000000000000", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 3, "12112122212110202102", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 4, "2000000000000000", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 5, "13344223434043", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 6, "553032005532", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 7, "104134211162", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 8, "20000000000", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 9, "5478773672", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 10, "2147483648", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 11, "a02220282", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 12, "4bb2308a8", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 13, "282ba4aab", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 14, "1652ca932", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 15, "c87e66b8", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 16, "80000000", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 17, "53g7f549", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 18, "3928g3h2", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 19, "27c57h33", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 20, "1db1f928", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 21, "140h2d92", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 22, "ikf5bf2", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 23, "ebelf96", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 24, "b5gge58", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 25, "8jmdnkn", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 26, "6oj8ioo", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 27, "5ehnckb", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 28, "4clm98g", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 29, "3hk7988", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 30, "2sb6cs8", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 31, "2d09uc2", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 32, "2000000", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 33, "1lsqtl2", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 34, "1d8xqrq", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 35, "15v22un", -2147483648);
+                    yield return new TestCaseData((uint)int.MaxValue + 1, 36, "zik0zk", -2147483648);
+
+                    yield return new TestCaseData(uint.MaxValue - 1, 2, "11111111111111111111111111111110", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 3, "102002022201221111202", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 4, "3333333333333332", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 5, "32244002423134", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 6, "1550104015502", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 7, "211301422352", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 8, "37777777776", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 9, "12068657452", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 10, "4294967294", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 11, "1904440552", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 12, "9ba461592", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 13, "535a79887", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 14, "2ca5b7462", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 15, "1a20dcd7e", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 16, "fffffffe", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 17, "a7ffda8g", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 18, "704he7g2", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 19, "4f5aff64", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 20, "3723ai4e", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 21, "281d55i2", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 22, "1fj8b182", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 23, "1606k7ia", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 24, "mb994ae", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 25, "hek2mgj", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 26, "dnchbnk", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 27, "b28jpdk", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 28, "8pfgih2", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 29, "76beige", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 30, "5qmcpqe", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 31, "4q0jto2", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 32, "3vvvvvu", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 33, "3aokq92", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 34, "2qhxjlg", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 35, "2br45q9", -2);
+                    yield return new TestCaseData(uint.MaxValue - 1, 36, "1z141z2", -2);
+
+                    yield return new TestCaseData(uint.MaxValue, 2, "11111111111111111111111111111111", -1);
+                    yield return new TestCaseData(uint.MaxValue, 3, "102002022201221111210", -1);
+                    yield return new TestCaseData(uint.MaxValue, 4, "3333333333333333", -1);
+                    yield return new TestCaseData(uint.MaxValue, 5, "32244002423140", -1);
+                    yield return new TestCaseData(uint.MaxValue, 6, "1550104015503", -1);
+                    yield return new TestCaseData(uint.MaxValue, 7, "211301422353", -1);
+                    yield return new TestCaseData(uint.MaxValue, 8, "37777777777", -1);
+                    yield return new TestCaseData(uint.MaxValue, 9, "12068657453", -1);
+                    yield return new TestCaseData(uint.MaxValue, 10, "4294967295", -1);
+                    yield return new TestCaseData(uint.MaxValue, 11, "1904440553", -1);
+                    yield return new TestCaseData(uint.MaxValue, 12, "9ba461593", -1);
+                    yield return new TestCaseData(uint.MaxValue, 13, "535a79888", -1);
+                    yield return new TestCaseData(uint.MaxValue, 14, "2ca5b7463", -1);
+                    yield return new TestCaseData(uint.MaxValue, 15, "1a20dcd80", -1);
+                    yield return new TestCaseData(uint.MaxValue, 16, "ffffffff", -1);
+                    yield return new TestCaseData(uint.MaxValue, 17, "a7ffda90", -1);
+                    yield return new TestCaseData(uint.MaxValue, 18, "704he7g3", -1);
+                    yield return new TestCaseData(uint.MaxValue, 19, "4f5aff65", -1);
+                    yield return new TestCaseData(uint.MaxValue, 20, "3723ai4f", -1);
+                    yield return new TestCaseData(uint.MaxValue, 21, "281d55i3", -1);
+                    yield return new TestCaseData(uint.MaxValue, 22, "1fj8b183", -1);
+                    yield return new TestCaseData(uint.MaxValue, 23, "1606k7ib", -1);
+                    yield return new TestCaseData(uint.MaxValue, 24, "mb994af", -1);
+                    yield return new TestCaseData(uint.MaxValue, 25, "hek2mgk", -1);
+                    yield return new TestCaseData(uint.MaxValue, 26, "dnchbnl", -1);
+                    yield return new TestCaseData(uint.MaxValue, 27, "b28jpdl", -1);
+                    yield return new TestCaseData(uint.MaxValue, 28, "8pfgih3", -1);
+                    yield return new TestCaseData(uint.MaxValue, 29, "76beigf", -1);
+                    yield return new TestCaseData(uint.MaxValue, 30, "5qmcpqf", -1);
+                    yield return new TestCaseData(uint.MaxValue, 31, "4q0jto3", -1);
+                    yield return new TestCaseData(uint.MaxValue, 32, "3vvvvvv", -1);
+                    yield return new TestCaseData(uint.MaxValue, 33, "3aokq93", -1);
+                    yield return new TestCaseData(uint.MaxValue, 34, "2qhxjlh", -1);
+                    yield return new TestCaseData(uint.MaxValue, 35, "2br45qa", -1);
+                    yield return new TestCaseData(uint.MaxValue, 36, "1z141z3", -1);
+                }
+            }
+
+            [Test]
+            [TestCaseSource("UnsignedIntTestCases")]
+            public void TestParseUnsigned_String_Int32(uint value, int radix, string bigString, int expected)
+            {
+                int actual = Int32.ParseUnsigned(bigString, radix);
+                assertEquals(expected, actual);
+            }
+
+
+            [Test]
+            [TestCaseSource("UnsignedIntTestCases")]
+            public void TestParseUnsigned_String_Int32_Int32_Int32(uint value, int radix, string bigString, int expected)
+            {
+                int actual = Int32.ParseUnsigned("prefix" + bigString + "suffix", "prefix".Length, bigString.Length, radix);
+                assertEquals(expected, actual);
+            }
+
+            //[Test]
+            //[TestCase(typeof(ArgumentNullException), null, 10)] // J2N: We mimic the .NET behavior by allowing null to be converted to 0
+            [TestCase(typeof(FormatException), "", 10)]
+            [TestCase(typeof(OverflowException), "-1", 10)]
+            [TestCase(typeof(OverflowException), "9223372036854775807", 10)] // long.MaxValue
+            [TestCase(typeof(OverflowException), "4294967296", 10)] // uint.MaxValue + 1
+            public void TestParseUnsigned_String_Int32_ForException(Type expectedExceptionType, string value, int radix)
+            {
+                Assert.Throws(expectedExceptionType, () => Int32.ParseUnsigned(value, radix));
+            }
+
+
+            //[Test]
+            [TestCase(typeof(FormatException), null, 10)] // Expected because we are concatenating a string. In .NET concatenating null to a string is the same as empty string.
+            [TestCase(typeof(FormatException), "", 10)]
+            [TestCase(typeof(OverflowException), "-1", 10)]
+            [TestCase(typeof(OverflowException), "9223372036854775807", 10)] // long.MaxValue
+            [TestCase(typeof(OverflowException), "4294967296", 10)] // uint.MaxValue + 1
+            public void TestParseUnsigned_String_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int radix)
+            {
+                Assert.Throws(expectedExceptionType, () => Int32.ParseUnsigned("prefix" + value + "suffix", "prefix".Length, value?.Length ?? 0, radix));
             }
         }
     }

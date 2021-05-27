@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
+    using SR = J2N.Resources.Strings;
+
     /// <inheritdoc/>
     public sealed class Int64 : Number, IComparable<Int64>
     {
@@ -145,8 +147,8 @@ namespace J2N.Numerics
                 throw new FormatException();
             }
             char firstDigit = value[i];
-            bool negative = firstDigit == '-';
-            if (negative)
+            int sign = firstDigit == '-' ? -1 : 1;
+            if (sign < 0)
             {
                 if (length == 1)
                 {
@@ -185,8 +187,12 @@ namespace J2N.Numerics
                 i++;
                 @base = 16;
             }
-
-            long result = Parse(value, i, @base, negative);
+#if FEATURE_READONLYSPAN
+            long result = ParseNumbers.StringToLong(value.AsSpan(), @base, flags: ParseNumbers.IsTight, sign, ref i, value.Length - i);
+#else
+            long result = Parse(value, i, @base, negative: sign < 0);
+#endif
+            
             return ValueOf(result);
         }
 
@@ -392,63 +398,505 @@ namespace J2N.Numerics
             return long.Parse(s, (NumberStyles)style, provider); // J2N TODO: AllowTrailingTypeSpecifier
         }
 
-        /**
-         * Parses the specified string as a signed long value using the specified
-         * radix. The ASCII character \u002d ('-') is recognized as the minus sign.
-         * 
-         * @param string
-         *            the string representation of a long value.
-         * @param radix
-         *            the radix to use when parsing.
-         * @return the primitive long value represented by {@code string} using
-         *         {@code radix}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null} or has a length of zero,
-         *             {@code radix < Character.MIN_RADIX},
-         *             {@code radix > Character.MAX_RADIX}, or if {@code string}
-         *             can not be parsed as a long value.
-         */
-        public static long Parse(string s, int radix) // J2N: Renamed from ParseLong()
+        internal static long ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
         {
-            if (s is null || radix < Character.MinRadix
-                    || radix > Character.MaxRadix)
-            {
-                throw new FormatException();
-            }
-            int length = s.Length, i = 0;
-            if (length == 0)
-            {
-                throw new FormatException(s);
-            }
-            bool negative = s[i] == '-';
-            if (negative && ++i == length)
-            {
-                throw new FormatException(s);
-            }
+            if (s is null)
+                throw new ArgumentNullException(nameof(s));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            return Parse(s, i, radix, negative);
+#if FEATURE_READONLYSPAN
+            return ParseNumbers.StringToLong(s.AsSpan(), radix, flags: ParseNumbers.NoSpace | ParseNumbers.TreatAsUnsigned, sign: 1, ref startIndex, length);
+#else
+            return 0;
+#endif
         }
 
-        private static long Parse(string value, int offset, int radix,
-                bool negative)
+        internal static long ParseUnsigned(string s, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
         {
+#if FEATURE_READONLYSPAN
+            return s != null ?
+                ParseNumbers.StringToLong(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned) :
+                0;
+#else
+            return 0;
+#endif
+        }
+
+
+        /////**
+        //// * Parses the specified string as a signed long value using the specified
+        //// * radix. The ASCII character \u002d ('-') is recognized as the minus sign.
+        //// * 
+        //// * @param string
+        //// *            the string representation of a long value.
+        //// * @param radix
+        //// *            the radix to use when parsing.
+        //// * @return the primitive long value represented by {@code string} using
+        //// *         {@code radix}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null} or has a length of zero,
+        //// *             {@code radix < Character.MIN_RADIX},
+        //// *             {@code radix > Character.MAX_RADIX}, or if {@code string}
+        //// *             can not be parsed as a long value.
+        //// */
+        //////public static long Parse(string s, int radix) // J2N: Renamed from ParseLong()
+        //////{
+        //////    if (s is null || radix < Character.MinRadix
+        //////            || radix > Character.MaxRadix)
+        //////    {
+        //////        throw new FormatException();
+        //////    }
+        //////    int length = s.Length, i = 0;
+        //////    if (length == 0)
+        //////    {
+        //////        throw new FormatException(s);
+        //////    }
+        //////    bool negative = s[i] == '-';
+        //////    if (negative && ++i == length)
+        //////    {
+        //////        throw new FormatException(s);
+        //////    }
+
+        //////    return Parse(s, i, radix, negative);
+        //////}
+
+        /// <summary>
+        /// Parses the <see cref="string"/> argument as a signed long in the specified <paramref name="radix"/>, beginning at the
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// <para/>
+        /// Usage Note: This is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
+        /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
+        /// or \u002B ('+') in any <paramref name="radix"/>.
+        /// </summary>
+        /// <param name="s">The <see cref="string"/> containing the <see cref="long"/> representation to be parsed.</param>
+        /// <param name="startIndex">The zero-based starting character position of a region in <paramref name="s"/>.</param>
+        /// <param name="length">The number of characters in the region to parse.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <returns>The signed <see cref="long"/> represented by the subsequence in the specified <paramref name="radix"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> and <paramref name="length"/> refer to a location outside of <paramref name="s"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// The range of characters in <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/>
+        /// contains a character that is not a valid digit in the base specified by <paramref name="radix"/>.
+        /// The exception message indicates that there are no digits to convert if the first character specified by
+        /// <paramref name="startIndex"/> is invalid; otherwise, the message indicates that the range of characters in
+        /// <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/> contains invalid trailing characters.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The range of characters in <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/>
+        /// contain only a the ASCII character \u002d ('-') or \u002B ('+') sign and/or hexadecimal prefix 0X or 0x with no digits.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="length"/> is zero.
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// The range of characters in <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/>
+        /// represents a number that is less than <see cref="long.MinValue"/> or greater than <see cref="long.MaxValue"/>.
+        /// </exception>
+        /// <seealso cref="Parse(string, int)"/>
+        public static long Parse(string s, int startIndex, int length, int radix)
+        {
+            if (s is null)
+                throw new ArgumentNullException(nameof(s));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+#if FEATURE_READONLYSPAN
+            //return s != null ? ParseNumbers.StringToLong(s.Substring(startIndex, length).AsSpan(), radix, ParseNumbers.IsTight) : 0;
+            return ParseNumbers.StringToLong(s.AsSpan(), radix, flags: ParseNumbers.NoSpace, sign: 1, ref startIndex, length);
+#else
+            return 0;
+#endif
+        }
+
+        
+
+        /// <summary>
+        /// J2N TODO: Docs
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="radix"></param>
+        /// <returns></returns>
+        public static long Parse(string s, int radix) // J2N: Renamed from ParseLong()
+        {
+#if FEATURE_READONLYSPAN
+            return s != null ?
+                ParseNumbers.StringToLong(s.AsSpan(), radix, ParseNumbers.IsTight) :
+                0;
+#else
+            return 0;
+#endif
+
+            //if (radix < Character.MinRadix || radix > Character.MaxRadix)
+            //    throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            //if (s is null)
+            //    return 0; // J2N: Match .NET behavior and return 0 when s is null
+
+            ////if (s is null || radix < Character.MinRadix
+            ////        || radix > Character.MaxRadix)
+            ////{
+            ////    throw new FormatException();
+            ////}
+            //int length = s.Length, i = 0;
+
+            //// Get rid of the whitespace and then check that we've still got some digits to parse.
+            //EatWhiteSpace(s, ref i);
+            //if (i == length)
+            //{
+            //    throw new FormatException(SR.Format_EmptyInputString);
+            //}
+
+            //// Check for a sign
+            //int sign = 1;
+            //if (s[i] == '-')
+            //{
+            //    sign = -1;
+            //    i++;
+            //}
+            //else if (s[i] == '+')
+            //{
+            //    i++;
+            //}
+
+            //// Consume the 0x if we're in base-16.
+            //if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            //{
+            //    if (s[i + 1] == 'x' || s[i + 1] == 'X')
+            //    {
+            //        i += 2;
+            //    }
+            //}
+
+            //// Check for no parseable digits
+            //if (i == length)
+            //{
+            //    DotNetNumber.ThrowOverflowOrFormatException(DotNetNumber.ParsingStatus.Failed);
+            //}
+
+            //return Parse(s, offset: i, radix, negative: sign < 0);
+        }
+
+        /// <summary>
+        /// J2N TODO: Docs
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="radix"></param>
+        /// <param name="result"></param>
+        /// <returns></returns>
+        public static bool TryParse(string? s, int radix, out long result)
+        {
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+            {
+                result = default;
+                return false;
+            }
+            if (s is null)
+            {
+                result = 0; // J2N: Match .NET behavior and return 0 when s is null
+                return true;
+            }
+            int length = s.Length, i = 0;
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            EatWhiteSpace(s, ref i);
+            if (i == length)
+                if (length == 0)
+            {
+                result = default;
+                return false;
+            }
+
+            // Check for a sign
+            int sign = 1;
+            if (s[i] == '-')
+            {
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            // Check for no parseable digits
+            if (i == length)
+            {
+                result = default;
+                return false;
+            }
+
+            return TryParse(s, offset: i, radix, negative: sign < 0, out result);
+        }
+
+#if FEATURE_READONLYSPAN
+        //public static bool TryParse(ReadOnlySpan<char> s, int radix, out long result)
+        //{
+        //    if (s.Length == 0 || radix < Character.MinRadix
+        //        || radix > Character.MaxRadix)
+        //    {
+        //        result = default;
+        //        return false;
+        //    }
+        //    unsafe
+        //    {
+        //        fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+        //        {
+        //            char* p = stringPointer;
+        //            if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info)
+        //                || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+        //            {
+        //                number.CheckConsistency();
+        //                return false;
+        //            }
+        //        }
+        //    }
+        //}
+
+        //private static unsafe bool TryParseNumber(ReadOnlySpan<char> s, int radix, out long result)
+        //{
+        //    fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+        //    {
+        //        char* p = stringPointer;
+        //        if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info)
+        //            || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+        //        {
+        //            number.CheckConsistency();
+        //            return false;
+        //        }
+        //    }
+        //}
+
+        private static void EatWhiteSpace(ReadOnlySpan<char> s, ref int i)
+        {
+            int localIndex = i;
+            for (; localIndex < s.Length && char.IsWhiteSpace(s[localIndex]); localIndex++) ;
+            i = localIndex;
+        }
+#endif
+
+        private static void EatWhiteSpace(string s, ref int i)
+        {
+            int localIndex = i;
+            for (; localIndex < s.Length && char.IsWhiteSpace(s[localIndex]); localIndex++) ;
+            i = localIndex;
+        }
+
+        //private static long Parse(string value, int offset, int radix,
+        //        bool negative)
+        //{
+        //    long length = value.Length;
+        //    if (!negative)
+        //    {
+        //        long max = long.MinValue / radix;
+        //        long result = 0;
+        //        while (offset < length)
+        //        {
+        //            int digit = Character.Digit(value[offset++], radix);
+        //            if (digit == -1)
+        //            {
+        //                DotNetNumber.ThrowOverflowOrFormatException(DotNetNumber.ParsingStatus.Failed); // Extra junk at the end of the string
+        //            }
+
+        //            if (max > result)
+        //            {
+        //                //throw new FormatException(value);
+        //                DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+        //            }
+        //            long next = result * radix - digit;
+        //            if (next > result)
+        //            {
+        //                //throw new FormatException(value);
+        //                DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+        //            }
+        //            result = next;
+        //        }
+
+        //        result = -result;
+        //        if (result < 0)
+        //        {
+        //            //throw new FormatException(value);
+        //            DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+        //        }
+        //        return result;
+        //    }
+        //    else
+        //    {
+        //        ulong result = 0;
+        //        ulong maxVal = 0xffffffffffffffff / (uint)radix;
+        //        while (offset < length)
+        //        {
+        //            int digit = Character.Digit(value[offset++], radix);
+        //            if (digit == -1)
+        //            {
+        //                DotNetNumber.ThrowOverflowOrFormatException(DotNetNumber.ParsingStatus.Failed); // Extra junk at the end of the string
+        //            }
+        //            // Check for overflows - this is sufficient & correct.
+        //            if (result > maxVal || ((long)result) < 0)
+        //            {
+        //                DotNetNumber.ThrowOverflowException(TypeCode.Int64);
+        //            }
+
+        //            result = result * (ulong)radix + (ulong)digit;
+        //        }
+
+        //        if ((long)result < 0 && result != 0x8000000000000000)
+        //        {
+        //            DotNetNumber.ThrowOverflowException(TypeCode.Int64);
+        //        }
+        //        return (long)result * -1;
+        //    }
+        //}
+
+        private static long Parse(string value, int offset, int radix,
+        bool negative)
+        {
+            long length = value.Length;
+            if (negative)
+            {
+                long max = long.MinValue / radix;
+                long result = 0;
+                while (offset < length)
+                {
+                    int digit = Character.Digit(value[offset++], radix);
+                    if (digit == -1)
+                    {
+                        DotNetNumber.ThrowOverflowOrFormatException(DotNetNumber.ParsingStatus.Failed); // Extra junk at the end of the string
+                    }
+
+                    if (max > result)
+                    {
+                        //throw new FormatException(value);
+                        DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+                    }
+                    long next = result * radix - digit;
+                    if (next > result)
+                    {
+                        //throw new FormatException(value);
+                        DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+                    }
+                    result = next;
+                }
+                return result;
+            }
+            else
+            {
+                ulong result = 0;
+                ulong maxVal = 0xffffffffffffffff / (uint)radix;
+                while (offset < length)
+                {
+                    int digit = Character.Digit(value[offset++], radix);
+                    if (digit == -1)
+                    {
+                        DotNetNumber.ThrowOverflowOrFormatException(DotNetNumber.ParsingStatus.Failed); // Extra junk at the end of the string
+                    }
+                    // Check for overflows - this is sufficient & correct.
+                    if (result > maxVal || ((long)result) < 0)
+                    {
+                        DotNetNumber.ThrowOverflowException(TypeCode.Int64);
+                    }
+
+                    result = result * (ulong)radix + (ulong)digit;
+                }
+
+                if ((long)result < 0 && result != 0x8000000000000000)
+                {
+                    DotNetNumber.ThrowOverflowException(TypeCode.Int64);
+                }
+                return (long)result;
+            }
+        }
+
+        //private static long Parse(string value, int offset, int radix,
+        //        bool negative)
+        //{
+        //    long max = long.MinValue / radix;
+        //    long result = 0, length = value.Length;
+        //    while (offset < length)
+        //    {
+        //        int digit = Character.Digit(value[offset++], radix);
+        //        if (digit == -1)
+        //        {
+        //            //throw new FormatException(value);
+        //            DotNetNumber.ThrowOverflowOrFormatException(DotNetNumber.ParsingStatus.Failed); // Extra junk at the end of the string
+        //        }
+        //        if (max > result)
+        //        {
+        //            //throw new FormatException(value);
+        //            DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+        //        }
+        //        long next = result * radix - digit;
+        //        if (next > result)
+        //        {
+        //            //throw new FormatException(value);
+        //            DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+        //        }
+        //        result = next;
+        //    }
+        //    // J2N: Test what JDK does when passed both a negative sign and setting bit 63 to 1 and duplicate behavior
+        //    if (!negative)
+        //    {
+        //        result = -result;
+        //        if (result < 0)
+        //        {
+        //            //throw new FormatException(value);
+        //            DotNetNumber.ThrowOverflowException(TypeCode.Int64); // J2N: Match .NET behavior here
+        //        }
+        //    }
+        //    return result;
+        //}
+
+        private static bool TryParse(string value, int offset, int radix,
+                bool negative, out long result)
+        {
+            result = default;
             long max = long.MinValue / radix;
-            long result = 0, length = value.Length;
+            long length = value.Length;
             while (offset < length)
             {
                 int digit = Character.Digit(value[offset++], radix);
                 if (digit == -1)
                 {
-                    throw new FormatException(value);
+                    return false; // Extra junk at the end of the string
                 }
                 if (max > result)
                 {
-                    throw new FormatException(value);
+                    return false;
                 }
                 long next = result * radix - digit;
                 if (next > result)
                 {
-                    throw new FormatException(value);
+                    return false;
                 }
                 result = next;
             }
@@ -457,10 +905,10 @@ namespace J2N.Numerics
                 result = -result;
                 if (result < 0)
                 {
-                    throw new FormatException(value);
+                    return false;
                 }
             }
-            return result;
+            return true;
         }
 
         /// <summary>
@@ -530,7 +978,7 @@ namespace J2N.Numerics
         /// <seealso cref="Number.ToString()"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static bool TryParse([NotNullWhen(true)] string? s, out long result)
         {
             return long.TryParse(s, out result);
@@ -604,7 +1052,7 @@ namespace J2N.Numerics
         /// <seealso cref="Number.ToString()"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static bool TryParse(ReadOnlySpan<char> s, out long result)
         {
             return long.TryParse(s, out result);
@@ -1009,7 +1457,7 @@ namespace J2N.Numerics
         /// <seealso cref="NumberStyle"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out long result)
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")

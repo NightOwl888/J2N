@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
+    using SR = J2N.Resources.Strings;
+
     /// <inheritdoc/>
     public sealed class Int32 : Number, IComparable<Int32>
     {
@@ -126,8 +128,8 @@ namespace J2N.Numerics
                 throw new FormatException();
             }
             char firstDigit = value[i];
-            bool negative = firstDigit == '-';
-            if (negative)
+            int sign = firstDigit == '-' ? -1 : 1;
+            if (sign < 0)
             {
                 if (length == 1)
                 {
@@ -165,9 +167,12 @@ namespace J2N.Numerics
                 @base = 16;
             }
 
-            //int result = Convert.ToInt32(value, @base);
+#if FEATURE_READONLYSPAN
+            int result = ParseNumbers.StringToInt(value.AsSpan(), @base, flags: ParseNumbers.IsTight, sign, ref i, value.Length - i);
+#else
+            int result = Parse(value, i, @base, negative: sign < 0);
+#endif
 
-            int result = Parse(value, i, @base, negative);
             return ValueOf(result);
         }
 
@@ -381,41 +386,154 @@ namespace J2N.Numerics
             return int.Parse(s, (NumberStyles)style, provider);
         }
 
-        /**
-         * Parses the specified string as a signed integer value using the specified
-         * radix. The ASCII character \u002d ('-') is recognized as the minus sign.
-         * 
-         * @param string
-         *            the string representation of an integer value.
-         * @param radix
-         *            the radix to use when parsing.
-         * @return the primitive integer value represented by {@code string} using
-         *         {@code radix}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null} or has a length of zero,
-         *             {@code radix < Character.MIN_RADIX},
-         *             {@code radix > Character.MAX_RADIX}, or if {@code string}
-         *             can not be parsed as an integer value.
-         */
-        public static int Parse(string s, int radix) // J2N: Renamed from ParseInt()
+        /// <summary>
+        /// Parses the <see cref="string"/> argument as a signed long in the specified <paramref name="radix"/>, beginning at the
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// <para/>
+        /// Usage Note: This is similar to the <see cref="Convert.ToInt32(string?, int)"/> method, however it allows conversion
+        /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
+        /// or \u002B ('+') in any <paramref name="radix"/> and allows any <paramref name="radix"/> value from
+        /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
+        /// </summary>
+        /// <param name="s">The <see cref="string"/> containing the <see cref="int"/> representation to be parsed.</param>
+        /// <param name="startIndex">The zero-based starting character position of a region in <paramref name="s"/>.</param>
+        /// <param name="length">The number of characters in the region to parse.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <returns>The signed <see cref="int"/> represented by the subsequence in the specified <paramref name="radix"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> and <paramref name="length"/> refer to a location outside of <paramref name="s"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// The range of characters in <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/>
+        /// contains a character that is not a valid digit in the base specified by <paramref name="radix"/>.
+        /// The exception message indicates that there are no digits to convert if the first character specified by
+        /// <paramref name="startIndex"/> is invalid; otherwise, the message indicates that the range of characters in
+        /// <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/> contains invalid trailing characters.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The range of characters in <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/>
+        /// contain only a the ASCII character \u002d ('-') or \u002B ('+') sign and/or hexadecimal prefix 0X or 0x with no digits.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="length"/> is zero.
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// The range of characters in <paramref name="s"/> specified by <paramref name="startIndex"/> and <paramref name="length"/>
+        /// represents a number that is less than <see cref="int.MinValue"/> or greater than <see cref="int.MaxValue"/>.
+        /// </exception>
+        /// <seealso cref="Parse(string, int)"/>
+        public static int Parse(string s, int startIndex, int length, int radix)
         {
-            if (s == null || radix < Character.MinRadix
-                    || radix > Character.MaxRadix)
-            {
-                throw new FormatException();
-            }
-            int length = s.Length, i = 0;
-            if (length == 0)
-            {
-                throw new FormatException(s);
-            }
-            bool negative = s[i] == '-';
-            if (negative && ++i == length)
-            {
-                throw new FormatException(s);
-            }
+            if (s is null)
+                throw new ArgumentNullException(nameof(s));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            return Parse(s, i, radix, negative);
+#if FEATURE_READONLYSPAN
+            //return s != null ? ParseNumbers.StringToInt(s.Substring(startIndex, length).AsSpan(), radix, ParseNumbers.IsTight) : 0;
+            return ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.NoSpace, sign: 1, ref startIndex, length);
+#else
+            return 0;
+#endif
+        }
+
+        internal static int ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
+        {
+            if (s is null)
+                throw new ArgumentNullException(nameof(s));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+#if FEATURE_READONLYSPAN
+            return ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.NoSpace | ParseNumbers.TreatAsUnsigned, sign: 1, ref startIndex, length);
+#else
+            return 0;
+#endif
+        }
+
+        internal static int ParseUnsigned(string s, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
+        {
+#if FEATURE_READONLYSPAN
+            return s != null ?
+                ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned) :
+                0;
+#else
+            return 0;
+#endif
+        }
+
+        /////**
+        //// * Parses the specified string as a signed integer value using the specified
+        //// * radix. The ASCII character \u002d ('-') is recognized as the minus sign.
+        //// * 
+        //// * @param string
+        //// *            the string representation of an integer value.
+        //// * @param radix
+        //// *            the radix to use when parsing.
+        //// * @return the primitive integer value represented by {@code string} using
+        //// *         {@code radix}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null} or has a length of zero,
+        //// *             {@code radix < Character.MIN_RADIX},
+        //// *             {@code radix > Character.MAX_RADIX}, or if {@code string}
+        //// *             can not be parsed as an integer value.
+        //// */
+        ////public static int Parse(string s, int radix) // J2N: Renamed from ParseInt()
+        ////{
+        ////    if (s == null || radix < Character.MinRadix
+        ////            || radix > Character.MaxRadix)
+        ////    {
+        ////        throw new FormatException();
+        ////    }
+        ////    int length = s.Length, i = 0;
+        ////    if (length == 0)
+        ////    {
+        ////        throw new FormatException(s);
+        ////    }
+        ////    bool negative = s[i] == '-';
+        ////    if (negative && ++i == length)
+        ////    {
+        ////        throw new FormatException(s);
+        ////    }
+
+        ////    return Parse(s, i, radix, negative);
+        ////}
+
+        /// <summary>
+        /// J2N TODO: Docs
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="radix"></param>
+        /// <returns></returns>
+        public static int Parse(string s, int radix) // J2N: Renamed from ParseLong()
+        {
+#if FEATURE_READONLYSPAN
+            return s != null ?
+                ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight) :
+                0;
+#else
+            return 0; // J2N TODO: finish
+#endif
         }
 
         private static int Parse(string value, int offset, int radix,

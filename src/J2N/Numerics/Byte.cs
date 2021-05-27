@@ -10,6 +10,8 @@ using System.Threading.Tasks;
 
 namespace J2N.Numerics
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// The wrapper for the primitive type <see cref="byte"/>.
     /// </summary>
@@ -234,9 +236,9 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a byte value.
          */
-        public static byte Parse(string value, IFormatProvider? provider) // J2N: Renamed from ParseByte()
+        public static byte Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseByte()
         {
-            return Parse(value, NumberStyle.Integer, provider);
+            return Parse(s, NumberStyle.Integer, provider);
         }
 
         /**
@@ -250,17 +252,40 @@ namespace J2N.Numerics
          *             if {@code string} is {@code null}, has a length of zero or
          *             can not be parsed as a byte value.
          */
-        public static byte Parse(string value, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseByte()
+        public static byte Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseByte()
         {
-            //int intValue = Convert.ToInt32(value, 10); //Int32.ParseInt32(value);
-            int intValue = Int32.Parse(value, style, provider);
-            byte result = (byte)intValue;
-            if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
-            {
-                return result;
-            }
-            throw new FormatException();
+            int r = Int32.Parse(s, style, provider);
+            if (r < sbyte.MinValue || r > byte.MaxValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
+                throw new OverflowException(SR.Overflow_Byte);
+            return (byte)r;
         }
+
+        /////**
+        //// * Parses the specified string as a signed byte value using the specified
+        //// * radix. The ASCII character \u002d ('-') is recognized as the minus sign.
+        //// * 
+        //// * @param string
+        //// *            the string representation of a single byte value.
+        //// * @param radix
+        //// *            the radix to use when parsing.
+        //// * @return the primitive byte value represented by {@code string} using
+        //// *         {@code radix}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null} or has a length of zero,
+        //// *             {@code radix < Character.MIN_RADIX},
+        //// *             {@code radix > Character.MAX_RADIX}, or if {@code string}
+        //// *             can not be parsed as a byte value.
+        //// */
+        ////public static byte Parse(string s, int radix) // J2N: Renamed from ParseByte()
+        ////{
+        ////    int intValue = Int32.Parse(value, radix);
+        ////    byte result = (byte)intValue;
+        ////    if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
+        ////    {
+        ////        return result;
+        ////    }
+        ////    throw new FormatException();
+        ////}
 
         /**
          * Parses the specified string as a signed byte value using the specified
@@ -278,15 +303,22 @@ namespace J2N.Numerics
          *             {@code radix > Character.MAX_RADIX}, or if {@code string}
          *             can not be parsed as a byte value.
          */
-        public static byte Parse(string value, int radix) // J2N: Renamed from ParseByte()
+        public static byte Parse(string s, int radix) // J2N: Renamed from ParseByte()
         {
-            int intValue = Int32.Parse(value, radix);
-            byte result = (byte)intValue;
-            if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
+            if (s == null)
             {
-                return result;
+                return 0;
             }
-            throw new FormatException();
+
+#if FEATURE_READONLYSPAN
+            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight);
+
+            if (r < sbyte.MinValue || r > byte.MaxValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
+                throw new OverflowException(SR.Overflow_Byte);
+            return (byte)r;
+#else
+            return 0; // J2N TODO: finish
+#endif
         }
 
         /// <summary>

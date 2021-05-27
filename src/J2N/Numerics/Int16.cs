@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
+    using SR = J2N.Resources.Strings;
+
     /// <inheritdoc/>
     public sealed class Int16 : Number, IComparable<Int16>
     {
@@ -138,7 +140,7 @@ namespace J2N.Numerics
          * @throws NumberFormatException
          *             if {@code string} can not be parsed as a short value.
          */
-        public static Int16 Decode(string value)
+        public static Int16 Decode(string value) // J2N TODO: Replace implementation (throw OverflowException when out of range)
         {
             int intValue = Int32.Decode(value).GetInt32Value();
             short result = (short)intValue;
@@ -246,31 +248,57 @@ namespace J2N.Numerics
         }
 
 
-        /**
-         * Parses the specified string as a signed short value using the specified
-         * radix. The ASCII character \u002d ('-') is recognized as the minus sign.
-         *
-         * @param string
-         *            the string representation of a short value.
-         * @param radix
-         *            the radix to use when parsing.
-         * @return the primitive short value represented by {@code string} using
-         *         {@code radix}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null} or has a length of zero,
-         *             {@code radix < Character.MIN_RADIX},
-         *             {@code radix > Character.MAX_RADIX}, or if {@code string}
-         *             can not be parsed as a short value.
-         */
+        /////**
+        //// * Parses the specified string as a signed short value using the specified
+        //// * radix. The ASCII character \u002d ('-') is recognized as the minus sign.
+        //// *
+        //// * @param string
+        //// *            the string representation of a short value.
+        //// * @param radix
+        //// *            the radix to use when parsing.
+        //// * @return the primitive short value represented by {@code string} using
+        //// *         {@code radix}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null} or has a length of zero,
+        //// *             {@code radix < Character.MIN_RADIX},
+        //// *             {@code radix > Character.MAX_RADIX}, or if {@code string}
+        //// *             can not be parsed as a short value.
+        //// */
+        ////public static short Parse(string s, int radix) // J2N: Renamed from ParseShort()
+        ////{
+        ////    int intValue = Int32.Parse(s, radix);
+        ////    short result = (short)intValue;
+        ////    if (result == intValue)
+        ////    {
+        ////        return result;
+        ////    }
+        ////    throw new FormatException();
+        ////}
+        
+        /// <summary>
+        /// J2N TODO: Docs
+        /// </summary>
+        /// <param name="s"></param>
+        /// <param name="radix"></param>
+        /// <returns></returns>
         public static short Parse(string s, int radix) // J2N: Renamed from ParseShort()
         {
-            int intValue = Int32.Parse(s, radix);
-            short result = (short)intValue;
-            if (result == intValue)
+            if (s == null)
             {
-                return result;
+                return 0;
             }
-            throw new FormatException();
+
+#if FEATURE_READONLYSPAN
+            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
+            if (radix != 10 && r <= ushort.MaxValue)
+                return (short)r;
+
+            if (r < short.MinValue || r > short.MaxValue)
+                throw new OverflowException(SR.Overflow_Int16);
+            return (short)r;
+#else
+            return 0; // J2N TODO: finish
+#endif
         }
 
         /// <summary>
@@ -336,11 +364,11 @@ namespace J2N.Numerics
         /// <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out short)"/> overload.
         /// </remarks>
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
-        /// <seealso cref="Parse(string, short)"/>
+        /// <seealso cref="Parse(string, out short)"/>
         /// <seealso cref="Number.ToString()"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static bool TryParse([NotNullWhen(true)] string? s, out short result)
         {
             return short.TryParse(s, out result);
@@ -414,7 +442,7 @@ namespace J2N.Numerics
         /// <seealso cref="Number.ToString()"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static bool TryParse(ReadOnlySpan<char> s, out short result)
         {
             return short.TryParse(s, out result);
@@ -818,7 +846,7 @@ namespace J2N.Numerics
         /// <seealso cref="NumberStyle"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out short result)
         {
             return short.TryParse(s, (NumberStyles)style, provider, out result);
