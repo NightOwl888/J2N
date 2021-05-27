@@ -144,7 +144,7 @@ namespace J2N.Numerics
             int length = value.Length, i = 0;
             if (length == 0)
             {
-                throw new FormatException();
+                throw new FormatException(); // J2N TODO: Error message
             }
             char firstDigit = value[i];
             int sign = firstDigit == '-' ? -1 : 1;
@@ -152,7 +152,7 @@ namespace J2N.Numerics
             {
                 if (length == 1)
                 {
-                    throw new FormatException(value);
+                    throw new FormatException(value); // J2N TODO: Error message
                 }
                 firstDigit = value[++i];
             }
@@ -168,7 +168,7 @@ namespace J2N.Numerics
                 {
                     if (i == length)
                     {
-                        throw new FormatException(value);
+                        throw new FormatException(value); // J2N TODO: Error message
                     }
                     i++;
                     @base = 16;
@@ -182,7 +182,7 @@ namespace J2N.Numerics
             {
                 if (i == length)
                 {
-                    throw new FormatException(value);
+                    throw new FormatException(value); // J2N TODO: Error message
                 }
                 i++;
                 @base = 16;

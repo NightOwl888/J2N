@@ -98,7 +98,7 @@ namespace J2N.Numerics
             {
                 Int32.Decode("2147483648");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -110,31 +110,33 @@ namespace J2N.Numerics
             {
                 Int32.Decode("-2147483649");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
             }
             assertTrue("Failed to throw exception for MIN_VALUE - 1", exception);
 
-            exception = false;
-            try
-            {
-                Int32.Decode("0x80000000");
-            }
-            catch (FormatException e)
-            {
-                // Correct
-                exception = true;
-            }
-            assertTrue("Failed to throw exception for hex MAX_VALUE + 1", exception);
+            // J2N: MinValue is a special case and must allow both a positive and negative version to be compatible
+            // with both .NET and Java
+            //exception = false;
+            //try
+            //{
+            //    Int32.Decode("0x80000000");
+            //}
+            //catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+            //{
+            //    // Correct
+            //    exception = true;
+            //}
+            //assertTrue("Failed to throw exception for hex MAX_VALUE + 1", exception);
 
             exception = false;
             try
             {
                 Int32.Decode("-0x80000001");
             }
-            catch (FormatException e)
+            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
                 // Correct
                 exception = true;
@@ -144,9 +146,9 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int32.Decode("9999999999");
+                Int32.Decode("9999999999"); // J2N: .NET throws OverflowException rather than FormatException in this case
             }
-            catch (FormatException e)
+            catch (OverflowException e)
             {
                 // Correct
                 exception = true;
@@ -767,18 +769,27 @@ namespace J2N.Numerics
             }
             assertTrue("Failed to throw exception with MIN_VALUE - 1", exception);
 
-            exception = false;
-            try
-            {
-                Int32.ValueOf("80000000", 16);
-            }
-            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
-            {
-                // Correct
-                exception = true;
-            }
-            assertTrue("Failed to throw exception with hex MAX_VALUE + 1",
-                    exception);
+            // J2N: MinValue is a special case and must allow both a positive and negative version to be compatible
+            // with both .NET and Java
+            //exception = false;
+            //try
+            //{
+            //    Int32.ValueOf("80000000", 16);
+            //}
+            //catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+            //{
+            //    // Correct
+            //    exception = true;
+            //}
+            //assertTrue("Failed to throw exception with hex MAX_VALUE + 1",
+            //        exception);
+
+            assertEquals(1, Int32.ValueOf("1", 16).GetInt32Value());
+            assertEquals(-1, Int32.ValueOf("ffffffff", 16).GetInt32Value());
+            assertEquals(2147483647, Int32.ValueOf("7fffffff", 16).GetInt32Value());
+            assertEquals(-2147483648, Int32.ValueOf("-80000000", 16).GetInt32Value()); // Special case: In Java, we allow the negative sign for the smallest negative number
+            assertEquals(-2147483648, Int32.ValueOf("80000000", 16).GetInt32Value());  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
+            assertEquals(-2147483647, Int32.ValueOf("80000001", 16).GetInt32Value());
 
             exception = false;
             try
