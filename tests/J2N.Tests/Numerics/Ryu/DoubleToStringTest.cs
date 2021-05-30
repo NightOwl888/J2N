@@ -1,12 +1,4 @@
-﻿using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-
-// Copyright 2018 Ulf Adams
+﻿// Copyright 2018 Ulf Adams
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -20,11 +12,14 @@ using System.Threading.Tasks;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using NUnit.Framework;
+using System;
+
 namespace J2N.Numerics
 {
     public abstract class DoubleToStringTest : TestCase
     {
-        public abstract string f(double value, RoundingMode roundingMode);
+        internal abstract string f(double value, RoundingMode roundingMode);
 
         private void assertD2sEquals(String expected, double value)
         {

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Globalization;
-using System.Numerics;
-
-
-// Copyright 2018 Ulf Adams
+﻿// Copyright 2018 Ulf Adams
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +12,9 @@ using System.Numerics;
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+using System;
+using System.Globalization;
+using System.Numerics;
 
 namespace J2N.Numerics
 {
@@ -24,7 +22,7 @@ namespace J2N.Numerics
     /**
      * An implementation of Ryu for float.
      */
-    public sealed class RyuFloat
+    internal sealed partial class RyuSingle
     {
         private static bool DEBUG = false;
 

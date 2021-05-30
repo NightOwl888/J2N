@@ -14,16 +14,12 @@
 
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace J2N.Numerics
 {
     public abstract class FloatToStringTest : TestCase
     {
-        public abstract string f(float value, RoundingMode roundingMode);
+        internal abstract string f(float value, RoundingMode roundingMode);
 
         private void assertF2sEquals(String expected, float value)
         {
