@@ -1,15 +1,34 @@
-﻿using J2N.Collections;
+﻿/*
+ * Copyright (c) 1996, 2013, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.  Oracle designates this
+ * particular file as subject to the "Classpath" exception as provided
+ * by Oracle in the LICENSE file that accompanied this code.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+
 using J2N.Text;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace J2N.Numerics
 {
@@ -23,11 +42,11 @@ namespace J2N.Numerics
     {
 
         /**
- * This class contains additional constants documenting limits of the
- * <code>double</code> type.
- *
- * @author Joseph D. Darcy
- */
+         * This class contains additional constants documenting limits of the
+         * <code>double</code> type.
+         *
+         * @author Joseph D. Darcy
+         */
 
         internal static class DoubleConsts
         {
@@ -378,7 +397,7 @@ namespace J2N.Numerics
             {
                 if (buf is StringBuilderCharSequence stringBuilderCharSequence && stringBuilderCharSequence.HasValue)
                 {
-                    stringBuilderCharSequence.Value!.Append(image);
+                    stringBuilderCharSequence.Value.Append(image);
                 }
                 else if (buf is StringBuffer stringBuffer)
                 {
@@ -477,7 +496,7 @@ namespace J2N.Numerics
                 int len = GetChars(buffer);
                 if (buf is StringBuilderCharSequence stringBuilderCharSequence && stringBuilderCharSequence.HasValue)
                 {
-                    stringBuilderCharSequence.Value!.Append(buffer, 0, len);
+                    stringBuilderCharSequence.Value.Append(buffer, 0, len);
                 }
                 else if (buf is StringBuffer stringBuffer)
                 {
@@ -1247,7 +1266,7 @@ namespace J2N.Numerics
 
         private static BinaryToASCIIBuffer GetBinaryToASCIIBuffer()
         {
-            return threadLocalBinaryToASCIIBuffer.Value!;
+            return threadLocalBinaryToASCIIBuffer.Value;
         }
 
         /**
@@ -1551,7 +1570,7 @@ namespace J2N.Numerics
                 int D5 = Math.Max(0, exp); // powers of 5 in bigD, value is not modified inside correctionLoop
                 bigD0 = bigD0.MultByPow52(D5, 0);
                 bigD0.MakeImmutable();   // prevent bigD0 modification inside correctionLoop
-                FDBigInteger? bigD = null;
+                FDBigInteger bigD = null;
                 int prevD2 = 0;
 
             //correctionLoop:
@@ -1912,7 +1931,7 @@ namespace J2N.Numerics
                 int D5 = Math.Max(0, exp); // powers of 5 in bigD, value is not modified inside correctionLoop
                 bigD0 = bigD0.MultByPow52(D5, 0);
                 bigD0.MakeImmutable();   // prevent bigD0 modification inside correctionLoop
-                FDBigInteger? bigD = null;
+                FDBigInteger bigD = null;
                 int prevD2 = 0;
 
             //correctionLoop:
@@ -2605,7 +2624,7 @@ namespace J2N.Numerics
                 // signed zero.
                 //
 
-                string? significandString = null;
+                string significandString = null;
                 int signifLength = 0;
                 int exponentAdjust = 0;
                 {
@@ -3074,9 +3093,9 @@ namespace J2N.Numerics
         /// <returns></returns>
         // J2N: Useful to check whether the string is negative after parsing in .NET because it doesn't automatically
         // handle negative zero.
-        internal static bool IsNegative(string s, IFormatProvider? provider)
+        internal static bool IsNegative(string s, IFormatProvider provider)
         {
-            NumberFormatInfo numberFormat = provider is null ? CultureInfo.CurrentCulture.NumberFormat : (NumberFormatInfo)provider.GetFormat(typeof(NumberFormatInfo))!;
+            NumberFormatInfo numberFormat = provider is null ? CultureInfo.CurrentCulture.NumberFormat : (NumberFormatInfo)provider.GetFormat(typeof(NumberFormatInfo));
             string negativeSign = numberFormat.NegativeSign;
             switch (numberFormat.NumberNegativePattern)
             {
