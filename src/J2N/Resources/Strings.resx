@@ -229,7 +229,7 @@
     <value>Additional non-parsable characters are at the end of the string.</value>
   </data>
   <data name="Format_InvalidString" xml:space="preserve">
-    <value>Input string was not in a correct format.</value>
+    <value>Input string was not in a correct format. Value: '{0}'.</value>
   </data>
   <data name="Format_InvalidUTFSpec2ndByte" xml:space="preserve">
     <value>Second byte at {0} does not match UTF8 Specification.</value>
