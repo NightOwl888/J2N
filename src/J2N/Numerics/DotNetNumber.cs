@@ -1700,7 +1700,7 @@ namespace J2N.Numerics
         {
             if (!TryParseDouble(value, styles, info, out double result))
             {
-                ThrowOverflowOrFormatException(ParsingStatus.Failed);
+                ThrowFormatException(value);
             }
 
             return result;
@@ -1722,7 +1722,7 @@ namespace J2N.Numerics
         {
             if (!TryParseSingle(value, styles, info, out float result))
             {
-                ThrowOverflowOrFormatException(ParsingStatus.Failed);
+                ThrowFormatException(value);
             }
 
             return result;
@@ -2125,6 +2125,28 @@ namespace J2N.Numerics
             return true;
         }
 
+//#if FEATURE_READONLYSPAN
+//        internal static unsafe bool TryStringToNumber(ReadOnlySpan<char> value, int radix, ref NumberBuffer number)
+//        {
+//            Debug.Assert(info != null);
+//            fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+//            {
+//                char* p = stringPointer;
+//                if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info)
+//                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+//                {
+//                    number.CheckConsistency();
+//                    return false;
+//                }
+//            }
+
+//            number.CheckConsistency();
+//            return true;
+//        }
+
+//        internal static
+//#endif
+
 #if FEATURE_READONLYSPAN
         private static bool TrailingZeros(ReadOnlySpan<char> value, int index)
         {
@@ -2192,23 +2214,26 @@ namespace J2N.Numerics
 
         private static bool IsFloatTypeSuffix(int ch) => ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D';
 
-        internal enum ParsingStatus
-        {
-            OK,
-            Failed,
-            Overflow
-        }
+        //internal enum ParsingStatus
+        //{
+        //    OK,
+        //    Failed,
+        //    Overflow
+        //}
+
+        //[DoesNotReturn]
+        //internal static void ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type = 0) => throw GetException(status, type);
 
         [DoesNotReturn]
-        internal static void ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type = 0) => throw GetException(status, type);
+        internal static void ThrowFormatException(string value) => throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, value));
 
         [DoesNotReturn]
-        internal static void ThrowOverflowException(TypeCode type) => throw GetException(ParsingStatus.Overflow, type);
+        internal static void ThrowOverflowException(TypeCode type) => throw GetException(type);
 
-        private static Exception GetException(ParsingStatus status, TypeCode type)
+        private static Exception GetException(TypeCode type)
         {
-            if (status == ParsingStatus.Failed)
-                return new FormatException(SR.Format_InvalidString);
+            //if (status == ParsingStatus.Failed)
+            //    return new FormatException(SR.Format_InvalidString, value);
 
             string s;
             switch (type)

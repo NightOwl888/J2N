@@ -1,5 +1,4 @@
-﻿#if FEATURE_READONLYSPAN
-// Licensed to the .NET Foundation under one or more agreements.
+﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System;
@@ -9,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using J2N.Text;
 
 namespace J2N.Numerics
 {
@@ -32,27 +32,21 @@ namespace J2N.Numerics
         internal const int NoSpace = 0x2000;
         internal const int PrintRadixBase = 0x4000;
 
-        //private const int MinRadix = 2;
-        //private const int MaxRadix = 36;
+        #region StringToLong
 
-        public static unsafe long StringToLong(ReadOnlySpan<char> s, int radix, int flags)
+#if FEATURE_READONLYSPAN
+
+        public static unsafe long StringToLong(ReadOnlySpan<char> s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
             int pos = 0;
             return StringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos);
         }
 
-        public static long StringToLong(ReadOnlySpan<char> s, int radix, int flags, int sign, ref int currPos, int length)
+        public static long StringToLong(ReadOnlySpan<char> s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
             int i = currPos;
 
-            //// Do some radix checking.
-            //// A radix of -1 says to use whatever base is spec'd on the number.
-            //// Parse in Base10 until we figure out what the base actually is.
-            //int r = (-1 == radix) ? 10 : radix;
-
-            //if (r != 2 && r != 10 && r != 8 && r != 16)
-            //    throw new ArgumentException(SR.Arg_InvalidBase, nameof(radix));
-
+            // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
             if (length < 0)
@@ -63,8 +57,8 @@ namespace J2N.Numerics
             if (length == 0)
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
-            if (i < 0 /*|| i >= s.Length*/)
-                throw new ArgumentOutOfRangeException(SR.ArgumentOutOfRange_Index);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -79,10 +73,6 @@ namespace J2N.Numerics
             // Check for a sign
             if (s[i] == '-')
             {
-                // J2N: We allow either passing in negative sign or passing in a negative value, but not both
-                //if (r != 10)
-                //    throw new ArgumentException(SR.Arg_CannotHaveNegativeValue);
-
                 if ((flags & TreatAsUnsigned) != 0)
                     throw new OverflowException(SR.Overflow_NegativeUnsigned);
 
@@ -98,16 +88,14 @@ namespace J2N.Numerics
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
                 {
-                    //r = 16;
                     i += 2;
                 }
             }
 
             int grabNumbersStart = i;
-            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
-            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned, out long result))
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out long result))
             {
-                DotNetNumber.ThrowOverflowException(isUnsigned ? TypeCode.UInt64 : TypeCode.Int64);
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
             }
 
             // Check if they passed us a string with no parsable digits.
@@ -124,46 +112,29 @@ namespace J2N.Numerics
             // Put the current index back into the correct place.
             currPos = i;
 
+            if (IsLongOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
+
             // Return the value properly signed.
-            if ((ulong)result == 0x8000000000000000 && sign == 1 && radix == 10 && ((flags & TreatAsUnsigned) == 0))
-                DotNetNumber.ThrowOverflowException(TypeCode.Int64);
-
-            // Don't allow both a sign in the string and a negative value in the string
-            // except when result is the smallest negative long, which is a special case.
-            if ((ulong)result != 0x8000000000000000 && result < 0 && sign == -1 && ((flags & TreatAsUnsigned) == 0))
-                DotNetNumber.ThrowOverflowException(TypeCode.Int64);
-
-
-
-            //if (radix == 10)
-            {
-                result *= sign;
-            }
-
+            result *= sign;
             return result;
         }
 
-        public static int StringToInt(ReadOnlySpan<char> s, int radix, int flags)
+#endif
+
+        public static unsafe long StringToLong(string s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
             int pos = 0;
-            return StringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos);
+            return StringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos);
         }
 
-        public static int StringToInt(ReadOnlySpan<char> s, int radix, int flags, int sign, ref int currPos, int length)
+        public static long StringToLong(string s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
-            // They're requied to tell me where to start parsing.
             int i = currPos;
 
-            //// Do some radix checking.
-            //// A radix of -1 says to use whatever base is spec'd on the number.
-            //// Parse in Base10 until we figure out what the base actually is.
-            //int r = (-1 == radix) ? 10 : radix;
-
-            //if (r != 2 && r != 10 && r != 8 && r != 16)
-            //    throw new ArgumentException(SR.Arg_InvalidBase, nameof(radix));
-
+            // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
@@ -172,8 +143,8 @@ namespace J2N.Numerics
             if (length == 0)
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
-            if (i < 0 /*|| i >= length*/)
-                throw new ArgumentOutOfRangeException(SR.ArgumentOutOfRange_Index);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -188,10 +159,657 @@ namespace J2N.Numerics
             // Check for a sign
             if (s[i] == '-')
             {
-                // J2N: We allow either passing in negative sign or passing in a negative value, but not both
-                //if (r != 10)
-                //    throw new ArgumentException(SR.Arg_CannotHaveNegativeValue);
+                if ((flags & TreatAsUnsigned) != 0)
+                    throw new OverflowException(SR.Overflow_NegativeUnsigned);
 
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out long result))
+            {
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+                throw new FormatException(SR.Format_NoParsibleDigits);
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                    throw new FormatException(SR.Format_ExtraJunkAtEnd);
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsLongOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
+
+            // Return the value properly signed.
+            result *= sign;
+            return result;
+        }
+
+        public static unsafe long StringToLong(char[] s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return StringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos);
+        }
+
+        public static long StringToLong(char[] s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (i > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+            if (length == 0)
+                throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
+
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    throw new FormatException(SR.Format_EmptyInputString);
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    throw new OverflowException(SR.Overflow_NegativeUnsigned);
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out long result))
+            {
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+                throw new FormatException(SR.Format_NoParsibleDigits);
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                    throw new FormatException(SR.Format_ExtraJunkAtEnd);
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsLongOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
+
+            // Return the value properly signed.
+            result *= sign;
+            return result;
+        }
+
+        public static unsafe long StringToLong(ICharSequence s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return StringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos);
+        }
+
+        public static long StringToLong(ICharSequence s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (i > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+            if (length == 0)
+                throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
+
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    throw new FormatException(SR.Format_EmptyInputString);
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    throw new OverflowException(SR.Overflow_NegativeUnsigned);
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out long result))
+            {
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+                throw new FormatException(SR.Format_NoParsibleDigits);
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                    throw new FormatException(SR.Format_ExtraJunkAtEnd);
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsLongOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetLongOverflowTypeCode(flags));
+
+            // Return the value properly signed.
+            result *= sign;
+            return result;
+        }
+
+        #endregion StringToLong
+
+        #region TryStringToLong
+
+#if FEATURE_READONLYSPAN
+
+        public static unsafe bool TryStringToLong(ReadOnlySpan<char> s, int radix, int flags, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToLong(ReadOnlySpan<char> s, int radix, int flags, int sign, ref int currPos, int length, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsLongOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+#endif
+
+        public static unsafe bool TryStringToLong(string s, int radix, int flags, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToLong(string s, int radix, int flags, int sign, ref int currPos, int length, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsLongOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+        public static unsafe bool TryStringToLong(char[] s, int radix, int flags, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToLong(char[] s, int radix, int flags, int sign, ref int currPos, int length, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsLongOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+        public static unsafe bool TryStringToLong(ICharSequence s, int radix, int flags, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToLong(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToLong(ICharSequence s, int radix, int flags, int sign, ref int currPos, int length, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabLongs(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsLongOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+        #endregion TryStringToLong
+
+        #region StringToInt
+
+#if FEATURE_READONLYSPAN
+
+        public static int StringToInt(ReadOnlySpan<char> s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return StringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos);
+        }
+
+        public static int StringToInt(ReadOnlySpan<char> s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (i > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+            if (length == 0)
+                throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
+
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    throw new FormatException(SR.Format_EmptyInputString);
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
                 if ((flags & TreatAsUnsigned) != 0)
                     throw new OverflowException(SR.Overflow_NegativeUnsigned);
 
@@ -208,22 +826,14 @@ namespace J2N.Numerics
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
                 {
-                    //r = 16;
                     i += 2;
                 }
             }
 
             int grabNumbersStart = i;
-            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
-            if (!TryGrabInts(radix, s, ref i, end, isUnsigned, out int result))
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out int result))
             {
-                TypeCode typeCode = isUnsigned ? TypeCode.UInt32 : TypeCode.Int32;
-                if ((flags & TreatAsI1) != 0)
-                    typeCode = isUnsigned ? TypeCode.Byte : TypeCode.SByte;
-                if ((flags & TreatAsI2) != 0)
-                    typeCode = isUnsigned ? TypeCode.UInt16 : TypeCode.Int16;
-                
-                DotNetNumber.ThrowOverflowException(typeCode);
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
             }
 
             // Check if they passed us a string with no parsable digits.
@@ -240,47 +850,681 @@ namespace J2N.Numerics
             // Put the current index back into the correct place.
             currPos = i;
 
+            if (IsIntOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
+
             // Return the value properly signed.
-            if ((flags & TreatAsI1) != 0 && ((flags & TreatAsUnsigned) != 0))
-            {
-                if ((uint)result > 0xFF)
-                    DotNetNumber.ThrowOverflowException(TypeCode.SByte);
-            }
-            else if ((flags & TreatAsI2) != 0 && ((flags & TreatAsUnsigned) != 0))
-            {
-                if ((uint)result > 0xFFFF)
-                    DotNetNumber.ThrowOverflowException(TypeCode.UInt16);
-            }
-            else if ((flags & TreatAsI2) != 0 && (uint)result == 0x8000 && radix == 10 && sign == 1 && ((flags & TreatAsUnsigned) == 0))
-            {
-                DotNetNumber.ThrowOverflowException(TypeCode.Int16);
-            }
-            else if ((flags & TreatAsI2) != 0 && (uint)result != 0x8000 && (short)result < 0 && sign == -1 && ((flags & TreatAsUnsigned) == 0))
-            {
-                DotNetNumber.ThrowOverflowException(TypeCode.Int16);
-            }
-            else if ((uint)result == 0x80000000 && sign == 1 && radix == 10 && ((flags & TreatAsUnsigned) == 0))
-            {
-                DotNetNumber.ThrowOverflowException(TypeCode.Int32);
-            }
-            // Don't allow both a sign in the string and a negative value in the string
-            // except when result is the smallest negative int, which is a special case.
-            else if ((uint)result != 0x80000000 && result < 0 && sign == -1 && ((flags & TreatAsUnsigned) == 0))
-            {
-                DotNetNumber.ThrowOverflowException(TypeCode.Int32);
-            }
-
-            ////// Don't allow both a sign in the string and a negative value in the string
-            ////if (result < 0 && sign < 0)
-            ////    DotNetNumber.ThrowOverflowException(TypeCode.Int32);
-
-            //if (radix == 10)
-            {
-                result *= sign;
-            }
-
+            result *= sign;
             return result;
         }
+
+#endif
+
+        public static int StringToInt(string s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return StringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos);
+        }
+
+        public static int StringToInt(string s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (i > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+            if (length == 0)
+                throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
+
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    throw new FormatException(SR.Format_EmptyInputString);
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    throw new OverflowException(SR.Overflow_NegativeUnsigned);
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in an unknown base or in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out int result))
+            {
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+                throw new FormatException(SR.Format_NoParsibleDigits);
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                    throw new FormatException(SR.Format_ExtraJunkAtEnd);
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsIntOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
+
+            // Return the value properly signed.
+            result *= sign;
+            return result;
+        }
+
+        public static int StringToInt(char[] s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return StringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos);
+        }
+
+        public static int StringToInt(char[] s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (i > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+            if (length == 0)
+                throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
+
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    throw new FormatException(SR.Format_EmptyInputString);
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    throw new OverflowException(SR.Overflow_NegativeUnsigned);
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in an unknown base or in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out int result))
+            {
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+                throw new FormatException(SR.Format_NoParsibleDigits);
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                    throw new FormatException(SR.Format_ExtraJunkAtEnd);
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsIntOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
+
+            // Return the value properly signed.
+            result *= sign;
+            return result;
+        }
+
+        public static int StringToInt(ICharSequence s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return StringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos);
+        }
+
+        public static int StringToInt(ICharSequence s, int radix, int flags, int sign, ref int currPos, int length) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (i > s.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+            if (length == 0)
+                throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
+
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    throw new FormatException(SR.Format_EmptyInputString);
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    throw new OverflowException(SR.Overflow_NegativeUnsigned);
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in an unknown base or in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned: (flags & TreatAsUnsigned) != 0, out int result))
+            {
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+                throw new FormatException(SR.Format_NoParsibleDigits);
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                    throw new FormatException(SR.Format_ExtraJunkAtEnd);
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsIntOverflow(result, radix, flags, sign))
+                DotNetNumber.ThrowOverflowException(GetIntOverflowTypeCode(flags));
+
+            // Return the value properly signed.
+            result *= sign;
+            return result;
+        }
+
+        #endregion StringToInt
+
+        #region TryStringToInt
+
+#if FEATURE_READONLYSPAN
+
+        public static bool TryStringToInt(ReadOnlySpan<char> s, int radix, int flags, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToInt(ReadOnlySpan<char> s, int radix, int flags, int sign, ref int currPos, int length, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in an unknown base or in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsIntOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+#endif
+
+        public static bool TryStringToInt(string s, int radix, int flags, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToInt(string s, int radix, int flags, int sign, ref int currPos, int length, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in an unknown base or in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsIntOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+        public static bool TryStringToInt(char[] s, int radix, int flags, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToInt(char[] s, int radix, int flags, int sign, ref int currPos, int length, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in an unknown base or in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsIntOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+        public static bool TryStringToInt(ICharSequence s, int radix, int flags, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            int pos = 0;
+            return TryStringToInt(s, radix, flags, sign: 1, ref pos, s.Length - pos, out result);
+        }
+
+        public static bool TryStringToInt(ICharSequence s, int radix, int flags, int sign, ref int currPos, int length, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
+        {
+            result = default;
+
+            // They're requied to tell me where to start parsing.
+            int i = currPos;
+
+            // Do some bounds checking.
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                return false;
+            if (length < 0)
+                return false;
+            if (i > s.Length - length) // Checks for int overflow
+                return false;
+
+            if (length == 0)
+                return false;
+
+            if (i < 0)
+                return false;
+
+            int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
+
+            // Get rid of the whitespace and then check that we've still got some digits to parse.
+            if (((flags & IsTight) == 0) && ((flags & NoSpace) == 0))
+            {
+                EatWhiteSpace(s, ref i);
+                if (i == end)
+                    return false;
+            }
+
+            // Check for a sign
+            if (s[i] == '-')
+            {
+                if ((flags & TreatAsUnsigned) != 0)
+                    return false;
+
+                sign = -1;
+                i++;
+            }
+            else if (s[i] == '+')
+            {
+                i++;
+            }
+
+            // Consume the 0x if we're in an unknown base or in base-16.
+            if ((radix == 16) && (i + 1 < length) && s[i] == '0')
+            {
+                if (s[i + 1] == 'x' || s[i + 1] == 'X')
+                {
+                    i += 2;
+                }
+            }
+
+            int grabNumbersStart = i;
+            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
+            if (!TryGrabInts(radix, s, ref i, end, isUnsigned, out result))
+            {
+                result = default;
+                return false;
+            }
+
+            // Check if they passed us a string with no parsable digits.
+            if (i == grabNumbersStart)
+            {
+                result = default;
+                return false;
+            }
+
+            if ((flags & IsTight) != 0)
+            {
+                // If we've got effluvia left at the end of the string, complain.
+                if (i < end)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+
+            // Put the current index back into the correct place.
+            currPos = i;
+
+            if (IsIntOverflow(result, radix, flags, sign))
+            {
+                result = default;
+                return false;
+            }
+
+            // Return the value properly signed.
+            result *= sign;
+            return true;
+        }
+
+        #endregion TryStringToInt
+
+        #region IntToString
 
         //public static string IntToString(int n, int radix, int width, char paddingChar, int flags)
         //{
@@ -421,6 +1665,10 @@ namespace J2N.Numerics
         //    }
         //    return result;
         //}
+
+        #endregion IntToString
+
+        #region LongToString
 
         //public static string LongToString(long n, int radix, int width, char paddingChar, int flags)
         //{
@@ -570,14 +1818,47 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-        private static void EatWhiteSpace(ReadOnlySpan<char> s, ref int i)
+        #endregion LongToString
+
+        #region EatWhiteSpace
+
+#if FEATURE_READONLYSPAN
+        private static void EatWhiteSpace(ReadOnlySpan<char> s, ref int i) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            int localIndex = i;
+            for (; localIndex < s.Length && char.IsWhiteSpace(s[localIndex]); localIndex++) ;
+            i = localIndex;
+        }
+#endif
+
+        private static void EatWhiteSpace(string s, ref int i) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
             int localIndex = i;
             for (; localIndex < s.Length && char.IsWhiteSpace(s[localIndex]); localIndex++) ;
             i = localIndex;
         }
 
-        private static bool TryGrabLongs(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out long result)
+        private static void EatWhiteSpace(char[] s, ref int i) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            int localIndex = i;
+            for (; localIndex < s.Length && char.IsWhiteSpace(s[localIndex]); localIndex++) ;
+            i = localIndex;
+        }
+
+        private static void EatWhiteSpace(ICharSequence s, ref int i) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            int localIndex = i;
+            for (; localIndex < s.Length && char.IsWhiteSpace(s[localIndex]); localIndex++) ;
+            i = localIndex;
+        }
+
+        #endregion EatWhiteSpace
+
+        #region TryGrabLongs
+
+#if FEATURE_READONLYSPAN
+
+        private static bool TryGrabLongs(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
             ulong unsignedResult = 0;
             ulong maxVal;
@@ -588,7 +1869,6 @@ namespace J2N.Numerics
                 maxVal = 0x7FFFFFFFFFFFFFFF / 10;
 
                 // Read all of the digits and convert to a number
-                //while (i < s.Length && IsDigit(s[i], radix, out int value))
                 int value;
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
@@ -615,7 +1895,6 @@ namespace J2N.Numerics
                 maxVal = 0xffffffffffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                //while (i < s.Length && IsDigit(s[i], radix, out int value))
                 int value;
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
@@ -643,7 +1922,207 @@ namespace J2N.Numerics
             return true;
         }
 
-        private static bool TryGrabInts(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out int result)
+#endif
+
+        private static bool TryGrabLongs(int radix, string s, ref int i, int end, bool isUnsigned, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            ulong unsignedResult = 0;
+            ulong maxVal;
+
+            // Allow all non-decimal numbers to set the sign bit.
+            if (radix == 10 && !isUnsigned)
+            {
+                maxVal = 0x7FFFFFFFFFFFFFFF / 10;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
+                    i++;
+                }
+
+                if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
+                maxVal = 0xffffffffffffffff / (uint)radix;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    ulong temp = unsignedResult * (ulong)radix + (ulong)value;
+
+                    if (temp < unsignedResult) // this means overflow as well
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = temp;
+                    i++;
+                }
+            }
+
+            result = (long)unsignedResult;
+            return true;
+        }
+
+        private static bool TryGrabLongs(int radix, char[] s, ref int i, int end, bool isUnsigned, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            ulong unsignedResult = 0;
+            ulong maxVal;
+
+            // Allow all non-decimal numbers to set the sign bit.
+            if (radix == 10 && !isUnsigned)
+            {
+                maxVal = 0x7FFFFFFFFFFFFFFF / 10;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
+                    i++;
+                }
+
+                if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
+                maxVal = 0xffffffffffffffff / (uint)radix;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    ulong temp = unsignedResult * (ulong)radix + (ulong)value;
+
+                    if (temp < unsignedResult) // this means overflow as well
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = temp;
+                    i++;
+                }
+            }
+
+            result = (long)unsignedResult;
+            return true;
+        }
+
+        private static bool TryGrabLongs(int radix, ICharSequence s, ref int i, int end, bool isUnsigned, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            ulong unsignedResult = 0;
+            ulong maxVal;
+
+            // Allow all non-decimal numbers to set the sign bit.
+            if (radix == 10 && !isUnsigned)
+            {
+                maxVal = 0x7FFFFFFFFFFFFFFF / 10;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
+                    i++;
+                }
+
+                if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
+                maxVal = 0xffffffffffffffff / (uint)radix;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    ulong temp = unsignedResult * (ulong)radix + (ulong)value;
+
+                    if (temp < unsignedResult) // this means overflow as well
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = temp;
+                    i++;
+                }
+            }
+
+            result = (long)unsignedResult;
+            return true;
+        }
+
+        #endregion TryGrabLongs
+
+        #region TryGrabInts
+
+#if FEATURE_READONLYSPAN
+
+        private static bool TryGrabInts(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
             uint unsignedResult = 0;
             uint maxVal;
@@ -654,7 +2133,6 @@ namespace J2N.Numerics
                 maxVal = (0x7FFFFFFF / 10);
 
                 // Read all of the digits and convert to a number
-                //while (i < s.Length && IsDigit(s[i], radix, out int value))
                 int value;
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
@@ -679,7 +2157,6 @@ namespace J2N.Numerics
                 maxVal = 0xffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                //while (i < s.Length && IsDigit(s[i], radix, out int value))
                 int value;
                 while (i < end && (value = Character.Digit(s[i], radix)) != -1)
                 {
@@ -707,31 +2184,298 @@ namespace J2N.Numerics
             return true;
         }
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //private static bool IsDigit(char c, int radix, out int result)
-        //{
-        //    int tmp;
-        //    if ((uint)(c - '0') <= 9)
-        //    {
-        //        result = tmp = c - '0';
-        //    }
-        //    else if ((uint)(c - 'A') <= 'Z' - 'A')
-        //    {
-        //        result = tmp = c - 'A' + 10;
-        //    }
-        //    else if ((uint)(c - 'a') <= 'z' - 'a')
-        //    {
-        //        result = tmp = c - 'a' + 10;
-        //    }
-        //    else
-        //    {
-        //        result = -1;
-        //        return false;
-        //    }
-
-        //    return tmp < radix;
-        //}
-    }
-
-}
 #endif
+
+        private static bool TryGrabInts(int radix, string s, ref int i, int end, bool isUnsigned, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            uint unsignedResult = 0;
+            uint maxVal;
+
+            // Allow all non-decimal numbers to set the sign bit.
+            if (radix == 10 && !isUnsigned)
+            {
+                maxVal = (0x7FFFFFFF / 10);
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal || (int)unsignedResult < 0)
+                    {
+                        result = default;
+                        return false;
+                    }
+                    unsignedResult = unsignedResult * (uint)radix + (uint)value;
+                    i++;
+                }
+                if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
+                maxVal = 0xffffffff / (uint)radix;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    uint temp = unsignedResult * (uint)radix + (uint)value;
+
+                    if (temp < unsignedResult) // this means overflow as well
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = temp;
+                    i++;
+                }
+            }
+
+            result = (int)unsignedResult;
+            return true;
+        }
+
+        private static bool TryGrabInts(int radix, char[] s, ref int i, int end, bool isUnsigned, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            uint unsignedResult = 0;
+            uint maxVal;
+
+            // Allow all non-decimal numbers to set the sign bit.
+            if (radix == 10 && !isUnsigned)
+            {
+                maxVal = (0x7FFFFFFF / 10);
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal || (int)unsignedResult < 0)
+                    {
+                        result = default;
+                        return false;
+                    }
+                    unsignedResult = unsignedResult * (uint)radix + (uint)value;
+                    i++;
+                }
+                if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
+                maxVal = 0xffffffff / (uint)radix;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    uint temp = unsignedResult * (uint)radix + (uint)value;
+
+                    if (temp < unsignedResult) // this means overflow as well
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = temp;
+                    i++;
+                }
+            }
+
+            result = (int)unsignedResult;
+            return true;
+        }
+
+        private static bool TryGrabInts(int radix, ICharSequence s, ref int i, int end, bool isUnsigned, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        {
+            uint unsignedResult = 0;
+            uint maxVal;
+
+            // Allow all non-decimal numbers to set the sign bit.
+            if (radix == 10 && !isUnsigned)
+            {
+                maxVal = (0x7FFFFFFF / 10);
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal || (int)unsignedResult < 0)
+                    {
+                        result = default;
+                        return false;
+                    }
+                    unsignedResult = unsignedResult * (uint)radix + (uint)value;
+                    i++;
+                }
+                if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
+                {
+                    result = default;
+                    return false;
+                }
+            }
+            else
+            {
+                Debug.Assert(radix >= Character.MinRadix && radix <= Character.MaxRadix);
+                maxVal = 0xffffffff / (uint)radix;
+
+                // Read all of the digits and convert to a number
+                int value;
+                while (i < end && (value = Character.Digit(s[i], radix)) != -1)
+                {
+                    // Check for overflows - this is sufficient & correct.
+                    if (unsignedResult > maxVal)
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    uint temp = unsignedResult * (uint)radix + (uint)value;
+
+                    if (temp < unsignedResult) // this means overflow as well
+                    {
+                        result = default;
+                        return false;
+                    }
+
+                    unsignedResult = temp;
+                    i++;
+                }
+            }
+
+            result = (int)unsignedResult;
+            return true;
+        }
+
+        #endregion TryGrabInts
+
+        #region IsLongOverflow
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        private static bool IsLongOverflow(long value, int radix, int flags, int sign)
+        {
+            // Return the value properly signed.
+            if ((ulong)value == 0x8000000000000000 && sign == 1 && radix == 10 && ((flags & TreatAsUnsigned) == 0))
+                return true;
+
+            // Don't allow both a sign in the string and a negative value in the string
+            // except when result is the smallest negative long, which is a special case.
+            else if ((ulong)value != 0x8000000000000000 && value < 0 && sign == -1 && ((flags & TreatAsUnsigned) == 0))
+                return true;
+
+            return false;
+        }
+
+        #endregion
+
+        #region IsIntOverflow
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        private static bool IsIntOverflow(int value, int radix, int flags, int sign)
+        {
+            if ((flags & TreatAsI1) != 0 && ((flags & TreatAsUnsigned) != 0))
+            {
+                if ((uint)value > 0xFF)
+                {
+                    return true;
+                }
+            }
+            else if ((flags & TreatAsI1) != 0 && (uint)value == 0x80 && radix == 10 && sign == 1 && ((flags & TreatAsUnsigned) == 0))
+            {
+                return true;
+            }
+            else if ((flags & TreatAsI1) != 0 && (uint)value != 0x80 && (sbyte)value < 0 && sign == -1 && ((flags & TreatAsUnsigned) == 0))
+            {
+                return true;
+            }
+            else if ((flags & TreatAsI2) != 0 && ((flags & TreatAsUnsigned) != 0))
+            {
+                if ((uint)value > 0xFFFF)
+                {
+                    return true;
+                }
+            }
+            else if ((flags & TreatAsI2) != 0 && (uint)value == 0x8000 && radix == 10 && sign == 1 && ((flags & TreatAsUnsigned) == 0))
+            {
+                return true;
+            }
+            else if ((flags & TreatAsI2) != 0 && (uint)value != 0x8000 && (short)value < 0 && sign == -1 && ((flags & TreatAsUnsigned) == 0))
+            {
+                return true;
+            }
+            else if ((uint)value == 0x80000000 && sign == 1 && radix == 10 && ((flags & TreatAsUnsigned) == 0))
+            {
+                return true;
+            }
+            // Don't allow both a sign in the string and a negative value in the string
+            // except when result is the smallest negative int, which is a special case.
+            else if ((uint)value != 0x80000000 && value < 0 && sign == -1 && ((flags & TreatAsUnsigned) == 0))
+            {
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
+
+        #region GetLongOverflowTypeCode
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        private static TypeCode GetLongOverflowTypeCode(int flags)
+        {
+            return (flags & TreatAsUnsigned) != 0 ? TypeCode.UInt64 : TypeCode.Int64;
+        }
+
+        #endregion
+
+        #region GetLongOverflowTypeCode
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        private static TypeCode GetIntOverflowTypeCode(int flags)
+        {
+            bool isUnsigned = (flags & TreatAsUnsigned) != 0;
+            TypeCode result = isUnsigned ? TypeCode.UInt32 : TypeCode.Int32;
+            if ((flags & TreatAsI1) != 0)
+                result = isUnsigned ? TypeCode.Byte : TypeCode.SByte;
+            if ((flags & TreatAsI2) != 0)
+                result = isUnsigned ? TypeCode.UInt16 : TypeCode.Int16;
+
+            return result;
+        }
+
+        #endregion
+    }
+}

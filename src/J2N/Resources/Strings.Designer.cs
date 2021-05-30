@@ -394,7 +394,7 @@ namespace J2N.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Input string was not in a correct format..
+        ///   Looks up a localized string similar to Input string was not in a correct format. Value: &apos;{0}&apos;..
         /// </summary>
         internal static string Format_InvalidString {
             get {
