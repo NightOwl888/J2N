@@ -267,7 +267,7 @@ namespace J2N.Text
                 //return J2N.Numerics.FloatingDecimal.ToJavaFormatString(f);
                 //return J2N.Numerics.RyuConversion.FloatToString(f);
 
-                return RyuFloat.FloatToString(f, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
+                return RyuSingle.FloatToString(f, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
             }
 
             if ((int)f == f)

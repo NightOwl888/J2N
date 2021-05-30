@@ -13,12 +13,9 @@
 // limitations under the License.
 
 using System;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace J2N.Numerics
 {
@@ -33,22 +30,22 @@ namespace J2N.Numerics
         private static bool DEBUG = false;
         private static readonly bool DEBUG_FLOAT = true;
 
-        public static void Main(string[] args)
-        {
-            DEBUG = true;
-            if (DEBUG_FLOAT)
-            {
-                float f = 0.33007812f;
-                string result = floatToString(f);
-                Console.WriteLine(result + " " + f);
-            }
-            else
-            {
-                double f = 1.1873267205539228E-308;
-                string result = doubleToString(f);
-                Console.WriteLine(result + " " + f);
-            }
-        }
+        //public static void Main(string[] args)
+        //{
+        //    DEBUG = true;
+        //    if (DEBUG_FLOAT)
+        //    {
+        //        float f = 0.33007812f;
+        //        string result = floatToString(f);
+        //        Console.WriteLine(result + " " + f);
+        //    }
+        //    else
+        //    {
+        //        double f = 1.1873267205539228E-308;
+        //        string result = doubleToString(f);
+        //        Console.WriteLine(result + " " + f);
+        //    }
+        //}
 
         public static string floatToString(float value)
         {
