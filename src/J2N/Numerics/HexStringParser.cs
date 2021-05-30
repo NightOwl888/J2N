@@ -373,8 +373,7 @@ namespace J2N.Numerics
         private int CountBitsLength(long value)
         {
             int leadingZeros = BitOperation.LeadingZeroCount(value);
-            //return sizeof(long) - leadingZeros;
-            return Int64.SIZE - leadingZeros; // J2N TODO: Make constant on Int64
+            return Int64.SIZE - leadingZeros;
         }
     }
 }
