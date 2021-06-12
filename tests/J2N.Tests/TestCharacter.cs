@@ -1,4 +1,7 @@
-﻿using J2N.Collections;
+﻿using ICU4N;
+using ICU4N.Globalization;
+using ICU4N.Text;
+using J2N.Collections;
 using J2N.Text;
 using NUnit.Framework;
 using System;
@@ -1465,25 +1468,73 @@ namespace J2N
         {
             assertEquals("Returned incorrect digit", 1, Character.Digit('1', 10));
             assertEquals("Returned incorrect digit", 15, Character.Digit('F', 16));
+
+            assertEquals("Returned incorrect digit", 1, Character.Digit('๑', 10));
         }
 
-        /////**
-        //// * @tests java.lang.Character#digit(int, int)
-        //// */
-        ////[Test]
-        ////public void Test_digit_II()
-        ////{
-        ////    assertEquals(1, Character.Digit((int)'1', 10));
-        ////    assertEquals(15, Character.Digit((int)'F', 16));
+        [Test]
+        public void Test_DigitCI_Against_ICU4N()
+        {
+            for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
+            {
+                if (c >= Character.MinSupplementaryCodePoint)
+                    continue;
 
-        ////    assertEquals(-1, Character.Digit(0x0000, 37));
-        ////    assertEquals(-1, Character.Digit(0x0045, 10));
+                for (int radix = Character.MinRadix; radix <= Character.MaxRadix; radix++)
+                {
+                    int expected = UChar.Digit(c, radix);
+                    int actual = Character.Digit((char)c, radix);
 
-        ////    assertEquals(10, Character.Digit(0x0041, 20));
-        ////    assertEquals(10, Character.Digit(0x0061, 20));
+                    assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
+                }
+            }
+        }
 
-        ////    assertEquals(-1, Character.Digit(0x110000, 20));
-        ////}
+        /**
+         * @tests java.lang.Character#digit(int, int)
+         */
+        [Test]
+        public void Test_digit_II()
+        {
+            assertEquals(1, Character.Digit((int)'1', 10));
+            assertEquals(15, Character.Digit((int)'F', 16));
+
+            assertEquals(-1, Character.Digit(0x0000, 37));
+            assertEquals(-1, Character.Digit(0x0045, 10));
+
+            assertEquals(10, Character.Digit(0x0041, 20));
+            assertEquals(10, Character.Digit(0x0061, 20));
+
+            assertEquals(-1, Character.Digit(0x110000, 20));
+        }
+
+        [Test]
+        public void Test_Digit_II_Against_ICU4N()
+        {
+            for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
+            {
+                for (int radix = Character.MinRadix; radix <= Character.MaxRadix; radix++)
+                {
+                    int expected = UChar.Digit(c, radix);
+                    int actual = Character.Digit(c, radix);
+
+                    assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
+                }
+            }
+        }
+
+        [Test]
+        [Ignore("For debugging")]
+        public void Test_Digit_II_Against_ICU4N_2()
+        {
+            int c = 0x1d7e2; // 0x1d7d8; // 0x1d7ce; //0x1d7f6; // 0x1d7ec; // 0x1d7e2; // 0x1d7d8;
+            int radix = 2;
+
+            int expected = UChar.Digit(c, radix);
+            int actual = Character.Digit(c, radix);
+
+            assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
+        }
 
         /////**
         //// * @tests java.lang.Character#equals(java.lang.Object)

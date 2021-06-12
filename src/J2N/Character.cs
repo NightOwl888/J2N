@@ -96,10 +96,49 @@ namespace J2N
         /// </summary>
         public const int MaxCodePoint = 0x10FFFF;
 
-        private const string digitKeys = "0Aa\u0660\u06f0\u0966\u09e6\u0a66\u0ae6\u0b66\u0be7\u0c66\u0ce6\u0d66\u0e50\u0ed0\u0f20\u1040\u1369\u17e0\u1810\uff10\uff21\uff41";
+        // Unicode 10.0
+        private const string digitKeys = "\u0660\u06f0\u07c0\u0966\u09e6\u0a66\u0ae6\u0b66\u0be6\u0c66\u0ce6\u0d66\u0de6\u0e50\u0ed0\u0f20\u1040\u1090\u17e0\u1810\u1946\u19d0\u1a80\u1a90\u1b50\u1bb0\u1c40\u1c50\ua620\ua8d0\ua900\ua9d0\ua9f0\uaa50\uabf0\uff10\uff21\uff41";
 
-        private static readonly char[] digitValues = "90Z7zW\u0669\u0660\u06f9\u06f0\u096f\u0966\u09ef\u09e6\u0a6f\u0a66\u0aef\u0ae6\u0b6f\u0b66\u0bef\u0be6\u0c6f\u0c66\u0cef\u0ce6\u0d6f\u0d66\u0e59\u0e50\u0ed9\u0ed0\u0f29\u0f20\u1049\u1040\u1371\u1368\u17e9\u17e0\u1819\u1810\uff19\uff10\uff3a\uff17\uff5a\uff37"
-            .ToCharArray();
+        // J2N NOTE: This is the string that came directly out of UnicodeSet. For some reason the last 2 ranges didn't match the original Harmony values.
+        // However, reverting back to those Harmony values makes the tests pass when compared against ICU4N.
+        // There were also Ethiopian digits (\u1368 - \u1371) in Harmony that don't conform to Unicode and the behavior both of ICU4N
+        // and the JDK do not recognize them as digits. Unlike recognizable digits, they are categorized as UUnicodeCategory.OtherNumber.
+        //private static readonly char[] digitValues = "\u0669\u0660\u06f9\u06f0\u07c9\u07c0\u096f\u0966\u09ef\u09e6\u0a6f\u0a66\u0aef\u0ae6\u0b6f\u0b66\u0bef\u0be6\u0c6f\u0c66\u0cef\u0ce6\u0d6f\u0d66\u0def\u0de6\u0e59\u0e50\u0ed9\u0ed0\u0f29\u0f20\u1049\u1040\u1099\u1090\u17e9\u17e0\u1819\u1810\u194f\u1946\u19d9\u19d0\u1a89\u1a80\u1a99\u1a90\u1b59\u1b50\u1bb9\u1bb0\u1c49\u1c40\u1c59\u1c50\ua629\ua620\ua8d9\ua8d0\ua909\ua900\ua9d9\ua9d0\ua9f9\ua9f0\uaa59\uaa50\uabf9\uabf0\uff19\uff10\uff3a\uff21\uff5a\uff41".ToCharArray();
+        private static readonly char[] digitValues = "\u0669\u0660\u06f9\u06f0\u07c9\u07c0\u096f\u0966\u09ef\u09e6\u0a6f\u0a66\u0aef\u0ae6\u0b6f\u0b66\u0bef\u0be6\u0c6f\u0c66\u0cef\u0ce6\u0d6f\u0d66\u0def\u0de6\u0e59\u0e50\u0ed9\u0ed0\u0f29\u0f20\u1049\u1040\u1099\u1090\u17e9\u17e0\u1819\u1810\u194f\u1946\u19d9\u19d0\u1a89\u1a80\u1a99\u1a90\u1b59\u1b50\u1bb9\u1bb0\u1c49\u1c40\u1c59\u1c50\ua629\ua620\ua8d9\ua8d0\ua909\ua900\ua9d9\ua9d0\ua9f9\ua9f0\uaa59\uaa50\uabf9\uabf0\uff19\uff10\uff3a\uff17\uff5a\uff37".ToCharArray();
+
+        /// <summary>
+        /// Supplemental characters (surrogates) for digits. Implements Unicode 10.0.
+        /// </summary>
+        private static class DigitSupplemental
+        {
+            public static readonly int[] Keys = new int[] {
+                0x000104a0, 0x00011066, 0x000110f0, 0x00011136, 0x000111d0, 0x000112f0, 0x00011450, 0x000114d0,
+                0x00011650, 0x000116c0, 0x00011730, 0x000118e0, 0x00011c50, 0x00011d50, 0x00016a60, 0x00016b50,
+
+                // J2N: The 5 ranges here didn't come directly out of the UnicodeSet class, but these
+                // were one contiguous range. However, they comprise 5 different numeric sets, so they were
+                // broken apart manually.
+                0x0001d7ce, 0x0001d7d8, 0x0001d7e2, 0x0001d7ec, 0x0001d7f6, 
+
+                0x0001e950
+            };
+
+            public static readonly int[] Values = new int[] {
+                0x000104a9, 0x000104a0, 0x0001106f, 0x00011066, 0x000110f9, 0x000110f0, 0x0001113f, 0x00011136,
+                0x000111d9, 0x000111d0, 0x000112f9, 0x000112f0, 0x00011459, 0x00011450, 0x000114d9, 0x000114d0,
+                0x00011659, 0x00011650, 0x000116c9, 0x000116c0, 0x00011739, 0x00011730, 0x000118e9, 0x000118e0,
+                0x00011c59, 0x00011c50, 0x00011d59, 0x00011d50, 0x00016a69, 0x00016a60, 0x00016b59, 0x00016b50,
+
+                // J2N: The 5 ranges here didn't come directly out of the UnicodeSet class, but these
+                // were one contiguous range. However, they comprise 5 different numeric sets, so they were
+                // broken apart manually.
+                //0x0001d7ff, 0x0001d7ce,
+                0x0001d7d7, 0x0001d7ce, 0x0001d7e1, 0x0001d7d8, 0x0001d7eb, 0x0001d7e2, 0x0001d7f5, 0x0001d7ec,
+                0x0001d7ff, 0x0001d7f6,
+
+                0x0001e959, 0x0001e950
+            };
+        }
 
         // Unicode 3.0.0 (NOT the same as Unicode 3.0.1)
         private const string numericKeys = "0Aa\u00b2\u00b9\u00bc\u0660\u06f0\u0966\u09e6\u09f4\u09f9\u0a66\u0ae6\u0b66\u0be7\u0bf1\u0bf2\u0c66\u0ce6\u0d66\u0e50\u0ed0\u0f20\u1040\u1369\u1373\u1374\u1375\u1376\u1377\u1378\u1379\u137a\u137b\u137c\u16ee\u17e0\u1810\u2070\u2074\u2080\u2153\u215f\u2160\u216c\u216d\u216e\u216f\u2170\u217c\u217d\u217e\u217f\u2180\u2181\u2182\u2460\u2474\u2488\u24ea\u2776\u2780\u278a\u3007\u3021\u3038\u3039\u303a\u3280\uff10\uff21\uff41";
@@ -1234,8 +1273,9 @@ namespace J2N
         /// <param name="c">The character to determine the value of.</param>
         /// <param name="radix">The radix.</param>
         /// <returns>
-        /// The value of <paramref name="c"/> in <paramref name="radix"/> if <paramref name="radix"/> lies
-        /// between <see cref="MinRadix"/> and <see cref="MaxRadix"/>; -1 otherwise.
+        /// The numeric value of <paramref name="c"/> in the specified <paramref name="radix"/>. Returns -1
+        /// if the <paramref name="radix"/> lies between <see cref="MinRadix"/> and <see cref="MaxRadix"/> or
+        /// if <paramref name="c"/> is not a decimal digit.
         /// </returns>
         public static int Digit(char c, int radix)
         {
@@ -1273,7 +1313,65 @@ namespace J2N
             return -1;
         }
 
-        // TODO: Digit(int, int)
+        /// <summary>
+        /// Convenience method to determine the value of the specified character
+        /// <paramref name="codePoint"/> in the supplied radix. The value of <paramref name="radix"/> must be
+        /// between <see cref="MinRadix"/> and <see cref="MaxRadix"/>.
+        /// </summary>
+        /// <param name="codePoint">The character to determine the value of.</param>
+        /// <param name="radix">The radix.</param>
+        /// <returns>
+        /// The numeric value of <paramref name="codePoint"/> in the specified <paramref name="radix"/>. Returns -1
+        /// if the <paramref name="radix"/> lies between <see cref="MinRadix"/> and <see cref="MaxRadix"/> or
+        /// if <paramref name="codePoint"/> is not a decimal digit.
+        /// </returns>
+        public static int Digit(int codePoint, int radix)
+        {
+            int result = -1;
+            if (radix >= MinRadix && radix <= MaxRadix)
+            {
+                if (codePoint < 128)
+                {
+                    // Optimized for ASCII
+                    if ('0' <= codePoint && codePoint <= '9')
+                    {
+                        result = codePoint - '0';
+                    }
+                    else if ('a' <= codePoint && codePoint <= 'z')
+                    {
+                        result = codePoint - ('a' - 10);
+                    }
+                    else if ('A' <= codePoint && codePoint <= 'Z')
+                    {
+                        result = codePoint - ('A' - 10);
+                    }
+                    return result < radix ? result : -1;
+                }
+                int value = -1;
+                if (codePoint < MinSupplementaryCodePoint)
+                {
+                    result = BinarySearchRange(digitKeys, (char)codePoint);
+                    if (result >= 0 && codePoint <= digitValues[result * 2])
+                    {
+                        value = (char)(codePoint - digitValues[result * 2 + 1]);
+                    }
+                }
+                else
+                {
+                    result = BinarySearchRange(DigitSupplemental.Keys, codePoint);
+                    if (result >= 0 && codePoint <= DigitSupplemental.Values[result * 2])
+                    {
+                        value = (char)(codePoint - DigitSupplemental.Values[result * 2 + 1]);
+                    }
+                }
+                if (value >= radix)
+                {
+                    return -1;
+                }
+                return value;
+            }
+            return -1;
+        }
 
         /// <summary>
         /// Search the sorted characters in the string and return the nearest index.
@@ -1297,6 +1395,30 @@ namespace J2N
                     high = mid - 1;
             }
             return mid - (c < value ? 1 : 0);
+        }
+
+        /// <summary>
+        /// Search the sorted characters in the string and return the nearest index.
+        /// </summary>
+        /// <param name="data">The String to search.</param>
+        /// <param name="codePoint">The character to search for.</param>
+        /// <returns>The nearest index.</returns>
+        private static int BinarySearchRange(int[] data, int codePoint)
+        {
+            int value = 0;
+            int low = 0, mid = -1, high = data.Length - 1;
+            while (low <= high)
+            {
+                mid = (low + high) >> 1;
+                value = data[mid];
+                if (codePoint > value)
+                    low = mid + 1;
+                else if (codePoint == value)
+                    return mid;
+                else
+                    high = mid - 1;
+            }
+            return mid - (codePoint < value ? 1 : 0);
         }
 
         /// <summary>

@@ -8,6 +8,10 @@
     <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ICU4N" Version="$(ICU4NPackageReferenceVersion)" />
+  </ItemGroup>
+
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) ">
     <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
   </ItemGroup>

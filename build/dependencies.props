@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup Label="NuGet Package Reference Versions">
+    <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
     <NerdBankGitVersioningPackageReferenceVersion>[3.3.37]</NerdBankGitVersioningPackageReferenceVersion>
