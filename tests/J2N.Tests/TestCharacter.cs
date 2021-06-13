@@ -1509,6 +1509,7 @@ namespace J2N
         }
 
         [Test]
+        //[Ignore("Run Manually - ICU4N's Digit method is slow with surrogates")]
         public void Test_Digit_II_Against_ICU4N()
         {
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
@@ -1525,7 +1526,7 @@ namespace J2N
 
         [Test]
         [Ignore("For debugging")]
-        public void Test_Digit_II_Against_ICU4N_2()
+        public void Test_Digit_II_Against_ICU4N_Debug()
         {
             int c = 0x1d7e2; // 0x1d7d8; // 0x1d7ce; //0x1d7f6; // 0x1d7ec; // 0x1d7e2; // 0x1d7d8;
             int radix = 2;
@@ -1594,41 +1595,92 @@ namespace J2N
                     .GetNumericValue('\uff12'));
         }
 
-        /////**
-        //// * @tests java.lang.Character#getNumericValue(int)
-        //// */
-        ////[Test]
-        ////public void Test_getNumericValue_I()
-        ////{
-        ////    assertEquals(1, Character.GetNumericValue((int)'1'));
-        ////    assertEquals(15, Character.GetNumericValue((int)'F'));
-        ////    assertEquals(-1, Character.GetNumericValue((int)'\u221e'));
-        ////    assertEquals(-2, Character.GetNumericValue((int)'\u00be'));
-        ////    assertEquals(10000, Character.GetNumericValue((int)'\u2182'));
-        ////    assertEquals(2, Character.GetNumericValue((int)'\uff12'));
-        ////    assertEquals(-1, Character.GetNumericValue(0xFFFF));
+        [Test]
+        public void Test_GetNumericValueC_Against_ICU4N()
+        {
+            for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
+            {
+                if (c >= Character.MinSupplementaryCodePoint)
+                    continue;
 
-        ////    assertEquals(-1, Character.GetNumericValue(0xFFFF));
-        ////    assertEquals(0, Character.GetNumericValue(0x1D7CE));
-        ////    assertEquals(0, Character.GetNumericValue(0x1D7D8));
-        ////    assertEquals(-1, Character.GetNumericValue(0x2F800));
-        ////    assertEquals(-1, Character.GetNumericValue(0x10FFFD));
-        ////    assertEquals(-1, Character.GetNumericValue(0x110000));
+                int expected = UChar.GetNumericValue(c);
+                int actual = Character.GetNumericValue((char)c);
 
-        ////    assertEquals(50, Character.GetNumericValue(0x216C));
+                assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
+            }
+        }
 
-        ////    assertEquals(10, Character.GetNumericValue(0x0041));
-        ////    assertEquals(35, Character.GetNumericValue(0x005A));
-        ////    assertEquals(10, Character.GetNumericValue(0x0061));
-        ////    assertEquals(35, Character.GetNumericValue(0x007A));
-        ////    assertEquals(10, Character.GetNumericValue(0xFF21));
+        [Test]
+        [Ignore("For debugging")]
+        public void Test_GetNumericValueC_Against_ICU4N_Debug()
+        {
+            int c = 0x2187; // 0xd58; //0xc7c; //0x9f9; //0x9f4; //0xb2;
 
-        ////    //FIXME depends on ICU4J
-        ////    //assertEquals(35, Character.GetNumericValue(0xFF3A));
+            int expected = UChar.GetNumericValue(c);
+            int actual = Character.GetNumericValue((char)c);
 
-        ////    assertEquals(10, Character.GetNumericValue(0xFF41));
-        ////    assertEquals(35, Character.GetNumericValue(0xFF5A));
-        ////}
+            assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
+        }
+
+        /**
+         * @tests java.lang.Character#getNumericValue(int)
+         */
+        [Test]
+        public void Test_getNumericValue_I()
+        {
+            assertEquals(1, Character.GetNumericValue((int)'1'));
+            assertEquals(15, Character.GetNumericValue((int)'F'));
+            assertEquals(-1, Character.GetNumericValue((int)'\u221e'));
+            assertEquals(-2, Character.GetNumericValue((int)'\u00be'));
+            assertEquals(10000, Character.GetNumericValue((int)'\u2182'));
+            assertEquals(2, Character.GetNumericValue((int)'\uff12'));
+            assertEquals(-1, Character.GetNumericValue(0xFFFF));
+
+            assertEquals(-1, Character.GetNumericValue(0xFFFF));
+            assertEquals(0, Character.GetNumericValue(0x1D7CE));
+            assertEquals(0, Character.GetNumericValue(0x1D7D8));
+            assertEquals(-1, Character.GetNumericValue(0x2F800));
+            assertEquals(-1, Character.GetNumericValue(0x10FFFD));
+            assertEquals(-1, Character.GetNumericValue(0x110000));
+
+            assertEquals(50, Character.GetNumericValue(0x216C));
+
+            assertEquals(10, Character.GetNumericValue(0x0041));
+            assertEquals(35, Character.GetNumericValue(0x005A));
+            assertEquals(10, Character.GetNumericValue(0x0061));
+            assertEquals(35, Character.GetNumericValue(0x007A));
+            assertEquals(10, Character.GetNumericValue(0xFF21));
+
+            //FIXME depends on ICU4J
+            //assertEquals(35, Character.GetNumericValue(0xFF3A));
+
+            assertEquals(10, Character.GetNumericValue(0xFF41));
+            assertEquals(35, Character.GetNumericValue(0xFF5A));
+        }
+
+        [Test]
+        public void Test_GetNumericValue_I_Against_ICU4N()
+        {
+            for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
+            {
+                int expected = UChar.GetNumericValue(c);
+                int actual = Character.GetNumericValue(c);
+
+                assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
+            }
+        }
+
+        [Test]
+        [Ignore("For debugging")]
+        public void Test_GetNumericValue_I_Against_ICU4N_Debug()
+        {
+            int c = 0x0; //0x10131; // 0xd58; //0xc7c; //0x9f9; //0x9f4; //0xb2;
+
+            int expected = UChar.GetNumericValue(c);
+            int actual = Character.GetNumericValue(c);
+
+            assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
+        }
 
         /**
          * @tests java.lang.Character#getType(char)
