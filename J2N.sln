@@ -71,6 +71,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Tests.MonoAndroid90.xUn
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Tests.MonoAndroid100.xUnit", "tests\Xamarin\Android\J2N.Tests.MonoAndroid100.xUnit\J2N.Tests.MonoAndroid100.xUnit.csproj", "{0599CD31-2FA8-4283-A777-155F81B5DB9A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Benchmarks", "J2N.Benchmarks\J2N.Benchmarks.csproj", "{17CC1AB5-142F-4845-B5F5-5198A3B62955}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -109,6 +111,10 @@ Global
 		{0599CD31-2FA8-4283-A777-155F81B5DB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0599CD31-2FA8-4283-A777-155F81B5DB9A}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{0599CD31-2FA8-4283-A777-155F81B5DB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17CC1AB5-142F-4845-B5F5-5198A3B62955}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17CC1AB5-142F-4845-B5F5-5198A3B62955}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17CC1AB5-142F-4845-B5F5-5198A3B62955}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17CC1AB5-142F-4845-B5F5-5198A3B62955}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -125,6 +131,7 @@ Global
 		{21C25B19-35F2-4EBA-8179-060D4E1D4FE4} = {8E8A62FD-68C1-427D-BA2A-781959BB85E7}
 		{9FD44903-EE22-4437-9AB9-A3E19DCD03EE} = {8E8A62FD-68C1-427D-BA2A-781959BB85E7}
 		{0599CD31-2FA8-4283-A777-155F81B5DB9A} = {8E8A62FD-68C1-427D-BA2A-781959BB85E7}
+		{17CC1AB5-142F-4845-B5F5-5198A3B62955} = {9F28FE5B-BE86-4A38-8534-A6555C7C53A4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B477AD9F-26BF-44CF-B94C-50D89AC24836}
