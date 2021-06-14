@@ -907,6 +907,18 @@ namespace J2N.Numerics
                         yield return new TestCaseData((short)-32768, "-8000", 16); // Special case: In Java, we allow the negative sign for the smallest negative number
                         yield return new TestCaseData((short)-32768, "8000", 16);
                         yield return new TestCaseData((short)-32767, "8001", 16);
+
+                        // Surrogate Pairs (.NET only supports ASCII, but Java supports these)
+
+                        yield return new TestCaseData((short)999, "𝟗𑃹𝟫", 10);
+                        yield return new TestCaseData((short)5783, "𝟓𝟕𝟖𝟑", 10);
+                        yield return new TestCaseData((short)479, "𑁪𑁭𑁯", 10);
+
+                        // Non-decimal needs to be tested separately because they go through
+                        // a separate execution path
+                        yield return new TestCaseData((short)2457, "𝟗𑃹𝟫", 16);
+                        yield return new TestCaseData((short)22403, "𝟓𝟕𝟖𝟑", 16);
+                        yield return new TestCaseData((short)1145, "𑁪𑁭𑁯", 16);
                     }
                 }
 
@@ -1057,6 +1069,18 @@ namespace J2N.Numerics
                         yield return new TestCaseData((short)-32768, "-8000", 0, 5, 16); // Special case: In Java, we allow the negative sign for the smallest negative number
                         yield return new TestCaseData((short)-32768, "8000", 0, 4, 16);
                         yield return new TestCaseData((short)-32767, "8001", 0, 4, 16);
+
+                        // Surrogate Pairs (.NET only supports ASCII, but Java supports these)
+
+                        yield return new TestCaseData((short)999, "𝟗𑃹𝟫", 0, 6, 10);
+                        yield return new TestCaseData((short)5783, "𝟓𝟕𝟖𝟑", 0, 8, 10);
+                        yield return new TestCaseData((short)479, "𑁪𑁭𑁯", 0, 6, 10);
+
+                        // Non-decimal needs to be tested separately because they go through
+                        // a separate execution path
+                        yield return new TestCaseData((short)2457, "𝟗𑃹𝟫", 0, 6, 16);
+                        yield return new TestCaseData((short)22403, "𝟓𝟕𝟖𝟑", 0, 8, 16);
+                        yield return new TestCaseData((short)1145, "𑁪𑁭𑁯", 0, 6, 16);
                     }
                 }
 
