@@ -1321,6 +1321,18 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-9223372036854775808L, "-8000000000000000", 16); // Special case: In Java, we allow the negative sign for the smallest negative number
                         yield return new TestCaseData(-9223372036854775808L, "8000000000000000", 16);  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
                         yield return new TestCaseData(-9223372036854775807L, "8000000000000001", 16);
+
+                        // Surrogate Pairs (.NET only supports ASCII, but Java supports these)
+
+                        yield return new TestCaseData(999L, "𝟗𑃹𝟫", 10);
+                        yield return new TestCaseData(5783L, "𝟓𝟕𝟖𝟑", 10);
+                        yield return new TestCaseData(479L, "𑁪𑁭𑁯", 10);
+
+                        // Non-decimal needs to be tested separately because they go through
+                        // a separate execution path
+                        yield return new TestCaseData(2457L, "𝟗𑃹𝟫", 16);
+                        yield return new TestCaseData(22403L, "𝟓𝟕𝟖𝟑", 16);
+                        yield return new TestCaseData(1145L, "𑁪𑁭𑁯", 16);
                     }
                 }
 
@@ -1469,6 +1481,18 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-9223372036854775808L, "-8000000000000000", 0, 17, 16); // Special case: In Java, we allow the negative sign for the smallest negative number
                         yield return new TestCaseData(-9223372036854775808L, "8000000000000000", 0, 16, 16);  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
                         yield return new TestCaseData(-9223372036854775807L, "8000000000000001", 0, 16, 16);
+
+                        // Surrogate Pairs (.NET only supports ASCII, but Java supports these)
+
+                        yield return new TestCaseData(999L, "𝟗𑃹𝟫", 0, 6, 10);
+                        yield return new TestCaseData(5783L, "𝟓𝟕𝟖𝟑", 0, 8, 10);
+                        yield return new TestCaseData(479L, "𑁪𑁭𑁯", 0, 6, 10);
+
+                        // Non-decimal needs to be tested separately because they go through
+                        // a separate execution path
+                        yield return new TestCaseData(2457L, "𝟗𑃹𝟫", 0, 6, 16);
+                        yield return new TestCaseData(22403L, "𝟓𝟕𝟖𝟑", 0, 8, 16);
+                        yield return new TestCaseData(1145L, "𑁪𑁭𑁯", 0, 6, 16);
                     }
                 }
 
