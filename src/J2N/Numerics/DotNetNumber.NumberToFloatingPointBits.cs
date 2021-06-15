@@ -44,6 +44,11 @@ namespace J2N.Numerics
             public int MinBinaryExponent { get; }
             public int MaxBinaryExponent { get; }
 
+            // Harmony has different values for MIN_EXPONENT and MAX_EXPONENT, so we
+            // add them to make it possible to use the Harmony logic to parse Hex floating point strings.
+            public long MaxExponent { get; }
+            public long MinExponent { get; }
+
             public int ExponentBias { get; }
             public int OverflowDecimalExponent { get; }
 
@@ -64,6 +69,11 @@ namespace J2N.Numerics
 
                 MaxBinaryExponent = maxBinaryExponent;
                 MinBinaryExponent = 1 - maxBinaryExponent;
+
+                // Harmony has different values for MIN_EXPONENT and MAX_EXPONENT, so we
+                // add them to make it possible to use the Harmony logic to parse Hex floating point strings.
+                MaxExponent = ~(-1L << exponentBits);
+                MinExponent = -(denormalMantissaBits + 1);
 
                 DenormalMantissaMask = (1UL << denormalMantissaBits) - 1;
                 NormalMantissaMask = (1UL << NormalMantissaBits) - 1;

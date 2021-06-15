@@ -30,7 +30,7 @@ namespace J2N.Globalization
         /// separators, or a decimal separator, can be present in the parsed string. The
         /// string to be parsed must consist of integral decimal digits only.
         /// </summary>
-        None = 0,
+        None = 0x00000000,
 
         /// <summary>
         /// Indicates that leading white-space characters can be present in the parsed string.
@@ -38,42 +38,35 @@ namespace J2N.Globalization
         /// U+000C, U+000D, and U+0020. Note that this is a subset of the characters for
         /// which the <see cref="char.IsWhiteSpace(char)"/> method returns <c>true</c>.
         /// </summary>
-        AllowLeadingWhite = 1,
+        AllowLeadingWhite = 0x00000001,
 
         /// Indicates that trailing white-space characters can be present in the parsed string.
         /// Valid white-space characters have the Unicode values U+0009, U+000A, U+000B,
         /// U+000C, U+000D, and U+0020. Note that this is a subset of the characters for
         /// which the <see cref="char.IsWhiteSpace(char)"/> method returns <c>true</c>.
         /// </summary>
-        AllowTrailingWhite = 2,
+        AllowTrailingWhite = 0x00000002,
 
         /// <summary>
         /// Indicates that the numeric string can have a leading sign. Valid leading sign
         /// characters are determined by the <see cref="NumberFormatInfo.PositiveSign"/>
         /// and <see cref="NumberFormatInfo.NegativeSign"/> properties.
         /// </summary>
-        AllowLeadingSign = 4,
-
-        /// <summary>
-        /// Indicates that the <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
-        /// and <see cref="AllowLeadingSign"/> styles are used. This
-        /// is a composite number style.
-        /// </summary>
-        Integer = 7,
+        AllowLeadingSign = 0x00000004,
 
         /// <summary>
         /// Indicates that the numeric string can have a trailing sign. Valid trailing sign
         /// characters are determined by the <see cref="NumberFormatInfo.PositiveSign"/>
         /// and <see cref="NumberFormatInfo.NegativeSign"/>.
         /// </summary>
-        AllowTrailingSign = 8,
+        AllowTrailingSign = 0x00000008,
 
         /// <summary>
         /// Indicates that the numeric string can have one pair of parentheses enclosing
         /// the number. The parentheses indicate that the string to be parsed represents
         /// a negative number.
         /// </summary>
-        AllowParentheses = 16,
+        AllowParentheses = 0x00000010,
 
         /// <summary>
         /// Indicates that the numeric string can have a decimal point. If the <see cref="NumberStyle"/>
@@ -83,7 +76,7 @@ namespace J2N.Globalization
         /// property. Otherwise, the decimal separator character is determined by the <see cref="NumberFormatInfo.NumberDecimalSeparator"/>
         /// property.
         /// </summary>
-        AllowDecimalPoint = 32,
+        AllowDecimalPoint = 0x00000020,
 
         /// <summary>
         /// Indicates that the numeric string can have group separators, such as symbols
@@ -96,15 +89,9 @@ namespace J2N.Globalization
         /// number of digits in each group is determined by the <see cref="NumberFormatInfo.NumberGroupSizes"/>
         /// property.
         /// </summary>
-        AllowThousands = 64,
+        AllowThousands = 0x00000040,
 
-        /// <summary>
-        /// Indicates that the <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
-        /// <see cref="AllowLeadingSign"/>, <see cref="AllowTrailingSign"/>,
-        /// <see cref="AllowDecimalPoint"/>, and <see cref="AllowThousands"/>
-        /// styles are used. This is a composite number style.
-        /// </summary>
-        Number = 111,
+        
 
         /// <summary>
         /// Indicates that the numeric string can be in exponential notation. The <see cref="AllowExponent"/>
@@ -115,22 +102,14 @@ namespace J2N.Globalization
         /// or mantissa; to allow these elements in the string to be parsed, use the <see cref="AllowDecimalPoint"/>
         /// style that includes these individual flags.
         /// </summary>
-        AllowExponent = 128,
-
-        /// <summary>
-        /// Indicates that the <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
-        /// <see cref="AllowLeadingSign"/>, <see cref="AllowDecimalPoint"/>,
-        /// and <see cref="AllowExponent"/> styles are used. This is
-        /// a composite number style.
-        /// </summary>
-        Float = 167,
+        AllowExponent = 0x00000080,
 
         /// <summary>
         /// Indicates that the numeric string can contain a currency symbol. Valid currency
         /// symbols are determined by the <see cref="NumberFormatInfo.CurrencySymbol"/>
         /// property.
         /// </summary>
-        AllowCurrencySymbol = 256,
+        AllowCurrencySymbol = 0x00000100,
 
         /// <summary>
         /// Indicates that all styles except <see cref="AllowExponent"/>
@@ -139,11 +118,7 @@ namespace J2N.Globalization
         /// </summary>
         Currency = 383,
 
-        /// <summary>
-        /// Indicates that all styles except <see cref="AllowHexSpecifier"/>
-        /// are used. This is a composite number style.
-        /// </summary>
-        Any = 511,
+        
 
         /// <summary>
         /// Indicates that the numeric string represents a hexadecimal value. Valid hexadecimal
@@ -156,16 +131,8 @@ namespace J2N.Globalization
         /// The <see cref="NumberStyle"/> enumeration includes a composite style,
         /// <see cref="HexNumber"/>, that consists of these three flags.
         /// </summary>
-        AllowHexSpecifier = 512,
+        AllowHexSpecifier = 0x00000200,
 
-        /// <summary>
-        /// Indicates that <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
-        /// and <see cref="AllowHexSpecifier"/> styles are used. This
-        /// is a composite number style.
-        /// </summary>
-        HexNumber = 515,
-
-        // J2N specific flags
 
         /// <summary>
         /// Indicates that the numeric string represents a floating point number expressed as a
@@ -174,6 +141,55 @@ namespace J2N.Globalization
         /// However, performance is better in .NET 5+ and .NET Core 3+ if you don't choose this option,
         /// so it is recommended only to use it if you have strings like this to parse.
         /// </summary>
-        AllowTrailingFloatType = 1024,
+        AllowTrailingFloatType = 0x00000400, // J2N specific
+
+
+        /// <summary>
+        /// Indicates that the <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
+        /// and <see cref="AllowLeadingSign"/> styles are used. This
+        /// is a composite number style.
+        /// </summary>
+        Integer = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign,
+
+        /// <summary>
+        /// Indicates that <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
+        /// and <see cref="AllowHexSpecifier"/> styles are used. This
+        /// is a composite number style.
+        /// </summary>
+        HexNumber = AllowLeadingWhite | AllowTrailingWhite | AllowHexSpecifier,
+
+        /// <summary>
+        /// Indicates that the <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
+        /// <see cref="AllowLeadingSign"/>, <see cref="AllowTrailingSign"/>,
+        /// <see cref="AllowDecimalPoint"/>, and <see cref="AllowThousands"/>
+        /// styles are used. This is a composite number style.
+        /// </summary>
+        Number = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign | AllowTrailingSign |
+                   AllowDecimalPoint | AllowThousands,
+
+        /// <summary>
+        /// Indicates that the <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
+        /// <see cref="AllowLeadingSign"/>, <see cref="AllowDecimalPoint"/>,
+        /// and <see cref="AllowExponent"/> styles are used. This is
+        /// a composite number style.
+        /// </summary>
+        Float = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign |
+                   AllowDecimalPoint | AllowExponent,
+
+        /// <summary>
+        /// Indicates that the <see cref="AllowLeadingWhite"/>, <see cref="AllowTrailingWhite"/>,
+        /// <see cref="AllowLeadingSign"/>, <see cref="AllowDecimalPoint"/>,
+        /// <see cref="AllowExponent"/>, and <see cref="AllowHexSpecifier"/> styles are used. This is
+        /// a composite number style.
+        /// </summary>
+        HexFloat = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign |
+                   AllowDecimalPoint | AllowExponent | AllowHexSpecifier, // J2N specific
+
+        /// <summary>
+        /// Indicates that all styles except <see cref="AllowHexSpecifier"/>
+        /// are used. This is a composite number style.
+        /// </summary>
+        Any = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign | AllowTrailingSign |
+                   AllowParentheses | AllowDecimalPoint | AllowThousands | AllowCurrencySymbol | AllowExponent,
     }
 }

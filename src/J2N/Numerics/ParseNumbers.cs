@@ -1,14 +1,10 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Text;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using J2N.Text;
 
 namespace J2N.Numerics
 {
@@ -84,6 +80,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -170,6 +167,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -254,6 +252,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -338,6 +337,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -430,6 +430,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -528,6 +529,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -624,6 +626,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -720,6 +723,7 @@ namespace J2N.Numerics
                 i++;
             }
 
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -821,7 +825,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -909,7 +913,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -995,7 +999,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -1081,7 +1085,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -1175,7 +1179,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -1276,7 +1280,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -1375,7 +1379,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -1474,7 +1478,7 @@ namespace J2N.Numerics
                 i++;
             }
 
-            // Consume the 0x if we're in an unknown base or in base-16.
+            // Consume the 0x if we're in base-16.
             if ((radix == 16) && (i + 1 < length) && s[i] == '0')
             {
                 if (s[i + 1] == 'x' || s[i + 1] == 'X')
@@ -1869,7 +1873,7 @@ namespace J2N.Numerics
                 maxVal = 0x7FFFFFFFFFFFFFFF / 10;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
@@ -1879,6 +1883,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
+                    i += charCount;
                 }
 
                 if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
@@ -1893,7 +1898,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffffffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -1911,6 +1916,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -1931,7 +1937,7 @@ namespace J2N.Numerics
                 maxVal = 0x7FFFFFFFFFFFFFFF / 10;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
@@ -1941,6 +1947,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
+                    i += charCount;
                 }
 
                 if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
@@ -1955,7 +1962,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffffffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -1973,6 +1980,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -1991,7 +1999,7 @@ namespace J2N.Numerics
                 maxVal = 0x7FFFFFFFFFFFFFFF / 10;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
@@ -2001,6 +2009,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
+                    i += charCount;
                 }
 
                 if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
@@ -2015,7 +2024,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffffffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -2033,6 +2042,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -2051,7 +2061,7 @@ namespace J2N.Numerics
                 maxVal = 0x7FFFFFFFFFFFFFFF / 10;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || ((long)unsignedResult) < 0)
@@ -2061,6 +2071,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = unsignedResult * (ulong)radix + (ulong)value;
+                    i += charCount;
                 }
 
                 if ((long)unsignedResult < 0 && unsignedResult != 0x8000000000000000)
@@ -2075,7 +2086,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffffffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -2093,6 +2104,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -2117,7 +2129,7 @@ namespace J2N.Numerics
                 maxVal = (0x7FFFFFFF / 10);
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || (int)unsignedResult < 0)
@@ -2126,6 +2138,7 @@ namespace J2N.Numerics
                         return false;
                     }
                     unsignedResult = unsignedResult * (uint)radix + (uint)value;
+                    i += charCount;
                 }
                 if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
                 {
@@ -2139,7 +2152,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -2157,6 +2170,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -2177,7 +2191,7 @@ namespace J2N.Numerics
                 maxVal = (0x7FFFFFFF / 10);
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || (int)unsignedResult < 0)
@@ -2186,6 +2200,7 @@ namespace J2N.Numerics
                         return false;
                     }
                     unsignedResult = unsignedResult * (uint)radix + (uint)value;
+                    i += charCount;
                 }
                 if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
                 {
@@ -2199,7 +2214,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -2217,6 +2232,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -2235,7 +2251,7 @@ namespace J2N.Numerics
                 maxVal = (0x7FFFFFFF / 10);
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || (int)unsignedResult < 0)
@@ -2244,6 +2260,7 @@ namespace J2N.Numerics
                         return false;
                     }
                     unsignedResult = unsignedResult * (uint)radix + (uint)value;
+                    i += charCount;
                 }
                 if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
                 {
@@ -2257,7 +2274,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -2275,6 +2292,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -2293,7 +2311,7 @@ namespace J2N.Numerics
                 maxVal = (0x7FFFFFFF / 10);
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal || (int)unsignedResult < 0)
@@ -2302,6 +2320,7 @@ namespace J2N.Numerics
                         return false;
                     }
                     unsignedResult = unsignedResult * (uint)radix + (uint)value;
+                    i += charCount;
                 }
                 if ((int)unsignedResult < 0 && unsignedResult != 0x80000000)
                 {
@@ -2315,7 +2334,7 @@ namespace J2N.Numerics
                 maxVal = 0xffffffff / (uint)radix;
 
                 // Read all of the digits and convert to a number
-                while (i < end && EatDigit(s, ref i, end, radix, out int value))
+                while (i < end && IsDigit(s, i, end, radix, out int value, out int charCount))
                 {
                     // Check for overflows - this is sufficient & correct.
                     if (unsignedResult > maxVal)
@@ -2333,6 +2352,7 @@ namespace J2N.Numerics
                     }
 
                     unsignedResult = temp;
+                    i += charCount;
                 }
             }
 
@@ -2450,122 +2470,70 @@ namespace J2N.Numerics
 
 #if FEATURE_READONLYSPAN
 
-        /// <summary>
-        /// Consumes one character from the array <paramref name="s"/> and increments <paramref name="i"/>
-        /// to the number of individual <see cref="char"/>s that the character is composed of. If the
-        /// character is a surrogate pair, consumes 2 characters; otherwise consumes 1 character.
-        /// Returns the result digit in <paramref name="result"/>. If there is no digit at <paramref name="i"/>,
-        /// returns <c>false</c> and doesn't increment <paramref name="i"/>.
-        /// </summary>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        private static bool EatDigit(ReadOnlySpan<char> s, ref int i, int end, int radix, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        private static bool IsDigit(ReadOnlySpan<char> s, int i, int end, int radix, out int result, out int charCount) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
-            int localIndex = i;
-            if (char.IsHighSurrogate(s[localIndex]) && localIndex + 1 < end && char.IsLowSurrogate(s[localIndex + 1]))
+            if (char.IsHighSurrogate(s[i]) && i + 1 < end && char.IsLowSurrogate(s[i + 1]))
             {
-                result = Character.Digit(Character.ToCodePoint(s[localIndex++], s[localIndex++]), radix);
+                result = Character.Digit(Character.ToCodePoint(s[i++], s[i++]), radix);
+                charCount = result == -1 ? 0 : 2;
+                return result != -1;
             }
-            else
-            {
-                result = Character.Digit(s[localIndex++], radix);
-            }
-            if (result != -1)
-            {
-                i = localIndex;
-                return true;
-            }
-            return false;
+            result = Character.Digit(s[i++], radix);
+            charCount = result == -1 ? 0 : 1;
+            return result != -1;
         }
 
 #endif
 
-        /// <summary>
-        /// Consumes one character from the array <paramref name="s"/> and increments <paramref name="i"/>
-        /// to the number of individual <see cref="char"/>s that the character is composed of. If the
-        /// character is a surrogate pair, consumes 2 characters; otherwise consumes 1 character.
-        /// Returns the result digit in <paramref name="result"/>. If there is no digit at <paramref name="i"/>,
-        /// returns <c>false</c> and doesn't increment <paramref name="i"/>.
-        /// </summary>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        private static bool EatDigit(string s, ref int i, int end, int radix, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        private static bool IsDigit(string s, int i, int end, int radix, out int result, out int charCount) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
-            int localIndex = i;
-            if (char.IsHighSurrogate(s[localIndex]) && localIndex + 1 < end && char.IsLowSurrogate(s[localIndex + 1]))
+            if (char.IsHighSurrogate(s[i]) && i + 1 < end && char.IsLowSurrogate(s[i + 1]))
             {
-                result = Character.Digit(Character.ToCodePoint(s[localIndex++], s[localIndex++]), radix);
+                result = Character.Digit(Character.ToCodePoint(s[i++], s[i++]), radix);
+                charCount = result == -1 ? 0 : 2;
+                return result != -1;
             }
-            else
-            {
-                result = Character.Digit(s[localIndex++], radix);
-            }
-            if (result != -1)
-            {
-                i = localIndex;
-                return true;
-            }
-            return false;
+            result = Character.Digit(s[i++], radix);
+            charCount = result == -1 ? 0 : 1;
+            return result != -1;
         }
 
-        /// <summary>
-        /// Consumes one character from the array <paramref name="s"/> and increments <paramref name="i"/>
-        /// to the number of individual <see cref="char"/>s that the character is composed of. If the
-        /// character is a surrogate pair, consumes 2 characters; otherwise consumes 1 character.
-        /// Returns the result digit in <paramref name="result"/>. If there is no digit at <paramref name="i"/>,
-        /// returns <c>false</c> and doesn't increment <paramref name="i"/>.
-        /// </summary>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        private static bool EatDigit(char[] s, ref int i, int end, int radix, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        private static bool IsDigit(char[] s, int i, int end, int radix, out int result, out int charCount) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
-            int localIndex = i;
-            if (char.IsHighSurrogate(s[localIndex]) && localIndex + 1 < end && char.IsLowSurrogate(s[localIndex + 1]))
+            if (char.IsHighSurrogate(s[i]) && i + 1 < end && char.IsLowSurrogate(s[i + 1]))
             {
-                result = Character.Digit(Character.ToCodePoint(s[localIndex++], s[localIndex++]), radix);
+                result = Character.Digit(Character.ToCodePoint(s[i++], s[i++]), radix);
+                charCount = result == -1 ? 0 : 2;
+                return result != -1;
             }
-            else
-            {
-                result = Character.Digit(s[localIndex++], radix);
-            }
-            if (result != -1)
-            {
-                i = localIndex;
-                return true;
-            }
-            return false;
+            result = Character.Digit(s[i++], radix);
+            charCount = result == -1 ? 0 : 1;
+            return result != -1;
         }
 
-        /// <summary>
-        /// Consumes one character from the array <paramref name="s"/> and increments <paramref name="i"/>
-        /// to the number of individual <see cref="char"/>s that the character is composed of. If the
-        /// character is a surrogate pair, consumes 2 characters; otherwise consumes 1 character.
-        /// Returns the result digit in <paramref name="result"/>. If there is no digit at <paramref name="i"/>,
-        /// returns <c>false</c> and doesn't increment <paramref name="i"/>.
-        /// </summary>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        private static bool EatDigit(ICharSequence s, ref int i, int end, int radix, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
+        private static bool IsDigit(ICharSequence s, int i, int end, int radix, out int result, out int charCount) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
-            int localIndex = i;
-            if (char.IsHighSurrogate(s[localIndex]) && localIndex + 1 < end && char.IsLowSurrogate(s[localIndex + 1]))
+            if (char.IsHighSurrogate(s[i]) && i + 1 < end && char.IsLowSurrogate(s[i + 1]))
             {
-                result = Character.Digit(Character.ToCodePoint(s[localIndex++], s[localIndex++]), radix);
+                result = Character.Digit(Character.ToCodePoint(s[i++], s[i++]), radix);
+                charCount = result == -1 ? 0 : 2;
+                return result != -1;
             }
-            else
-            {
-                result = Character.Digit(s[localIndex++], radix);
-            }
-            if (result != -1)
-            {
-                i = localIndex;
-                return true;
-            }
-            return false;
+            result = Character.Digit(s[i++], radix);
+            charCount = result == -1 ? 0 : 1;
+            return result != -1;
         }
 
         #endregion IsDigit
