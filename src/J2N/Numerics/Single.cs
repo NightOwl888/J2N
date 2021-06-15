@@ -374,7 +374,13 @@ namespace J2N.Numerics
             //        .parseDouble(string);
 
             if (FloatingPointParser.ParseAsHex(s))
-                return HexStringParser.ParseFloat(s);
+            //return HexStringParser.ParseSingle(s, style, numberFormat);
+            {
+                //var value1 = HexStringParser.ParseSingle(s, style, numberFormat);
+                //return HexStringParser.ParseSingle(s, style, numberFormat);
+                if (DotNetNumber.TryParseSingleHexFloatStyle(s, style, numberFormat, out float result) == DotNetNumber.ParsingStatus.OK)
+                    return result;
+            }
 
             return DotNetNumber.ParseSingle(s, style, numberFormat);
             //return FloatingDecimal.ParseFloat(s);
