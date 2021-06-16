@@ -323,7 +323,7 @@ namespace J2N.Numerics
          */
         public static double Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
-            return Parse(s, NumberStyle.Float, provider);
+            return Parse(s, NumberStyle.Float | NumberStyle.AllowThousands, provider);
 
             //return FloatingPointParser.ParseDouble(s, J2N.Text.StringFormatter.CurrentCulture);
             //return org.apache.harmony.luni.util.FloatingPointParser
