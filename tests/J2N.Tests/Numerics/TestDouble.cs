@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using J2N.Globalization;
+using NUnit.Framework;
 using System;
 using System.Globalization;
 
@@ -605,7 +606,7 @@ namespace J2N.Numerics
         {
             try
             {
-                Double.Parse("0.0p0D", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse("0.0p0D", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -615,7 +616,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse("+0x.p1d", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse("+0x.p1d", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -625,7 +626,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse("0Xg.gp1D", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse("0Xg.gp1D", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -635,7 +636,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse("-0x1.1p", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse("-0x1.1p", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -645,7 +646,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse("+0x 1.1 p2d", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse("+0x 1.1 p2d", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -655,7 +656,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse("x1.1p2d", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse("x1.1p2d", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -665,7 +666,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse(" 0x-2.1p2", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse(" 0x-2.1p2", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -675,7 +676,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse(" 0x2.1pad", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse(" 0x2.1pad", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -685,7 +686,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.Parse(" 0x111.222p 22d", J2N.Text.StringFormatter.InvariantCulture);
+                Double.Parse(" 0x111.222p 22d", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Should throw FormatException.");
             }
             catch (FormatException e)
@@ -703,80 +704,80 @@ namespace J2N.Numerics
             double actual;
             double expected;
 
-            actual = Double.Parse("0x0.0p0D", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x0.0p0D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0d, actual, 0.0D);
 
-            actual = Double.Parse("0xa.ap+9d", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0xa.ap+9d", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 5440.0d, actual, 0.0D);
 
-            actual = Double.Parse("+0Xb.10ap8", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("+0Xb.10ap8", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 2832.625d, actual, 0.0D);
 
-            actual = Double.Parse("-0X.a0P2D", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("-0X.a0P2D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", -2.5d, actual, 0.0D);
 
-            actual = Double.Parse("\r 0x22.1p2d \t", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("\r 0x22.1p2d \t", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 136.25d, actual, 0.0D);
 
-            actual = Double.Parse("0x1.0p-1", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x1.0p-1", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.5, actual, 0.0D);
 
             actual = Double
-                    .Parse("0x00000000000000000000000000000000001.0p-1", J2N.Text.StringFormatter.InvariantCulture);
+                    .Parse("0x00000000000000000000000000000000001.0p-1", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.5, actual, 0.0D);
 
-            actual = Double.Parse("0x1.0p-00000000000000000000000000001", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x1.0p-00000000000000000000000000001", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.5, actual, 0.0D);
 
-            actual = Double.Parse("0x.100000000000000000000000000000000p1", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x.100000000000000000000000000000000p1", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.125, actual, 0.0D);
 
-            actual = Double.Parse("0x0.0p999999999999999999999999999999999999999999999999999999999999999", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x0.0p999999999999999999999999999999999999999999999999999999999999999", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0, actual, 0.0D);
 
-            actual = Double.Parse("0xf1.0p9999999999999999999999999999999999999999999999999999999999999999", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0xf1.0p9999999999999999999999999999999999999999999999999999999999999999", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", double.PositiveInfinity, actual, 0.0D);
 
-            actual = Double.Parse("0xffffffffffffffffffffffffffffffffffff.ffffffffffffffffffffffffffffffffffffffffffffffp1", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0xffffffffffffffffffffffffffffffffffff.ffffffffffffffffffffffffffffffffffffffffffffffp1", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             expected = Double.Int64BitsToDouble(0x4900000000000000L);
             assertEquals("Returned incorrect value", expected, actual, 0.0D);
 
-            actual = Double.Parse("0x0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001p1600", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x0.000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001p1600", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             expected = Double.Int64BitsToDouble(0x7f30000000000000L);
             assertEquals("Returned incorrect value", expected, actual, 0.0D);
 
-            actual = Double.Parse("0x0.0p-999999999999999999999999999999999999999999999999999999", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x0.0p-999999999999999999999999999999999999999999999999999999", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0, actual, 0.0D);
 
-            actual = Double.Parse("0xf1.0p-9999999999999999999999999999999999999999999999999999999999999999", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0xf1.0p-9999999999999999999999999999999999999999999999999999999999999999", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0, actual, 0.0D);
 
-            actual = Double.Parse("0x10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000p-1600", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000p-1600", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             expected = Double.Int64BitsToDouble(0xf0000000000000L);
             assertEquals("Returned incorrect value", expected, actual, 0.0D);
 
-            actual = Double.Parse("0x1.p9223372036854775807", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x1.p9223372036854775807", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", double.PositiveInfinity, actual, 0.0D);
 
-            actual = Double.Parse("0x1.p9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x1.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", double.PositiveInfinity, actual, 0.0D);
 
-            actual = Double.Parse("0x10.p9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x10.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", double.PositiveInfinity, actual, 0.0D);
 
-            actual = Double.Parse("0xabcd.ffffffffp+2000", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0xabcd.ffffffffp+2000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", double.PositiveInfinity, actual, 0.0D);
 
-            actual = Double.Parse("0x1.p-9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x1.p-9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0, actual, 0.0D);
 
-            actual = Double.Parse("0x1.p-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x1.p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0, actual, 0.0D);
 
-            actual = Double.Parse("0x.1p-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0x.1p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0, actual, 0.0D);
 
-            actual = Double.Parse("0xabcd.ffffffffffffffp-2000", J2N.Text.StringFormatter.InvariantCulture);
+            actual = Double.Parse("0xabcd.ffffffffffffffp-2000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Returned incorrect value", 0.0, actual, 0.0D);
         }
 
@@ -831,7 +832,7 @@ namespace J2N.Numerics
                 int part = i * 11;
                 String inputString = "0x" + part + "." + part + "0123456789abcdefp" + part;
 
-                double actual = Double.Parse(inputString, J2N.Text.StringFormatter.InvariantCulture);
+                double actual = Double.Parse(inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 double expected = Double.Int64BitsToDouble(expecteds[i]);
 
                 String expectedString = "0x" + Double.DoubleToInt64Bits(expected).ToHexString();
@@ -895,7 +896,7 @@ namespace J2N.Numerics
                 int part = i * 11;
                 String inputString = "0x" + part + "." + part + "0123456789abcdefp-" + part;
 
-                double actual = Double.Parse(inputString, J2N.Text.StringFormatter.InvariantCulture);
+                double actual = Double.Parse(inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 double expected = Double.Int64BitsToDouble(expecteds[i]);
 
                 String expectedString = "0x" + Double.DoubleToInt64Bits(expected).ToHexString();
@@ -962,7 +963,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                double actual = Double.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                double actual = Double.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 double expected = Double.Int64BitsToDouble(expecteds[i]);
 
                 String expectedString = "0x" + Double.DoubleToInt64Bits(expected).ToHexString();
@@ -1029,7 +1030,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                double actual = Double.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                double actual = Double.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 double expected = Double.Int64BitsToDouble(expecteds[i]);
 
                 String expectedString = "0x" + Double.DoubleToInt64Bits(expected).ToHexString();
@@ -1096,7 +1097,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                double actual = Double.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                double actual = Double.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 double expected = Double.Int64BitsToDouble(expecteds[i]);
 
                 String expectedString = "0x" + Double.DoubleToInt64Bits(expected).ToHexString();
@@ -1163,7 +1164,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                double actual = Double.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                double actual = Double.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 double expected = Double.Int64BitsToDouble(expecteds[i]);
 
                 String expectedString = "0x" + Double.DoubleToInt64Bits(expected).ToHexString();
@@ -1213,7 +1214,7 @@ namespace J2N.Numerics
 
             for (int i = 0; i < inputs.Length; i++)
             {
-                double actual = Double.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+                double actual = Double.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                 double expected = Double.Int64BitsToDouble(expecteds[i]);
 
                 String expectedString = "0x" + Double.DoubleToInt64Bits(expected).ToHexString();
@@ -1377,17 +1378,15 @@ namespace J2N.Numerics
             assertTrue("Incorrect double returned", Math.Abs(Double.ValueOf("999999999999.999", J2N.Text.StringFormatter.InvariantCulture)
                     .GetDoubleValue() - 999999999999.999d) < 1);
 
-            //try
-            //{
-            //    Double.ValueOf(null);
-            //    fail("Expected Double.valueOf(null) to throw NPE.");
-            //}
-            //catch (ArgumentNullException ex)
-            //{
-            //    // expected
-            //}
-
-            assertEquals(Double.ValueOf(0d), Double.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Match .NET behavior so this is more of a drop-in replacement
+            try
+            {
+                Double.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                fail("Expected Double.valueOf(null) to throw NPE.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                // expected
+            }
 
             try
             {
