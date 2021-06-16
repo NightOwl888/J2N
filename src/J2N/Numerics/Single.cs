@@ -349,17 +349,16 @@ namespace J2N.Numerics
          */
         public static float Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Rename Parse()
         {
-            // J2N: In .NET we don't throw on null, but return zero to match behavior of built-in parser.
             if (s is null)
-                return 0.0f;
+                throw new ArgumentNullException(nameof(s));
 
-            provider ??= CultureInfo.CurrentCulture;
+            //provider ??= NumberFormatInfo.CurrentInfo;
 
-            s = s.Trim();
-            if (s == string.Empty)
-                throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
+            //s = s.Trim();
+            //if (s == string.Empty)
+            //    throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
 
-            var numberFormat = (NumberFormatInfo)(provider?.GetFormat(typeof(NumberFormatInfo)) ?? CultureInfo.CurrentCulture.NumberFormat);
+            var numberFormat = (NumberFormatInfo)(provider?.GetFormat(typeof(NumberFormatInfo)) ?? NumberFormatInfo.CurrentInfo);
 
             //provider ??= CultureInfo.CurrentCulture;
 
@@ -373,14 +372,14 @@ namespace J2N.Numerics
             //return org.apache.harmony.luni.util.FloatingPointParser
             //        .parseDouble(string);
 
-            if (FloatingPointParser.ParseAsHex(s))
-            //return HexStringParser.ParseSingle(s, style, numberFormat);
-            {
-                //var value1 = HexStringParser.ParseSingle(s, style, numberFormat);
-                //return HexStringParser.ParseSingle(s, style, numberFormat);
-                if (DotNetNumber.TryParseSingleHexFloatStyle(s, style, numberFormat, out float result) == DotNetNumber.ParsingStatus.OK)
-                    return result;
-            }
+            //if (FloatingPointParser.ParseAsHex(s))
+            ////return HexStringParser.ParseSingle(s, style, numberFormat);
+            //{
+            //    //var value1 = HexStringParser.ParseSingle(s, style, numberFormat);
+            //    //return HexStringParser.ParseSingle(s, style, numberFormat);
+            //    if (DotNetNumber.TryParseSingleHexFloatStyle(s, style, numberFormat, out float result) == DotNetNumber.ParsingStatus.OK)
+            //        return result;
+            //}
 
             return DotNetNumber.ParseSingle(s, style, numberFormat);
             //return FloatingDecimal.ParseFloat(s);

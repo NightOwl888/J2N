@@ -342,16 +342,15 @@ namespace J2N.Numerics
          */
         public static double Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
-            // J2N: In .NET we don't throw on null, but return zero to match behavior of built-in parser.
             if (s is null)
-                return 0.0d;
+                throw new ArgumentNullException(nameof(s));
 
-            s = s.Trim();
-            if (s == string.Empty)
-                throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
+            //s = s.Trim();
+            //if (s == string.Empty)
+            //    throw new FormatException("The string was empty, which is not allowed."); // J2N TODO: Localize string
 
-            //provider ??= CultureInfo.CurrentCulture;
-            var numberFormat = (NumberFormatInfo)(provider?.GetFormat(typeof(NumberFormatInfo)) ?? CultureInfo.CurrentCulture.NumberFormat);
+            //provider ??= NumberFormatInfo.CurrentInfo;
+            var numberFormat = (NumberFormatInfo)(provider?.GetFormat(typeof(NumberFormatInfo)) ?? NumberFormatInfo.CurrentInfo);
 
             //if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))) ||
             //    FloatingDecimal.ParseAsHex(s))
@@ -363,8 +362,8 @@ namespace J2N.Numerics
             //return org.apache.harmony.luni.util.FloatingPointParser
             //        .parseDouble(string);
 
-            if (FloatingPointParser.ParseAsHex(s))
-                return HexStringParser.ParseDouble(s);
+            //if (FloatingPointParser.ParseAsHex(s))
+            //    return HexStringParser.ParseDouble(s);
 
             //double result = double.Parse(s, provider); // J2N TODO: For now, fallback to .NET. We should respect the NumberFormatInfo settings in the Java parser/formatter, though.
             double result = DotNetNumber.ParseDouble(s, style, numberFormat);

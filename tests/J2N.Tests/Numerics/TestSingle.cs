@@ -950,17 +950,15 @@ namespace J2N.Numerics
             assertTrue("Incorrect float returned--wanted: " + wanted + " but got: " + got, got
                     .Equals(wanted));
 
-            //try
-            //{
-            //    Single.ValueOf(null);
-            //    fail("Expected Float.valueOf(null) to throw NPE.");
-            //}
-            //catch (ArgumentNullException ex)
-            //{
-            //    // expected
-            //}
-
-            assertEquals(Single.ValueOf(0f), Single.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Match .NET behavior so this is more of a drop-in replacement
+            try
+            {
+                Single.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                fail("Expected Float.valueOf(null) to throw NPE.");
+            }
+            catch (ArgumentNullException ex)
+            {
+                // expected
+            }
 
             try
             {

@@ -482,32 +482,7 @@ namespace J2N.Numerics
         }
 
 
-        internal static unsafe ParsingStatus TryParseSingleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
-        {
-            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
-
-            var number = new SingleNumberBuffer(value.Length);
-
-            fixed (char* stringPointer = value)
-            {
-                char* p = stringPointer;
-
-                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
-                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
-                {
-                    //number.CheckConsistency();
-                    result = 0;
-                    return ParsingStatus.Failed;
-                }
-            }
-
-            if (!number.TryGetValue(out result))
-            {
-                return ParsingStatus.Failed;
-            }
-
-            return ParsingStatus.OK;
-        }
+        
 
         private static unsafe bool TryParseFloatingPointHexNumber(ref char* str, char* strEnd, NumberStyle styles, HexFloatingPointNumberBuffer number, NumberFormatInfo info)
         {
@@ -701,24 +676,24 @@ namespace J2N.Numerics
                         do
                         {
                             exp = exp * 10 + (ch - '0');
-                            if (exp <= 1000)
+                            //if (exp <= 1000)
                             {
                                 number.Exponent[number.ExponentLength++] = ch;
                             }
                             ch = ++p < strEnd ? *p : '\0';
-                            if (exp > 1000)
-                            {
-                                exp = 9999;
-                                number.Exponent[0] = '9';
-                                number.Exponent[1] = '9';
-                                number.Exponent[2] = '9';
-                                number.Exponent[3] = '9';
-                                number.ExponentLength = 4;
-                                while (IsDigit(ch))
-                                {
-                                    ch = ++p < strEnd ? *p : '\0';
-                                }
-                            }
+                            //if (exp > 1000)
+                            //{
+                            //    exp = 9999;
+                            //    number.Exponent[0] = '9';
+                            //    number.Exponent[1] = '9';
+                            //    number.Exponent[2] = '9';
+                            //    number.Exponent[3] = '9';
+                            //    number.ExponentLength = 4;
+                            //    while (IsDigit(ch))
+                            //    {
+                            //        ch = ++p < strEnd ? *p : '\0';
+                            //    }
+                            //}
                         } while (IsDigit(ch));
                         //if (negExp)
                         //{
@@ -1987,17 +1962,17 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-        //#if FEATURE_READONLYSPAN
-        //        internal static double ParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
-        //        {
-        //            if (!TryParseDouble(value, styles, info, out double result))
-        //            {
-        //                ThrowOverflowOrFormatException(ParsingStatus.Failed);
-        //            }
+#if FEATURE_READONLYSPAN
+        internal static double ParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
+        {
+            if (!TryParseDouble(value, styles, info, out double result))
+            {
+                ThrowFormatException(new string(value));
+            }
 
-        //            return result;
-        //        }
-        //#endif
+            return result;
+        }
+#endif
 
         internal static double ParseDouble(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
         {
@@ -2009,17 +1984,17 @@ namespace J2N.Numerics
             return result;
         }
 
-//#if FEATURE_READONLYSPAN
-//        internal static float ParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
-//        {
-//            if (!TryParseSingle(value, styles, info, out float result))
-//            {
-//                ThrowOverflowOrFormatException(ParsingStatus.Failed);
-//            }
+#if FEATURE_READONLYSPAN
+        internal static float ParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
+        {
+            if (!TryParseSingle(value, styles, info, out float result))
+            {
+                ThrowFormatException(new string(value));
+            }
 
-//            return result;
-//        }
-//#endif
+            return result;
+        }
+#endif
 
         internal static float ParseSingle(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
         {
@@ -2063,6 +2038,42 @@ namespace J2N.Numerics
 
 #if FEATURE_READONLYSPAN
         internal static unsafe bool TryParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
+        {
+            if ((styles & NumberStyle.AllowHexSpecifier) != 0)
+            {
+                if (TryParseDoubleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
+                {
+                    return true;
+                }
+            }
+
+            if (!TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
+            {
+                return false;
+            }
+            return true;
+        }
+#endif
+
+        internal static unsafe bool TryParseDouble(string value, NumberStyle styles, NumberFormatInfo info, out double result)
+        {
+            if ((styles & NumberStyle.AllowHexSpecifier) != 0)
+            {
+                if (TryParseDoubleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
+                {
+                    return true;
+                }
+            }
+
+            if (!TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
+            {
+                return false;
+            }
+            return true;
+        }
+
+#if FEATURE_READONLYSPAN
+        internal static unsafe bool TryParseDoubleFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             byte* pDigits = stackalloc byte[DoubleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, DoubleNumberBufferLength);
@@ -2125,7 +2136,7 @@ namespace J2N.Numerics
         }
 #endif
 
-        internal static unsafe bool TryParseDouble(string value, NumberStyle styles, NumberFormatInfo info, out double result)
+        internal static unsafe bool TryParseDoubleFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             byte* pDigits = stackalloc byte[DoubleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, DoubleNumberBufferLength);
@@ -2185,6 +2196,69 @@ namespace J2N.Numerics
             }
 
             return true;
+        }
+
+#if FEATURE_READONLYSPAN
+
+        internal static unsafe ParsingStatus TryParseDoubleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
+        {
+            Debug.Assert(info != null);
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+
+            var number = new DoubleNumberBuffer(value.Length);
+
+            fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+            {
+                char* p = stringPointer;
+
+                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
+                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                {
+                    //number.CheckConsistency();
+                    result = 0;
+                    return ParsingStatus.Failed;
+                }
+
+                // J2N TODO: Do we need to do the same validation as the TryParseDoubleFloatStyle?
+            }
+
+            if (!number.TryGetValue(out result))
+            {
+                return ParsingStatus.Failed;
+            }
+
+            return ParsingStatus.OK;
+        }
+#endif
+
+        internal static unsafe ParsingStatus TryParseDoubleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
+        {
+            Debug.Assert(info != null);
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+
+            var number = new DoubleNumberBuffer(value.Length);
+
+            fixed (char* stringPointer = value)
+            {
+                char* p = stringPointer;
+
+                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
+                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                {
+                    //number.CheckConsistency();
+                    result = 0;
+                    return ParsingStatus.Failed;
+                }
+
+                // J2N TODO: Do we need to do the same validation as the TryParseDoubleFloatStyle?
+            }
+
+            if (!number.TryGetValue(out result))
+            {
+                return ParsingStatus.Failed;
+            }
+
+            return ParsingStatus.OK;
         }
 
         //internal static unsafe bool TryParseHalf(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out Half result)
@@ -2257,6 +2331,43 @@ namespace J2N.Numerics
 #if FEATURE_READONLYSPAN
         internal static unsafe bool TryParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
+            if ((styles & NumberStyle.AllowHexSpecifier) != 0)
+            {
+                if (TryParseSingleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
+                {
+                    return true;
+                }
+            }
+
+            if (!TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
+            {
+                return false;
+            }
+            return true;
+        }
+#endif
+
+        internal static unsafe bool TryParseSingle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
+        {
+            if ((styles & NumberStyle.AllowHexSpecifier) != 0)
+            {
+                if (TryParseSingleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
+                {
+                    return true;
+                }
+            }
+
+            if (!TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
+            {
+                return false;
+            }
+            return true;
+        }
+
+
+#if FEATURE_READONLYSPAN
+        internal static unsafe bool TryParseSingleFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
+        {
             byte* pDigits = stackalloc byte[SingleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, SingleNumberBufferLength);
 
@@ -2323,7 +2434,7 @@ namespace J2N.Numerics
         }
 #endif
 
-        internal static unsafe bool TryParseSingle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
+        internal static unsafe bool TryParseSingleFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             byte* pDigits = stackalloc byte[SingleNumberBufferLength];
             NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, SingleNumberBufferLength);
@@ -2388,6 +2499,69 @@ namespace J2N.Numerics
             }
 
             return true;
+        }
+
+#if FEATURE_READONLYSPAN
+
+        internal static unsafe ParsingStatus TryParseSingleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
+        {
+            Debug.Assert(info != null);
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+
+            var number = new SingleNumberBuffer(value.Length);
+
+            fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+            {
+                char* p = stringPointer;
+
+                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
+                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                {
+                    //number.CheckConsistency();
+                    result = 0;
+                    return ParsingStatus.Failed;
+                }
+
+                // J2N TODO: Do we need to do the same validation as the TryParseSingleFloatStyle?
+            }
+
+            if (!number.TryGetValue(out result))
+            {
+                return ParsingStatus.Failed;
+            }
+
+            return ParsingStatus.OK;
+        }
+#endif
+
+        internal static unsafe ParsingStatus TryParseSingleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
+        {
+            Debug.Assert(info != null);
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+
+            var number = new SingleNumberBuffer(value.Length);
+
+            fixed (char* stringPointer = value)
+            {
+                char* p = stringPointer;
+
+                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
+                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                {
+                    //number.CheckConsistency();
+                    result = 0;
+                    return ParsingStatus.Failed;
+                }
+
+                // J2N TODO: Do we need to do the same validation as the TryParseSingleFloatStyle?
+            }
+
+            if (!number.TryGetValue(out result))
+            {
+                return ParsingStatus.Failed;
+            }
+
+            return ParsingStatus.OK;
         }
 
 #if FEATURE_READONLYSPAN
