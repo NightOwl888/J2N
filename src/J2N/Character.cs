@@ -1677,6 +1677,9 @@ namespace J2N
             return -1;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         internal static bool IsAsciiHexDigit(int c)
         {
             if (c < 128)
