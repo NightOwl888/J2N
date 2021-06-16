@@ -327,7 +327,7 @@ namespace J2N.Numerics
          */
         public static float Parse(string s, IFormatProvider? provider) // J2N: Rename Parse()
         {
-            return Parse(s, NumberStyle.Float, provider);
+            return Parse(s, NumberStyle.Float | NumberStyle.AllowThousands, provider);
             //return FloatingPointParser.ParseFloat(value, J2N.Text.StringFormatter.CurrentCulture);
 
             //return float.Parse(value, J2N.Text.StringFormatter.CurrentCulture); // J2N TODO: Is this right?
