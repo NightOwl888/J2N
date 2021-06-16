@@ -76,23 +76,24 @@ namespace J2N.Numerics
             "-1.1754944E35", "-1.1754944E36", "-1.1754943E37", "-1.1754943E38" };
 
 
-        private void doTestCompareRawBits(string originalFloatString, int expectedRawBits,
-            string expectedString)
-        {
-            doTestCompareRawBits(originalFloatString, NumberStyle.Float, expectedRawBits, expectedString);
-        }
+        // J2N: Moved to CharSequences
+        //private void doTestCompareRawBits(string originalFloatString, int expectedRawBits,
+        //    string expectedString)
+        //{
+        //    doTestCompareRawBits(originalFloatString, NumberStyle.Float, expectedRawBits, expectedString);
+        //}
 
-        // J2N specific - allow passing style through so we can test the edge cases for hex or float type suffix (i.e "1.23f") specifier
-        private void doTestCompareRawBits(string originalFloatString, NumberStyle style, int expectedRawBits,
-            string expectedString)
-        {
-            int rawBits;
-            float result = Single.Parse(originalFloatString, style, J2N.Text.StringFormatter.InvariantCulture);
-            rawBits = Single.SingleToInt32Bits(result);
-            assertEquals("Original float(" + originalFloatString + ") Converted float(" + result
-                    + ") Expecting:" + Int32.ToHexString(expectedRawBits) + " Got: "
-                    + Int32.ToHexString(rawBits), expectedRawBits, rawBits);
-        }
+        //// J2N specific - allow passing style through so we can test the edge cases for hex or float type suffix (i.e "1.23f") specifier
+        //private void doTestCompareRawBits(string originalFloatString, NumberStyle style, int expectedRawBits,
+        //    string expectedString)
+        //{
+        //    int rawBits;
+        //    float result = Single.Parse(originalFloatString, style, J2N.Text.StringFormatter.InvariantCulture);
+        //    rawBits = Single.SingleToInt32Bits(result);
+        //    assertEquals("Original float(" + originalFloatString + ") Converted float(" + result
+        //            + ") Expecting:" + Int32.ToHexString(expectedRawBits) + " Got: "
+        //            + Int32.ToHexString(rawBits), expectedRawBits, rawBits);
+        //}
 
         /**
          * @tests java.lang.Float#Float(float)
@@ -325,534 +326,543 @@ namespace J2N.Numerics
             assertTrue("Returned incorrect long value", f.GetInt64Value() == 0 && f2.GetInt64Value() == 90);
         }
 
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloatLjava_lang_String()
-        {
-            assertEquals("Incorrect float returned, expected zero.", 0.0, Single
-                    .Parse("7.0064923216240853546186479164495e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
-            assertEquals("Incorrect float returned, expected minimum float.", float.Epsilon, // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
-                    Single.Parse("7.0064923216240853546186479164496e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
-
-            doTestCompareRawBits(
-                    "0.000000000000000000000000000000000000011754942807573642917278829910357665133228589927589904276829631184250030649651730385585324256680905818939208984375",
-                    0x800000, "1.17549435E-38");
-            doTestCompareRawBits(
-                    "0.00000000000000000000000000000000000001175494280757364291727882991035766513322858992758990427682963118425003064965173038558532425668090581893920898437499999f",
-                    NumberStyle.Float | NumberStyle.AllowTrailingFloatType, // J2N specific - must use AllowTrailingFloatType to specify this is valid
-                    0x7fffff, "1.1754942E-38");
-
-            /* Test a set of regular floats with exponents from -38 to +38 */
-            for (int i = 38; i > 3; i--)
-            {
-                String testString;
-                testString = "3.4028234663852886e-" + i;
-                doTestCompareRawBits(testString, rawBitsFor3_4eN38To38[38 - i],
-                        expectedStringFor3_4eN38To38[38 - i]);
-            }
-            doTestCompareRawBits("3.4028234663852886e-3", rawBitsFor3_4eN38To38[38 - 3],
-                    expectedStringFor3_4eN38To38[38 - 3]);
-            doTestCompareRawBits("3.4028234663852886e-2", rawBitsFor3_4eN38To38[38 - 2],
-                    expectedStringFor3_4eN38To38[38 - 2]);
-            doTestCompareRawBits("3.4028234663852886e-1", rawBitsFor3_4eN38To38[38 - 1],
-                    expectedStringFor3_4eN38To38[38 - 1]);
-            doTestCompareRawBits("3.4028234663852886e-0", rawBitsFor3_4eN38To38[38 - 0],
-                    expectedStringFor3_4eN38To38[38 - 0]);
-            doTestCompareRawBits("3.4028234663852886e+1", rawBitsFor3_4eN38To38[38 + 1],
-                    expectedStringFor3_4eN38To38[38 + 1]);
-            doTestCompareRawBits("3.4028234663852886e+2", rawBitsFor3_4eN38To38[38 + 2],
-                    expectedStringFor3_4eN38To38[38 + 2]);
-            doTestCompareRawBits("3.4028234663852886e+3", rawBitsFor3_4eN38To38[38 + 3],
-                    expectedStringFor3_4eN38To38[38 + 3]);
-            doTestCompareRawBits("3.4028234663852886e+4", rawBitsFor3_4eN38To38[38 + 4],
-                    expectedStringFor3_4eN38To38[38 + 4]);
-            doTestCompareRawBits("3.4028234663852886e+5", rawBitsFor3_4eN38To38[38 + 5],
-                    expectedStringFor3_4eN38To38[38 + 5]);
-            doTestCompareRawBits("3.4028234663852886e+6", rawBitsFor3_4eN38To38[38 + 6],
-                    expectedStringFor3_4eN38To38[38 + 6]);
-
-            for (int i = 7; i < 39; i++)
-            {
-                String testString;
-                testString = "3.4028234663852886e+" + i;
-                doTestCompareRawBits(testString, rawBitsFor3_4eN38To38[38 + i],
-                        expectedStringFor3_4eN38To38[38 + i]);
-            }
-
-            /* Test another set of regular floats with exponents from -38 to +38 */
-            for (int i = 38; i > 3; i--)
-            {
-                String testString;
-                testString = "-1.1754943508222875e-" + i;
-                doTestCompareRawBits(testString, rawBitsFor1_17eN38To38[38 - i],
-                        expectedStringFor1_17eN38To38[38 - i]);
-            }
-            doTestCompareRawBits("-1.1754943508222875e-3", rawBitsFor1_17eN38To38[38 - 3],
-                    expectedStringFor1_17eN38To38[38 - 3]);
-            doTestCompareRawBits("-1.1754943508222875e-2", rawBitsFor1_17eN38To38[38 - 2],
-                    expectedStringFor1_17eN38To38[38 - 2]);
-            doTestCompareRawBits("-1.1754943508222875e-1", rawBitsFor1_17eN38To38[38 - 1],
-                    expectedStringFor1_17eN38To38[38 - 1]);
-            doTestCompareRawBits("-1.1754943508222875e-0", rawBitsFor1_17eN38To38[38 - 0],
-                    expectedStringFor1_17eN38To38[38 - 0]);
-            doTestCompareRawBits("-1.1754943508222875e+1", rawBitsFor1_17eN38To38[38 + 1],
-                    expectedStringFor1_17eN38To38[38 + 1]);
-            doTestCompareRawBits("-1.1754943508222875e+2", rawBitsFor1_17eN38To38[38 + 2],
-                    expectedStringFor1_17eN38To38[38 + 2]);
-            doTestCompareRawBits("-1.1754943508222875e+3", rawBitsFor1_17eN38To38[38 + 3],
-                    expectedStringFor1_17eN38To38[38 + 3]);
-            doTestCompareRawBits("-1.1754943508222875e+4", rawBitsFor1_17eN38To38[38 + 4],
-                    expectedStringFor1_17eN38To38[38 + 4]);
-            doTestCompareRawBits("-1.1754943508222875e+5", rawBitsFor1_17eN38To38[38 + 5],
-                    expectedStringFor1_17eN38To38[38 + 5]);
-            doTestCompareRawBits("-1.1754943508222875e+6", rawBitsFor1_17eN38To38[38 + 6],
-                    expectedStringFor1_17eN38To38[38 + 6]);
-
-            for (int i = 7; i < 39; i++)
-            {
-                String testString;
-                testString = "-1.1754943508222875e+" + i;
-                doTestCompareRawBits(testString, rawBitsFor1_17eN38To38[38 + i],
-                        expectedStringFor1_17eN38To38[38 + i]);
-            }
-
-            /* Test denormalized floats (floats with exponents <= -38 */
-            doTestCompareRawBits("1.1012984643248170E-45", 1, "1.4E-45");
-            doTestCompareRawBits("-1.1012984643248170E-45", unchecked((int)0x80000001), "-1.4E-45");
-            doTestCompareRawBits("1.0E-45", 1, "1.4E-45");
-            doTestCompareRawBits("-1.0E-45", unchecked((int)0x80000001), "-1.4E-45");
-            doTestCompareRawBits("0.9E-45", 1, "1.4E-45");
-            doTestCompareRawBits("-0.9E-45", unchecked((int)0x80000001), "-1.4E-45");
-            doTestCompareRawBits("4.203895392974451e-45", 3, "4.2E-45");
-            doTestCompareRawBits("-4.203895392974451e-45", unchecked((int)0x80000003), "-4.2E-45");
-            doTestCompareRawBits("0.004E-45", 0, "0.0");
-            doTestCompareRawBits("-0.004E-45", unchecked((int)0x80000000), "-0.0");
-
-            /*
-             * Test for large floats close to and greater than 3.4028235E38 and
-             * -3.4028235E38
-             */
-            doTestCompareRawBits("1.2E+38", 0x7eb48e52, "1.2E38");
-            doTestCompareRawBits("-1.2E+38", unchecked((int)0xfeb48e52), "-1.2E38");
-            doTestCompareRawBits("3.2E+38", 0x7f70bdc2, "3.2E38");
-            doTestCompareRawBits("-3.2E+38", unchecked((int)0xff70bdc2), "-3.2E38");
-            doTestCompareRawBits("3.4E+38", 0x7f7fc99e, "3.4E38");
-            doTestCompareRawBits("-3.4E+38", unchecked((int)0xff7fc99e), "-3.4E38");
-            doTestCompareRawBits("3.4028234663852886E+38", 0x7f7fffff, "3.4028235E38");
-            doTestCompareRawBits("-3.4028234663852886E+38", unchecked((int)0xff7fffff), "-3.4028235E38");
-            doTestCompareRawBits("3.405E+38", 0x7f800000, "Infinity");
-            doTestCompareRawBits("-3.405E+38", unchecked((int)0xff800000), "-Infinity");
-            doTestCompareRawBits("3.41E+38", 0x7f800000, "Infinity");
-            doTestCompareRawBits("-3.41E+38", unchecked((int)0xff800000), "-Infinity");
-            doTestCompareRawBits("3.42E+38", 0x7f800000, "Infinity");
-            doTestCompareRawBits("-3.42E+38", unchecked((int)0xff800000), "-Infinity");
-            doTestCompareRawBits("1.0E+39", 0x7f800000, "Infinity");
-            doTestCompareRawBits("-1.0E+39", unchecked((int)0xff800000), "-Infinity");
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_Unusual()
-        {
-            float actual;
-
-            actual = Single.Parse("0x00000000000000000000000000000000000000000.0000000000000000000000000000000000000p0000000000000000000000000000000000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
-
-            actual = Single.Parse("+0Xfffff.fffffffffffffffffffffffffffffffp+99F", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", 6.64614E35f, actual, 0.0F);
-
-            actual = Single.Parse("-0X.123456789abcdefp+99f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", -4.5072022E28f, actual, 0.0F);
-
-            actual = Single.Parse("-0X123456789abcdef.p+1f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", -1.63971062E17f, actual, 0.0F);
-
-            actual = Single.Parse("-0X000000000000000000000000000001abcdef.0000000000000000000000000001abefp00000000000000000000000000000000000000000004f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", -4.48585472E8f, actual, 0.0F);
-
-            actual = Single.Parse("0X0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001234p600f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", 5.907252E33f, actual, 0.0F);
-
-            actual = Single.Parse("0x1.p9223372036854775807", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
-
-            actual = Single.Parse("0x1.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
-
-            actual = Single.Parse("0x10.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
-
-            actual = Single.Parse("0xabcd.ffffffffp+2000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
-
-            actual = Single.Parse("0x1.p-9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
-
-            actual = Single.Parse("0x1.p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
-
-            actual = Single.Parse("0x.1p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_NormalPositiveExponent()
-        {
-            int[] expecteds = {
-                0x3991a2b4,                0x43cc0247,                0x47909009,
-                0x4ac0c009,                0x4e109005,                0x5140c005,
-                0x5458d805,                0x57848402,                0x5a909002,
-                0x5da8a802,                0x60c0c002,                0x63cccc02,
-                0x66e4e402,                0x69f0f002,                0x6d048401,
-                0x70109001,                0x73169601,                0x76810810,
-                0x79840840,                0x7c8a08a0,                0x7f800000,
-                0x7f800000,                0x7f800000,                0x7f800000,
-                0x7f800000,
-        };
-
-            for (int i = 0; i < expecteds.Length; i++)
-            {
-                int part = i * 6;
-                String inputString = "0x" + part + "." + part + "0123456789abcdefp" + part;
-
-                float actual = Single.Parse(inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                float expected = Single.Int32BitsToSingle(expecteds[i]);
-
-                String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
-                String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
-                String errorMsg = i + "th input string is:<" + inputString
-                + ">.The expected result should be:<" + expectedString
-                + ">, but was: <" + actualString + ">. ";
-
-                assertEquals(errorMsg, expected, actual, 0.0F);
-            }
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_NormalNegativeExponent()
-        {
-            int[] expecteds = {
-                0x3991a2b4,
-                0x3d6e0247,
-                0x3aa0a009,
-                0x37848405,
-                0x3420a005,
-                0x30d4d405,
-                0x2d848402,
-                0x2a129202,
-                0x26acac02,
-                0x2346c602,
-                0x1fe0e002,
-                0x1c6eee02,
-                0x19048401,
-                0x15919101,
-                0x12189801,
-                0xf028828,
-                0xb890890,
-                0x80c88c8,
-                0x4930930,
-                0x1198998,
-                0x28028,
-                0x51c,
-                0xb,
-                0x0,
-                0x0,
-        };
-
-            for (int i = 0; i < expecteds.Length; i++)
-            {
-                int part = i * 7;
-                String inputString = "0x" + part + "." + part + "0123456789abcdefp-" + part;
-
-                float actual = Single.Parse(inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                float expected = Single.Int32BitsToSingle(expecteds[i]);
-
-                String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
-                String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
-                String errorMsg = i + "th input string is:<" + inputString
-                + ">.The expected result should be:<" + expectedString
-                + ">, but was: <" + actualString + ">. ";
-
-                assertEquals(errorMsg, expected, actual, 0.0F);
-            }
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_MaxNormalBoundary()
-        {
-            int[] expecteds ={
-                0x7f7fffff,
-                0x7f7fffff,
-                0x7f7fffff,
-                0x7f800000,
-                0x7f800000,
-                0x7f800000,
-
-                unchecked((int)0xff7fffff),
-                unchecked((int)0xff7fffff),
-                unchecked((int)0xff7fffff),
-                unchecked((int)0xff800000),
-                unchecked((int)0xff800000),
-                unchecked((int)0xff800000),
-        };
-
-            String[] inputs = {
-                "0x1.fffffep127",
-                "0x1.fffffe000000000000000000000000000000000000000000000001p127",
-                "0x1.fffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
-                "0x1.ffffffp127",
-                "0x1.ffffff000000000000000000000000000000000000000000000001p127",
-                "0x1.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
-
-                "-0x1.fffffep127",
-                "-0x1.fffffe000000000000000000000000000000000000000000000001p127",
-                "-0x1.fffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
-                "-0x1.ffffffp127",
-                "-0x1.ffffff000000000000000000000000000000000000000000000001p127",
-                "-0x1.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
-        };
-
-            for (int i = 0; i < inputs.Length; i++)
-            {
-                //float actual = Single.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
-                float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                float expected = Single.Int32BitsToSingle(expecteds[i]);
-
-                String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
-                String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
-                String errorMsg = i + "th input string is:<" + inputs[i]
-                + ">.The expected result should be:<" + expectedString
-                + ">, but was: <" + actualString + ">. ";
-
-                assertEquals(errorMsg, expected, actual, 0.0F);
-            }
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_MinNormalBoundary()
-        {
-            int[] expecteds = {
-                0x800000,
-                0x800000,
-                0x800000,
-                0x800000,
-                0x800001,
-                0x800001,
-
-                unchecked((int)0x80800000),
-                unchecked((int)0x80800000),
-                unchecked((int)0x80800000),
-                unchecked((int)0x80800000),
-                unchecked((int)0x80800001),
-                unchecked((int)0x80800001),
-        };
-
-            String[] inputs = {
-                "0x1.0p-126",
-                "0x1.00000000000000000000000000000000000000000000001p-126",
-                "0x1.000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "0x1.000001p-126",
-                "0x1.000001000000000000000000000000000000000000000001p-126",
-                "0x1.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-
-                "-0x1.0p-126",
-                "-0x1.00000000000000000000000000000000000000000000001p-126",
-                "-0x1.000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "-0x1.000001p-126",
-                "-0x1.000001000000000000000000000000000000000000000001p-126",
-                "-0x1.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-        };
-
-            for (int i = 0; i < inputs.Length; i++)
-            {
-                float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                float expected = Single.Int32BitsToSingle(expecteds[i]);
-
-                String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
-                String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
-                String errorMsg = i + "th input string is:<" + inputs[i]
-                + ">.The expected result should be:<" + expectedString
-                + ">, but was: <" + actualString + ">. ";
-
-                assertEquals(errorMsg, expected, actual, 0.0F);
-            }
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_MaxSubNormalBoundary()
-        {
-            int[] expecteds = {
-                0x7fffff,
-                0x7fffff,
-                0x7fffff,
-                0x800000,
-                0x800000,
-                0x800000,
-
-                unchecked((int)0x807fffff),
-                unchecked((int)0x807fffff),
-                unchecked((int)0x807fffff),
-                unchecked((int)0x80800000),
-                unchecked((int)0x80800000),
-                unchecked((int)0x80800000),
-        };
-
-            String[] inputs = {
-                "0x0.fffffep-126",
-                "0x0.fffffe000000000000000000000000000000000000000000000000000001p-126",
-                "0x0.fffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "0x0.ffffffp-126",
-                "0x0.ffffff0000000000000000000000000000000000000000000000000000001p-126",
-                "0x0.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-
-                "-0x0.fffffep-126",
-                "-0x0.fffffe000000000000000000000000000000000000000000000000000001p-126",
-                "-0x0.fffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "-0x0.ffffffp-126",
-                "-0x0.ffffff0000000000000000000000000000000000000000000000000000001p-126",
-                "-0x0.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-        };
-
-            for (int i = 0; i < inputs.Length; i++)
-            {
-                float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                float expected = Single.Int32BitsToSingle(expecteds[i]);
-
-                String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
-                String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
-                String errorMsg = i + "th input string is:<" + inputs[i]
-                + ">.The expected result should be:<" + expectedString
-                + ">, but was: <" + actualString + ">. ";
-
-                assertEquals(errorMsg, expected, actual, 0.0F);
-            }
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_MinSubNormalBoundary()
-        {
-            int[] expecteds = {
-                0x1,
-                0x1,
-                0x1,
-                0x2,
-                0x2,
-                0x2,
-
-                unchecked((int)0x80000001),
-                unchecked((int)0x80000001),
-                unchecked((int)0x80000001),
-                unchecked((int)0x80000002),
-                unchecked((int)0x80000002),
-                unchecked((int)0x80000002),
-        };
-
-            String[] inputs = {
-                "0x0.000002p-126",
-                "0x0.00000200000000000000000000000000000000000001p-126",
-                "0x0.000002ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "0x0.000003p-126",
-                "0x0.000003000000000000000000000000000000000000001p-126",
-                "0x0.000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-
-                "-0x0.000002p-126",
-                "-0x0.00000200000000000000000000000000000000000001p-126",
-                "-0x0.000002ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "-0x0.000003p-126",
-                "-0x0.000003000000000000000000000000000000000000001p-126",
-                "-0x0.000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-        };
-
-            for (int i = 0; i < inputs.Length; i++)
-            {
-                float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                float expected = Single.Int32BitsToSingle(expecteds[i]);
-
-                String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
-                String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
-                String errorMsg = i + "th input string is:<" + inputs[i]
-                + ">.The expected result should be:<" + expectedString
-                + ">, but was: <" + actualString + ">. ";
-
-                assertEquals(errorMsg, expected, actual, 0.0F);
-            }
-        }
-
-        /**
-         * @tests java.lang.Float#parseFloat(java.lang.String)
-         */
-        [Test]
-        public void Test_parseFloat_LString_ZeroBoundary()
-        {
-            int[] expecteds = {
-                0x0,
-                0x0,
-                0x0,
-                0x0,
-                0x1,
-                0x1,
-
-                unchecked((int)0x80000000),
-                unchecked((int)0x80000000),
-                unchecked((int)0x80000000),
-                unchecked((int)0x80000000),
-                unchecked((int)0x80000001),
-                unchecked((int)0x80000001),
-        };
-
-            String[] inputs = {
-                "0x0.000000000000000p-126",
-                "0x0.000000000000000000000000000000000000000000000001p-126",
-                "0x0.000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "0x0.000001p-126",
-                "0x0.000001000000000000000000000000000000000000000001p-126",
-                "0x0.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-
-                "-0x0.000000000000000p-126",
-                "-0x0.000000000000000000000000000000000000000000000001p-126",
-                "-0x0.000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-                "-0x0.000001p-126",
-                "-0x0.000001000000000000000000000000000000000000000001p-126",
-                "-0x0.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
-        };
-
-            for (int i = 0; i < inputs.Length; i++)
-            {
-                float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                float expected = Single.Int32BitsToSingle(expecteds[i]);
-
-                String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
-                String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
-                String errorMsg = i + "th input string is:<" + inputs[i]
-                + ">.The expected result should be:<" + expectedString
-                + ">, but was: <" + actualString + ">. ";
-
-                assertEquals(errorMsg, expected, actual, 0.0F);
-            }
-        }
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloatLjava_lang_String()
+        //{
+        //    assertEquals("Incorrect float returned, expected zero.", 0.0, Single
+        //            .Parse("7.0064923216240853546186479164495e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
+        //    assertEquals("Incorrect float returned, expected minimum float.", float.Epsilon, // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
+        //            Single.Parse("7.0064923216240853546186479164496e-46", J2N.Text.StringFormatter.InvariantCulture), 0.0);
+
+        //    doTestCompareRawBits(
+        //            "0.000000000000000000000000000000000000011754942807573642917278829910357665133228589927589904276829631184250030649651730385585324256680905818939208984375",
+        //            0x800000, "1.17549435E-38");
+        //    doTestCompareRawBits(
+        //            "0.00000000000000000000000000000000000001175494280757364291727882991035766513322858992758990427682963118425003064965173038558532425668090581893920898437499999f",
+        //            NumberStyle.Float | NumberStyle.AllowTrailingFloatType, // J2N specific - must use AllowTrailingFloatType to specify this is valid
+        //            0x7fffff, "1.1754942E-38");
+
+        //    /* Test a set of regular floats with exponents from -38 to +38 */
+        //    for (int i = 38; i > 3; i--)
+        //    {
+        //        String testString;
+        //        testString = "3.4028234663852886e-" + i;
+        //        doTestCompareRawBits(testString, rawBitsFor3_4eN38To38[38 - i],
+        //                expectedStringFor3_4eN38To38[38 - i]);
+        //    }
+        //    doTestCompareRawBits("3.4028234663852886e-3", rawBitsFor3_4eN38To38[38 - 3],
+        //            expectedStringFor3_4eN38To38[38 - 3]);
+        //    doTestCompareRawBits("3.4028234663852886e-2", rawBitsFor3_4eN38To38[38 - 2],
+        //            expectedStringFor3_4eN38To38[38 - 2]);
+        //    doTestCompareRawBits("3.4028234663852886e-1", rawBitsFor3_4eN38To38[38 - 1],
+        //            expectedStringFor3_4eN38To38[38 - 1]);
+        //    doTestCompareRawBits("3.4028234663852886e-0", rawBitsFor3_4eN38To38[38 - 0],
+        //            expectedStringFor3_4eN38To38[38 - 0]);
+        //    doTestCompareRawBits("3.4028234663852886e+1", rawBitsFor3_4eN38To38[38 + 1],
+        //            expectedStringFor3_4eN38To38[38 + 1]);
+        //    doTestCompareRawBits("3.4028234663852886e+2", rawBitsFor3_4eN38To38[38 + 2],
+        //            expectedStringFor3_4eN38To38[38 + 2]);
+        //    doTestCompareRawBits("3.4028234663852886e+3", rawBitsFor3_4eN38To38[38 + 3],
+        //            expectedStringFor3_4eN38To38[38 + 3]);
+        //    doTestCompareRawBits("3.4028234663852886e+4", rawBitsFor3_4eN38To38[38 + 4],
+        //            expectedStringFor3_4eN38To38[38 + 4]);
+        //    doTestCompareRawBits("3.4028234663852886e+5", rawBitsFor3_4eN38To38[38 + 5],
+        //            expectedStringFor3_4eN38To38[38 + 5]);
+        //    doTestCompareRawBits("3.4028234663852886e+6", rawBitsFor3_4eN38To38[38 + 6],
+        //            expectedStringFor3_4eN38To38[38 + 6]);
+
+        //    for (int i = 7; i < 39; i++)
+        //    {
+        //        String testString;
+        //        testString = "3.4028234663852886e+" + i;
+        //        doTestCompareRawBits(testString, rawBitsFor3_4eN38To38[38 + i],
+        //                expectedStringFor3_4eN38To38[38 + i]);
+        //    }
+
+        //    /* Test another set of regular floats with exponents from -38 to +38 */
+        //    for (int i = 38; i > 3; i--)
+        //    {
+        //        String testString;
+        //        testString = "-1.1754943508222875e-" + i;
+        //        doTestCompareRawBits(testString, rawBitsFor1_17eN38To38[38 - i],
+        //                expectedStringFor1_17eN38To38[38 - i]);
+        //    }
+        //    doTestCompareRawBits("-1.1754943508222875e-3", rawBitsFor1_17eN38To38[38 - 3],
+        //            expectedStringFor1_17eN38To38[38 - 3]);
+        //    doTestCompareRawBits("-1.1754943508222875e-2", rawBitsFor1_17eN38To38[38 - 2],
+        //            expectedStringFor1_17eN38To38[38 - 2]);
+        //    doTestCompareRawBits("-1.1754943508222875e-1", rawBitsFor1_17eN38To38[38 - 1],
+        //            expectedStringFor1_17eN38To38[38 - 1]);
+        //    doTestCompareRawBits("-1.1754943508222875e-0", rawBitsFor1_17eN38To38[38 - 0],
+        //            expectedStringFor1_17eN38To38[38 - 0]);
+        //    doTestCompareRawBits("-1.1754943508222875e+1", rawBitsFor1_17eN38To38[38 + 1],
+        //            expectedStringFor1_17eN38To38[38 + 1]);
+        //    doTestCompareRawBits("-1.1754943508222875e+2", rawBitsFor1_17eN38To38[38 + 2],
+        //            expectedStringFor1_17eN38To38[38 + 2]);
+        //    doTestCompareRawBits("-1.1754943508222875e+3", rawBitsFor1_17eN38To38[38 + 3],
+        //            expectedStringFor1_17eN38To38[38 + 3]);
+        //    doTestCompareRawBits("-1.1754943508222875e+4", rawBitsFor1_17eN38To38[38 + 4],
+        //            expectedStringFor1_17eN38To38[38 + 4]);
+        //    doTestCompareRawBits("-1.1754943508222875e+5", rawBitsFor1_17eN38To38[38 + 5],
+        //            expectedStringFor1_17eN38To38[38 + 5]);
+        //    doTestCompareRawBits("-1.1754943508222875e+6", rawBitsFor1_17eN38To38[38 + 6],
+        //            expectedStringFor1_17eN38To38[38 + 6]);
+
+        //    for (int i = 7; i < 39; i++)
+        //    {
+        //        String testString;
+        //        testString = "-1.1754943508222875e+" + i;
+        //        doTestCompareRawBits(testString, rawBitsFor1_17eN38To38[38 + i],
+        //                expectedStringFor1_17eN38To38[38 + i]);
+        //    }
+
+        //    /* Test denormalized floats (floats with exponents <= -38 */
+        //    doTestCompareRawBits("1.1012984643248170E-45", 1, "1.4E-45");
+        //    doTestCompareRawBits("-1.1012984643248170E-45", unchecked((int)0x80000001), "-1.4E-45");
+        //    doTestCompareRawBits("1.0E-45", 1, "1.4E-45");
+        //    doTestCompareRawBits("-1.0E-45", unchecked((int)0x80000001), "-1.4E-45");
+        //    doTestCompareRawBits("0.9E-45", 1, "1.4E-45");
+        //    doTestCompareRawBits("-0.9E-45", unchecked((int)0x80000001), "-1.4E-45");
+        //    doTestCompareRawBits("4.203895392974451e-45", 3, "4.2E-45");
+        //    doTestCompareRawBits("-4.203895392974451e-45", unchecked((int)0x80000003), "-4.2E-45");
+        //    doTestCompareRawBits("0.004E-45", 0, "0.0");
+        //    doTestCompareRawBits("-0.004E-45", unchecked((int)0x80000000), "-0.0");
+
+        //    /*
+        //     * Test for large floats close to and greater than 3.4028235E38 and
+        //     * -3.4028235E38
+        //     */
+        //    doTestCompareRawBits("1.2E+38", 0x7eb48e52, "1.2E38");
+        //    doTestCompareRawBits("-1.2E+38", unchecked((int)0xfeb48e52), "-1.2E38");
+        //    doTestCompareRawBits("3.2E+38", 0x7f70bdc2, "3.2E38");
+        //    doTestCompareRawBits("-3.2E+38", unchecked((int)0xff70bdc2), "-3.2E38");
+        //    doTestCompareRawBits("3.4E+38", 0x7f7fc99e, "3.4E38");
+        //    doTestCompareRawBits("-3.4E+38", unchecked((int)0xff7fc99e), "-3.4E38");
+        //    doTestCompareRawBits("3.4028234663852886E+38", 0x7f7fffff, "3.4028235E38");
+        //    doTestCompareRawBits("-3.4028234663852886E+38", unchecked((int)0xff7fffff), "-3.4028235E38");
+        //    doTestCompareRawBits("3.405E+38", 0x7f800000, "Infinity");
+        //    doTestCompareRawBits("-3.405E+38", unchecked((int)0xff800000), "-Infinity");
+        //    doTestCompareRawBits("3.41E+38", 0x7f800000, "Infinity");
+        //    doTestCompareRawBits("-3.41E+38", unchecked((int)0xff800000), "-Infinity");
+        //    doTestCompareRawBits("3.42E+38", 0x7f800000, "Infinity");
+        //    doTestCompareRawBits("-3.42E+38", unchecked((int)0xff800000), "-Infinity");
+        //    doTestCompareRawBits("1.0E+39", 0x7f800000, "Infinity");
+        //    doTestCompareRawBits("-1.0E+39", unchecked((int)0xff800000), "-Infinity");
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_Unusual()
+        //{
+        //    float actual;
+
+        //    actual = Single.Parse("0x00000000000000000000000000000000000000000.0000000000000000000000000000000000000p0000000000000000000000000000000000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
+
+        //    actual = Single.Parse("+0Xfffff.fffffffffffffffffffffffffffffffp+99F", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", 6.64614E35f, actual, 0.0F);
+
+        //    actual = Single.Parse("-0X.123456789abcdefp+99f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", -4.5072022E28f, actual, 0.0F);
+
+        //    actual = Single.Parse("-0X123456789abcdef.p+1f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", -1.63971062E17f, actual, 0.0F);
+
+        //    actual = Single.Parse("-0X000000000000000000000000000001abcdef.0000000000000000000000000001abefp00000000000000000000000000000000000000000004f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", -4.48585472E8f, actual, 0.0F);
+
+        //    actual = Single.Parse("0X0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001234p600f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", 5.907252E33f, actual, 0.0F);
+
+        //    actual = Single.Parse("0x1.p9223372036854775807", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
+
+        //    actual = Single.Parse("0x1.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
+
+        //    actual = Single.Parse("0x10.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
+
+        //    actual = Single.Parse("0xabcd.ffffffffp+2000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", float.PositiveInfinity, actual, 0.0F);
+
+        //    actual = Single.Parse("0x1.p-9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
+
+        //    actual = Single.Parse("0x1.p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
+
+        //    actual = Single.Parse("0x.1p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect value", 0.0f, actual, 0.0F);
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_NormalPositiveExponent()
+        //{
+        //    int[] expecteds = {
+        //        0x3991a2b4,                0x43cc0247,                0x47909009,
+        //        0x4ac0c009,                0x4e109005,                0x5140c005,
+        //        0x5458d805,                0x57848402,                0x5a909002,
+        //        0x5da8a802,                0x60c0c002,                0x63cccc02,
+        //        0x66e4e402,                0x69f0f002,                0x6d048401,
+        //        0x70109001,                0x73169601,                0x76810810,
+        //        0x79840840,                0x7c8a08a0,                0x7f800000,
+        //        0x7f800000,                0x7f800000,                0x7f800000,
+        //        0x7f800000,
+        //};
+
+        //    for (int i = 0; i < expecteds.Length; i++)
+        //    {
+        //        int part = i * 6;
+        //        String inputString = "0x" + part + "." + part + "0123456789abcdefp" + part;
+
+        //        float actual = Single.Parse(inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //        float expected = Single.Int32BitsToSingle(expecteds[i]);
+
+        //        String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+        //        String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+        //        String errorMsg = i + "th input string is:<" + inputString
+        //        + ">.The expected result should be:<" + expectedString
+        //        + ">, but was: <" + actualString + ">. ";
+
+        //        assertEquals(errorMsg, expected, actual, 0.0F);
+        //    }
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_NormalNegativeExponent()
+        //{
+        //    int[] expecteds = {
+        //        0x3991a2b4,
+        //        0x3d6e0247,
+        //        0x3aa0a009,
+        //        0x37848405,
+        //        0x3420a005,
+        //        0x30d4d405,
+        //        0x2d848402,
+        //        0x2a129202,
+        //        0x26acac02,
+        //        0x2346c602,
+        //        0x1fe0e002,
+        //        0x1c6eee02,
+        //        0x19048401,
+        //        0x15919101,
+        //        0x12189801,
+        //        0xf028828,
+        //        0xb890890,
+        //        0x80c88c8,
+        //        0x4930930,
+        //        0x1198998,
+        //        0x28028,
+        //        0x51c,
+        //        0xb,
+        //        0x0,
+        //        0x0,
+        //};
+
+        //    for (int i = 0; i < expecteds.Length; i++)
+        //    {
+        //        int part = i * 7;
+        //        String inputString = "0x" + part + "." + part + "0123456789abcdefp-" + part;
+
+        //        float actual = Single.Parse(inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //        float expected = Single.Int32BitsToSingle(expecteds[i]);
+
+        //        String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+        //        String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+        //        String errorMsg = i + "th input string is:<" + inputString
+        //        + ">.The expected result should be:<" + expectedString
+        //        + ">, but was: <" + actualString + ">. ";
+
+        //        assertEquals(errorMsg, expected, actual, 0.0F);
+        //    }
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_MaxNormalBoundary()
+        //{
+        //    int[] expecteds ={
+        //        0x7f7fffff,
+        //        0x7f7fffff,
+        //        0x7f7fffff,
+        //        0x7f800000,
+        //        0x7f800000,
+        //        0x7f800000,
+
+        //        unchecked((int)0xff7fffff),
+        //        unchecked((int)0xff7fffff),
+        //        unchecked((int)0xff7fffff),
+        //        unchecked((int)0xff800000),
+        //        unchecked((int)0xff800000),
+        //        unchecked((int)0xff800000),
+        //};
+
+        //    String[] inputs = {
+        //        "0x1.fffffep127",
+        //        "0x1.fffffe000000000000000000000000000000000000000000000001p127",
+        //        "0x1.fffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+        //        "0x1.ffffffp127",
+        //        "0x1.ffffff000000000000000000000000000000000000000000000001p127",
+        //        "0x1.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+
+        //        "-0x1.fffffep127",
+        //        "-0x1.fffffe000000000000000000000000000000000000000000000001p127",
+        //        "-0x1.fffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+        //        "-0x1.ffffffp127",
+        //        "-0x1.ffffff000000000000000000000000000000000000000000000001p127",
+        //        "-0x1.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+        //};
+
+        //    for (int i = 0; i < inputs.Length; i++)
+        //    {
+        //        //float actual = Single.Parse(inputs[i], J2N.Text.StringFormatter.InvariantCulture);
+        //        float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //        float expected = Single.Int32BitsToSingle(expecteds[i]);
+
+        //        String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+        //        String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+        //        String errorMsg = i + "th input string is:<" + inputs[i]
+        //        + ">.The expected result should be:<" + expectedString
+        //        + ">, but was: <" + actualString + ">. ";
+
+        //        assertEquals(errorMsg, expected, actual, 0.0F);
+        //    }
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_MinNormalBoundary()
+        //{
+        //    int[] expecteds = {
+        //        0x800000,
+        //        0x800000,
+        //        0x800000,
+        //        0x800000,
+        //        0x800001,
+        //        0x800001,
+
+        //        unchecked((int)0x80800000),
+        //        unchecked((int)0x80800000),
+        //        unchecked((int)0x80800000),
+        //        unchecked((int)0x80800000),
+        //        unchecked((int)0x80800001),
+        //        unchecked((int)0x80800001),
+        //};
+
+        //    String[] inputs = {
+        //        "0x1.0p-126",
+        //        "0x1.00000000000000000000000000000000000000000000001p-126",
+        //        "0x1.000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "0x1.000001p-126",
+        //        "0x1.000001000000000000000000000000000000000000000001p-126",
+        //        "0x1.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+        //        "-0x1.0p-126",
+        //        "-0x1.00000000000000000000000000000000000000000000001p-126",
+        //        "-0x1.000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "-0x1.000001p-126",
+        //        "-0x1.000001000000000000000000000000000000000000000001p-126",
+        //        "-0x1.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //};
+
+        //    for (int i = 0; i < inputs.Length; i++)
+        //    {
+        //        float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //        float expected = Single.Int32BitsToSingle(expecteds[i]);
+
+        //        String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+        //        String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+        //        String errorMsg = i + "th input string is:<" + inputs[i]
+        //        + ">.The expected result should be:<" + expectedString
+        //        + ">, but was: <" + actualString + ">. ";
+
+        //        assertEquals(errorMsg, expected, actual, 0.0F);
+        //    }
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_MaxSubNormalBoundary()
+        //{
+        //    int[] expecteds = {
+        //        0x7fffff,
+        //        0x7fffff,
+        //        0x7fffff,
+        //        0x800000,
+        //        0x800000,
+        //        0x800000,
+
+        //        unchecked((int)0x807fffff),
+        //        unchecked((int)0x807fffff),
+        //        unchecked((int)0x807fffff),
+        //        unchecked((int)0x80800000),
+        //        unchecked((int)0x80800000),
+        //        unchecked((int)0x80800000),
+        //};
+
+        //    String[] inputs = {
+        //        "0x0.fffffep-126",
+        //        "0x0.fffffe000000000000000000000000000000000000000000000000000001p-126",
+        //        "0x0.fffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "0x0.ffffffp-126",
+        //        "0x0.ffffff0000000000000000000000000000000000000000000000000000001p-126",
+        //        "0x0.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+        //        "-0x0.fffffep-126",
+        //        "-0x0.fffffe000000000000000000000000000000000000000000000000000001p-126",
+        //        "-0x0.fffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "-0x0.ffffffp-126",
+        //        "-0x0.ffffff0000000000000000000000000000000000000000000000000000001p-126",
+        //        "-0x0.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //};
+
+        //    for (int i = 0; i < inputs.Length; i++)
+        //    {
+        //        float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //        float expected = Single.Int32BitsToSingle(expecteds[i]);
+
+        //        String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+        //        String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+        //        String errorMsg = i + "th input string is:<" + inputs[i]
+        //        + ">.The expected result should be:<" + expectedString
+        //        + ">, but was: <" + actualString + ">. ";
+
+        //        assertEquals(errorMsg, expected, actual, 0.0F);
+        //    }
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_MinSubNormalBoundary()
+        //{
+        //    int[] expecteds = {
+        //        0x1,
+        //        0x1,
+        //        0x1,
+        //        0x2,
+        //        0x2,
+        //        0x2,
+
+        //        unchecked((int)0x80000001),
+        //        unchecked((int)0x80000001),
+        //        unchecked((int)0x80000001),
+        //        unchecked((int)0x80000002),
+        //        unchecked((int)0x80000002),
+        //        unchecked((int)0x80000002),
+        //};
+
+        //    String[] inputs = {
+        //        "0x0.000002p-126",
+        //        "0x0.00000200000000000000000000000000000000000001p-126",
+        //        "0x0.000002ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "0x0.000003p-126",
+        //        "0x0.000003000000000000000000000000000000000000001p-126",
+        //        "0x0.000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+        //        "-0x0.000002p-126",
+        //        "-0x0.00000200000000000000000000000000000000000001p-126",
+        //        "-0x0.000002ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "-0x0.000003p-126",
+        //        "-0x0.000003000000000000000000000000000000000000001p-126",
+        //        "-0x0.000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //};
+
+        //    for (int i = 0; i < inputs.Length; i++)
+        //    {
+        //        float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //        float expected = Single.Int32BitsToSingle(expecteds[i]);
+
+        //        String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+        //        String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+        //        String errorMsg = i + "th input string is:<" + inputs[i]
+        //        + ">.The expected result should be:<" + expectedString
+        //        + ">, but was: <" + actualString + ">. ";
+
+        //        assertEquals(errorMsg, expected, actual, 0.0F);
+        //    }
+        //}
+
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Float#parseFloat(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseFloat_LString_ZeroBoundary()
+        //{
+        //    int[] expecteds = {
+        //        0x0,
+        //        0x0,
+        //        0x0,
+        //        0x0,
+        //        0x1,
+        //        0x1,
+
+        //        unchecked((int)0x80000000),
+        //        unchecked((int)0x80000000),
+        //        unchecked((int)0x80000000),
+        //        unchecked((int)0x80000000),
+        //        unchecked((int)0x80000001),
+        //        unchecked((int)0x80000001),
+        //};
+
+        //    String[] inputs = {
+        //        "0x0.000000000000000p-126",
+        //        "0x0.000000000000000000000000000000000000000000000001p-126",
+        //        "0x0.000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "0x0.000001p-126",
+        //        "0x0.000001000000000000000000000000000000000000000001p-126",
+        //        "0x0.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+        //        "-0x0.000000000000000p-126",
+        //        "-0x0.000000000000000000000000000000000000000000000001p-126",
+        //        "-0x0.000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //        "-0x0.000001p-126",
+        //        "-0x0.000001000000000000000000000000000000000000000001p-126",
+        //        "-0x0.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+        //};
+
+        //    for (int i = 0; i < inputs.Length; i++)
+        //    {
+        //        float actual = Single.Parse(inputs[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+        //        float expected = Single.Int32BitsToSingle(expecteds[i]);
+
+        //        String expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+        //        String actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+        //        String errorMsg = i + "th input string is:<" + inputs[i]
+        //        + ">.The expected result should be:<" + expectedString
+        //        + ">, but was: <" + actualString + ">. ";
+
+        //        assertEquals(errorMsg, expected, actual, 0.0F);
+        //    }
+        //}
 
         /**
          * @tests java.lang.Float#parseFloat(java.lang.String)
@@ -865,11 +875,13 @@ namespace J2N.Numerics
             //assertEquals("2.14748365E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Changed from "2.1474836E9" to "2.14748365E9" to match JDK behavior
             assertEquals("2.1474836E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture));
 
-            // J2N specific - need to specify AllowTrailingFloatType to match numbers ending in "d" or "f" (case insensitive)
-            doTestCompareRawBits("123456790528.000000000000000f", NumberStyle.Float | NumberStyle.AllowTrailingFloatType, 0x51e5f4c9, "1.2345679E11");
-            doTestCompareRawBits("123456790528.000000000000000", 0x51e5f4c9, "1.2345679E11");
-            doTestCompareRawBits("8589934592", 0x50000000, "8.5899346E9");
-            doTestCompareRawBits("8606711808", 0x50004000, "8.606712E9");
+            // J2N: Moved to CharSequences
+
+            //// J2N specific - need to specify AllowTrailingFloatType to match numbers ending in "d" or "f" (case insensitive)
+            //doTestCompareRawBits("123456790528.000000000000000f", NumberStyle.Float | NumberStyle.AllowTrailingFloatType, 0x51e5f4c9, "1.2345679E11");
+            //doTestCompareRawBits("123456790528.000000000000000", 0x51e5f4c9, "1.2345679E11");
+            //doTestCompareRawBits("8589934592", 0x50000000, "8.5899346E9");
+            //doTestCompareRawBits("8606711808", 0x50004000, "8.606712E9");
         }
 
         /**
@@ -1151,6 +1163,717 @@ namespace J2N.Numerics
                 assertEquals(new Single(s + 0.1F), Single.ValueOf(s + 0.1F));
                 assertEquals(Single.ValueOf(s + 0.1F), Single.ValueOf(s + 0.1F));
                 s++;
+            }
+        }
+
+
+        public class CharSequences : TestCase
+        {
+            public abstract class ParseTestCase : TestCase
+            {
+                private static string[] badStrings = {
+                    "",
+                    "+",
+                    "-",
+                    "+e",
+                    "-e",
+                    "+e170",
+                    "-e170",
+
+                    // Make sure intermediate white space is not deleted.
+                    "1234   e10",
+                    "-1234   e10",
+
+                    // Control characters in the interior of a string are not legal
+                    "1\u0007e1",
+                    "1e\u00071",
+
+                    // NaN and infinity can't have trailing type suffices or exponents
+                    "NaNf",
+                    "NaNF",
+                    "NaNd",
+                    "NaND",
+                    "-NaNf",
+                    "-NaNF",
+                    "-NaNd",
+                    "-NaND",
+                    "+NaNf",
+                    "+NaNF",
+                    "+NaNd",
+                    "+NaND",
+                    "Infinityf",
+                    "InfinityF",
+                    "Infinityd",
+                    "InfinityD",
+                    "-Infinityf",
+                    "-InfinityF",
+                    "-Infinityd",
+                    "-InfinityD",
+                    "+Infinityf",
+                    "+InfinityF",
+                    "+Infinityd",
+                    "+InfinityD",
+
+                    "NaNe10",
+                    "-NaNe10",
+                    "+NaNe10",
+                    "Infinitye10",
+                    "-Infinitye10",
+                    "+Infinitye10",
+
+                    // Non-ASCII digits are not recognized
+                    "\u0661e\u0661", // 1e1 in Arabic-Indic digits
+                    "\u06F1e\u06F1", // 1e1 in Extended Arabic-Indic digits
+                    "\u0967e\u0967" // 1e1 in Devanagari digits
+                };
+
+                private static string[] goodStrings = {
+                    "NaN",
+                    "+NaN",
+                    "-NaN",
+                    "Infinity",
+                    "+Infinity",
+                    "-Infinity",
+                    "1.1e-23f",
+                    ".1e-23f",
+                    "1e-23",
+                    "1f",
+                    "1",
+                    "2",
+                    "1234",
+                    "-1234",
+                    "+1234",
+                    "2147483647",   // Integer.MAX_VALUE
+                    "2147483648",
+                    "-2147483648",  // Integer.MIN_VALUE
+                    "-2147483649",
+
+                    "16777215",
+                    "16777216",     // 2^24
+                    "16777217",
+
+                    "-16777215",
+                    "-16777216",    // -2^24
+                    "-16777217",
+
+                    "9007199254740991",
+                    "9007199254740992",     // 2^53
+                    "9007199254740993",
+
+                    "-9007199254740991",
+                    "-9007199254740992",    // -2^53
+                    "-9007199254740993",
+
+                    "9223372036854775807",
+                    "9223372036854775808",  // Long.MAX_VALUE
+                    "9223372036854775809",
+
+                    "-9223372036854775808",
+                    "-9223372036854775809", // Long.MIN_VALUE
+                    "-9223372036854775810"
+                };
+
+                private static string[] paddedBadStrings = LoadPaddedBadStrings();
+                private static string[] paddedGoodStrings = LoadPaddedGoodStrings();
+
+                private static string[] LoadPaddedBadStrings()
+                {
+                    string pad = " \t\n\r\f\u0001\u000b\u001f";
+                    var result = new string[badStrings.Length];
+                    for (int i = 0; i < badStrings.Length; i++)
+                        result[i] = pad + badStrings[i] + pad;
+                    return result;
+                }
+
+                private static string[] LoadPaddedGoodStrings()
+                {
+                    string pad = " \t\n\r\f\u0001\u000b\u001f";
+                    var result = new string[goodStrings.Length];
+                    for (int i = 0; i < goodStrings.Length; i++)
+                        result[i] = pad + goodStrings[i] + pad;
+                    return result;
+                }
+
+                public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_Data
+                {
+                    get
+                    {
+                        // JDK 8
+
+                        yield return new TestCaseData(float.Epsilon, "" + float.Epsilon, NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(float.MaxValue, "" + float.MaxValue, NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+
+                        yield return new TestCaseData((float)10.0, "10", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData((float)10.0, "10.0", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData((float)10.01, "10.01", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+
+                        yield return new TestCaseData((float)-10.0, "-10", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData((float)-10.0, "-10.00", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData((float)-10.01, "-10.01", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+
+                        // bug 6358355
+                        yield return new TestCaseData(/*0x1.000002p57f*/ 1.44115205E17f, "144115196665790480", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture); // J2N: Hex literals not supported in .NET
+                        yield return new TestCaseData(/*0x1.000002p57f*/ 1.44115205E17f, "144115196665790481", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture); // J2N: Hex literals not supported in .NET
+                        yield return new TestCaseData(0.05f, "0.050000002607703203", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.05f, "0.050000002607703204", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.05f, "0.050000002607703205", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.05f, "0.050000002607703206", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.05f, "0.050000002607703207", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.05f, "0.050000002607703208", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.050000004f, "0.050000002607703209", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+
+                        for (int i = 0; i < goodStrings.Length; i++)
+                        {
+                            string inputString = goodStrings[i];
+                            var styles = inputString.EndsWith("f", StringComparison.Ordinal) || inputString.EndsWith("F", StringComparison.Ordinal) ? NumberStyle.Float | NumberStyle.AllowTrailingFloatType : NumberStyle.Float;
+                            var provider = J2N.Text.StringFormatter.InvariantCulture;
+
+                            // Pass through the same value - all we care about here is that the input is accepted without error
+                            yield return new TestCaseData(Single.Parse(inputString, styles, provider), inputString, styles, provider);
+                        }
+
+                        // Java's .trim() method (which is how they deal with whitespace) removes all characters
+                        // with a value below 20 (the space character and all control characters). .NET doesn't trim
+                        // the string at all, and only ignores characters Unicode values U+0009, U+000A, U+000B, U+000C, U+000D, and U+0020.
+                        // So, if there is a need to pre-trim the string, to remove all control characters the same way Java does, it can be
+                        // done as follows.
+                        char[] javaTrimChars = Enumerable.Range(0, ' ' + 1).Select(c => (char)c).ToArray();
+
+                        for (int i = 0; i < paddedGoodStrings.Length; i++)
+                        {
+                            string inputString = paddedGoodStrings[i].Trim(javaTrimChars);
+                            var styles = inputString.EndsWith("f", StringComparison.Ordinal) || inputString.EndsWith("F", StringComparison.Ordinal) ? NumberStyle.Float | NumberStyle.AllowTrailingFloatType : NumberStyle.Float;
+                            var provider = J2N.Text.StringFormatter.InvariantCulture;
+
+                            // Pass through the same value - all we care about here is that the input is accepted without error
+                            yield return new TestCaseData(Single.Parse(inputString, styles, provider), inputString, styles, provider);
+                        }
+
+
+                        // Harmony (Test_parseFloat_LString_MaxNormalBoundary())
+
+                        int[] expecteds1 ={
+                                0x7f7fffff,
+                                0x7f7fffff,
+                                0x7f7fffff,
+                                0x7f800000,
+                                0x7f800000,
+                                0x7f800000,
+
+                                unchecked((int)0xff7fffff),
+                                unchecked((int)0xff7fffff),
+                                unchecked((int)0xff7fffff),
+                                unchecked((int)0xff800000),
+                                unchecked((int)0xff800000),
+                                unchecked((int)0xff800000),
+                        };
+
+                        string[] inputs1 = {
+                            "0x1.fffffep127",
+                            "0x1.fffffe000000000000000000000000000000000000000000000001p127",
+                            "0x1.fffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+                            "0x1.ffffffp127",
+                            "0x1.ffffff000000000000000000000000000000000000000000000001p127",
+                            "0x1.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+
+                            "-0x1.fffffep127",
+                            "-0x1.fffffe000000000000000000000000000000000000000000000001p127",
+                            "-0x1.fffffeffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+                            "-0x1.ffffffp127",
+                            "-0x1.ffffff000000000000000000000000000000000000000000000001p127",
+                            "-0x1.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp127",
+                        };
+
+                        for (int i = 0; i < inputs1.Length; i++)
+                        {
+                            yield return new TestCaseData(Single.Int32BitsToSingle(expecteds1[i]), inputs1[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        }
+
+                        // Harmony (Test_parseFloat_LString_MaxSubNormalBoundary())
+
+                        int[] expecteds2 = {
+                            0x7fffff,
+                            0x7fffff,
+                            0x7fffff,
+                            0x800000,
+                            0x800000,
+                            0x800000,
+
+                            unchecked((int)0x807fffff),
+                            unchecked((int)0x807fffff),
+                            unchecked((int)0x807fffff),
+                            unchecked((int)0x80800000),
+                            unchecked((int)0x80800000),
+                            unchecked((int)0x80800000),
+                        };
+
+                        string[] inputs2 = {
+                            "0x0.fffffep-126",
+                            "0x0.fffffe000000000000000000000000000000000000000000000000000001p-126",
+                            "0x0.fffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "0x0.ffffffp-126",
+                            "0x0.ffffff0000000000000000000000000000000000000000000000000000001p-126",
+                            "0x0.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+                            "-0x0.fffffep-126",
+                            "-0x0.fffffe000000000000000000000000000000000000000000000000000001p-126",
+                            "-0x0.fffffefffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "-0x0.ffffffp-126",
+                            "-0x0.ffffff0000000000000000000000000000000000000000000000000000001p-126",
+                            "-0x0.ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                        };
+
+                        for (int i = 0; i < inputs2.Length; i++)
+                        {
+                            yield return new TestCaseData(Single.Int32BitsToSingle(expecteds2[i]), inputs2[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        }
+
+                        // Harmony (Test_parseFloat_LString_MinSubNormalBoundary())
+
+                        int[] expecteds3 = {
+                            0x1,
+                            0x1,
+                            0x1,
+                            0x2,
+                            0x2,
+                            0x2,
+
+                            unchecked((int)0x80000001),
+                            unchecked((int)0x80000001),
+                            unchecked((int)0x80000001),
+                            unchecked((int)0x80000002),
+                            unchecked((int)0x80000002),
+                            unchecked((int)0x80000002),
+                        };
+
+                        string[] inputs3 = {
+                            "0x0.000002p-126",
+                            "0x0.00000200000000000000000000000000000000000001p-126",
+                            "0x0.000002ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "0x0.000003p-126",
+                            "0x0.000003000000000000000000000000000000000000001p-126",
+                            "0x0.000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+                            "-0x0.000002p-126",
+                            "-0x0.00000200000000000000000000000000000000000001p-126",
+                            "-0x0.000002ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "-0x0.000003p-126",
+                            "-0x0.000003000000000000000000000000000000000000001p-126",
+                            "-0x0.000003ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                        };
+
+                        for (int i = 0; i < inputs3.Length; i++)
+                        {
+                            yield return new TestCaseData(Single.Int32BitsToSingle(expecteds3[i]), inputs3[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        }
+
+                        // Harmony (Test_parseFloat_LString_MinNormalBoundary())
+
+                        int[] expecteds4 = {
+                            0x800000,
+                            0x800000,
+                            0x800000,
+                            0x800000,
+                            0x800001,
+                            0x800001,
+
+                            unchecked((int)0x80800000),
+                            unchecked((int)0x80800000),
+                            unchecked((int)0x80800000),
+                            unchecked((int)0x80800000),
+                            unchecked((int)0x80800001),
+                            unchecked((int)0x80800001),
+                        };
+
+                        string[] inputs4 = {
+                            "0x1.0p-126",
+                            "0x1.00000000000000000000000000000000000000000000001p-126",
+                            "0x1.000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "0x1.000001p-126",
+                            "0x1.000001000000000000000000000000000000000000000001p-126",
+                            "0x1.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+                            "-0x1.0p-126",
+                            "-0x1.00000000000000000000000000000000000000000000001p-126",
+                            "-0x1.000000ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "-0x1.000001p-126",
+                            "-0x1.000001000000000000000000000000000000000000000001p-126",
+                            "-0x1.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                        };
+                        for (int i = 0; i < inputs4.Length; i++)
+                        {
+                            yield return new TestCaseData(Single.Int32BitsToSingle(expecteds4[i]), inputs4[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        }
+
+                        // Harmony (Test_parseFloat_LString_NormalNegativeExponent())
+
+                        int[] expecteds5 = {
+                            0x3991a2b4,
+                            0x3d6e0247,
+                            0x3aa0a009,
+                            0x37848405,
+                            0x3420a005,
+                            0x30d4d405,
+                            0x2d848402,
+                            0x2a129202,
+                            0x26acac02,
+                            0x2346c602,
+                            0x1fe0e002,
+                            0x1c6eee02,
+                            0x19048401,
+                            0x15919101,
+                            0x12189801,
+                            0xf028828,
+                            0xb890890,
+                            0x80c88c8,
+                            0x4930930,
+                            0x1198998,
+                            0x28028,
+                            0x51c,
+                            0xb,
+                            0x0,
+                            0x0,
+                        };
+
+                        for (int i = 0; i < expecteds5.Length; i++)
+                        {
+                            int part = i * 7;
+                            string inputString = "0x" + part.ToString(NumberFormatInfo.InvariantInfo) + "."
+                                + part.ToString(NumberFormatInfo.InvariantInfo) + "0123456789abcdefp-" + part.ToString(NumberFormatInfo.InvariantInfo);
+
+                            yield return new TestCaseData(Single.Int32BitsToSingle(expecteds5[i]), inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        }
+
+                        // Harmony (Test_parseFloat_LString_NormalPositiveExponent())
+
+                        int[] expecteds6 = {
+                            0x3991a2b4,                0x43cc0247,                0x47909009,
+                            0x4ac0c009,                0x4e109005,                0x5140c005,
+                            0x5458d805,                0x57848402,                0x5a909002,
+                            0x5da8a802,                0x60c0c002,                0x63cccc02,
+                            0x66e4e402,                0x69f0f002,                0x6d048401,
+                            0x70109001,                0x73169601,                0x76810810,
+                            0x79840840,                0x7c8a08a0,                0x7f800000,
+                            0x7f800000,                0x7f800000,                0x7f800000,
+                            0x7f800000,
+                        };
+
+                        for (int i = 0; i < expecteds6.Length; i++)
+                        {
+                            int part = i * 6;
+                            string inputString = "0x" + part.ToString(NumberFormatInfo.InvariantInfo) + "."
+                                + part.ToString(NumberFormatInfo.InvariantInfo) + "0123456789abcdefp" + part.ToString(NumberFormatInfo.InvariantInfo);
+
+                            yield return new TestCaseData(Single.Int32BitsToSingle(expecteds6[i]), inputString, NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        }
+
+                        // Harmony (Test_parseFloat_LString_Unusual())
+
+                        yield return new TestCaseData(0.0f, "0x00000000000000000000000000000000000000000.0000000000000000000000000000000000000p0000000000000000000000000000000000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(6.64614E35f, "+0Xfffff.fffffffffffffffffffffffffffffffp+99F", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(-4.5072022E28f, "-0X.123456789abcdefp+99f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(-1.63971062E17f, "-0X123456789abcdef.p+1f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(-4.48585472E8f, "-0X000000000000000000000000000001abcdef.0000000000000000000000000001abefp00000000000000000000000000000000000000000004f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(5.907252E33f, "0X0.00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001234p600f", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(float.PositiveInfinity, "0x1.p9223372036854775807", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(float.PositiveInfinity, "0x1.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(float.PositiveInfinity, "0x10.p9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(float.PositiveInfinity, "0xabcd.ffffffffp+2000", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.0f, "0x1.p-9223372036854775808", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.0f, "0x1.p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.0f, "0x.1p-9223372036854775809", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+
+                        // Harmony (Test_parseFloat_LString_ZeroBoundary())
+
+                        int[] expecteds7 = {
+                            0x0,
+                            0x0,
+                            0x0,
+                            0x0,
+                            0x1,
+                            0x1,
+
+                            unchecked((int)0x80000000),
+                            unchecked((int)0x80000000),
+                            unchecked((int)0x80000000),
+                            unchecked((int)0x80000000),
+                            unchecked((int)0x80000001),
+                            unchecked((int)0x80000001),
+                        };
+
+                        string[] inputs7 = {
+                            "0x0.000000000000000p-126",
+                            "0x0.000000000000000000000000000000000000000000000001p-126",
+                            "0x0.000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "0x0.000001p-126",
+                            "0x0.000001000000000000000000000000000000000000000001p-126",
+                            "0x0.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+
+                            "-0x0.000000000000000p-126",
+                            "-0x0.000000000000000000000000000000000000000000000001p-126",
+                            "-0x0.000000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                            "-0x0.000001p-126",
+                            "-0x0.000001000000000000000000000000000000000000000001p-126",
+                            "-0x0.000001fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffp-126",
+                        };
+
+                        for (int i = 0; i < inputs7.Length; i++)
+                        {
+                            yield return new TestCaseData(Single.Int32BitsToSingle(expecteds7[i]), inputs7[i], NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
+                        }
+
+                        // Harmony (Test_parseFloatLjava_lang_String())
+
+                        yield return new TestCaseData(0.0f, "7.0064923216240853546186479164495e-46", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.Epsilon, "7.0064923216240853546186479164496e-46", NumberStyle.Float, NumberFormatInfo.InvariantInfo); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
+
+                        // Custom
+
+                        yield return new TestCaseData(3.0f, "0x1.8p1", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(3.0f, "0x1,8p1", NumberStyle.HexFloat, new NumberFormatInfo { NumberDecimalSeparator = "," });
+                        yield return new TestCaseData(3.0f, "0x1--8p1", NumberStyle.HexFloat, new NumberFormatInfo { NumberDecimalSeparator = "--" });
+                        yield return new TestCaseData(3.0f, "0x1.8", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+
+                        // Negative sign format tests
+                        yield return new TestCaseData(-3.0f, "-0x1.8p1", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-3.0f, "-0x1.8", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-2.0f, "-0x1.", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-3.0f, "- 0x1.8p1", NumberStyle.HexFloat, new NumberFormatInfo { NumberNegativePattern = 2 });
+                        yield return new TestCaseData(-3.0f, "- 0x1.8", NumberStyle.HexFloat, new NumberFormatInfo { NumberNegativePattern = 2 });
+                        yield return new TestCaseData(-2.0f, "- 0x1.", NumberStyle.HexFloat, new NumberFormatInfo { NumberNegativePattern = 2 });
+
+                        yield return new TestCaseData(-3.0f, "0x1.8p1-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-3.0f, "0x1.8-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-2.0f, "0x1.-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-3.0f, "0x1.8p1 -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-3.0f, "0x1.8 -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-2.0f, "0x1. -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(-3.0f, "(0x1.8p1)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-3.0f, "(0x1.8)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-2.0f, "(0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
+                    }
+                }
+
+                public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data
+                {
+                    get
+                    {
+                        //JDK 8
+
+                        for (int i = 0; i < badStrings.Length; i++)
+                        {
+                            string inputString = badStrings[i];
+                            var styles = inputString.EndsWith("f", StringComparison.OrdinalIgnoreCase) || inputString.EndsWith("d", StringComparison.OrdinalIgnoreCase) ? NumberStyle.Float | NumberStyle.AllowTrailingFloatType : NumberStyle.Float;
+                            var provider = J2N.Text.StringFormatter.InvariantCulture;
+
+                            // Pass through the same value - all we care about here is that the input is accepted without error
+                            yield return new TestCaseData(typeof(FormatException), inputString, styles, provider, "Bad input not expected to be parsed.");
+                        }
+
+                        // Java's .trim() method (which is how they deal with whitespace) removes all characters
+                        // with a value below 20 (the space character and all control characters). .NET doesn't trim
+                        // the string at all, and only ignores characters Unicode values U+0009, U+000A, U+000B, U+000C, U+000D, and U+0020.
+                        // So, if there is a need to pre-trim the string, to remove all control characters the same way Java does, it can be
+                        // done as follows.
+                        char[] javaTrimChars = Enumerable.Range(0, ' ' + 1).Select(c => (char)c).ToArray();
+
+                        for (int i = 0; i < paddedBadStrings.Length; i++)
+                        {
+                            string inputString = paddedBadStrings[i].Trim(javaTrimChars);
+                            var styles = inputString.EndsWith("f", StringComparison.OrdinalIgnoreCase) || inputString.EndsWith("d", StringComparison.OrdinalIgnoreCase) ? NumberStyle.Float | NumberStyle.AllowTrailingFloatType : NumberStyle.Float;
+                            var provider = J2N.Text.StringFormatter.InvariantCulture;
+
+                            // Pass through the same value - all we care about here is that the input is accepted without error
+                            yield return new TestCaseData(typeof(FormatException), inputString, styles, provider, "Bad input not expected to be parsed.");
+                        }
+
+                        // Custom
+
+                        yield return new TestCaseData(typeof(FormatException), "-0x1.8p1", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo, "NumberStyle.HexNumber doesn't allow negative sign.");
+
+                        yield return new TestCaseData(typeof(FormatException), "0x1.8p1-", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1.8-", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1.-", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1.8p1 -", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1.8 -", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1. -", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow trailing negative sign.");
+
+                        yield return new TestCaseData(typeof(FormatException), "(0x1.8p1)", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
+                        yield return new TestCaseData(typeof(FormatException), "(0x1.8)", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
+                        yield return new TestCaseData(typeof(FormatException), "(0x1.)", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
+                    }
+                }
+
+                public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
+                {
+                    get
+                    {
+                        // Harmony (Test_parseFloat_LString_Harmony6261())
+
+                        yield return new TestCaseData(0x51e5f4c9, "1.2345679E11", "123456790528.000000000000000f", NumberStyle.Float | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x51e5f4c9, "1.2345679E11", "123456790528.000000000000000", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x50000000, "8.5899346E9", "8589934592", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x50004000, "8.606712E9", "8606711808", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+
+                        // Harmony (Test_parseFloatLjava_lang_String())
+
+                        yield return new TestCaseData(0x800000, "1.17549435E-38",
+                            "0.000000000000000000000000000000000000011754942807573642917278829910357665133228589927589904276829631184250030649651730385585324256680905818939208984375",
+                            NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7fffff, "1.1754942E-38",
+                            "0.00000000000000000000000000000000000001175494280757364291727882991035766513322858992758990427682963118425003064965173038558532425668090581893920898437499999f",
+                            NumberStyle.Float | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+
+                        /* Test a set of regular floats with exponents from -38 to +38 */
+                        for (int i = 38; i > 3; i--)
+                        {
+                            string testString = "3.4028234663852886e-" + i;
+                            yield return new TestCaseData(rawBitsFor3_4eN38To38[38 - i],
+                                expectedStringFor3_4eN38To38[38 - i], testString, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        }
+
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 - 3],
+                            expectedStringFor3_4eN38To38[38 - 3], "3.4028234663852886e-3", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 - 2],
+                            expectedStringFor3_4eN38To38[38 - 2], "3.4028234663852886e-2", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 - 1],
+                            expectedStringFor3_4eN38To38[38 - 1], "3.4028234663852886e-1", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 - 0],
+                            expectedStringFor3_4eN38To38[38 - 0], "3.4028234663852886e-0", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 + 1],
+                            expectedStringFor3_4eN38To38[38 + 1], "3.4028234663852886e+1", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 + 2],
+                            expectedStringFor3_4eN38To38[38 + 2], "3.4028234663852886e+2", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 + 3],
+                            expectedStringFor3_4eN38To38[38 + 3], "3.4028234663852886e+3", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 + 4],
+                            expectedStringFor3_4eN38To38[38 + 4], "3.4028234663852886e+4", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 + 5],
+                            expectedStringFor3_4eN38To38[38 + 5], "3.4028234663852886e+5", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor3_4eN38To38[38 + 6],
+                            expectedStringFor3_4eN38To38[38 + 6], "3.4028234663852886e+6", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+
+                        for (int i = 7; i < 39; i++)
+                        {
+                            string testString = "3.4028234663852886e+" + i;
+                            yield return new TestCaseData(rawBitsFor3_4eN38To38[38 + i],
+                                expectedStringFor3_4eN38To38[38 + i], testString, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        }
+
+                        /* Test another set of regular floats with exponents from -38 to +38 */
+                        for (int i = 38; i > 3; i--)
+                        {
+                            string testString = "-1.1754943508222875e-" + i;
+                            yield return new TestCaseData(rawBitsFor1_17eN38To38[38 - i],
+                                expectedStringFor1_17eN38To38[38 - i], testString, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        }
+
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 - 3],
+                            expectedStringFor1_17eN38To38[38 - 3], "-1.1754943508222875e-3", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 - 2],
+                            expectedStringFor1_17eN38To38[38 - 2], "-1.1754943508222875e-2", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 - 1],
+                            expectedStringFor1_17eN38To38[38 - 1], "-1.1754943508222875e-1", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 - 0],
+                            expectedStringFor1_17eN38To38[38 - 0], "-1.1754943508222875e-0", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 + 1],
+                            expectedStringFor1_17eN38To38[38 + 1], "-1.1754943508222875e+1", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 + 2],
+                            expectedStringFor1_17eN38To38[38 + 2], "-1.1754943508222875e+2", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 + 3],
+                            expectedStringFor1_17eN38To38[38 + 3], "-1.1754943508222875e+3", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 + 4],
+                            expectedStringFor1_17eN38To38[38 + 4], "-1.1754943508222875e+4", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 + 5],
+                            expectedStringFor1_17eN38To38[38 + 5], "-1.1754943508222875e+5", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(rawBitsFor1_17eN38To38[38 + 6],
+                            expectedStringFor1_17eN38To38[38 + 6], "-1.1754943508222875e+6", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+
+                        for (int i = 7; i < 39; i++)
+                        {
+                            string testString = "-1.1754943508222875e+" + i;
+                            yield return new TestCaseData(rawBitsFor1_17eN38To38[38 + i],
+                                expectedStringFor1_17eN38To38[38 + i], testString, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        }
+
+                        /* Test denormalized floats (floats with exponents <= -38 */
+                        yield return new TestCaseData(1, "1.4E-45", "1.1012984643248170E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000001), "-1.4E-45", "-1.1012984643248170E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(1, "1.4E-45", "1.0E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000001), "-1.4E-45", "-1.0E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(1, "1.4E-45", "0.9E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000001), "-1.4E-45", "-0.9E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(3, "4.2E-45", "4.203895392974451e-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000003), "-4.2E-45", "-4.203895392974451e-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0, "0.0", "0.004E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000000), "-0.0", "-0.004E-45", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+
+                        /*
+                         * Test for large floats close to and greater than 3.4028235E38 and
+                         * -3.4028235E38
+                         */
+                        yield return new TestCaseData(0x7eb48e52, "1.2E38", "1.2E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xfeb48e52), "-1.2E38", "-1.2E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7f70bdc2, "3.2E38", "3.2E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xff70bdc2), "-3.2E38", "-3.2E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7f7fc99e, "3.4E38", "3.4E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xff7fc99e), "-3.4E38", "-3.4E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7f7fffff, "3.4028235E38", "3.4028234663852886E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xff7fffff), "-3.4028235E38", "-3.4028234663852886E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7f800000, "Infinity", "3.405E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xff800000), "-Infinity", "-3.405E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7f800000, "Infinity", "3.41E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xff800000), "-Infinity", "-3.41E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7f800000, "Infinity", "3.42E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xff800000), "-Infinity", "-3.42E+38", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7f800000, "Infinity", "1.0E+39", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0xff800000), "-Infinity", "-1.0E+39", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                    }
+                }
+            }
+
+            public abstract class Parse_CharSequence_NumberStyle_IFormatProvider : ParseSingleTestCase
+            {
+                protected abstract float GetResult(string value, NumberStyle style, IFormatProvider provider);
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider(float expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                        float actual = GetResult(value, style, provider);
+
+                        string expectedString = Int32.ToHexString(Single.SingleToInt32Bits(expected));
+                        string actualString = Int32.ToHexString(Single.SingleToInt32Bits(actual));
+                        string errorMsg = $"input string is:<{value}>. "
+                            + $"The expected result should be:<{expectedString}>, "
+                            + $"but was: <{actualString}>. ";
+
+                        assertEquals(errorMsg, expected, actual, 0.0F);
+                    }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits(int expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    int rawBits;
+                    float result = GetResult(value, style, provider);
+                    rawBits = Single.SingleToInt32Bits(result);
+                    assertEquals($"Original float({value.ToString(NumberFormatInfo.InvariantInfo)}) Converted float({result.ToString(NumberFormatInfo.InvariantInfo)}) "
+                            + $" Expecting:{expectedRawBits.ToHexString()} Got: {rawBits.ToHexString()}", expectedRawBits, rawBits);
+                }
+            }
+
+            public class Parse_String_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider
+            {
+                protected override float GetResult(string value, NumberStyle style, IFormatProvider provider)
+                {
+                    return Single.Parse(value, style, provider);
+                }
             }
         }
     }
