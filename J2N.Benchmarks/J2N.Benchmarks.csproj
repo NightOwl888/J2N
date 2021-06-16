@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\src\J2N\J2N.csproj" />
+    <ProjectReference Include="..\tests\J2N.Tests\J2N.Tests.csproj" />
   </ItemGroup>
 
 </Project>

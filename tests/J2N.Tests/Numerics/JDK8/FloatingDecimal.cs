@@ -38,7 +38,7 @@ namespace J2N.Numerics
     /// static convenience methods, although a <code>IBinaryToASCIIConverter</code>
     /// instance may be obtained and reused.
     /// </summary>
-    internal class FloatingDecimal
+    public class FloatingDecimal
     {
 
         /**
