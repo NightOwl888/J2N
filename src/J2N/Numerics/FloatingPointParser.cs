@@ -428,7 +428,7 @@ namespace J2N.Numerics
             // See if it could be a hexadecimal representation
             if (ParseAsHex(s))
             {
-                return HexStringParser.ParseFloat(s);
+                return HexStringParser.ParseSingle(s, Globalization.NumberStyle.HexNumber, new NumberFormatInfo());
             }
 
             //StringExponentPair info = initialParse(s, length);
