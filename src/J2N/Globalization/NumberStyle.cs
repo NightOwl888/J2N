@@ -91,8 +91,6 @@ namespace J2N.Globalization
         /// </summary>
         AllowThousands = 0x00000040,
 
-        
-
         /// <summary>
         /// Indicates that the numeric string can be in exponential notation. The <see cref="AllowExponent"/>
         /// flag allows the parsed string to contain an exponent that begins with the "E"
@@ -118,30 +116,32 @@ namespace J2N.Globalization
         /// </summary>
         Currency = 383,
 
-        
-
         /// <summary>
         /// Indicates that the numeric string represents a hexadecimal value. Valid hexadecimal
         /// values include the numeric digits 0-9 and the hexadecimal digits A-F and a-f.
-        /// Strings that are parsed using this style cannot be prefixed with "0x" or "&amp;h".
+        /// Strings that are parsed using this style can only be prefixed with "0x" or "&amp;h"
+        /// when parsing floating point hexadecimal types.
         /// A string that is parsed with the <see cref="AllowHexSpecifier"/>
-        /// style will always be interpreted as a hexadecimal value. The only flags that
-        /// can be combined with <see cref="AllowHexSpecifier"/> are
-        /// <see cref="AllowLeadingWhite"/> and <see cref="AllowTrailingWhite"/>.
-        /// The <see cref="NumberStyle"/> enumeration includes a composite style,
-        /// <see cref="HexNumber"/>, that consists of these three flags.
+        /// style will always be interpreted as a hexadecimal value.
+        /// The <see cref="NumberStyle"/> enumeration includes 2 composite styles,
+        /// <see cref="HexNumber"/> and <see cref="HexFloat"/>, that can be used to
+        /// specifiy either hexadecimal integral or floating-point types along with
+        /// a default set of options that are used in most cases.
         /// </summary>
         AllowHexSpecifier = 0x00000200,
 
 
         /// <summary>
-        /// Indicates that the numeric string represents a floating point number expressed as a
+        /// Indicates that the numeric string represents a number expressed as a
         /// C# or Java literal string, such as <c>3.14159f</c> or <c>4.972135238332232d</c>.
+        /// This option only applies to floating point numbers <see cref="float"/> and <see cref="double"/>, however,
+        /// the real type suffix 'd', 'D', 'f', 'F', 'm' or 'M' are all valid for each floating point type.
+        /// If this option is used with <see cref="AllowHexSpecifier"/>, then 'd', 'D', 'f', or 'F' are all treated as
+        /// hexadecimal values unless an exponent (beginning with 'p') is also supplied (i.e. <c>0x1.8p1f</c>) so it must be
+        /// used in conjunction with <see cref="AllowExponent"/> for hexadecimal values.
         /// Note the type is simply ignored during the parse when you specify this option (which is how it works in Java).
-        /// However, performance is better in .NET 5+ and .NET Core 3+ if you don't choose this option,
-        /// so it is recommended only to use it if you have strings like this to parse.
         /// </summary>
-        AllowTrailingFloatType = 0x00000400, // J2N specific
+        AllowTypeSpecifier = 0x00000400, // J2N specific
 
 
         /// <summary>
