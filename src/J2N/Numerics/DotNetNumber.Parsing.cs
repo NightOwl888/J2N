@@ -2041,17 +2041,10 @@ namespace J2N.Numerics
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
             {
-                if (TryParseDoubleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
-                {
-                    return true;
-                }
+                return TryParseDoubleHexFloatStyle(value, styles, info, out result);
             }
 
-            if (!TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
-            {
-                return false;
-            }
-            return true;
+            return TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
 #endif
 
@@ -2059,17 +2052,10 @@ namespace J2N.Numerics
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
             {
-                if (TryParseDoubleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
-                {
-                    return true;
-                }
+                return TryParseDoubleHexFloatStyle(value, styles, info, out result);
             }
 
-            if (!TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
-            {
-                return false;
-            }
-            return true;
+            return TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
 
 #if FEATURE_READONLYSPAN
@@ -2200,65 +2186,133 @@ namespace J2N.Numerics
 
 #if FEATURE_READONLYSPAN
 
-        internal static unsafe ParsingStatus TryParseDoubleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
+        internal static unsafe bool TryParseDoubleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             Debug.Assert(info != null);
             Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new DoubleNumberBuffer(value.Length);
 
-            fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+            if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
             {
-                char* p = stringPointer;
+                ReadOnlySpan<char> valueTrim = value.Trim();
 
-                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
-                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
+                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
+                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
+
+                if (valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol))
                 {
-                    //number.CheckConsistency();
-                    result = 0;
-                    return ParsingStatus.Failed;
+                    result = double.PositiveInfinity;
                 }
+                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NegativeInfinitySymbol))
+                {
+                    result = double.NegativeInfinity;
+                }
+                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol))
+                {
+                    result = double.NaN;
+                }
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
+                {
+                    valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                // J2N TODO: Do we need to do the same validation as the TryParseDoubleFloatStyle?
+                    if (valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol))
+                    {
+                        result = double.PositiveInfinity;
+                    }
+                    else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol))
+                    {
+                        result = double.NaN;
+                    }
+                    else
+                    {
+                        result = 0;
+                        return false;
+                    }
+                }
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                        valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol))
+                {
+                    result = double.NaN;
+                }
+                else
+                {
+                    result = 0;
+                    return false; // We really failed
+                }
             }
-
-            if (!number.TryGetValue(out result))
+            else if (!number.TryGetValue(out result))
             {
-                return ParsingStatus.Failed;
+                return false;
             }
 
-            return ParsingStatus.OK;
+            return true;
         }
 #endif
 
-        internal static unsafe ParsingStatus TryParseDoubleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
+        internal static unsafe bool TryParseDoubleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             Debug.Assert(info != null);
             Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new DoubleNumberBuffer(value.Length);
 
-            fixed (char* stringPointer = value)
+            if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
             {
-                char* p = stringPointer;
+                string valueTrim = value.Trim();
 
-                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
-                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
+                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
+                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
+
+                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
                 {
-                    //number.CheckConsistency();
-                    result = 0;
-                    return ParsingStatus.Failed;
+                    result = double.PositiveInfinity;
                 }
+                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NegativeInfinitySymbol))
+                {
+                    result = double.NegativeInfinity;
+                }
+                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
+                {
+                    result = double.NaN;
+                }
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
+                {
+                    valueTrim = valueTrim.Substring(info.PositiveSign.Length);
 
-                // J2N TODO: Do we need to do the same validation as the TryParseDoubleFloatStyle?
+                    if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
+                    {
+                        result = double.PositiveInfinity;
+                    }
+                    else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
+                    {
+                        result = double.NaN;
+                    }
+                    else
+                    {
+                        result = 0;
+                        return false;
+                    }
+                }
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                        StringComparer.OrdinalIgnoreCase.Equals(valueTrim.Substring(info.NegativeSign.Length), info.NaNSymbol))
+                {
+                    result = double.NaN;
+                }
+                else
+                {
+                    result = 0;
+                    return false; // We really failed
+                }
             }
-
-            if (!number.TryGetValue(out result))
+            else if (!number.TryGetValue(out result))
             {
-                return ParsingStatus.Failed;
+                return false;
             }
 
-            return ParsingStatus.OK;
+            return true;
         }
 
         //internal static unsafe bool TryParseHalf(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out Half result)
@@ -2333,17 +2387,10 @@ namespace J2N.Numerics
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
             {
-                if (TryParseSingleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
-                {
-                    return true;
-                }
+                return TryParseSingleHexFloatStyle(value, styles, info, out result);
             }
 
-            if (!TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
-            {
-                return false;
-            }
-            return true;
+            return TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
 #endif
 
@@ -2351,17 +2398,10 @@ namespace J2N.Numerics
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
             {
-                if (TryParseSingleHexFloatStyle(value, styles, info, out result) == ParsingStatus.OK)
-                {
-                    return true;
-                }
+                return TryParseSingleHexFloatStyle(value, styles, info, out result);
             }
 
-            if (!TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result))
-            {
-                return false;
-            }
-            return true;
+            return TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
 
 
@@ -2503,65 +2543,143 @@ namespace J2N.Numerics
 
 #if FEATURE_READONLYSPAN
 
-        internal static unsafe ParsingStatus TryParseSingleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
+        internal static unsafe bool TryParseSingleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             Debug.Assert(info != null);
             Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new SingleNumberBuffer(value.Length);
 
-            fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+            if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
             {
-                char* p = stringPointer;
+                ReadOnlySpan<char> valueTrim = value.Trim();
 
-                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
-                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
+                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
+                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
+                //
+                // Additionally, since some cultures ("wo") actually define `PositiveInfinitySymbol`
+                // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
+                // that case so that we don't start parsing things like `++infini`.
+
+                if (valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol))
                 {
-                    //number.CheckConsistency();
-                    result = 0;
-                    return ParsingStatus.Failed;
+                    result = float.PositiveInfinity;
                 }
+                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NegativeInfinitySymbol))
+                {
+                    result = float.NegativeInfinity;
+                }
+                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol))
+                {
+                    result = float.NaN;
+                }
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
+                {
+                    valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                // J2N TODO: Do we need to do the same validation as the TryParseSingleFloatStyle?
+                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol))
+                    {
+                        result = float.PositiveInfinity;
+                    }
+                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol))
+                    {
+                        result = float.NaN;
+                    }
+                    else
+                    {
+                        result = 0;
+                        return false;
+                    }
+                }
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                         !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                         valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol))
+                {
+                    result = float.NaN;
+                }
+                else
+                {
+                    result = 0;
+                    return false; // We really failed
+                }
             }
-
-            if (!number.TryGetValue(out result))
+            else if(!number.TryGetValue(out result))
             {
-                return ParsingStatus.Failed;
+                return false;
             }
 
-            return ParsingStatus.OK;
+            return true;
         }
 #endif
 
-        internal static unsafe ParsingStatus TryParseSingleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
+        internal static unsafe bool TryParseSingleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             Debug.Assert(info != null);
             Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new SingleNumberBuffer(value.Length);
 
-            fixed (char* stringPointer = value)
+            if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
             {
-                char* p = stringPointer;
+                string valueTrim = value.Trim();
 
-                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
-                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
+                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
+                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
+                //
+                // Additionally, since some cultures ("wo") actually define `PositiveInfinitySymbol`
+                // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
+                // that case so that we don't start parsing things like `++infini`.
+
+                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
                 {
-                    //number.CheckConsistency();
-                    result = 0;
-                    return ParsingStatus.Failed;
+                    result = float.PositiveInfinity;
                 }
+                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NegativeInfinitySymbol))
+                {
+                    result = float.NegativeInfinity;
+                }
+                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
+                {
+                    result = float.NaN;
+                }
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
+                {
+                    valueTrim = valueTrim.Substring(info.PositiveSign.Length);
 
-                // J2N TODO: Do we need to do the same validation as the TryParseSingleFloatStyle?
+                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
+                    {
+                        result = float.PositiveInfinity;
+                    }
+                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
+                    {
+                        result = float.NaN;
+                    }
+                    else
+                    {
+                        result = 0;
+                        return false;
+                    }
+                }
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                         !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                         StringComparer.OrdinalIgnoreCase.Equals(valueTrim.Substring(info.NegativeSign.Length), info.NaNSymbol))
+                {
+                    result = float.NaN;
+                }
+                else
+                {
+                    result = 0;
+                    return false; // We really failed
+                }
             }
-
-            if (!number.TryGetValue(out result))
+            else if (!number.TryGetValue(out result))
             {
-                return ParsingStatus.Failed;
+                return false;
             }
 
-            return ParsingStatus.OK;
+            return true;
         }
 
 #if FEATURE_READONLYSPAN
@@ -2597,32 +2715,46 @@ namespace J2N.Numerics
                 }
             }
 
-
             number.CheckConsistency();
             return true;
         }
 
-//#if FEATURE_READONLYSPAN
-//        internal static unsafe bool TryStringToNumber(ReadOnlySpan<char> value, int radix, ref NumberBuffer number)
-//        {
-//            Debug.Assert(info != null);
-//            fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
-//            {
-//                char* p = stringPointer;
-//                if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info)
-//                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
-//                {
-//                    number.CheckConsistency();
-//                    return false;
-//                }
-//            }
+#if FEATURE_READONLYSPAN
+        internal static unsafe bool TryStringToFloatingPointHexNumber(ReadOnlySpan<char> value, NumberStyle styles, HexFloatingPointNumberBuffer number, NumberFormatInfo info)
+        {
+            Debug.Assert(info != null);
+            fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
+            {
+                char* p = stringPointer;
+                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
+                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                {
+                    //number.CheckConsistency();
+                    return false;
+                }
+            }
 
-//            number.CheckConsistency();
-//            return true;
-//        }
+            //number.CheckConsistency();
+            return true;
+        }
+#endif
+        internal static unsafe bool TryStringToFloatingPointHexNumber(string value, NumberStyle styles, HexFloatingPointNumberBuffer number, NumberFormatInfo info)
+        {
+            Debug.Assert(info != null);
+            fixed (char* stringPointer = value)
+            {
+                char* p = stringPointer;
+                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
+                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
+                {
+                    //number.CheckConsistency();
+                    return false;
+                }
+            }
 
-//        internal static
-//#endif
+            //number.CheckConsistency();
+            return true;
+        }
 
 #if FEATURE_READONLYSPAN
         private static bool TrailingZeros(ReadOnlySpan<char> value, int index)
@@ -2691,12 +2823,13 @@ namespace J2N.Numerics
 
         private static bool IsFloatTypeSuffix(int ch) => ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D' || ch == 'm' || ch == 'M';
 
-        internal enum ParsingStatus
-        {
-            OK,
-            Failed,
-            Overflow
-        }
+
+        //internal enum ParsingStatus
+        //{
+        //    OK,
+        //    Failed,
+        //    Overflow
+        //}
 
         //[DoesNotReturn]
         //internal static void ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type = 0) => throw GetException(status, type);
