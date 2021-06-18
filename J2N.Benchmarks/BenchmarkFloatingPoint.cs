@@ -20,14 +20,14 @@ namespace J2N.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void Parse_Single_Hexidecimal_ShortString_HexStringParser()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.HexStringParser.ParseSingle(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
-        }
+        //[Benchmark]
+        //public void Parse_Single_Hexidecimal_ShortString_HexStringParser()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.HexStringParser.ParseSingle(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //    }
+        //}
 
         [Benchmark]
         public void Parse_Single_Hexidecimal_ShortString_FloatingDecimal()
@@ -47,14 +47,14 @@ namespace J2N.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void Parse_Double_Hexidecimal_ShortString_HexStringParser()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.HexStringParser.ParseDouble(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
-        }
+        //[Benchmark]
+        //public void Parse_Double_Hexidecimal_ShortString_HexStringParser()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.HexStringParser.ParseDouble(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //    }
+        //}
 
         [Benchmark]
         public void Parse_Double_Hexidecimal_ShortString_FloatingDecimal()
@@ -74,14 +74,14 @@ namespace J2N.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void Parse_Single_Hexidecimal_LongString_HexStringParser()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.HexStringParser.ParseSingle(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
-        }
+        //[Benchmark]
+        //public void Parse_Single_Hexidecimal_LongString_HexStringParser()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.HexStringParser.ParseSingle(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //    }
+        //}
 
         [Benchmark]
         public void Parse_Single_Hexidecimal_LongString_FloatingDecimal()
@@ -101,14 +101,14 @@ namespace J2N.Benchmarks
             }
         }
 
-        [Benchmark]
-        public void Parse_Double_Hexidecimal_LongString_HexStringParser()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.HexStringParser.ParseDouble(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
-        }
+        //[Benchmark]
+        //public void Parse_Double_Hexidecimal_LongString_HexStringParser()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.HexStringParser.ParseDouble(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //    }
+        //}
 
         [Benchmark]
         public void Parse_Double_Hexidecimal_LongString_FloatingDecimal()
