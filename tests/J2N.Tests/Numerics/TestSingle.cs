@@ -1513,6 +1513,16 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-1.8f, "(1.8p0)", NumberStyle.Float | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(-1.8f, "(1.8)", NumberStyle.Float | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(-1.0f, "(1.)", NumberStyle.Float | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
+
+                        // Constant values
+
+                        yield return new TestCaseData(float.NaN, "NaN", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.NaN, "+NaN", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.NaN, "-NaN", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(float.PositiveInfinity, "Infinity", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.PositiveInfinity, "+Infinity", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.NegativeInfinity, "-Infinity", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
@@ -1925,7 +1935,14 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-2.0f, "(0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
 
                         // Constant values
-                        
+
+                        yield return new TestCaseData(float.NaN, "NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.NaN, "+NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.NaN, "-NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(float.PositiveInfinity, "Infinity", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.PositiveInfinity, "+Infinity", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(float.NegativeInfinity, "-Infinity", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
@@ -2222,12 +2239,6 @@ namespace J2N.Numerics
                 protected override float GetResult(string value, NumberStyle style, IFormatProvider provider)
                 {
                     return Single.Parse(value, style, provider);
-                }
-
-                [Test]
-                public void TestDebug()
-                {
-                    var value = Single.Parse("NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
                 }
             }
         }

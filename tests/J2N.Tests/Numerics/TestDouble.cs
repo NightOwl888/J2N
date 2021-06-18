@@ -2496,6 +2496,16 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-1.8d, "(1.8e0)", NumberStyle.Float | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(-1.8d, "(1.8)", NumberStyle.Float | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(-1.0d, "(1.)", NumberStyle.Float | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
+
+                        // Constant values
+
+                        yield return new TestCaseData(double.NaN, "NaN", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.NaN, "+NaN", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.NaN, "-NaN", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(double.PositiveInfinity, "Infinity", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.PositiveInfinity, "+Infinity", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.NegativeInfinity, "-Infinity", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
@@ -3085,6 +3095,16 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-3.0d, "(0x1.8p1)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(-3.0d, "(0x1.8)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(-2.0d, "(0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
+
+                        // Constant values
+
+                        yield return new TestCaseData(double.NaN, "NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.NaN, "+NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.NaN, "-NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(double.PositiveInfinity, "Infinity", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.PositiveInfinity, "+Infinity", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(double.NegativeInfinity, "-Infinity", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
