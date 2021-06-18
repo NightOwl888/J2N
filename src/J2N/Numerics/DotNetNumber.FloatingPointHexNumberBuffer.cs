@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace J2N.Numerics
+﻿namespace J2N.Numerics
 {
     internal static partial class DotNetNumber
     {
@@ -10,7 +8,7 @@ namespace J2N.Numerics
         // us to break out early if any of the validation checks don't pass rather than having an extremely complex
         // Regex with many optional capturing groups. We store the strings as char[] buffers
         // along with a length so we don't have to re-allocate memory in most cases to analyze them further.
-        internal abstract class HexFloatingPointNumberBuffer
+        internal abstract class FloatingPointHexNumberBuffer
         {
             protected const int MaxSignificantLength = 15;
             protected const int HexRadix = 16;
@@ -47,7 +45,7 @@ namespace J2N.Numerics
 
             private string abandonedNumber = ""; //$NON-NLS-1$
 
-            internal HexFloatingPointNumberBuffer(int bufferLength, FloatingPointInfo floatingPointInfo)
+            internal FloatingPointHexNumberBuffer(int bufferLength, FloatingPointInfo floatingPointInfo)
             {
                 IntegerPart = new char[bufferLength];
                 DecimalPart = new char[bufferLength];
@@ -76,7 +74,6 @@ namespace J2N.Numerics
             /// <summary>
             /// Parses the exponent field.
             /// </summary>
-            /// <param name="exponentStr"></param>
             private void ParseExponent()
             {
                 // No exponent, raise to the power of 1
@@ -91,7 +88,7 @@ namespace J2N.Numerics
                 if (Int64.TryParse(Exponent, 0, ExponentLength, radix: 10, out long tempExponent))
                 {
                     exponent = expSign * tempExponent;
-                    CheckedAddExponent(FloatingPointInfo.ExponentBias /*EXPONENT_BASE*/);
+                    CheckedAddExponent(FloatingPointInfo.ExponentBias);
                 }
                 else
                 {
@@ -103,10 +100,7 @@ namespace J2N.Numerics
             /// <summary>
             /// Parses the mantissa field.
             /// </summary>
-            /// <param name="significantStr">The significant <see cref="string"/>.</param>
-            /// <param name="info">The culture sensitive number format information.</param>
-            /// <returns><c>true</c> if the operation succeeded; otherwise <c>false</c>. Note that this method sets the <see cref="mantissa"/> if successful.</returns>
-            private bool TryParseMantissa(/*string significantStr, NumberFormatInfo info*/)
+            private bool TryParseMantissa()
             {
                 if (SignificandIsZero)
                 { //$NON-NLS-1$
@@ -170,7 +164,6 @@ namespace J2N.Numerics
             /// Sets the exponent variable to <see cref="long.MaxValue"/> or -<see cref="long.MaxValue"/> if
             /// overflow or underflow happens.
             /// </summary>
-            /// <param name="offset"></param>
             private void CheckedAddExponent(long offset)
             {
                 long result = exponent + offset;
@@ -258,17 +251,16 @@ namespace J2N.Numerics
                 }
             }
 
+            // J2N: The significand is normalized on the first pass using DotNetNumber.TryParseFloatingPointHexNumber(), so there
+            // is no need for a separate method for it here.
+
             /// <summary>
             /// Calculates the offset between the normalized number and unnormalized
             /// number. In a normalized representation, significand is represented by the
             /// characters "0x1." followed by a lowercase hexadecimal representation of
             /// the rest of the significand as a fraction.
             /// </summary>
-            /// <param name="strIntegerPart">The integer part, as a <see cref="string"/>.</param>
-            /// <param name="strDecimalPart">The decimal part, as a <see cref="string"/>.</param>
-            /// <param name="result">The offset between the nomralized number and unnormalized number.</param>
-            /// <returns><c>true</c> if the operation succeeded; otherwise <c>false</c>.</returns>
-            private bool TryGetOffset(/*string strIntegerPart, string strDecimalPart,*/ out int result)
+            private bool TryGetOffset(out int result)
             {
                 result = default;
                 long leadingNumberValue;
@@ -297,6 +289,7 @@ namespace J2N.Numerics
                 result = (Scale - 1) * 4 + CountBitsLength(leadingNumberValue) - 1;
                 return true;
             }
+
             private int CountBitsLength(long value)
             {
                 int leadingZeros = BitOperation.LeadingZeroCount(value);
@@ -304,9 +297,9 @@ namespace J2N.Numerics
             }
         }
 
-        internal class SingleNumberBuffer : HexFloatingPointNumberBuffer
+        internal class SingleHexNumberBuffer : FloatingPointHexNumberBuffer
         {
-            public SingleNumberBuffer(int bufferLength)
+            public SingleHexNumberBuffer(int bufferLength)
                 : base(bufferLength, FloatingPointInfo.Single)
             {
             }
@@ -314,11 +307,7 @@ namespace J2N.Numerics
             /// <summary>
             /// Parses the hex string to a <see cref="float"/> number.
             /// </summary>
-            /// <param name="hexString">The hex string to parse.</param>
-            /// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="hexString"/>.</param>
-            /// <param name="info">Culture-sensitive number formatting information.</param>
-            /// <returns>A single-precision floating-point number equivalent to the numeric value or symbol specified in <paramref name="hexString"/>.</returns>
-            /// <exception cref="FormatException"></exception>
+            /// <param name="result">A single-precision floating-point number equivalent to the numeric value or symbol.</param>
             public bool TryGetValue(out float result)
             {
                 if (!TryParse(out long value))
@@ -331,7 +320,7 @@ namespace J2N.Numerics
             }
         }
 
-        internal class DoubleNumberBuffer : HexFloatingPointNumberBuffer
+        internal class DoubleNumberBuffer : FloatingPointHexNumberBuffer
         {
             public DoubleNumberBuffer(int bufferLength)
                 : base(bufferLength, FloatingPointInfo.Double)
@@ -341,11 +330,7 @@ namespace J2N.Numerics
             /// <summary>
             /// Parses the hex string to a <see cref="float"/> number.
             /// </summary>
-            /// <param name="hexString">The hex string to parse.</param>
-            /// <param name="style">A bitwise combination of enumeration values that indicates the permitted format of <paramref name="hexString"/>.</param>
-            /// <param name="info">Culture-sensitive number formatting information.</param>
-            /// <returns>A single-precision floating-point number equivalent to the numeric value or symbol specified in <paramref name="hexString"/>.</returns>
-            /// <exception cref="FormatException"></exception>
+            /// <param name="result">A double-precision floating-point number equivalent to the numeric value or symbol.</param>
             public bool TryGetValue(out double result)
             {
                 if (!TryParse(out long value))

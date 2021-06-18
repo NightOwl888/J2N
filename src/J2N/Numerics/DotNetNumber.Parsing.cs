@@ -501,7 +501,7 @@ namespace J2N.Numerics
             return false;
         }
 
-        private static unsafe bool TryParseFloatingPointHexNumber(ref char* str, char* strEnd, NumberStyle styles, HexFloatingPointNumberBuffer number, NumberFormatInfo info)
+        private static unsafe bool TryParseFloatingPointHexNumber(ref char* str, char* strEnd, NumberStyle styles, FloatingPointHexNumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(str != null);
             Debug.Assert(strEnd != null);
@@ -2565,7 +2565,7 @@ namespace J2N.Numerics
             Debug.Assert(info != null);
             Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
-            var number = new SingleNumberBuffer(value.Length);
+            var number = new SingleHexNumberBuffer(value.Length);
 
             if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
             {
@@ -2635,7 +2635,7 @@ namespace J2N.Numerics
             Debug.Assert(info != null);
             Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
-            var number = new SingleNumberBuffer(value.Length);
+            var number = new SingleHexNumberBuffer(value.Length);
 
             if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
             {
@@ -2737,7 +2737,7 @@ namespace J2N.Numerics
         }
 
 #if FEATURE_READONLYSPAN
-        internal static unsafe bool TryStringToFloatingPointHexNumber(ReadOnlySpan<char> value, NumberStyle styles, HexFloatingPointNumberBuffer number, NumberFormatInfo info)
+        internal static unsafe bool TryStringToFloatingPointHexNumber(ReadOnlySpan<char> value, NumberStyle styles, FloatingPointHexNumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
             fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
@@ -2755,7 +2755,7 @@ namespace J2N.Numerics
             return true;
         }
 #endif
-        internal static unsafe bool TryStringToFloatingPointHexNumber(string value, NumberStyle styles, HexFloatingPointNumberBuffer number, NumberFormatInfo info)
+        internal static unsafe bool TryStringToFloatingPointHexNumber(string value, NumberStyle styles, FloatingPointHexNumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
             fixed (char* stringPointer = value)
