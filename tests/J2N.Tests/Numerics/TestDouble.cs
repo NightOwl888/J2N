@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using static J2N.Numerics.DotNetNumber;
 
@@ -711,19 +712,19 @@ namespace J2N.Numerics
         //    double actual;
         //    double expected;
 
-        //    actual = Double.Parse("0x0.0p0D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    actual = Double.Parse("0x0.0p0D", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
         //    assertEquals("Returned incorrect value", 0.0d, actual, 0.0D);
 
-        //    actual = Double.Parse("0xa.ap+9d", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    actual = Double.Parse("0xa.ap+9d", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
         //    assertEquals("Returned incorrect value", 5440.0d, actual, 0.0D);
 
         //    actual = Double.Parse("+0Xb.10ap8", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
         //    assertEquals("Returned incorrect value", 2832.625d, actual, 0.0D);
 
-        //    actual = Double.Parse("-0X.a0P2D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    actual = Double.Parse("-0X.a0P2D", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
         //    assertEquals("Returned incorrect value", -2.5d, actual, 0.0D);
 
-        //    actual = Double.Parse("\r 0x22.1p2d \t", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+        //    actual = Double.Parse("\r 0x22.1p2d \t", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
         //    assertEquals("Returned incorrect value", 136.25d, actual, 0.0D);
 
         //    actual = Double.Parse("0x1.0p-1", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
@@ -1555,7 +1556,7 @@ namespace J2N.Numerics
             assertEquals("0x1.700d1061d3333p33", Double.ToHexString(12349743299.65000D));
 
             // test HARMONY-2132
-            //assertEquals("0x1.01p10", Double.ToHexString(0x1.01p10)); // .NET cannot represent this as a float literal
+            assertEquals("0x1.01p10", Double.ToHexString(/*0x1.01p10*/ 1028.0D)); // .NET cannot represent this as a float literal
         }
 
         /**
@@ -1643,7 +1644,7 @@ namespace J2N.Numerics
                                         //                              -expected :
                                         //                              expected));
 
-                                        yield return new TestCaseData(signs[n].Equals("-") ? -expected : expected, s5, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                                        yield return new TestCaseData(signs[n].Equals("-") ? -expected : expected, s5, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
                                     }
                                 }
                             }
@@ -2068,7 +2069,125 @@ namespace J2N.Numerics
                     "2.2250738585072012e-308",    // near Double.MIN_NORMAL
                 };
 
+                private static double[] goodStringsExpecteds = new double[] {
+                    double.NaN,
+                    double.NaN,
+                    double.NaN,
+                    double.PositiveInfinity,
+                    double.PositiveInfinity,
+                    double.NegativeInfinity,
+                    1.1E-23d,
+                    1E-24d,
+                    1E-23d,
+                    1d,
+                    0d,
+                    -0d,
+                    0d,
+                    0d,
+                    0d,
+                    -0d,
+                    0d,
+                    0d,
+                    -0d,
+                    0d,
+                    1d,
+                    2d,
+                    1234d,
+                    -1234d,
+                    1234d,
+                    2147483647d,   // Integer.MAX_VALUE
+                    2147483648d,
+                    -2147483648d,  // Integer.MIN_VALUE
+                    -2147483649d,
+
+                    16777215d,
+                    16777216d,     // 2^24
+                    16777217d,
+
+                    -16777215d,
+                    -16777216d,    // -2^24
+                    -16777217d,
+
+                    9007199254740991d,
+                    9007199254740992d,     // 2^53
+                    9007199254740992d,
+
+                    -9007199254740991d,
+                    -9007199254740992d,    // -2^53
+                    -9007199254740992d,
+
+                    9.223372036854776E+18d,
+                    9.223372036854776E+18d,  // Long.MAX_VALUE
+                    9.223372036854776E+18d,
+
+                    -9.223372036854776E+18d,
+                    -9.223372036854776E+18d, // Long.MIN_VALUE
+                    -9.223372036854776E+18d,
+
+                    // Culled from JCK test lex03591m1
+                    54.0714d,
+                    5E-324d,
+                    2147483647.01d,
+                    1.2147483647d,
+                    1d,
+                    0.01d,
+
+                    // Culled from JCK test lex03592m2
+                    2d,
+                    0.0909d,
+                    122112217090d,
+                    0.0709d,
+                    2E-20d,
+                    9.09E+40d,
+                    1.2211221709E+111d,
+                    7090d,
+                    2d,
+                    0.0909d,
+                    122112217090d,
+                    0.0709d,
+                    2E-20d,
+                    9.09E+40d,
+                    1.2211221709E+111d,
+
+                    // Culled from JCK test lex03594m31 -- unicode escapes
+                    5.1492367801102E-200d,
+                    1.29087312301E+106d,
+                    1.1E-10d,
+
+                    // Culled from JCK test lex03595m1
+                    0d,
+                    10000000000d,
+
+                    // Culled from JCK test lex03691m1
+                    0d,
+                    1d,
+                    0d,
+                    1d,
+                    0.12d,
+                    1d,
+                    120d,
+                    0d,
+                    120d,
+                    0.1d,
+
+                    // Limits
+
+                    1.7976931348623157E+308d,     // Double.MAX_VALUE
+                    5E-324d,                      // Double.MIN_VALUE
+                    2.2250738585072014E-308d,     // Double.MIN_NORMAL
+
+                    2.2250738585072014E-308d,     // near Double.MIN_NORMAL
+
+                };
+
                 private static string[] goodHexStrings = new string[] {
+                    "NaN",
+                    "+NaN",
+                    "-NaN",
+                    "Infinity",
+                    "+Infinity",
+                    "-Infinity",
+
                     // Good hex strings
                     // Vary capitalization of separators.
 
@@ -2182,6 +2301,124 @@ namespace J2N.Numerics
                     "0x001.100p1",
                 };
 
+                private static double[] goodHexStringsExpecteds = new double[]
+                {
+                    double.NaN,
+                    double.NaN,
+                    double.NaN,
+                    double.PositiveInfinity,
+                    double.PositiveInfinity,
+                    double.NegativeInfinity,
+
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+                    2d,
+
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+                    -2d,
+
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+                    0.5d,
+
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+                    -0.5d,
+
+                    // Try different significand combinations
+                    20d,
+                    22d,
+                    24d,
+                    26d,
+                    28d,
+                    30d,
+
+                    2d,
+                    0.125d,
+                    2.125d,
+
+                    8388608d,
+                    0.125d,
+                    2.125d,
+
+                    512d,
+                    0.125d,
+                    2.125d,
+
+                    512d,
+                    0.125d,
+                    2.125d,
+                };
+
                 // J2N: The .NET parser doesn't remove the \u0001 or \u001f characters, so we are omitting them in tests
                 private static string pad = " \t\n\r\f\u000b"; /* " \t\n\r\f\u0001\u000b\u001f"; */
 
@@ -2246,11 +2483,11 @@ namespace J2N.Numerics
                             string inputString = goodStrings[i];
                             NumberStyle styles = NumberStyle.Float;
                             if (inputString.EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
-                            yield return new TestCaseData(Double.Parse(inputString, styles, provider), inputString, styles, provider);
+                            yield return new TestCaseData(goodStringsExpecteds[i], inputString, styles, provider);
                         }
 
                         for (int i = 0; i < paddedGoodStrings.Length; i++)
@@ -2258,11 +2495,11 @@ namespace J2N.Numerics
                             string inputString = paddedGoodStrings[i];
                             NumberStyle styles = NumberStyle.Float;
                             if (inputString.TrimEnd().EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.TrimEnd().EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
-                            yield return new TestCaseData(Double.Parse(inputString, styles, provider), inputString, styles, provider);
+                            yield return new TestCaseData(goodStringsExpecteds[i], inputString, styles, provider);
                         }
 
                         // JDK8 (testSubnormalPowers())
@@ -2520,11 +2757,11 @@ namespace J2N.Numerics
                             string inputString = goodHexStrings[i];
                             NumberStyle styles = NumberStyle.HexFloat;
                             if (inputString.EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
-                            yield return new TestCaseData(Double.Parse(inputString, styles, provider), inputString, styles, provider);
+                            yield return new TestCaseData(goodHexStringsExpecteds[i], inputString, styles, provider);
                         }
 
                         for (int i = 0; i < paddedGoodHexStrings.Length; i++)
@@ -2532,11 +2769,11 @@ namespace J2N.Numerics
                             string inputString = paddedGoodHexStrings[i];
                             NumberStyle styles = NumberStyle.HexFloat;
                             if (inputString.TrimEnd().EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.TrimEnd().EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
-                            yield return new TestCaseData(Double.Parse(inputString, styles, provider), inputString, styles, provider);
+                            yield return new TestCaseData(goodHexStringsExpecteds[i], inputString, styles, provider);
                         }
 
                         // JDK 8 (ParseHexFloatingPoint.doubleTests())
@@ -2686,11 +2923,11 @@ namespace J2N.Numerics
 
                         // Harmony (Test_parseDouble_LString_FromHexString())
 
-                        yield return new TestCaseData(0.0d, "0x0.0p0D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
-                        yield return new TestCaseData(5440.0d, "0xa.ap+9d", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(0.0d, "0x0.0p0D", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(5440.0d, "0xa.ap+9d", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
                         yield return new TestCaseData(2832.625d, "+0Xb.10ap8", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
-                        yield return new TestCaseData(-2.5d, "-0X.a0P2D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
-                        yield return new TestCaseData(136.25d, "\r 0x22.1p2d \t", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(-2.5d, "-0X.a0P2D", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
+                        yield return new TestCaseData(136.25d, "\r 0x22.1p2d \t", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, J2N.Text.StringFormatter.InvariantCulture);
                         yield return new TestCaseData(0.5d, "0x1.0p-1", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                         yield return new TestCaseData(0.5d, "0x00000000000000000000000000000000001.0p-1", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
                         yield return new TestCaseData(0.5d, "0x1.0p-00000000000000000000000000001", NumberStyle.HexFloat, J2N.Text.StringFormatter.InvariantCulture);
@@ -3119,7 +3356,7 @@ namespace J2N.Numerics
                             string inputString = badStrings[i];
                             NumberStyle styles = NumberStyle.Float;
                             if (inputString.EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
@@ -3131,7 +3368,7 @@ namespace J2N.Numerics
                             string inputString = paddedBadStrings[i];
                             NumberStyle styles = NumberStyle.Float;
                             if (inputString.TrimEnd().EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.TrimEnd().EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
@@ -3152,12 +3389,12 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(FormatException), "(1.8)", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow parentheses.");
                         yield return new TestCaseData(typeof(FormatException), "(1.)", NumberStyle.Float, NumberFormatInfo.InvariantInfo, "NumberStyle.Float doesn't allow parentheses.");
 
-                        yield return new TestCaseData(typeof(FormatException), "1. -d", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Float type specifier may not be after negative sign.");
-                        yield return new TestCaseData(typeof(FormatException), "1.-d", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Float type specifier may not be after negative sign.");
-                        yield return new TestCaseData(typeof(FormatException), "(1.)d", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Float type specifier may not be after negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "1. -d", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "1.-d", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "(1.)d", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
 
-                        yield return new TestCaseData(typeof(FormatException), "(1.", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
-                        yield return new TestCaseData(typeof(FormatException), "1.)", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
+                        yield return new TestCaseData(typeof(FormatException), "(1.", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
+                        yield return new TestCaseData(typeof(FormatException), "1.)", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
                     }
                 }
 
@@ -3172,7 +3409,7 @@ namespace J2N.Numerics
                             string inputString = badHexStrings[i];
                             NumberStyle styles = NumberStyle.HexFloat;
                             if (inputString.EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
@@ -3184,7 +3421,7 @@ namespace J2N.Numerics
                             string inputString = paddedBadHexStrings[i];
                             NumberStyle styles = NumberStyle.HexFloat;
                             if (inputString.TrimEnd().EndsWith("d", StringComparison.OrdinalIgnoreCase) || inputString.TrimEnd().EndsWith("f", StringComparison.OrdinalIgnoreCase))
-                                styles |= NumberStyle.AllowTrailingFloatType;
+                                styles |= NumberStyle.AllowTypeSpecifier;
                             var provider = J2N.Text.StringFormatter.InvariantCulture;
 
                             // Pass through the same value - all we care about here is that the input is accepted without error
@@ -3194,15 +3431,15 @@ namespace J2N.Numerics
                         // Harmony (Test_parseDouble_LString_Illegal())
 
                         // J2N: This format is valid in .NET, since the hex specifier is optional
-                        //yield return new TestCaseData(typeof(FormatException), "0.0p0D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
-                        yield return new TestCaseData(typeof(FormatException), "+0x.p1d", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
-                        yield return new TestCaseData(typeof(FormatException), "0Xg.gp1D", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
+                        //yield return new TestCaseData(typeof(FormatException), "0.0p0D", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
+                        yield return new TestCaseData(typeof(FormatException), "+0x.p1d", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
+                        yield return new TestCaseData(typeof(FormatException), "0Xg.gp1D", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
                         yield return new TestCaseData(typeof(FormatException), "-0x1.1p", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
                         yield return new TestCaseData(typeof(FormatException), "+0x 1.1 p2d", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
                         yield return new TestCaseData(typeof(FormatException), "x1.1p2d", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
                         yield return new TestCaseData(typeof(FormatException), " 0x-2.1p2", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
-                        yield return new TestCaseData(typeof(FormatException), " 0x2.1pad", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
-                        yield return new TestCaseData(typeof(FormatException), " 0x111.222p 22d", NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
+                        yield return new TestCaseData(typeof(FormatException), " 0x2.1pad", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
+                        yield return new TestCaseData(typeof(FormatException), " 0x111.222p 22d", NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Should throw FormatException.");
 
                         // Custom
 
@@ -3220,12 +3457,12 @@ namespace J2N.Numerics
 
                         // Custom
 
-                        yield return new TestCaseData(typeof(FormatException), "0x1. -d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Float type specifier may not be after negative sign.");
-                        yield return new TestCaseData(typeof(FormatException), "0x1.-d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Float type specifier may not be after negative sign.");
-                        yield return new TestCaseData(typeof(FormatException), "(0x1.)d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Float type specifier may not be after negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1. -d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1.-d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
+                        yield return new TestCaseData(typeof(FormatException), "(0x1.)d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
 
-                        yield return new TestCaseData(typeof(FormatException), "(0x1.", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
-                        yield return new TestCaseData(typeof(FormatException), "0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
+                        yield return new TestCaseData(typeof(FormatException), "(0x1.", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
+                        yield return new TestCaseData(typeof(FormatException), "0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
                     }
                 }
 

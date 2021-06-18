@@ -254,7 +254,7 @@ namespace J2N.Numerics
             {
                 return false;
             }
-            if (!TryValidateFeature(typeSuffixStr, (styles & NumberStyle.AllowTrailingFloatType) != 0))
+            if (!TryValidateFeature(typeSuffixStr, (styles & NumberStyle.AllowTypeSpecifier) != 0))
             {
                 return false;
             }

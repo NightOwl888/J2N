@@ -16,7 +16,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.Single.Parse(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.Single.Parse(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 
@@ -25,7 +25,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.HexStringParser.ParseSingle(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.HexStringParser.ParseSingle(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 
@@ -43,7 +43,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.Double.Parse(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.Double.Parse(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 
@@ -52,7 +52,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.HexStringParser.ParseDouble(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.HexStringParser.ParseDouble(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 
@@ -70,7 +70,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.Single.Parse(LongString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.Single.Parse(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 
@@ -79,7 +79,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.HexStringParser.ParseSingle(LongString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.HexStringParser.ParseSingle(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 
@@ -97,7 +97,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.Double.Parse(LongString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.Double.Parse(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 
@@ -106,7 +106,7 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
             {
-                J2N.Numerics.HexStringParser.ParseDouble(LongString, NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.HexStringParser.ParseDouble(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
             }
         }
 

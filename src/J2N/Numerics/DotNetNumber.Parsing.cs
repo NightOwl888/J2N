@@ -429,6 +429,32 @@ namespace J2N.Numerics
                         ch = p < strEnd ? *p : '\0';
                     }
                 }
+                if ((styles & NumberStyle.AllowTypeSpecifier) != 0)
+                {
+                    // J2N: We treat a trailing f, F, d, D, m or M as if it were whitespace if the NumberStyle.AllowTypeSpecifier option is specified
+                    if ((number.Kind == NumberBufferKind.FloatingPoint || number.Kind == NumberBufferKind.Decimal || number.Kind == NumberBufferKind.Unknown) && IsFloatTypeSuffix(ch))
+                    {
+                        ch = ++p < strEnd ? *p : '\0'; // skip
+                    }
+                    // J2N: We treat a trailing l, L, lu, Lu, lU, or LU as if it were whitespace if the NumberStyle.AllowTypeSpecifier option is specified
+                    else if ((number.Kind == NumberBufferKind.Integer || number.Kind == NumberBufferKind.Unknown) && IsIntegralTypeSuffix(ch))
+                    {
+                        ch = ++p < strEnd ? *p : '\0'; // skip
+                        if (IsUnsignedTypeSuffix(ch))
+                        {
+                            ch = ++p < strEnd ? *p : '\0'; // skip
+                        }
+                    }
+                    // J2N: We treat a trailing u, U, ul, Ul, uL, or UL as if it were whitespace if the NumberStyle.AllowTypeSpecifier option is specified
+                    else if ((number.Kind == NumberBufferKind.Integer || number.Kind == NumberBufferKind.Unknown) && IsUnsignedTypeSuffix(ch))
+                    {
+                        ch = ++p < strEnd ? *p : '\0'; // skip
+                        if (IsIntegralTypeSuffix(ch))
+                        {
+                            ch = ++p < strEnd ? *p : '\0'; // skip
+                        }
+                    }
+                }
                 while (true)
                 {
                     if (!IsWhite(ch) || (styles & NumberStyle.AllowTrailingWhite) == 0)
@@ -437,12 +463,6 @@ namespace J2N.Numerics
                         {
                             state |= StateSign;
                             p = next - 1;
-                        }
-                        // J2N: We treat a trailing f, F, d, D, m or M as if it were whitespace if the NumberStyle.AllowTrailingFloatType option is specified
-                        else if (((styles & NumberStyle.AllowTrailingFloatType) != 0) && IsFloatTypeSuffix(ch))
-                        {
-                            // skip
-                            ch = ++p < strEnd ? *p : '\0';
                         }
                         else if (ch == ')' && ((state & StateParens) != 0))
                         {
@@ -480,9 +500,6 @@ namespace J2N.Numerics
             str = p;
             return false;
         }
-
-
-        
 
         private static unsafe bool TryParseFloatingPointHexNumber(ref char* str, char* strEnd, NumberStyle styles, HexFloatingPointNumberBuffer number, NumberFormatInfo info)
         {
@@ -572,7 +589,7 @@ namespace J2N.Numerics
 
             int digCount = 0;
             int digEnd = 0;
-            int maxDigCount = number.Significand.Length; //number.Digits.Length - 1;
+            int maxDigCount = number.Significand.Length - 1; //number.Digits.Length - 1;
 
             while (true)
             {
@@ -707,6 +724,12 @@ namespace J2N.Numerics
                         ch = p < strEnd ? *p : '\0';
                     }
                 }
+                // J2N: We treat a trailing f, F, d, D, m or M as if it were whitespace if the NumberStyle.AllowTypeSpecifier option is specified
+                if ((styles & NumberStyle.AllowTypeSpecifier) != 0 /*&& (number.Kind == NumberBufferKind.FloatingPoint || number.Kind == NumberBufferKind.Decimal || number.Kind == NumberBufferKind.Unknown)*/
+                    && IsFloatTypeSuffix(ch))
+                {
+                    ch = ++p < strEnd ? *p : '\0'; // skip
+                }
                 while (true)
                 {
                     if (!IsWhite(ch) || (styles & NumberStyle.AllowTrailingWhite) == 0)
@@ -715,12 +738,6 @@ namespace J2N.Numerics
                         {
                             state |= StateSign;
                             p = next - 1;
-                        }
-                        // J2N: We treat a trailing f, F, d, D, m or M as if it were whitespace if the NumberStyle.AllowTrailingFloatType option is specified
-                        else if (((styles & NumberStyle.AllowTrailingFloatType) != 0) && IsFloatTypeSuffix(ch))
-                        {
-                            // skip
-                            ch = ++p < strEnd ? *p : '\0';
                         }
                         else if (ch == ')' && ((state & StateParens) != 0))
                         {
@@ -2189,7 +2206,7 @@ namespace J2N.Numerics
         internal static unsafe bool TryParseDoubleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             Debug.Assert(info != null);
-            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new DoubleNumberBuffer(value.Length);
 
@@ -2254,7 +2271,7 @@ namespace J2N.Numerics
         internal static unsafe bool TryParseDoubleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             Debug.Assert(info != null);
-            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new DoubleNumberBuffer(value.Length);
 
@@ -2546,7 +2563,7 @@ namespace J2N.Numerics
         internal static unsafe bool TryParseSingleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             Debug.Assert(info != null);
-            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new SingleNumberBuffer(value.Length);
 
@@ -2616,7 +2633,7 @@ namespace J2N.Numerics
         internal static unsafe bool TryParseSingleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             Debug.Assert(info != null);
-            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTrailingFloatType | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
+            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
 
             var number = new SingleNumberBuffer(value.Length);
 
@@ -2823,6 +2840,9 @@ namespace J2N.Numerics
 
         private static bool IsFloatTypeSuffix(int ch) => ch == 'f' || ch == 'F' || ch == 'd' || ch == 'D' || ch == 'm' || ch == 'M';
 
+        private static bool IsIntegralTypeSuffix(int ch) => ch == 'L' || ch == 'l';
+
+        private static bool IsUnsignedTypeSuffix(int ch) => ch == 'u' || ch == 'U';
 
         //internal enum ParsingStatus
         //{
