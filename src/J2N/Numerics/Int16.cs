@@ -445,8 +445,49 @@ namespace J2N.Numerics
          */
         public static short Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
-            return short.Parse(s, (NumberStyles)style, provider);
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            return short.Parse(s, style.ToNumberStyles(), provider);
         }
+
+
+
+        //// J2N: This is not implemented in JDK 8
+        //internal static short ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
+        //{
+        //    if (s is null)
+        //        throw new ArgumentNullException(nameof(s));
+        //    if (startIndex < 0)
+        //        throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+        //    if (length < 0)
+        //        throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+        //    if (startIndex > s.Length - length) // Checks for int overflow
+        //        throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+
+        //    int r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
+        //    if (radix != 10 && r <= ushort.MaxValue)
+        //        return (short)r;
+
+        //    if (r < ushort.MinValue || r > ushort.MaxValue)
+        //        throw new OverflowException(SR.Overflow_Int16);
+        //    return (short)r;
+        //}
+
+        //// J2N: This is not implemented in JDK 8
+        //internal static short ParseUnsigned(string? s, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
+        //{
+        //    if (s is null)
+        //        return 0;
+
+        //    int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned | ParseNumbers.TreatAsI2);
+        //    if (radix != 10 && r <= ushort.MaxValue)
+        //        return (short)r;
+
+        //    if (r < ushort.MinValue || r > ushort.MaxValue)
+        //        throw new OverflowException(SR.Overflow_Int16);
+        //    return (short)r;
+        //}
+
+        // Radix-based parsing (default in Java)
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
@@ -856,7 +897,7 @@ namespace J2N.Numerics
 
         #endregion Parse_CharSequence_Int32_Int32_Int32
 
-        #region TryParse_CharSequence_Int32_Int32_Int32
+        #region TryParse_CharSequence_Int32_Int32_Int32_Int16
 
 #if FEATURE_READONLYSPAN
 
@@ -1193,43 +1234,7 @@ namespace J2N.Numerics
             return false;
         }
 
-        #endregion TryParse_CharSequence_Int32_Int32_Int32
-
-        //// J2N: This is not implemented in JDK 8
-        //internal static short ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
-        //{
-        //    if (s is null)
-        //        throw new ArgumentNullException(nameof(s));
-        //    if (startIndex < 0)
-        //        throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
-        //    if (length < 0)
-        //        throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
-        //    if (startIndex > s.Length - length) // Checks for int overflow
-        //        throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
-
-        //    int r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
-        //    if (radix != 10 && r <= ushort.MaxValue)
-        //        return (short)r;
-
-        //    if (r < ushort.MinValue || r > ushort.MaxValue)
-        //        throw new OverflowException(SR.Overflow_Int16);
-        //    return (short)r;
-        //}
-
-        //// J2N: This is not implemented in JDK 8
-        //internal static short ParseUnsigned(string? s, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
-        //{
-        //    if (s is null)
-        //        return 0;
-
-        //    int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned | ParseNumbers.TreatAsI2);
-        //    if (radix != 10 && r <= ushort.MaxValue)
-        //        return (short)r;
-
-        //    if (r < ushort.MinValue || r > ushort.MaxValue)
-        //        throw new OverflowException(SR.Overflow_Int16);
-        //    return (short)r;
-        //}
+        #endregion TryParse_CharSequence_Int32_Int32_Int32_Int16
 
         #region Parse_CharSequence_Int32
 
@@ -1292,7 +1297,7 @@ namespace J2N.Numerics
 
         #endregion Parse_CharSequence_Int32
 
-        #region TryParse_CharSequence_Int32
+        #region TryParse_CharSequence_Int32_Int16
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>.
@@ -1353,7 +1358,11 @@ namespace J2N.Numerics
             return true;
         }
 
-        #endregion TryParse_CharSequence_Int32
+        #endregion TryParse_CharSequence_Int32_Int16
+
+        // Culture-aware parsing (default in .NET)
+
+        #region TryParse_CharSequence_Int16
 
         /// <summary>
         /// Converts the string representation of a number to its 16-bit signed integer equivalent.
@@ -1501,6 +1510,10 @@ namespace J2N.Numerics
             return short.TryParse(s, out result);
         }
 #endif
+
+        #endregion TryParse_CharSequence_Int16
+
+        #region TryParse_CharSequence_NumberStyle_IFormatProvider_Int16
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to its
@@ -1652,8 +1665,8 @@ namespace J2N.Numerics
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
         ///     <item>
-        ///         <term><see cref="NumberStyle.AllowTrailingFloatType"/></term>
-        ///         <term>The type suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
+        ///         <term>The <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -1679,8 +1692,8 @@ namespace J2N.Numerics
         /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
         /// Therefore, simply casting the value will convert it properly between the two in both directions.
         /// <para/>
-        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, s must be a hexadecimal value without a prefix.
-        /// For example, "C9AF3" parses successfully, but "0xC9AF3" does not. The only other flags that can be present in style
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
+        /// For example, "C9AF3" parses successfully, but "0xC9AF3" does not. The only other flags that can be present in <paramref name="style"/>
         /// are <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/>
         /// enumeration has a composite style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
         /// <para/>
@@ -1699,7 +1712,8 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse([NotNullWhen(true)] string? s, NumberStyle style, IFormatProvider? provider, out short result)
         {
-            return short.TryParse(s, (NumberStyles)style, provider, out result);
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            return short.TryParse(s, style.ToNumberStyles(), provider, out result);
         }
 
 
@@ -1789,9 +1803,9 @@ namespace J2N.Numerics
         ///         the <see cref="NumberStyle.AllowDecimalPoint"/> flag.</term>
         ///     </item>
         ///     <item>
-        ///         <term><i>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
-        ///         parameter can represent a number in exponential notation if style includes the <see cref="NumberStyle.AllowExponent"/> flag.</i></term>
-        ///         <term></term>
+        ///         <term><i>e</i></term>
+        ///         <term>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
+        ///         parameter can represent a number in exponential notation if style includes the <see cref="NumberStyle.AllowExponent"/> flag.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -1855,7 +1869,7 @@ namespace J2N.Numerics
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
         ///     <item>
-        ///         <term><see cref="NumberStyle.AllowTrailingFloatType"/></term>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
         ///         <term>The type suffix used in the literal identifier syntax of C# or Java.</term>
         ///     </item>
         ///     <item>
@@ -1902,9 +1916,12 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out short result)
         {
-            return short.TryParse(s, (NumberStyles)style, provider, out result);
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            return short.TryParse(s, style.ToNumberStyles(), provider, out result);
         }
 #endif
+
+        #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int16
 
         /**
          * Gets the primitive value of this short.
