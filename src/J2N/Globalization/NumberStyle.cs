@@ -3,24 +3,26 @@ using System.Globalization;
 
 namespace J2N.Globalization
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// Determines the styles permitted in numeric string arguments that are passed to
     /// the Parse and TryParse methods of the integral and floating-point numeric types
     /// in the <see cref="J2N.Numerics"/> namespace.
     /// <para/>
-    /// Usage Note: This enum is compatible in both symbol and value to <see cref="NumberStyles"/>.
-    /// To convert from <see cref="NumberStyles"/> to <see cref="NumberStyle"/>, simply
-    /// do a cast.
+    /// Usage Note: This enum is compatible in both symbol and value to <see cref="NumberStyles"/>,
+    /// however it is not recommended to cast due to strict flag validation.
+    /// To convert from <see cref="NumberStyles"/> to <see cref="NumberStyle"/>, call the
+    /// <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
     /// <code>
     /// NumberStyles myStyle = NumberStyles.Float | NumberStyles.AllowParentheses;<br/>
-    /// NumberStyle myStyleConverted = (NumberStyle)myStyle;
+    /// NumberStyle myStyleConverted = myStyle.ToNumberStyle();
     /// </code>
-    /// You may cast the other way, as well.
+    /// You may convert the other way, as well.
     /// <code>
     /// NumberStyle myStyle = NumberStyle.Float | NumberStyle.AllowParentheses;<br/>
-    /// NumberStyles myStyleConverted = (NumberStyles)myStyle;
+    /// NumberStyles myStyleConverted = myStyle.ToNumberStyles();
     /// </code>
-    /// However, the stock .NET parser will ignore additional symbols that were added to this enum when parsing.
     /// </summary>
     [Flags]
     public enum NumberStyle
@@ -110,13 +112,6 @@ namespace J2N.Globalization
         AllowCurrencySymbol = 0x00000100,
 
         /// <summary>
-        /// Indicates that all styles except <see cref="AllowExponent"/>
-        /// and <see cref="AllowHexSpecifier"/> are used. This is a composite
-        /// number style.
-        /// </summary>
-        Currency = 383,
-
-        /// <summary>
         /// Indicates that the numeric string represents a hexadecimal value. Valid hexadecimal
         /// values include the numeric digits 0-9 and the hexadecimal digits A-F and a-f.
         /// Strings that are parsed using this style can only be prefixed with "0x" or "&amp;h"
@@ -186,10 +181,125 @@ namespace J2N.Globalization
                    AllowDecimalPoint | AllowExponent | AllowHexSpecifier, // J2N specific
 
         /// <summary>
+        /// Indicates that all styles except <see cref="AllowExponent"/>
+        /// <see cref="AllowHexSpecifier"/> and <see cref="AllowTypeSpecifier"/> are used. This is a composite
+        /// number style.
+        /// </summary>
+        Currency = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign | AllowTrailingSign |
+                  AllowParentheses | AllowDecimalPoint | AllowThousands | AllowCurrencySymbol,
+
+        /// <summary>
         /// Indicates that all styles except <see cref="AllowHexSpecifier"/>
-        /// are used. This is a composite number style.
+        /// and <see cref="AllowTypeSpecifier"/>are used. This is a composite number style.
         /// </summary>
         Any = AllowLeadingWhite | AllowTrailingWhite | AllowLeadingSign | AllowTrailingSign |
                    AllowParentheses | AllowDecimalPoint | AllowThousands | AllowCurrencySymbol | AllowExponent,
+    }
+
+    /// <summary>
+    /// Extensions to <see cref="NumberStyle"/> and <see cref="NumberStyles"/>.
+    /// </summary>
+    public static class NumberStyleExtensions
+    {
+        /// <summary>
+        /// The <see cref="NumberStyle"/> flags that are supported in <see cref="NumberStyles"/> (in .NET).
+        /// <para/>
+        /// This list should be kept up to date with changes in the .NET platform, but serves as a safety
+        /// net to ensure no new flags are considered until we have manually included them.
+        /// </summary>
+        private const NumberStyle ValidNumberStyles = (NumberStyle.AllowLeadingWhite | NumberStyle.AllowTrailingWhite
+                                                        | NumberStyle.AllowLeadingSign | NumberStyle.AllowTrailingSign
+                                                        | NumberStyle.AllowParentheses | NumberStyle.AllowDecimalPoint
+                                                        | NumberStyle.AllowThousands | NumberStyle.AllowExponent
+                                                        | NumberStyle.AllowCurrencySymbol | NumberStyle.AllowHexSpecifier);
+
+        /// <summary>
+        /// The <see cref="NumberStyle"/> flags that are supported in J2N.
+        /// </summary>
+        private const NumberStyle ValidNumberStyle =    (NumberStyle.AllowLeadingWhite | NumberStyle.AllowTrailingWhite
+                                                        | NumberStyle.AllowLeadingSign | NumberStyle.AllowTrailingSign
+                                                        | NumberStyle.AllowParentheses | NumberStyle.AllowDecimalPoint
+                                                        | NumberStyle.AllowThousands | NumberStyle.AllowExponent
+                                                        | NumberStyle.AllowCurrencySymbol | NumberStyle.AllowHexSpecifier
+                                                        | NumberStyle.AllowTypeSpecifier);
+
+        /// <summary>
+        /// Converts a <see cref="NumberStyle"/> to <see cref="NumberStyles"/> and removes all of the
+        /// flags that are not valid on the .NET platform.
+        /// </summary>
+        /// <param name="style">The flags to convert.</param>
+        /// <returns>The flags in <paramref name="style"/> that are supported on the .NET platform.</returns>
+        public static NumberStyles ToNumberStyles(this NumberStyle style)
+        {
+            return (NumberStyles)(style & ValidNumberStyles);
+        }
+
+        /// <summary>
+        /// Converts a <see cref="NumberStyles"/> to <see cref="NumberStyle"/> and removes all of the
+        /// flags that are not valid in J2N.
+        /// </summary>
+        /// <param name="style">The flags to convert.</param>
+        /// <returns>The flags in <paramref name="style"/> that are supported in J2N.</returns>
+        public static NumberStyle ToNumberStyle(this NumberStyles style)
+        {
+            return (NumberStyle)style & ValidNumberStyles;
+        }
+
+        internal static void ValidateParseStyleInteger(NumberStyle style)
+        {
+            // Check for undefined flags or invalid hex number flags.
+            // Since we are cascading the call to .NET in this case, we must not allow any custom J2N flags here.
+            if ((style & (~ValidNumberStyles | NumberStyle.AllowHexSpecifier)) != 0
+                && (style & ~NumberStyle.HexNumber) != 0)
+            {
+                throwInvalid(style);
+
+                void throwInvalid(NumberStyle value)
+                {
+                    if ((value & ~ValidNumberStyles) != 0)
+                    {
+                        throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidNumberStyle, value & ~ValidNumberStyles), nameof(style));
+                    }
+
+                    throw new ArgumentException(J2N.SR.Format(SR.Arg_InvalidHexStyle, value & ~NumberStyle.HexNumber), nameof(style));
+                }
+            }
+        }
+
+        internal static void ValidateParseStyleFloatingPoint(NumberStyle style)
+        {
+            // Check for undefined flags or hex number
+            if ((style & (~ValidNumberStyle | NumberStyle.AllowHexSpecifier)) != 0
+                && ((style & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier)) != 0
+
+                // Make sure if this is a hex number and AllowTypeSpecifier is enabled, that AllowExponent is also enabled
+                || (style & NumberStyle.AllowHexSpecifier) != 0 && (style & NumberStyle.AllowTypeSpecifier) != 0 && (style & NumberStyle.AllowExponent) == 0)
+                
+                // Make sure if this is any number that the AllowCurrencySymbol and AllowTypeSpecifier are not both enabled
+                || (style & NumberStyle.AllowTypeSpecifier) != 0 && (style & NumberStyle.AllowCurrencySymbol) != 0)
+            {
+                throwInvalid(style);
+
+                void throwInvalid(NumberStyle value)
+                {
+                    if ((value & NumberStyle.AllowHexSpecifier) != 0 && (value & NumberStyle.AllowTypeSpecifier) != 0 && (value & NumberStyle.AllowExponent) == 0)
+                    {
+                        throw new ArgumentException(SR.Arg_ExponentRequiredIfTypeSpecifierUsed, nameof(style));
+                    }
+
+                    if ((value & ~ValidNumberStyle) != 0)
+                    {
+                        throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidNumberStyle, value & ~ValidNumberStyle), nameof(style));
+                    }
+
+                    if ((value & NumberStyle.AllowTypeSpecifier) != 0 && (value & NumberStyle.AllowCurrencySymbol) != 0)
+                    {
+                        throw new ArgumentException(SR.Arg_TypeSpecifierNotAllowedIfCurrencyUsed, nameof(style));
+                    }
+
+                    throw new ArgumentException(J2N.SR.Format(SR.Arg_InvalidHexFloatStyle, value & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier)), nameof(style));
+                }
+            }
+        }
     }
 }
