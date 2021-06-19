@@ -3322,17 +3322,6 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-3.0d, "- 0x1.8", NumberStyle.HexFloat, new NumberFormatInfo { NumberNegativePattern = 2 });
                         yield return new TestCaseData(-2.0d, "- 0x1.", NumberStyle.HexFloat, new NumberFormatInfo { NumberNegativePattern = 2 });
 
-                        yield return new TestCaseData(-3.0d, "0x1.8p1-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(-3.0d, "0x1.8-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(-2.0d, "0x1.-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(-3.0d, "0x1.8p1 -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(-3.0d, "0x1.8 -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(-2.0d, "0x1. -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo);
-
-                        yield return new TestCaseData(-3.0d, "(0x1.8p1)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(-3.0d, "(0x1.8)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(-2.0d, "(0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo);
-
                         // Constant values
 
                         yield return new TestCaseData(double.NaN, "NaN", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo);
@@ -3455,14 +3444,16 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(FormatException), "(0x1.8)", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
                         yield return new TestCaseData(typeof(FormatException), "(0x1.)", NumberStyle.HexFloat, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
 
-                        // Custom
+                        yield return new TestCaseData(typeof(ArgumentException), "0x1.8p1-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(ArgumentException), "0x1.8-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(ArgumentException), "0x1.-", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(ArgumentException), "0x1.8p1 -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(ArgumentException), "0x1.8 -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow trailing negative sign.");
+                        yield return new TestCaseData(typeof(ArgumentException), "0x1. -", NumberStyle.HexFloat | NumberStyle.AllowTrailingSign, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow trailing negative sign.");
 
-                        yield return new TestCaseData(typeof(FormatException), "0x1. -d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
-                        yield return new TestCaseData(typeof(FormatException), "0x1.-d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
-                        yield return new TestCaseData(typeof(FormatException), "(0x1.)d", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Type specifier may not be after negative sign.");
-
-                        yield return new TestCaseData(typeof(FormatException), "(0x1.", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
-                        yield return new TestCaseData(typeof(FormatException), "0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
+                        yield return new TestCaseData(typeof(ArgumentException), "(0x1.8p1)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
+                        yield return new TestCaseData(typeof(ArgumentException), "(0x1.8)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
+                        yield return new TestCaseData(typeof(ArgumentException), "(0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
                     }
                 }
 
