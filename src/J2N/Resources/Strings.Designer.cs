@@ -88,6 +88,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to With the AllowHexSpecifier and AllowTypeSpecifier bits set in the enum bit field, the parser is unable to distinguish between a type specifier d, D, f, or F and a hexadecimal digit. Therefore, AllowExponent is also required to delineate between hexadecimal digits and type specifier and an exponent must be supplied if type specifier d, D, f, or F is used..
+        /// </summary>
+        internal static string Arg_ExponentRequiredIfTypeSpecifierUsed {
+            get {
+                return ResourceManager.GetString("Arg_ExponentRequiredIfTypeSpecifierUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HashSet capacity is too big..
         /// </summary>
         internal static string Arg_HSCapacityOverflow {
@@ -124,6 +133,24 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexFloat or AllowTypeSpecifier. The bit(s) &apos;{0}&apos; were also specified, which are not allowed..
+        /// </summary>
+        internal static string Arg_InvalidHexFloatStyle {
+            get {
+                return ResourceManager.GetString("Arg_InvalidHexFloatStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexNumber. The bit(s) &apos;{0}&apos; were also specified, which are not allowed..
+        /// </summary>
+        internal static string Arg_InvalidHexStyle {
+            get {
+                return ResourceManager.GetString("Arg_InvalidHexStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The given key &apos;{0}&apos; was not present in the dictionary..
         /// </summary>
         internal static string Arg_KeyNotFoundWithKey {
@@ -156,6 +183,15 @@ namespace J2N.Resources {
         internal static string Arg_RankMultiDimNotSupported {
             get {
                 return ResourceManager.GetString("Arg_RankMultiDimNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The AllowCurrencySymbol bit and AllowTypeSpecifier bit may not be combined..
+        /// </summary>
+        internal static string Arg_TypeSpecifierNotAllowedIfCurrencyUsed {
+            get {
+                return ResourceManager.GetString("Arg_TypeSpecifierNotAllowedIfCurrencyUsed", resourceCulture);
             }
         }
         
@@ -219,6 +255,15 @@ namespace J2N.Resources {
         internal static string Argument_InvalidCodePoint {
             get {
                 return ResourceManager.GetString("Argument_InvalidCodePoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An undefined NumberStyle value is being used: {0}..
+        /// </summary>
+        internal static string Argument_InvalidNumberStyle {
+            get {
+                return ResourceManager.GetString("Argument_InvalidNumberStyle", resourceCulture);
             }
         }
         

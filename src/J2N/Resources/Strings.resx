@@ -162,6 +162,9 @@
   <data name="Argument_InvalidCodePoint" xml:space="preserve">
     <value>'{0}' is not a valid Unicode code point.</value>
   </data>
+  <data name="Argument_InvalidNumberStyle" xml:space="preserve">
+    <value>An undefined NumberStyle value is being used: {0}.</value>
+  </data>
   <data name="Argument_InvalidOffLen" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
   </data>
@@ -189,6 +192,9 @@
   <data name="Arg_BitArrayTypeUnsupported" xml:space="preserve">
     <value>Only supported array types for CopyTo on BitArrays are Boolean[], Int32[] and Byte[].</value>
   </data>
+  <data name="Arg_ExponentRequiredIfTypeSpecifierUsed" xml:space="preserve">
+    <value>With the AllowHexSpecifier and AllowTypeSpecifier bits set in the enum bit field, the parser is unable to distinguish between a type specifier d, D, f, or F and a hexadecimal digit. Therefore, AllowExponent is also required to delineate between hexadecimal digits and type specifier and an exponent must be supplied if type specifier d, D, f, or F is used.</value>
+  </data>
   <data name="Arg_HSCapacityOverflow" xml:space="preserve">
     <value>HashSet capacity is too big.</value>
   </data>
@@ -201,6 +207,12 @@
   <data name="Arg_InvalidANSIString" xml:space="preserve">
     <value>The ANSI string passed in could not be converted from the default ANSI code page to Unicode.</value>
   </data>
+  <data name="Arg_InvalidHexFloatStyle" xml:space="preserve">
+    <value>With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexFloat or AllowTypeSpecifier. The bit(s) '{0}' were also specified, which are not allowed.</value>
+  </data>
+  <data name="Arg_InvalidHexStyle" xml:space="preserve">
+    <value>With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexNumber. The bit(s) '{0}' were also specified, which are not allowed.</value>
+  </data>
   <data name="Arg_KeyNotFoundWithKey" xml:space="preserve">
     <value>The given key '{0}' was not present in the dictionary.</value>
   </data>
@@ -212,6 +224,9 @@
   </data>
   <data name="Arg_RankMultiDimNotSupported" xml:space="preserve">
     <value>Only single dimensional arrays are supported for the requested action.</value>
+  </data>
+  <data name="Arg_TypeSpecifierNotAllowedIfCurrencyUsed" xml:space="preserve">
+    <value>The AllowCurrencySymbol bit and AllowTypeSpecifier bit may not be combined.</value>
   </data>
   <data name="Arg_WrongType" xml:space="preserve">
     <value>The value '{0}' is not of type '{1}' and cannot be used in this generic collection.</value>
