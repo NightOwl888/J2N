@@ -589,7 +589,7 @@ namespace J2N.Numerics
 
             int digCount = 0;
             int digEnd = 0;
-            int maxDigCount = number.Significand.Length - 1; //number.Digits.Length - 1;
+            int maxDigCount = number.Significand.Length; //number.Digits.Length - 1;
 
             while (true)
             {
