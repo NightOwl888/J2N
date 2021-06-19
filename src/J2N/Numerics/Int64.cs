@@ -548,7 +548,9 @@ namespace J2N.Numerics
          */
         public static long Parse(string s, NumberStyle style , IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
-            return long.Parse(s, (NumberStyles)style, provider); // J2N TODO: AllowTrailingTypeSpecifier
+            // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            return long.Parse(s, style.ToNumberStyles(), provider);
         }
 
         internal static long ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
@@ -572,6 +574,7 @@ namespace J2N.Numerics
                 0;
         }
 
+        // Radix-based parsing (default in Java)
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
@@ -949,7 +952,7 @@ namespace J2N.Numerics
 
         #endregion Parse_CharSequence_Int32_Int32_Int32
 
-        #region TryParse_CharSequence_Int32_Int32_Int32
+        #region TryParse_CharSequence_Int32_Int32_Int32_Int64
 
 #if FEATURE_READONLYSPAN
 
@@ -1203,7 +1206,7 @@ namespace J2N.Numerics
             return ParseNumbers.TryStringToLong(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
 
-        #endregion TryParse_CharSequence_Int32_Int32_Int32
+        #endregion TryParse_CharSequence_Int32_Int32_Int32_Int64
 
         #region Parse_CharSequence_Int32
 
@@ -1257,7 +1260,7 @@ namespace J2N.Numerics
 
         #endregion Parse_CharSequence_Int32
 
-        #region TryParse_CharSequence_Int32
+        #region TryParse_CharSequence_Int32_Int64
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>.
@@ -1299,7 +1302,11 @@ namespace J2N.Numerics
             return ParseNumbers.TryStringToLong(s, radix, ParseNumbers.IsTight, out result);
         }
 
-        #endregion TryParse_CharSequence_Int32
+        #endregion TryParse_CharSequence_Int32_Int64
+
+        // Culture-aware parsing (default in .NET)
+
+        #region TryParse_CharSequence_Int64
 
         /// <summary>
         /// Converts the string representation of a number to its 64-bit signed integer equivalent.
@@ -1448,6 +1455,10 @@ namespace J2N.Numerics
             return long.TryParse(s, out result);
         }
 #endif
+
+        #endregion TryParse_CharSequence_Int64
+
+        #region TryParse_CharSequence_NumberStyle_IFormatProvider_Int64
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to its
@@ -1599,7 +1610,7 @@ namespace J2N.Numerics
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
         ///     <item>
-        ///         <term><see cref="NumberStyle.AllowTrailingFloatType"/></term>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
         ///         <term>The type suffix used in the literal identifier syntax of C# or Java.</term>
         ///     </item>
         ///     <item>
@@ -1647,7 +1658,8 @@ namespace J2N.Numerics
         public static bool TryParse([NotNullWhen(true)] string? s, NumberStyle style, IFormatProvider? provider, out long result)
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
-            return long.TryParse(s, (NumberStyles)style, provider, out result);
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            return long.TryParse(s, style.ToNumberStyles(), provider, out result);
         }
 
 
@@ -1737,9 +1749,9 @@ namespace J2N.Numerics
         ///         the <see cref="NumberStyle.AllowDecimalPoint"/> flag.</term>
         ///     </item>
         ///     <item>
-        ///         <term><i>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
-        ///         parameter can represent a number in exponential notation if style includes the <see cref="NumberStyle.AllowExponent"/> flag.</i></term>
-        ///         <term></term>
+        ///         <term><i>e</i></term>
+        ///         <term>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
+        ///         parameter can represent a number in exponential notation if style includes the <see cref="NumberStyle.AllowExponent"/> flag.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -1803,8 +1815,8 @@ namespace J2N.Numerics
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
         ///     <item>
-        ///         <term><see cref="NumberStyle.AllowTrailingFloatType"/></term>
-        ///         <term>The type suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
+        ///         <term>The <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -1830,7 +1842,7 @@ namespace J2N.Numerics
         /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
         /// Therefore, simply casting the value will convert it properly between the two in both directions.
         /// <para/>
-        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, s must be a hexadecimal value without a prefix.
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
         /// For example, "C9AF3" parses successfully, but "0xC9AF3" does not. The only other flags that can be present in style
         /// are <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/>
         /// enumeration has a composite style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
@@ -1851,9 +1863,11 @@ namespace J2N.Numerics
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out long result)
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
-            return long.TryParse(s, (NumberStyles)style, provider, out result);
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            return long.TryParse(s, style.ToNumberStyles(), provider, out result);
         }
 #endif
+        #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int64
 
         /// <inheritdoc/>
         public override short GetInt16Value()
@@ -2276,16 +2290,16 @@ namespace J2N.Numerics
         public static long RotateRight(long lng, int distance)
         {
             return lng.RotateRight(distance);
-            //if (distance == 0)
-            //{
-            //    return lng;
-            //}
-            ///*
-            // * According to JLS3, 15.19, the right operand of a shift is always
-            // * implicitly masked with 0x3F, which the negation of 'distance' is
-            // * taking advantage of.
-            // */
-            //return ((lng >>> distance) | (lng << (-distance)));
+            ////if (distance == 0)
+            ////{
+            ////    return lng;
+            ////}
+            /////*
+            //// * According to JLS3, 15.19, the right operand of a shift is always
+            //// * implicitly masked with 0x3F, which the negation of 'distance' is
+            //// * taking advantage of.
+            //// */
+            ////return ((lng >>> distance) | (lng << (-distance)));
         }
 
         /**

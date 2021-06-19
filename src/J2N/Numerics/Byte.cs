@@ -467,6 +467,7 @@ namespace J2N.Numerics
             return (byte)r;
         }
 
+        // Radix-based parsing (default in Java)
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
@@ -891,7 +892,7 @@ namespace J2N.Numerics
 
         #endregion Parse_CharSequence_Int32_Int32_Int32
 
-        #region TryParse_CharSequence_Int32_Int32_Int32
+        #region TryParse_CharSequence_Int32_Int32_Int32_Byte
 
 #if FEATURE_READONLYSPAN
 
@@ -1243,7 +1244,7 @@ namespace J2N.Numerics
             return false;
         }
 
-        #endregion TryParse_CharSequence_Int32_Int32_Int32
+        #endregion TryParse_CharSequence_Int32_Int32_Int32_Byte
 
         #region Parse_CharSequence_Int32
 
@@ -1310,7 +1311,7 @@ namespace J2N.Numerics
 
         #endregion Parse_CharSequence_Int32
 
-        #region TryParse_CharSequence_Int32
+        #region TryParse_CharSequence_Int32_Byte
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a <see cref="byte"/> in the specified <paramref name="radix"/>.
@@ -1374,7 +1375,11 @@ namespace J2N.Numerics
             return true;
         }
 
-        #endregion TryParse_CharSequence_Int32
+        #endregion TryParse_CharSequence_Int32_Byte
+
+        // Culture-aware parsing (default in .NET)
+
+        #region TryParse_CharSequence_Byte
 
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed
@@ -1526,6 +1531,10 @@ namespace J2N.Numerics
         }
 #endif
 
+        #endregion TryParse_CharSequence_Byte
+
+        #region TryParse_CharSequence_NumberStyle_IFormatProvider_Byte
+
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
@@ -1612,9 +1621,9 @@ namespace J2N.Numerics
         ///         the <see cref="NumberStyle.AllowDecimalPoint"/> flag.</term>
         ///     </item>
         ///     <item>
-        ///         <term><i>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
-        ///         parameter can represent a number in exponential notation if style includes the <see cref="NumberStyle.AllowExponent"/> flag.</i></term>
-        ///         <term></term>
+        ///         <term><i>e</i></term>
+        ///         <term>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
+        ///         parameter can represent a number in exponential notation if style includes the <see cref="NumberStyle.AllowExponent"/> flag.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -1678,7 +1687,7 @@ namespace J2N.Numerics
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
         ///     <item>
-        ///         <term><see cref="NumberStyle.AllowTrailingFloatType"/></term>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
         ///         <term>The type suffix used in the literal identifier syntax of C# or Java.</term>
         ///     </item>
         ///     <item>
@@ -1896,8 +1905,8 @@ namespace J2N.Numerics
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
         ///     <item>
-        ///         <term><see cref="NumberStyle.AllowTrailingFloatType"/></term>
-        ///         <term>The type suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
+        ///         <term>The <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -1923,8 +1932,8 @@ namespace J2N.Numerics
         /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
         /// Therefore, simply casting the value will convert it properly between the two in both directions.
         /// <para/>
-        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, s must be a hexadecimal value without a prefix.
-        /// For example, "C9AF3" parses successfully, but "0xC9AF3" does not. The only other flags that can be present in style
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
+        /// For example, "C9AF3" parses successfully, but "0xC9AF3" does not. The only other flags that can be present in <paramref name="style"/>
         /// are <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/>
         /// enumeration has a composite style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
         /// <para/>
@@ -1952,6 +1961,8 @@ namespace J2N.Numerics
             return false;
         }
 #endif
+
+        #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Byte
 
         /// <inheritdoc/>
         public override short GetInt16Value()
