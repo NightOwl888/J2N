@@ -370,7 +370,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Some examples of <paramref name="s"/> are "100", "-123,456,789", "123.45e+6", "+500", "5e2", "3.1416", "600.", "-.123", and "-Infinity".
         /// </remarks>
-        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="GetValueOf(string, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(string s, IFormatProvider? provider)
         {
@@ -484,7 +484,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="GetValueOf(string, IFormatProvider?)"/>
         public static bool TryParse([NotNullWhen(true)] string? s, out float result)
         {
             if (s == null)
@@ -600,7 +600,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(ReadOnlySpan{char}, IFormatProvider?)"/>
+        /// <seealso cref="GetValueOf(ReadOnlySpan{char}, IFormatProvider?)"/>
         public static bool TryParse(ReadOnlySpan<char> s, out float result)
         {
             return DotNetNumber.TryParseSingle(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
@@ -881,7 +881,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetValueOf(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(string s, NumberStyle style, IFormatProvider? provider)
         {
@@ -1159,7 +1159,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetValueOf(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider)
         {
@@ -1827,9 +1827,9 @@ namespace J2N.Numerics
         // *             can not be parsed as a float value.
         // * @see #parseFloat(String)
         // */
-        //public static Single ValueOf(string value)
+        //public static Single GetValueOf(string value)
         //{
-        //    return ValueOf(ParseSingle(value));
+        //    return GetValueOf(ParseSingle(value));
         //}
 
         /**
@@ -1844,9 +1844,9 @@ namespace J2N.Numerics
          *             can not be parsed as a float value.
          * @see #parseFloat(String)
          */
-        public static Single ValueOf(string value, IFormatProvider? provider)
+        public static Single GetValueOf(string value, IFormatProvider? provider)
         {
-            return ValueOf(Parse(value, NumberStyle.Float, provider));
+            return GetValueOf(Parse(value, NumberStyle.Float, provider));
         }
 
 
@@ -1862,9 +1862,9 @@ namespace J2N.Numerics
          *             can not be parsed as a float value.
          * @see #parseFloat(String)
          */
-        public static Single ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        public static Single GetValueOf(string value, NumberStyle style, IFormatProvider? provider)
         {
-            return ValueOf(Parse(value, style, provider));
+            return GetValueOf(Parse(value, style, provider));
         }
 
         /**
@@ -1933,7 +1933,7 @@ namespace J2N.Numerics
          * @return a {@code Float} instance containing {@code f}.
          * @since 1.5
          */
-        public static Single ValueOf(float f)
+        public static Single GetValueOf(float f)
         {
             return new Single(f);
         }
@@ -2027,6 +2027,6 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator float(Single value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Single(float value) => ValueOf(value);
+        public static implicit operator Single(float value) => GetValueOf(value);
     }
 }

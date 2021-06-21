@@ -670,17 +670,17 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Integer
             // java.lang.Integer.valueOf(java.lang.String)
-            assertEquals("Returned incorrect int", 8888888, Int32.ValueOf("8888888", J2N.Text.StringFormatter.InvariantCulture)
+            assertEquals("Returned incorrect int", 8888888, Int32.GetValueOf("8888888", J2N.Text.StringFormatter.InvariantCulture)
                     .GetInt32Value());
-            assertTrue("Returned incorrect int", Int32.ValueOf("2147483647", J2N.Text.StringFormatter.InvariantCulture)
+            assertTrue("Returned incorrect int", Int32.GetValueOf("2147483647", J2N.Text.StringFormatter.InvariantCulture)
                     .GetInt32Value() == int.MaxValue);
-            assertTrue("Returned incorrect int", Int32.ValueOf("-2147483648", J2N.Text.StringFormatter.InvariantCulture)
+            assertTrue("Returned incorrect int", Int32.GetValueOf("-2147483648", J2N.Text.StringFormatter.InvariantCulture)
                     .GetInt32Value() == int.MinValue);
 
             bool exception = false;
             try
             {
-                Int32.ValueOf("2147483648", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetValueOf("2147483648", J2N.Text.StringFormatter.InvariantCulture);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -692,7 +692,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int32.ValueOf("-2147483649", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetValueOf("-2147483649", J2N.Text.StringFormatter.InvariantCulture);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -710,32 +710,32 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Integer
             // java.lang.Integer.valueOf(java.lang.String, int)
-            assertEquals("Returned incorrect int for hex string", 255, Int32.ValueOf(
+            assertEquals("Returned incorrect int for hex string", 255, Int32.GetValueOf(
                     "FF", 16).GetInt32Value());
-            assertEquals("Returned incorrect int for oct string", 16, Int32.ValueOf(
+            assertEquals("Returned incorrect int for oct string", 16, Int32.GetValueOf(
                     "20", 8).GetInt32Value());
-            assertEquals("Returned incorrect int for bin string", 4, Int32.ValueOf(
+            assertEquals("Returned incorrect int for bin string", 4, Int32.GetValueOf(
                     "100", 2).GetInt32Value());
 
-            assertEquals("Returned incorrect int for - hex string", -255, Int32.ValueOf(
+            assertEquals("Returned incorrect int for - hex string", -255, Int32.GetValueOf(
                     "-FF", 16).GetInt32Value());
-            assertEquals("Returned incorrect int for - oct string", -16, Int32.ValueOf(
+            assertEquals("Returned incorrect int for - oct string", -16, Int32.GetValueOf(
                     "-20", 8).GetInt32Value());
-            assertEquals("Returned incorrect int for - bin string", -4, Int32.ValueOf(
+            assertEquals("Returned incorrect int for - bin string", -4, Int32.GetValueOf(
                     "-100", 2).GetInt32Value());
-            assertTrue("Returned incorrect int", Int32.ValueOf("2147483647", 10)
+            assertTrue("Returned incorrect int", Int32.GetValueOf("2147483647", 10)
                     .GetInt32Value() == int.MaxValue);
-            assertTrue("Returned incorrect int", Int32.ValueOf("-2147483648", 10)
+            assertTrue("Returned incorrect int", Int32.GetValueOf("-2147483648", 10)
                     .GetInt32Value() == int.MinValue);
-            assertTrue("Returned incorrect int", Int32.ValueOf("7fffffff", 16)
+            assertTrue("Returned incorrect int", Int32.GetValueOf("7fffffff", 16)
                     .GetInt32Value() == int.MaxValue);
-            assertTrue("Returned incorrect int", Int32.ValueOf("-80000000", 16)
+            assertTrue("Returned incorrect int", Int32.GetValueOf("-80000000", 16)
                     .GetInt32Value() == int.MinValue);
 
             bool exception = false;
             try
             {
-                Int32.ValueOf("FF", 2);
+                Int32.GetValueOf("FF", 2);
             }
             catch (FormatException e)
             {
@@ -749,7 +749,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int32.ValueOf("2147483648", 10);
+                Int32.GetValueOf("2147483648", 10);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -761,7 +761,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int32.ValueOf("-2147483649", 10);
+                Int32.GetValueOf("-2147483649", 10);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -775,7 +775,7 @@ namespace J2N.Numerics
             //exception = false;
             //try
             //{
-            //    Int32.ValueOf("80000000", 16);
+            //    Int32.GetValueOf("80000000", 16);
             //}
             //catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             //{
@@ -785,17 +785,17 @@ namespace J2N.Numerics
             //assertTrue("Failed to throw exception with hex MAX_VALUE + 1",
             //        exception);
 
-            assertEquals(1, Int32.ValueOf("1", 16).GetInt32Value());
-            assertEquals(-1, Int32.ValueOf("ffffffff", 16).GetInt32Value());
-            assertEquals(2147483647, Int32.ValueOf("7fffffff", 16).GetInt32Value());
-            assertEquals(-2147483648, Int32.ValueOf("-80000000", 16).GetInt32Value()); // Special case: In Java, we allow the negative sign for the smallest negative number
-            assertEquals(-2147483648, Int32.ValueOf("80000000", 16).GetInt32Value());  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
-            assertEquals(-2147483647, Int32.ValueOf("80000001", 16).GetInt32Value());
+            assertEquals(1, Int32.GetValueOf("1", 16).GetInt32Value());
+            assertEquals(-1, Int32.GetValueOf("ffffffff", 16).GetInt32Value());
+            assertEquals(2147483647, Int32.GetValueOf("7fffffff", 16).GetInt32Value());
+            assertEquals(-2147483648, Int32.GetValueOf("-80000000", 16).GetInt32Value()); // Special case: In Java, we allow the negative sign for the smallest negative number
+            assertEquals(-2147483648, Int32.GetValueOf("80000000", 16).GetInt32Value());  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
+            assertEquals(-2147483647, Int32.GetValueOf("80000001", 16).GetInt32Value());
 
             exception = false;
             try
             {
-                Int32.ValueOf("-80000001", 16);
+                Int32.GetValueOf("-80000001", 16);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -812,15 +812,15 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfI()
         {
-            assertEquals(new Int32(int.MinValue), Int32.ValueOf(int.MinValue));
-            assertEquals(new Int32(int.MaxValue), Int32.ValueOf(int.MaxValue));
-            assertEquals(new Int32(0), Int32.ValueOf(0));
+            assertEquals(new Int32(int.MinValue), Int32.GetValueOf(int.MinValue));
+            assertEquals(new Int32(int.MaxValue), Int32.GetValueOf(int.MaxValue));
+            assertEquals(new Int32(0), Int32.GetValueOf(0));
 
             short s = -128;
             while (s < 128)
             {
-                assertEquals(new Int32(s), Int32.ValueOf(s));
-                assertSame(Int32.ValueOf(s), Int32.ValueOf(s));
+                assertEquals(new Int32(s), Int32.GetValueOf(s));
+                assertSame(Int32.GetValueOf(s), Int32.GetValueOf(s));
                 s++;
             }
         }
@@ -910,9 +910,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
-            assertEquals(new Int32(0), Int32.ValueOf(0));
-            assertEquals(new Int32(1), Int32.ValueOf(1));
-            assertEquals(new Int32(-1), Int32.ValueOf(-1));
+            assertEquals(new Int32(0), Int32.GetValueOf(0));
+            assertEquals(new Int32(1), Int32.GetValueOf(1));
+            assertEquals(new Int32(-1), Int32.GetValueOf(-1));
 
             Int32 fixture = new Int32(25);
             assertEquals(fixture, fixture);
@@ -950,34 +950,34 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String()
         {
-            assertEquals(new Int32(0), Int32.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int32(1), Int32.ValueOf("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int32(-1), Int32.ValueOf("-1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int32(0), Int32.GetValueOf("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int32(1), Int32.GetValueOf("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int32(-1), Int32.GetValueOf("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                Int32.ValueOf("0x1", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetValueOf("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.ValueOf("9.2", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetValueOf("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetValueOf("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with null string.");
             }
             catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
@@ -989,44 +989,44 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_StringI()
         {
-            assertEquals(new Int32(0), Int32.ValueOf("0", 10));
-            assertEquals(new Int32(1), Int32.ValueOf("1", 10));
-            assertEquals(new Int32(-1), Int32.ValueOf("-1", 10));
+            assertEquals(new Int32(0), Int32.GetValueOf("0", 10));
+            assertEquals(new Int32(1), Int32.GetValueOf("1", 10));
+            assertEquals(new Int32(-1), Int32.GetValueOf("-1", 10));
 
             //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Int32.ValueOf("1", 2).GetByteValue());
-            assertEquals(Character.Digit('F', 16), Int32.ValueOf("F", 16).GetByteValue());
+            assertEquals(Character.Digit('1', 2), Int32.GetValueOf("1", 2).GetByteValue());
+            assertEquals(Character.Digit('F', 16), Int32.GetValueOf("F", 16).GetByteValue());
 
             try
             {
-                Int32.ValueOf("0x1", 10);
+                Int32.GetValueOf("0x1", 10);
                 fail("Expected FormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.ValueOf("9.2", 10);
+                Int32.GetValueOf("9.2", 10);
                 fail("Expected FormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.ValueOf("", 10);
+                Int32.GetValueOf("", 10);
                 fail("Expected FormatException with empty string.");
             }
             catch (FormatException e) { }
 
             //try
             //{
-            //    Int32.ValueOf(null, 10);
+            //    Int32.GetValueOf(null, 10);
             //    fail("Expected FormatException with null string.");
             //}
             //catch (FormatException e) { }
 
             // J2N: Match .NET behavior and return 0 for a null string
-            assertEquals(0, Int32.ValueOf(null, 10));
+            assertEquals(0, Int32.GetValueOf(null, 10));
         }
 
         /**
