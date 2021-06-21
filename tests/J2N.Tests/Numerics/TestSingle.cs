@@ -113,10 +113,12 @@ namespace J2N.Numerics
         [Test]
         public void Test_ConstructorLjava_lang_String()
         {
+            // J2N TODO: Move to Parse tests in CharSequences
+
             // Test for method java.lang.Float(java.lang.String)
 
-            Single f = new Single("900.89", J2N.Text.StringFormatter.InvariantCulture);
-            assertTrue("Created incorrect Float", f.GetSingleValue() == 900.89f);
+            float f = Single.Parse("900.89", J2N.Text.StringFormatter.InvariantCulture);
+            assertTrue("Created incorrect Float", f == 900.89f);
         }
 
         /**
@@ -871,7 +873,7 @@ namespace J2N.Numerics
         public void Test_parseFloat_LString_Harmony6261()
         {
             // Regression test for HARMONY-6261
-            float f = new Single("2147483648", J2N.Text.StringFormatter.InvariantCulture);
+            float f = Single.Parse("2147483648", J2N.Text.StringFormatter.InvariantCulture);
             //assertEquals("2.14748365E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Changed from "2.1474836E9" to "2.14748365E9" to match JDK behavior
             assertEquals("2.1474836E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture));
 

@@ -53,52 +53,12 @@ namespace J2N.Numerics
          * @param value
          *            the primitive byte value to store in the new instance.
          */
-        public Byte(byte value)
+        internal Byte(byte value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;
         }
 
-        ///**
-        // * Constructs a new {@code Byte} from the specified string.
-        // * 
-        // * @param string
-        // *            the string representation of a single byte value.
-        // * @throws NumberFormatException
-        // *             if {@code string} can not be decoded into a byte value.
-        // * @see #parseByte(String)
-        // */
-        //public Byte(string s)
-        //    : this(Parse(s))
-        //{
-        //}
-
-        /**
-         * Constructs a new {@code Byte} from the specified string.
-         * 
-         * @param string
-         *            the string representation of a single byte value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a byte value.
-         * @see #parseByte(String)
-         */
-        public Byte(string s, IFormatProvider? provider)
-            : this(Parse(s, provider))
-        {
-        }
-
-        /**
-         * Constructs a new {@code Byte} from the specified string.
-         * 
-         * @param string
-         *            the string representation of a single byte value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a byte value.
-         * @see #parseByte(String)
-         */
-        public Byte(string s, NumberStyle style, IFormatProvider? provider)
-            : this(Parse(s, style, provider))
-        {
-        }
+        // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
         /**
          * Gets the primitive value of this byte.
