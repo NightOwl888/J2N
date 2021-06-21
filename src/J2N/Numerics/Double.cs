@@ -733,7 +733,8 @@ namespace J2N.Numerics
         ///     <item>
         ///         <term><i>$</i></term>
         ///         <term>A culture-specific currency symbol. Its position in the string is defined by the <see cref="NumberFormatInfo.CurrencyNegativePattern"/>
-        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the current culture. The current culture's currency symbol can
+        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the <see cref="NumberFormatInfo"/> object returned by the
+        ///             <see cref="IFormatProvider.GetFormat(Type?)"/> method of the <paramref name="provider"/> parameter. The current culture's currency symbol can
         ///             appear in <paramref name="s"/> if style includes the <see cref="NumberStyle.AllowCurrencySymbol"/> flag.</term>
         ///     </item>
         ///     <item>
@@ -821,7 +822,7 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowDecimalPoint"/></term>
-        ///         <term>The decimal point (.) and <i>fractional_digits</i> elements. However, <i>fractional_digits</i> must consist
+        ///         <term>The decimal point (.) and <i>fractional-digits</i> elements. However, <i>fractional-digits</i> must consist
         ///         of only one or more 0 digits or the method returns <c>false</c>.</term>
         ///     </item>
         ///     <item>
@@ -889,8 +890,10 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// <para/>
-        /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
-        /// Therefore, simply casting the value will convert it properly between the two in both directions.
+        /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
+        /// <see cref="NumberStyleExtensions.ToNumberStyles(NumberStyle)"/> extension method.
+        /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
+        /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
         /// <para/>
         /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value which may include an optional 0x or 0X prefix.
         /// For example, "0xC9AF3.8BD4C". This flag may be combined with any of the flags specified in <see cref="NumberStyle.Float"/> and also
@@ -1010,7 +1013,8 @@ namespace J2N.Numerics
         ///     <item>
         ///         <term><i>$</i></term>
         ///         <term>A culture-specific currency symbol. Its position in the string is defined by the <see cref="NumberFormatInfo.CurrencyNegativePattern"/>
-        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the current culture. The current culture's currency symbol can
+        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the <see cref="NumberFormatInfo"/> object returned by the
+        ///             <see cref="IFormatProvider.GetFormat(Type?)"/> method of the <paramref name="provider"/> parameter. The current culture's currency symbol can
         ///             appear in <paramref name="s"/> if style includes the <see cref="NumberStyle.AllowCurrencySymbol"/> flag.</term>
         ///     </item>
         ///     <item>
@@ -1098,7 +1102,7 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowDecimalPoint"/></term>
-        ///         <term>The decimal point (.) and <i>fractional_digits</i> elements. However, <i>fractional_digits</i> must consist
+        ///         <term>The decimal point (.) and <i>fractional-digits</i> elements. However, <i>fractional-digits</i> must consist
         ///         of only one or more 0 digits or the method returns <c>false</c>.</term>
         ///     </item>
         ///     <item>
@@ -1166,8 +1170,10 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// <para/>
-        /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
-        /// Therefore, simply casting the value will convert it properly between the two in both directions.
+        /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
+        /// <see cref="NumberStyleExtensions.ToNumberStyles(NumberStyle)"/> extension method.
+        /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
+        /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
         /// <para/>
         /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value which may include an optional 0x or 0X prefix.
         /// For example, "0xC9AF3.8BD4C". This flag may be combined with any of the flags specified in <see cref="NumberStyle.Float"/> and also
@@ -1298,7 +1304,8 @@ namespace J2N.Numerics
         ///     <item>
         ///         <term><i>$</i></term>
         ///         <term>A culture-specific currency symbol. Its position in the string is defined by the <see cref="NumberFormatInfo.CurrencyNegativePattern"/>
-        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the current culture. The current culture's currency symbol can
+        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the <see cref="NumberFormatInfo"/> object returned by the
+        ///             <see cref="IFormatProvider.GetFormat(Type?)"/> method of the <paramref name="provider"/> parameter. The current culture's currency symbol can
         ///             appear in <paramref name="s"/> if style includes the <see cref="NumberStyle.AllowCurrencySymbol"/> flag.</term>
         ///     </item>
         ///     <item>
@@ -1386,7 +1393,7 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowDecimalPoint"/></term>
-        ///         <term>The decimal point (.) and <i>fractional_digits</i> elements. However, <i>fractional_digits</i> must consist
+        ///         <term>The decimal point (.) and <i>fractional-digits</i> elements. However, <i>fractional-digits</i> must consist
         ///         of only one or more 0 digits or the method returns <c>false</c>.</term>
         ///     </item>
         ///     <item>
@@ -1454,8 +1461,10 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// <para/>
-        /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
-        /// Therefore, simply casting the value will convert it properly between the two in both directions.
+        /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
+        /// <see cref="NumberStyleExtensions.ToNumberStyles(NumberStyle)"/> extension method.
+        /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
+        /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
         /// <para/>
         /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value which may include an optional 0x or 0X prefix.
         /// For example, "0xC9AF3.8BD4C". This flag may be combined with any of the flags specified in <see cref="NumberStyle.Float"/> and also
@@ -1587,7 +1596,8 @@ namespace J2N.Numerics
         ///     <item>
         ///         <term><i>$</i></term>
         ///         <term>A culture-specific currency symbol. Its position in the string is defined by the <see cref="NumberFormatInfo.CurrencyNegativePattern"/>
-        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the current culture. The current culture's currency symbol can
+        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the <see cref="NumberFormatInfo"/> object returned by the
+        ///             <see cref="IFormatProvider.GetFormat(Type?)"/> method of the <paramref name="provider"/> parameter. The current culture's currency symbol can
         ///             appear in <paramref name="s"/> if style includes the <see cref="NumberStyle.AllowCurrencySymbol"/> flag.</term>
         ///     </item>
         ///     <item>
@@ -1675,7 +1685,7 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowDecimalPoint"/></term>
-        ///         <term>The decimal point (.) and <i>fractional_digits</i> elements. However, <i>fractional_digits</i> must consist
+        ///         <term>The decimal point (.) and <i>fractional-digits</i> elements. However, <i>fractional-digits</i> must consist
         ///         of only one or more 0 digits or the method returns <c>false</c>.</term>
         ///     </item>
         ///     <item>
@@ -1743,8 +1753,10 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// <para/>
-        /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
-        /// Therefore, simply casting the value will convert it properly between the two in both directions.
+        /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
+        /// <see cref="NumberStyleExtensions.ToNumberStyles(NumberStyle)"/> extension method.
+        /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
+        /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
         /// <para/>
         /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value which may include an optional 0x or 0X prefix.
         /// For example, "0xC9AF3.8BD4C". This flag may be combined with any of the flags specified in <see cref="NumberStyle.Float"/> and also
