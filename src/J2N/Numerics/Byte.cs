@@ -171,7 +171,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    return GetValueOf(0);
+                    return ValueOf(0);
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
                 {
@@ -206,7 +206,7 @@ namespace J2N.Numerics
             // Only allow negative if it was passed as a sign in the string
             if (r < 0 && sign > 0)
                 throw new OverflowException(SR.Overflow_Byte);
-            return GetValueOf((byte)r);
+            return ValueOf((byte)r);
         }
 
         /// <summary>
@@ -278,7 +278,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    result = GetValueOf(0);
+                    result = ValueOf(0);
                     return true;
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
@@ -315,7 +315,7 @@ namespace J2N.Numerics
                 return false;
             }
 
-            result = GetValueOf((byte)r);
+            result = ValueOf((byte)r);
             return true;
         }
 
@@ -2445,9 +2445,9 @@ namespace J2N.Numerics
         //// *             can not be parsed as a byte value.
         //// * @see #parseByte(String)
         //// */
-        ////public static Byte GetValueOf(string value)
+        ////public static Byte ValueOf(string value)
         ////{
-        ////    return GetValueOf(Parse(value));
+        ////    return ValueOf(Parse(value));
         ////}
 
         /**
@@ -2462,9 +2462,9 @@ namespace J2N.Numerics
          *             can not be parsed as a byte value.
          * @see #parseByte(String)
          */
-        public static Byte GetValueOf(string s, IFormatProvider? provider)
+        public static Byte ValueOf(string s, IFormatProvider? provider)
         {
-            return GetValueOf(Parse(s, provider));
+            return ValueOf(Parse(s, provider));
         }
 
         /**
@@ -2479,9 +2479,9 @@ namespace J2N.Numerics
          *             can not be parsed as a byte value.
          * @see #parseByte(String)
          */
-        public static Byte GetValueOf(string s, NumberStyle style, IFormatProvider? provider)
+        public static Byte ValueOf(string s, NumberStyle style, IFormatProvider? provider)
         {
-            return GetValueOf(Parse(s, style, provider));
+            return ValueOf(Parse(s, style, provider));
         }
 
         /// <summary>
@@ -2511,9 +2511,9 @@ namespace J2N.Numerics
         /// <paramref name="s"/> cannot be parsed as a <see cref="byte"/> or <see cref="sbyte"/> value.
         /// </exception>
         /// <seealso cref="Parse(string, int)"/>
-        public static Byte GetValueOf(string s, int radix) // J2N TODO: Exception handling - throw ArgumentOutOfRangeException and ArgumentNullException? Accept null like Convert.ToInt32() does?
+        public static Byte ValueOf(string s, int radix) // J2N TODO: Exception handling - throw ArgumentOutOfRangeException and ArgumentNullException? Accept null like Convert.ToInt32() does?
         {
-            return GetValueOf(Parse(s, radix));
+            return ValueOf(Parse(s, radix));
         }
 
         /**
@@ -2528,7 +2528,7 @@ namespace J2N.Numerics
          * @return a {@code Byte} instance containing {@code b}.
          * @since 1.5
          */
-        public static Byte GetValueOf(byte b)
+        public static Byte ValueOf(byte b)
         {
             lock (Cache)
             {
@@ -2545,6 +2545,6 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator byte(Byte value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Byte(byte value) => GetValueOf(value);
+        public static implicit operator Byte(byte value) => ValueOf(value);
     }
 }

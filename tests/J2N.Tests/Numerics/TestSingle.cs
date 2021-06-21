@@ -950,23 +950,23 @@ namespace J2N.Numerics
             // java.lang.Float.valueOf(java.lang.String)
 
             Single wanted = new Single(432.1235f);
-            Single got = Single.GetValueOf("432.1235", J2N.Text.StringFormatter.InvariantCulture);
+            Single got = Single.ValueOf("432.1235", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Incorrect float returned--wanted: " + wanted + " but got: " + got, got
                     .Equals(wanted));
 
             wanted = new Single(0f);
-            got = Single.GetValueOf("0", J2N.Text.StringFormatter.InvariantCulture);
+            got = Single.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Incorrect float returned--wanted: " + wanted + " but got: " + got, got
                     .Equals(wanted));
 
             wanted = new Single(-1212.3232f);
-            got = Single.GetValueOf("-1212.3232", J2N.Text.StringFormatter.InvariantCulture);
+            got = Single.ValueOf("-1212.3232", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Incorrect float returned--wanted: " + wanted + " but got: " + got, got
                     .Equals(wanted));
 
             try
             {
-                Single.GetValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                Single.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected Float.valueOf(null) to throw NPE.");
             }
             catch (ArgumentNullException ex)
@@ -976,7 +976,7 @@ namespace J2N.Numerics
 
             try
             {
-                Single.GetValueOf("", J2N.Text.StringFormatter.InvariantCulture);
+                Single.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected Single.valueOf(\"\") to throw NFE");
             }
             catch (FormatException e)
@@ -984,13 +984,13 @@ namespace J2N.Numerics
                 // expected
             }
 
-            Single posZero = Single.GetValueOf("+0.0", J2N.Text.StringFormatter.InvariantCulture);
-            Single negZero = Single.GetValueOf("-0.0", J2N.Text.StringFormatter.InvariantCulture);
+            Single posZero = Single.ValueOf("+0.0", J2N.Text.StringFormatter.InvariantCulture);
+            Single negZero = Single.ValueOf("-0.0", J2N.Text.StringFormatter.InvariantCulture);
             assertFalse("Floattest0", posZero.Equals(negZero));
 
             // J2N: .NET specific - testing specific cultures should also parse negative zero correctly
-            Single posZero_de = Single.GetValueOf("+0,0", new CultureInfo("de-DE"));
-            Single negZero_de = Single.GetValueOf("-0,0", new CultureInfo("de-DE"));
+            Single posZero_de = Single.ValueOf("+0,0", new CultureInfo("de-DE"));
+            Single negZero_de = Single.ValueOf("-0,0", new CultureInfo("de-DE"));
             assertFalse("Floattest0", posZero_de.Equals(negZero_de));
 
             assertTrue("Floattest1", 0.0f == -0.0f);
@@ -998,29 +998,29 @@ namespace J2N.Numerics
             // Tests for float values by name.
             Single expectedNaN = new Single(float.NaN);
 
-            Single posNaN = Single.GetValueOf("NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
+            Single posNaN = Single.ValueOf("NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
             assertTrue("Floattest2", posNaN.Equals(expectedNaN));
 
-            Single posNaNSigned = Single.GetValueOf("+NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
+            Single posNaNSigned = Single.ValueOf("+NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
             assertTrue("Floattest3", posNaNSigned.Equals(expectedNaN));
 
-            Single negNaNSigned = Single.GetValueOf("-NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
+            Single negNaNSigned = Single.ValueOf("-NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
             assertTrue("Floattest4", negNaNSigned.Equals(expectedNaN));
 
-            Single posInfinite = Single.GetValueOf("Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Single posInfinite = Single.ValueOf("Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Floattest5", posInfinite.Equals(new Single(float.PositiveInfinity)));
 
-            Single posInfiniteSigned = Single.GetValueOf("+Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Single posInfiniteSigned = Single.ValueOf("+Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Floattest6", posInfiniteSigned.Equals(new Single(float.PositiveInfinity)));
 
-            Single negInfiniteSigned = Single.GetValueOf("-Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Single negInfiniteSigned = Single.ValueOf("-Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Floattest7", negInfiniteSigned.Equals(new Single(float.NegativeInfinity)));
 
             // test HARMONY-6641
-            posInfinite = Single.GetValueOf("320.0E+2147483647", J2N.Text.StringFormatter.InvariantCulture);
+            posInfinite = Single.ValueOf("320.0E+2147483647", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Floattest8", float.PositiveInfinity, posInfinite, 0.0f);
 
-            negZero = Single.GetValueOf("-1.4E-2147483314", J2N.Text.StringFormatter.InvariantCulture);
+            negZero = Single.ValueOf("-1.4E-2147483314", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Floattest9", -0.0f, negZero, 0.0f);
         }
 
@@ -1154,16 +1154,16 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfF()
         {
-            assertEquals(new Single(float.Epsilon), Single.GetValueOf(float.Epsilon)); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
-            assertEquals(new Single(float.MaxValue), Single.GetValueOf(float.MaxValue));
-            assertEquals(new Single(0), Single.GetValueOf(0));
+            assertEquals(new Single(float.Epsilon), Single.ValueOf(float.Epsilon)); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
+            assertEquals(new Single(float.MaxValue), Single.ValueOf(float.MaxValue));
+            assertEquals(new Single(0), Single.ValueOf(0));
 
             int s = -128;
             while (s < 128)
             {
-                assertEquals(new Single(s), Single.GetValueOf(s));
-                assertEquals(new Single(s + 0.1F), Single.GetValueOf(s + 0.1F));
-                assertEquals(Single.GetValueOf(s + 0.1F), Single.GetValueOf(s + 0.1F));
+                assertEquals(new Single(s), Single.ValueOf(s));
+                assertEquals(new Single(s + 0.1F), Single.ValueOf(s + 0.1F));
+                assertEquals(Single.ValueOf(s + 0.1F), Single.ValueOf(s + 0.1F));
                 s++;
             }
         }

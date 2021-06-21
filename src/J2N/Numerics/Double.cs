@@ -379,7 +379,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Some examples of <paramref name="s"/> are "100", "-123,456,789", "123.45e+6", "+500", "5e2", "3.1416", "600.", "-.123", and "-Infinity".
         /// </remarks>
-        /// <seealso cref="GetValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
@@ -493,7 +493,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
-        /// <seealso cref="GetValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
         public static bool TryParse([NotNullWhen(true)] string? s, out double result)
         {
             if (s == null)
@@ -890,7 +890,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="GetValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
@@ -1170,7 +1170,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="GetValueOf(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
@@ -1828,7 +1828,7 @@ namespace J2N.Numerics
         // *             can not be parsed as a double value.
         // * @see #parseDouble(String)
         // */
-        //public static Double GetValueOf(string value)
+        //public static Double ValueOf(string value)
         //{
         //    return new Double(ParseDouble(value));
         //}
@@ -1846,7 +1846,7 @@ namespace J2N.Numerics
          *             can not be parsed as a double value.
          * @see #parseDouble(String)
          */
-        public static Double GetValueOf(string value, IFormatProvider? provider)
+        public static Double ValueOf(string value, IFormatProvider? provider)
         {
             return new Double(Parse(value, provider));
         }
@@ -1863,7 +1863,7 @@ namespace J2N.Numerics
          *             can not be parsed as a double value.
          * @see #parseDouble(String)
          */
-        public static Double GetValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        public static Double ValueOf(string value, NumberStyle style, IFormatProvider? provider)
         {
             return new Double(Parse(value, style, provider));
         }
@@ -1932,7 +1932,7 @@ namespace J2N.Numerics
          * @return a {@code Double} instance containing {@code d}.
          * @since 1.5
          */
-        public static Double GetValueOf(double d)
+        public static Double ValueOf(double d)
         {
             return new Double(d);
         }
@@ -2024,6 +2024,6 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator double(Double value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Double(double value) => GetValueOf(value);
+        public static implicit operator Double(double value) => ValueOf(value);
     }
 }

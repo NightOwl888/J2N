@@ -481,18 +481,18 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Long
             // java.lang.Long.valueOf(java.lang.String)
-            assertEquals("Returned incorrect value", 100000000L, Int64.GetValueOf("100000000", J2N.Text.StringFormatter.InvariantCulture)
+            assertEquals("Returned incorrect value", 100000000L, Int64.ValueOf("100000000", J2N.Text.StringFormatter.InvariantCulture)
                     .GetInt64Value());
-            assertTrue("Returned incorrect value", Int64.GetValueOf(
+            assertTrue("Returned incorrect value", Int64.ValueOf(
                     "9223372036854775807", J2N.Text.StringFormatter.InvariantCulture).GetInt64Value() == long.MaxValue);
-            assertTrue("Returned incorrect value", Int64.GetValueOf(
+            assertTrue("Returned incorrect value", Int64.ValueOf(
                     "-9223372036854775808", J2N.Text.StringFormatter.InvariantCulture).GetInt64Value() == long.MinValue);
 
             bool exception = false;
             try
             {
                 Int64
-                        .GetValueOf("999999999999999999999999999999999999999999999999999999999999", J2N.Text.StringFormatter.InvariantCulture);
+                        .ValueOf("999999999999999999999999999999999999999999999999999999999999", J2N.Text.StringFormatter.InvariantCulture);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -505,7 +505,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.GetValueOf("9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
+                Int64.ValueOf("9223372036854775808", J2N.Text.StringFormatter.InvariantCulture);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -518,7 +518,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.GetValueOf("-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
+                Int64.ValueOf("-9223372036854775809", J2N.Text.StringFormatter.InvariantCulture);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -537,26 +537,26 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Long
             // java.lang.Long.valueOf(java.lang.String, int)
-            assertEquals("Returned incorrect value", 100000000L, Int64.GetValueOf("100000000", 10)
+            assertEquals("Returned incorrect value", 100000000L, Int64.ValueOf("100000000", 10)
                     .GetInt64Value());
-            assertEquals("Returned incorrect value from hex string", 68719476735L, Int64.GetValueOf(
+            assertEquals("Returned incorrect value from hex string", 68719476735L, Int64.ValueOf(
                     "FFFFFFFFF", 16).GetInt64Value());
             assertTrue("Returned incorrect value from octal string: "
-                    + Int64.GetValueOf("77777777777", 8).ToString(), Int64.GetValueOf(
+                    + Int64.ValueOf("77777777777", 8).ToString(), Int64.ValueOf(
                     "77777777777", 8).GetInt64Value() == 8589934591L);
-            assertTrue("Returned incorrect value", Int64.GetValueOf(
+            assertTrue("Returned incorrect value", Int64.ValueOf(
                     "9223372036854775807", 10).GetInt64Value() == long.MaxValue);
-            assertTrue("Returned incorrect value", Int64.GetValueOf(
+            assertTrue("Returned incorrect value", Int64.ValueOf(
                     "-9223372036854775808", 10).GetInt64Value() == long.MinValue);
-            assertTrue("Returned incorrect value", Int64.GetValueOf("7fffffffffffffff",
+            assertTrue("Returned incorrect value", Int64.ValueOf("7fffffffffffffff",
                     16).GetInt64Value() == long.MaxValue);
-            assertTrue("Returned incorrect value", Int64.GetValueOf(
+            assertTrue("Returned incorrect value", Int64.ValueOf(
                     "-8000000000000000", 16).GetInt64Value() == long.MinValue);
 
             bool exception = false;
             try
             {
-                Int64.GetValueOf("999999999999", 8);
+                Int64.ValueOf("999999999999", 8);
             }
             catch (FormatException e)
             {
@@ -569,7 +569,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.GetValueOf("9223372036854775808", 10);
+                Int64.ValueOf("9223372036854775808", 10);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -582,7 +582,7 @@ namespace J2N.Numerics
             exception = false;
             try
             {
-                Int64.GetValueOf("-9223372036854775809", 10);
+                Int64.ValueOf("-9223372036854775809", 10);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -598,15 +598,15 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfJ()
         {
-            assertEquals(new Int64(long.MinValue), Int64.GetValueOf(long.MinValue));
-            assertEquals(new Int64(long.MaxValue), Int64.GetValueOf(long.MaxValue));
-            assertEquals(new Int64(0), Int64.GetValueOf(0));
+            assertEquals(new Int64(long.MinValue), Int64.ValueOf(long.MinValue));
+            assertEquals(new Int64(long.MaxValue), Int64.ValueOf(long.MaxValue));
+            assertEquals(new Int64(0), Int64.ValueOf(0));
 
             long lng = -128;
             while (lng < 128)
             {
-                assertEquals(new Int64(lng), Int64.GetValueOf(lng));
-                assertSame(Int64.GetValueOf(lng), Int64.GetValueOf(lng));
+                assertEquals(new Int64(lng), Int64.ValueOf(lng));
+                assertSame(Int64.ValueOf(lng), Int64.ValueOf(lng));
                 lng++;
             }
         }
@@ -693,9 +693,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
-            assertEquals(new Int64(0), Int64.GetValueOf(0));
-            assertEquals(new Int64(1), Int64.GetValueOf(1));
-            assertEquals(new Int64(-1), Int64.GetValueOf(-1));
+            assertEquals(new Int64(0), Int64.ValueOf(0));
+            assertEquals(new Int64(1), Int64.ValueOf(1));
+            assertEquals(new Int64(-1), Int64.ValueOf(-1));
 
             Int64 fixture = new Int64(25);
             assertEquals(fixture, fixture);
@@ -733,34 +733,34 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String()
         {
-            assertEquals(new Int64(0), Int64.GetValueOf("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int64(1), Int64.GetValueOf("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int64(-1), Int64.GetValueOf("-1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(0), Int64.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(1), Int64.ValueOf("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(-1), Int64.ValueOf("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                Int64.GetValueOf("0x1", J2N.Text.StringFormatter.InvariantCulture);
+                Int64.ValueOf("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetValueOf("9.2", J2N.Text.StringFormatter.InvariantCulture);
+                Int64.ValueOf("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetValueOf("", J2N.Text.StringFormatter.InvariantCulture);
+                Int64.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                Int64.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with null string.");
             }
             catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
@@ -772,44 +772,44 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_StringJ()
         {
-            assertEquals(new Int64(0), Int64.GetValueOf("0", 10));
-            assertEquals(new Int64(1), Int64.GetValueOf("1", 10));
-            assertEquals(new Int64(-1), Int64.GetValueOf("-1", 10));
+            assertEquals(new Int64(0), Int64.ValueOf("0", 10));
+            assertEquals(new Int64(1), Int64.ValueOf("1", 10));
+            assertEquals(new Int64(-1), Int64.ValueOf("-1", 10));
 
             //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Int64.GetValueOf("1", 2).GetByteValue());
-            assertEquals(Character.Digit('F', 16), Int64.GetValueOf("F", 16).GetByteValue());
+            assertEquals(Character.Digit('1', 2), Int64.ValueOf("1", 2).GetByteValue());
+            assertEquals(Character.Digit('F', 16), Int64.ValueOf("F", 16).GetByteValue());
 
             try
             {
-                Int64.GetValueOf("0x1", 10);
+                Int64.ValueOf("0x1", 10);
                 fail("Expected NumberFormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetValueOf("9.2", 10);
+                Int64.ValueOf("9.2", 10);
                 fail("Expected NumberFormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetValueOf("", 10);
+                Int64.ValueOf("", 10);
                 fail("Expected NumberFormatException with empty string.");
             }
             catch (FormatException e) { } // J2N: .NET throws ArgumentOutOfRangeException rather than FormatException in this case, but since it is inconsistent with long.Parse() we are going with FormatException.
 
             //try
             //{
-            //    Int64.GetValueOf(null, 10);
+            //    Int64.ValueOf(null, 10);
             //    fail("Expected NumberFormatException with null string.");
             //}
             //catch (FormatException e) { }
 
             // J2N: Match .NET behavior and return 0 for a null string
-            assertEquals(0, Int64.GetValueOf(null, 10));
+            assertEquals(0, Int64.ValueOf(null, 10));
         }
 
         /**

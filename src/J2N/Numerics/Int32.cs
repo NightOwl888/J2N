@@ -144,7 +144,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    return GetValueOf(0);
+                    return ValueOf(0);
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
                 {
@@ -177,7 +177,7 @@ namespace J2N.Numerics
             // Only allow negative if it was passed as a sign in the string
             if (r < 0 && sign > 0)
                 throw new OverflowException(SR.Overflow_Int32);
-            return GetValueOf(r);
+            return ValueOf(r);
         }
 
         /// <summary>
@@ -246,7 +246,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    result = GetValueOf(0);
+                    result = ValueOf(0);
                     return true;
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
@@ -283,7 +283,7 @@ namespace J2N.Numerics
                 return false;
             }
 
-            result = GetValueOf(r);
+            result = ValueOf(r);
             return true;
         }
 
@@ -1323,7 +1323,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out int)"/>
-        /// <seealso cref="GetValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         public static int Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             return Parse(s, NumberStyle.Integer, provider);
@@ -1667,7 +1667,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out int)"/>
-        /// <seealso cref="GetValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         public static int Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -1856,7 +1856,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out int)"/>
-        /// <seealso cref="GetValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         public static int Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -2620,9 +2620,9 @@ namespace J2N.Numerics
         ////*             can not be parsed as an integer value.
         ////* @see #parseInt(String)
         ////*/
-        ////public static Int32 GetValueOf(string value)
+        ////public static Int32 ValueOf(string value)
         ////{
-        ////    return GetValueOf(Parse(value));
+        ////    return ValueOf(Parse(value));
         ////}
         ///
 
@@ -2638,9 +2638,9 @@ namespace J2N.Numerics
         *             can not be parsed as an integer value.
         * @see #parseInt(String)
         */
-        public static Int32 GetValueOf(string value, IFormatProvider? provider)
+        public static Int32 ValueOf(string value, IFormatProvider? provider)
         {
-            return GetValueOf(Parse(value, provider));
+            return ValueOf(Parse(value, provider));
         }
 
         /**
@@ -2655,9 +2655,9 @@ namespace J2N.Numerics
         *             can not be parsed as an integer value.
         * @see #parseInt(String)
         */
-        public static Int32 GetValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        public static Int32 ValueOf(string value, NumberStyle style, IFormatProvider? provider)
         {
-            return GetValueOf(Parse(value, style, provider));
+            return ValueOf(Parse(value, style, provider));
         }
 
         /**
@@ -2677,9 +2677,9 @@ namespace J2N.Numerics
          *             can not be parsed as an integer value.
          * @see #parseInt(String, int)
          */
-        public static Int32 GetValueOf(string value, int radix)
+        public static Int32 ValueOf(string value, int radix)
         {
-            return GetValueOf(Parse(value, radix));
+            return ValueOf(Parse(value, radix));
         }
 
 
@@ -2895,7 +2895,7 @@ namespace J2N.Numerics
          * @return a {@code Integer} instance containing {@code i}.
          * @since 1.5
          */
-        public static Int32 GetValueOf(int i)
+        public static Int32 ValueOf(int i)
         {
             if (i < -128 || i > 127)
             {
@@ -2933,6 +2933,6 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator int(Int32 value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Int32(int value) => GetValueOf(value);
+        public static implicit operator Int32(int value) => ValueOf(value);
     }
 }

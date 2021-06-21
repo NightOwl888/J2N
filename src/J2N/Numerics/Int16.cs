@@ -166,7 +166,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    return GetValueOf(0);
+                    return ValueOf(0);
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
                 {
@@ -201,7 +201,7 @@ namespace J2N.Numerics
             // Only allow negative if it was passed as a sign in the string
             if (r < 0 && sign > 0)
                 throw new OverflowException(SR.Overflow_Int16);
-            return GetValueOf((short)r);
+            return ValueOf((short)r);
         }
 
         /// <summary>
@@ -270,7 +270,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    result = GetValueOf(0);
+                    result = ValueOf(0);
                     return true;
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
@@ -307,7 +307,7 @@ namespace J2N.Numerics
                 return false;
             }
 
-            result = GetValueOf((short)r);
+            result = ValueOf((short)r);
             return true;
         }
 
@@ -1397,7 +1397,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out short)"/>
-        /// <seealso cref="GetValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
         public static short Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             return short.Parse(s, provider);
@@ -1740,7 +1740,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out short)"/>
-        /// <seealso cref="GetValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         public static short Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -1929,7 +1929,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out short)"/>
-        /// <seealso cref="GetValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         public static short Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -2419,9 +2419,9 @@ namespace J2N.Numerics
         // *             can not be parsed as a short value.
         // * @see #parseShort(String)
         // */
-        //public static Int16 GetValueOf(string value)
+        //public static Int16 ValueOf(string value)
         //{
-        //    return GetValueOf(Parse(value));
+        //    return ValueOf(Parse(value));
         //}
 
         /**
@@ -2436,9 +2436,9 @@ namespace J2N.Numerics
          *             can not be parsed as a short value.
          * @see #parseShort(String)
          */
-        public static Int16 GetValueOf(string value, IFormatProvider? provider)
+        public static Int16 ValueOf(string value, IFormatProvider? provider)
         {
-            return GetValueOf(Parse(value, provider));
+            return ValueOf(Parse(value, provider));
         }
 
         /**
@@ -2453,9 +2453,9 @@ namespace J2N.Numerics
          *             can not be parsed as a short value.
          * @see #parseShort(String)
          */
-        public static Int16 GetValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        public static Int16 ValueOf(string value, NumberStyle style, IFormatProvider? provider)
         {
-            return GetValueOf(Parse(value, style, provider));
+            return ValueOf(Parse(value, style, provider));
         }
 
         /**
@@ -2475,9 +2475,9 @@ namespace J2N.Numerics
          *             can not be parsed as a short value.
          * @see #parseShort(String, int)
          */
-        public static Int16 GetValueOf(string value, int radix)
+        public static Int16 ValueOf(string value, int radix)
         {
-            return GetValueOf(Parse(value, radix));
+            return ValueOf(Parse(value, radix));
         }
 
         /**
@@ -2508,7 +2508,7 @@ namespace J2N.Numerics
          * @return a {@code Short} instance containing {@code s}.
          * @since 1.5
          */
-        public static Int16 GetValueOf(short s)
+        public static Int16 ValueOf(short s)
         {
             if (s < -128 || s > 127)
             {
@@ -2542,6 +2542,6 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator short(Int16 value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Int16(short value) => GetValueOf(value);
+        public static implicit operator Int16(short value) => ValueOf(value);
     }
 }
