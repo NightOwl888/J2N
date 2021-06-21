@@ -837,44 +837,45 @@ namespace J2N.Numerics
             assertEquals(-1, new Int32(-1).GetHashCode());
         }
 
-        /**
-         * @tests java.lang.Integer#Int32(String)
-         */
-        [Test]
-        public void Test_ConstructorLjava_lang_String()
-        {
-            assertEquals(new Int32(0), new Int32("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int32(1), new Int32("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int32(-1), new Int32("-1", J2N.Text.StringFormatter.InvariantCulture));
+        // J2N: Removed this overload because all constructors have been deprecated in JDK 16
+        ///**
+        // * @tests java.lang.Integer#Int32(String)
+        // */
+        //[Test]
+        //public void Test_ConstructorLjava_lang_String()
+        //{
+        //    assertEquals(new Int32(0), new Int32("0", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(new Int32(1), new Int32("1", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(new Int32(-1), new Int32("-1", J2N.Text.StringFormatter.InvariantCulture));
 
-            try
-            {
-                new Int32("0x1", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with hex string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        new Int32("0x1", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with hex string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                new Int32("9.2", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with floating point string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        new Int32("9.2", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with floating point string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                new Int32("", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with empty string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        new Int32("", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with empty string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                new Int32(null, J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with null string.");
-            }
-            catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
-        }
+        //    try
+        //    {
+        //        new Int32(null, J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with null string.");
+        //    }
+        //    catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
+        //}
 
         /**
          * @tests java.lang.Integer#Integer

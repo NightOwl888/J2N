@@ -47,59 +47,18 @@ namespace J2N.Numerics
         // Note: This can't be set to "short.class", since *that* is
         // defined to be "java.lang.Short.TYPE";
 
-
-        ///**
-        // * Constructs a new {@code Short} from the specified string.
-        // *
-        // * @param string
-        // *            the string representation of a short value.
-        // * @throws NumberFormatException
-        // *             if {@code string} can not be decoded into a short value.
-        // * @see #parseShort(String)
-        // */
-        //public Int16(string value)
-        //    : this(Parse(value))
-        //{
-        //}
-
-        /**
-         * Constructs a new {@code Short} from the specified string.
-         *
-         * @param string
-         *            the string representation of a short value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a short value.
-         * @see #parseShort(String)
-         */
-        public Int16(string s, IFormatProvider? provider)
-            : this(Parse(s, provider))
-        {
-        }
-
-        /**
-         * Constructs a new {@code Short} from the specified string.
-         *
-         * @param string
-         *            the string representation of a short value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a short value.
-         * @see #parseShort(String)
-         */
-        public Int16(string s, NumberStyle style, IFormatProvider? provider)
-            : this(Parse(s, style, provider))
-        {
-        }
-
         /**
          * Constructs a new {@code Short} with the specified primitive short value.
          *
          * @param value
          *            the primitive short value to store in the new instance.
          */
-        public Int16(short value)
+        internal Int16(short value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;
         }
+
+        // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
         /// <inheritdoc/>
         public override byte GetByteValue()

@@ -34,52 +34,12 @@ namespace J2N.Numerics
          * @param value
          *            the primitive integer value to store in the new instance.
          */
-        public Int32(int value)
+        internal Int32(int value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;
         }
 
-        ///**
-        // * Constructs a new {@code Integer} from the specified string.
-        // * 
-        // * @param string
-        // *            the string representation of an integer value.
-        // * @throws NumberFormatException
-        // *             if {@code string} can not be decoded into an integer value.
-        // * @see #parseInt(String)
-        // */
-        //public Int32(string value)
-        //    : this(Parse(value))
-        //{
-        //}
-
-        /**
-         * Constructs a new {@code Integer} from the specified string.
-         * 
-         * @param string
-         *            the string representation of an integer value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into an integer value.
-         * @see #parseInt(String)
-         */
-        public Int32(string value, IFormatProvider? provider)
-            : this(Parse(value, provider))
-        {
-        }
-
-        /**
-         * Constructs a new {@code Integer} from the specified string.
-         * 
-         * @param string
-         *            the string representation of an integer value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into an integer value.
-         * @see #parseInt(String)
-         */
-        public Int32(string value, NumberStyle style, IFormatProvider? provider)
-            : this(Parse(value, style, provider))
-        {
-        }
+        // J2N: Removed other constructors, since they have been deprecated in JDK 16
 
         /// <inheritdoc/>
         public override byte GetByteValue()

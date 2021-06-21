@@ -623,44 +623,45 @@ namespace J2N.Numerics
             assertEquals((int)(-1L ^ ((-1L).TripleShift(32))), new Int64(-1).GetHashCode());
         }
 
-        /**
-         * @tests java.lang.Long#Int64(String)
-         */
-        [Test]
-        public void Test_ConstructorLjava_lang_String()
-        {
-            assertEquals(new Int64(0), new Int64("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int64(1), new Int64("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int64(-1), new Int64("-1", J2N.Text.StringFormatter.InvariantCulture));
+        // J2N: Removed this overload because all of the constructors are deprecated in JDK 16
+        ///**
+        // * @tests java.lang.Long#Int64(String)
+        // */
+        //[Test]
+        //public void Test_ConstructorLjava_lang_String()
+        //{
+        //    assertEquals(new Int64(0), new Int64("0", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(new Int64(1), new Int64("1", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(new Int64(-1), new Int64("-1", J2N.Text.StringFormatter.InvariantCulture));
 
-            try
-            {
-                new Int64("0x1", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected NumberFormatException with hex string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        new Int64("0x1", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected NumberFormatException with hex string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                new Int64("9.2", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected NumberFormatException with floating point string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        new Int64("9.2", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected NumberFormatException with floating point string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                new Int64("", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected NumberFormatException with empty string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        new Int64("", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected NumberFormatException with empty string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                new Int64(null, J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected NumberFormatException with null string.");
-            }
-            catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
-        }
+        //    try
+        //    {
+        //        new Int64(null, J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected NumberFormatException with null string.");
+        //    }
+        //    catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
+        //}
 
         /**
          * @tests java.lang.Long#Long

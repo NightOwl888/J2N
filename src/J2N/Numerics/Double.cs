@@ -75,52 +75,12 @@ namespace J2N.Numerics
          * @param value
          *            the primitive double value to store in the new instance.
          */
-        public Double(double value)
+        internal Double(double value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;
         }
 
-        ///**
-        // * Constructs a new {@code Double} from the specified string.
-        // * 
-        // * @param string
-        // *            the string representation of a double value.
-        // * @throws NumberFormatException
-        // *             if {@code string} can not be decoded into a double value.
-        // * @see #parseDouble(String)
-        // */
-        //public Double(string value)
-        //    : this(ParseDouble(value))
-        //{
-        //}
-
-        /**
-         * Constructs a new {@code Double} from the specified string.
-         * 
-         * @param string
-         *            the string representation of a double value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a double value.
-         * @see #parseDouble(String)
-         */
-        public Double(string value, IFormatProvider? provider)
-            : this(Parse(value, provider))
-        {
-        }
-
-        /**
-         * Constructs a new {@code Double} from the specified string.
-         * 
-         * @param string
-         *            the string representation of a double value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a double value.
-         * @see #parseDouble(String)
-         */
-        public Double(string value, NumberStyle style, IFormatProvider? provider)
-            : this(Parse(value, style, provider))
-        {
-        }
+        // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
         /**
          * Compares this object to the specified double object to determine their

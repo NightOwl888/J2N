@@ -43,52 +43,53 @@ namespace J2N.Numerics
             assertEquals(-1, (sbyte)new Byte(unchecked((byte)-1)).GetHashCode()); // J2N: cast required to change the result to negative
         }
 
-        /**
-         * @tests java.lang.Byte#Byte(String)
-         */
-        [Test]
-        public void Test_ConstructorLjava_lang_String()
-        {
-            assertEquals(new Byte((byte)0), new Byte("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Byte((byte)1), new Byte("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Byte(unchecked((byte)-1)), new Byte("-1", J2N.Text.StringFormatter.InvariantCulture));
+        // J2N: Removed this overload because all of the constructors are deprecated in JDK 16
+        ///**
+        // * @tests java.lang.Byte#Byte(String)
+        // */
+        //[Test]
+        //public void Test_ConstructorLjava_lang_String()
+        //{
+        //    assertEquals(new Byte((byte)0), new Byte("0", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(new Byte((byte)1), new Byte("1", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(new Byte(unchecked((byte)-1)), new Byte("-1", J2N.Text.StringFormatter.InvariantCulture));
 
-            try
-            {
-                new Byte("0x1", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with hex string.");
-            }
-            catch (FormatException e)
-            {
-            }
+        //    try
+        //    {
+        //        new Byte("0x1", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with hex string.");
+        //    }
+        //    catch (FormatException e)
+        //    {
+        //    }
 
-            try
-            {
-                new Byte("9.2", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with floating point string.");
-            }
-            catch (FormatException e)
-            {
-            }
+        //    try
+        //    {
+        //        new Byte("9.2", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with floating point string.");
+        //    }
+        //    catch (FormatException e)
+        //    {
+        //    }
 
-            try
-            {
-                new Byte("", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with empty string.");
-            }
-            catch (FormatException e)
-            {
-            }
+        //    try
+        //    {
+        //        new Byte("", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with empty string.");
+        //    }
+        //    catch (FormatException e)
+        //    {
+        //    }
 
-            try
-            {
-                new Byte(null, J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with null string.");
-            }
-            catch (ArgumentNullException e) // J2N: .NET throws ArgumentNullException rather than FormatException in this case
-            {
-            }
-        }
+        //    try
+        //    {
+        //        new Byte(null, J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with null string.");
+        //    }
+        //    catch (ArgumentNullException e) // J2N: .NET throws ArgumentNullException rather than FormatException in this case
+        //    {
+        //    }
+        //}
 
         /**
          * @tests java.lang.Byte#Byte(byte)
@@ -529,20 +530,21 @@ namespace J2N.Numerics
             assertTrue("Byte creation failed", b.GetByteValue() == (byte)127);
         }
 
-        /**
-         * @tests java.lang.Byte#Byte(java.lang.String)
-         */
-        [Test]
-        public void Test_ConstructorLjava_lang_String2()
-        {
-            // Test for method java.lang.Byte(java.lang.String)
+        // J2N: Removed this overload because all of the constructors are deprecated in JDK 16
+        ///**
+        // * @tests java.lang.Byte#Byte(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_ConstructorLjava_lang_String2()
+        //{
+        //    // Test for method java.lang.Byte(java.lang.String)
 
-            Byte b = new Byte("127", J2N.Text.StringFormatter.InvariantCulture);
-            Byte nb = new Byte("-128", J2N.Text.StringFormatter.InvariantCulture);
-            assertTrue("Incorrect Byte Object created", b.GetByteValue() == (byte)127
-                    && (nb.GetByteValue() == unchecked((byte)-128)));
+        //    Byte b = new Byte("127", J2N.Text.StringFormatter.InvariantCulture);
+        //    Byte nb = new Byte("-128", J2N.Text.StringFormatter.InvariantCulture);
+        //    assertTrue("Incorrect Byte Object created", b.GetByteValue() == (byte)127
+        //            && (nb.GetByteValue() == unchecked((byte)-128)));
 
-        }
+        //}
 
         /**
          * @tests java.lang.Byte#byteValue()
@@ -1234,6 +1236,8 @@ namespace J2N.Numerics
             }
 
             #endregion ParseTestCase
+
+            // Radix-based parsing
 
             #region Parse_CharSequence_Int32
 

@@ -71,63 +71,12 @@ namespace J2N.Numerics
          * @param value
          *            the primitive float value to store in the new instance.
          */
-        public Single(float value)
+        internal Single(float value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;
         }
 
-        /**
-         * Constructs a new {@code Float} with the specified primitive double value.
-         * 
-         * @param value
-         *            the primitive double value to store in the new instance.
-         */
-        public Single(double value)
-        {
-            this.value = (float)value;
-        }
-
-        ///**
-        // * Constructs a new {@code Float} from the specified string.
-        // * 
-        // * @param string
-        // *            the string representation of a float value.
-        // * @throws NumberFormatException
-        // *             if {@code string} can not be decoded into a float value.
-        // * @see #parseFloat(String)
-        // */
-        //public Single(string value)
-        //    : this(ParseSingle(value))
-        //{
-        //}
-
-        /**
-         * Constructs a new {@code Float} from the specified string.
-         * 
-         * @param string
-         *            the string representation of a float value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a float value.
-         * @see #parseFloat(String)
-         */
-        public Single(string value, IFormatProvider? provider)
-            : this(Parse(value, NumberStyle.Float, provider))
-        {
-        }
-
-        /**
-         * Constructs a new {@code Float} from the specified string.
-         * 
-         * @param string
-         *            the string representation of a float value.
-         * @throws NumberFormatException
-         *             if {@code string} can not be decoded into a float value.
-         * @see #parseFloat(String)
-         */
-        public Single(string value, NumberStyle style, IFormatProvider? provider)
-            : this(Parse(value, style, provider))
-        {
-        }
+        // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
         /**
          * Compares this object to the specified float object to determine their

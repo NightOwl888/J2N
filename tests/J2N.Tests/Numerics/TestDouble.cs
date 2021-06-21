@@ -214,14 +214,17 @@ namespace J2N.Numerics
         [Test]
         public void Test_ConstructorLjava_lang_String()
         {
-            Double d = new Double("39089.88888888888888888888888888888888", J2N.Text.StringFormatter.InvariantCulture);
+            // J2N TODO: Move the following tests to Double.Parse() in CharSequences
+
+            Double d = Double.Parse("39089.88888888888888888888888888888888", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Created incorrect double", 39089.88888888888888888888888888888888, d
                     .GetDoubleValue(), 0D);
+
 
             // Regression test for HARMONY-489
             try
             {
-                d = new Double("1E+-20", J2N.Text.StringFormatter.InvariantCulture);
+                d = Double.Parse("1E+-20", J2N.Text.StringFormatter.InvariantCulture);
                 fail("new Double(\"1E+-20\") should throw exception");
             }
             catch (FormatException e)
