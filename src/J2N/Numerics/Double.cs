@@ -609,7 +609,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(ReadOnlySpan{char}, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string?, IFormatProvider?)"/>
         public static bool TryParse(ReadOnlySpan<char> s, out double result)
         {
             return DotNetNumber.TryParseDouble(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
