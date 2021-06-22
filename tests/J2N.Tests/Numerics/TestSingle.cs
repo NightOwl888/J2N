@@ -2288,17 +2288,23 @@ namespace J2N.Numerics
                 }
             }
 
+            #region Parse_CharSequence_NumberStyle_IFormatProvider
+
             public abstract class Parse_CharSequence_NumberStyle_IFormatProvider : ParseTestCase
             {
+                protected virtual bool IsNullableType => true;
+
                 protected abstract float GetResult(string value, NumberStyle style, IFormatProvider provider);
 
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle(float expected, string value, NumberStyle style, IFormatProvider provider)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     float actual = GetResult(value, style, provider);
 
-                    string expectedString = Int32.ToHexString(BitConversion.SingleToInt32Bits(expected));
-                    string actualString = Int32.ToHexString(BitConversion.SingleToInt32Bits(actual));
+                    string expectedString = "0x" + BitConversion.SingleToInt32Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.SingleToInt32Bits(actual).ToHexString();
                     string errorMsg = $"input string is:<{value}>. "
                         + $"The expected result should be:<{expectedString}>, "
                         + $"but was: <{actualString}>. ";
@@ -2309,10 +2315,12 @@ namespace J2N.Numerics
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle(float expected, string value, NumberStyle style, IFormatProvider provider)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     float actual = GetResult(value, style, provider);
 
-                    string expectedString = Int32.ToHexString(BitConversion.SingleToInt32Bits(expected));
-                    string actualString = Int32.ToHexString(BitConversion.SingleToInt32Bits(actual));
+                    string expectedString = "0x" + BitConversion.SingleToInt32Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.SingleToInt32Bits(actual).ToHexString();
                     string errorMsg = $"input string is:<{value}>. "
                         + $"The expected result should be:<{expectedString}>, "
                         + $"but was: <{actualString}>. ";
@@ -2323,18 +2331,24 @@ namespace J2N.Numerics
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
                 }
 
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
                 }
 
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits(int expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     int rawBits;
                     float result = GetResult(value, style, provider);
                     rawBits = BitConversion.SingleToInt32Bits(result);
@@ -2350,6 +2364,274 @@ namespace J2N.Numerics
                     return Single.Parse(value, style, provider);
                 }
             }
+
+#if FEATURE_READONLYSPAN
+            public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider
+            {
+                protected override bool IsNullableType => false;
+
+                protected override float GetResult(string value, NumberStyle style, IFormatProvider provider)
+                {
+                    return Single.Parse(value.AsSpan(), style, provider);
+                }
+
+                [Test]
+                public void TestUnicodeSymbols()
+                {
+                    assertEquals(float.PositiveInfinity, GetResult("INFINITYe\u0661234", NumberStyle.Float, new NumberFormatInfo { PositiveInfinitySymbol = "Infinitye\u0661234" }));
+                    assertEquals(float.NegativeInfinity, GetResult("NEGINFINITYe\u0661234", NumberStyle.Float, new NumberFormatInfo { NegativeInfinitySymbol = "NegInfinitye\u0661234" }));
+                    assertEquals(float.NaN, GetResult("NANe\u0661234", NumberStyle.Float, new NumberFormatInfo { NaNSymbol = "NaNe\u0661234" }));
+                }
+            }
+#endif
+            #endregion Parse_CharSequence_NumberStyle_IFormatProvider
+
+            #region Parse_CharSequence_IFormatProvider
+
+            public abstract class Parse_CharSequence_IFormatProvider : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract float GetResult(string value, IFormatProvider provider);
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                public void TestParse_CharSequence_IFormatProvider_ForFloatStyle(float expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    float actual = GetResult(value, provider);
+
+                    string expectedString = "0x" + BitConversion.SingleToInt32Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.SingleToInt32Bits(actual).ToHexString();
+                    string errorMsg = $"input string is:<{value}>. "
+                        + $"The expected result should be:<{expectedString}>, "
+                        + $"but was: <{actualString}>. ";
+
+                    assertEquals(errorMsg, expected, actual, 0.0F);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    Assert.Throws(expectedExceptionType, () => GetResult(value, provider), message);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits(int expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    int rawBits;
+                    float result = GetResult(value, provider);
+                    rawBits = BitConversion.SingleToInt32Bits(result);
+                    assertEquals($"Original float({value.ToString(NumberFormatInfo.InvariantInfo)}) Converted float({result.ToString(NumberFormatInfo.InvariantInfo)}) "
+                            + $" Expecting:{expectedRawBits.ToHexString()} Got: {rawBits.ToHexString()}", expectedRawBits, rawBits);
+                }
+            }
+
+            public class Parse_String_IFormatProvider : Parse_CharSequence_IFormatProvider
+            {
+                protected override float GetResult(string value, IFormatProvider provider)
+                {
+                    return Single.Parse(value, provider);
+                }
+            }
+
+            #endregion Parse_CharSequence_IFormatProvider
+
+            #region TryParse_CharSequence_NumberStyle_IFormatProvider_Single
+
+            public abstract class TryParse_CharSequence_NumberStyle_IFormatProvider_Single_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract bool GetResult(string value, NumberStyle style, IFormatProvider provider, out float result);
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Single_ForFloatStyle(float expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    assertTrue(GetResult(value, style, provider, out float actual));
+
+                    string expectedString = "0x" + BitConversion.SingleToInt32Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.SingleToInt32Bits(actual).ToHexString();
+                    string errorMsg = $"input string is:<{value}>. "
+                        + $"The expected result should be:<{expectedString}>, "
+                        + $"but was: <{actualString}>. ";
+
+                    assertEquals(errorMsg, expected, actual, 0.0D);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Single_ForHexFloatStyle(float expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    assertTrue(GetResult(value, style, provider, out float actual));
+
+                    string expectedString = "0x" + BitConversion.SingleToInt32Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.SingleToInt32Bits(actual).ToHexString();
+                    string errorMsg = $"input string is:<{value}>. "
+                        + $"The expected result should be:<{expectedString}>, "
+                        + $"but was: <{actualString}>. ";
+
+                    assertEquals(errorMsg, expected, actual, 0.0D);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Single_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    assertFalse(message, GetResult(value, style, provider, out float actual));
+                    assertEquals(0, actual);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Single_ForHexFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    float actual = 0;
+                    if (expectedExceptionType == typeof(FormatException) || expectedExceptionType.Equals(typeof(OverflowException)))
+                    {
+                        assertFalse(message, GetResult(value, style, provider, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider, out actual), message);
+                    }
+                    assertEquals(0, actual);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Single_ForRawBits(int expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    int rawBits;
+                    assertTrue(GetResult(value, style, provider, out float result));
+                    rawBits = BitConversion.SingleToInt32Bits(result);
+                    assertEquals($"Original float({value.ToString(NumberFormatInfo.InvariantInfo)}) Converted float({result.ToString(NumberFormatInfo.InvariantInfo)}) "
+                            + $" Expecting:{expectedRawBits.ToHexString()} Got: {rawBits.ToHexString()}", expectedRawBits, rawBits);
+                }
+            }
+
+            public class TryParse_String_NumberStyle_IFormatProvider_Single : TryParse_CharSequence_NumberStyle_IFormatProvider_Single_TestCase
+            {
+                protected override bool GetResult(string value, NumberStyle style, IFormatProvider provider, out float result)
+                {
+                    return Single.TryParse(value, style, provider, out result);
+                }
+            }
+
+#if FEATURE_READONLYSPAN
+            public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_Single : TryParse_CharSequence_NumberStyle_IFormatProvider_Single_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override bool GetResult(string value, NumberStyle style, IFormatProvider provider, out float result)
+                {
+                    return Single.TryParse(value.AsSpan(), style, provider, out result);
+                }
+            }
+#endif
+
+            #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Single
+
+            #region TryParse_CharSequence_Single
+
+            public abstract class TryParse_CharSequence_Single_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract bool GetResult(string value, out float result);
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                public void TestTryParse_CharSequence_Single_ForFloatStyle(float expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+                    // NOTE: Assumption made here that this contains no culture sensitivity tests.
+                    Assume.That(NumberFormatInfo.GetInstance(provider).Equals(NumberFormatInfo.InvariantInfo), "Non-invariant tests do not apply to this overload.");
+
+                    using (var context = new CultureContext(CultureInfo.InvariantCulture))
+                    {
+                        assertTrue(GetResult(value, out float actual));
+
+                        string expectedString = "0x" + BitConversion.SingleToInt32Bits(expected).ToHexString();
+                        string actualString = "0x" + BitConversion.SingleToInt32Bits(actual).ToHexString();
+                        string errorMsg = $"input string is:<{value}>. "
+                            + $"The expected result should be:<{expectedString}>, "
+                            + $"but was: <{actualString}>. ";
+
+                        assertEquals(errorMsg, expected, actual, 0.0D);
+                    }
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                public void TestTryParse_CharSequence_Single_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+                    // NOTE: Assumption made here that this contains no culture sensitivity tests.
+                    Assume.That(NumberFormatInfo.GetInstance(provider).Equals(NumberFormatInfo.InvariantInfo), "Non-invariant tests do not apply to this overload.");
+
+                    using (var context = new CultureContext(CultureInfo.InvariantCulture))
+                    {
+
+                        assertFalse(message, GetResult(value, out float actual));
+                        assertEquals(0, actual);
+                    }
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                public void TestTryParse_CharSequence_Single_ForRawBits(int expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+                    // NOTE: Assumption made here that this contains no culture sensitivity tests.
+                    Assume.That(NumberFormatInfo.GetInstance(provider).Equals(NumberFormatInfo.InvariantInfo), "Non-invariant tests do not apply to this overload.");
+
+                    using (var context = new CultureContext(CultureInfo.InvariantCulture))
+                    {
+
+                        int rawBits;
+                        assertTrue(GetResult(value, out float result));
+                        rawBits = BitConversion.SingleToInt32Bits(result);
+                        assertEquals($"Original float({value.ToString(NumberFormatInfo.InvariantInfo)}) Converted float({result.ToString(NumberFormatInfo.InvariantInfo)}) "
+                                + $" Expecting:{expectedRawBits.ToHexString()} Got: {rawBits.ToHexString()}", expectedRawBits, rawBits);
+                    }
+                }
+            }
+
+            public class TryParse_String_Single : TryParse_CharSequence_Single_TestCase
+            {
+                protected override bool GetResult(string value, out float result)
+                {
+                    return Single.TryParse(value, out result);
+                }
+            }
+
+#if FEATURE_READONLYSPAN
+            public class TryParse_ReadOnlySpan_Single : TryParse_CharSequence_Single_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override bool GetResult(string value, out float result)
+                {
+                    return Single.TryParse(value.AsSpan(), out result);
+                }
+            }
+#endif
+
+            #endregion TryParse_CharSequence_Single
         }
     }
 }

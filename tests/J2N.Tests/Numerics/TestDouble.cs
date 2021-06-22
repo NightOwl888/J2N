@@ -1585,6 +1585,8 @@ namespace J2N.Numerics
         {
             public abstract class ParseTestCase : TestCase
             {
+                #region Static_Test_Data
+
                 /*
                  * A String, double pair
                  */
@@ -2462,6 +2464,10 @@ namespace J2N.Numerics
                     return result;
                 }
 
+                #endregion Static_Test_Data
+
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data
+
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data
                 {
                     get
@@ -2749,6 +2755,10 @@ namespace J2N.Numerics
                     }
                 }
 
+                #endregion
+
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
+
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
                 {
                     get
@@ -2781,147 +2791,151 @@ namespace J2N.Numerics
 
                         // JDK 8 (ParseHexFloatingPoint.doubleTests())
 
-                        // Hex strings that convert to three; test basic functionality
-                        // of significand and exponent shift adjusts along with the
-                        // no-op of adding leading zeros.  These cases don't exercise
-                        // the rounding code.
-                        string leadingZeros = "0x0000000000000000000";
-                        string[] threeTests = {
-                            "0x.003p12",
-                            "0x.006p11",
-                            "0x.00cp10",
-                            "0x.018p9",
+                        // J2N: These pass, but since there are so many, it causes NUnit to run super slow.
+                        // These tests should be run manually. There should be enough Harmony tests to catch
+                        // most issues.
 
-                            "0x.3p4",
-                            "0x.6p3",
-                            "0x.cp2",
-                            "0x1.8p1",
+                        //// Hex strings that convert to three; test basic functionality
+                        //// of significand and exponent shift adjusts along with the
+                        //// no-op of adding leading zeros.  These cases don't exercise
+                        //// the rounding code.
+                        //string leadingZeros = "0x0000000000000000000";
+                        //string[] threeTests = {
+                        //    "0x.003p12",
+                        //    "0x.006p11",
+                        //    "0x.00cp10",
+                        //    "0x.018p9",
 
-                            "0x3p0",
-                            "0x6.0p-1",
-                            "0xc.0p-2",
-                            "0x18.0p-3",
+                        //    "0x.3p4",
+                        //    "0x.6p3",
+                        //    "0x.cp2",
+                        //    "0x1.8p1",
 
-                            "0x3000000p-24",
-                            "0x3.0p0",
-                            "0x3.000000p0",
-                        };
+                        //    "0x3p0",
+                        //    "0x6.0p-1",
+                        //    "0xc.0p-2",
+                        //    "0x18.0p-3",
 
-                        for (int i = 0; i < threeTests.Length; i++)
-                        {
-                            string input = threeTests[i];
-                            //yield return new TestCaseData(3.0d, input, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
-                            foreach (var test in TestCases(input, 3.0d).ToArray())
-                                yield return test;
+                        //    "0x3000000p-24",
+                        //    "0x3.0p0",
+                        //    "0x3.000000p0",
+                        //};
 
-                            input = Regex.Replace(input, "^0x", leadingZeros);
-                            //yield return new TestCaseData(3.0d, input, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
-                            foreach (var test in TestCases(input, 3.0d).ToArray())
-                                yield return test;
-                        }
+                        //for (int i = 0; i < threeTests.Length; i++)
+                        //{
+                        //    string input = threeTests[i];
+                        //    //yield return new TestCaseData(3.0d, input, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        //    foreach (var test in TestCases(input, 3.0d).ToArray())
+                        //        yield return test;
 
-                        long[] bigExponents = {
-                            2 * FloatingDecimal.DoubleConsts.MAX_EXPONENT, //FloatingPointInfo.Double.MaxExponent, //DoubleConsts.MAX_EXPONENT,
-                            2 * FloatingDecimal.DoubleConsts.MIN_EXPONENT, //FloatingPointInfo.Double.MinExponent, //DoubleConsts.MIN_EXPONENT,
+                        //    input = Regex.Replace(input, "^0x", leadingZeros);
+                        //    //yield return new TestCaseData(3.0d, input, NumberStyle.Float, NumberFormatInfo.InvariantInfo);
+                        //    foreach (var test in TestCases(input, 3.0d).ToArray())
+                        //        yield return test;
+                        //}
 
-                            (long)int.MaxValue-1,
-                            (long)int.MaxValue,
-                            (long)int.MaxValue+1,
+                        //long[] bigExponents = {
+                        //    2 * FloatingDecimal.DoubleConsts.MAX_EXPONENT, //FloatingPointInfo.Double.MaxExponent, //DoubleConsts.MAX_EXPONENT,
+                        //    2 * FloatingDecimal.DoubleConsts.MIN_EXPONENT, //FloatingPointInfo.Double.MinExponent, //DoubleConsts.MIN_EXPONENT,
 
-                            (long)int.MinValue-1,
-                            (long)int.MinValue,
-                            (long)int.MinValue+1,
+                        //    (long)int.MaxValue-1,
+                        //    (long)int.MaxValue,
+                        //    (long)int.MaxValue+1,
 
-                            long.MaxValue-1,
-                            long.MaxValue,
+                        //    (long)int.MinValue-1,
+                        //    (long)int.MinValue,
+                        //    (long)int.MinValue+1,
 
-                            long.MinValue+1,
-                            long.MinValue,
-                        };
+                        //    long.MaxValue-1,
+                        //    long.MaxValue,
 
-                        // Test zero significand with large exponents.
-                        for (int i = 0; i < bigExponents.Length; i++)
-                        {
-                            foreach (var test in TestCases("0x0.0p" + Convert.ToString(bigExponents[i], 10), 0.0d).ToArray())
-                                yield return test;
-                        }
+                        //    long.MinValue+1,
+                        //    long.MinValue,
+                        //};
 
-                        // Test nonzero significand with large exponents.
-                        for (int i = 0; i < bigExponents.Length; i++)
-                        {
-                            long exponent = bigExponents[i];
-                            foreach (var test in TestCases("0x10000.0p" + Convert.ToString(exponent, 10), exponent < 0 ? 0.0d : double.PositiveInfinity).ToArray())
-                                yield return test;
-                        }
+                        //// Test zero significand with large exponents.
+                        //for (int i = 0; i < bigExponents.Length; i++)
+                        //{
+                        //    foreach (var test in TestCases("0x0.0p" + Convert.ToString(bigExponents[i], 10), 0.0d).ToArray())
+                        //        yield return test;
+                        //}
 
-                        // Test significands with different lengths and bit patterns.
-                        {
-                            long signif = 0;
-                            for (int i = 1; i <= 0xe; i++)
-                            {
-                                signif = (signif << 4) | (long)i;
-                                foreach (var test in TestCases("0x" + signif.ToHexString() + "p0", signif).ToArray())
-                                    yield return test;
-                            }
-                        }
+                        //// Test nonzero significand with large exponents.
+                        //for (int i = 0; i < bigExponents.Length; i++)
+                        //{
+                        //    long exponent = bigExponents[i];
+                        //    foreach (var test in TestCases("0x10000.0p" + Convert.ToString(exponent, 10), exponent < 0 ? 0.0d : double.PositiveInfinity).ToArray())
+                        //        yield return test;
+                        //}
 
-                        PairSD[] testCases = {
-                            new PairSD("0x0.0p0",               0.0/16.0),
-                            new PairSD("0x0.1p0",               1.0/16.0),
-                            new PairSD("0x0.2p0",               2.0/16.0),
-                            new PairSD("0x0.3p0",               3.0/16.0),
-                            new PairSD("0x0.4p0",               4.0/16.0),
-                            new PairSD("0x0.5p0",               5.0/16.0),
-                            new PairSD("0x0.6p0",               6.0/16.0),
-                            new PairSD("0x0.7p0",               7.0/16.0),
-                            new PairSD("0x0.8p0",               8.0/16.0),
-                            new PairSD("0x0.9p0",               9.0/16.0),
-                            new PairSD("0x0.ap0",               10.0/16.0),
-                            new PairSD("0x0.bp0",               11.0/16.0),
-                            new PairSD("0x0.cp0",               12.0/16.0),
-                            new PairSD("0x0.dp0",               13.0/16.0),
-                            new PairSD("0x0.ep0",               14.0/16.0),
-                            new PairSD("0x0.fp0",               15.0/16.0),
+                        //// Test significands with different lengths and bit patterns.
+                        //{
+                        //    long signif = 0;
+                        //    for (int i = 1; i <= 0xe; i++)
+                        //    {
+                        //        signif = (signif << 4) | (long)i;
+                        //        foreach (var test in TestCases("0x" + signif.ToHexString() + "p0", signif).ToArray())
+                        //            yield return test;
+                        //    }
+                        //}
 
-                            // Half-way case between zero and MIN_VALUE rounds down to
-                            // zero
-                            new PairSD("0x1.0p-1075",           0.0),
+                        //PairSD[] testCases = {
+                        //    new PairSD("0x0.0p0",               0.0/16.0),
+                        //    new PairSD("0x0.1p0",               1.0/16.0),
+                        //    new PairSD("0x0.2p0",               2.0/16.0),
+                        //    new PairSD("0x0.3p0",               3.0/16.0),
+                        //    new PairSD("0x0.4p0",               4.0/16.0),
+                        //    new PairSD("0x0.5p0",               5.0/16.0),
+                        //    new PairSD("0x0.6p0",               6.0/16.0),
+                        //    new PairSD("0x0.7p0",               7.0/16.0),
+                        //    new PairSD("0x0.8p0",               8.0/16.0),
+                        //    new PairSD("0x0.9p0",               9.0/16.0),
+                        //    new PairSD("0x0.ap0",               10.0/16.0),
+                        //    new PairSD("0x0.bp0",               11.0/16.0),
+                        //    new PairSD("0x0.cp0",               12.0/16.0),
+                        //    new PairSD("0x0.dp0",               13.0/16.0),
+                        //    new PairSD("0x0.ep0",               14.0/16.0),
+                        //    new PairSD("0x0.fp0",               15.0/16.0),
 
-                            // Slighly more than half-way case between zero and
-                            // MIN_VALUES rounds up to zero.
-                            new PairSD("0x1.1p-1075",                   double.Epsilon),
-                            new PairSD("0x1.000000000001p-1075",        double.Epsilon),
-                            new PairSD("0x1.000000000000001p-1075",     double.Epsilon),
+                        //    // Half-way case between zero and MIN_VALUE rounds down to
+                        //    // zero
+                        //    new PairSD("0x1.0p-1075",           0.0),
 
-                            // More subnormal rounding tests
-                            new PairSD("0x0.fffffffffffff7fffffp-1022", MathExtensions.NextDown(FloatingDecimal.DoubleConsts.MIN_NORMAL)),
-                            new PairSD("0x0.fffffffffffff8p-1022",      FloatingDecimal.DoubleConsts.MIN_NORMAL),
-                            new PairSD("0x0.fffffffffffff800000001p-1022",FloatingDecimal.DoubleConsts.MIN_NORMAL),
-                            new PairSD("0x0.fffffffffffff80000000000000001p-1022",FloatingDecimal.DoubleConsts.MIN_NORMAL),
-                            new PairSD("0x1.0p-1022",                   FloatingDecimal.DoubleConsts.MIN_NORMAL),
+                        //    // Slighly more than half-way case between zero and
+                        //    // MIN_VALUES rounds up to zero.
+                        //    new PairSD("0x1.1p-1075",                   double.Epsilon),
+                        //    new PairSD("0x1.000000000001p-1075",        double.Epsilon),
+                        //    new PairSD("0x1.000000000000001p-1075",     double.Epsilon),
+
+                        //    // More subnormal rounding tests
+                        //    new PairSD("0x0.fffffffffffff7fffffp-1022", MathExtensions.NextDown(FloatingDecimal.DoubleConsts.MIN_NORMAL)),
+                        //    new PairSD("0x0.fffffffffffff8p-1022",      FloatingDecimal.DoubleConsts.MIN_NORMAL),
+                        //    new PairSD("0x0.fffffffffffff800000001p-1022",FloatingDecimal.DoubleConsts.MIN_NORMAL),
+                        //    new PairSD("0x0.fffffffffffff80000000000000001p-1022",FloatingDecimal.DoubleConsts.MIN_NORMAL),
+                        //    new PairSD("0x1.0p-1022",                   FloatingDecimal.DoubleConsts.MIN_NORMAL),
 
 
-                            // Large value and overflow rounding tests
-                            new PairSD("0x1.fffffffffffffp1023",        double.MaxValue),
-                            new PairSD("0x1.fffffffffffff0000000p1023", double.MaxValue),
-                            new PairSD("0x1.fffffffffffff4p1023",       double.MaxValue),
-                            new PairSD("0x1.fffffffffffff7fffffp1023",  double.MaxValue),
-                            new PairSD("0x1.fffffffffffff8p1023",       double.PositiveInfinity),
-                            new PairSD("0x1.fffffffffffff8000001p1023", double.PositiveInfinity),
+                        //    // Large value and overflow rounding tests
+                        //    new PairSD("0x1.fffffffffffffp1023",        double.MaxValue),
+                        //    new PairSD("0x1.fffffffffffff0000000p1023", double.MaxValue),
+                        //    new PairSD("0x1.fffffffffffff4p1023",       double.MaxValue),
+                        //    new PairSD("0x1.fffffffffffff7fffffp1023",  double.MaxValue),
+                        //    new PairSD("0x1.fffffffffffff8p1023",       double.PositiveInfinity),
+                        //    new PairSD("0x1.fffffffffffff8000001p1023", double.PositiveInfinity),
 
-                            new PairSD("0x1.ffffffffffffep1023",        MathExtensions.NextDown(double.MaxValue)),
-                            new PairSD("0x1.ffffffffffffe0000p1023",    MathExtensions.NextDown(double.MaxValue)),
-                            new PairSD("0x1.ffffffffffffe8p1023",       MathExtensions.NextDown(double.MaxValue)),
-                            new PairSD("0x1.ffffffffffffe7p1023",       MathExtensions.NextDown(double.MaxValue)),
-                            new PairSD("0x1.ffffffffffffeffffffp1023",  double.MaxValue),
-                            new PairSD("0x1.ffffffffffffe8000001p1023", double.MaxValue),
-                        };
+                        //    new PairSD("0x1.ffffffffffffep1023",        MathExtensions.NextDown(double.MaxValue)),
+                        //    new PairSD("0x1.ffffffffffffe0000p1023",    MathExtensions.NextDown(double.MaxValue)),
+                        //    new PairSD("0x1.ffffffffffffe8p1023",       MathExtensions.NextDown(double.MaxValue)),
+                        //    new PairSD("0x1.ffffffffffffe7p1023",       MathExtensions.NextDown(double.MaxValue)),
+                        //    new PairSD("0x1.ffffffffffffeffffffp1023",  double.MaxValue),
+                        //    new PairSD("0x1.ffffffffffffe8000001p1023", double.MaxValue),
+                        //};
 
-                        for (int i = 0; i < testCases.Length; i++)
-                        {
-                            foreach (var test in TestCases(testCases[i].s, testCases[i].d).ToArray())
-                                yield return test;
-                        }
+                        //for (int i = 0; i < testCases.Length; i++)
+                        //{
+                        //    foreach (var test in TestCases(testCases[i].s, testCases[i].d).ToArray())
+                        //        yield return test;
+                        //}
 
 
                         // Harmony (Test_parseDouble_LString_FromHexString())
@@ -3337,6 +3351,10 @@ namespace J2N.Numerics
                     }
                 }
 
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
+
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
+
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
                 {
                     get
@@ -3389,6 +3407,10 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(FormatException), "1.)", NumberStyle.Float | NumberStyle.AllowParentheses | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo, "Not a complete set of parentheses.");
                     }
                 }
+
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
+
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
                 {
@@ -3459,6 +3481,10 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(ArgumentException), "(0x1.)", NumberStyle.HexFloat | NumberStyle.AllowParentheses, NumberFormatInfo.InvariantInfo, "NumberStyle.HexFloat doesn't allow parentheses.");
                     }
                 }
+
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
+
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
                 {
@@ -3582,15 +3608,23 @@ namespace J2N.Numerics
                             "-0.0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000055595409854908458349204328908234982349050934129878452378432452458968024357823490509341298784523784324524589680243578234905093412987845237843245245896802435782349050934129878452378432452458968024357868024357823490509341298784523784324524589680243578234905093412987845237843245245896802435786802435782349050934129878452378432452458968024357823490509341298784523784324524589680243578", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
                     }
                 }
+
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
             }
 
-            public abstract class Parse_CharSequence_NumberStyle_IFormatProvider : ParseTestCase
+            #region Parse_CharSequence_NumberStyle_IFormatProvider
+
+            public abstract class Parse_CharSequence_NumberStyle_IFormatProvider_TestCase : ParseTestCase
             {
+                protected virtual bool IsNullableType => true;
+
                 protected abstract double GetResult(string value, NumberStyle style, IFormatProvider provider);
 
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     double actual = GetResult(value, style, provider);
 
                     string expectedString = "0x" + BitConversion.DoubleToInt64Bits(expected).ToHexString();
@@ -3605,6 +3639,8 @@ namespace J2N.Numerics
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     double actual = GetResult(value, style, provider);
 
                     string expectedString = "0x" + BitConversion.DoubleToInt64Bits(expected).ToHexString();
@@ -3619,18 +3655,24 @@ namespace J2N.Numerics
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
                 }
 
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
                 }
 
                 [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     long rawBits;
                     string convertedString;
                     double result = GetResult(value, style, provider);
@@ -3643,13 +3685,295 @@ namespace J2N.Numerics
                 }
             }
 
-            public class Parse_String_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider
+            public class Parse_String_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override double GetResult(string value, NumberStyle style, IFormatProvider provider)
                 {
                     return Double.Parse(value, style, provider);
                 }
             }
+
+#if FEATURE_READONLYSPAN
+            public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override double GetResult(string value, NumberStyle style, IFormatProvider provider)
+                {
+                    return Double.Parse(value.AsSpan(), style, provider);
+                }
+
+                [Test]
+                public void TestUnicodeSymbols()
+                {
+                    assertEquals(double.PositiveInfinity, GetResult("INFINITYe\u0661234", NumberStyle.Float, new NumberFormatInfo { PositiveInfinitySymbol = "Infinitye\u0661234" }));
+                    assertEquals(double.NegativeInfinity, GetResult("NEGINFINITYe\u0661234", NumberStyle.Float, new NumberFormatInfo { NegativeInfinitySymbol = "NegInfinitye\u0661234" }));
+                    assertEquals(double.NaN, GetResult("NANe\u0661234", NumberStyle.Float, new NumberFormatInfo { NaNSymbol = "NaNe\u0661234" }));
+                }
+            }
+#endif
+
+            #endregion
+
+            #region Parse_CharSequence_IFormatProvider
+
+            public abstract class Parse_CharSequence_IFormatProvider_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract double GetResult(string value, NumberStyle style, IFormatProvider provider);
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                public void TestParse_CharSequence_IFormatProvider_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    double actual = GetResult(value, style, provider);
+
+                    string expectedString = "0x" + BitConversion.DoubleToInt64Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.DoubleToInt64Bits(actual).ToHexString();
+                    string errorMsg = $"input string is:<{value}>. "
+                        + $"The expected result should be:<{expectedString}>, "
+                        + $"but was: <{actualString}>. ";
+
+                    assertEquals(errorMsg, expected, actual, 0.0D);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                public void TestParse_CharSequence_IFormatProvider_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                public void TestParse_CharSequence_IFormatProvider_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    long rawBits;
+                    string convertedString;
+                    double result = GetResult(value, style, provider);
+                    rawBits = BitConversion.DoubleToInt64Bits(result);
+                    convertedString = Double.ValueOf(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
+
+                    assertEquals(expectedRawBits, rawBits);
+                    assertEquals(expectedString.ToLower(Locale_US), convertedString
+                            .ToLower(Locale_US));
+                }
+            }
+
+            public class Parse_String_IFormatProvider : Parse_CharSequence_IFormatProvider_TestCase
+            {
+                protected override double GetResult(string value, NumberStyle style, IFormatProvider provider)
+                {
+                    return Double.Parse(value, provider);
+                }
+            }
+
+            #endregion
+
+            #region TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+
+            public abstract class TryParse_CharSequence_NumberStyle_IFormatProvider_Double_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract bool GetResult(string value, NumberStyle style, IFormatProvider provider, out double result);
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    assertTrue(GetResult(value, style, provider, out double actual));
+
+                    string expectedString = "0x" + BitConversion.DoubleToInt64Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.DoubleToInt64Bits(actual).ToHexString();
+                    string errorMsg = $"input string is:<{value}>. "
+                        + $"The expected result should be:<{expectedString}>, "
+                        + $"but was: <{actualString}>. ";
+
+                    assertEquals(errorMsg, expected, actual, 0.0D);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForHexFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    assertTrue(GetResult(value, style, provider, out double actual));
+
+                    string expectedString = "0x" + BitConversion.DoubleToInt64Bits(expected).ToHexString();
+                    string actualString = "0x" + BitConversion.DoubleToInt64Bits(actual).ToHexString();
+                    string errorMsg = $"input string is:<{value}>. "
+                        + $"The expected result should be:<{expectedString}>, "
+                        + $"but was: <{actualString}>. ";
+
+                    assertEquals(errorMsg, expected, actual, 0.0D);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    assertFalse(message, GetResult(value, style, provider, out double actual));
+                    assertEquals(0, actual);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    double actual = 0;
+                    if (expectedExceptionType == typeof(FormatException) || expectedExceptionType.Equals(typeof(OverflowException)))
+                    {
+                        assertFalse(message, GetResult(value, style, provider, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider, out actual), message);
+                    }
+                    assertEquals(0, actual);
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    long rawBits;
+                    string convertedString;
+                    assertTrue(GetResult(value, style, provider, out double result));
+                    rawBits = BitConversion.DoubleToInt64Bits(result);
+                    convertedString = Double.ValueOf(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
+
+                    assertEquals(expectedRawBits, rawBits);
+                    assertEquals(expectedString.ToLower(Locale_US), convertedString
+                            .ToLower(Locale_US));
+                }
+            }
+
+            public class TryParse_String_NumberStyle_IFormatProvider_Double : TryParse_CharSequence_NumberStyle_IFormatProvider_Double_TestCase
+            {
+                protected override bool GetResult(string value, NumberStyle style, IFormatProvider provider, out double result)
+                {
+                    return Double.TryParse(value, style, provider, out result);
+                }
+            }
+
+#if FEATURE_READONLYSPAN
+            public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_Double : TryParse_CharSequence_NumberStyle_IFormatProvider_Double_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override bool GetResult(string value, NumberStyle style, IFormatProvider provider, out double result)
+                {
+                    return Double.TryParse(value.AsSpan(), style, provider, out result);
+                }
+            }
+#endif
+
+            #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+
+            #region TryParse_CharSequence_Double
+
+            public abstract class TryParse_CharSequence_Double_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract bool GetResult(string value, out double result);
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                public void TestTryParse_CharSequence_Double_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+                    // NOTE: Assumption made here that this contains no culture sensitivity tests.
+                    Assume.That(NumberFormatInfo.GetInstance(provider).Equals(NumberFormatInfo.InvariantInfo), "Non-invariant tests do not apply to this overload.");
+
+                    using (var context = new CultureContext(CultureInfo.InvariantCulture))
+                    {
+                        assertTrue(GetResult(value, out double actual));
+
+                        string expectedString = "0x" + BitConversion.DoubleToInt64Bits(expected).ToHexString();
+                        string actualString = "0x" + BitConversion.DoubleToInt64Bits(actual).ToHexString();
+                        string errorMsg = $"input string is:<{value}>. "
+                            + $"The expected result should be:<{expectedString}>, "
+                            + $"but was: <{actualString}>. ";
+
+                        assertEquals(errorMsg, expected, actual, 0.0D);
+                    }
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                public void TestTryParse_CharSequence_Double_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+                    // NOTE: Assumption made here that this contains no culture sensitivity tests.
+                    Assume.That(NumberFormatInfo.GetInstance(provider).Equals(NumberFormatInfo.InvariantInfo), "Non-invariant tests do not apply to this overload.");
+
+                    using (var context = new CultureContext(CultureInfo.InvariantCulture))
+                    {
+
+                        assertFalse(message, GetResult(value, out double actual));
+                        assertEquals(0, actual);
+                    }
+                }
+
+                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                public void TestTryParse_CharSequence_Double_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~(NumberStyle.Float | NumberStyle.AllowThousands)) == 0, "Custom NumberStyles are not supported on this overload.");
+                    // NOTE: Assumption made here that this contains no culture sensitivity tests.
+                    Assume.That(NumberFormatInfo.GetInstance(provider).Equals(NumberFormatInfo.InvariantInfo), "Non-invariant tests do not apply to this overload.");
+
+                    using (var context = new CultureContext(CultureInfo.InvariantCulture))
+                    {
+
+                        long rawBits;
+                        string convertedString;
+                        assertTrue(GetResult(value, out double result));
+                        rawBits = BitConversion.DoubleToInt64Bits(result);
+                        convertedString = Double.ValueOf(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
+
+                        assertEquals(expectedRawBits, rawBits);
+                        assertEquals(expectedString.ToLower(Locale_US), convertedString
+                                .ToLower(Locale_US));
+                    }
+                }
+            }
+
+            public class TryParse_String_Double : TryParse_CharSequence_Double_TestCase
+            {
+                protected override bool GetResult(string value, out double result)
+                {
+                    return Double.TryParse(value, out result);
+                }
+            }
+
+#if FEATURE_READONLYSPAN
+            public class TryParse_ReadOnlySpan_Double : TryParse_CharSequence_Double_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override bool GetResult(string value, out double result)
+                {
+                    return Double.TryParse(value.AsSpan(), out result);
+                }
+            }
+#endif
+
+            #endregion TryParse_CharSequence_Double
+
         }
     }
 }
