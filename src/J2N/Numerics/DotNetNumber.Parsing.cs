@@ -2978,7 +2978,7 @@ namespace J2N.Numerics
                 return false;
             if (value.Length == 0)  // span.Length == value.Length == 0
                 return true;
-            return EqualsIgnoreCase(ref MemoryMarshal.GetReference(span), ref MemoryMarshal.GetReference(value), span.Length);
+            return EqualsIgnoreCase(ref MemoryMarshal.GetReference(span), span, ref MemoryMarshal.GetReference(value), value, span.Length);
         }
 #endif
 
@@ -2986,7 +2986,7 @@ namespace J2N.Numerics
 
 #if FEATURE_READONLYSPAN
         // From Ordinal class in .NET Runtime
-        internal static bool EqualsIgnoreCase(ref char charA, ref char charB, int length)
+        internal static unsafe bool EqualsIgnoreCase(ref char charA, ReadOnlySpan<char> spanA, ref char charB, ReadOnlySpan<char> spanB, int length)
         {
             IntPtr byteOffset = IntPtr.Zero;
 
@@ -3033,8 +3033,7 @@ namespace J2N.Numerics
 
                 if (!/*Utf16Utility.*/AllCharsInUInt32AreAscii(valueA | valueB))
                 {
-                    //goto NonAscii; // one of the inputs contains non-ASCII data
-                    throw new NotSupportedException("Only ASCII characters are supported."); // J2N: Since we only use for float/double parsing, we don't need to support non-ascii here. But maybe, someday if this is made into a Span comparer.
+                    goto NonAscii; // one of the inputs contains non-ASCII data
                 }
 
                 // Generally, the caller has likely performed a first-pass check that the input strings
@@ -3062,8 +3061,7 @@ namespace J2N.Numerics
 
                 if ((valueA | valueB) > 0x7Fu)
                 {
-                    //goto NonAscii; // one of the inputs contains non-ASCII data
-                    throw new NotSupportedException("Only ASCII characters are supported."); // J2N: Since we only use for float/double parsing, we don't need to support non-ascii here. But maybe, someday if this is made into a Span comparer.
+                    goto NonAscii; // one of the inputs contains non-ASCII data
                 }
 
                 if (valueA == valueB)
@@ -3085,10 +3083,17 @@ namespace J2N.Numerics
             Debug.Assert(length == 0);
             return true;
 
-        //NonAscii:
-        //    // The non-ASCII case is factored out into its own helper method so that the JIT
-        //    // doesn't need to emit a complex prolog for its caller (this method).
-        //    return CompareStringIgnoreCase(ref Unsafe.AddByteOffset(ref charA, byteOffset), length, ref Unsafe.AddByteOffset(ref charB, byteOffset), length) == 0;
+        NonAscii:
+            // The non-ASCII case is factored out into its own helper method so that the JIT
+            // doesn't need to emit a complex prolog for its caller (this method).
+            //return CompareStringIgnoreCase(ref Unsafe.AddByteOffset(ref charA, byteOffset), length, ref Unsafe.AddByteOffset(ref charB, byteOffset), length) == 0;
+
+            // J2N TODO: There is probably a way to get the substring from knowing the ref of the char, the byteOffset, and its length, which
+            // would both be more optimal and eliminate the need to pass the ReadOnlySpan<char> values into this method. But it would be better
+            // if we could stay at a low level and make the comparison without converting to string. In CompareStringIgnoreCase there are calls directly into
+            // NLS or ICU resources, but need to investigate how to deal with this further.
+            int startIndex = byteOffset.ToInt32() / 2; // Convert number of bytes to number of chars
+            return StringComparer.OrdinalIgnoreCase.Equals(spanA.Slice(startIndex, length).ToString(), spanB.Slice(startIndex, length).ToString());
         }
 #endif
 
