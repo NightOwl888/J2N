@@ -3620,7 +3620,7 @@ namespace J2N.Numerics
 
                 protected abstract double GetResult(string value, NumberStyle style, IFormatProvider provider);
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3636,7 +3636,7 @@ namespace J2N.Numerics
                     assertEquals(errorMsg, expected, actual, 0.0D);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3652,7 +3652,7 @@ namespace J2N.Numerics
                     assertEquals(errorMsg, expected, actual, 0.0D);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3660,7 +3660,7 @@ namespace J2N.Numerics
                     Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3668,7 +3668,7 @@ namespace J2N.Numerics
                     Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
                 public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3723,7 +3723,7 @@ namespace J2N.Numerics
 
                 protected abstract double GetResult(string value, NumberStyle style, IFormatProvider provider);
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
                 public void TestParse_CharSequence_IFormatProvider_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3740,7 +3740,7 @@ namespace J2N.Numerics
                     assertEquals(errorMsg, expected, actual, 0.0D);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
                 public void TestParse_CharSequence_IFormatProvider_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3749,7 +3749,7 @@ namespace J2N.Numerics
                     Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider), message);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
                 public void TestParse_CharSequence_IFormatProvider_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3785,7 +3785,7 @@ namespace J2N.Numerics
 
                 protected abstract bool GetResult(string value, NumberStyle style, IFormatProvider provider, out double result);
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
                 public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3801,7 +3801,7 @@ namespace J2N.Numerics
                     assertEquals(errorMsg, expected, actual, 0.0D);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data")]
                 public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForHexFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3817,7 +3817,7 @@ namespace J2N.Numerics
                     assertEquals(errorMsg, expected, actual, 0.0D);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
                 public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3826,7 +3826,7 @@ namespace J2N.Numerics
                     assertEquals(0, actual);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data")]
                 public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3843,7 +3843,7 @@ namespace J2N.Numerics
                     assertEquals(0, actual);
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
                 public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_Double_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3890,7 +3890,7 @@ namespace J2N.Numerics
 
                 protected abstract bool GetResult(string value, out double result);
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data")]
                 public void TestTryParse_CharSequence_Double_ForFloatStyle(double expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3912,7 +3912,7 @@ namespace J2N.Numerics
                     }
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data")]
                 public void TestTryParse_CharSequence_Double_ForFloatStyleException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider, string message)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -3928,7 +3928,7 @@ namespace J2N.Numerics
                     }
                 }
 
-                [TestCaseSource("TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data")]
                 public void TestTryParse_CharSequence_Double_ForRawBits(long expectedRawBits, string expectedString, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");

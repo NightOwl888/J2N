@@ -1,4 +1,5 @@
-﻿using J2N.Text;
+﻿using J2N.Globalization;
+using J2N.Text;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -354,58 +355,59 @@ namespace J2N.Numerics
             assertEquals("Returned incorrect long value", 8900L, i.GetInt64Value());
         }
 
-        /**
-         * @tests java.lang.Integer#parseInt(java.lang.String)
-         */
-        [Test]
-        public void Test_parseIntLjava_lang_String2()
-        {
-            // Test for method int java.lang.Integer.parseInt(java.lang.String)
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Integer#parseInt(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseIntLjava_lang_String2()
+        //{
+        //    // Test for method int java.lang.Integer.parseInt(java.lang.String)
 
-            int i = Int32.Parse("-8900", J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Returned incorrect int", -8900, i);
-            assertEquals("Returned incorrect value for 0", 0, Int32.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertTrue("Returned incorrect value for most negative value", Int32
-                    .Parse("-2147483648", J2N.Text.StringFormatter.InvariantCulture) == unchecked((int)0x80000000));
-            assertTrue("Returned incorrect value for most positive value", Int32
-                    .Parse("2147483647", J2N.Text.StringFormatter.InvariantCulture) == 0x7fffffff);
+        //    int i = Int32.Parse("-8900", J2N.Text.StringFormatter.InvariantCulture);
+        //    assertEquals("Returned incorrect int", -8900, i);
+        //    assertEquals("Returned incorrect value for 0", 0, Int32.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertTrue("Returned incorrect value for most negative value", Int32
+        //            .Parse("-2147483648", J2N.Text.StringFormatter.InvariantCulture) == unchecked((int)0x80000000));
+        //    assertTrue("Returned incorrect value for most positive value", Int32
+        //            .Parse("2147483647", J2N.Text.StringFormatter.InvariantCulture) == 0x7fffffff);
 
-            bool exception = false;
-            try
-            {
-                Int32.Parse("999999999999", J2N.Text.StringFormatter.InvariantCulture);
-            }
-            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
-            {
-                // Correct
-                exception = true;
-            }
-            assertTrue("Failed to throw exception for value > int", exception);
+        //    bool exception = false;
+        //    try
+        //    {
+        //        Int32.Parse("999999999999", J2N.Text.StringFormatter.InvariantCulture);
+        //    }
+        //    catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+        //    {
+        //        // Correct
+        //        exception = true;
+        //    }
+        //    assertTrue("Failed to throw exception for value > int", exception);
 
-            exception = false;
-            try
-            {
-                Int32.Parse("2147483648", J2N.Text.StringFormatter.InvariantCulture);
-            }
-            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
-            {
-                // Correct
-                exception = true;
-            }
-            assertTrue("Failed to throw exception for MAX_VALUE + 1", exception);
+        //    exception = false;
+        //    try
+        //    {
+        //        Int32.Parse("2147483648", J2N.Text.StringFormatter.InvariantCulture);
+        //    }
+        //    catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+        //    {
+        //        // Correct
+        //        exception = true;
+        //    }
+        //    assertTrue("Failed to throw exception for MAX_VALUE + 1", exception);
 
-            exception = false;
-            try
-            {
-                Int32.Parse("-2147483649", J2N.Text.StringFormatter.InvariantCulture);
-            }
-            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
-            {
-                // Correct
-                exception = true;
-            }
-            assertTrue("Failed to throw exception for MIN_VALUE - 1", exception);
-        }
+        //    exception = false;
+        //    try
+        //    {
+        //        Int32.Parse("-2147483649", J2N.Text.StringFormatter.InvariantCulture);
+        //    }
+        //    catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+        //    {
+        //        // Correct
+        //        exception = true;
+        //    }
+        //    assertTrue("Failed to throw exception for MIN_VALUE - 1", exception);
+        //}
 
         // J2N: Moved to CharSequences
         ///**
@@ -983,90 +985,92 @@ namespace J2N.Numerics
             catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
         }
 
-        /**
-         * @tests java.lang.Integer#valueOf(String,int)
-         */
-        [Test]
-        public void Test_valueOfLjava_lang_StringI()
-        {
-            assertEquals(new Int32(0), Int32.ValueOf("0", 10));
-            assertEquals(new Int32(1), Int32.ValueOf("1", 10));
-            assertEquals(new Int32(-1), Int32.ValueOf("-1", 10));
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Integer#valueOf(String,int)
+        // */
+        //[Test]
+        //public void Test_valueOfLjava_lang_StringI()
+        //{
+        //    assertEquals(new Int32(0), Int32.ValueOf("0", 10));
+        //    assertEquals(new Int32(1), Int32.ValueOf("1", 10));
+        //    assertEquals(new Int32(-1), Int32.ValueOf("-1", 10));
 
-            //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Int32.ValueOf("1", 2).GetByteValue());
-            assertEquals(Character.Digit('F', 16), Int32.ValueOf("F", 16).GetByteValue());
+        //    //must be consistent with Character.digit()
+        //    assertEquals(Character.Digit('1', 2), Int32.ValueOf("1", 2).GetByteValue());
+        //    assertEquals(Character.Digit('F', 16), Int32.ValueOf("F", 16).GetByteValue());
 
-            try
-            {
-                Int32.ValueOf("0x1", 10);
-                fail("Expected FormatException with hex string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        Int32.ValueOf("0x1", 10);
+        //        fail("Expected FormatException with hex string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                Int32.ValueOf("9.2", 10);
-                fail("Expected FormatException with floating point string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        Int32.ValueOf("9.2", 10);
+        //        fail("Expected FormatException with floating point string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                Int32.ValueOf("", 10);
-                fail("Expected FormatException with empty string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        Int32.ValueOf("", 10);
+        //        fail("Expected FormatException with empty string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            //try
-            //{
-            //    Int32.ValueOf(null, 10);
-            //    fail("Expected FormatException with null string.");
-            //}
-            //catch (FormatException e) { }
+        //    //try
+        //    //{
+        //    //    Int32.ValueOf(null, 10);
+        //    //    fail("Expected FormatException with null string.");
+        //    //}
+        //    //catch (FormatException e) { }
 
-            // J2N: Match .NET behavior and return 0 for a null string
-            assertEquals(0, Int32.ValueOf(null, 10));
-        }
+        //    // J2N: Match .NET behavior and return 0 for a null string
+        //    assertEquals(0, Int32.ValueOf(null, 10));
+        //}
 
-        /**
-         * @tests java.lang.Integer#parseInt(String)
-         */
-        [Test]
-        public void Test_parseIntLjava_lang_String()
-        {
-            assertEquals(0, Int32.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(1, Int32.Parse("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(-1, Int32.Parse("-1", J2N.Text.StringFormatter.InvariantCulture));
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Integer#parseInt(String)
+        // */
+        //[Test]
+        //public void Test_parseIntLjava_lang_String()
+        //{
+        //    assertEquals(0, Int32.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(1, Int32.Parse("1", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(-1, Int32.Parse("-1", J2N.Text.StringFormatter.InvariantCulture));
 
-            try
-            {
-                Int32.Parse("0x1", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with hex string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        Int32.Parse("0x1", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with hex string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                Int32.Parse("9.2", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with floating point string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        Int32.Parse("9.2", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with floating point string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                Int32.Parse("", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with empty string.");
-            }
-            catch (FormatException e) { }
+        //    try
+        //    {
+        //        Int32.Parse("", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with empty string.");
+        //    }
+        //    catch (FormatException e) { }
 
-            try
-            {
-                Int32.Parse(null, J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with null string.");
-            }
-            catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
-        }
+        //    try
+        //    {
+        //        Int32.Parse(null, J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with null string.");
+        //    }
+        //    catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
+        //}
 
         // J2N: Moved to CharSequences
         ///**
@@ -1462,6 +1466,8 @@ namespace J2N.Numerics
 
             public abstract class ParseTestCase
             {
+                #region TestParse_CharSequence_Int32_Data
+
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_Int32_Data
                 {
                     get
@@ -1551,6 +1557,10 @@ namespace J2N.Numerics
                     }
                 }
 
+                #endregion TestParse_CharSequence_Int32_Data
+
+                #region TestParse_CharSequence_Int32_ForException_Data
+
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_Int32_ForException_Data
                 {
                     get
@@ -1624,6 +1634,10 @@ namespace J2N.Numerics
                         }
                     }
                 }
+
+                #endregion TestParse_CharSequence_Int32_ForException_Data
+
+                #region TestParse_CharSequence_Int32_Int32_Int32_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_Int32_Int32_Int32_Data
                 {
@@ -1709,6 +1723,10 @@ namespace J2N.Numerics
                     }
                 }
 
+                #endregion TestParse_CharSequence_Int32_Int32_Int32_Data
+
+                #region TestParse_CharSequence_Int32_Int32_Int32_ForException_Data
+
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_Int32_Int32_Int32_ForException_Data
                 {
                     get
@@ -1793,9 +1811,125 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(FormatException), "xx  34567yy", 2, 5, 10); // spaces in range are not allowed
                     }
                 }
+
+                #endregion TestParse_CharSequence_Int32_Int32_Int32_ForException_Data
+
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_Data
+
+                public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_Data
+                {
+                    get
+                    {
+                        // JDK 8
+
+                        yield return new TestCaseData(+100, "+100", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-100, "-100", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(0, "+0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0, "-0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0, "+00000", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0, "-00000", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(0, "0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(1, "1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(9, "9", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Harmony (Test_parseIntLjava_lang_String())
+
+                        yield return new TestCaseData(0, "0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(1, "1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-1, "-1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        //yield return new TestCaseData(0, null, NumberStyle.Integer, NumberFormatInfo.InvariantInfo); // .NET returns 0 in this case (JDK throws)
+
+                        // Harmony (Test_parseIntLjava_lang_String2())
+
+                        yield return new TestCaseData(-8900, "-8900", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0, "0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000000), "-2147483648", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7fffffff, "2147483647", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Harmony (Test_parseIntLjava_lang_StringI())
+
+                        yield return new TestCaseData(0, "0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(1, "1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(-1, "-1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        //yield return new TestCaseData(0, null, NumberStyle.Integer, NumberFormatInfo.InvariantInfo); // J2N: Match .NET behavior where null will result in 0
+
+                        // Harmony (Test_parseIntLjava_lang_StringI2())
+
+                        yield return new TestCaseData(-8000, "-8000", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(255, "FF", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0, "0", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000000), /*"-80000000"*/ "80000000", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // 2's complement required
+                        yield return new TestCaseData(0x7fffffff, "7fffffff", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0, "0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(unchecked((int)0x80000000), "-2147483648", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x7fffffff, "2147483647", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                    }
+                }
+
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_Data
+
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data
+
+                public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data
+                {
+                    get
+                    {
+                        // JDK 8
+
+                        yield return new TestCaseData(typeof(FormatException), "", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "\u0000", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "\u002f", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "+", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "-", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "++", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "+-", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "-+", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "--", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "++100", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "--100", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "+-6", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "-+6", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "*100", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Harmony (Test_parseIntLjava_lang_String())
+
+                        yield return new TestCaseData(typeof(FormatException), "0x1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "9.2", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(ArgumentNullException), null, NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Harmony (Test_parseIntLjava_lang_String2())
+
+                        yield return new TestCaseData(typeof(OverflowException), "999999999999", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(OverflowException), "2147483648", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(OverflowException), "-2147483649", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Harmony (Test_parseIntLjava_lang_StringI())
+
+                        yield return new TestCaseData(typeof(FormatException), "0x1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "9.2", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "", NumberStyle.Integer, NumberFormatInfo.InvariantInfo); // J2N: .NET throws ArgumentOutOfRangeException rather than FormatException in this case, but since it is inconsistent with int.Parse() we are going with FormatException.
+                        yield return new TestCaseData(typeof(ArgumentNullException), null, NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Harmony (Test_parseIntLjava_lang_StringI2())
+
+                        yield return new TestCaseData(typeof(FormatException), "FFFF", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(OverflowException), "2147483648", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(OverflowException), "-2147483649", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(OverflowException), /*"-80000001"*/ "100000000", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // J2N:  2's complement required
+                        yield return new TestCaseData(typeof(OverflowException), "9999999999", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                    }
+                }
+
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data
             }
 
             #endregion ParseTestCase
+
+            // Radix-based parsing
 
             #region Parse_CharSequence_Int32
 
@@ -1804,7 +1938,7 @@ namespace J2N.Numerics
                 protected abstract int GetResult(string value, int radix);
 
 
-                [TestCaseSource("TestParse_CharSequence_Int32_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Data")]
                 public virtual void TestParse_CharSequence_Int32(int expected, string value, int radix)
                 {
                     var actual = GetResult(value, radix);
@@ -1812,7 +1946,7 @@ namespace J2N.Numerics
                 }
 
 
-                [TestCaseSource("TestParse_CharSequence_Int32_ForException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_ForException_Data")]
                 public virtual void TestParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
                     Assert.Throws(expectedExceptionType, () => GetResult(value, radix));
@@ -1849,7 +1983,7 @@ namespace J2N.Numerics
                 protected abstract int GetResult(string value, int startIndex, int length, int radix);
 
 
-                [TestCaseSource("TestParse_CharSequence_Int32_Int32_Int32_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Int32_Int32_Data")]
 
                 public virtual void TestParse_CharSequence_Int32_Int32_Int32(int expected, string value, int startIndex, int length, int radix)
                 {
@@ -1860,7 +1994,7 @@ namespace J2N.Numerics
                 }
 
 
-                [TestCaseSource("TestParse_CharSequence_Int32_Int32_Int32_ForException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Int32_Int32_ForException_Data")]
                 public virtual void TestParse_CharSequence_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int startIndex, int length, int radix)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -1926,7 +2060,7 @@ namespace J2N.Numerics
 
                 protected abstract bool GetResult(string value, int startIndex, int length, int radix, out int result);
 
-                [TestCaseSource("TestParse_CharSequence_Int32_Int32_Int32_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Int32_Int32_Data")]
 
                 public virtual void TestTryParse_CharSequence_Int32_Int32_Int32(int expected, string value, int startIndex, int length, int radix)
                 {
@@ -1937,7 +2071,7 @@ namespace J2N.Numerics
                 }
 
 
-                [TestCaseSource("TestParse_CharSequence_Int32_Int32_Int32_ForException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Int32_Int32_ForException_Data")]
                 public virtual void TestTryParse_CharSequence_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int startIndex, int length, int radix)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
@@ -2000,7 +2134,7 @@ namespace J2N.Numerics
                 protected abstract bool GetResult(string value, int radix, out int result);
 
 
-                [TestCaseSource("TestParse_CharSequence_Int32_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Data")]
                 public virtual void TestParse_CharSequence_Int32(int expected, string value, int radix)
                 {
                     assertTrue(GetResult(value, radix, out int actual));
@@ -2008,7 +2142,7 @@ namespace J2N.Numerics
                 }
 
 
-                [TestCaseSource("TestParse_CharSequence_Int32_ForException_Data")]
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_ForException_Data")]
                 public virtual void TestParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
                     assertFalse(GetResult(value, radix, out int actual));
@@ -2036,6 +2170,215 @@ namespace J2N.Numerics
             //#endif
 
             #endregion Parse_CharSequence_Int32
+
+            // Culture-aware parsing
+
+            #region Parse_CharSequence_IFormatProvider
+
+            public abstract class Parse_CharSequence_IFormatProvider_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract int GetResult(string s, IFormatProvider provider);
+
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_Data")]
+                public void TestParse_CharSequence_IFormatProvider(int expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~NumberStyle.Integer) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    var actual = GetResult(value, provider);
+                    assertEquals($"Int32.Parse(string, NumberStyle, IFormatProvider) failed. Expected: {expected} String: \"{value}\", NumberStyle: {style}, provider: {provider} Result: {actual}", expected, actual);
+                }
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data")]
+                public void TestParse_CharSequence_IFormatProvider_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~NumberStyle.Integer) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    Assert.Throws(expectedExceptionType, () => GetResult(value, provider));
+                }
+            }
+
+            public class Parse_String_IFormatProvider_TestCase : Parse_CharSequence_IFormatProvider_TestCase
+            {
+                protected override int GetResult(string s, IFormatProvider provider)
+                {
+                    return Int32.Parse(s, provider);
+                }
+            }
+
+            #endregion Parse_CharSequence_IFormatProvider
+
+            #region Parse_CharSequence_NumberStyle_IFormatProvider
+
+            public abstract class Parse_CharSequence_NumberStyle_IFormatProvider_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract int GetResult(string s, NumberStyle style, IFormatProvider provider);
+
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider(int expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    var actual = GetResult(value, style, provider);
+                    assertEquals($"Int32.Parse(string, NumberStyle, IFormatProvider) failed. Expected: {expected} String: \"{value}\", NumberStyle: {style}, provider: {provider} Result: {actual}", expected, actual);
+                }
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider));
+                }
+            }
+
+            public class Parse_String_NumberStyle_IFormatProvider_TestCase : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
+            {
+                protected override int GetResult(string s, NumberStyle style, IFormatProvider provider)
+                {
+                    return Int32.Parse(s, style, provider);
+                }
+            }
+
+#if FEATURE_READONLYSPAN
+            public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override int GetResult(string s, NumberStyle style, IFormatProvider provider)
+                {
+                    return Int32.Parse(s.AsSpan(), style, provider);
+                }
+            }
+#endif
+
+            #endregion Parse_CharSequence_NumberStyle_IFormatProvider
+
+            #region TryParse_CharSequence_NumberStyle_IFormatProvider
+
+            public abstract class TryParse_CharSequence_NumberStyle_IFormatProvider_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract bool GetResult(string s, NumberStyle style, IFormatProvider provider, out int result);
+
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider(int expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    assertTrue(GetResult(value, style, provider, out int actual));
+                    assertEquals($"Int32.Parse(string, NumberStyle, IFormatProvider) failed. Expected: {expected} String: \"{value}\", NumberStyle: {style}, provider: {provider} Result: {actual}", expected, actual);
+                }
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data")]
+                public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
+                    int actual = 0;
+                    if (expectedExceptionType != typeof(ArgumentException))
+                    {
+                        assertFalse(GetResult(value, style, provider, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, style, provider, out actual));
+                    }
+                    assertEquals(0, actual);
+                }
+            }
+
+            public class TryParse_String_NumberStyle_IFormatProvider_TestCase : TryParse_CharSequence_NumberStyle_IFormatProvider_TestCase
+            {
+                protected override bool GetResult(string s, NumberStyle style, IFormatProvider provider, out int result)
+                {
+                    return Int32.TryParse(s, style, provider, out result);
+                }
+            }
+
+#if FEATURE_READONLYSPAN
+            public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : TryParse_CharSequence_NumberStyle_IFormatProvider_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override bool GetResult(string s, NumberStyle style, IFormatProvider provider, out int result)
+                {
+                    return Int32.TryParse(s.AsSpan(), style, provider, out result);
+                }
+            }
+#endif
+
+            #endregion Parse_CharSequence_NumberStyle_IFormatProvider
+
+            #region TryParse_CharSequence
+
+            public abstract class TryParse_CharSequence_TestCase : ParseTestCase
+            {
+                protected virtual bool IsNullableType => true;
+
+                protected abstract bool GetResult(string s, out int result);
+
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_Data")]
+                public void TestParse_CharSequence(int expected, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~NumberStyle.Integer) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    assertTrue(GetResult(value, out int actual));
+                    assertEquals($"Int32.Parse(string, NumberStyle, IFormatProvider) failed. Expected: {expected} String: \"{value}\", NumberStyle: {style}, provider: {provider} Result: {actual}", expected, actual);
+                }
+
+                [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data")]
+                public void TestParse_CharSequence_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
+                {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+                    Assume.That((style & ~NumberStyle.Integer) == 0, "Custom NumberStyles are not supported on this overload.");
+
+                    int actual = 0;
+                    if (expectedExceptionType != typeof(ArgumentException))
+                    {
+                        assertFalse(GetResult(value, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, out actual));
+                    }
+                    assertEquals(0, actual);
+                }
+            }
+
+            public class TryParse_String_TestCase : TryParse_CharSequence_TestCase
+            {
+                protected override bool GetResult(string s, out int result)
+                {
+                    return Int32.TryParse(s, out result);
+                }
+            }
+
+#if FEATURE_READONLYSPAN
+            public class TryParse_ReadOnlySpan_TestCase : TryParse_CharSequence_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override bool GetResult(string s, out int result)
+                {
+                    return Int32.TryParse(s.AsSpan(), out result);
+                }
+            }
+#endif
+
+            #endregion TryParse_CharSequence
+
 
             #region ParseUnsignedTestCase
 
@@ -2376,14 +2719,14 @@ namespace J2N.Numerics
             {
                 protected abstract int GetResult(string s, int radix);
 
-                [TestCaseSource("UnsignedIntTestCases")]
+                [TestCaseSource(typeof(ParseUnsignedTestCase), "UnsignedIntTestCases")]
                 public void TestParseUnsigned_CharSequence_Int32(uint value, int radix, string bigString, int expected)
                 {
                     int actual = GetResult(bigString, radix);
                     assertEquals(expected, actual);
                 }
 
-                [TestCaseSource("ParseUnsigned_CharSequence_Int32_ForException_Data")]
+                [TestCaseSource(typeof(ParseUnsignedTestCase), "ParseUnsigned_CharSequence_Int32_ForException_Data")]
                 public void TestParseUnsigned_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
                     Assert.Throws(expectedExceptionType, () => GetResult(value, radix));
@@ -2406,14 +2749,14 @@ namespace J2N.Numerics
             {
                 protected abstract int GetResult(string s, int startIndex, int length, int radix);
 
-                [TestCaseSource("UnsignedIntTestCases")]
+                [TestCaseSource(typeof(ParseUnsignedTestCase), "UnsignedIntTestCases")]
                 public void TestParseUnsigned_CharSequence_Int32_Int32_Int32(uint value, int radix, string bigString, int expected)
                 {
                     int actual = GetResult("prefix" + bigString + "suffix", "prefix".Length, bigString.Length, radix);
                     assertEquals(expected, actual);
                 }
 
-                [TestCaseSource("ParseUnsigned_CharSequence_Int32_Int32_Int32_ForException_Data")]
+                [TestCaseSource(typeof(ParseUnsignedTestCase), "ParseUnsigned_CharSequence_Int32_Int32_Int32_ForException_Data")]
                 public void TestParseUnsigned_CharSequence_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
                     Assert.Throws(expectedExceptionType, () => GetResult("prefix" + value + "suffix", "prefix".Length, value?.Length ?? 0, radix));
@@ -2545,14 +2888,14 @@ namespace J2N.Numerics
             {
                 protected abstract Int32 GetResult(string value);
 
-                [TestCaseSource("TestDecode_CharSequence_Data")]
+                [TestCaseSource(typeof(DecodeTestCase), "TestDecode_CharSequence_Data")]
                 public virtual void TestDecode_CharSequence(string value, int expected)
                 {
                     var actual = GetResult(value);
                     assertEquals($"Int32.Decode(string) failed. String: \"{value}\" Result: {actual}", expected, actual);
                 }
 
-                [TestCaseSource("TestDecode_CharSequence_ForException_Data")]
+                [TestCaseSource(typeof(DecodeTestCase), "TestDecode_CharSequence_ForException_Data")]
                 public virtual void TestDecode_CharSequence_ForException(Type expectedExceptionType, string value, string message)
                 {
                     Assert.Throws(expectedExceptionType, () => GetResult(value), message);
@@ -2586,14 +2929,14 @@ namespace J2N.Numerics
             {
                 protected abstract bool GetResult(string value, out Int32 result);
 
-                [TestCaseSource("TestDecode_CharSequence_Data")]
+                [TestCaseSource(typeof(DecodeTestCase), "TestDecode_CharSequence_Data")]
                 public virtual void TestTryDecode_CharSequence(string value, int expected)
                 {
                     assertTrue(GetResult(value, out Int32 actual));
                     assertEquals($"Int32.TryDecode(string, out Int32) failed. String: \"{value}\" Result: {actual}", new Int32(expected), actual);
                 }
 
-                [TestCaseSource("TestDecode_CharSequence_ForException_Data")]
+                [TestCaseSource(typeof(DecodeTestCase), "TestDecode_CharSequence_ForException_Data")]
                 public virtual void TestTryDecode_CharSequence_ForException(Type expectedExceptionType, string value, string message)
                 {
                     assertFalse(GetResult(value, out Int32 actual));
