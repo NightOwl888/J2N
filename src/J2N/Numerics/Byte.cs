@@ -494,6 +494,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="byte"/>
         /// data type is converted to a <see cref="byte"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -580,6 +581,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="byte"/>
         /// data type is converted to a <see cref="byte"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -666,6 +668,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="byte"/>
         /// data type is converted to a <see cref="byte"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -752,6 +755,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="byte"/>
         /// data type is converted to a <see cref="byte"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c> or its <see cref="ICharSequence.HasValue"/> property returns <c>false</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -1219,7 +1223,6 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="byte"/>
         /// data type is converted to a <see cref="byte"/> value without the method throwing an exception.
         /// </remarks>
-        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
         /// </exception>
@@ -1747,10 +1750,30 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/>
         public static byte Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseByte()
         {
-            int r = Int32.Parse(s, style, provider);
-            if (r < sbyte.MinValue || r > byte.MaxValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
-                throw new OverflowException(SR.Overflow_Byte);
-            return (byte)r;
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            if (s is null)
+                throw new ArgumentNullException(nameof(s));
+#if FEATURE_READONLYSPAN
+            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i);
+#else
+            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i);
+#endif
+            if (status != DotNetNumber.ParsingStatus.OK)
+            {
+                if (status == DotNetNumber.ParsingStatus.Overflow)
+                    DotNetNumber.ThrowOverflowException(TypeCode.Byte);
+                if (status == DotNetNumber.ParsingStatus.Failed)
+                    DotNetNumber.ThrowFormatException(s.ToString());
+            }
+
+            // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
+            // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
+            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
+            if ((uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
+            {
+                DotNetNumber.ThrowOverflowException(TypeCode.Byte);
+            }
+            return (byte)i;
         }
 
 #if FEATURE_READONLYSPAN
@@ -1938,10 +1961,23 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out byte)"/>
         public static byte Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseByte()
         {
-            int r = Int32.Parse(s, style, provider);
-            if (r < sbyte.MinValue || r > byte.MaxValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
-                throw new OverflowException(SR.Overflow_Byte);
-            return (byte)r;
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i);
+            if (status != DotNetNumber.ParsingStatus.OK)
+            {
+                if (status == DotNetNumber.ParsingStatus.Overflow)
+                    DotNetNumber.ThrowOverflowException(TypeCode.Byte);
+                if (status == DotNetNumber.ParsingStatus.Failed)
+                    DotNetNumber.ThrowFormatException(s.ToString());
+            }
+
+            // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
+            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
+            if ((uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
+            {
+                DotNetNumber.ThrowOverflowException(TypeCode.Byte);
+            }
+            return (byte)i;
         }
 #endif
 
@@ -2149,25 +2185,30 @@ namespace J2N.Numerics
         /// <seealso cref="NumberStyle"/>
         public static bool TryParse([NotNullWhen(true)] string? s, NumberStyle style, IFormatProvider? provider, out byte result)
         {
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s == null)
             {
                 result = 0;
                 return false;
             }
+            // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
 #if FEATURE_READONLYSPAN
-            return TryParse((ReadOnlySpan<char>)s, style, provider, out result);
+            // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
+            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
+            if (DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
+                || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
 #else
-            if (Int32.TryParse(s, style, provider, out int intValue))
-            {
-                result = (byte)intValue;
-                if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
-                {
-                    return true;
-                }
-            }
-            result = default;
-            return false;
+            // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
+            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
+            if (DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
+                || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
 #endif
+            {
+                result = 0;
+                return false;
+            }
+            result = (byte)i;
+            return true;
         }
 
 #if FEATURE_READONLYSPAN
@@ -2373,20 +2414,22 @@ namespace J2N.Numerics
         /// <seealso cref="NumberStyle"/>
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out byte result)
         {
-            if (Int32.TryParse(s, style, provider, out int intValue))
+            NumberStyleExtensions.ValidateParseStyleInteger(style);
+            // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
+            // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
+            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
+            if (DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
+                || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
             {
-                result = (byte)intValue;
-                if (result == intValue || (sbyte)result == intValue) // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
-                {
-                    return true;
-                }
+                result = 0;
+                return false;
             }
-            result = default;
-            return false;
+            result = (byte)i;
+            return true;
         }
 #endif
 
-        #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Byte
+#endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Byte
 
         /// <inheritdoc/>
         public override short GetInt16Value()
