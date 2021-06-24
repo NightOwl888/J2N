@@ -518,7 +518,6 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="long"/>
         /// data type is converted to an <see cref="long"/> value without the method throwing an exception.
         /// </remarks>
-        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -1185,7 +1184,6 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="long"/>
         /// data type is converted to an <see cref="long"/> value without the method throwing an exception.
         /// </remarks>
-        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
         /// </exception>
@@ -1270,7 +1268,6 @@ namespace J2N.Numerics
         /// 64-bit signed integer equivalent.
         /// </summary>
         /// <param name="s">A string containing a number to convert.</param>
-        /// <param name="provider"></param>
         /// <param name="provider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information about <paramref name="s"/>.</param>
         /// <returns>A 64-bit signed integer equivalent to the number specified in <paramref name="s"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
