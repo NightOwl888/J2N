@@ -519,6 +519,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="short"/>
         /// data type is converted to a <see cref="short"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -602,6 +603,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="short"/>
         /// data type is converted to a <see cref="short"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -685,6 +687,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="short"/>
         /// data type is converted to a <see cref="short"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -768,6 +771,7 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="short"/>
         /// data type is converted to a <see cref="short"/> value without the method throwing an exception.
         /// </remarks>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c> or <see cref="ICharSequence.HasValue"/> returns <c>false</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <para/>
@@ -1217,7 +1221,6 @@ namespace J2N.Numerics
         /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="short"/>
         /// data type is converted to a <see cref="short"/> value without the method throwing an exception.
         /// </remarks>
-        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
         /// </exception>
@@ -1501,7 +1504,7 @@ namespace J2N.Numerics
         /// is passed uninitialized; any value originally supplied in <paramref name="result"/> will be overwritten.</param>
         /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// The <see cref="TryParse(ReadOnlySpan{char}, out short)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, IFormatProvider?)"/> method,
+        /// The <see cref="TryParse(ReadOnlySpan{char}, out short)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/> method,
         /// except the <see cref="TryParse(ReadOnlySpan{char}, out short)"/> method does not throw an exception if the
         /// conversion fails. It eliminates the need to use exception handling to test for a <see cref="FormatException"/>
         /// in the event that <paramref name="s"/> is invalid and cannot be successfully parsed.
@@ -1542,7 +1545,7 @@ namespace J2N.Numerics
         /// as decimal digits. To parse the string representation of a hexadecimal number, call the
         /// <see cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out short)"/> overload.
         /// </remarks>
-        /// <seealso cref="Parse(ReadOnlySpan{char}, IFormatProvider?)"/>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string?, out short)"/>
         /// <seealso cref="Number.ToString()"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
