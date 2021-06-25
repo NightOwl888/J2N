@@ -2475,7 +2475,8 @@ namespace J2N.Numerics
                         // JDK 8 (rudimentaryTest())
 
                         yield return new TestCaseData(double.Epsilon, "" + double.Epsilon, NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
-                        yield return new TestCaseData(double.MaxValue, "" + double.MaxValue, NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
+                        // J2N: Prior to .NET Core 3.x, the round-trip format is required in order to provide enough digits to round-trip, otherwise we get infinity.
+                        yield return new TestCaseData(double.MaxValue, double.MaxValue.ToString("R", CultureInfo.InvariantCulture), NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
 
                         yield return new TestCaseData((double)10.0, "10", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
                         yield return new TestCaseData((double)10.0, "10.0", NumberStyle.Float, J2N.Text.StringFormatter.InvariantCulture);
