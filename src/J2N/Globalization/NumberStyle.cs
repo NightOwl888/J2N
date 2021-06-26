@@ -42,6 +42,7 @@ namespace J2N.Globalization
         /// </summary>
         AllowLeadingWhite = 0x00000001,
 
+        /// <summary>
         /// Indicates that trailing white-space characters can be present in the parsed string.
         /// Valid white-space characters have the Unicode values U+0009, U+000A, U+000B,
         /// U+000C, U+000D, and U+0020. Note that this is a subset of the characters for
