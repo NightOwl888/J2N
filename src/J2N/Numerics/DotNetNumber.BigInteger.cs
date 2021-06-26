@@ -30,7 +30,7 @@ namespace J2N.Numerics
             private const int MaxBits = BitsForLongestBinaryMantissa + BitsForLongestDigitSequence + BitsPerBlock;
 
             private const int BitsPerBlock = sizeof(int) * 8;
-            private const int MaxBlockCount = (MaxBits + (BitsPerBlock - 1)) / BitsPerBlock;
+            private const int MaxBlockCount = ((MaxBits + (BitsPerBlock - 1)) / BitsPerBlock) + 1; // J2N: Increased MaxBlockCount by 1 to prevent buffer overflow for long strings.
 
             private static readonly uint[] s_Pow10UInt32Table = new uint[]
             {
@@ -311,6 +311,7 @@ namespace J2N.Numerics
                 0x00000000,
                 0x00000000,
                 0x00000000,
+                0x00000000, // J2N: Added one because long strings would overrun the buffer
             };
 
             private int _length;
@@ -1115,13 +1116,15 @@ namespace J2N.Numerics
                 int rhsLength = value._length;
                 result._length = rhsLength;
                 //Buffer.Memcpy((byte*)result.GetBlocksPointer(), (byte*)value.GetBlocksPointer(), rhsLength * sizeof(uint));
-                fixed (uint* dest = &result._blocks[0], src = &value._blocks[0])
+                fixed (uint* destP = &result._blocks[0], srcP = &value._blocks[0])
                 {
-#if FEATURE_BUFFER_MEMORYCOPY
+                    byte* dest = (byte*)destP;
+                    byte* src = (byte*)srcP;
                     long byteLength = rhsLength * sizeof(uint);
+#if FEATURE_BUFFER_MEMORYCOPY
                     Buffer.MemoryCopy(src, dest, byteLength, byteLength);
 #else
-                    for (int i = 0; i < rhsLength; i++)
+                    for (int i = 0; i < byteLength; i++)
                     {
                         dest[i] = src[i];
                     }
@@ -1172,7 +1175,7 @@ namespace J2N.Numerics
                 {
                     // We need an extra block for the partial shift
                     writeIndex++;
-                    //Debug.Assert(writeIndex < MaxBlockCount); // J2N: Some of the testSubnormalPowers() JDK tests require this to exceed MaxBlockCount, but the test otherwise passes
+                    Debug.Assert(writeIndex < MaxBlockCount);
 
                     // Set the length to hold the shifted blocks
                     _length = writeIndex + 1;
