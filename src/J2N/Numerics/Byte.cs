@@ -23,24 +23,11 @@ namespace J2N.Numerics
         /// </summary>
         private readonly byte value;
 
-
-        ///**
-        // * The number of bits needed to represent a {@code Byte} value in two's
-        // * complement form.
-        // * 
-        // * @since 1.5
-        // */
-        //public static final int SIZE = 8;
-
-        //    /**
-        //     * The {@link Class} object that represents the primitive type {@code byte}.
-        //     */
-        //    @SuppressWarnings("unchecked")
-        //public static final Class<Byte> TYPE = (Class<Byte>)new byte[0].getClass()
-        //        .getComponentType();
-
-        // Note: This can't be set to "byte.class", since *that* is
-        // defined to be "java.lang.Byte.TYPE";
+        /// <summary>
+        /// Constant for the number of bits needed to represent a <see cref="byte"/> in
+        /// two's complement form.
+        /// </summary>
+        public const int Size = 8;
 
         /**
          * A cache of instances used by {@link #valueOf(byte)} and auto-boxing.

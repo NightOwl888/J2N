@@ -19,51 +19,27 @@ namespace J2N.Numerics
         /// </summary>
         private readonly float value;
 
-        /////// <summary>
-        /////// Constant for the maximum <see cref="float"/> value, (2 - 2<sup>-23</sup>) * 2<sup>127</sup>.
-        /////// </summary>
-        ////public const float MAX_VALUE = 3.40282346638528860e+38f;
+        /// <summary>
+        /// Maximum exponent a finite <see cref="float"/> variable may have.
+        /// </summary>
+        public const int MaxExponent = 127;
 
-        /////**
-        //// * Constant for the minimum <see cref="float"/> value, 2<sup>-149</sup>.
-        //// */
-        ////public const float MIN_VALUE = 1.40129846432481707e-45f;
+        /// <summary>
+        /// Minimum exponent a normalized <see cref="float"/> variable may have.
+        /// </summary>
+        public const int MinExponent = -126;
 
-        /////**
-        //// * Constant for the Not-a-Number (NaN) value of the <see cref="float"/> type.
-        //// */
-        ////public const float NaN = float.NaN;
+        /// <summary>
+        /// The smallest positive normal value of type <see cref="float"/>, 2<sup>-126</sup>.
+        /// It is equal to the value <c>BitConversion.Int32BitsToSingle(0x00800000)</c>.
+        /// </summary>
+        public const float MinNormal = 1.17549435E-38F;
 
-        /////**
-        //// * Constant for the Positive Infinity value of the <see cref="float"/> type.
-        //// */
-        ////public const float PositiveInfinity = float.PositiveInfinity;
-
-        /////**
-        //// * Constant for the Negative Infinity value of the <see cref="float"/> type.
-        //// */
-        ////public const float NegativeInfinity = float.NegativeInfinity;
-
-        ////    /**
-        ////     * The {@link Class} object that represents the primitive type {@code
-        ////     * float}.
-        ////     *
-        ////     * @since 1.1
-        ////     */
-        ////    @SuppressWarnings("unchecked")
-        ////public static final Class<Float> TYPE = (Class<Float>)new float[0]
-        ////        .getClass().getComponentType();
-
-        ////// Note: This can't be set to "float.class", since *that* is
-        ////// defined to be "java.lang.Float.TYPE";
-
-        /**
-         * Constant for the number of bits needed to represent a {@code float} in
-         * two's complement form.
-         *
-         * @since 1.5
-         */
-        public const int SIZE = 32; // J2N TODO: Rename BitCount?
+        /// <summary>
+        /// The number of bits needed to represent a <see cref="float"/> in
+        /// two's complement form.
+        /// </summary>
+        public const int Size = 32;
 
         /**
          * Constructs a new {@code Float} with the specified primitive float value.

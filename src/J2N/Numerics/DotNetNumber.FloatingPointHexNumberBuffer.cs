@@ -293,7 +293,7 @@
             private int CountBitsLength(long value)
             {
                 int leadingZeros = BitOperation.LeadingZeroCount(value);
-                return Int64.SIZE - leadingZeros;
+                return Int64.Size - leadingZeros;
             }
         }
 

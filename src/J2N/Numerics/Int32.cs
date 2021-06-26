@@ -13,17 +13,15 @@ namespace J2N.Numerics
     /// <inheritdoc/>
     public sealed class Int32 : Number, IComparable<Int32>
     {
-        /**
-         * Constant for the number of bits needed to represent a {@code int} in
-         * two's complement form.
-         *
-         * @since 1.5
-         */
-        public const int SIZE = 32; // J2N: Rename BitCount?
+        /// <summary>
+        /// Constant for the number of bits needed to represent a <see cref="int"/> in
+        /// two's complement form.
+        /// </summary>
+        public const int Size = 32;
 
-        /**
-         * The value which the receiver represents.
-         */
+        /// <summary>
+        /// The value which the receiver represents.
+        /// </summary>
         private readonly int value;
 
 

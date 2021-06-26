@@ -13,39 +13,17 @@ namespace J2N.Numerics
     /// <inheritdoc/>
     public sealed class Int16 : Number, IComparable<Int16>
     {
-        /**
-     * The value which the receiver represents.
-     */
+        /// <summary>
+        /// The value which the receiver represents.
+        /// </summary>
         private readonly short value;
 
-        /////**
-        //// * Constant for the maximum {@code short} value, 2<sup>15</sup>-1.
-        //// */
-        ////public static final short MAX_VALUE = (short)0x7FFF;
 
-        /////**
-        //// * Constant for the minimum {@code short} value, -2<sup>15</sup>.
-        //// */
-        ////public static final short MIN_VALUE = (short)0x8000;
-
-        /**
-         * Constant for the number of bits needed to represent a {@code short} in
-         * two's complement form.
-         *
-         * @since 1.5
-         */
-        public const int SIZE = 16; // J2N: Rename BitCount?
-
-        //    /**
-        //     * The {@link Class} object that represents the primitive type {@code
-        //     * short}.
-        //     */
-        //    @SuppressWarnings("unchecked")
-        //public static final Class<Short> TYPE = (Class<Short>)new short[0]
-        //        .getClass().getComponentType();
-
-        // Note: This can't be set to "short.class", since *that* is
-        // defined to be "java.lang.Short.TYPE";
+        /// <summary>
+        /// Constant for the number of bits needed to represent a <see cref="short"/> in
+        /// two's complement form.
+        /// </summary>
+        public const int Size = 16;
 
         /**
          * Constructs a new {@code Short} with the specified primitive short value.
