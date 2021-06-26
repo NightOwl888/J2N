@@ -13,38 +13,16 @@ namespace J2N.Numerics
     /// <inheritdoc/>
     public sealed class Int64 : Number, IComparable<Int64>
     {
-        /**
-     * The value which the receiver represents.
-     */
+        /// <summary>
+        /// The value which the receiver represents.
+        /// </summary>
         private readonly long value;
 
-        ////    /**
-        ////     * Constant for the maximum {@code long} value, 2<sup>63</sup>-1.
-        ////     */
-        ////    public static final long MAX_VALUE = 0x7FFFFFFFFFFFFFFFL;
-
-        ////    /**
-        ////     * Constant for the minimum {@code long} value, -2<sup>63</sup>.
-        ////     */
-        ////    public static final long MIN_VALUE = 0x8000000000000000L;
-
-        ////    /**
-        ////     * The {@link Class} object that represents the primitive type {@code long}.
-        ////     */
-        ////    @SuppressWarnings("unchecked")
-        ////public static final Class<Long> TYPE = (Class<Long>)new long[0].getClass()
-        ////        .getComponentType();
-
-        ////    // Note: This can't be set to "long.class", since *that* is
-        ////    // defined to be "java.lang.Long.TYPE";
-
-        /**
-         * Constant for the number of bits needed to represent a {@code long} in
-         * two's complement form.
-         *
-         * @since 1.5
-         */
-        public const int SIZE = 64; // J2N TODO: Rename BitCount? The BitCount method will be named PopCount() so there won't be a collision
+        /// <summary>
+        /// Constant for the number of bits needed to represent a <see cref="long"/> in
+        /// two's complement form.
+        /// </summary>
+        public const int Size = 64;
 
 
         /**

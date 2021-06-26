@@ -14,59 +14,32 @@ namespace J2N.Numerics
     /// <inheritdoc/>
     public sealed class Double : Number, IComparable<Double>
     {
-        /**
-         * The value which the receiver represents.
-         */
+        /// <summary>
+        /// The value which the receiver represents.
+        /// </summary>
         private readonly double value;
 
-        ////    /**
-        ////     * Constant for the maximum {@code double} value, (2 - 2<sup>-52</sup>) *
-        ////     * 2<sup>1023</sup>.
-        ////     */
-        ////    public static final double MAX_VALUE = 1.79769313486231570e+308;
+        /// <summary>
+        /// Maximum exponent a finite <see cref="double"/> variable may have.
+        /// </summary>
+        public const int MaxExponent = 1023;
 
-        ////    /**
-        ////     * Constant for the minimum {@code double} value, 2<sup>-1074</sup>.
-        ////     */
-        ////    public static final double MIN_VALUE = 5e-324;
+        /// <summary>
+        /// Minimum exponent a normalized <see cref="double"/> variable may have.
+        /// </summary>
+        public const int MinExponent = -1022;
 
-        ////    /* 4.94065645841246544e-324 gets rounded to 9.88131e-324 */
+        /// <summary>
+        /// The smallest positive normal value of type <see cref="double"/>, 2<sup>-1022</sup>.
+        /// It is equal to the value <c>BitConversion.Int64BitsToDouble(0x0010000000000000L)</c>.
+        /// </summary>
+        public const double MinNormal = 2.2250738585072014E-308;
 
-        ////    /**
-        ////     * Constant for the Not-a-Number (NaN) value of the {@code double} type.
-        ////     */
-        ////    public static final double NaN = 0.0 / 0.0;
-
-        ////    /**
-        ////     * Constant for the Positive Infinity value of the {@code double} type.
-        ////     */
-        ////    public static final double POSITIVE_INFINITY = 1.0 / 0.0;
-
-        ////    /**
-        ////     * Constant for the Negative Infinity value of the {@code double} type.
-        ////     */
-        ////    public static final double NEGATIVE_INFINITY = -1.0 / 0.0;
-
-        ////    /**
-        ////     * The {@link Class} object that represents the primitive type {@code
-        ////     * double}.
-        ////     *
-        ////     * @since 1.1
-        ////     */
-        ////    @SuppressWarnings("unchecked")
-        ////public static final Class<Double> TYPE = (Class<Double>)new double[0]
-        ////        .getClass().getComponentType();
-
-        ////    // Note: This can't be set to "double.class", since *that* is
-        // defined to be "java.lang.Double.TYPE";
-
-        /**
-         * Constant for the number of bits needed to represent a {@code double} in
-         * two's complement form.
-         *
-         * @since 1.5
-         */
-        public const int SIZE = 64;
+        /// <summary>
+        /// The number of bits needed to represent a <see cref="double"/> in
+        /// two's complement form.
+        /// </summary>
+        public const int Size = 64;
 
         /**
          * Constructs a new {@code Double} with the specified primitive double
