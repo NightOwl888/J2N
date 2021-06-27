@@ -1505,6 +1505,61 @@ namespace J2N.Numerics
         }
 
         /**
+         * @tests java.lang.Double#compareTo(Object)
+         * @tests java.lang.Double#compare(double, double)
+         */
+        [Test]
+        public void Test_compareTo_Object()
+        {
+            // A selection of double values in ascending order.
+            double[] values = new double[] { double.NegativeInfinity, -double.MaxValue, -2d,
+                -double.Epsilon, -0d, 0d, double.Epsilon, 2d, double.MaxValue,
+                double.PositiveInfinity, double.NaN }; // J2N NOTE: MIN_VALUE in Java is the same as Epsilon in .NET
+            for (int i = 0; i < values.Length; i++)
+            {
+                double d1 = values[i];
+
+                // Test that each value compares equal to itself; and each object is
+                // equal to another object like itself.
+                assertTrue("Assert 0: compare() should be equal: " + d1,
+                        Double.Compare(d1, d1) == 0);
+                Double objDouble = new Double(d1);
+                assertTrue("Assert 1: compareTo() should be equal: " + d1, objDouble
+                        .CompareTo((object)objDouble) == 0);
+
+                // Test that the Double-defined order is respected
+                for (int j = i + 1; j < values.Length; j++)
+                {
+                    double d2 = values[j];
+                    assertTrue("Assert 2: compare() " + d1 + " should be less " + d2, Double
+                            .Compare(d1, d2) == -1);
+                    assertTrue("Assert 3: compare() " + d2 + " should be greater " + d1, Double
+                            .Compare(d2, d1) == 1);
+                    Double D2 = new Double(d2);
+                    assertTrue("Assert 4: compareTo() " + d1 + " should be less " + d2, objDouble
+                            .CompareTo((object)D2) == -1);
+                    assertTrue("Assert 5: compareTo() " + d2 + " should be greater " + d1, D2
+                            .CompareTo((object)objDouble) == 1);
+                }
+            }
+
+            //try
+            //{
+            //    new Double(0.0D).CompareTo(null);
+            //    fail("No NPE");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //}
+
+            // J2N: Return 1 when comparing to null to match other .NET classes
+            assertEquals(1, new Double(0.0D).CompareTo((object)null));
+
+            // J2N: Check to ensure exception is thrown when there is a type mismatch
+            Assert.Throws<ArgumentException>(() => new Double(0.0D).CompareTo((object)4));
+        }
+
+        /**
          * @tests java.lang.Double#equals(java.lang.Object)
          */
         [Test]

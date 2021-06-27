@@ -1081,6 +1081,55 @@ namespace J2N.Numerics
         }
 
         /**
+         * @tests java.lang.Float#compareTo(Object)
+         * @tests java.lang.Float#compare(float, float)
+         */
+        [Test]
+        public void Test_compareTo_Object()
+        {
+            // A selection of float values in ascending order.
+            float[] values = new float[] { float.NegativeInfinity, -float.MaxValue, -2f,
+                -float.Epsilon, -0f, 0f, float.Epsilon, 2f, float.MaxValue,
+                float.PositiveInfinity, float.NaN }; // J2N NOTE: MIN_VALUE in Java is the same as Epsilon in .NET
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                float f1 = values[i];
+
+                // Test that each value compares equal to itself; and each object is
+                // equal to another object
+                // like itself
+                assertTrue("Assert 0: compare() should be equal: " + f1, Single.Compare(f1, f1) == 0);
+                Single objFloat = new Single(f1);
+                assertTrue("Assert 1: compareTo() should be equal: " + objFloat, objFloat
+                        .CompareTo((object)objFloat) == 0);
+
+                // Test that the Float-defined order is respected
+                for (int j = i + 1; j < values.Length; j++)
+                {
+                    float f2 = values[j];
+
+                    assertTrue("Assert 2: compare() " + f1 + " should be less " + f2, Single
+                            .Compare(f1, f2) == -1);
+                    assertTrue("Assert 3: compare() " + f2 + " should be greater " + f1, Single
+                            .Compare(f2, f1) == 1);
+
+                    Single F2 = new Single(f2);
+                    assertTrue("Assert 4: compareTo() " + f1 + " should be less " + f2, objFloat
+                            .CompareTo((object)F2) == -1);
+                    assertTrue("Assert 5: compareTo() " + f2 + " should be greater " + f1, F2
+                            .CompareTo((object)objFloat) == 1);
+                }
+            }
+
+            // J2N: Return 1 when comparing to null to match other .NET classes
+            assertEquals(1, new Single(0.0F).CompareTo((object)null));
+
+            // J2N: Check to ensure exception is thrown when there is a type mismatch
+            Assert.Throws<ArgumentException>(() => new Single(0.0F).CompareTo((object)4));
+        }
+
+        /**
          * @tests java.lang.Float#equals(java.lang.Object)
          */
         [Test]
