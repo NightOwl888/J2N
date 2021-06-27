@@ -1568,10 +1568,36 @@ namespace J2N.Numerics
             Double d1 = new Double(87654321.12345d);
             Double d2 = new Double(87654321.12345d);
             Double d3 = new Double(0.0002f);
+            assertTrue("Assert 0: Equality test failed", d1.Equals((object)d2) && !(d1.Equals((object)d3)));
+
+            assertTrue("Assert 2: NaN should not be == NaN", double.NaN != double.NaN);
+            assertTrue("Assert 3: NaN should be == NaN", new Double(double.NaN)
+                    .Equals((object)new Double(double.NaN)));
+            assertTrue("Assert 4: -0d should be == 0d", 0d == -0d);
+            assertTrue("Assert 5: -0d should not be equals() 0d", !new Double(0d)
+                    .Equals((object)new Double(-0d)));
+
+            Double dmax = new Double(double.MaxValue);
+            Double dmax1 = new Double(double.MaxValue);
+
+            assertTrue("Equality test failed", dmax.Equals((object)dmax1) && !(dmax.Equals(new Object())));
+        }
+
+        /**
+         * @tests java.lang.Double#equals(Double)
+         */
+        [Test]
+        public void Test_equals_Double()
+        {
+            Double d1 = new Double(87654321.12345d);
+            Double d2 = new Double(87654321.12345d);
+            Double d3 = new Double(0.0002f);
             assertTrue("Assert 0: Equality test failed", d1.Equals(d2) && !(d1.Equals(d3)));
 
-            assertTrue("Assert 2: NaN should not be == Nan", double.NaN != double.NaN);
-            assertTrue("Assert 3: NaN should not be == Nan", new Double(double.NaN)
+#pragma warning disable CA2242 // Test for NaN correctly
+            assertTrue("Assert 2: NaN should not be == NaN", double.NaN != double.NaN);
+#pragma warning restore CA2242 // Test for NaN correctly
+            assertTrue("Assert 3: NaN should be == NaN", new Double(double.NaN)
                     .Equals(new Double(double.NaN)));
             assertTrue("Assert 4: -0d should be == 0d", 0d == -0d);
             assertTrue("Assert 5: -0d should not be equals() 0d", !new Double(0d)

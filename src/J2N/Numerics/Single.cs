@@ -14,7 +14,7 @@ namespace J2N.Numerics
     using SR = J2N.Resources.Strings;
 
     /// <inheritdoc/>
-    public sealed class Single : Number, IComparable<Single>, IComparable
+    public sealed class Single : Number, IComparable<Single>, IComparable, IEquatable<Single>
     {
         /// <summary>
         /// The value which the receiver represents.
@@ -156,21 +156,166 @@ namespace J2N.Numerics
             return value;
         }
 
-        /**
-         * Compares this instance with the specified object and indicates if they
-         * are equal. In order to be equal, {@code object} must be an instance of
-         * {@code Float} and have the same float value as this object.
-         * 
-         * @param object
-         *            the object to compare this float with.
-         * @return {@code true} if the specified object is equal to this
-         *         {@code Float}; {@code false} otherwise.
-         */
+        /////**
+        //// * Compares this instance with the specified object and indicates if they
+        //// * are equal. In order to be equal, {@code object} must be an instance of
+        //// * {@code Float} and have the same float value as this object.
+        //// * 
+        //// * @param object
+        //// *            the object to compare this float with.
+        //// * @return {@code true} if the specified object is equal to this
+        //// *         {@code Float}; {@code false} otherwise.
+        //// */
+
+        /// <summary>
+        /// Returns a value indicating whether this instance and a specified <see cref="Single"/> object represent the same value.
+        /// </summary>
+        /// <param name="obj">An object to compare with this instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is equal to this instance; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method implements the <see cref="IEquatable{T}"/> interface, and performs slightly better than
+        /// <see cref="Equals(Single?)"/> because it does not have to convert the <paramref name="obj"/> parameter to an object.
+        /// <para/>
+        /// The <see cref="Equals(Single?)"/> method should be used with caution, because two apparently equivalent values
+        /// can be unequal due to the differing precision of the two values. The following example reports that the <see cref="Single"/>
+        /// value .3333 and the <see cref="Single"/> returned by dividing 1 by 3 are unequal.
+        /// <code>
+        /// // Initialize two floats with apparently identical values<br/>
+        /// Single float1 = .33333f;<br/>
+        /// Single float2 = (float)1 / 3;<br/>
+        /// // Compare them for equality<br/>
+        /// Console.WriteLine(float1.Equals(float2));    // displays false
+        /// </code>
+        /// <para/>
+        /// Rather than comparing for equality, one technique involves defining an acceptable relative margin of difference
+        /// between two values (such as .01% of one of the values). If the absolute value of the difference between the two
+        /// values is less than or equal to that margin, the difference is likely to be due to differences in precision and,
+        /// therefore, the values are likely to be equal. The following example uses this technique to compare .33333 and 1/3,
+        /// the two <see cref="Single"/> values that the previous code example found to be unequal. In this case, the values are equal.
+        /// <code>
+        /// // Initialize two floats with apparently identical values<br/>
+        /// Single float1 = .333333f;<br/>
+        /// Single float2 = (float) 1/3;<br/>
+        /// // Define the tolerance for variation in their values<br/>
+        /// float difference = Math.Abs(float1 * .00001f);<br/>
+        /// <br/>
+        /// // Compare the values<br/>
+        /// // The output to the console indicates that the two values are equal<br/>
+        /// if (Math.Abs(float1 - float2) &lt;= difference)<br/>
+        /// Console.WriteLine("float1 and float2 are equal.");<br/>
+        /// else<br/>
+        /// Console.WriteLine("float1 and float2 are unequal.");
+        /// </code>
+        /// In this case, the values are equal.
+        /// <para/>
+        /// NOTE: Because <see cref="float.Epsilon"/> defines the minimum expression of a positive value
+        /// whose range is near zero, the margin of difference between two similar values must be greater
+        /// than <see cref="float.Epsilon"/>. Typically, it is many times greater than <see cref="float.Epsilon"/>.
+        /// <para/>
+        /// A second technique involves comparing the difference between two floating-point numbers with some absolute value.
+        /// If the difference is less than or equal to that absolute value, the numbers are equal. If it is greater, the
+        /// numbers are not equal. One alternative is to arbitrarily select an absolute value. This is problematic, however,
+        /// because an acceptable margin of difference depends on the magnitude of the <see cref="Single"/> values. A second
+        /// alternative takes advantage of a design feature of the floating-point format: The difference between the integer
+        /// representation of two floating-point values indicates the number of possible floating-point values that separates
+        /// them. For example, the difference between 0.0 and <see cref="float.Epsilon"/> is 1, because <see cref="float.Epsilon"/>
+        /// is the smallest representable value when working with a <see cref="Single"/> whose value is zero. The following
+        /// example uses this technique to compare .33333 and 1/3, which are the two <see cref="Single"/> values that the
+        /// previous code example with the <see cref="Equals(Single?)"/> method found to be unequal. Note that the example
+        /// uses <see cref="BitConverter.GetBytes(float)"/> <see cref="BitConverter.ToInt32(byte[], int)"/> method to convert
+        /// a double-precision floating-point value to its integer representation.
+        /// <code>
+        /// using System;<br/>
+        /// <br/>
+        /// public class Example<br/>
+        /// {<br/>
+        ///     public static void Main()<br/>
+        ///     {<br/>
+        ///         Single value1 = .1f * 10f;<br/>
+        ///         float value2x = 0f;<br/>
+        ///         for (int ctr = 0; ctr &lt; 10; ctr++)<br/>
+        ///             value2x += .1f;<br/>
+        ///         Single value2 = Single.ValueOf(value2x);<br/>
+        ///         <br/>
+        ///         Console.WriteLine("{0:R} = {1:R}: {2}", value1, value2,<br/>
+        ///                           HasMinimalDifference(value1, value2, 1));<br/>
+        ///     }<br/>
+        ///     <br/>
+        ///     public static bool HasMinimalDifference(float value1, float value2, int units)<br/>
+        ///     {<br/>
+        ///         byte[] bytes = BitConverter.GetBytes(value1);<br/>
+        ///         int lValue1 = BitConverter.ToInt32(bytes, 0);<br/>
+        ///         <br/>
+        ///         bytes = BitConverter.GetBytes(value2);<br/>
+        ///         int lValue2 = BitConverter.ToInt32(bytes, 0);<br/>
+        ///         <br/>
+        ///         // If the signs are different, return false except for +0 and -0.<br/>
+        ///         if ((lValue1 &gt;&gt; 63) != (lValue2 &gt;&gt; 63))<br/>
+        ///         {<br/>
+        ///             if (value1 == value2)<br/>
+        ///                 return true;<br/>
+        ///             <br/>
+        ///             return false;<br/>
+        ///         }<br/>
+        ///         <br/>
+        ///         int diff = Math.Abs(lValue1 - lValue2);<br/>
+        ///         <br/>
+        ///         if (diff &lt;= units)<br/>
+        ///             return true;<br/>
+        ///             <br/>
+        ///         return false;<br/>
+        ///     }<br/>
+        /// }<br/>
+        /// // The example displays the following output:<br/>
+        /// //        1 = 1.00000012: True
+        /// </code>
+        /// <para/>
+        /// If two <see cref="float.NaN"/> values are tested for equality by calling the <see cref="Equals(Single?)"/>
+        /// method, the method returns <c>true</c>. However, if two <see cref="float.NaN"/> values are tested for equality
+        /// by using the equality operator, the operator returns <c>false</c>. When you want to determine whether the value
+        /// of a <see cref="Single"/> is not a number (NaN), an alternative is to call the <see cref="IsNaN()"/> method.
+        /// </remarks>
+        public bool Equals(Single? obj)
+        {
+            if (obj is null) return false;
+
+            return ReferenceEquals(obj, this)
+                || (BitConversion.SingleToInt32Bits(this.value) == BitConversion.SingleToInt32Bits(obj.value));
+        }
+
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare with this instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is an instance of <see cref="Single"/> and equals the value of
+        /// this instance; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// The <see cref="Equals(object?)"/> method should be used with caution, because two apparently equivalent values
+        /// can be unequal due to the differing precision of the two values. The following example reports that the <see cref="Single"/>
+        /// value .3333 and the <see cref="Single"/> returned by dividing 1 by 3 are unequal.
+        /// <code>
+        /// // Initialize two singles with apparently identical values<br/>
+        /// Single float1 = Single.ValueOf(.33333f);<br/>
+        /// Single float2 = Single.ValueOf((float)1/3);<br/>
+        /// // Compare them for equality<br/>
+        /// Console.WriteLine(float1.Equals(float2));    // displays false
+        /// </code>
+        /// <para/>
+        /// NOTE: Because <see cref="float.Epsilon"/> defines the minimum expression of a positive value
+        /// whose range is near zero, the margin of difference between two similar values must be greater
+        /// than <see cref="float.Epsilon"/>. Typically, it is many times greater than <see cref="float.Epsilon"/>.
+        /// <para/>
+        /// If two <see cref="float.NaN"/> values are tested for equality by calling the <see cref="Equals(object?)"/>
+        /// method, the method returns <c>true</c>. However, if two <see cref="float.NaN"/> values are tested for equality
+        /// by using the equality operator, the operator returns <c>false</c>. When you want to determine whether the value
+        /// of a <see cref="Single"/> is not a number (NaN), an alternative is to call the <see cref="IsNaN()"/> method.
+        /// </remarks>
         public override bool Equals(object? obj)
         {
             if (obj is null) return false;
 
-            return (ReferenceEquals(obj, this))
+            return ReferenceEquals(obj, this)
                 || (obj is Single other)
                 && (BitConversion.SingleToInt32Bits(this.value) == BitConversion.SingleToInt32Bits(other.value));
         }

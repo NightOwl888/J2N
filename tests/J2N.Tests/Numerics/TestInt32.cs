@@ -281,6 +281,19 @@ namespace J2N.Numerics
             Int32 i1 = new Int32(1000);
             Int32 i2 = new Int32(1000);
             Int32 i3 = new Int32(-1000);
+            assertTrue("Equality test failed", i1.Equals((object)i2) && !(i1.Equals((object)i3)));
+        }
+
+        /**
+        * @tests java.lang.Integer#equals(Int32)
+        */
+        [Test]
+        public void Test_equals_Int32_2()
+        {
+            // Test for method boolean java.lang.Integer.equals(java.lang.Object)
+            Int32 i1 = new Int32(1000);
+            Int32 i2 = new Int32(1000);
+            Int32 i3 = new Int32(-1000);
             assertTrue("Equality test failed", i1.Equals(i2) && !(i1.Equals(i3)));
         }
 
@@ -942,14 +955,36 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
+            assertEquals((object)new Int32(0), (object)Int32.ValueOf(0));
+            assertEquals((object)new Int32(1), (object)Int32.ValueOf(1));
+            assertEquals((object)new Int32(-1), (object)Int32.ValueOf(-1));
+
+            Int32 fixture = new Int32(25);
+            assertEquals((object)fixture, (object)fixture);
+            assertFalse(fixture.Equals((object)null));
+            assertFalse(fixture.Equals((object)"Not a Integer"));
+        }
+
+        /**
+        * @tests java.lang.Integer#equals(Object)
+        */
+        [Test]
+        public void Test_equals_Int32()
+        {
+            // Implicit conversion
             assertEquals(new Int32(0), Int32.ValueOf(0));
             assertEquals(new Int32(1), Int32.ValueOf(1));
             assertEquals(new Int32(-1), Int32.ValueOf(-1));
 
+            // Explicit
+            assertTrue(new Int32(0).Equals(Int32.ValueOf(0)));
+            assertTrue(new Int32(1).Equals(Int32.ValueOf(1)));
+            assertTrue(new Int32(-1).Equals(Int32.ValueOf(-1)));
+
             Int32 fixture = new Int32(25);
             assertEquals(fixture, fixture);
-            assertFalse(fixture.Equals(null));
-            assertFalse(fixture.Equals("Not a Integer"));
+            assertFalse(fixture.Equals((Int32)null));
+            //assertFalse(fixture.Equals("Not a Integer"));
         }
 
         /**

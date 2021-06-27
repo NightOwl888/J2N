@@ -725,14 +725,36 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
+            assertEquals((object)new Int64(0), (object)Int64.ValueOf(0));
+            assertEquals((object)new Int64(1), (object)Int64.ValueOf(1));
+            assertEquals((object)new Int64(-1), (object)Int64.ValueOf(-1));
+
+            Int64 fixture = new Int64(25);
+            assertEquals((object)fixture, (object)fixture);
+            assertFalse(fixture.Equals((object)null));
+            assertFalse(fixture.Equals((object)"Not a Long"));
+        }
+
+        /**
+         * @tests java.lang.Long#equals(Object)
+         */
+        [Test]
+        public void Test_equals_Int64()
+        {
+            // Implicit conversion
             assertEquals(new Int64(0), Int64.ValueOf(0));
             assertEquals(new Int64(1), Int64.ValueOf(1));
             assertEquals(new Int64(-1), Int64.ValueOf(-1));
 
+            // Explicit
+            assertTrue(new Int64(0).Equals(Int64.ValueOf(0)));
+            assertTrue(new Int64(1).Equals(Int64.ValueOf(1)));
+            assertTrue(new Int64(-1).Equals(Int64.ValueOf(-1)));
+
             Int64 fixture = new Int64(25);
             assertEquals(fixture, fixture);
-            assertFalse(fixture.Equals(null));
-            assertFalse(fixture.Equals("Not a Long"));
+            assertFalse(fixture.Equals((Int64)null));
+            //assertFalse(fixture.Equals("Not a Long"));
         }
 
         /**
