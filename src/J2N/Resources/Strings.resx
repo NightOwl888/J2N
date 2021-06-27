@@ -216,6 +216,27 @@
   <data name="Arg_KeyNotFoundWithKey" xml:space="preserve">
     <value>The given key '{0}' was not present in the dictionary.</value>
   </data>
+  <data name="Arg_MustBeByte" xml:space="preserve">
+    <value>Object must be of type Byte.</value>
+  </data>
+  <data name="Arg_MustBeDouble" xml:space="preserve">
+    <value>Object must be of type Double.</value>
+  </data>
+  <data name="Arg_MustBeInt16" xml:space="preserve">
+    <value>Object must be of type Int16.</value>
+  </data>
+  <data name="Arg_MustBeInt32" xml:space="preserve">
+    <value>Object must be of type Int32.</value>
+  </data>
+  <data name="Arg_MustBeInt64" xml:space="preserve">
+    <value>Object must be of type Int16.</value>
+  </data>
+  <data name="Arg_MustBeSByte" xml:space="preserve">
+    <value>Object must be of type SByte.</value>
+  </data>
+  <data name="Arg_MustBeSingle" xml:space="preserve">
+    <value>Object must be of type Single.</value>
+  </data>
   <data name="Arg_Need1DArray" xml:space="preserve">
     <value>Array was not a one-dimensional array.</value>
   </data>

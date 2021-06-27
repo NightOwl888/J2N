@@ -61,6 +61,42 @@ namespace J2N.Numerics
             assertEquals(1, new Int16(0).CompareTo(null));
         }
 
+        /**
+         * @tests java.lang.Short#compareTo(Object)
+         */
+        [Test]
+        public void Test_compareTo_Object()
+        {
+            // Test for method int java.lang.Short.compareTo(java.lang.Short)
+            Int16 s = new Int16((short)1);
+            Int16 x = new Int16((short)3);
+            assertTrue(
+                    "Should have returned negative value when compared to greater short",
+                    s.CompareTo((object)x) < 0);
+            x = new Int16((short)-1);
+            assertTrue(
+                    "Should have returned positive value when compared to lesser short",
+                    s.CompareTo((object)x) > 0);
+            x = new Int16((short)1);
+            assertEquals("Should have returned zero when compared to equal short",
+                                 0, s.CompareTo((object)x));
+
+            //try
+            //{
+            //    new Int16((short)0).CompareTo(null);
+            //    fail("No NPE");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //}
+
+            // J2N: Return 1 when comparing to null to match other .NET classes
+            assertEquals(1, new Int16(0).CompareTo((object)null));
+
+            // J2N: Check to ensure exception is thrown when there is a type mismatch
+            Assert.Throws<ArgumentException>(() => new Int16(0).CompareTo((object)4));
+        }
+
         // J2N: Moved to CharSequences
         ///**
         // * @tests java.lang.Short#decode(java.lang.String)

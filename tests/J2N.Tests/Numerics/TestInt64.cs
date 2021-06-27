@@ -51,6 +51,36 @@ namespace J2N.Numerics
             assertEquals(1, new Int64(0).CompareTo(null));
         }
 
+        /**
+         * @tests java.lang.Long#compareTo(Object)
+         */
+        [Test]
+        public void Test_compareTo_Object()
+        {
+            // Test for method int java.lang.Long.compareTo(java.lang.Long)
+            assertTrue("-2 compared to 1 gave non-negative answer", new Int64(-2L)
+                    .CompareTo((object)new Int64(1L)) < 0);
+            assertEquals("-2 compared to -2 gave non-zero answer", 0, new Int64(-2L)
+                    .CompareTo((object)new Int64(-2L)));
+            assertTrue("3 compared to 2 gave non-positive answer", new Int64(3L)
+                    .CompareTo((object)new Int64(2L)) > 0);
+
+            //try
+            //{
+            //    new Int64(0).CompareTo(null);
+            //    fail("No NPE");
+            //}
+            //catch (NullPointerException e)
+            //{
+            //}
+
+            // J2N: Return 1 when comparing to null to match other .NET classes
+            assertEquals(1, new Int64(0).CompareTo((object)null));
+
+            // J2N: Check to ensure exception is thrown when there is a type mismatch
+            Assert.Throws<ArgumentException>(() => new Int64(0).CompareTo((object)4));
+        }
+
         // J2N: Moved to CharSequences
         ///**
         // * @tests java.lang.Long#decode(java.lang.String)

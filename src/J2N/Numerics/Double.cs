@@ -11,8 +11,10 @@ using JCG = J2N.Collections.Generic;
 
 namespace J2N.Numerics
 {
+    using SR = J2N.Resources.Strings;
+
     /// <inheritdoc/>
-    public sealed class Double : Number, IComparable<Double>
+    public sealed class Double : Number, IComparable<Double>, IComparable
     {
         /// <summary>
         /// The value which the receiver represents.
@@ -55,31 +57,94 @@ namespace J2N.Numerics
 
         // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
-        /**
-         * Compares this object to the specified double object to determine their
-         * relative order. There are two special cases:
-         * <ul>
-         * <li>{@code Double.NaN} is equal to {@code Double.NaN} and it is greater
-         * than any other double value, including {@code Double.POSITIVE_INFINITY};</li>
-         * <li>+0.0d is greater than -0.0d</li>
-         * </ul>
-         * 
-         * @param object
-         *            the double object to compare this object to.
-         * @return a negative value if the value of this double is less than the
-         *         value of {@code object}; 0 if the value of this double and the
-         *         value of {@code object} are equal; a positive value if the value
-         *         of this double is greater than the value of {@code object}.
-         * @throws NullPointerException
-         *             if {@code object} is {@code null}.
-         * @see java.lang.Comparable
-         * @since 1.2
-         */
-        public int CompareTo(Double? other)
+        /// <summary>
+        /// Compares this instance to a specified <see cref="Double"/> and returns an indication of their relative values.
+        /// </summary>
+        /// <param name="value">A <see cref="Double"/> to compare, or <c>null</c>.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="value"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term>This instance is less than <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term>This instance is equal to <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term>This instance is greater than <paramref name="value"/>, or <paramref name="value"/> is <c>null</c>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// There are two special cases:
+        /// <list type="table">
+        ///     <item><description><see cref="double.NaN"/> is equal to <see cref="double.NaN"/> and it is greater
+        ///     than any other double value, including <see cref="double.PositiveInfinity"/></description></item>
+        ///     <item><description>+0.0d (positive zero) is greater than -0.0d (negative zero).</description></item>
+        /// </list>
+        /// <para/>
+        /// This method implements the <see cref="IComparable{T}"/> interface and performs slightly better than the <see cref="CompareTo(object?)"/>
+        /// method because it does not have to convert the <paramref name="value"/> parameter to an object.
+        /// </remarks>
+        public int CompareTo(Double? value)
         {
-            if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            if (value is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            return Compare(this.value, value.value);
+        }
 
-            return Compare(value, other.value);
+        /// <summary>
+        /// Compares this instance to a specified object and returns an indication of their relative values.
+        /// </summary>
+        /// <param name="value">An object to compare, or <c>null</c>.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="value"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term>This instance is less than <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term>This instance is equal to <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term>This instance is greater than <paramref name="value"/>, or <paramref name="value"/> is <c>null</c>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <exception cref="ArgumentException"><paramref name="value"/> is not a <see cref="Double"/>.</exception>
+        /// <remarks>
+        /// <paramref name="value"/> must be <c>null</c> or an instance of <see cref="Double"/>; otherwise, an exception is thrown.
+        /// <para/>
+        /// Any instance of <see cref="Double"/>, regardless of its value, is considered greater than <c>null</c>.
+        /// <para/>
+        /// There are two special cases:
+        /// <list type="table">
+        ///     <item><description><see cref="double.NaN"/> is equal to <see cref="double.NaN"/> and it is greater
+        ///     than any other double value, including <see cref="double.PositiveInfinity"/></description></item>
+        ///     <item><description>+0.0d (positive zero) is greater than -0.0d (negative zero).</description></item>
+        /// </list>
+        /// <para/>
+        /// This method is implemented to support the <see cref="IComparable"/> interface.
+        /// </remarks>
+        public int CompareTo(object? value)
+        {
+            if (value is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            if (!(value is Double other))
+                throw new ArgumentException(SR.Arg_MustBeDouble);
+            return Compare(this.value, other.value);
         }
 
         /// <inheritdoc/>
@@ -1841,60 +1906,40 @@ namespace J2N.Numerics
             return new Double(Parse(value, style, provider));
         }
 
-        /**
-         * Compares the two specified double values. There are two special cases:
-         * <ul>
-         * <li>{@code Double.NaN} is equal to {@code Double.NaN} and it is greater
-         * than any other double value, including {@code Double.POSITIVE_INFINITY};</li>
-         * <li>+0.0d is greater than -0.0d</li>
-         * </ul>
-         * 
-         * @param double1
-         *            the first value to compare.
-         * @param double2
-         *            the second value to compare.
-         * @return a negative value if {@code double1} is less than {@code double2};
-         *         0 if {@code double1} and {@code double2} are equal; a positive
-         *         value if {@code double1} is greater than {@code double2}.
-         */
-        public static int Compare(double double1, double double2)
+        /// <summary>
+        /// Compares the two specified <see cref="double"/> values. There are two special cases:
+        /// <list type="table">
+        ///     <item><description><see cref="double.NaN"/> is equal to <see cref="double.NaN"/> and it is greater
+        ///     than any other double value, including <see cref="double.PositiveInfinity"/></description></item>
+        ///     <item><description>+0.0d (positive zero) is greater than -0.0d (negative zero).</description></item>
+        /// </list>
+        /// </summary>
+        /// <param name="doubleA">The first value to compare.</param>
+        /// <param name="doubleB">The second value to compare.</param>
+        /// <returns>
+        /// A 32-bit signed integer that indicates the relationship between the two comparands.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term><paramref name="doubleA"/> is less than <paramref name="doubleB"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term><paramref name="doubleA"/> equal to <paramref name="doubleB"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term><paramref name="doubleA"/> is greater than <paramref name="doubleB"/>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        public static int Compare(double doubleA, double doubleB)
         {
-            return JCG.Comparer<double>.Default.Compare(double1, double2);
-
-            //// Non-zero, non-NaN checking.
-            //if (double1 > double2)
-            //{
-            //    return 1;
-            //}
-            //if (double2 > double1)
-            //{
-            //    return -1;
-            //}
-            //if (double1 == double2 && 0.0d != double1)
-            //{
-            //    return 0;
-            //}
-
-            //// NaNs are equal to other NaNs and larger than any other double
-            //if (double.IsNaN(double1))
-            //{
-            //    if (double.IsNaN(double2))
-            //    {
-            //        return 0;
-            //    }
-            //    return 1;
-            //}
-            //else if (double.IsNaN(double2))
-            //{
-            //    return -1;
-            //}
-
-            //// Deal with +0.0 and -0.0
-            //long d1 = BitConversion.DoubleToRawInt64Bits(double1);
-            //long d2 = BitConversion.DoubleToRawInt64Bits(double2);
-            //// The below expression is equivalent to:
-            //// (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
-            //return (int)((d1 >> 63) - (d2 >> 63));
+            return JCG.Comparer<double>.Default.Compare(doubleA, doubleB);
         }
 
         /**

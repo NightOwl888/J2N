@@ -11,7 +11,7 @@ namespace J2N.Numerics
     using SR = J2N.Resources.Strings;
 
     /// <inheritdoc/>
-    public sealed class Int16 : Number, IComparable<Int16>
+    public sealed class Int16 : Number, IComparable<Int16>, IComparable
     {
         /// <summary>
         /// The value which the receiver represents.
@@ -44,26 +44,80 @@ namespace J2N.Numerics
             return (byte)value;
         }
 
-        /**
-         * Compares this object to the specified short object to determine their
-         * relative order.
-         * 
-         * @param object
-         *            the short object to compare this object to.
-         * @return a negative value if the value of this short is less than the
-         *         value of {@code object}; 0 if the value of this short and the
-         *         value of {@code object} are equal; a positive value if the value
-         *         of this short is greater than the value of {@code object}.
-         * @throws NullPointerException
-         *             if {@code object} is null.
-         * @see java.lang.Comparable
-         * @since 1.2
-         */
-        public int CompareTo(Int16? other)
+        /// <summary>
+        /// Compares this instance to a specified <see cref="Int16"/> and returns an indication of their relative values.
+        /// </summary>
+        /// <param name="value">An <see cref="Int16"/> to compare, or <c>null</c>.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="value"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term>This instance is less than <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term>This instance is equal to <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term>This instance is greater than <paramref name="value"/>, or <paramref name="value"/> is <c>null</c>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// This method implements the <see cref="IComparable{T}"/> interface and performs slightly better than the <see cref="CompareTo(object?)"/>
+        /// method because it does not have to convert the <paramref name="value"/> parameter to an object.
+        /// </remarks>
+        public int CompareTo(Int16? value)
         {
-            if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            if (value is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            return this.value - value.value;
+        }
 
-            return value > other.value ? 1 : (value < other.value ? -1 : 0);
+        /// <summary>
+        /// Compares this instance to a specified object and returns an indication of their relative values.
+        /// </summary>
+        /// <param name="value">An object to compare, or <c>null</c>.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="value"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term>This instance is less than <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term>This instance is equal to <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term>This instance is greater than <paramref name="value"/>, or <paramref name="value"/> is <c>null</c>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <exception cref="ArgumentException"><paramref name="value"/> is not a <see cref="Int16"/>.</exception>
+        /// <remarks>
+        /// <paramref name="value"/> must be <c>null</c> or an instance of <see cref="Int16"/>; otherwise, an exception is thrown.
+        /// <para/>
+        /// Any instance of <see cref="Int16"/>, regardless of its value, is considered greater than <c>null</c>.
+        /// <para/>
+        /// This method is implemented to support the <see cref="IComparable"/> interface.
+        /// </remarks>
+        public int CompareTo(object? value)
+        {
+            if (value is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            if (!(value is Int16 other))
+                throw new ArgumentException(SR.Arg_MustBeInt16);
+            return this.value - other.value;
         }
 
         /// <summary>

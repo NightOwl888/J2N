@@ -160,6 +160,69 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Byte..
+        /// </summary>
+        internal static string Arg_MustBeByte {
+            get {
+                return ResourceManager.GetString("Arg_MustBeByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Double..
+        /// </summary>
+        internal static string Arg_MustBeDouble {
+            get {
+                return ResourceManager.GetString("Arg_MustBeDouble", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Int16..
+        /// </summary>
+        internal static string Arg_MustBeInt16 {
+            get {
+                return ResourceManager.GetString("Arg_MustBeInt16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Int32..
+        /// </summary>
+        internal static string Arg_MustBeInt32 {
+            get {
+                return ResourceManager.GetString("Arg_MustBeInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Int16..
+        /// </summary>
+        internal static string Arg_MustBeInt64 {
+            get {
+                return ResourceManager.GetString("Arg_MustBeInt64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type SByte..
+        /// </summary>
+        internal static string Arg_MustBeSByte {
+            get {
+                return ResourceManager.GetString("Arg_MustBeSByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Single..
+        /// </summary>
+        internal static string Arg_MustBeSingle {
+            get {
+                return ResourceManager.GetString("Arg_MustBeSingle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Array was not a one-dimensional array..
         /// </summary>
         internal static string Arg_Need1DArray {

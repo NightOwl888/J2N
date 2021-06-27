@@ -11,8 +11,10 @@ using JCG = J2N.Collections.Generic;
 
 namespace J2N.Numerics
 {
+    using SR = J2N.Resources.Strings;
+
     /// <inheritdoc/>
-    public sealed class Single : Number, IComparable<Single>
+    public sealed class Single : Number, IComparable<Single>, IComparable
     {
         /// <summary>
         /// The value which the receiver represents.
@@ -54,28 +56,94 @@ namespace J2N.Numerics
 
         // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
-        /**
-         * Compares this object to the specified float object to determine their
-         * relative order. There are two special cases:
-         * <ul>
-         * <li>{@code Float.NaN} is equal to {@code Float.NaN} and it is greater
-         * than any other float value, including {@code Float.POSITIVE_INFINITY};</li>
-         * <li>+0.0f is greater than -0.0f</li>
-         * </ul>
-         * 
-         * @param object
-         *            the float object to compare this object to.
-         * @return a negative value if the value of this float is less than the
-         *         value of {@code object}; 0 if the value of this float and the
-         *         value of {@code object} are equal; a positive value if the value
-         *         of this float is greater than the value of {@code object}.
-         * @see java.lang.Comparable
-         * @since 1.2
-         */
-        public int CompareTo(Single? other)
+        /// <summary>
+        /// Compares this instance to a specified <see cref="Single"/> and returns an indication of their relative values.
+        /// </summary>
+        /// <param name="value">An <see cref="Single"/> to compare, or <c>null</c>.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="value"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term>This instance is less than <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term>This instance is equal to <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term>This instance is greater than <paramref name="value"/>, or <paramref name="value"/> is <c>null</c>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <remarks>
+        /// There are two special cases:
+        /// <list type="table">
+        ///     <item><description><see cref="float.NaN"/> is equal to <see cref="float.NaN"/> and it is greater
+        ///     than any other double value, including <see cref="float.PositiveInfinity"/></description></item>
+        ///     <item><description>+0.0f (positive zero) is greater than -0.0f (negative zero).</description></item>
+        /// </list>
+        /// <para/>
+        /// This method implements the <see cref="IComparable{T}"/> interface and performs slightly better than the <see cref="CompareTo(object?)"/>
+        /// method because it does not have to convert the <paramref name="value"/> parameter to an object.
+        /// </remarks>
+        public int CompareTo(Single? value)
         {
-            if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
-            return Compare(value, other.value);
+            if (value is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            return Compare(this.value, value.value);
+        }
+
+        /// <summary>
+        /// Compares this instance to a specified object and returns an indication of their relative values.
+        /// </summary>
+        /// <param name="value">An object to compare, or <c>null</c>.</param>
+        /// <returns>
+        /// A signed integer that indicates the relative order of this instance and <paramref name="value"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term>This instance is less than <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term>This instance is equal to <paramref name="value"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term>This instance is greater than <paramref name="value"/>, or <paramref name="value"/> is <c>null</c>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        /// <exception cref="ArgumentException"><paramref name="value"/> is not a <see cref="Single"/>.</exception>
+        /// <remarks>
+        /// <paramref name="value"/> must be <c>null</c> or an instance of <see cref="Single"/>; otherwise, an exception is thrown.
+        /// <para/>
+        /// Any instance of <see cref="Single"/>, regardless of its value, is considered greater than <c>null</c>.
+        /// <para/>
+        /// There are two special cases:
+        /// <list type="table">
+        ///     <item><description><see cref="float.NaN"/> is equal to <see cref="float.NaN"/> and it is greater
+        ///     than any other double value, including <see cref="float.PositiveInfinity"/></description></item>
+        ///     <item><description>+0.0f (positive zero) is greater than -0.0f (negative zero).</description></item>
+        /// </list>
+        /// <para/>
+        /// This method is implemented to support the <see cref="IComparable"/> interface.
+        /// </remarks>
+        public int CompareTo(object? value)
+        {
+            if (value is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
+            if (!(value is Single other))
+                throw new ArgumentException(SR.Arg_MustBeSingle);
+            return Compare(this.value, other.value);
         }
 
         /// <inheritdoc/>
@@ -1843,62 +1911,40 @@ namespace J2N.Numerics
             return ValueOf(Parse(value, style, provider));
         }
 
-        /**
-         * Compares the two specified float values. There are two special cases:
-         * <ul>
-         * <li>{@code Float.NaN} is equal to {@code Float.NaN} and it is greater
-         * than any other float value, including {@code Float.POSITIVE_INFINITY};</li>
-         * <li>+0.0f is greater than -0.0f</li>
-         * </ul>
-         * 
-         * @param float1
-         *            the first value to compare.
-         * @param float2
-         *            the second value to compare.
-         * @return a negative value if {@code float1} is less than {@code float2};
-         *         0 if {@code float1} and {@code float2} are equal; a positive
-         *         value if {@code float1} is greater than {@code float2}.
-         * @since 1.4
-         */
-        public static int Compare(float float1, float float2)
+        /// <summary>
+        /// Compares the two specified <see cref="float"/> values. There are two special cases:
+        /// <list type="table">
+        ///     <item><description><see cref="float.NaN"/> is equal to <see cref="float.NaN"/> and it is greater
+        ///     than any other double value, including <see cref="float.PositiveInfinity"/></description></item>
+        ///     <item><description>+0.0f (positive zero) is greater than -0.0f (negative zero).</description></item>
+        /// </list>
+        /// </summary>
+        /// <param name="floatA">The first value to compare.</param>
+        /// <param name="floatB">The second value to compare.</param>
+        /// <returns>
+        /// A 32-bit signed integer that indicates the relationship between the two comparands.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Return Value</term>
+        ///         <term>Description </term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Less than zero</term>
+        ///         <term><paramref name="floatA"/> is less than <paramref name="floatB"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Zero</term>
+        ///         <term><paramref name="floatA"/> equal to <paramref name="floatB"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Greater than zero</term>
+        ///         <term><paramref name="floatA"/> is greater than <paramref name="floatB"/>.</term>
+        ///     </item>
+        /// </list>
+        /// </returns>
+        public static int Compare(float floatA, float floatB)
         {
-            return JCG.Comparer<float>.Default.Compare(float1, float2);
-
-            //// Non-zero, non-NaN checking.
-            //if (float1 > float2)
-            //{
-            //    return 1;
-            //}
-            //if (float2 > float1)
-            //{
-            //    return -1;
-            //}
-            //if (float1 == float2 && 0.0f != float1)
-            //{
-            //    return 0;
-            //}
-
-            //// NaNs are equal to other NaNs and larger than any other float
-            //if (IsNaN(float1))
-            //{
-            //    if (IsNaN(float2))
-            //    {
-            //        return 0;
-            //    }
-            //    return 1;
-            //}
-            //else if (IsNaN(float2))
-            //{
-            //    return -1;
-            //}
-
-            //// Deal with +0.0 and -0.0
-            //int f1 = SingleToRawInt32Bits(float1);
-            //int f2 = SingleToRawInt32Bits(float2);
-            //// The below expression is equivalent to:
-            //// (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
-            //// because f1 and f2 are either 0 or Integer.MIN_VALUE
-            //return (f1 >> 31) - (f2 >> 31);
+            return JCG.Comparer<float>.Default.Compare(floatA, floatB);
         }
 
         /**

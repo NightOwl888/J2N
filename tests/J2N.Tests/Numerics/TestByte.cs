@@ -520,6 +520,63 @@ namespace J2N.Numerics
         }
 
         /**
+         * @tests java.lang.Byte#compareTo(Object)
+         */
+        [Test]
+        public void Test_compareTo_Object() // J2N: Added to test IComparable overload
+        {
+            //Byte min = new Byte(byte.MinValue);
+            //Byte zero = new Byte((byte)0);
+            //Byte max = new Byte(byte.MaxValue);
+
+            //assertTrue(max.CompareTo(max) == 0);
+            //assertTrue(min.CompareTo(min) == 0);
+            //assertTrue(zero.CompareTo(zero) == 0);
+
+            //assertTrue(max.CompareTo(zero) > 0);
+            //assertTrue(max.CompareTo(min) > 0);
+
+            //assertTrue(zero.CompareTo(max) < 0);
+            //assertTrue(zero.CompareTo(min) > 0);
+
+            //assertTrue(min.CompareTo(zero) < 0);
+            //assertTrue(min.CompareTo(max) < 0);
+
+            //try
+            //{
+            //    min.CompareTo(null);
+            //    fail("No NPE");
+            //}
+            //catch (NullPointerException e)
+            //{
+            //}
+
+            // J2N: Changed from using zero to median, as zero is already in use by byte.MinValue
+            Byte min = new Byte(byte.MinValue);
+            Byte median = new Byte((byte)sbyte.MaxValue);
+            Byte max = new Byte(byte.MaxValue);
+
+            assertTrue(max.CompareTo((object)max) == 0);
+            assertTrue(min.CompareTo((object)min) == 0);
+            assertTrue(median.CompareTo((object)median) == 0);
+
+            assertTrue(max.CompareTo((object)median) > 0);
+            assertTrue(max.CompareTo((object)min) > 0);
+
+            assertTrue(median.CompareTo((object)max) < 0);
+            assertTrue(median.CompareTo((object)min) > 0);
+
+            assertTrue(min.CompareTo((object)median) < 0);
+            assertTrue(min.CompareTo((object)max) < 0);
+
+            // J2N: Return 1 when comparing to null to match other .NET classes
+            assertEquals(1, min.CompareTo((object)null));
+
+            // J2N: Check to ensure exception is thrown when there is a type mismatch
+            Assert.Throws<ArgumentException>(() => min.CompareTo((object)4));
+        }
+
+        /**
          * @tests java.lang.Byte#Byte(byte)
          */
         [Test]
@@ -569,6 +626,19 @@ namespace J2N.Numerics
             // J2N: Comparison is with byte, which is 254, not -2
             assertTrue("Comparison failed", new Byte((byte)1).CompareTo(new Byte(unchecked((byte)-2))) < 0); // assertTrue("Comparison failed", new Byte((byte)1).CompareTo(new Byte(unchecked((byte)-2))) > 0);
             assertEquals("Comparison failed", 0, new Byte((byte)1).CompareTo(new Byte((byte)1)));
+        }
+
+        /**
+         * @tests java.lang.Byte#compareTo(Object)
+         */
+        [Test]
+        public void Test_compareTo_Object2()
+        {
+            // Test for method int java.lang.Byte.compareTo(java.lang.Byte)
+            assertTrue("Comparison failed", new Byte((byte)1).CompareTo((object)new Byte((byte)2)) < 0);
+            // J2N: Comparison is with byte, which is 254, not -2
+            assertTrue("Comparison failed", new Byte((byte)1).CompareTo((object)new Byte(unchecked((byte)-2))) < 0); // assertTrue("Comparison failed", new Byte((byte)1).CompareTo(new Byte(unchecked((byte)-2))) > 0);
+            assertEquals("Comparison failed", 0, new Byte((byte)1).CompareTo((object)new Byte((byte)1)));
         }
 
         // J2N: Moved to CharSequences
