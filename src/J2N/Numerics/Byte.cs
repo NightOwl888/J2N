@@ -16,7 +16,7 @@ namespace J2N.Numerics
     /// <summary>
     /// The wrapper for the primitive type <see cref="byte"/>.
     /// </summary>
-    public sealed class Byte : Number, IComparable<Byte>, IComparable
+    public sealed class Byte : Number, IComparable<Byte>, IComparable, IEquatable<Byte>
     {
         /// <summary>
         /// The value which the receiver represents.
@@ -367,24 +367,31 @@ namespace J2N.Numerics
             return value;
         }
 
-        /**
-         * Compares this object with the specified object and indicates if they are
-         * equal. In order to be equal, {@code object} must be an instance of
-         * {@code Byte} and have the same byte value as this object.
-         * 
-         * @param object
-         *            the object to compare this byte with.
-         * @return {@code true} if the specified object is equal to this
-         *         {@code Byte}; {@code false} otherwise.
-         */
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified <see cref="Byte"/> value.
+        /// </summary>
+        /// <param name="obj">A <see cref="Byte"/> value to compare to this instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> has the same value as this instance; otherwise, <c>false</c>.</returns>
+        /// <remarks>This method implements the <see cref="IEquatable{T}"/> interface, and performs slightly better than
+        /// <see cref="Equals(object?)"/> because it does not have to convert the <paramref name="obj"/> parameter to an object.</remarks>
+        public bool Equals(Byte? obj)
+        {
+            if (obj is null) return false;
 
-        /// <inheritdoc/>
+            return ReferenceEquals(obj, this) || (value == obj.value);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare with this instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is an instance of <see cref="Byte"/> and equals the value of
+        /// this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
             if (obj is null) return false;
 
-            return ReferenceEquals(obj, this) || (obj is Byte other) // TODO: Check this logic
-                        && (value == other.value);
+            return ReferenceEquals(obj, this) || (obj is Byte other) && (value == other.value);
         }
 
         /// <inheritdoc/>

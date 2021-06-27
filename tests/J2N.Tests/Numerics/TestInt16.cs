@@ -553,14 +553,36 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
+            assertEquals((object)new Int16((short)0), (object)Int16.ValueOf((short)0));
+            assertEquals((object)new Int16((short)1), (object)Int16.ValueOf((short)1));
+            assertEquals((object)new Int16((short)-1), (object)Int16.ValueOf((short)-1));
+
+            Int16 fixture = new Int16((short)25);
+            assertEquals((object)fixture, (object)fixture);
+            assertFalse(fixture.Equals((object)null));
+            assertFalse(fixture.Equals((object)"Not a Short"));
+        }
+
+        /**
+         * @tests java.lang.Short#equals(Int16)
+         */
+        [Test]
+        public void Test_equals_Int16()
+        {
+            // Implicit conversion
             assertEquals(new Int16((short)0), Int16.ValueOf((short)0));
             assertEquals(new Int16((short)1), Int16.ValueOf((short)1));
             assertEquals(new Int16((short)-1), Int16.ValueOf((short)-1));
 
+            // Explicit
+            assertTrue(new Int16((short)0).Equals(Int16.ValueOf((short)0)));
+            assertTrue(new Int16((short)1).Equals(Int16.ValueOf((short)1)));
+            assertTrue(new Int16((short)-1).Equals(Int16.ValueOf((short)-1)));
+
             Int16 fixture = new Int16((short)25);
             assertEquals(fixture, fixture);
-            assertFalse(fixture.Equals(null));
-            assertFalse(fixture.Equals("Not a Short"));
+            assertFalse(fixture.Equals((Int16)null));
+            //assertFalse(fixture.Equals("Not a Short"));
         }
 
         /**

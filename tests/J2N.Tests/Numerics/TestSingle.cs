@@ -1138,12 +1138,46 @@ namespace J2N.Numerics
             Single f1 = new Single(8765.4321f);
             Single f2 = new Single(8765.4321f);
             Single f3 = new Single(-1.0f);
+            assertTrue("Assert 0: Equality test failed", f1.Equals((object)f2) && !(f1.Equals((object)f3)));
+
+#pragma warning disable CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("Assert 1: NaN should not be == NaN", float.NaN != float.NaN);
+#pragma warning restore CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("Assert 2: NaN should be == NaN", new Single(float.NaN).Equals((object)new Single(
+                    float.NaN)));
+            assertTrue("Assert 3: -0f should not be == 0f", 0f == -0f);
+            assertTrue("Assert 4: -0f should be equals() 0f", !new Single(0f).Equals((object)new Single(
+                    -0f)));
+
+            f1 = new Single(1098.576f);
+            f2 = new Single(1098.576f);
+            f3 = new Single(1.0f);
+            assertTrue("Equality test failed", f1.Equals((object)f2) && !(f1.Equals((object)f3)));
+
+#pragma warning disable CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("NaN should not be == NaN", float.NaN != float.NaN);
+#pragma warning restore CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("NaN should be == NaN", new Single(float.NaN)
+                    .Equals((object)new Single(float.NaN)));
+            assertTrue("-0f should not be == 0f", 0f == -0f);
+            assertTrue("-0f should be equals() 0f", !new Single(0f).Equals((object)new Single(-0f)));
+        }
+
+        /**
+         * @tests java.lang.Float#equals(Single)
+         */
+        [Test]
+        public void Test_equals_Single()
+        {
+            Single f1 = new Single(8765.4321f);
+            Single f2 = new Single(8765.4321f);
+            Single f3 = new Single(-1.0f);
             assertTrue("Assert 0: Equality test failed", f1.Equals(f2) && !(f1.Equals(f3)));
 
-#pragma warning disable CS1718 // Comparison made to same variable
-            assertTrue("Assert 1: NaN should not be == Nan", float.NaN != float.NaN);
-#pragma warning restore CS1718 // Comparison made to same variable
-            assertTrue("Assert 2: NaN should not be == Nan", new Single(float.NaN).Equals(new Single(
+#pragma warning disable CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("Assert 1: NaN should not be == NaN", float.NaN != float.NaN);
+#pragma warning restore CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("Assert 2: NaN should be == NaN", new Single(float.NaN).Equals(new Single(
                     float.NaN)));
             assertTrue("Assert 3: -0f should be == 0f", 0f == -0f);
             assertTrue("Assert 4: -0f should not be equals() 0f", !new Single(0f).Equals(new Single(
@@ -1154,13 +1188,13 @@ namespace J2N.Numerics
             f3 = new Single(1.0f);
             assertTrue("Equality test failed", f1.Equals(f2) && !(f1.Equals(f3)));
 
-#pragma warning disable CS1718 // Comparison made to same variable
-            assertTrue("NaN should not be == Nan", float.NaN != float.NaN);
-#pragma warning restore CS1718 // Comparison made to same variable
-            assertTrue("NaN should not be == Nan", new Single(float.NaN)
+#pragma warning disable CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("NaN should not be == NaN", float.NaN != float.NaN);
+#pragma warning restore CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
+            assertTrue("NaN should be == NaN", new Single(float.NaN)
                     .Equals(new Single(float.NaN)));
-            assertTrue("-0f should be == 0f", 0f == -0f);
-            assertTrue("-0f should not be equals() 0f", !new Single(0f).Equals(new Single(-0f)));
+            assertTrue("-0f should not be == 0f", 0f == -0f);
+            assertTrue("-0f should be equals() 0f", !new Single(0f).Equals(new Single(-0f)));
         }
 
         /**

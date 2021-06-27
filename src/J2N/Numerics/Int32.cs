@@ -11,7 +11,7 @@ namespace J2N.Numerics
     using SR = J2N.Resources.Strings;
 
     /// <inheritdoc/>
-    public sealed class Int32 : Number, IComparable<Int32>, IComparable
+    public sealed class Int32 : Number, IComparable<Int32>, IComparable, IEquatable<Int32>
     {
         /// <summary>
         /// Constant for the number of bits needed to represent a <see cref="int"/> in
@@ -23,7 +23,6 @@ namespace J2N.Numerics
         /// The value which the receiver represents.
         /// </summary>
         private readonly int value;
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Int32"/> class.
@@ -352,23 +351,31 @@ namespace J2N.Numerics
             return value;
         }
 
-        /**
-         * Compares this instance with the specified object and indicates if they
-         * are equal. In order to be equal, {@code o} must be an instance of
-         * {@code Integer} and have the same integer value as this object.
-         * 
-         * @param o
-         *            the object to compare this integer with.
-         * @return {@code true} if the specified object is equal to this
-         *         {@code Integer}; {@code false} otherwise.
-         */
-        /// <inheritdoc/>
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified <see cref="Int32"/> value.
+        /// </summary>
+        /// <param name="obj">A <see cref="Int32"/> value to compare to this instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> has the same value as this instance; otherwise, <c>false</c>.</returns>
+        /// <remarks>This method implements the <see cref="IEquatable{T}"/> interface, and performs slightly better than
+        /// <see cref="Equals(object?)"/> because it does not have to convert the <paramref name="obj"/> parameter to an object.</remarks>
+        public bool Equals(Int32? obj)
+        {
+            if (obj is null) return false;
+
+            return ReferenceEquals(obj, this) || (value == obj.value);
+        }
+
+        /// <summary>
+        /// Returns a value indicating whether this instance is equal to a specified object.
+        /// </summary>
+        /// <param name="obj">An object to compare with this instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is an instance of <see cref="Int32"/> and equals the value of
+        /// this instance; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
             if (obj is null) return false;
 
-            return (obj is Int32 other)
-                && (value == other.value);
+            return ReferenceEquals(obj, this) || (obj is Int32 other) && (value == other.value);
         }
 
         /// <inheritdoc/>

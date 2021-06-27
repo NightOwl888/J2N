@@ -122,14 +122,36 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
+            assertEquals((object)new Byte((byte)0), Byte.ValueOf((byte)0));
+            assertEquals((object)new Byte((byte)1), Byte.ValueOf((byte)1));
+            assertEquals((object)new Byte(unchecked((byte)-1)), Byte.ValueOf(unchecked((byte)-1)));
+
+            Byte fixture = new Byte((byte)25);
+            assertEquals((object)fixture, (object)fixture);
+            assertFalse(fixture.Equals((object)null));
+            assertFalse(fixture.Equals((object)"Not a Byte"));
+        }
+
+        /**
+         * @tests java.lang.Byte#equals(Byte)
+         */
+        [Test]
+        public void Test_equals_Byte()
+        {
+            // Implicit conversion
             assertEquals(new Byte((byte)0), Byte.ValueOf((byte)0));
             assertEquals(new Byte((byte)1), Byte.ValueOf((byte)1));
             assertEquals(new Byte(unchecked((byte)-1)), Byte.ValueOf(unchecked((byte)-1)));
 
+            // Explicit
+            assertTrue(new Byte((byte)0).Equals(Byte.ValueOf((byte)0)));
+            assertTrue(new Byte((byte)1).Equals(Byte.ValueOf((byte)1)));
+            assertTrue(new Byte(unchecked((byte)-1)).Equals(Byte.ValueOf(unchecked((byte)-1))));
+
             Byte fixture = new Byte((byte)25);
             assertEquals(fixture, fixture);
-            assertFalse(fixture.Equals(null));
-            assertFalse(fixture.Equals("Not a Byte"));
+            assertFalse(fixture.Equals((Byte)null));
+            //assertFalse(fixture.Equals("Not a Byte"));
         }
 
         /**
@@ -732,6 +754,20 @@ namespace J2N.Numerics
          */
         [Test]
         public void Test_equalsLjava_lang_Object2()
+        {
+            // Test for method boolean java.lang.Byte.equals(java.lang.Object)
+            Byte b1 = new Byte((byte)90);
+            Byte b2 = new Byte((byte)90);
+            Byte b3 = new Byte(unchecked((byte)-90));
+            assertTrue("Equality test failed", b1.Equals((object)b2));
+            assertTrue("Equality test failed", !b1.Equals((object)b3));
+        }
+
+        /**
+         * @tests java.lang.Byte#equals(Byte)
+         */
+        [Test]
+        public void Test_equals_Byte2()
         {
             // Test for method boolean java.lang.Byte.equals(java.lang.Object)
             Byte b1 = new Byte((byte)90);
