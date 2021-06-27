@@ -29,17 +29,15 @@ namespace J2N.Numerics
         /// </summary>
         public const int Size = 8;
 
-        /**
-         * A cache of instances used by {@link #valueOf(byte)} and auto-boxing.
-         */
+        /// <summary>
+        /// A cache of instances used by <see cref="ValueOf(byte)"/> and auto-boxing.
+        /// </summary>
         private static readonly Byte[] Cache = new Byte[256];
 
-        /**
-         * Constructs a new {@code Byte} with the specified primitive byte value.
-         * 
-         * @param value
-         *            the primitive byte value to store in the new instance.
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Byte"/> class.
+        /// </summary>
+        /// <param name="value">The primitive <see cref="byte"/> value to store in the new instance.</param>
         internal Byte(byte value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;

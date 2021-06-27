@@ -24,13 +24,10 @@ namespace J2N.Numerics
         /// </summary>
         public const int Size = 64;
 
-
-        /**
-         * Constructs a new {@code Long} with the specified primitive long value.
-         * 
-         * @param value
-         *            the primitive long value to store in the new instance.
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Int64"/> class.
+        /// </summary>
+        /// <param name="value">The primitive <see cref="long"/> value to store in the new instance.</param>
         internal Int64(long value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;

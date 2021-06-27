@@ -25,13 +25,10 @@ namespace J2N.Numerics
         private readonly int value;
 
 
-        /**
-         * Constructs a new {@code Integer} with the specified primitive integer
-         * value.
-         * 
-         * @param value
-         *            the primitive integer value to store in the new instance.
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Int32"/> class.
+        /// </summary>
+        /// <param name="value">The primitive <see cref="int"/> value to store in the new instance.</param>
         internal Int32(int value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;

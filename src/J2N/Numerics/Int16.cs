@@ -25,12 +25,10 @@ namespace J2N.Numerics
         /// </summary>
         public const int Size = 16;
 
-        /**
-         * Constructs a new {@code Short} with the specified primitive short value.
-         *
-         * @param value
-         *            the primitive short value to store in the new instance.
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Int16"/> class.
+        /// </summary>
+        /// <param name="value">The primitive <see cref="short"/> value to store in the new instance.</param>
         internal Int16(short value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;

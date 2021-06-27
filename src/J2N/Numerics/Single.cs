@@ -43,12 +43,10 @@ namespace J2N.Numerics
         /// </summary>
         public const int Size = 32;
 
-        /**
-         * Constructs a new {@code Float} with the specified primitive float value.
-         * 
-         * @param value
-         *            the primitive float value to store in the new instance.
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Single"/> class.
+        /// </summary>
+        /// <param name="value">The primitive <see cref="float"/> value to store in the new instance.</param>
         internal Single(float value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;
