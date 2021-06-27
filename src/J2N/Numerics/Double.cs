@@ -43,13 +43,10 @@ namespace J2N.Numerics
         /// </summary>
         public const int Size = 64;
 
-        /**
-         * Constructs a new {@code Double} with the specified primitive double
-         * value.
-         * 
-         * @param value
-         *            the primitive double value to store in the new instance.
-         */
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Double"/> class.
+        /// </summary>
+        /// <param name="value">The primitive <see cref="double"/> value to store in the new instance.</param>
         internal Double(double value) // J2N: This has been marked deprecated in JDK 16, so we are marking it internal
         {
             this.value = value;
