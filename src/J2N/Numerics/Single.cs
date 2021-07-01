@@ -423,7 +423,10 @@ namespace J2N.Numerics
 
         #region GetHashCode
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer hash code.</returns>
         public override int GetHashCode()
         {
             return SingleToInt32Bits(value);

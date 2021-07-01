@@ -409,11 +409,18 @@ namespace J2N.Numerics
             return (int)(value ^ (value.TripleShift(32)));
         }
 
-        /// <inheritdoc/>
+        #region GetHashCode
+
+        /// <summary>
+        /// Returns the hash code for this instance.
+        /// </summary>
+        /// <returns>A 32-bit signed integer hash code.</returns>
         public override int GetInt32Value()
         {
             return (int)value;
         }
+
+        #endregion GetHashCode
 
         /**
          * Gets the primitive value of this long.
