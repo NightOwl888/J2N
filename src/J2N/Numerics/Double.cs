@@ -148,12 +148,6 @@ namespace J2N.Numerics
 
         #endregion CompareTo
 
-        /// <inheritdoc/>
-        public override byte GetByteValue()
-        {
-            return (byte)value;
-        }
-
         #region DoubleToInt64Bits
 
         /// <summary>
@@ -250,16 +244,6 @@ namespace J2N.Numerics
         }
 
         #endregion DoubleToRawInt64Bits
-
-        /**
-         * Gets the primitive value of this double.
-         * 
-         * @return this object's primitive value.
-         */
-        public override double GetDoubleValue()
-        {
-            return value;
-        }
 
         #region Equals
 
@@ -414,12 +398,6 @@ namespace J2N.Numerics
 
         #endregion Equals
 
-        /// <inheritdoc/>
-        public override float GetSingleValue()
-        {
-            return (float)value;
-        }
-
         #region GetHashCode
 
         /// <summary>
@@ -433,12 +411,6 @@ namespace J2N.Numerics
         }
 
         #endregion GetHashCode
-
-        /// <inheritdoc/>
-        public override int GetInt32Value()
-        {
-            return (int)value;
-        }
 
         #region IsFinite
 
@@ -667,12 +639,6 @@ namespace J2N.Numerics
         }
 
         #endregion Int64BitsToDouble
-
-        /// <inheritdoc/>
-        public override long GetInt64Value()
-        {
-            return (long)value;
-        }
 
         #region Parse_CharSequence_IFormatProvider
 
@@ -2164,12 +2130,6 @@ namespace J2N.Numerics
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
-        /// <inheritdoc/>
-        public override short GetInt16Value()
-        {
-            return (short)value;
-        }
-
         //@Override
         //public String toString()
         //{
@@ -2414,5 +2374,52 @@ namespace J2N.Numerics
         public static implicit operator double(Double value) => value.value;
         /// <inheritdoc/>
         public static implicit operator Double(double value) => ValueOf(value);
+
+        #region IConvertible implementation
+
+        /// <inheritdoc/>
+        public override byte ToByte()
+        {
+            return (byte)value;
+        }
+
+        /// <inheritdoc/>
+        public override double ToDouble()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public override short ToInt16()
+        {
+            return (short)value;
+        }
+
+        /// <inheritdoc/>
+        public override int ToInt32()
+        {
+            return (int)value;
+        }
+
+        /// <inheritdoc/>
+        public override long ToInt64()
+        {
+            return (long)value;
+        }
+
+        /// <inheritdoc/>
+        [CLSCompliant(false)]
+        public override sbyte ToSByte()
+        {
+            return (sbyte)value;
+        }
+
+        /// <inheritdoc/>
+        public override float ToSingle()
+        {
+            return (float)value;
+        }
+
+        #endregion
     }
 }

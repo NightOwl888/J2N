@@ -104,7 +104,7 @@ namespace J2N.Numerics
             // Test for method java.lang.Float(float)
 
             Single f = new Single(900.89f);
-            assertTrue("Created incorrect float", f.GetSingleValue() == 900.89f);
+            assertTrue("Created incorrect float", f.ToSingle() == 900.89f);
         }
 
         /**
@@ -130,7 +130,7 @@ namespace J2N.Numerics
             // Test for method byte java.lang.Float.byteValue()
             Single f = new Single(0.46874f);
             Single f2 = new Single(90.8f);
-            assertTrue("Returned incorrect byte value", f.GetByteValue() == 0 && f2.GetByteValue() == 90);
+            assertTrue("Returned incorrect byte value", f.ToByte() == 0 && f2.ToByte() == 90);
         }
 
         /**
@@ -186,7 +186,7 @@ namespace J2N.Numerics
         {
             // Test for method double java.lang.Float.doubleValue()
             assertTrue("Incorrect double value returned", Math.Abs(new Single(999999.999f)
-                    .GetDoubleValue() - 999999.999d) < 1);
+                    .ToDouble() - 999999.999d) < 1);
         }
 
         /**
@@ -221,8 +221,8 @@ namespace J2N.Numerics
             // Test for method float java.lang.Float.floatValue()
             Single f = new Single(87.657f);
             Single f2 = new Single(-0.876f);
-            assertTrue("Returned incorrect floatValue", f.GetSingleValue() == 87.657f
-                    && (f2.GetSingleValue() == -0.876f));
+            assertTrue("Returned incorrect floatValue", f.ToSingle() == 87.657f
+                    && (f2.ToSingle() == -0.876f));
 
         }
 
@@ -267,7 +267,7 @@ namespace J2N.Numerics
             // Test for method int java.lang.Float.intValue()
             Single f = new Single(0.46874f);
             Single f2 = new Single(90.8f);
-            assertTrue("Returned incorrect int value", f.GetInt32Value() == 0 && f2.GetInt32Value() == 90);
+            assertTrue("Returned incorrect int value", f.ToInt32() == 0 && f2.ToInt32() == 90);
         }
 
         /**
@@ -558,7 +558,7 @@ namespace J2N.Numerics
             // Test for method long java.lang.Float.longValue()
             Single f = new Single(0.46874f);
             Single f2 = new Single(90.8f);
-            assertTrue("Returned incorrect long value", f.GetInt64Value() == 0 && f2.GetInt64Value() == 90);
+            assertTrue("Returned incorrect long value", f.ToInt64() == 0 && f2.ToInt64() == 90);
         }
 
         // J2N: Moved to CharSequences
@@ -1128,8 +1128,8 @@ namespace J2N.Numerics
             // Test for method short java.lang.Float.shortValue()
             Single f = new Single(0.46874f);
             Single f2 = new Single(90.8f);
-            assertTrue("Returned incorrect short value", f.GetInt16Value() == 0
-                    && f2.GetInt16Value() == 90);
+            assertTrue("Returned incorrect short value", f.ToInt16() == 0
+                    && f2.ToInt16() == 90);
         }
 
         /**
@@ -1264,7 +1264,7 @@ namespace J2N.Numerics
                     + Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture) + ")", Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
             Single f = new Single(ff);
             assertTrue("Incorrect String representation want " + answer + ", got ("
-                    + Single.ToString(f.GetSingleValue(), J2N.Text.StringFormatter.InvariantCulture) + ")", Single.ToString(f.GetSingleValue(), J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    + Single.ToString(f.ToSingle(), J2N.Text.StringFormatter.InvariantCulture) + ")", Single.ToString(f.ToSingle(), J2N.Text.StringFormatter.InvariantCulture).Equals(
                     answer));
             assertTrue("Incorrect String representation want " + answer + ", got (" + f.ToString(J2N.Text.StringFormatter.InvariantCulture)
                     + ")", f.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));

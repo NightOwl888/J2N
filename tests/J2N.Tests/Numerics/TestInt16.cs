@@ -23,9 +23,9 @@ namespace J2N.Numerics
         {
             // Test for method byte java.lang.Short.byteValue()
             assertEquals("Returned incorrect byte value", 0, new Int16(short.MinValue)
-                    .GetByteValue());
+                    .ToByte());
             assertEquals("Returned incorrect byte value", -1, (sbyte)new Int16(short.MaxValue)
-                    .GetByteValue()); // J2N: cast required to change the result to negative
+                    .ToByte()); // J2N: cast required to change the result to negative
         }
 
         /**
@@ -392,9 +392,9 @@ namespace J2N.Numerics
             // Test for method java.lang.Short
             // java.lang.Short.valueOf(java.lang.String)
             assertEquals("Returned incorrect short", -32768, Int16.ValueOf("-32768", J2N.Text.StringFormatter.InvariantCulture)
-                    .GetInt16Value());
+                    .ToInt16());
             assertEquals("Returned incorrect short", 32767, Int16.ValueOf("32767", J2N.Text.StringFormatter.InvariantCulture)
-                    .GetInt16Value());
+                    .ToInt16());
         }
 
         /**
@@ -407,25 +407,25 @@ namespace J2N.Numerics
             // java.lang.Short.valueOf(java.lang.String, int)
             bool aThrow = true;
             assertEquals("Incorrectly parsed hex string", 255, Int16.ValueOf("FF", 16)
-                    .GetInt16Value());
+                    .ToInt16());
             assertEquals("Incorrectly parsed oct string", 16, Int16.ValueOf("20", 8)
-                    .GetInt16Value());
+                    .ToInt16());
             assertEquals("Incorrectly parsed dec string", 20, Int16.ValueOf("20", 10)
-                    .GetInt16Value());
+                    .ToInt16());
             assertEquals("Incorrectly parsed bin string", 4, Int16.ValueOf("100", 2)
-                    .GetInt16Value());
+                    .ToInt16());
             assertEquals("Incorrectly parsed -hex string", -255, Int16.ValueOf("-FF", 16)
-                    .GetInt16Value());
+                    .ToInt16());
             assertEquals("Incorrectly parsed -oct string", -16, Int16.ValueOf("-20", 8)
-                    .GetInt16Value());
+                    .ToInt16());
             assertEquals("Incorrectly parsed -bin string", -4, Int16.ValueOf("-100", 2)
-                    .GetInt16Value());
+                    .ToInt16());
             assertTrue("Did not decode 32767 correctly", Int16.ValueOf("32767", 10)
-                    .GetInt16Value() == (short)32767);
+                    .ToInt16() == (short)32767);
             assertTrue("Did not decode -32767 correctly", Int16.ValueOf("-32767",
-                    10).GetInt16Value() == (short)-32767);
+                    10).ToInt16() == (short)-32767);
             assertTrue("Did not decode -32768 correctly", Int16.ValueOf("-32768",
-                    10).GetInt16Value() == (short)-32768);
+                    10).ToInt16() == (short)-32768);
             try
             {
                 Int16.ValueOf("FF", 2);
@@ -529,10 +529,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_ConstructorS()
         {
-            assertEquals(1, new Int16((short)1).GetInt16Value());
-            assertEquals(2, new Int16((short)2).GetInt16Value());
-            assertEquals(0, new Int16((short)0).GetInt16Value());
-            assertEquals(-1, new Int16((short)-1).GetInt16Value());
+            assertEquals(1, new Int16((short)1).ToInt16());
+            assertEquals(2, new Int16((short)2).ToInt16());
+            assertEquals(0, new Int16((short)0).ToInt16());
+            assertEquals(-1, new Int16((short)-1).ToInt16());
         }
 
         /**
@@ -541,10 +541,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_booleanValue()
         {
-            assertEquals(1, new Int16((short)1).GetByteValue());
-            assertEquals(2, new Int16((short)2).GetByteValue());
-            assertEquals(0, new Int16((short)0).GetByteValue());
-            assertEquals(-1, (sbyte)new Int16((short)-1).GetByteValue()); // J2N: cast required to change the result to negative
+            assertEquals(1, new Int16((short)1).ToByte());
+            assertEquals(2, new Int16((short)2).ToByte());
+            assertEquals(0, new Int16((short)0).ToByte());
+            assertEquals(-1, (sbyte)new Int16((short)-1).ToByte()); // J2N: cast required to change the result to negative
         }
 
         /**
@@ -659,8 +659,8 @@ namespace J2N.Numerics
             assertEquals(new Int16((short)-1), Int16.ValueOf("-1", 10));
 
             //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Int16.ValueOf("1", 2).GetByteValue());
-            assertEquals(Character.Digit('F', 16), Int16.ValueOf("F", 16).GetByteValue());
+            assertEquals(Character.Digit('1', 2), Int16.ValueOf("1", 2).ToByte());
+            assertEquals(Character.Digit('F', 16), Int16.ValueOf("F", 16).ToByte());
 
             try
             {
@@ -825,9 +825,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_doubleValue()
         {
-            assertEquals(-1D, new Int16((short)-1).GetDoubleValue(), 0D);
-            assertEquals(0D, new Int16((short)0).GetDoubleValue(), 0D);
-            assertEquals(1D, new Int16((short)1).GetDoubleValue(), 0D);
+            assertEquals(-1D, new Int16((short)-1).ToDouble(), 0D);
+            assertEquals(0D, new Int16((short)0).ToDouble(), 0D);
+            assertEquals(1D, new Int16((short)1).ToDouble(), 0D);
         }
 
         /**
@@ -836,9 +836,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_floatValue()
         {
-            assertEquals(-1F, new Int16((short)-1).GetSingleValue(), 0F);
-            assertEquals(0F, new Int16((short)0).GetSingleValue(), 0F);
-            assertEquals(1F, new Int16((short)1).GetSingleValue(), 0F);
+            assertEquals(-1F, new Int16((short)-1).ToSingle(), 0F);
+            assertEquals(0F, new Int16((short)0).ToSingle(), 0F);
+            assertEquals(1F, new Int16((short)1).ToSingle(), 0F);
         }
 
         /**
@@ -847,9 +847,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_intValue()
         {
-            assertEquals(-1, new Int16((short)-1).GetInt32Value());
-            assertEquals(0, new Int16((short)0).GetInt32Value());
-            assertEquals(1, new Int16((short)1).GetInt32Value());
+            assertEquals(-1, new Int16((short)-1).ToInt32());
+            assertEquals(0, new Int16((short)0).ToInt32());
+            assertEquals(1, new Int16((short)1).ToInt32());
         }
 
         /**
@@ -858,9 +858,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_longValue()
         {
-            assertEquals(-1L, new Int16((short)-1).GetInt64Value());
-            assertEquals(0L, new Int16((short)0).GetInt64Value());
-            assertEquals(1L, new Int16((short)1).GetInt64Value());
+            assertEquals(-1L, new Int16((short)-1).ToInt64());
+            assertEquals(0L, new Int16((short)0).ToInt64());
+            assertEquals(1L, new Int16((short)1).ToInt64());
         }
 
         /**
@@ -869,9 +869,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_shortValue()
         {
-            assertEquals(-1, new Int16((short)-1).GetInt16Value());
-            assertEquals(0, new Int16((short)0).GetInt16Value());
-            assertEquals(1, new Int16((short)1).GetInt16Value());
+            assertEquals(-1, new Int16((short)-1).ToInt16());
+            assertEquals(0, new Int16((short)0).ToInt16());
+            assertEquals(1, new Int16((short)1).ToInt16());
         }
 
         /**

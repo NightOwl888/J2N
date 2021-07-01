@@ -193,7 +193,7 @@ namespace J2N.Numerics
         {
             assertEquals(answer, Double.ToString(dd, J2N.Text.StringFormatter.InvariantCulture));
             Double d = new Double(dd);
-            assertEquals(answer, Double.ToString(d.GetDoubleValue(), J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(answer, Double.ToString(d.ToDouble(), J2N.Text.StringFormatter.InvariantCulture));
             assertEquals(answer, d.ToString(J2N.Text.StringFormatter.InvariantCulture));
         }
 
@@ -205,7 +205,7 @@ namespace J2N.Numerics
         {
             Double d = new Double(39089.88888888888888888888888888888888);
             assertEquals("Created incorrect double", 39089.88888888888888888888888888888888, d
-                    .GetDoubleValue(), 0D);
+                    .ToDouble(), 0D);
         }
 
         /**
@@ -218,7 +218,7 @@ namespace J2N.Numerics
 
             Double d = Double.Parse("39089.88888888888888888888888888888888", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Created incorrect double", 39089.88888888888888888888888888888888, d
-                    .GetDoubleValue(), 0D);
+                    .ToDouble(), 0D);
 
 
             // Regression test for HARMONY-489
@@ -234,7 +234,7 @@ namespace J2N.Numerics
 
             // Regression test for HARMONY-329
             d = Double.Parse("-1.233999999999999965116738099630936817275852021384209929081813042837802886790127428328465579708849276001782791006814286802871737087810957327493372866733334925806221045495205250590286471187577636646208155890426896101636282423463443661040209738873506655844025580428394216030152374941053494694642722606658935546875E-112", J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals("Failed to parse long string", -1.234E-112D, d.GetDoubleValue(), 0D);
+            assertEquals("Failed to parse long string", -1.234E-112D, d.ToDouble(), 0D);
         }
 
         /**
@@ -244,7 +244,7 @@ namespace J2N.Numerics
         public void Test_byteValue()
         {
             Double d = new Double(1923311.47712);
-            assertEquals("Returned incorrect byte value", (sbyte)-17, (sbyte)d.GetByteValue());
+            assertEquals("Returned incorrect byte value", (sbyte)-17, (sbyte)d.ToByte());
         }
 
         /**
@@ -299,10 +299,10 @@ namespace J2N.Numerics
         {
             // Test for method long java.lang.Double.doubleToLongBits(double)
             Double d = new Double(double.MaxValue);
-            long lbits = Double.DoubleToInt64Bits(d.GetDoubleValue());
+            long lbits = Double.DoubleToInt64Bits(d.ToDouble());
             double r = Double.Int64BitsToDouble(lbits);
 
-            assertTrue("Bit conversion failed", d.GetDoubleValue() == r);
+            assertTrue("Bit conversion failed", d.ToDouble() == r);
         }
 
         /**
@@ -323,7 +323,7 @@ namespace J2N.Numerics
         public void Test_doubleValue()
         {
             assertEquals("Incorrect double value returned", 999999999999999.9999999999999,
-                    new Double(999999999999999.9999999999999).GetDoubleValue(), 0D);
+                    new Double(999999999999999.9999999999999).ToDouble(), 0D);
         }
 
         /**
@@ -336,7 +336,7 @@ namespace J2N.Numerics
             assertTrue(
                     "Incorrect float value returned ",
                     Math
-                            .Abs(new Double(999999999999999.9999999999999d).GetSingleValue() - 999999999999999.9999999999999f) < 1);
+                            .Abs(new Double(999999999999999.9999999999999d).ToSingle() - 999999999999999.9999999999999f) < 1);
         }
 
         /**
@@ -353,7 +353,7 @@ namespace J2N.Numerics
                 assertTrue("Should not be identical ", d != dd);
                 assertTrue("Should be equals 1 ", d.Equals(dd));
                 assertTrue("Should be equals 2 ", dd.Equals(d));
-                assertTrue("Should have identical values ", dd.GetDoubleValue() == d.GetDoubleValue());
+                assertTrue("Should have identical values ", dd.ToDouble() == d.ToDouble());
                 assertTrue("Invalid hash for equal but not identical doubles ", d.GetHashCode() == dd
                         .GetHashCode());
             }
@@ -368,7 +368,7 @@ namespace J2N.Numerics
         {
             // Test for method int java.lang.Double.intValue()
             Double d = new Double(1923311.47712);
-            assertEquals("Returned incorrect int value", 1923311, d.GetInt32Value());
+            assertEquals("Returned incorrect int value", 1923311, d.ToInt32());
         }
 
         /**
@@ -419,7 +419,7 @@ namespace J2N.Numerics
             // Test for method boolean java.lang.Double.isNaN(double)
 
             Double d = new Double(0.0 / 0.0);
-            assertTrue("NAN check failed", d.GetDoubleValue().IsNaN());
+            assertTrue("NAN check failed", d.ToDouble().IsNaN());
         }
 
         public static IEnumerable<TestCaseData> Test_IsInfinity_Data
@@ -666,10 +666,10 @@ namespace J2N.Numerics
             // Test for method double java.lang.Double.longBitsToDouble(long)
 
             Double d = new Double(double.MaxValue);
-            long lbits = Double.DoubleToInt64Bits(d.GetDoubleValue());
+            long lbits = Double.DoubleToInt64Bits(d.ToDouble());
             double r = Double.Int64BitsToDouble(lbits);
 
-            assertTrue("Bit conversion failed", d.GetDoubleValue() == r);
+            assertTrue("Bit conversion failed", d.ToDouble() == r);
         }
 
         /**
@@ -680,7 +680,7 @@ namespace J2N.Numerics
         {
             // Test for method long java.lang.Double.longValue()
             Double d = new Double(1923311.47712);
-            assertEquals("Returned incorrect long value", 1923311, d.GetInt64Value());
+            assertEquals("Returned incorrect long value", 1923311, d.ToInt64());
         }
 
         // J2N: Moved to CharSequences
@@ -1488,7 +1488,7 @@ namespace J2N.Numerics
         {
             // Test for method short java.lang.Double.shortValue()
             Double d = new Double(1923311.47712);
-            assertEquals("Returned incorrect short value", 22767, d.GetInt16Value());
+            assertEquals("Returned incorrect short value", 22767, d.ToInt16());
         }
 
         /**
@@ -1629,7 +1629,7 @@ namespace J2N.Numerics
             // Test for method java.lang.Double
             // java.lang.Double.valueOf(java.lang.String)
             assertTrue("Incorrect double returned", Math.Abs(Double.ValueOf("999999999999.999", J2N.Text.StringFormatter.InvariantCulture)
-                    .GetDoubleValue() - 999999999999.999d) < 1);
+                    .ToDouble() - 999999999999.999d) < 1);
 
             try
             {
@@ -1652,7 +1652,7 @@ namespace J2N.Numerics
             }
 
             Double pi = Double.ValueOf("3.141592654", J2N.Text.StringFormatter.InvariantCulture);
-            assertEquals(3.141592654, pi.GetDoubleValue(), 0D);
+            assertEquals(3.141592654, pi.ToDouble(), 0D);
 
             Double posZero = Double.ValueOf("+0.0", J2N.Text.StringFormatter.InvariantCulture);
             Double negZero = Double.ValueOf("-0.0", J2N.Text.StringFormatter.InvariantCulture);

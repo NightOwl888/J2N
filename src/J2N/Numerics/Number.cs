@@ -17,47 +17,73 @@ namespace J2N.Numerics
         /// <summary>
         /// Returns this object's value as a <see cref="byte"/>. Might involve rounding and/or
         /// truncating the value, so it fits into a <see cref="byte"/>.
+        /// <para/>
+        /// Usage Note: This is similar to byteValue() in the JDK, however for an exact match
+        /// use <see cref="ToSByte()"/>.
         /// </summary>
         /// <returns>the primitive <see cref="byte"/> value of this object.</returns>
-        public virtual byte GetByteValue() // J2N TODO: Rename To...() and drop "value"
+        public virtual byte ToByte()
         {
-            return (byte)GetInt32Value();
+            return (byte)ToInt32();
+        }
+
+        /// <summary>
+        /// Returns this object's value as a <see cref="sbyte"/>. Might involve rounding and/or
+        /// truncating the value, so it fits into a <see cref="sbyte"/>.
+        /// <para/>
+        /// Usage Note: This is the equivalent operation of byteValue() in the JDK.
+        /// </summary>
+        /// <returns>the primitive <see cref="sbyte"/> value of this object.</returns>
+        [CLSCompliant(false)]
+        public virtual sbyte ToSByte()
+        {
+            return (sbyte)ToInt32();
         }
 
         /// <summary>
         /// Returns this object's value as a <see cref="double"/>. Might involve rounding.
+        /// <para/>
+        /// Usage Note: This is the equivalent operation of doubleValue() in the JDK.
         /// </summary>
         /// <returns>the primitive <see cref="double"/> value of this object.</returns>
-        public abstract double GetDoubleValue(); // J2N TODO: Rename To...() and drop "value"
+        public abstract double ToDouble();
 
         /// <summary>
         /// Returns this object's value as a <see cref="float"/>. Might involve rounding.
+        /// <para/>
+        /// Usage Note: This is the equivalent operation of floatValue() in the JDK.
         /// </summary>
         /// <returns>the primitive <see cref="float"/> value of this object.</returns>
-        public abstract float GetSingleValue(); // J2N TODO: Rename To...() and drop "value"
+        public abstract float ToSingle();
 
         /// <summary>
         /// Returns this object's value as an <see cref="int"/>. Might involve rounding and/or
         /// truncating the value, so it fits into an <see cref="int"/>.
+        /// <para/>
+        /// Usage Note: This is the equivalent operation of intValue() in the JDK.
         /// </summary>
         /// <returns>the primitive <see cref="int"/> value of this object.</returns>
-        public abstract int GetInt32Value(); // J2N TODO: Rename To...() and drop "value"
+        public abstract int ToInt32();
 
         /// <summary>
         /// Returns this object's value as a <see cref="long"/>. Might involve rounding and/or
         /// truncating the value, so it fits into a <see cref="long"/>.
+        /// <para/>
+        /// Usage Note: This is the equivalent operation of longValue() in the JDK.
         /// </summary>
         /// <returns>the primitive <see cref="long"/> value of this object.</returns>
-        public abstract long GetInt64Value(); // J2N TODO: Rename To...() and drop "value"
+        public abstract long ToInt64();
 
         /// <summary>
         /// Returns this object's value as a <see cref="short"/>. Might involve rounding and/or
         /// truncating the value, so it fits into a <see cref="short"/>.
+        /// <para/>
+        /// Usage Note: This is the equivalent operation of shortValue() in the JDK.
         /// </summary>
         /// <returns>the primitive <see cref="short"/> value of this object.</returns>
-        public virtual short GetInt16Value() // J2N TODO: Rename To...() and drop "value"
+        public virtual short ToInt16()
         {
-            return (short)GetInt32Value();
+            return (short)ToInt32();
         }
 
         /// <summary>
