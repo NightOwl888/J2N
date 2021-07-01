@@ -1569,7 +1569,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
@@ -2215,22 +2215,22 @@ namespace J2N.Numerics
             //return org.apache.harmony.luni.util.NumberConverter.convert(d);
         }
 
-        ///**
-        // * Parses the specified string as a double value.
-        // * 
-        // * @param string
-        // *            the string representation of a double value.
-        // * @return a {@code Double} instance containing the double value represented
-        // *         by {@code string}.
-        // * @throws NumberFormatException
-        // *             if {@code string} is {@code null}, has a length of zero or
-        // *             can not be parsed as a double value.
-        // * @see #parseDouble(String)
-        // */
-        //public static Double ValueOf(string value)
-        //{
-        //    return new Double(ParseDouble(value));
-        //}
+        /////**
+        //// * Parses the specified string as a double value.
+        //// * 
+        //// * @param string
+        //// *            the string representation of a double value.
+        //// * @return a {@code Double} instance containing the double value represented
+        //// *         by {@code string}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null}, has a length of zero or
+        //// *             can not be parsed as a double value.
+        //// * @see #parseDouble(String)
+        //// */
+        ////public static Double ValueOf(string value)
+        ////{
+        ////    return new Double(ParseDouble(value));
+        ////}
 
 
         /**

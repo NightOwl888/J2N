@@ -1375,7 +1375,7 @@ namespace J2N.Numerics
         /// <param name="provider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information about <paramref name="s"/>.</param>
         /// <returns>A 16-bit signed integer equivalent to the number specified in <paramref name="s"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
-        /// <exception cref="FormatException"><paramref name="s"/> is not in a format compliant with <paramref name="style"/>.</exception>
+        /// <exception cref="FormatException"><paramref name="s"/> is not in a valid <see cref="NumberStyle.Integer"/> format.</exception>
         /// <exception cref="OverflowException">
         /// <paramref name="s"/> represents a number less than <see cref="short.MinValue"/> or greater than <see cref="short.MaxValue"/>.
         /// </exception>
@@ -2449,22 +2449,22 @@ namespace J2N.Numerics
             return Int32.ToString(value, provider);
         }
 
-        ///**
-        // * Parses the specified string as a signed decimal short value.
-        // *
-        // * @param string
-        // *            the string representation of a short value.
-        // * @return a {@code Short} instance containing the short value represented
-        // *         by {@code string}.
-        // * @throws NumberFormatException
-        // *             if {@code string} is {@code null}, has a length of zero or
-        // *             can not be parsed as a short value.
-        // * @see #parseShort(String)
-        // */
-        //public static Int16 ValueOf(string value)
-        //{
-        //    return ValueOf(Parse(value));
-        //}
+        /////**
+        //// * Parses the specified string as a signed decimal short value.
+        //// *
+        //// * @param string
+        //// *            the string representation of a short value.
+        //// * @return a {@code Short} instance containing the short value represented
+        //// *         by {@code string}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null}, has a length of zero or
+        //// *             can not be parsed as a short value.
+        //// * @see #parseShort(String)
+        //// */
+        ////public static Int16 ValueOf(string value)
+        ////{
+        ////    return ValueOf(Parse(value));
+        ////}
 
         /**
          * Parses the specified string as a signed decimal short value.

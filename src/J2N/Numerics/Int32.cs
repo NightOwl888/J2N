@@ -1322,7 +1322,7 @@ namespace J2N.Numerics
         /// <param name="provider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information about <paramref name="s"/>.</param>
         /// <returns>A 32-bit signed integer equivalent to the number specified in <paramref name="s"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
-        /// <exception cref="FormatException"><paramref name="s"/> is not in a format compliant with <paramref name="style"/>.</exception>
+        /// <exception cref="FormatException"><paramref name="s"/> is not in a valid <see cref="NumberStyle.Integer"/> format.</exception>
         /// <exception cref="OverflowException">
         /// <paramref name="s"/> represents a number less than <see cref="int.MinValue"/> or greater than <see cref="int.MaxValue"/>.
         /// </exception>
@@ -1491,7 +1491,7 @@ namespace J2N.Numerics
         /// is passed uninitialized; any value originally supplied in <paramref name="result"/> will be overwritten.</param>
         /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// The <see cref="TryParse(ReadOnlySpan{char}, out int)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, IFormatProvider?)"/> method,
+        /// The <see cref="TryParse(ReadOnlySpan{char}, out int)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/> method,
         /// except the <see cref="TryParse(ReadOnlySpan{char}, out int)"/> method does not throw an exception if the
         /// conversion fails. It eliminates the need to use exception handling to test for a <see cref="FormatException"/>
         /// in the event that <paramref name="s"/> is invalid and cannot be successfully parsed.

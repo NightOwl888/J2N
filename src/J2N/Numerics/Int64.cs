@@ -1318,7 +1318,7 @@ namespace J2N.Numerics
         /// <param name="provider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information about <paramref name="s"/>.</param>
         /// <returns>A 64-bit signed integer equivalent to the number specified in <paramref name="s"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
-        /// <exception cref="FormatException"><paramref name="s"/> is not in a format compliant with <paramref name="style"/>.</exception>
+        /// <exception cref="FormatException"><paramref name="s"/> is not in a valid <see cref="NumberStyle.Integer"/> format.</exception>
         /// <exception cref="OverflowException">
         /// <paramref name="s"/> represents a number less than <see cref="long.MinValue"/> or greater than <see cref="long.MaxValue"/>.
         /// </exception>
@@ -1455,7 +1455,7 @@ namespace J2N.Numerics
         /// <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out long)"/> overload.
         /// </remarks>
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
-        /// <seealso cref="TryParse(ReadOnlySpan{char}, out long)"/>
+        /// <seealso cref="TryParse(string?, out long)"/>
         /// <seealso cref="Number.ToString()"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1487,7 +1487,7 @@ namespace J2N.Numerics
         /// is passed uninitialized; any value originally supplied in <paramref name="result"/> will be overwritten.</param>
         /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// The <see cref="TryParse(ReadOnlySpan{char}, out long)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, IFormatProvider?)"/> method,
+        /// The <see cref="TryParse(ReadOnlySpan{char}, out long)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/> method,
         /// except the <see cref="TryParse(ReadOnlySpan{char}, out long)"/> method does not throw an exception if the
         /// conversion fails. It eliminates the need to use exception handling to test for a <see cref="FormatException"/>
         /// in the event that <paramref name="s"/> is invalid and cannot be successfully parsed.
@@ -1528,7 +1528,7 @@ namespace J2N.Numerics
         /// as decimal digits. To parse the string representation of a hexadecimal number, call the
         /// <see cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out long)"/> overload.
         /// </remarks>
-        /// <seealso cref="Parse(ReadOnlySpan{char}, IFormatProvider?)"/>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string?, out long)"/>
         /// <seealso cref="Number.ToString()"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -2559,22 +2559,22 @@ namespace J2N.Numerics
             return new string(buffer, 0, buffer.Length);
         }
 
-        ///**
-        // * Parses the specified string as a signed decimal long value.
-        // * 
-        // * @param string
-        // *            the string representation of a long value.
-        // * @return a {@code Long} instance containing the long value represented by
-        // *         {@code string}.
-        // * @throws NumberFormatException
-        // *             if {@code string} is {@code null}, has a length of zero or
-        // *             can not be parsed as a long value.
-        // * @see #parseLong(String)
-        // */
-        //public static Int64 ValueOf(string value)
-        //{
-        //    return ValueOf(Parse(value));
-        //}
+        /////**
+        //// * Parses the specified string as a signed decimal long value.
+        //// * 
+        //// * @param string
+        //// *            the string representation of a long value.
+        //// * @return a {@code Long} instance containing the long value represented by
+        //// *         {@code string}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null}, has a length of zero or
+        //// *             can not be parsed as a long value.
+        //// * @see #parseLong(String)
+        //// */
+        ////public static Int64 ValueOf(string value)
+        ////{
+        ////    return ValueOf(Parse(value));
+        ////}
 
         /**
          * Parses the specified string as a signed decimal long value.

@@ -1465,12 +1465,12 @@ namespace J2N.Numerics
         /// integer equivalent. A return value indicates whether the conversion succeeded.
         /// <para/>
         /// Usage Note: When porting from Java, note that this is a culture-sensitive method. Java uses the invariant
-        /// culture in the Byte class, so call <see cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out byte)"/>
+        /// culture in the Byte class, so call <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/>
         /// and pass <see cref="NumberStyle.AllowLeadingSign"/> and <see cref="NumberFormatInfo.InvariantInfo"/> to exactly match the Java parsing behavior.
         /// <para/>
         /// Using that overload also allows you to normalize the exception behavior. The <see cref="Parse(string, IFormatProvider?)"/>
         /// method may throw <see cref="ArgumentNullException"/>, <see cref="OverflowException"/>, or <see cref="FormatException"/>,
-        /// but Java only ever throws NumberFormatException in any of those cases. Using <see cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out byte)"/>
+        /// but Java only ever throws NumberFormatException in any of those cases. Using <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/>
         /// means a <see cref="FormatException"/> can be thrown in any of those error condtions when it returns <c>false</c>.
         /// </summary>
         /// <param name="s">A span containing the characters that represent the number to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
@@ -1482,8 +1482,8 @@ namespace J2N.Numerics
         /// is passed uninitialized; any value originally supplied in <paramref name="result"/> will be overwritten.</param>
         /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// The <see cref="TryParse(ReadOnlySpan{char}, out byte)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/> method,
-        /// except the <see cref="TryParse(ReadOnlySpan{char}, out byte)"/> method does not throw an exception if the
+        /// The <see cref="TryParse(string?, out byte)"/> method is like the <see cref="Parse(string?, NumberStyle, IFormatProvider?)"/> method,
+        /// except the <see cref="TryParse(string?, out byte)"/> method does not throw an exception if the
         /// conversion fails. It eliminates the need to use exception handling to test for a <see cref="FormatException"/>
         /// in the event that <paramref name="s"/> is invalid and cannot be successfully parsed.
         /// <para/>
@@ -1514,7 +1514,7 @@ namespace J2N.Numerics
         /// The <paramref name="s"/> parameter is interpreted using the <see cref="NumberStyle.Integer"/> style.
         /// In addition to the decimal digits, only leading and trailing spaces together with a leading sign are
         /// allowed. To explicitly define the style elements together with the culture-specific formatting
-        /// information that can be present in <paramref name="s"/>, use the <see cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out byte)"/> method.
+        /// information that can be present in <paramref name="s"/>, use the <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/> method.
         /// <para/>
         /// The <paramref name="s"/> parameter is parsed using the formatting information in a <see cref="NumberFormatInfo"/>
         /// object initialized for the current system culture. For more information, see <see cref="NumberFormatInfo.CurrentInfo"/>.
@@ -2063,8 +2063,8 @@ namespace J2N.Numerics
         /// <paramref name="style"/> is not a combination of <see cref="NumberStyle.AllowHexSpecifier"/> and <see cref="NumberStyle.HexNumber"/> values.
         /// </exception>
         /// <remarks>
-        /// The <see cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out byte)"/> method is like the <see cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/> method,
-        /// except the <see cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out byte)"/> method does not throw an exception if the
+        /// The <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/> method is like the <see cref="Parse(string, NumberStyle, IFormatProvider?)"/> method,
+        /// except the <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/> method does not throw an exception if the
         /// conversion fails. It eliminates the need to use exception handling to test for a <see cref="FormatException"/>
         /// in the event that <paramref name="s"/> is invalid and cannot be successfully parsed.
         /// <para/>
