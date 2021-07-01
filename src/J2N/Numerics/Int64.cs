@@ -2243,123 +2243,57 @@ namespace J2N.Numerics
 #endif
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int64
 
-        /**
-         * Converts the specified long value into its binary string representation.
-         * The returned string is a concatenation of '0' and '1' characters.
-         * 
-         * @param l
-         *            the long value to convert.
-         * @return the binary string representation of {@code l}.
-         */
-        public static string ToBinaryString(long l)
+        #region ToBinaryString
+
+        /// <summary>
+        /// Converts the current instance into its binary string representation. The
+        /// returned string is a concatenation of '0' and '1' characters.
+        /// </summary>
+        /// <returns>The binary string representation of the current instance.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public string ToBinaryString()
         {
-            return l.ToBinaryString();
-
-            //int count = 1;
-            //long j = l;
-
-            //if (l < 0)
-            //{
-            //    count = 64;
-            //}
-            //else
-            //{
-            //    while ((j >>= 1) != 0)
-            //    {
-            //        count++;
-            //    }
-            //}
-
-            //char[] buffer = new char[count];
-            //do
-            //{
-            //    buffer[--count] = (char)((l & 1) + '0');
-            //    l >>= 1;
-            //} while (count > 0);
-            //return new String(0, buffer.length, buffer);
+            return value.ToBinaryString();
         }
 
-        /**
-         * Converts the specified long value into its hexadecimal string
-         * representation. The returned string is a concatenation of characters from
-         * '0' to '9' and 'a' to 'f'.
-         * 
-         * @param l
-         *            the long value to convert.
-         * @return the hexadecimal string representation of {@code l}.
-         */
-        public static string ToHexString(long l)
+        #endregion ToBinaryString
+
+        #region ToHexString
+
+        /// <summary>
+        /// Converts the current instance into its hexadecimal string
+        /// representation (in lowercase). The returned string is a 
+        /// concatenation of characters from '0' to '9' and 'a' to 'f'.
+        /// </summary>
+        /// <returns>The hexadecimal string representation of the current instance.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public string ToHexString()
         {
-            return l.ToHexString();
-
-            //int count = 1;
-            //long j = l;
-
-            //if (l < 0)
-            //{
-            //    count = 16;
-            //}
-            //else
-            //{
-            //    while ((j >>= 4) != 0)
-            //    {
-            //        count++;
-            //    }
-            //}
-
-            //char[] buffer = new char[count];
-            //do
-            //{
-            //    int t = (int)(l & 15);
-            //    if (t > 9)
-            //    {
-            //        t = t - 10 + 'a';
-            //    }
-            //    else
-            //    {
-            //        t += '0';
-            //    }
-            //    buffer[--count] = (char)t;
-            //    l >>= 4;
-            //} while (count > 0);
-            //return new String(0, buffer.length, buffer);
+            return value.ToHexString();
         }
 
-        /**
-         * Converts the specified long value into its octal string representation.
-         * The returned string is a concatenation of characters from '0' to '7'.
-         * 
-         * @param l
-         *            the long value to convert.
-         * @return the octal string representation of {@code l}.
-         */
-        public static string ToOctalString(long l)
+        #endregion ToHexString
+
+        #region ToOctalString
+
+        /// <summary>
+        /// Converts the current instance into its octal string representation. The
+        /// returned string is a concatenation of characters from '0' to '7'.
+        /// </summary>
+        /// <returns>The octal string representation of the current instance.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public string ToOctalString()
         {
-            return l.ToOctalString();
-
-            //int count = 1;
-            //long j = l;
-
-            //if (l < 0)
-            //{
-            //    count = 22;
-            //}
-            //else
-            //{
-            //    while ((j >>>= 3) != 0)
-            //    {
-            //        count++;
-            //    }
-            //}
-
-            //char[] buffer = new char[count];
-            //do
-            //{
-            //    buffer[--count] = (char)((l & 7) + '0');
-            //    l >>>= 3;
-            //} while (count > 0);
-            //return new String(0, buffer.length, buffer);
+            return value.ToOctalString();
         }
+
+        #endregion ToOctalString
 
         //@Override
         //public string toString()

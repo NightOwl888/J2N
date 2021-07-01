@@ -2286,11 +2286,13 @@ namespace J2N.Numerics
             return new Double(d);
         }
 
+        #region ToHexString
+
         /// <summary>
-        /// Returns a hexadecimal string representation of the <see cref="double"/> argument. All characters mentioned below are ASCII characters.
+        /// Returns a hexadecimal string representation of the current object. All characters mentioned below are ASCII characters.
         /// <list type="bullet">
-        ///     <item><description>If the argument is <see cref="double.NaN"/>, the result is the string "NaN".</description></item>
-        ///     <item><description>Otherwise, the result is a string that represents the sign and magnitude of the argument. If the sign
+        ///     <item><description>If the value is <see cref="double.NaN"/>, the result is the string "NaN".</description></item>
+        ///     <item><description>Otherwise, the result is a string that represents the sign and magnitude of the value. If the sign
         ///         is negative, the first character of the result is '-' ('\u002D'); if the sign is positive, no sign character appears
         ///         in the result. As for the magnitude <i>m</i>: </description>
         ///         <list type="bullet">
@@ -2358,15 +2360,16 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// </summary>
-        /// <param name="d">The double to be converted.</param>
-        /// <returns>A hex string representing <paramref name="d"/>.</returns>
+        /// <returns>A hex string representing the current instance.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static string ToHexString(double d)
+        public string ToHexString()
         {
-            return d.ToHexString();
+            return value.ToHexString();
         }
+
+        #endregion ToHexString
 
         // J2N: Support implicit conversion
 

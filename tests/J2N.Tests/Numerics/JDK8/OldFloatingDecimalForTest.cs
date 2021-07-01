@@ -85,7 +85,7 @@ namespace J2N.Numerics
         static readonly int bigDecimalExponent = 324; // i.e. abs(minDecimalExponent)
 
         static readonly long highbyte = unchecked((long)0xff00000000000000L);
-        static readonly long highbit = unchecked((long)0x8000000000000000L);
+        //static readonly long highbit = unchecked((long)0x8000000000000000L); // J2N: Never used
         static readonly long lowbytes = ~highbyte;
 
         static readonly int singleSignMask = unchecked((int)0x80000000);
@@ -2377,7 +2377,7 @@ namespace J2N.Numerics
 
                 bool round = false;
                 bool sticky = false;
-                int bitsCopied = 0;
+                //int bitsCopied = 0; // J2N: Never used
                 int nextShift = 0;
                 long significand = 0L;
                 // First iteration is different, since we only copy
@@ -2631,12 +2631,12 @@ namespace J2N.Numerics
                      * x1.10        x1. + 1
                      * x1.11        x1. + 1
                      */
-                    bool incremented = false;
+                    //bool incremented = false; // J2N: Never used
                     bool leastZero = ((significand & 1L) == 0L);
                     if ((leastZero && round && sticky) ||
                         ((!leastZero) && round))
                     {
-                        incremented = true;
+                        //incremented = true; // J2N: Never used
                         significand++;
                     }
 

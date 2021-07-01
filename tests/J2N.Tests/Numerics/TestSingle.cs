@@ -1443,31 +1443,31 @@ namespace J2N.Numerics
         public void Test_toHexStringF()
         {
             // the follow values comes from the Float Javadoc/Spec
-            assertEquals("0x0.0p0", Single.ToHexString(0.0F));
-            assertEquals("-0x0.0p0", Single.ToHexString(-0.0F));
-            assertEquals("0x1.0p0", Single.ToHexString(1.0F));
-            assertEquals("-0x1.0p0", Single.ToHexString(-1.0F));
-            assertEquals("0x1.0p1", Single.ToHexString(2.0F));
-            assertEquals("0x1.8p1", Single.ToHexString(3.0F));
-            assertEquals("0x1.0p-1", Single.ToHexString(0.5F));
-            assertEquals("0x1.0p-2", Single.ToHexString(0.25F));
-            assertEquals("0x1.fffffep127", Single.ToHexString(float.MaxValue));
-            assertEquals("0x0.000002p-126", Single.ToHexString(float.Epsilon)); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
+            assertEquals("0x0.0p0", Single.ValueOf(0.0F).ToHexString());
+            assertEquals("-0x0.0p0", Single.ValueOf(-0.0F).ToHexString());
+            assertEquals("0x1.0p0", Single.ValueOf(1.0F).ToHexString());
+            assertEquals("-0x1.0p0", Single.ValueOf(-1.0F).ToHexString());
+            assertEquals("0x1.0p1", Single.ValueOf(2.0F).ToHexString());
+            assertEquals("0x1.8p1", Single.ValueOf(3.0F).ToHexString());
+            assertEquals("0x1.0p-1", Single.ValueOf(0.5F).ToHexString());
+            assertEquals("0x1.0p-2", Single.ValueOf(0.25F).ToHexString());
+            assertEquals("0x1.fffffep127", Single.ValueOf(float.MaxValue).ToHexString());
+            assertEquals("0x0.000002p-126", Single.ValueOf(float.Epsilon).ToHexString()); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
 
             // test edge cases
-            assertEquals("NaN", Single.ToHexString(float.NaN));
-            assertEquals("-Infinity", Single.ToHexString(float.NegativeInfinity));
-            assertEquals("Infinity", Single.ToHexString(float.PositiveInfinity));
+            assertEquals("NaN", Single.ValueOf(float.NaN).ToHexString());
+            assertEquals("-Infinity", Single.ValueOf(float.NegativeInfinity).ToHexString());
+            assertEquals("Infinity", Single.ValueOf(float.PositiveInfinity).ToHexString());
 
             // test various numbers
-            assertEquals("-0x1.da8p6", Single.ToHexString(-118.625F));
-            assertEquals("0x1.295788p23", Single.ToHexString(9743299.65F));
-            assertEquals("0x1.295788p23", Single.ToHexString(9743299.65000F));
-            assertEquals("0x1.295788p23", Single.ToHexString(9743299.650001234F));
-            assertEquals("0x1.700d1p33", Single.ToHexString(12349743299.65000F));
+            assertEquals("-0x1.da8p6", Single.ValueOf(-118.625F).ToHexString());
+            assertEquals("0x1.295788p23", Single.ValueOf(9743299.65F).ToHexString());
+            assertEquals("0x1.295788p23", Single.ValueOf(9743299.65000F).ToHexString());
+            assertEquals("0x1.295788p23", Single.ValueOf(9743299.650001234F).ToHexString());
+            assertEquals("0x1.700d1p33", Single.ValueOf(12349743299.65000F).ToHexString());
 
             // test HARMONY-2132
-            //assertEquals("0x1.01p10", Single.ToHexString(0x1.01p10f)); // .NET cannot represent this as a float literal
+            assertEquals("0x1.01p10", Single.ValueOf(/*0x1.01p10f*/ 1028.0f).ToHexString()); // .NET cannot represent this as a float literal
         }
 
         /**
