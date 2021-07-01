@@ -10,22 +10,179 @@ namespace J2N
     /// </summary>
     public static class SingleExtensions
     {
-        private const float NegativeZero = -0.0f;
+        #region IsFinite
+
+        /// <summary>
+        /// Determines whether the specified value is finite (zero, subnormal, or normal).
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if the value is finite (zero, subnormal or normal); otherwise <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static unsafe bool IsFinite(this float f)
+        {
+            int bits = BitConversion.SingleToRawInt32Bits(f);
+            return (bits & 0x7FFFFFFF) < 0x7F800000;
+        }
+
+        #endregion
+
+        #region IsInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether the specified value evaluates to negative or positive infinity.
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if the value evaluates to <see cref="float.PositiveInfinity"/> or
+        /// <see cref="float.NegativeInfinity"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static unsafe bool IsInfinity(this float f)
+        {
+            int bits = BitConversion.SingleToRawInt32Bits(f);
+            return (bits & 0x7FFFFFFF) == 0x7F800000;
+        }
+
+        #endregion IsInfinity
+
+        #region IsNaN
+
+        /// <summary>
+        /// Returns a value that indicates whether the specified value is not a number
+        /// (<see cref="float.NaN"/>).
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if the value evaluates to <see cref="float.NaN"/>;
+        /// otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static bool IsNaN(this float f)
+        {
+            // A NaN will never equal itself so this is an
+            // easy and efficient way to check for NaN.
+
+#pragma warning disable CS1718
+            return f != f;
+#pragma warning restore CS1718
+        }
+
+        #endregion IsNaN
+
+        #region IsNegative
+
+        /// <summary>
+        /// Determines whether the specified value is negative.
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if the value is negative; otherwise, <c>false</c>.</returns>
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static unsafe bool IsNegative(this float f)
+        {
+            return BitConversion.SingleToRawInt32Bits(f) < 0;
+        }
+
+        #endregion IsNegative
+
+        #region IsNegativeInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether the specified number evaluates to negative
+        /// infinity.
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if <paramref name="f"/> evaluates to <see cref="float.NegativeInfinity"/>;
+        /// otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static unsafe bool IsNegativeInfinity(this float f)
+        {
+            return f == float.NegativeInfinity;
+        }
+
+        #endregion IsNegativeInfinity
+
+        #region IsNegativeZero
 
         /// <summary>
         /// Gets a value indicating whether the current <see cref="float"/> has the value negative zero (<c>-0.0f</c>).
         /// While negative zero is supported by the <see cref="float"/> datatype in .NET, comparisons and string formatting ignore
         /// this feature. This method allows a simple way to check whether the current <see cref="float"/> has the value negative zero.
         /// </summary>
-        /// <param name="f">This <see cref="float"/>.</param>
+        /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
         public static bool IsNegativeZero(this float f)
         {
-            return (f == 0 && BitConversion.SingleToRawInt32Bits(f) == BitConversion.SingleToRawInt32Bits(NegativeZero));
+            return f == 0 && IsNegative(f);
         }
+
+        #endregion IsNegativeZero
+
+        #region IsNormal
+
+        /// <summary>
+        /// Determines whether the specified value is normal.
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if the value is normal; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static unsafe bool IsNormal(this float f)
+        {
+            int bits = BitConversion.SingleToRawInt32Bits(f);
+            bits &= 0x7FFFFFFF;
+            return (bits < 0x7F800000) && (bits != 0) && ((bits & 0x7F800000) != 0);
+        }
+
+        #endregion IsNormal
+
+        #region IsPositiveInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether the specified number evaluates to positive infinity.
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if <paramref name="f"/> evaluates to <see cref="float.PositiveInfinity"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static bool IsPositiveInfinity(this float f)
+        {
+            return f == float.PositiveInfinity;
+        }
+
+        #endregion IsPositiveInfinity
+
+        #region IsSubnormal
+
+        /// <summary>
+        /// Determines whether the specified value is subnormal.
+        /// </summary>
+        /// <param name="f">A single-precision floating-point number.</param>
+        /// <returns><c>true</c> if the value is subnormal; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public static unsafe bool IsSubnormal(this float f)
+        {
+            int bits = BitConversion.SingleToRawInt32Bits(f);
+            bits &= 0x7FFFFFFF;
+            return (bits < 0x7F800000) && (bits != 0) && ((bits & 0x7F800000) == 0);
+        }
+
+        #endregion IsSubnormal
+
+        #region ToHexString
 
         /// <summary>
         /// Returns a hexadecimal string representation of the <see cref="float"/> argument. All characters mentioned below are ASCII characters.
@@ -203,5 +360,7 @@ namespace J2N
             }
             return hexString.ToString();
         }
+
+        #endregion ToHexString
     }
 }

@@ -54,6 +54,8 @@ namespace J2N.Numerics
 
         // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
+        #region CompareTo
+
         /// <summary>
         /// Compares this instance to a specified <see cref="Double"/> and returns an indication of their relative values.
         /// </summary>
@@ -144,6 +146,8 @@ namespace J2N.Numerics
             return Compare(this.value, other.value);
         }
 
+        #endregion CompareTo
+
         /// <inheritdoc/>
         public override byte GetByteValue()
         {
@@ -194,6 +198,8 @@ namespace J2N.Numerics
         {
             return value;
         }
+
+        #region Equals
 
         /// <summary>
         /// Returns a value indicating whether this instance and a specified <see cref="Double"/> object represent the same value.
@@ -344,11 +350,15 @@ namespace J2N.Numerics
                 && (BitConversion.DoubleToInt64Bits(this.value) == BitConversion.DoubleToInt64Bits(other.value));
         }
 
+        #endregion Equals
+
         /// <inheritdoc/>
         public override float GetSingleValue()
         {
             return (float)value;
         }
+
+        #region GetHashCode
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -357,62 +367,165 @@ namespace J2N.Numerics
             return (int)(v ^ (v.TripleShift(32)));
         }
 
+        #endregion GetHashCode
+
         /// <inheritdoc/>
         public override int GetInt32Value()
         {
             return (int)value;
         }
 
-        /**
-         * Indicates whether this object represents an infinite value.
-         * 
-         * @return {@code true} if the value of this double is positive or negative
-         *         infinity; {@code false} otherwise.
-         */
+        #region IsFinite
+
+        /// <summary>
+        /// Determines whether this object's value is finite (zero, subnormal, or normal).
+        /// </summary>
+        /// <returns><c>true</c> if the value is finite (zero, subnormal or normal); otherwise <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsFinite()
+        {
+            return value.IsFinite();
+        }
+
+        #endregion
+
+        #region IsInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether this object's value evaluates to negative or positive infinity.
+        /// </summary>
+        /// <returns><c>true</c> if this object's value evaluates to <see cref="double.PositiveInfinity"/> or
+        /// <see cref="double.NegativeInfinity"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public bool IsInfinity()
         {
-            return IsInfinity(value);
+            return value.IsInfinity();
         }
 
-        /**
-         * Indicates whether the specified double represents an infinite value.
-         * 
-         * @param d
-         *            the double to check.
-         * @return {@code true} if the value of {@code d} is positive or negative
-         *         infinity; {@code false} otherwise.
-         */
-        public static bool IsInfinity(double d)
-        {
-            return double.IsInfinity(d);
-            //return (d == POSITIVE_INFINITY) || (d == NEGATIVE_INFINITY);
-        }
+        #endregion IsInfinity
 
-        /**
-         * Indicates whether this object is a <em>Not-a-Number (NaN)</em> value.
-         * 
-         * @return {@code true} if this double is <em>Not-a-Number</em>;
-         *         {@code false} if it is a (potentially infinite) double number.
-         */
+        #region IsNaN
+
+        /// <summary>
+        /// Returns a value that indicates whether this objects's value is not a number
+        /// (<see cref="double.NaN"/>).
+        /// </summary>
+        /// <returns><c>true</c> if this object's' value evaluates to <see cref="double.NaN"/>;
+        /// otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public bool IsNaN()
         {
-            return IsNaN(value);
+            return value.IsNaN();
         }
 
-        /**
-         * Indicates whether the specified double is a <em>Not-a-Number (NaN)</em>
-         * value.
-         * 
-         * @param d
-         *            the double value to check.
-         * @return {@code true} if {@code d} is <em>Not-a-Number</em>;
-         *         {@code false} if it is a (potentially infinite) double number.
-         */
-        public static bool IsNaN(double d)
+        #endregion IsNaN
+
+        #region IsNegative
+
+        /// <summary>
+        /// Determines whether this object's value value is negative.
+        /// </summary>
+        /// <returns><c>true</c> if the value is negative; otherwise, <c>false</c>.</returns>
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNegative()
         {
-            return double.IsNaN(d);
-            //return d != d;
+            return value.IsNegative();
         }
+
+        #endregion IsNegative
+
+        #region IsNegativeInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether this object's value evaluates to negative
+        /// infinity.
+        /// </summary>
+        /// <returns><c>true</c> if the value evaluates to <see cref="double.NegativeInfinity"/>;
+        /// otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNegativeInfinity()
+        {
+            return value.IsNegativeInfinity();
+        }
+
+        #endregion IsNegativeInfinity
+
+        #region IsNegativeZero
+
+        /// <summary>
+        /// Gets a value indicating whether the current <see cref="double"/> has the value negative zero (<c>-0.0d</c>).
+        /// While negative zero is supported by the <see cref="double"/> datatype in .NET, comparisons and string formatting ignore
+        /// this feature. This method allows a simple way to check whether the current <see cref="double"/> has the value negative zero.
+        /// </summary>
+        /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNegativeZero()
+        {
+            return value.IsNegativeZero();
+        }
+
+        #endregion IsNegativeZero
+
+        #region IsNormal
+
+        /// <summary>
+        /// Determines whether this object's value specified value is normal.
+        /// </summary>
+        /// <returns><c>true</c> if the value is normal; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNormal()
+        {
+            return value.IsNormal();
+        }
+
+        #endregion IsNormal
+
+        #region IsPositiveInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether this object's value evaluates to positive infinity.
+        /// </summary>
+        /// <returns><c>true</c> if the value evaluates to <see cref="double.PositiveInfinity"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsPositiveInfinity()
+        {
+            return value.IsPositiveInfinity();
+        }
+
+        #endregion IsPositiveInfinity
+
+        #region IsSubnormal
+
+        /// <summary>
+        /// Determines whether this object's value is subnormal.
+        /// </summary>
+        /// <returns><c>true</c> if the value is subnormal; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsSubnormal()
+        {
+            return value.IsSubnormal();
+        }
+
+        #endregion IsSubnormal
 
         /**
          * Converts the specified IEEE 754 floating-point double precision bit
@@ -436,7 +549,7 @@ namespace J2N.Numerics
             return (long)value;
         }
 
-        #region Parse_CharSequence_IFormatProvider
+#region Parse_CharSequence_IFormatProvider
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to
@@ -550,9 +663,9 @@ namespace J2N.Numerics
             return Parse(s, NumberStyle.Float | NumberStyle.AllowThousands, provider);
         }
 
-        #endregion Parse_CharSequence_IFormatProvider
+#endregion Parse_CharSequence_IFormatProvider
 
-        #region TryParse_CharSequence_Double
+#region TryParse_CharSequence_Double
 
         /// <summary>
         /// Converts the string representation of a number to
@@ -781,9 +894,9 @@ namespace J2N.Numerics
 
 #endif
 
-        #endregion TryParse_CharSequence_Double
+#endregion TryParse_CharSequence_Double
 
-        #region Parse_CharSequence_NumberStyle_IFormatProvider
+#region Parse_CharSequence_NumberStyle_IFormatProvider
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to
@@ -1344,9 +1457,9 @@ namespace J2N.Numerics
         }
 #endif
 
-        #endregion Parse_CharSequence_NumberStyle_IFormatProvider
+#endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
-        #region TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+#region TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to
@@ -1924,7 +2037,7 @@ namespace J2N.Numerics
         }
 #endif
 
-        #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+#endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
         /// <inheritdoc/>
         public override short GetInt16Value()
@@ -2032,6 +2145,8 @@ namespace J2N.Numerics
             return new Double(Parse(value, style, provider));
         }
 
+        #region Compare
+
         /// <summary>
         /// Compares the two specified <see cref="double"/> values. There are two special cases:
         /// <list type="table">
@@ -2063,10 +2178,15 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// </returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static int Compare(double doubleA, double doubleB)
         {
             return JCG.Comparer<double>.Default.Compare(doubleA, doubleB);
         }
+
+        #endregion Compare
 
         /**
          * Returns a {@code Double} instance for the specified double value.
@@ -2157,7 +2277,7 @@ namespace J2N.Numerics
         /// <returns>A hex string representing <paramref name="d"/>.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static string ToHexString(double d)
         {
             return d.ToHexString();
