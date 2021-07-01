@@ -41,6 +41,8 @@ namespace J2N.Numerics
             return (byte)value;
         }
 
+        #region CompareTo
+
         /// <summary>
         /// Compares this instance to a specified <see cref="Int32"/> and returns an indication of their relative values.
         /// </summary>
@@ -122,6 +124,10 @@ namespace J2N.Numerics
             // around in cases where _value - value > MaxValue.
             return this.value > other.value ? 1 : (this.value < other.value ? -1 : 0);
         }
+
+        #endregion
+
+        #region Decode
 
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Int32"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
@@ -237,6 +243,10 @@ namespace J2N.Numerics
             return ValueOf(r);
         }
 
+        #endregion Decode
+
+        #region TryDecode
+
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Int32"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
         /// <list type="bullet">
@@ -344,12 +354,15 @@ namespace J2N.Numerics
             return true;
         }
 
+        #endregion TryDecode
 
         /// <inheritdoc/>
         public override double GetDoubleValue()
         {
             return value;
         }
+
+        #region Equals
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified <see cref="Int32"/> value.
@@ -378,121 +391,25 @@ namespace J2N.Numerics
             return ReferenceEquals(obj, this) || (obj is Int32 other) && (value == other.value);
         }
 
+        #endregion Equals
+
         /// <inheritdoc/>
         public override float GetSingleValue()
         {
             return value;
         }
 
-        // J2N: These access system properties, for which .NET has no equivalent
-        /////**
-        //// * Returns the {@code Integer} value of the system property identified by
-        //// * {@code string}. Returns {@code null} if {@code string} is {@code null}
-        //// * or empty, if the property can not be found or if its value can not be
-        //// * parsed as an integer.
-        //// * 
-        //// * @param string
-        //// *            the name of the requested system property.
-        //// * @return the requested property's value as an {@code Integer} or
-        //// *         {@code null}.
-        //// */
-        ////public static Int32 GetInt32(string value)
-        ////{
-        ////    if (value == null || string.length() == 0)
-        ////    {
-        ////        return null;
-        ////    }
-        ////    String prop = System.getProperty(value);
-        ////    if (prop == null)
-        ////    {
-        ////        return null;
-        ////    }
-        ////    try
-        ////    {
-        ////        return decode(prop);
-        ////    }
-        ////    catch (NumberFormatException ex)
-        ////    {
-        ////        return null;
-        ////    }
-        ////}
+        // J2N: getInteger() overloads not implemented because .NET has no native concept of "system properties"
 
-        /////**
-        //// * Returns the {@code Integer} value of the system property identified by
-        //// * {@code string}. Returns the specified default value if {@code string} is
-        //// * {@code null} or empty, if the property can not be found or if its value
-        //// * can not be parsed as an integer.
-        //// * 
-        //// * @param string
-        //// *            the name of the requested system property.
-        //// * @param defaultValue
-        //// *            the default value that is returned if there is no integer
-        //// *            system property with the requested name.
-        //// * @return the requested property's value as an {@code Integer} or the
-        //// *         default value.
-        //// */
-        ////public static Integer getInteger(String string, int defaultValue)
-        ////{
-        ////    if (string == null || string.length() == 0)
-        ////    {
-        ////        return valueOf(defaultValue);
-        ////    }
-        ////    String prop = System.getProperty(string);
-        ////    if (prop == null)
-        ////    {
-        ////        return valueOf(defaultValue);
-        ////    }
-        ////    try
-        ////    {
-        ////        return decode(prop);
-        ////    }
-        ////    catch (NumberFormatException ex)
-        ////    {
-        ////        return valueOf(defaultValue);
-        ////    }
-        ////}
-
-        /////**
-        //// * Returns the {@code Integer} value of the system property identified by
-        //// * {@code string}. Returns the specified default value if {@code string} is
-        //// * {@code null} or empty, if the property can not be found or if its value
-        //// * can not be parsed as an integer.
-        //// * 
-        //// * @param string
-        //// *            the name of the requested system property.
-        //// * @param defaultValue
-        //// *            the default value that is returned if there is no integer
-        //// *            system property with the requested name.
-        //// * @return the requested property's value as an {@code Integer} or the
-        //// *         default value.
-        //// */
-        ////public static Integer getInteger(String string, Integer defaultValue)
-        ////{
-        ////    if (string == null || string.length() == 0)
-        ////    {
-        ////        return defaultValue;
-        ////    }
-        ////    String prop = System.getProperty(string);
-        ////    if (prop == null)
-        ////    {
-        ////        return defaultValue;
-        ////    }
-        ////    try
-        ////    {
-        ////        return decode(prop);
-        ////    }
-        ////    catch (NumberFormatException ex)
-        ////    {
-        ////        return defaultValue;
-        ////    }
-        ////}
-
+        #region GetHashCode
 
         /// <inheritdoc/>
         public override int GetHashCode()
         {
             return value;
         }
+
+        #endregion GetHashCode
 
         /**
          * Gets the primitive value of this int.
@@ -510,11 +427,7 @@ namespace J2N.Numerics
             return value;
         }
 
-
-
-
-
-
+        #region ParseUnsigned
 
         internal static int ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
         {
@@ -536,6 +449,8 @@ namespace J2N.Numerics
                 ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned) :
                 0;
         }
+
+        #endregion ParseUnsigned
 
         // Radix-based parsing (default in Java)
 
