@@ -582,10 +582,10 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.String
             // java.lang.Integer.toBinaryString(int)
-            assertEquals("Incorrect string returned", "1111111111111111111111111111111", Int32.ToBinaryString(
-                    int.MaxValue));
-            assertEquals("Incorrect string returned", "10000000000000000000000000000000", Int32.ToBinaryString(
-                    int.MinValue));
+            assertEquals("Incorrect string returned", "1111111111111111111111111111111", Int32.ValueOf(
+                    int.MaxValue).ToBinaryString());
+            assertEquals("Incorrect string returned", "10000000000000000000000000000000", Int32.ValueOf(
+                    int.MinValue).ToBinaryString());
         }
 
         /**
@@ -602,15 +602,15 @@ namespace J2N.Numerics
             for (int i = 0; i < 16; i++)
             {
                 assertTrue("Incorrect string returned " + hexvals[i], Int32
-                        .ToHexString(i).Equals(hexvals[i]));
+                        .ValueOf(i).ToHexString().Equals(hexvals[i]));
             }
 
             assertTrue("Returned incorrect hex string: "
-                    + Int32.ToHexString(int.MaxValue), Int32.ToHexString(
-                    int.MaxValue).Equals("7fffffff"));
+                    + Int32.ValueOf(int.MaxValue).ToHexString(), Int32.ValueOf(
+                    int.MaxValue).ToHexString().Equals("7fffffff"));
             assertTrue("Returned incorrect hex string: "
-                    + Int32.ToHexString(int.MinValue), Int32.ToHexString(
-                    int.MinValue).Equals("80000000"));
+                    + Int32.ValueOf(int.MinValue).ToHexString(), Int32.ValueOf(
+                    int.MinValue).ToHexString().Equals("80000000"));
         }
 
         /**
@@ -621,10 +621,10 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.String java.lang.Integer.toOctalString(int)
             // Spec states that the int arg is treated as unsigned
-            assertEquals("Returned incorrect octal string", "17777777777", Int32.ToOctalString(
-                    int.MaxValue));
-            assertEquals("Returned incorrect octal string", "20000000000", Int32.ToOctalString(
-                    int.MinValue));
+            assertEquals("Returned incorrect octal string", "17777777777", Int32.ValueOf(
+                    int.MaxValue).ToOctalString());
+            assertEquals("Returned incorrect octal string", "20000000000", Int32.ValueOf(
+                    int.MinValue).ToOctalString());
         }
 
         /**

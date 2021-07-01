@@ -403,17 +403,17 @@ namespace J2N.Numerics
         public void Test_toBinaryStringJ()
         {
             // Test for method java.lang.String java.lang.Long.toBinaryString(long)
-            assertEquals("Incorrect binary string returned", "11011001010010010000", Int64.ToBinaryString(
-                    890000L));
+            assertEquals("Incorrect binary string returned", "11011001010010010000", Int64.ValueOf(
+                    890000L).ToBinaryString());
             assertEquals("Incorrect binary string returned",
 
                                     "1000000000000000000000000000000000000000000000000000000000000000", Int64
-                            .ToBinaryString(long.MinValue)
+                            .ValueOf(long.MinValue).ToBinaryString()
                             );
             assertEquals("Incorrect binary string returned",
 
                                     "111111111111111111111111111111111111111111111111111111111111111", Int64
-                            .ToBinaryString(long.MaxValue)
+                            .ValueOf(long.MaxValue).ToBinaryString()
                             );
         }
 
@@ -424,12 +424,12 @@ namespace J2N.Numerics
         public void Test_toHexStringJ()
         {
             // Test for method java.lang.String java.lang.Long.toHexString(long)
-            assertEquals("Incorrect hex string returned", "54e0845", Int64.ToHexString(89000005L)
+            assertEquals("Incorrect hex string returned", "54e0845", Int64.ValueOf(89000005L).ToHexString()
                     );
-            assertEquals("Incorrect hex string returned", "8000000000000000", Int64.ToHexString(
-                    long.MinValue));
-            assertEquals("Incorrect hex string returned", "7fffffffffffffff", Int64.ToHexString(
-                    long.MaxValue));
+            assertEquals("Incorrect hex string returned", "8000000000000000", Int64.ValueOf(
+                    long.MinValue).ToHexString());
+            assertEquals("Incorrect hex string returned", "7fffffffffffffff", Int64.ValueOf(
+                    long.MaxValue).ToHexString());
         }
 
         /**
@@ -439,12 +439,12 @@ namespace J2N.Numerics
         public void Test_toOctalStringJ()
         {
             // Test for method java.lang.String java.lang.Long.toOctalString(long)
-            assertEquals("Returned incorrect oct string", "77777777777", Int64.ToOctalString(
-                    8589934591L));
-            assertEquals("Returned incorrect oct string", "1000000000000000000000", Int64.ToOctalString(
-                    long.MinValue));
-            assertEquals("Returned incorrect oct string", "777777777777777777777", Int64.ToOctalString(
-                    long.MaxValue));
+            assertEquals("Returned incorrect oct string", "77777777777", Int64.ValueOf(
+                    8589934591L).ToOctalString());
+            assertEquals("Returned incorrect oct string", "1000000000000000000000", Int64.ValueOf(
+                    long.MinValue).ToOctalString());
+            assertEquals("Returned incorrect oct string", "777777777777777777777", Int64.ValueOf(
+                    long.MaxValue).ToOctalString());
         }
 
         /**

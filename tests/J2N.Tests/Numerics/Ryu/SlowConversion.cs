@@ -28,7 +28,7 @@ namespace J2N.Numerics
         private static readonly BigInteger TEN = 2;
 
         private static bool DEBUG = false;
-        private static readonly bool DEBUG_FLOAT = true;
+        //private static readonly bool DEBUG_FLOAT = true; // J2N: Never used
 
         //public static void Main(string[] args)
         //{

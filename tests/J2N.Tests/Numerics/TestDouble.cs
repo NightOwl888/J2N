@@ -1811,7 +1811,9 @@ namespace J2N.Numerics
             Double d3 = new Double(0.0002f);
             assertTrue("Assert 0: Equality test failed", d1.Equals((object)d2) && !(d1.Equals((object)d3)));
 
+#pragma warning disable CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
             assertTrue("Assert 2: NaN should not be == NaN", double.NaN != double.NaN);
+#pragma warning restore CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
             assertTrue("Assert 3: NaN should be == NaN", new Double(double.NaN)
                     .Equals((object)new Double(double.NaN)));
             assertTrue("Assert 4: -0d should be == 0d", 0d == -0d);
@@ -1835,9 +1837,9 @@ namespace J2N.Numerics
             Double d3 = new Double(0.0002f);
             assertTrue("Assert 0: Equality test failed", d1.Equals(d2) && !(d1.Equals(d3)));
 
-#pragma warning disable CA2242 // Test for NaN correctly
+#pragma warning disable CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
             assertTrue("Assert 2: NaN should not be == NaN", double.NaN != double.NaN);
-#pragma warning restore CA2242 // Test for NaN correctly
+#pragma warning restore CS1718, CA2242 // Comparison made to same variable, Test for NaN correctly
             assertTrue("Assert 3: NaN should be == NaN", new Double(double.NaN)
                     .Equals(new Double(double.NaN)));
             assertTrue("Assert 4: -0d should be == 0d", 0d == -0d);
@@ -1857,31 +1859,31 @@ namespace J2N.Numerics
         public void Test_toHexStringF()
         {
             // the follow values come from the Double Javadoc/Spec
-            assertEquals("0x0.0p0", Double.ToHexString(0.0D));
-            assertEquals("-0x0.0p0", Double.ToHexString(-0.0D));
-            assertEquals("0x1.0p0", Double.ToHexString(1.0D));
-            assertEquals("-0x1.0p0", Double.ToHexString(-1.0D));
-            assertEquals("0x1.0p1", Double.ToHexString(2.0D));
-            assertEquals("0x1.8p1", Double.ToHexString(3.0D));
-            assertEquals("0x1.0p-1", Double.ToHexString(0.5D));
-            assertEquals("0x1.0p-2", Double.ToHexString(0.25D));
-            assertEquals("0x1.fffffffffffffp1023", Double.ToHexString(double.MaxValue));
-            assertEquals("0x0.0000000000001p-1022", Double.ToHexString(double.Epsilon)); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
+            assertEquals("0x0.0p0", Double.ValueOf(0.0D).ToHexString());
+            assertEquals("-0x0.0p0", Double.ValueOf(-0.0D).ToHexString());
+            assertEquals("0x1.0p0", Double.ValueOf(1.0D).ToHexString());
+            assertEquals("-0x1.0p0", Double.ValueOf(-1.0D).ToHexString());
+            assertEquals("0x1.0p1", Double.ValueOf(2.0D).ToHexString());
+            assertEquals("0x1.8p1", Double.ValueOf(3.0D).ToHexString());
+            assertEquals("0x1.0p-1", Double.ValueOf(0.5D).ToHexString());
+            assertEquals("0x1.0p-2", Double.ValueOf(0.25D).ToHexString());
+            assertEquals("0x1.fffffffffffffp1023", Double.ValueOf(double.MaxValue).ToHexString());
+            assertEquals("0x0.0000000000001p-1022", Double.ValueOf(double.Epsilon).ToHexString()); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
 
             // test edge cases
-            assertEquals("NaN", Double.ToHexString(double.NaN));
-            assertEquals("-Infinity", Double.ToHexString(double.NegativeInfinity));
-            assertEquals("Infinity", Double.ToHexString(double.PositiveInfinity));
+            assertEquals("NaN", Double.ValueOf(double.NaN).ToHexString());
+            assertEquals("-Infinity", Double.ValueOf(double.NegativeInfinity).ToHexString());
+            assertEquals("Infinity", Double.ValueOf(double.PositiveInfinity).ToHexString());
 
             // test various numbers
-            assertEquals("-0x1.da8p6", Double.ToHexString(-118.625D));
-            assertEquals("0x1.2957874cccccdp23", Double.ToHexString(9743299.65D));
-            assertEquals("0x1.2957874cccccdp23", Double.ToHexString(9743299.65000D));
-            assertEquals("0x1.2957874cccf63p23", Double.ToHexString(9743299.650001234D));
-            assertEquals("0x1.700d1061d3333p33", Double.ToHexString(12349743299.65000D));
+            assertEquals("-0x1.da8p6", Double.ValueOf(-118.625D).ToHexString());
+            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65D).ToHexString());
+            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65000D).ToHexString());
+            assertEquals("0x1.2957874cccf63p23", Double.ValueOf(9743299.650001234D).ToHexString());
+            assertEquals("0x1.700d1061d3333p33", Double.ValueOf(12349743299.65000D).ToHexString());
 
             // test HARMONY-2132
-            assertEquals("0x1.01p10", Double.ToHexString(/*0x1.01p10*/ 1028.0D)); // .NET cannot represent this as a float literal
+            assertEquals("0x1.01p10", Double.ValueOf(/*0x1.01p10*/ 1028.0D).ToHexString()); // .NET cannot represent this as a float literal
         }
 
         /**
