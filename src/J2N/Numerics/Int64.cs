@@ -2632,215 +2632,247 @@ namespace J2N.Numerics
             return ValueOf(Parse(value, radix));
         }
 
-        /**
-         * Determines the highest (leftmost) bit of the specified long value that is
-         * 1 and returns the bit mask value for that bit. This is also referred to
-         * as the Most Significant 1 Bit. Returns zero if the specified long is
-         * zero.
-         * 
-         * @param lng
-         *            the long to examine.
-         * @return the bit mask indicating the highest 1 bit in {@code lng}.
-         * @since 1.5
-         */
-        public static long HighestOneBit(long lng)
+        #region HighestOneBit
+
+        /// <summary>
+        /// Returns a <see cref="long"/> value with at most a single one-bit, in the
+        /// position of the highest-order ("leftmost") one-bit in the specified
+        /// <paramref name="value"/>.  Returns zero if the specified <paramref name="value"/> has no
+        /// one-bits in its two's complement binary representation, that is, if it
+        /// is equal to zero.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> to examine.</param>
+        /// <returns>A <see cref="long"/> value with a single one-bit, in the position
+        /// of the highest-order one-bit in the specified <paramref name="value"/>, or zero if
+        /// the specified <paramref name="value"/> is itself equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static long HighestOneBit(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.HighestOneBit();
-            //lng |= (lng >> 1);
-            //lng |= (lng >> 2);
-            //lng |= (lng >> 4);
-            //lng |= (lng >> 8);
-            //lng |= (lng >> 16);
-            //lng |= (lng >> 32);
-            //return (lng & ~(lng >>> 1));
+            return value.HighestOneBit();
         }
 
-        /**
-         * Determines the lowest (rightmost) bit of the specified long value that is
-         * 1 and returns the bit mask value for that bit. This is also referred to
-         * as the Least Significant 1 Bit. Returns zero if the specified long is
-         * zero.
-         * 
-         * @param lng
-         *            the long to examine.
-         * @return the bit mask indicating the lowest 1 bit in {@code lng}.
-         * @since 1.5
-         */
-        public static long LowestOneBit(long lng)
+        #endregion HighestOneBit
+
+        #region LowestOneBit
+
+        /// <summary>
+        /// Returns a <see cref="long"/> value with at most a single one-bit, in the
+        /// position of the lowest-order ("rightmost") one-bit in the specified
+        /// <see cref="long"/> value.  Returns zero if the specified value has no
+        /// one-bits in its two's complement binary representation, that is, if it
+        /// is equal to zero.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> to examine.</param>
+        /// <returns>A <see cref="long"/> value with a single one-bit, in the position
+        /// of the lowest-order one-bit in the specified <paramref name="value"/>, or zero if
+        /// the specified <paramref name="value"/> is itself equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static long LowestOneBit(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.LowestOneBit();
-            //return (lng & (-lng));
+            return value.LowestOneBit();
         }
 
-        /**
-         * Determines the number of leading zeros in the specified long value prior
-         * to the {@link #highestOneBit(long) highest one bit}.
-         *
-         * @param lng
-         *            the long to examine.
-         * @return the number of leading zeros in {@code lng}.
-         * @since 1.5
-         */
-        public static int NumberOfLeadingZeros(long lng)
+        #endregion LowestOneBit
+
+        #region LeadingZeroCount
+
+        /// <summary>
+        /// Returns the number of zero bits preceding the highest-order
+        /// ("leftmost") one-bit in the two's complement binary representation
+        /// of the specified <paramref name="value"/>. Returns 64 if the
+        /// specified value has no one-bits in its two's complement representation,
+        /// in other words if it is equal to zero.
+        /// <para/>
+        /// Note that this method is closely related to the logarithm base 2.
+        /// For all positive <see cref="long"/> values x:
+        /// <list type="bullet">
+        ///     <item><description>floor(log<sub>2</sub>(x)) = <c>63 - Int64.LeadingZeroCount(x)</c></description></item>
+        ///     <item><description>ceil(log<sub>2</sub>(x)) = <c>64 - Int64.LeadingZeroCount(x - 1)</c></description></item>
+        /// </list>
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.numberOfLeadingZeros() in the JDK.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> to examine.</param>
+        /// <returns>The number of zero bits preceding the highest-order
+        /// ("leftmost") one-bit in the two's complement binary representation
+        /// of the specified <paramref name="value"/>, or 64 if the value
+        /// is equal to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static int LeadingZeroCount(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.LeadingZeroCount();
-            //lng |= lng >> 1;
-            //lng |= lng >> 2;
-            //lng |= lng >> 4;
-            //lng |= lng >> 8;
-            //lng |= lng >> 16;
-            //lng |= lng >> 32;
-            //return bitCount(~lng);
+            return value.LeadingZeroCount();
         }
 
-        /**
-         * Determines the number of trailing zeros in the specified long value after
-         * the {@link #lowestOneBit(long) lowest one bit}.
-         *
-         * @param lng
-         *            the long to examine.
-         * @return the number of trailing zeros in {@code lng}.
-         * @since 1.5
-         */
-        public static int NumberOfTrailingZeros(long lng)
+        #endregion LeadingZeroCount
+
+        #region TrailingZeroCount
+
+        /// <summary>
+        /// Returns the number of zero bits following the lowest-order ("rightmost")
+        /// one-bit in the two's complement binary representation of the specified
+        /// <paramref name="value"/>. Returns 64 if the specified value has no
+        /// one-bits in its two's complement representation, in other words if it is
+        /// equal to zero.
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.numberOfTrailingZeros() in the JDK.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> to examine.</param>
+        /// <returns>The number of zero bits following the lowest-order ("rightmost")
+        /// one-bit in the two's complement binary representation of the
+        /// specified <paramref name="value"/>, or 64 if the value is equal
+        /// to zero.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static int TrailingZeroCount(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.TrailingZeroCount();
-            //return bitCount((lng & -lng) - 1);
+            return value.TrailingZeroCount();
         }
 
-        /**
-         * Counts the number of 1 bits in the specified long value; this is also
-         * referred to as population count.
-         *
-         * @param lng
-         *            the long to examine.
-         * @return the number of 1 bits in {@code lng}.
-         * @since 1.5
-         */
-        public static int BitCount(long lng)
+        #endregion TrailingZeroCount
+
+        #region PopCount
+
+        /// <summary>
+        /// Returns the population count (number of set bits) of a <see cref="long"/> mask.
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.bitCount() in the JDK.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> to examine.</param>
+        /// <returns>The number of one-bits in the two's complement binary
+        /// representation of the specified <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static int PopCount(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.PopCount();
-            //lng = (lng & 0x5555555555555555L) + ((lng >> 1) & 0x5555555555555555L);
-            //lng = (lng & 0x3333333333333333L) + ((lng >> 2) & 0x3333333333333333L);
-            //// adjust for 64-bit integer
-            //int i = (int)((lng >>> 32) + lng);
-            //i = (i & 0x0F0F0F0F) + ((i >> 4) & 0x0F0F0F0F);
-            //i = (i & 0x00FF00FF) + ((i >> 8) & 0x00FF00FF);
-            //i = (i & 0x0000FFFF) + ((i >> 16) & 0x0000FFFF);
-            //return i;
+            return value.PopCount();
         }
 
-        /**
-         * Rotates the bits of the specified long value to the left by the specified
-         * number of bits.
-         *
-         * @param lng
-         *            the long value to rotate left.
-         * @param distance
-         *            the number of bits to rotate.
-         * @return the rotated value.
-         * @since 1.5
-         */
-        public static long RotateLeft(long lng, int distance)
+        #endregion PopCount
+
+        #region RotateLeft
+
+        /// <summary>
+        /// Returns the value obtained by rotating the two's complement binary
+        /// representation of the specified <paramref name="value"/> left by the
+        /// specified number of bits.  (Bits shifted out of the left hand, or
+        /// high-order, side reenter on the right, or low-order.)
+        /// <para/>
+        /// Note that left rotation with a negative distance is equivalent to
+        /// right rotation: <c>Int64.RotateLeft(val, -distance) == Int64.RotateRight(val, distance)</c>
+        /// Note also that rotation by any multiple of 64 is a
+        /// no-op, so all but the last six bits of the rotation distance can be
+        /// ignored, even if the distance is negative:
+        /// <c>Int64.RotateLeft(val, distance) == Int64.RotateLeft(val, distance &amp; 0x3F)</c>.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> value to rotate left.</param>
+        /// <param name="distance">The number of bits to rotate.</param>
+        /// <returns>The value obtained by rotating the two's complement binary
+        /// representation of the specified <paramref name="value"/> left by the
+        /// specified number of bits.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static long RotateLeft(long value, int distance) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.RotateLeft(distance);
-            //if (distance == 0)
-            //{
-            //    return lng;
-            //}
-            ///*
-            // * According to JLS3, 15.19, the right operand of a shift is always
-            // * implicitly masked with 0x3F, which the negation of 'distance' is
-            // * taking advantage of.
-            // */
-            //return ((lng << distance) | (lng >>> (-distance)));
+            return value.RotateLeft(distance);
         }
 
-        /**
-         * <p>
-         * Rotates the bits of the specified long value to the right by the
-         * specified number of bits.
-         *
-         * @param lng
-         *            the long value to rotate right.
-         * @param distance
-         *            the number of bits to rotate.
-         * @return the rotated value.
-         * @since 1.5
-         */
-        public static long RotateRight(long lng, int distance)
+        #endregion RotateLeft
+
+        #region RotateRight
+
+        /// <summary>
+        /// Returns the value obtained by rotating the two's complement binary
+        /// representation of the specified <see cref="long"/> value right by the
+        /// specified number of bits.  (Bits shifted out of the right hand, or
+        /// low-order, side reenter on the left, or high-order.)
+        /// <para/>
+        /// Note that right rotation with a negative distance is equivalent to
+        /// left rotation: <c>Int64.RotateRight(val, -distance) == Int64.RotateLeft(val, distance)</c>.
+        /// Note also that rotation by any multiple of 64 is a
+        /// no-op, so all but the last six bits of the rotation distance can be
+        /// ignored, even if the distance is negative: 
+        /// <c>Int64.RotateRight(val, distance) == Int64.RotateRight(val, distance &amp; 0x3F)</c>.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> value to rotate right.</param>
+        /// <param name="distance">The number of bits to rotate.</param>
+        /// <returns>The value obtained by rotating the two's complement binary
+        /// representation of the specified <paramref name="value"/> right by the
+        /// specified number of bits.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static long RotateRight(long value, int distance) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.RotateRight(distance);
-            ////if (distance == 0)
-            ////{
-            ////    return lng;
-            ////}
-            /////*
-            //// * According to JLS3, 15.19, the right operand of a shift is always
-            //// * implicitly masked with 0x3F, which the negation of 'distance' is
-            //// * taking advantage of.
-            //// */
-            ////return ((lng >>> distance) | (lng << (-distance)));
+            return value.RotateRight(distance);
         }
 
-        /**
-         * Reverses the order of the bytes of the specified long value.
-         * 
-         * @param lng
-         *            the long value for which to reverse the byte order.
-         * @return the reversed value.
-         * @since 1.5
-         */
-        public static long ReverseBytes(long lng)
+        #endregion RotateRight
+
+        #region ReverseBytes
+
+        /// <summary>
+        /// Returns the value obtained by reversing the order of the bytes in the
+        /// two's complement representation of the specified <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> value for which to reverse the byte order.</param>
+        /// <returns>The value obtained by reversing the bytes in the specified
+        /// <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static long ReverseBytes(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.ReverseBytes();
-            //long b7 = lng >>> 56;
-            //long b6 = (lng >>> 40) & 0xFF00L;
-            //long b5 = (lng >>> 24) & 0xFF0000L;
-            //long b4 = (lng >>> 8) & 0xFF000000L;
-            //long b3 = (lng & 0xFF000000L) << 8;
-            //long b2 = (lng & 0xFF0000L) << 24;
-            //long b1 = (lng & 0xFF00L) << 40;
-            //long b0 = lng << 56;
-            //return (b0 | b1 | b2 | b3 | b4 | b5 | b6 | b7);
+            return value.ReverseBytes();
         }
 
-        /**
-         * Reverses the order of the bits of the specified long value.
-         * 
-         * @param lng
-         *            the long value for which to reverse the bit order.
-         * @return the reversed value.
-         * @since 1.5
-         */
-        public static long Reverse(long lng)
+        #endregion ReverseBytes
+
+        #region Reverse
+
+        /// <summary>
+        /// Returns the value obtained by reversing the order of the bits in the
+        /// two's complement binary representation of the specified <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> value for which to reverse the bit order.</param>
+        /// <returns>The value obtained by reversing order of the bits in the
+        /// specified <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static long Reverse(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.Reverse();
-            //// From Hacker's Delight, 7-1, Figure 7-1
-            //lng = (lng & 0x5555555555555555L) << 1 | (lng >> 1)
-            //        & 0x5555555555555555L;
-            //lng = (lng & 0x3333333333333333L) << 2 | (lng >> 2)
-            //        & 0x3333333333333333L;
-            //lng = (lng & 0x0F0F0F0F0F0F0F0FL) << 4 | (lng >> 4)
-            //        & 0x0F0F0F0F0F0F0F0FL;
-            //return reverseBytes(lng);
+            return value.Reverse();
         }
 
-        /**
-         * Returns the value of the {@code signum} function for the specified long
-         * value.
-         * 
-         * @param lng
-         *            the long value to check.
-         * @return -1 if {@code lng} is negative, 1 if {@code lng} is positive, 0 if
-         *         {@code lng} is zero.
-         * @since 1.5
-         */
-        public static int Signum(long lng)
+        #endregion Reverse
+
+        #region Signum
+
+        /// <summary>
+        /// Returns the signum function of the specified <see cref="long"/> value. (The
+        /// return value is <c>-1</c> if the specified value is negative; <c>0</c> if the
+        /// specified value is zero; and <c>1</c> if the specified value is positive.)
+        /// </summary>
+        /// <param name="value">The value whose signum has to be computed.</param>
+        /// <returns>The signum function of the specified <see cref="long"/> value.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static int Signum(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return lng.Signum();
-            //return (lng == 0 ? 0 : (lng < 0 ? -1 : 1));
+            return value.Signum();
         }
+
+        #endregion Signum
 
         /**
          * Returns a {@code Long} instance for the specified long value.
