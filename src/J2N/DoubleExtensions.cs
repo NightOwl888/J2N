@@ -1,4 +1,5 @@
 ﻿using J2N.Numerics;
+using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -187,28 +188,33 @@ namespace J2N
         /// <summary>
         /// Returns a hexadecimal string representation of the <see cref="double"/> argument. All characters mentioned below are ASCII characters.
         /// <list type="bullet">
-        ///     <item><description>If the argument is <see cref="double.NaN"/>, the result is the string "NaN".</description></item>
+        ///     <item><description>If the argument is <see cref="double.NaN"/>, the result is <see cref="NumberFormatInfo.NumberDecimalSeparator"/>
+        ///         of the <paramref name="provider"/>.</description></item>
         ///     <item><description>Otherwise, the result is a string that represents the sign and magnitude of the argument. If the sign
-        ///         is negative, the first character of the result is '-' ('\u002D'); if the sign is positive, no sign character appears
-        ///         in the result. As for the magnitude <i>m</i>: </description>
+        ///         is negative, it is prefixed by <see cref="NumberFormatInfo.NegativeSign"/> of the <paramref name="provider"/>; if the
+        ///         sign is positive, no sign character appears in the result. As for the magnitude <i>m</i>: </description>
         ///         <list type="bullet">
-        ///             <item><description>If <i>m</i> is infinity, it is represented by the string "Infinity"; thus, positive infinity produces
-        ///                 the result "Infinity" and negative infinity produces the result "-Infinity".</description></item>
+        ///             <item><description>If <i>m</i> is positive infinity, it is represented by <see cref="NumberFormatInfo.PositiveInfinitySymbol"/> of the <paramref name="provider"/>;
+        ///                 if <i>m</i> is negative infinity, it is represented by <see cref="NumberFormatInfo.NegativeInfinitySymbol"/> of the <paramref name="provider"/>.</description></item>
         ///             <item><description>If <i>m</i> is zero, it is represented by the string "0x0.0p0"; thus, negative zero produces the result
-        ///                 "-0x0.0p0" and positive zero produces the result "0x0.0p0". </description></item>
+        ///                 "-0x0.0p0" and positive zero produces the result "0x0.0p0". The negative symbol is represented by <see cref="NumberFormatInfo.NegativeSign"/>
+        ///                 and decimal separator character is represented by <see cref="NumberFormatInfo.NumberDecimalSeparator"/>.</description></item>
         ///             <item><description>If <i>m</i> is a <see cref="double"/> value with a normalized representation, substrings are used to represent the significand
-        ///                 and exponent fields. The significand is represented by the characters "0x1." followed by a lowercase hexadecimal
-        ///                 representation of the rest of the significand as a fraction. Trailing zeros in the hexadecimal representation are
+        ///                 and exponent fields. The significand is represented by the characters "0x1" followed by <see cref="NumberFormatInfo.NumberDecimalSeparator"/>,
+        ///                 followed by a lowercase hexadecimal representation of the rest of the significand as a fraction. Trailing zeros in the hexadecimal representation are
         ///                 removed unless all the digits are zero, in which case a single zero is used. Next, the exponent is represented by "p"
         ///                 followed by a decimal string of the unbiased exponent as if produced by a call to <see cref="int.ToString()"/> with invariant culture on the exponent value. </description></item>
-        ///             <item><description>If <i>m</i> is a <see cref="double"/> value with a subnormal representation, the significand is represented by the characters "0x0."
-        ///                 followed by a hexadecimal representation of the rest of the significand as a fraction. Trailing zeros in the hexadecimal
-        ///                 representation are removed. Next, the exponent is represented by "p-1022". Note that there must be at least one nonzero
+        ///             <item><description>If <i>m</i> is a <see cref="double"/> value with a subnormal representation, the significand is represented by the characters "0x0"
+        ///                 followed by <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, followed by a hexadecimal representation of the rest of the significand as a fraction.
+        ///                 Trailing zeros in the hexadecimal representation are removed. Next, the exponent is represented by "p-1022". Note that there must be at least one nonzero
         ///                 digit in a subnormal significand. </description></item>
         ///         </list>
         ///     </item>
         /// </list>
-        /// <h3>Examples</h3>
+        /// <para/>
+        /// The value of <see cref="NumberFormatInfo.NumberNegativePattern"/> of <paramref name="provider"/> is ignored.
+        /// <para/>
+        /// <h3>Examples (using <see cref="NumberFormatInfo.InvariantInfo"/>)</h3>
         /// <list type="table">
         ///     <listheader>
         ///         <term>Floating-point Value</term>
@@ -255,25 +261,30 @@ namespace J2N
         ///         <term>0x0.0000000000001p-1022</term>
         ///     </item>
         /// </list>
+        /// <para/>
+        /// Usage Note: To exactly match the behavior of the JDK, use <see cref="NumberFormatInfo.InvariantInfo"/>
+        /// for <paramref name="provider"/>.
         /// </summary>
         /// <param name="value">The double to be converted.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A hex string representing <paramref name="value"/>.</returns>
-        public static string ToHexString(this double value)
+        public static string ToHexString(this double value, IFormatProvider? provider)
         {
+            var info = NumberFormatInfo.GetInstance(provider);
             /*
              * Reference: http://en.wikipedia.org/wiki/IEEE_754
              */
             if (double.IsNaN(value))
             {
-                return "NaN"; //$NON-NLS-1$
+                return info.NaNSymbol; //$NON-NLS-1$
             }
             if (double.IsPositiveInfinity(value))
             {
-                return "Infinity"; //$NON-NLS-1$
+                return info.PositiveInfinitySymbol; //$NON-NLS-1$
             }
             if (double.IsNegativeInfinity(value))
             {
-                return "-Infinity"; //$NON-NLS-1$
+                return info.NegativeInfinitySymbol; //$NON-NLS-1$
             }
 
             long bitValue = BitConversion.DoubleToInt64Bits(value);
@@ -284,24 +295,23 @@ namespace J2N
             // mask significand bits and shift up
             long significand = bitValue & 0x000FFFFFFFFFFFFFL;
 
+
             if (exponent == 0 && significand == 0)
             {
-                return (negative ? "-0x0.0p0" : "0x0.0p0"); //$NON-NLS-1$ //$NON-NLS-2$
+                return string.Concat(negative ? info.NegativeSign : "", "0x0", info.NumberDecimalSeparator, "0p0"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             StringBuilder hexString = new StringBuilder(10);
             if (negative)
             {
-                hexString.Append("-0x"); //$NON-NLS-1$
+                hexString.Append(info.NegativeSign);
             }
-            else
-            {
-                hexString.Append("0x"); //$NON-NLS-1$
-            }
+            hexString.Append("0x"); //$NON-NLS-1$
 
             if (exponent == 0)
             { // denormal (subnormal) value
-                hexString.Append("0."); //$NON-NLS-1$
+                hexString.Append('0'); //$NON-NLS-1$
+                hexString.Append(info.NumberDecimalSeparator);
                 // significand is 52-bits, so there can be 13 hex digits
                 int fractionDigits = 13;
                 // remove trailing hex zeros, so long.ToHexString() won't print
@@ -328,7 +338,8 @@ namespace J2N
             }
             else
             { // normal value
-                hexString.Append("1."); //$NON-NLS-1$
+                hexString.Append('1'); //$NON-NLS-1$
+                hexString.Append(info.NumberDecimalSeparator);
                 // significand is 52-bits, so there can be 13 hex digits
                 int fractionDigits = 13;
                 // remove trailing hex zeros, so long.ToHexString() won't print

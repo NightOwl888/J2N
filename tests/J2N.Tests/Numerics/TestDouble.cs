@@ -1859,31 +1859,43 @@ namespace J2N.Numerics
         public void Test_toHexStringF()
         {
             // the follow values come from the Double Javadoc/Spec
-            assertEquals("0x0.0p0", Double.ValueOf(0.0D).ToHexString());
-            assertEquals("-0x0.0p0", Double.ValueOf(-0.0D).ToHexString());
-            assertEquals("0x1.0p0", Double.ValueOf(1.0D).ToHexString());
-            assertEquals("-0x1.0p0", Double.ValueOf(-1.0D).ToHexString());
-            assertEquals("0x1.0p1", Double.ValueOf(2.0D).ToHexString());
-            assertEquals("0x1.8p1", Double.ValueOf(3.0D).ToHexString());
-            assertEquals("0x1.0p-1", Double.ValueOf(0.5D).ToHexString());
-            assertEquals("0x1.0p-2", Double.ValueOf(0.25D).ToHexString());
-            assertEquals("0x1.fffffffffffffp1023", Double.ValueOf(double.MaxValue).ToHexString());
-            assertEquals("0x0.0000000000001p-1022", Double.ValueOf(double.Epsilon).ToHexString()); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
+            assertEquals("0x0.0p0", Double.ValueOf(0.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x0.0p0", Double.ValueOf(-0.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p0", Double.ValueOf(1.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x1.0p0", Double.ValueOf(-1.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p1", Double.ValueOf(2.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.8p1", Double.ValueOf(3.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p-1", Double.ValueOf(0.5D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p-2", Double.ValueOf(0.25D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.fffffffffffffp1023", Double.ValueOf(double.MaxValue).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x0.0000000000001p-1022", Double.ValueOf(double.Epsilon).ToHexString(NumberFormatInfo.InvariantInfo)); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
 
             // test edge cases
-            assertEquals("NaN", Double.ValueOf(double.NaN).ToHexString());
-            assertEquals("-Infinity", Double.ValueOf(double.NegativeInfinity).ToHexString());
-            assertEquals("Infinity", Double.ValueOf(double.PositiveInfinity).ToHexString());
+            assertEquals("NaN", Double.ValueOf(double.NaN).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-Infinity", Double.ValueOf(double.NegativeInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("Infinity", Double.ValueOf(double.PositiveInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
 
             // test various numbers
-            assertEquals("-0x1.da8p6", Double.ValueOf(-118.625D).ToHexString());
-            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65D).ToHexString());
-            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65000D).ToHexString());
-            assertEquals("0x1.2957874cccf63p23", Double.ValueOf(9743299.650001234D).ToHexString());
-            assertEquals("0x1.700d1061d3333p33", Double.ValueOf(12349743299.65000D).ToHexString());
+            assertEquals("-0x1.da8p6", Double.ValueOf(-118.625D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65000D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.2957874cccf63p23", Double.ValueOf(9743299.650001234D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.700d1061d3333p33", Double.ValueOf(12349743299.65000D).ToHexString(NumberFormatInfo.InvariantInfo));
 
             // test HARMONY-2132
-            assertEquals("0x1.01p10", Double.ValueOf(/*0x1.01p10*/ 1028.0D).ToHexString()); // .NET cannot represent this as a float literal
+            assertEquals("0x1.01p10", Double.ValueOf(/*0x1.01p10*/ 1028.0D).ToHexString(NumberFormatInfo.InvariantInfo)); // .NET cannot represent this as a float literal
+
+            // J2N: Test custom cultures
+
+            assertEquals("-0x1,0p0", Double.ValueOf(-1.0D).ToHexString(new CultureInfo("fr-FR")));
+
+            // test edge cases
+            assertEquals("0x0,0p0", Double.ValueOf(0.0D).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
+            assertEquals("neg0x0,0p0", Double.ValueOf(-0.0D).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
+
+            assertEquals("NotANumber", Double.ValueOf(double.NaN).ToHexString(new NumberFormatInfo { NaNSymbol = "NotANumber" }));
+            assertEquals("-∞", Double.ValueOf(double.NegativeInfinity).ToHexString(new NumberFormatInfo { NegativeInfinitySymbol = "-∞" }));
+            assertEquals("∞", Double.ValueOf(double.PositiveInfinity).ToHexString(new NumberFormatInfo { PositiveInfinitySymbol = "∞" }));
         }
 
         /**
