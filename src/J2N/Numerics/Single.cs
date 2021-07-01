@@ -316,40 +316,100 @@ namespace J2N.Numerics
 
         #endregion Equals
 
-        /**
-         * Converts the specified float value to a binary representation conforming
-         * to the IEEE 754 floating-point single precision bit layout. All
-         * <em>Not-a-Number (NaN)</em> values are converted to a single NaN
-         * representation ({@code 0x7ff8000000000000L}).
-         * 
-         * @param value
-         *            the float value to convert.
-         * @return the IEEE 754 floating-point single precision representation of
-         *         {@code value}.
-         * @see #floatToRawIntBits(float)
-         * @see #intBitsToFloat(int)
-         */
-        public static int SingleToInt32Bits(float value)
+        #region SingleToInt32Bits
+
+        /// <summary>
+        /// Returns a representation of the specified floating-point value
+        /// according to the IEEE 754 floating-point "single format" bit
+        /// layout.
+        ///
+        /// <para/>Bit 31 (the bit that is selected by the mask
+        /// <c>0x80000000</c>) represents the sign of the floating-point
+        /// number.
+        /// Bits 30-23 (the bits that are selected by the mask
+        /// <c>0x7f800000</c>) represent the exponent.
+        /// Bits 22-0 (the bits that are selected by the mask
+        /// <c>0x007fffff</c>) represent the significand (sometimes called
+        /// the mantissa) of the floating-point number.
+        ///
+        /// <para/>If the argument is positive infinity, the result is
+        /// <c>0x7f800000</c>.
+        ///
+        /// <para/>If the argument is negative infinity, the result is
+        /// <c>0xff800000</c>.
+        ///
+        /// <para/>If the argument is NaN, the result is <c>0x7fc00000</c>.
+        ///
+        /// <para/>In all cases, the result is an integer that, when given to the
+        /// <see cref="Int32BitsToSingle(int)"/> method, will produce a floating-point
+        /// value the same as the argument to <see cref="SingleToInt32Bits(float)"/>
+        /// (except all NaN values are collapsed to a single
+        /// "canonical" NaN value).
+        /// 
+        /// <para/>
+        /// NOTE: This corresponds to Float.floatToIntBits() in the JDK.
+        /// There is no corresponding method in .NET.
+        /// </summary>
+        /// <param name="value">A floating-point number.</param>
+        /// <returns>The bits that represent the floating-point number.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        internal static int SingleToInt32Bits(float value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.SingleToInt32Bits(value);
         }
 
-        /**
-         * Converts the specified float value to a binary representation conforming
-         * to the IEEE 754 floating-point single precision bit layout.
-         * <em>Not-a-Number (NaN)</em> values are preserved.
-         * 
-         * @param value
-         *            the float value to convert.
-         * @return the IEEE 754 floating-point single precision representation of
-         *         {@code value}.
-         * @see #floatToIntBits(float)
-         * @see #intBitsToFloat(int)
-         */
-        public static int SingleToRawInt32Bits(float value)
+        #endregion SingleToInt32Bits
+
+        #region SingleToRawInt32Bits
+
+        /// <summary>
+        /// Returns a representation of the specified floating-point value
+        /// according to the IEEE 754 floating-point "single format" bit
+        /// layout, preserving Not-a-Number (NaN) values.
+        ///
+        /// <para/>Bit 31 (the bit that is selected by the mask
+        /// <c>0x80000000</c>) represents the sign of the floating-point
+        /// number.
+        /// Bits 30-23 (the bits that are selected by the mask
+        /// <c>0x7f800000</c>) represent the exponent.
+        /// Bits 22-0 (the bits that are selected by the mask
+        /// <c>0x007fffff</c>) represent the significand (sometimes called
+        /// the mantissa) of the floating-point number.
+        ///
+        /// <para/>If the argument is positive infinity, the result is
+        /// <c>0x7f800000</c>.
+        ///
+        /// <para/>If the argument is negative infinity, the result is
+        /// <c>0xff800000</c>.
+        ///
+        /// <para/>If the argument is NaN, the result is the integer representing
+        /// the actual NaN value.  Unlike the <see cref="SingleToInt32Bits(float)"/>
+        /// method, <see cref="SingleToRawInt32Bits(float)"/> does not collapse all the
+        /// bit patterns encoding a NaN to a single "canonical"
+        /// NaN value.
+        ///
+        /// <para/>In all cases, the result is an integer that, when given to the
+        /// <see cref="Int32BitsToSingle(int)"/> method, will produce a
+        /// floating-point value the same as the argument to
+        /// <see cref="SingleToRawInt32Bits(float)"/>.
+        /// 
+        /// <para/>
+        /// NOTE: This corresponds to Float.floatToRawIntBits(float) in the JDK
+        /// and BitConverter.SingleToInt32Bits(float) in .NET (where implemented).
+        /// </summary>
+        /// <param name="value">A floating-point number.</param>
+        /// <returns>The bits that represent the floating-point number.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        internal static int SingleToRawInt32Bits(float value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.SingleToRawInt32Bits(value);
         }
+
+        #endregion SingleToRawInt32Bits
 
         /**
          * Gets the primitive value of this float.
@@ -371,21 +431,78 @@ namespace J2N.Numerics
 
         #endregion GetHashCode
 
-        /**
-         * Converts the specified IEEE 754 floating-point single precision bit
-         * pattern to a Java float value.
-         * 
-         * @param bits
-         *            the IEEE 754 floating-point single precision representation of
-         *            a float value.
-         * @return the float value converted from {@code bits}.
-         * @see #floatToIntBits(float)
-         * @see #floatToRawIntBits(float)
-         */
-        public static float Int32BitsToSingle(int value)
+        #region Int32BitsToSingle
+
+        /// <summary>
+        /// Returns the <see cref="float"/> value corresponding to a given
+        /// bit representation.
+        /// The argument is considered to be a representation of a
+        /// floating-point value according to the IEEE 754 floating-point
+        /// "single format" bit layout.
+        ///
+        /// <para/>If the argument is <c>0x7f800000</c>, the result is positive
+        /// infinity.
+        ///
+        /// <para/>If the argument is <c>0xff800000</c>, the result is negative
+        /// infinity.
+        ///
+        /// <para/>If the argument is any value in the range
+        /// <c>0x7f800001</c> through <c>0x7fffffff</c> or in
+        /// the range <c>0xff800001</c> through
+        /// <c>0xffffffff</c>, the result is a NaN.  No IEEE 754
+        /// floating-point operation provided by .NET can distinguish
+        /// between two NaN values of the same type with different bit
+        /// patterns.  Distinct values of NaN are only distinguishable by
+        /// use of the <see cref="SingleToRawInt32Bits(float)"/> method.
+        ///
+        /// <para/>In all other cases, let <i>s</i>, <i>e</i>, and <i>m</i> be three
+        /// values that can be computed from the argument:
+        ///
+        /// <code>
+        /// int s = ((bits &gt;&gt; 31) == 0) ? 1 : -1;
+        /// int e = ((bits &gt;&gt; 23) &amp; 0xff);
+        /// int m = (e == 0) ?
+        ///                 (bits &amp; 0x7fffff) &lt;&lt; 1 :
+        ///                 (bits &amp; 0x7fffff) | 0x800000;
+        /// </code>
+        ///
+        /// Then the floating-point result equals the value of the mathematical
+        /// expression <i>s</i>&#183;<i>m</i>&#183;2<sup><i>e</i>-150</sup>.
+        ///
+        /// <para/>Note that this method may not be able to return a
+        /// <see cref="float.NaN"/> with exactly same bit pattern as the
+        /// <see cref="int"/> argument.  IEEE 754 distinguishes between two
+        /// kinds of NaNs, quiet NaNs and <i>signaling NaNs</i>.  The
+        /// differences between the two kinds of NaN are generally not
+        /// visible in .NET.  Arithmetic operations on signaling NaNs turn
+        /// them into quiet NaNs with a different, but often similar, bit
+        /// pattern.  However, on some processors merely copying a
+        /// signaling NaN also performs that conversion.  In particular,
+        /// copying a signaling NaN to return it to the calling method may
+        /// perform this conversion.  So <see cref="Int32BitsToSingle(int)"/> may
+        /// not be able to return a <see cref="float"/> with a signaling NaN
+        /// bit pattern.  Consequently, for some <see cref="int"/> values,
+        /// <c>BitConversion.SingleToRawInt32Bits(BitConversion.Int32BitsToSingle(start))</c> may
+        /// <i>not</i> equal <c>start</c>.  Moreover, which
+        /// particular bit patterns represent signaling NaNs is platform
+        /// dependent; although all NaN bit patterns, quiet or signaling,
+        /// must be in the NaN range identified above.
+        /// 
+        /// <para/>
+        /// NOTE: This corresponds to Float.intBitsToFloat(int) in the JDK
+        /// and BitConverter.Int32BitsToSingle(int) in .NET (where implemented).
+        /// </summary>
+        /// <param name="value">The integer to convert.</param>
+        /// <returns>A single-precision floating-point value that represents the converted integer.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        internal static float Int32BitsToSingle(int value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.Int32BitsToSingle(value);
         }
+
+        #endregion Int32BitsToSingle
 
         /// <inheritdoc/>
         public override int GetInt32Value()

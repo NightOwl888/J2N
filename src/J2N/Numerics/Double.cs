@@ -154,40 +154,102 @@ namespace J2N.Numerics
             return (byte)value;
         }
 
-        /**
-         * Converts the specified double value to a binary representation conforming
-         * to the IEEE 754 floating-point double precision bit layout. All
-         * <em>Not-a-Number (NaN)</em> values are converted to a single NaN
-         * representation ({@code 0x7ff8000000000000L}).
-         * 
-         * @param value
-         *            the double value to convert.
-         * @return the IEEE 754 floating-point double precision representation of
-         *         {@code value}.
-         * @see #doubleToRawLongBits(double)
-         * @see #longBitsToDouble(long)
-         */
-        public static long DoubleToInt64Bits(double value)
+        #region DoubleToInt64Bits
+
+        /// <summary>
+        /// Returns a representation of the specified floating-point value
+        /// according to the IEEE 754 floating-point "double
+        /// format" bit layout.
+        ///
+        /// <para/>Bit 63 (the bit that is selected by the mask
+        /// <c>0x8000000000000000L</c>) represents the sign of the
+        /// floating-point number. Bits
+        /// 62-52 (the bits that are selected by the mask
+        /// <c>0x7ff0000000000000L</c>) represent the exponent. Bits 51-0
+        /// (the bits that are selected by the mask
+        /// <c>0x000fffffffffffffL</c>) represent the significand
+        /// (sometimes called the mantissa) of the floating-point number.
+        ///
+        /// <para/>If the argument is positive infinity, the result is
+        /// <c>0x7ff0000000000000L</c>.
+        ///
+        /// <para/>If the argument is negative infinity, the result is
+        /// <c>0xfff0000000000000L</c>.
+        ///
+        /// <para/>If the argument is NaN, the result is
+        /// <c>0x7ff8000000000000L</c>.
+        ///
+        /// <para/>In all cases, the result is a <see cref="long"/> integer that, when
+        /// given to the <see cref="Int64BitsToDouble(long)"/> method, will produce a
+        /// floating-point value the same as the argument to
+        /// <see cref="DoubleToInt64Bits(double)"/> (except all NaN values are
+        /// collapsed to a single "canonical" NaN value).
+        /// 
+        /// <para/>
+        /// NOTE: This corresponds to Double.doubleToLongBits() in the JDK.
+        /// There is no corresponding method in .NET.
+        /// </summary>
+        /// <param name="value">A <see cref="double"/> precision floating-point number.</param>
+        /// <returns>The bits that represent the floating-point number.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        internal static long DoubleToInt64Bits(double value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.DoubleToInt64Bits(value);
         }
 
-        /**
-         * Converts the specified double value to a binary representation conforming
-         * to the IEEE 754 floating-point double precision bit layout.
-         * <em>Not-a-Number (NaN)</em> values are preserved.
-         * 
-         * @param value
-         *            the double value to convert.
-         * @return the IEEE 754 floating-point double precision representation of
-         *         {@code value}.
-         * @see #doubleToLongBits(double)
-         * @see #longBitsToDouble(long)
-         */
-        public static long DoubleToRawInt64Bits(double value)
+        #endregion DoubleToInt64Bits
+
+        #region DoubleToRawInt64Bits
+
+        /// <summary>
+        /// Returns a representation of the specified floating-point value
+        /// according to the IEEE 754 floating-point "double
+        /// format" bit layout, preserving Not-a-Number (NaN) values.
+        ///
+        /// <para/>Bit 63 (the bit that is selected by the mask
+        /// <c>0x8000000000000000L</c>) represents the sign of the
+        /// floating-point number. Bits
+        /// 62-52 (the bits that are selected by the mask
+        /// <c>0x7ff0000000000000L</c>) represent the exponent. Bits 51-0
+        /// (the bits that are selected by the mask
+        /// <c>0x000fffffffffffffL</c>) represent the significand
+        /// (sometimes called the mantissa) of the floating-point number.
+        ///
+        /// <para/>If the argument is positive infinity, the result is
+        /// <c>0x7ff0000000000000L</c>.
+        ///
+        /// <para/>If the argument is negative infinity, the result is
+        /// <c>0xfff0000000000000L</c>.
+        ///
+        /// <para/>If the argument is NaN, the result is the <see cref="long"/>
+        /// integer representing the actual NaN value.  Unlike the
+        /// <see cref="DoubleToInt64Bits(double)"/> method,
+        /// <see cref="DoubleToRawInt64Bits(double)"/> does not collapse all the bit
+        /// patterns encoding a NaN to a single "canonical" NaN
+        /// value.
+        ///
+        /// <para/>In all cases, the result is a <see cref="long"/> integer that,
+        /// when given to the <see cref="Int64BitsToDouble(long)"/> method, will
+        /// produce a floating-point value the same as the argument to
+        /// <see cref="DoubleToRawInt64Bits(double)"/>.
+        /// 
+        /// <para/>
+        /// NOTE: This corresponds to Double.doubleToRawLongBits() in the JDK
+        /// and to <see cref="BitConverter.DoubleToInt64Bits(double)"/> in .NET.
+        /// </summary>
+        /// <param name="value">A <see cref="double"/> precision floating-point number.</param>
+        /// <returns>The bits that represent the floating-point number.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        internal static long DoubleToRawInt64Bits(double value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.DoubleToRawInt64Bits(value);
         }
+
+        #endregion DoubleToRawInt64Bits
 
         /**
          * Gets the primitive value of this double.
@@ -527,21 +589,81 @@ namespace J2N.Numerics
 
         #endregion IsSubnormal
 
-        /**
-         * Converts the specified IEEE 754 floating-point double precision bit
-         * pattern to a Java double value.
-         * 
-         * @param bits
-         *            the IEEE 754 floating-point double precision representation of
-         *            a double value.
-         * @return the double value converted from {@code bits}.
-         * @see #doubleToLongBits(double)
-         * @see #doubleToRawLongBits(double)
-         */
-        public static double Int64BitsToDouble(long bits)
+        #region Int64BitsToDouble
+
+        /// <summary>
+        /// Returns the <see cref="double"/> value corresponding to a given
+        /// bit representation.
+        /// The argument is considered to be a representation of a
+        /// floating-point value according to the IEEE 754 floating-point
+        /// "double format" bit layout.
+        ///
+        /// <para/>If the argument is <c>0x7ff0000000000000L</c>, the result
+        /// is positive infinity.
+        ///
+        /// <para/>If the argument is <c>0xfff0000000000000L</c>, the result
+        /// is negative infinity.
+        ///
+        /// <para/>If the argument is any value in the range
+        /// <c>0x7ff0000000000001L</c> through
+        /// <c>0x7fffffffffffffffL</c> or in the range
+        /// <c>0xfff0000000000001L</c> through
+        /// <c>0xffffffffffffffffL</c>, the result is a NaN.  No IEEE
+        /// 754 floating-point operation provided by .NET can distinguish
+        /// between two NaN values of the same type with different bit
+        /// patterns.  Distinct values of NaN are only distinguishable by
+        /// use of the <see cref="DoubleToRawInt64Bits(double)"/> method.
+        ///
+        /// <para/>In all other cases, let <i>s</i>, <i>e</i>, and <i>m</i> be three
+        /// values that can be computed from the argument:
+        ///
+        /// <code>
+        /// int s = ((bits &gt;&gt; 63) == 0) ? 1 : -1;
+        /// int e = (int)((bits &gt;&gt; 52) &amp; 0x7ffL);
+        /// long m = (e == 0) ?
+        ///                 (bits &amp; 0xfffffffffffffL) &lt;&lt; 1 :
+        ///                 (bits &amp; 0xfffffffffffffL) | 0x10000000000000L;
+        /// </code>
+        ///
+        /// Then the floating-point result equals the value of the mathematical
+        /// expression <i>s</i>&#183;<i>m</i>&#183;2<sup><i>e</i>-1075</sup>.
+        ///
+        /// <para/>Note that this method may not be able to return a
+        /// <see cref="double"/> NaN with exactly same bit pattern as the
+        /// <see cref="long"/> argument.  IEEE 754 distinguishes between two
+        /// kinds of NaNs, quiet NaNs and <i>signaling NaNs</i>.  The
+        /// differences between the two kinds of NaN are generally not
+        /// visible in .NET.  Arithmetic operations on signaling NaNs turn
+        /// them into quiet NaNs with a different, but often similar, bit
+        /// pattern.  However, on some processors merely copying a
+        /// signaling NaN also performs that conversion.  In particular,
+        /// copying a signaling NaN to return it to the calling method
+        /// may perform this conversion.  So <see cref="Int64BitsToDouble(long)"/>
+        /// may not be able to return a <see cref="double"/> with a
+        /// signaling NaN bit pattern.  Consequently, for some
+        /// <see cref="long"/> values,
+        /// <c>BitConversion.DoubleToRawInt64Bits(BitConversion.Int64BitsToDouble(start))</c> may
+        /// <i>not</i> equal <c>start</c>.  Moreover, which
+        /// particular bit patterns represent signaling NaNs is platform
+        /// dependent; although all NaN bit patterns, quiet or signaling,
+        /// must be in the NaN range identified above.
+        /// 
+        /// <para/>
+        /// NOTE: This corresponds to Double.longBitsToDouble() in the JDK
+        /// and <see cref="BitConverter.Int64BitsToDouble(long)"/> in .NET.
+        /// </summary>
+        /// <param name="value">Any <see cref="long"/> integer.</param>
+        /// <returns>The <see cref="double"/> floating-point value with
+        /// the same bit pattern.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        internal static double Int64BitsToDouble(long value) // J2N: Only used as a proxy for testing purposes
         {
-            return BitConversion.Int64BitsToDouble(bits);
+            return BitConversion.Int64BitsToDouble(value);
         }
+
+        #endregion Int64BitsToDouble
 
         /// <inheritdoc/>
         public override long GetInt64Value()
@@ -549,7 +671,7 @@ namespace J2N.Numerics
             return (long)value;
         }
 
-#region Parse_CharSequence_IFormatProvider
+        #region Parse_CharSequence_IFormatProvider
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to
@@ -663,9 +785,9 @@ namespace J2N.Numerics
             return Parse(s, NumberStyle.Float | NumberStyle.AllowThousands, provider);
         }
 
-#endregion Parse_CharSequence_IFormatProvider
+        #endregion Parse_CharSequence_IFormatProvider
 
-#region TryParse_CharSequence_Double
+        #region TryParse_CharSequence_Double
 
         /// <summary>
         /// Converts the string representation of a number to
@@ -894,9 +1016,9 @@ namespace J2N.Numerics
 
 #endif
 
-#endregion TryParse_CharSequence_Double
+        #endregion TryParse_CharSequence_Double
 
-#region Parse_CharSequence_NumberStyle_IFormatProvider
+        #region Parse_CharSequence_NumberStyle_IFormatProvider
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to
@@ -1457,9 +1579,9 @@ namespace J2N.Numerics
         }
 #endif
 
-#endregion Parse_CharSequence_NumberStyle_IFormatProvider
+        #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
-#region TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+        #region TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to
@@ -2037,7 +2159,7 @@ namespace J2N.Numerics
         }
 #endif
 
-#endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+        #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
         /// <inheritdoc/>
         public override short GetInt16Value()
