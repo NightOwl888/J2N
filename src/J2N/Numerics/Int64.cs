@@ -35,12 +35,6 @@ namespace J2N.Numerics
 
         // J2N: Removed other constructors, since they have been deprecated in JDK 16
 
-        /// <inheritdoc/>
-        public override byte GetByteValue()
-        {
-            return (byte)value;
-        }
-
         #region CompareTo
 
         /// <summary>
@@ -358,12 +352,6 @@ namespace J2N.Numerics
 
         #endregion TryDecode
 
-        /// <inheritdoc/>
-        public override double GetDoubleValue()
-        {
-            return value;
-        }
-
         #region Equals
 
         /// <summary>
@@ -395,19 +383,7 @@ namespace J2N.Numerics
 
         #endregion Equals
 
-        /// <inheritdoc/>
-        public override float GetSingleValue()
-        {
-            return value;
-        }
-
         // J2N: getLong() overloads not implemented because .NET has no native concept of "system properties"
-
-        /// <inheritdoc/>
-        public override int GetHashCode()
-        {
-            return (int)(value ^ (value.TripleShift(32)));
-        }
 
         #region GetHashCode
 
@@ -415,22 +391,12 @@ namespace J2N.Numerics
         /// Returns the hash code for this instance.
         /// </summary>
         /// <returns>A 32-bit signed integer hash code.</returns>
-        public override int GetInt32Value()
+        public override int GetHashCode()
         {
-            return (int)value;
+            return (int)(value ^ (value.TripleShift(32)));
         }
 
         #endregion GetHashCode
-
-        /**
-         * Gets the primitive value of this long.
-         * 
-         * @return this object's primitive value.
-         */
-        public override long GetInt64Value()
-        {
-            return value;
-        }
 
         #region ParseUnsigned
 
@@ -2277,12 +2243,6 @@ namespace J2N.Numerics
 #endif
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int64
 
-        /// <inheritdoc/>
-        public override short GetInt16Value()
-        {
-            return (short)value;
-        }
-
         /**
          * Converts the specified long value into its binary string representation.
          * The returned string is a concatenation of '0' and '1' characters.
@@ -2847,5 +2807,52 @@ namespace J2N.Numerics
         public static implicit operator long(Int64 value) => value.value;
         /// <inheritdoc/>
         public static implicit operator Int64(long value) => ValueOf(value);
+
+        #region IConvertible implementation
+
+        /// <inheritdoc/>
+        public override byte ToByte()
+        {
+            return (byte)value;
+        }
+
+        /// <inheritdoc/>
+        public override double ToDouble()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public override short ToInt16()
+        {
+            return (short)value;
+        }
+
+        /// <inheritdoc/>
+        public override int ToInt32()
+        {
+            return (int)value;
+        }
+
+        /// <inheritdoc/>
+        public override long ToInt64()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        [CLSCompliant(false)]
+        public override sbyte ToSByte()
+        {
+            return (sbyte)value;
+        }
+
+        /// <inheritdoc/>
+        public override float ToSingle()
+        {
+            return value;
+        }
+
+        #endregion IConvertible implementation
     }
 }

@@ -98,10 +98,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_ConstructorB()
         {
-            assertEquals(1, new Byte((byte)1).GetByteValue());
-            assertEquals(2, new Byte((byte)2).GetByteValue());
-            assertEquals(0, new Byte((byte)0).GetByteValue());
-            assertEquals(-1, (sbyte)new Byte(unchecked((byte)-1)).GetByteValue()); // J2N: cast required to change the result to negative
+            assertEquals(1, new Byte((byte)1).ToByte());
+            assertEquals(2, new Byte((byte)2).ToByte());
+            assertEquals(0, new Byte((byte)0).ToByte());
+            assertEquals(-1, (sbyte)new Byte(unchecked((byte)-1)).ToByte()); // J2N: cast required to change the result to negative
         }
 
         /**
@@ -110,10 +110,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_booleanValue()
         {
-            assertEquals(1, new Byte((byte)1).GetByteValue());
-            assertEquals(2, new Byte((byte)2).GetByteValue());
-            assertEquals(0, new Byte((byte)0).GetByteValue());
-            assertEquals(-1, (sbyte)new Byte(unchecked((byte)-1)).GetByteValue()); // J2N: cast required to change the result to negative
+            assertEquals(1, new Byte((byte)1).ToByte());
+            assertEquals(2, new Byte((byte)2).ToByte());
+            assertEquals(0, new Byte((byte)0).ToByte());
+            assertEquals(-1, (sbyte)new Byte(unchecked((byte)-1)).ToByte()); // J2N: cast required to change the result to negative
         }
 
         /**
@@ -238,8 +238,8 @@ namespace J2N.Numerics
             assertEquals(new Byte(unchecked((byte)-1)), Byte.ValueOf("-1", 10));
 
             //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Byte.ValueOf("1", 2).GetByteValue());
-            assertEquals(Character.Digit('F', 16), Byte.ValueOf("F", 16).GetByteValue());
+            assertEquals(Character.Digit('1', 2), Byte.ValueOf("1", 2).ToByte());
+            assertEquals(Character.Digit('F', 16), Byte.ValueOf("F", 16).ToByte());
 
             try
             {
@@ -434,9 +434,9 @@ namespace J2N.Numerics
         public void Test_doubleValue()
         {
             // J2N: We get a byte value converted to a double, so the result is always positive
-            assertEquals(255D, new Byte(unchecked((byte)-1)).GetDoubleValue(), 0D); // assertEquals(-1D, new Byte(unchecked((byte)-1)).GetDoubleValue(), 0D);
-            assertEquals(0D, new Byte((byte)0).GetDoubleValue(), 0D);
-            assertEquals(1D, new Byte((byte)1).GetDoubleValue(), 0D);
+            assertEquals(255D, new Byte(unchecked((byte)-1)).ToDouble(), 0D); // assertEquals(-1D, new Byte(unchecked((byte)-1)).GetDoubleValue(), 0D);
+            assertEquals(0D, new Byte((byte)0).ToDouble(), 0D);
+            assertEquals(1D, new Byte((byte)1).ToDouble(), 0D);
         }
 
         /**
@@ -446,9 +446,9 @@ namespace J2N.Numerics
         public void Test_floatValue()
         {
             // J2N: We get a byte value converted to a double, so the result is always positive
-            assertEquals(255F, new Byte(unchecked((byte)-1)).GetSingleValue(), 0F); // assertEquals(-1F, new Byte(unchecked((byte)-1)).GetSingleValue(), 0F);
-            assertEquals(0F, new Byte((byte)0).GetSingleValue(), 0F);
-            assertEquals(1F, new Byte((byte)1).GetSingleValue(), 0F);
+            assertEquals(255F, new Byte(unchecked((byte)-1)).ToSingle(), 0F); // assertEquals(-1F, new Byte(unchecked((byte)-1)).GetSingleValue(), 0F);
+            assertEquals(0F, new Byte((byte)0).ToSingle(), 0F);
+            assertEquals(1F, new Byte((byte)1).ToSingle(), 0F);
         }
 
         /**
@@ -458,9 +458,9 @@ namespace J2N.Numerics
         public void Test_intValue()
         {
             // J2N: We get a byte value converted to an int, so the result is always positive
-            assertEquals(255, new Byte(unchecked((byte)-1)).GetInt32Value()); // assertEquals(-1, new Byte(unchecked((byte)-1)).GetInt32Value());
-            assertEquals(0, new Byte((byte)0).GetInt32Value());
-            assertEquals(1, new Byte((byte)1).GetInt32Value());
+            assertEquals(255, new Byte(unchecked((byte)-1)).ToInt32()); // assertEquals(-1, new Byte(unchecked((byte)-1)).GetInt32Value());
+            assertEquals(0, new Byte((byte)0).ToInt32());
+            assertEquals(1, new Byte((byte)1).ToInt32());
         }
 
         /**
@@ -470,9 +470,9 @@ namespace J2N.Numerics
         public void Test_longValue()
         {
             // J2N: We get a byte value converted to an int, so the result is always positive
-            assertEquals(255L, new Byte(unchecked((byte)-1)).GetInt64Value()); // assertEquals(-1L, new Byte(unchecked((byte)-1)).GetInt64Value());
-            assertEquals(0L, new Byte((byte)0).GetInt64Value());
-            assertEquals(1L, new Byte((byte)1).GetInt64Value());
+            assertEquals(255L, new Byte(unchecked((byte)-1)).ToInt64()); // assertEquals(-1L, new Byte(unchecked((byte)-1)).GetInt64Value());
+            assertEquals(0L, new Byte((byte)0).ToInt64());
+            assertEquals(1L, new Byte((byte)1).ToInt64());
         }
 
         /**
@@ -482,9 +482,9 @@ namespace J2N.Numerics
         public void Test_shortValue()
         {
             // J2N: We get a byte value converted to an int, so the result is always positive
-            assertEquals(255, new Byte(unchecked((byte)-1)).GetInt16Value()); // assertEquals(-1, new Byte(unchecked((byte)-1)).GetInt16Value());
-            assertEquals(0, new Byte((byte)0).GetInt16Value());
-            assertEquals(1, new Byte((byte)1).GetInt16Value());
+            assertEquals(255, new Byte(unchecked((byte)-1)).ToInt16()); // assertEquals(-1, new Byte(unchecked((byte)-1)).GetInt16Value());
+            assertEquals(0, new Byte((byte)0).ToInt16());
+            assertEquals(1, new Byte((byte)1).ToInt16());
         }
 
         /**
@@ -607,7 +607,7 @@ namespace J2N.Numerics
             // Test for method java.lang.Byte(byte)
 
             Byte b = new Byte((byte)127);
-            assertTrue("Byte creation failed", b.GetByteValue() == (byte)127);
+            assertTrue("Byte creation failed", b.ToByte() == (byte)127);
         }
 
         // J2N: Removed this overload because all of the constructors are deprecated in JDK 16
@@ -634,7 +634,7 @@ namespace J2N.Numerics
         {
             // Test for method byte java.lang.Byte.byteValue()
             assertTrue("Returned incorrect byte value",
-                    new Byte((byte)127).GetByteValue() == (byte)(127));
+                    new Byte((byte)127).ToByte() == (byte)(127));
         }
 
         /**
@@ -746,7 +746,7 @@ namespace J2N.Numerics
         [Test]
         public void Test_doubleValue2()
         {
-            assertEquals(127D, new Byte((byte)127).GetDoubleValue(), 0.0);
+            assertEquals(127D, new Byte((byte)127).ToDouble(), 0.0);
         }
 
         /**
@@ -783,7 +783,7 @@ namespace J2N.Numerics
         [Test]
         public void Test_floatValue2()
         {
-            assertEquals(127F, new Byte((byte)127).GetSingleValue(), 0.0);
+            assertEquals(127F, new Byte((byte)127).ToSingle(), 0.0);
         }
 
         /**
@@ -803,7 +803,7 @@ namespace J2N.Numerics
         public void Test_intValue2()
         {
             // Test for method int java.lang.Byte.intValue()
-            assertEquals("Returned incorrect int value", 127, new Byte((byte)127).GetInt32Value());
+            assertEquals("Returned incorrect int value", 127, new Byte((byte)127).ToInt32());
         }
 
         /**
@@ -813,7 +813,7 @@ namespace J2N.Numerics
         public void Test_longValue2()
         {
             // Test for method long java.lang.Byte.longValue()
-            assertEquals("Returned incorrect long value", 127L, new Byte((byte)127).GetInt64Value());
+            assertEquals("Returned incorrect long value", 127L, new Byte((byte)127).ToInt64());
         }
 
         /**
@@ -942,7 +942,7 @@ namespace J2N.Numerics
         [Test]
         public void Test_shortValue2()
         {
-            assertEquals((short)127, new Byte((byte)127).GetInt16Value());
+            assertEquals((short)127, new Byte((byte)127).ToInt16());
         }
 
         /**
@@ -975,10 +975,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String2()
         {
-            assertEquals("Returned incorrect byte", 0, Byte.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture).GetByteValue());
-            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("127", J2N.Text.StringFormatter.InvariantCulture).GetByteValue());
-            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-127", J2N.Text.StringFormatter.InvariantCulture).GetByteValue()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-128", J2N.Text.StringFormatter.InvariantCulture).GetByteValue()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", 0, Byte.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture).ToByte());
+            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("127", J2N.Text.StringFormatter.InvariantCulture).ToByte());
+            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-127", J2N.Text.StringFormatter.InvariantCulture).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-128", J2N.Text.StringFormatter.InvariantCulture).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
 
             try
             {
@@ -997,13 +997,13 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_StringI2()
         {
-            assertEquals("Returned incorrect byte", 10, Byte.ValueOf("A", 16).GetByteValue());
-            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("127", 10).GetByteValue());
-            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-127", 10).GetByteValue()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-128", 10).GetByteValue()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("7f", 16).GetByteValue());
-            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-7f", 16).GetByteValue()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-80", 16).GetByteValue()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", 10, Byte.ValueOf("A", 16).ToByte());
+            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("127", 10).ToByte());
+            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-127", 10).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-128", 10).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("7f", 16).ToByte());
+            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-7f", 16).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-80", 16).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
 
             try
             {

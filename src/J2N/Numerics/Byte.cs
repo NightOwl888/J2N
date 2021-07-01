@@ -45,16 +45,6 @@ namespace J2N.Numerics
 
         // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
-        /**
-         * Gets the primitive value of this byte.
-         * 
-         * @return this object's primitive value.
-         */
-        public override byte GetByteValue()
-        {
-            return value;
-        }
-
         #region CompareTo
 
         /// <summary>
@@ -372,12 +362,6 @@ namespace J2N.Numerics
 
         #endregion TryDecode
 
-        /// <inheritdoc/>
-        public override double GetDoubleValue()
-        {
-            return value;
-        }
-
         #region Equals
 
         /// <summary>
@@ -409,12 +393,6 @@ namespace J2N.Numerics
 
         #endregion Equals
 
-        /// <inheritdoc/>
-        public override float GetSingleValue()
-        {
-            return value;
-        }
-
         #region GetHashCode
 
         /// <summary>
@@ -427,18 +405,6 @@ namespace J2N.Numerics
         }
 
         #endregion
-
-        /// <inheritdoc/>
-        public override int GetInt32Value()
-        {
-            return value;
-        }
-
-        /// <inheritdoc/>
-        public override long GetInt64Value()
-        {
-            return value;
-        }
 
         // Radix-based parsing (default in Java)
 
@@ -2502,12 +2468,6 @@ namespace J2N.Numerics
 
 #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Byte
 
-        /// <inheritdoc/>
-        public override short GetInt16Value()
-        {
-            return value;
-        }
-
         //    public override string ToString()
         //{
         //    return Integer.toString(value);
@@ -2660,5 +2620,52 @@ namespace J2N.Numerics
         public static implicit operator byte(Byte value) => value.value;
         /// <inheritdoc/>
         public static implicit operator Byte(byte value) => ValueOf(value);
+
+        #region IConvertible implementation
+
+        /// <inheritdoc/>
+        public override byte ToByte()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public override double ToDouble()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public override short ToInt16()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public override int ToInt32()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        public override long ToInt64()
+        {
+            return value;
+        }
+
+        /// <inheritdoc/>
+        [CLSCompliant(false)]
+        public override sbyte ToSByte()
+        {
+            return (sbyte)value;
+        }
+
+        /// <inheritdoc/>
+        public override float ToSingle()
+        {
+            return value;
+        }
+
+        #endregion IConvertible implementation
     }
 }

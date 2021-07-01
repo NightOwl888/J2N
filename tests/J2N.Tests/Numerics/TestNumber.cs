@@ -12,20 +12,20 @@ namespace J2N.Numerics
         {
             int number = 1231243;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((byte)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetByteValue());
+                    ((byte)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToByte());
             number = 0;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((byte)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetByteValue());
+                    ((byte)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToByte());
             number = -1;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((byte)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetByteValue());
+                    ((byte)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToByte());
             number = -84109328;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((byte)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetByteValue());
+                    ((byte)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToByte());
         }
 
         /**
@@ -36,20 +36,20 @@ namespace J2N.Numerics
         {
             int number = 1231243;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((short)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetInt16Value());
+                    ((short)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToInt16());
             number = 0;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((short)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetInt16Value());
+                    ((short)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToInt16());
             number = -1;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((short)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetInt16Value());
+                    ((short)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToInt16());
             number = -84109328;
             assertTrue("Incorrect byte returned for: " + number,
-                    ((short)new Int32(number).GetInt32Value()) == new Int32(number)
-                            .GetInt16Value());
+                    ((short)new Int32(number).ToInt32()) == new Int32(number)
+                            .ToInt16());
 
         }
     }

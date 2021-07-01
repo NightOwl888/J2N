@@ -20,9 +20,9 @@ namespace J2N.Numerics
         {
             // Test for method byte java.lang.Integer.GetByteValue()
             assertEquals("Returned incorrect byte value", -1, (sbyte)new Int32(65535) // J2N: cast required to change the result to negative
-                    .GetByteValue());
+                    .ToByte());
             assertEquals("Returned incorrect byte value", 127, new Int32(127)
-                    .GetByteValue());
+                    .ToByte());
         }
 
         /**
@@ -266,9 +266,9 @@ namespace J2N.Numerics
         {
             // Test for method double java.lang.Integer.doubleValue()
             assertEquals("Returned incorrect double value", 2147483647.0, new Int32(2147483647)
-                    .GetDoubleValue(), 0.0D);
+                    .ToDouble(), 0.0D);
             assertEquals("Returned incorrect double value", -2147483647.0, new Int32(-2147483647)
-                    .GetDoubleValue(), 0.0D);
+                    .ToDouble(), 0.0D);
         }
 
         /**
@@ -305,9 +305,9 @@ namespace J2N.Numerics
         {
             // Test for method float java.lang.Integer.floatValue()
             assertTrue("Returned incorrect float value", new Int32(65535)
-                    .GetSingleValue() == 65535.0f);
+                    .ToSingle() == 65535.0f);
             assertTrue("Returned incorrect float value", new Int32(-65535)
-                    .GetSingleValue() == -65535.0f);
+                    .ToSingle() == -65535.0f);
         }
 
         ///**
@@ -384,7 +384,7 @@ namespace J2N.Numerics
             // Test for method int java.lang.Integer.intValue()
 
             Int32 i = new Int32(8900);
-            assertEquals("Returned incorrect int value", 8900, i.GetInt32Value());
+            assertEquals("Returned incorrect int value", 8900, i.ToInt32());
         }
 
         /**
@@ -395,7 +395,7 @@ namespace J2N.Numerics
         {
             // Test for method long java.lang.Integer.longValue()
             Int32 i = new Int32(8900);
-            assertEquals("Returned incorrect long value", 8900L, i.GetInt64Value());
+            assertEquals("Returned incorrect long value", 8900L, i.ToInt64());
         }
 
         // J2N: Moved to CharSequences
@@ -571,7 +571,7 @@ namespace J2N.Numerics
         {
             // Test for method short java.lang.Integer.shortValue()
             Int32 i = new Int32(2147450880);
-            assertEquals("Returned incorrect long value", -32768, i.GetInt16Value());
+            assertEquals("Returned incorrect long value", -32768, i.ToInt16());
         }
 
         /**
@@ -716,11 +716,11 @@ namespace J2N.Numerics
             // Test for method java.lang.Integer
             // java.lang.Integer.valueOf(java.lang.String)
             assertEquals("Returned incorrect int", 8888888, Int32.ValueOf("8888888", J2N.Text.StringFormatter.InvariantCulture)
-                    .GetInt32Value());
+                    .ToInt32());
             assertTrue("Returned incorrect int", Int32.ValueOf("2147483647", J2N.Text.StringFormatter.InvariantCulture)
-                    .GetInt32Value() == int.MaxValue);
+                    .ToInt32() == int.MaxValue);
             assertTrue("Returned incorrect int", Int32.ValueOf("-2147483648", J2N.Text.StringFormatter.InvariantCulture)
-                    .GetInt32Value() == int.MinValue);
+                    .ToInt32() == int.MinValue);
 
             bool exception = false;
             try
@@ -756,26 +756,26 @@ namespace J2N.Numerics
             // Test for method java.lang.Integer
             // java.lang.Integer.valueOf(java.lang.String, int)
             assertEquals("Returned incorrect int for hex string", 255, Int32.ValueOf(
-                    "FF", 16).GetInt32Value());
+                    "FF", 16).ToInt32());
             assertEquals("Returned incorrect int for oct string", 16, Int32.ValueOf(
-                    "20", 8).GetInt32Value());
+                    "20", 8).ToInt32());
             assertEquals("Returned incorrect int for bin string", 4, Int32.ValueOf(
-                    "100", 2).GetInt32Value());
+                    "100", 2).ToInt32());
 
             assertEquals("Returned incorrect int for - hex string", -255, Int32.ValueOf(
-                    "-FF", 16).GetInt32Value());
+                    "-FF", 16).ToInt32());
             assertEquals("Returned incorrect int for - oct string", -16, Int32.ValueOf(
-                    "-20", 8).GetInt32Value());
+                    "-20", 8).ToInt32());
             assertEquals("Returned incorrect int for - bin string", -4, Int32.ValueOf(
-                    "-100", 2).GetInt32Value());
+                    "-100", 2).ToInt32());
             assertTrue("Returned incorrect int", Int32.ValueOf("2147483647", 10)
-                    .GetInt32Value() == int.MaxValue);
+                    .ToInt32() == int.MaxValue);
             assertTrue("Returned incorrect int", Int32.ValueOf("-2147483648", 10)
-                    .GetInt32Value() == int.MinValue);
+                    .ToInt32() == int.MinValue);
             assertTrue("Returned incorrect int", Int32.ValueOf("7fffffff", 16)
-                    .GetInt32Value() == int.MaxValue);
+                    .ToInt32() == int.MaxValue);
             assertTrue("Returned incorrect int", Int32.ValueOf("-80000000", 16)
-                    .GetInt32Value() == int.MinValue);
+                    .ToInt32() == int.MinValue);
 
             bool exception = false;
             try
@@ -830,12 +830,12 @@ namespace J2N.Numerics
             //assertTrue("Failed to throw exception with hex MAX_VALUE + 1",
             //        exception);
 
-            assertEquals(1, Int32.ValueOf("1", 16).GetInt32Value());
-            assertEquals(-1, Int32.ValueOf("ffffffff", 16).GetInt32Value());
-            assertEquals(2147483647, Int32.ValueOf("7fffffff", 16).GetInt32Value());
-            assertEquals(-2147483648, Int32.ValueOf("-80000000", 16).GetInt32Value()); // Special case: In Java, we allow the negative sign for the smallest negative number
-            assertEquals(-2147483648, Int32.ValueOf("80000000", 16).GetInt32Value());  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
-            assertEquals(-2147483647, Int32.ValueOf("80000001", 16).GetInt32Value());
+            assertEquals(1, Int32.ValueOf("1", 16).ToInt32());
+            assertEquals(-1, Int32.ValueOf("ffffffff", 16).ToInt32());
+            assertEquals(2147483647, Int32.ValueOf("7fffffff", 16).ToInt32());
+            assertEquals(-2147483648, Int32.ValueOf("-80000000", 16).ToInt32()); // Special case: In Java, we allow the negative sign for the smallest negative number
+            assertEquals(-2147483648, Int32.ValueOf("80000000", 16).ToInt32());  // In .NET, it should parse without the negative sign to the same value (in .NET the negative sign is not allowed)
+            assertEquals(-2147483647, Int32.ValueOf("80000001", 16).ToInt32());
 
             exception = false;
             try
@@ -928,13 +928,13 @@ namespace J2N.Numerics
         [Test]
         public void Test_ConstructorI()
         {
-            assertEquals(1, new Int32(1).GetInt32Value());
-            assertEquals(2, new Int32(2).GetInt32Value());
-            assertEquals(0, new Int32(0).GetInt32Value());
-            assertEquals(-1, new Int32(-1).GetInt32Value());
+            assertEquals(1, new Int32(1).ToInt32());
+            assertEquals(2, new Int32(2).ToInt32());
+            assertEquals(0, new Int32(0).ToInt32());
+            assertEquals(-1, new Int32(-1).ToInt32());
 
             Int32 i = new Int32(-89000);
-            assertEquals("Incorrect Integer created", -89000, i.GetInt32Value());
+            assertEquals("Incorrect Integer created", -89000, i.ToInt32());
         }
 
         /**
@@ -943,10 +943,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_booleanValue()
         {
-            assertEquals(1, new Int32(1).GetByteValue());
-            assertEquals(2, new Int32(2).GetByteValue());
-            assertEquals(0, new Int32(0).GetByteValue());
-            assertEquals(-1, (sbyte)new Int32(-1).GetByteValue()); // J2N: cast required to change the result to negative
+            assertEquals(1, new Int32(1).ToByte());
+            assertEquals(2, new Int32(2).ToByte());
+            assertEquals(0, new Int32(0).ToByte());
+            assertEquals(-1, (sbyte)new Int32(-1).ToByte()); // J2N: cast required to change the result to negative
         }
 
         /**
@@ -1228,9 +1228,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_doubleValue()
         {
-            assertEquals(-1D, new Int32(-1).GetDoubleValue(), 0D);
-            assertEquals(0D, new Int32(0).GetDoubleValue(), 0D);
-            assertEquals(1D, new Int32(1).GetDoubleValue(), 0D);
+            assertEquals(-1D, new Int32(-1).ToDouble(), 0D);
+            assertEquals(0D, new Int32(0).ToDouble(), 0D);
+            assertEquals(1D, new Int32(1).ToDouble(), 0D);
         }
 
         /**
@@ -1239,9 +1239,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_floatValue()
         {
-            assertEquals(-1F, new Int32(-1).GetSingleValue(), 0F);
-            assertEquals(0F, new Int32(0).GetSingleValue(), 0F);
-            assertEquals(1F, new Int32(1).GetSingleValue(), 0F);
+            assertEquals(-1F, new Int32(-1).ToSingle(), 0F);
+            assertEquals(0F, new Int32(0).ToSingle(), 0F);
+            assertEquals(1F, new Int32(1).ToSingle(), 0F);
         }
 
         /**
@@ -1250,9 +1250,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_intValue()
         {
-            assertEquals(-1, new Int32(-1).GetInt32Value());
-            assertEquals(0, new Int32(0).GetInt32Value());
-            assertEquals(1, new Int32(1).GetInt32Value());
+            assertEquals(-1, new Int32(-1).ToInt32());
+            assertEquals(0, new Int32(0).ToInt32());
+            assertEquals(1, new Int32(1).ToInt32());
         }
 
         /**
@@ -1261,9 +1261,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_longValue()
         {
-            assertEquals(-1L, new Int32(-1).GetInt64Value());
-            assertEquals(0L, new Int32(0).GetInt64Value());
-            assertEquals(1L, new Int32(1).GetInt64Value());
+            assertEquals(-1L, new Int32(-1).ToInt64());
+            assertEquals(0L, new Int32(0).ToInt64());
+            assertEquals(1L, new Int32(1).ToInt64());
         }
 
         /**
@@ -1272,9 +1272,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_shortValue()
         {
-            assertEquals(-1, new Int32(-1).GetInt16Value());
-            assertEquals(0, new Int32(0).GetInt16Value());
-            assertEquals(1, new Int32(1).GetInt16Value());
+            assertEquals(-1, new Int32(-1).ToInt16());
+            assertEquals(0, new Int32(0).ToInt16());
+            assertEquals(1, new Int32(1).ToInt16());
         }
         /**
          * @tests java.lang.Integer#highestOneBit(int)
