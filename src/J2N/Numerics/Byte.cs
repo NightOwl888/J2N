@@ -55,6 +55,8 @@ namespace J2N.Numerics
             return value;
         }
 
+        #region CompareTo
+
         /// <summary>
         /// Compares this instance to a specified <see cref="Byte"/> and returns an indication of their relative values.
         /// </summary>
@@ -130,7 +132,10 @@ namespace J2N.Numerics
                 throw new ArgumentException(SR.Arg_MustBeByte);
             return this.value - other.value;
         }
-        
+
+        #endregion CompareTo
+
+        #region Decode
 
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Byte"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
@@ -251,6 +256,10 @@ namespace J2N.Numerics
             return ValueOf((byte)r);
         }
 
+        #endregion Decode
+
+        #region TryDecode
+
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Byte"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
         /// <list type="bullet">
@@ -361,11 +370,15 @@ namespace J2N.Numerics
             return true;
         }
 
+        #endregion TryDecode
+
         /// <inheritdoc/>
         public override double GetDoubleValue()
         {
             return value;
         }
+
+        #region Equals
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified <see cref="Byte"/> value.
@@ -394,17 +407,23 @@ namespace J2N.Numerics
             return ReferenceEquals(obj, this) || (obj is Byte other) && (value == other.value);
         }
 
+        #endregion Equals
+
         /// <inheritdoc/>
         public override float GetSingleValue()
         {
             return value;
         }
 
+        #region GetHashCode
+
         /// <inheritdoc/>
         public override int GetHashCode()
         {
             return value;
         }
+
+        #endregion
 
         /// <inheritdoc/>
         public override int GetInt32Value()

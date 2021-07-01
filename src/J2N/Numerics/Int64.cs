@@ -41,6 +41,8 @@ namespace J2N.Numerics
             return (byte)value;
         }
 
+        #region CompareTo
+
         /// <summary>
         /// Compares this instance to a specified <see cref="Int64"/> and returns an indication of their relative values.
         /// </summary>
@@ -122,6 +124,10 @@ namespace J2N.Numerics
             // around in cases where _value - value > MaxValue.
             return this.value > other.value ? 1 : (this.value < other.value ? -1 : 0);
         }
+
+        #endregion CompareTo
+
+        #region Decode
 
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Int64"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
@@ -239,6 +245,10 @@ namespace J2N.Numerics
             return ValueOf(r);
         }
 
+        #endregion Decode
+
+        #region TryDecode
+
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Int64"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
         /// <list type="bullet">
@@ -346,11 +356,15 @@ namespace J2N.Numerics
             return true;
         }
 
+        #endregion TryDecode
+
         /// <inheritdoc/>
         public override double GetDoubleValue()
         {
             return value;
         }
+
+        #region Equals
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified <see cref="Int64"/> value.
@@ -379,113 +393,15 @@ namespace J2N.Numerics
             return ReferenceEquals(obj, this) || (obj is Int64 other) && (value == other.value);
         }
 
+        #endregion Equals
+
         /// <inheritdoc/>
         public override float GetSingleValue()
         {
             return value;
         }
 
-        /////**
-        //// * Returns the {@code Long} value of the system property identified by
-        //// * {@code string}. Returns {@code null} if {@code string} is {@code null}
-        //// * or empty, if the property can not be found or if its value can not be
-        //// * parsed as a long.
-        //// * 
-        //// * @param string
-        //// *            the name of the requested system property.
-        //// * @return the requested property's value as a {@code Long} or {@code null}.
-        //// */
-        ////public static Long getLong(String string)
-        ////{
-        ////    if (string == null || string.length() == 0)
-        ////    {
-        ////        return null;
-        ////    }
-        ////    String prop = System.getProperty(string);
-        ////    if (prop == null)
-        ////    {
-        ////        return null;
-        ////    }
-        ////    try
-        ////    {
-        ////        return decode(prop);
-        ////    }
-        ////    catch (NumberFormatException ex)
-        ////    {
-        ////        return null;
-        ////    }
-        ////}
-
-        /////**
-        //// * Returns the {@code Long} value of the system property identified by
-        //// * {@code string}. Returns the specified default value if {@code string} is
-        //// * {@code null} or empty, if the property can not be found or if its value
-        //// * can not be parsed as a long.
-        //// * 
-        //// * @param string
-        //// *            the name of the requested system property.
-        //// * @param defaultValue
-        //// *            the default value that is returned if there is no long system
-        //// *            property with the requested name.
-        //// * @return the requested property's value as a {@code Long} or the default
-        //// *         value.
-        //// */
-        ////public static Long getLong(String string, long defaultValue)
-        ////{
-        ////    if (string == null || string.length() == 0)
-        ////    {
-        ////        return valueOf(defaultValue);
-        ////    }
-        ////    String prop = System.getProperty(string);
-        ////    if (prop == null)
-        ////    {
-        ////        return valueOf(defaultValue);
-        ////    }
-        ////    try
-        ////    {
-        ////        return decode(prop);
-        ////    }
-        ////    catch (NumberFormatException ex)
-        ////    {
-        ////        return valueOf(defaultValue);
-        ////    }
-        ////}
-
-        /////**
-        //// * Returns the {@code Long} value of the system property identified by
-        //// * {@code string}. Returns the specified default value if {@code string} is
-        //// * {@code null} or empty, if the property can not be found or if its value
-        //// * can not be parsed as a long.
-        //// * 
-        //// * @param string
-        //// *            the name of the requested system property.
-        //// * @param defaultValue
-        //// *            the default value that is returned if there is no long system
-        //// *            property with the requested name.
-        //// * @return the requested property's value as a {@code Long} or the default
-        //// *         value.
-        //// */
-        ////public static Long getLong(String string, Long defaultValue)
-        ////{
-        ////    if (string == null || string.length() == 0)
-        ////    {
-        ////        return defaultValue;
-        ////    }
-        ////    String prop = System.getProperty(string);
-        ////    if (prop == null)
-        ////    {
-        ////        return defaultValue;
-        ////    }
-        ////    try
-        ////    {
-        ////        return decode(prop);
-        ////    }
-        ////    catch (NumberFormatException ex)
-        ////    {
-        ////        return defaultValue;
-        ////    }
-        ////}
-
+        // J2N: getLong() overloads not implemented because .NET has no native concept of "system properties"
 
         /// <inheritdoc/>
         public override int GetHashCode()
@@ -509,6 +425,8 @@ namespace J2N.Numerics
             return value;
         }
 
+        #region ParseUnsigned
+
         internal static long ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
         {
             if (s is null)
@@ -529,6 +447,8 @@ namespace J2N.Numerics
                 ParseNumbers.StringToLong(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned) :
                 0;
         }
+
+        #endregion ParseUnsigned
 
         // Radix-based parsing (default in Java)
 

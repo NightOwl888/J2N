@@ -41,6 +41,8 @@ namespace J2N.Numerics
             return (byte)value;
         }
 
+        #region CompareTo
+
         /// <summary>
         /// Compares this instance to a specified <see cref="Int16"/> and returns an indication of their relative values.
         /// </summary>
@@ -116,6 +118,10 @@ namespace J2N.Numerics
                 throw new ArgumentException(SR.Arg_MustBeInt16);
             return this.value - other.value;
         }
+
+        #endregion CompareTo
+
+        #region Decode
 
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Int16"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
@@ -233,6 +239,10 @@ namespace J2N.Numerics
             return ValueOf((short)r);
         }
 
+        #endregion Decode
+
+        #region TryDecode
+
         /// <summary>
         /// Decodes a <see cref="string"/> into an <see cref="Int16"/>. Accepts decimal, hexadecimal, and octal numbers given by the following grammar:
         /// <list type="bullet">
@@ -340,11 +350,15 @@ namespace J2N.Numerics
             return true;
         }
 
+        #endregion TryDecode
+
         /// <inheritdoc/>
         public override double GetDoubleValue()
         {
             return value;
         }
+
+        #region Equals
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified <see cref="Int16"/> value.
@@ -360,7 +374,6 @@ namespace J2N.Numerics
             return ReferenceEquals(obj, this) || (value == obj.value);
         }
 
-
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
@@ -374,17 +387,23 @@ namespace J2N.Numerics
             return ReferenceEquals(obj, this) || (obj is Int16 other) && (value == other.value);
         }
 
+        #endregion Equals
+
         /// <inheritdoc/>
         public override float GetSingleValue()
         {
             return value;
         }
 
+        #region GetHashCode
+
         /// <inheritdoc/>
         public override int GetHashCode()
         {
             return value;
         }
+
+        #endregion GetHashCode
 
         /// <inheritdoc/>
         public override int GetInt32Value()
@@ -397,47 +416,6 @@ namespace J2N.Numerics
         {
             return value;
         }
-
-
-
-
-
-
-        //// J2N: This is not implemented in JDK 8
-        //internal static short ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
-        //{
-        //    if (s is null)
-        //        throw new ArgumentNullException(nameof(s));
-        //    if (startIndex < 0)
-        //        throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
-        //    if (length < 0)
-        //        throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
-        //    if (startIndex > s.Length - length) // Checks for int overflow
-        //        throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
-
-        //    int r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
-        //    if (radix != 10 && r <= ushort.MaxValue)
-        //        return (short)r;
-
-        //    if (r < ushort.MinValue || r > ushort.MaxValue)
-        //        throw new OverflowException(SR.Overflow_Int16);
-        //    return (short)r;
-        //}
-
-        //// J2N: This is not implemented in JDK 8
-        //internal static short ParseUnsigned(string? s, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
-        //{
-        //    if (s is null)
-        //        return 0;
-
-        //    int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned | ParseNumbers.TreatAsI2);
-        //    if (radix != 10 && r <= ushort.MaxValue)
-        //        return (short)r;
-
-        //    if (r < ushort.MinValue || r > ushort.MaxValue)
-        //        throw new OverflowException(SR.Overflow_Int16);
-        //    return (short)r;
-        //}
 
         // Radix-based parsing (default in Java)
 
