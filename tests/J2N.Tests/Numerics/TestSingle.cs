@@ -226,6 +226,12 @@ namespace J2N.Numerics
 
         }
 
+        [Test]
+        public void GetTypeCode_Invoke_ReturnsSingle()
+        {
+            assertEquals(TypeCode.Single, Single.ValueOf(0.0f).GetTypeCode());
+        }
+
         /**
          * @tests java.lang.Float#hashCode()
          */

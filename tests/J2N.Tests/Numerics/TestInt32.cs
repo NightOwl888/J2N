@@ -870,6 +870,12 @@ namespace J2N.Numerics
             }
         }
 
+        [Test]
+        public void GetTypeCode_Invoke_ReturnsInt32()
+        {
+            assertEquals(TypeCode.Int32, Int32.ValueOf(1).GetTypeCode());
+        }
+
         /**
          * @tests java.lang.Integer#hashCode()
          */

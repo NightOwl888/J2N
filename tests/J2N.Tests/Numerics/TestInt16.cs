@@ -471,6 +471,12 @@ namespace J2N.Numerics
             }
         }
 
+        [Test]
+        public void GetTypeCode_Invoke_ReturnsInt16()
+        {
+            assertEquals(TypeCode.Int16, Int16.ValueOf((short)1).GetTypeCode());
+        }
+
         /**
          * @tests java.lang.Short#hashCode()
          */

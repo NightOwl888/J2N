@@ -1,9 +1,12 @@
 ﻿using J2N.Text;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace J2N.Numerics
 {
+    using SR = J2N.Resources.Strings;
+
     /// <summary>
     /// The abstract superclass of the classes which represent numeric base types
     /// (that is <see cref="Byte"/>, <see cref="System.Int16"/>, <see cref="Int32"/>,
@@ -14,6 +17,37 @@ namespace J2N.Numerics
 #endif
     public abstract class Number : IFormattable
     {
+        // From System.Convert
+
+        // A typeof operation is fairly expensive (does a system call), so we'll cache these here
+        // statically.  These are exactly lined up with the TypeCode, eg. ConvertType[TypeCode.Int16]
+        // will give you the type of an short.
+        internal static readonly Type?[] ConvertTypes = {
+            null, //Type.GetType("System.Empty"), //typeof(System.Empty), // J2N: This type is internal, but isn't currently being used, anyway, so rather than using Reflection, we are setting to null for now
+            typeof(object),
+            typeof(System.DBNull),
+            typeof(bool),
+            typeof(char),
+            typeof(sbyte),
+            typeof(byte),
+            typeof(short),
+            typeof(ushort),
+            typeof(int),
+            typeof(uint),
+            typeof(long),
+            typeof(ulong),
+            typeof(float),
+            typeof(double),
+            typeof(decimal),
+            typeof(DateTime),
+            typeof(object), // TypeCode is discontinuous so we need a placeholder.
+            typeof(string)
+        };
+
+        // Need to special case Enum because typecode will be underlying type, e.g. Int32
+        private static readonly Type EnumType = typeof(Enum);
+
+
         /// <summary>
         /// Returns this object's value as a <see cref="byte"/>. Might involve rounding and/or
         /// truncating the value, so it fits into a <see cref="byte"/>.
@@ -140,6 +174,64 @@ namespace J2N.Numerics
             // Built-in .NET numeric types don't support custom format providers, so we resort
             // to using string.Format with some hacky format conversion in order to support them.
             return string.Format(provider, format is null ? "{0}" : "{0:" + format + '}', value);
+        }
+
+
+        // From System.Convert
+        internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
+        {
+            Debug.Assert(value != null, "[Convert.DefaultToType]value!=null");
+            if (targetType == null)
+            {
+                throw new ArgumentNullException(nameof(targetType));
+            }
+
+            if (ReferenceEquals(value!.GetType(), targetType))
+            {
+                return value;
+            }
+
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Boolean]))
+                return value.ToBoolean(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Char]))
+                return value.ToChar(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.SByte]))
+                return value.ToSByte(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Byte]))
+                return value.ToByte(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Int16]))
+                return value.ToInt16(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.UInt16]))
+                return value.ToUInt16(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Int32]))
+                return value.ToInt32(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.UInt32]))
+                return value.ToUInt32(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Int64]))
+                return value.ToInt64(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.UInt64]))
+                return value.ToUInt64(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Single]))
+                return value.ToSingle(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Double]))
+                return value.ToDouble(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Decimal]))
+                return value.ToDecimal(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.DateTime]))
+                return value.ToDateTime(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.String]))
+                return value.ToString(provider);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Object]))
+                return (object)value;
+            // Need to special case Enum because typecode will be underlying type, e.g. Int32
+            if (ReferenceEquals(targetType, EnumType))
+                return (Enum)value;
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.DBNull]))
+                throw new InvalidCastException(SR.InvalidCast_DBNull);
+            if (ReferenceEquals(targetType, ConvertTypes[(int)TypeCode.Empty]))
+                throw new InvalidCastException(SR.InvalidCast_Empty);
+
+            throw new InvalidCastException(J2N.SR.Format(SR.InvalidCast_FromTo, value.GetType().FullName, targetType.FullName));
         }
     }
 }

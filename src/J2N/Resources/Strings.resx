@@ -285,6 +285,15 @@
   <data name="Format_NoParsibleDigits" xml:space="preserve">
     <value>Could not find any recognizable digits.</value>
   </data>
+  <data name="InvalidCast_DBNull" xml:space="preserve">
+    <value>Object cannot be cast to DBNull.</value>
+  </data>
+  <data name="InvalidCast_Empty" xml:space="preserve">
+    <value>Object cannot be cast to Empty.</value>
+  </data>
+  <data name="InvalidCast_FromTo" xml:space="preserve">
+    <value>Invalid cast from '{0}' to '{1}'.</value>
+  </data>
   <data name="InvalidOperation_CannotEditNullObject" xml:space="preserve">
     <value>Cannot edit a null {0}.</value>
   </data>

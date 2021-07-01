@@ -339,6 +339,12 @@ namespace J2N.Numerics
                             .Abs(new Double(999999999999999.9999999999999d).ToSingle() - 999999999999999.9999999999999f) < 1);
         }
 
+        [Test]
+        public void GetTypeCode_Invoke_ReturnsDouble()
+        {
+            assertEquals(TypeCode.Double, Double.ValueOf(0.0).GetTypeCode());
+        }
+
         /**
          * @tests java.lang.Double#hashCode()
          */
