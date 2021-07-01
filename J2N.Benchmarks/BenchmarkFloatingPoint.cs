@@ -5,118 +5,219 @@ using System.Globalization;
 namespace J2N.Benchmarks
 {
     [MemoryDiagnoser]
+    [MediumRunJob]
     public class BenchmarkFloatingPoint
     {
-        public static int Iterations = 1000;
-        public static string ShortString = "0x1.fffffep127";
-        public static string LongString = "-0X000000000000000000000000000001abcdef.0000000000000000000000000001abefp00000000000000000000000000000000000000000004f";
+
+        public static int Iterations = 100000;
+        public static string ShortHexString = "0x1.fffffep127";
+        public static string LongHexString = "-0X000000000000000000000000000001abcdef.0000000000000000000000000001abefp00000000000000000000000000000000000000000004f";
+
+        public static double SmallDouble = 3.14d;
+        public static double LargeDouble = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196d;
+
+        public static float SmallSingle = 3.14f;
+        public static float LargeSingle = 3.14159265358979323846264338327950288419716939937510582097494459230781640628620899862803482534211706798214808651328230664709384460955058223172535940812848111745028410270193852110555964462294895493038196f;
+
 
         [Benchmark]
-        public void Parse_Single_Hexadecimal_ShortString_DotNet()
+        public void Format_Double_Small_NumberConverter()
         {
             for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.Single.Parse(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
+                J2N.Numerics.NumberConverter.Convert(SmallDouble);
         }
 
+        [Benchmark]
+        public void Format_Double_Small_Ryu_Conservative()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.RyuDouble.DoubleToString(SmallDouble, Numerics.RoundingMode.Conservative);
+        }
+
+        [Benchmark]
+        public void Format_Double_Small_DotNet()
+        {
+            for (int i = 0; i < Iterations; i++)
+                SmallDouble.ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Double_Large_Ryu_Conservative()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.RyuDouble.DoubleToString(LargeDouble, Numerics.RoundingMode.Conservative);
+        }
+
+        [Benchmark]
+        public void Format_Double_Large_DotNet()
+        {
+            for (int i = 0; i < Iterations; i++)
+                LargeDouble.ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Double_MaxValue_Ryu_Conservative()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.RyuDouble.DoubleToString(double.MaxValue, Numerics.RoundingMode.Conservative);
+        }
+
+        [Benchmark]
+        public void Format_Single_Small_NumberConverter()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.NumberConverter.Convert(SmallSingle);
+        }
+
+        [Benchmark]
+        public void Format_Single_Large_Ryu_Conservative()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.RyuSingle.FloatToString(LargeSingle, Numerics.RoundingMode.Conservative);
+        }
+
+        [Benchmark]
+        public void Format_Single_Large_DotNet()
+        {
+            for (int i = 0; i < Iterations; i++)
+                LargeSingle.ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Single_MaxValue_Ryu_Conservative()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.RyuSingle.FloatToString(float.MaxValue, Numerics.RoundingMode.Conservative);
+        }
+
+        [Benchmark]
+        public void Format_Single_MaxValue_DotNet()
+        {
+            for (int i = 0; i < Iterations; i++)
+                float.MaxValue.ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Single_Small_Ryu_Conservative()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.RyuSingle.FloatToString(SmallSingle, Numerics.RoundingMode.Conservative);
+        }
+
+        [Benchmark]
+        public void Format_Single_Small_DotNet()
+        {
+            for (int i = 0; i < Iterations; i++)
+                SmallSingle.ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+
         //[Benchmark]
-        //public void Parse_Single_Hexidecimal_ShortString_HexStringParser()
+        //public void Parse_Single_Hexadecimal_ShortString_DotNet()
         //{
         //    for (int i = 0; i < Iterations; i++)
         //    {
-        //        J2N.Numerics.HexStringParser.ParseSingle(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //        J2N.Numerics.Single.Parse(ShortHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
         //    }
         //}
 
-        [Benchmark]
-        public void Parse_Single_Hexidecimal_ShortString_FloatingDecimal()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.FloatingDecimal.ParseFloat(ShortString);
-            }
-        }
-
-        [Benchmark]
-        public void Parse_Double_Hexadecimal_ShortString_DotNet()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.Double.Parse(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
-        }
+        ////[Benchmark]
+        ////public void Parse_Single_Hexidecimal_ShortString_HexStringParser()
+        ////{
+        ////    for (int i = 0; i < Iterations; i++)
+        ////    {
+        ////        J2N.Numerics.HexStringParser.ParseSingle(ShortHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        ////    }
+        ////}
 
         //[Benchmark]
-        //public void Parse_Double_Hexidecimal_ShortString_HexStringParser()
+        //public void Parse_Single_Hexidecimal_ShortString_FloatingDecimal()
         //{
         //    for (int i = 0; i < Iterations; i++)
         //    {
-        //        J2N.Numerics.HexStringParser.ParseDouble(ShortString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //        J2N.Numerics.FloatingDecimal.ParseFloat(ShortHexString);
         //    }
         //}
 
-        [Benchmark]
-        public void Parse_Double_Hexidecimal_ShortString_FloatingDecimal()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.FloatingDecimal.ParseDouble(ShortString);
-            }
-        }
-
-        [Benchmark]
-        public void Parse_Single_Hexadecimal_LongString_DotNet()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.Single.Parse(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
-        }
-
         //[Benchmark]
-        //public void Parse_Single_Hexidecimal_LongString_HexStringParser()
+        //public void Parse_Double_Hexadecimal_ShortString_DotNet()
         //{
         //    for (int i = 0; i < Iterations; i++)
         //    {
-        //        J2N.Numerics.HexStringParser.ParseSingle(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //        J2N.Numerics.Double.Parse(ShortHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
         //    }
         //}
 
-        [Benchmark]
-        public void Parse_Single_Hexidecimal_LongString_FloatingDecimal()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.FloatingDecimal.ParseFloat(LongString);
-            }
-        }
-
-        [Benchmark]
-        public void Parse_Double_Hexadecimal_LongString_DotNet()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.Double.Parse(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
-            }
-        }
+        ////[Benchmark]
+        ////public void Parse_Double_Hexidecimal_ShortString_HexStringParser()
+        ////{
+        ////    for (int i = 0; i < Iterations; i++)
+        ////    {
+        ////        J2N.Numerics.HexStringParser.ParseDouble(ShortHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        ////    }
+        ////}
 
         //[Benchmark]
-        //public void Parse_Double_Hexidecimal_LongString_HexStringParser()
+        //public void Parse_Double_Hexidecimal_ShortString_FloatingDecimal()
         //{
         //    for (int i = 0; i < Iterations; i++)
         //    {
-        //        J2N.Numerics.HexStringParser.ParseDouble(LongString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //        J2N.Numerics.FloatingDecimal.ParseDouble(ShortHexString);
         //    }
         //}
 
-        [Benchmark]
-        public void Parse_Double_Hexidecimal_LongString_FloatingDecimal()
-        {
-            for (int i = 0; i < Iterations; i++)
-            {
-                J2N.Numerics.FloatingDecimal.ParseDouble(LongString);
-            }
-        }
+        //[Benchmark]
+        //public void Parse_Single_Hexadecimal_LongString_DotNet()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.Single.Parse(LongHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //    }
+        //}
+
+        ////[Benchmark]
+        ////public void Parse_Single_Hexidecimal_LongString_HexStringParser()
+        ////{
+        ////    for (int i = 0; i < Iterations; i++)
+        ////    {
+        ////        J2N.Numerics.HexStringParser.ParseSingle(LongHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        ////    }
+        ////}
+
+        //[Benchmark]
+        //public void Parse_Single_Hexidecimal_LongString_FloatingDecimal()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.FloatingDecimal.ParseFloat(LongHexString);
+        //    }
+        //}
+
+        //[Benchmark]
+        //public void Parse_Double_Hexadecimal_LongString_DotNet()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.Double.Parse(LongHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        //    }
+        //}
+
+        ////[Benchmark]
+        ////public void Parse_Double_Hexidecimal_LongString_HexStringParser()
+        ////{
+        ////    for (int i = 0; i < Iterations; i++)
+        ////    {
+        ////        J2N.Numerics.HexStringParser.ParseDouble(LongHexString, NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+        ////    }
+        ////}
+
+        //[Benchmark]
+        //public void Parse_Double_Hexidecimal_LongString_FloatingDecimal()
+        //{
+        //    for (int i = 0; i < Iterations; i++)
+        //    {
+        //        J2N.Numerics.FloatingDecimal.ParseDouble(LongHexString);
+        //    }
+        //}
     }
 }
