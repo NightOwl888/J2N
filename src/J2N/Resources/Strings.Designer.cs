@@ -565,6 +565,33 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Object cannot be cast to DBNull..
+        /// </summary>
+        internal static string InvalidCast_DBNull {
+            get {
+                return ResourceManager.GetString("InvalidCast_DBNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object cannot be cast to Empty..
+        /// </summary>
+        internal static string InvalidCast_Empty {
+            get {
+                return ResourceManager.GetString("InvalidCast_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid cast from &apos;{0}&apos; to &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidCast_FromTo {
+            get {
+                return ResourceManager.GetString("InvalidCast_FromTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot edit a null {0}..
         /// </summary>
         internal static string InvalidOperation_CannotEditNullObject {

@@ -643,6 +643,12 @@ namespace J2N.Numerics
             }
         }
 
+        [Test]
+        public void GetTypeCode_Invoke_ReturnsInt64()
+        {
+            assertEquals(TypeCode.Int64, Int64.ValueOf((long)1).GetTypeCode());
+        }
+
         /**
          * @tests java.lang.Long#hashCode()
          */

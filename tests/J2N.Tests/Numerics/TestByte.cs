@@ -32,6 +32,12 @@ namespace J2N.Numerics
             }
         }
 
+        [Test]
+        public void GetTypeCode_Invoke_ReturnsByte()
+        {
+            assertEquals(TypeCode.Byte, Byte.ValueOf((byte)1).GetTypeCode());
+        }
+
         /**
          * @tests java.lang.Byte#hashCode()
          */

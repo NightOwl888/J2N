@@ -14,7 +14,7 @@ namespace J2N.Numerics
     using SR = J2N.Resources.Strings;
 
     /// <inheritdoc/>
-    public sealed class Single : Number, IComparable<Single>, IComparable, IEquatable<Single>
+    public sealed class Single : Number, IComparable<Single>, IComparable, IConvertible, IEquatable<Single>
     {
         /// <summary>
         /// The value which the receiver represents.
@@ -2424,6 +2424,94 @@ namespace J2N.Numerics
         public override float ToSingle()
         {
             return value;
+        }
+
+        //
+        // IConvertible implementation
+        //
+
+        /// <summary>
+        /// Returns the <see cref="TypeCode"/> for value type <see cref="float"/>.
+        /// </summary>
+        /// <returns>The enumerated constant, <see cref="TypeCode.Single"/>.</returns>
+        public TypeCode GetTypeCode()
+        {
+            return TypeCode.Single;
+        }
+
+        bool IConvertible.ToBoolean(IFormatProvider? provider)
+        {
+            return Convert.ToBoolean(value);
+        }
+
+        char IConvertible.ToChar(IFormatProvider? provider)
+        {
+            throw new InvalidCastException(J2N.SR.Format(SR.InvalidCast_FromTo, "Single", "Char"));
+        }
+
+        sbyte IConvertible.ToSByte(IFormatProvider? provider)
+        {
+            return Convert.ToSByte(value);
+        }
+
+        byte IConvertible.ToByte(IFormatProvider? provider)
+        {
+            return Convert.ToByte(value);
+        }
+
+        short IConvertible.ToInt16(IFormatProvider? provider)
+        {
+            return Convert.ToInt16(value);
+        }
+
+        ushort IConvertible.ToUInt16(IFormatProvider? provider)
+        {
+            return Convert.ToUInt16(value);
+        }
+
+        int IConvertible.ToInt32(IFormatProvider? provider)
+        {
+            return Convert.ToInt32(value);
+        }
+
+        uint IConvertible.ToUInt32(IFormatProvider? provider)
+        {
+            return Convert.ToUInt32(value);
+        }
+
+        long IConvertible.ToInt64(IFormatProvider? provider)
+        {
+            return Convert.ToInt64(value);
+        }
+
+        ulong IConvertible.ToUInt64(IFormatProvider? provider)
+        {
+            return Convert.ToUInt64(value);
+        }
+
+        float IConvertible.ToSingle(IFormatProvider? provider)
+        {
+            return value;
+        }
+
+        double IConvertible.ToDouble(IFormatProvider? provider)
+        {
+            return Convert.ToDouble(value);
+        }
+
+        decimal IConvertible.ToDecimal(IFormatProvider? provider)
+        {
+            return Convert.ToDecimal(value);
+        }
+
+        DateTime IConvertible.ToDateTime(IFormatProvider? provider)
+        {
+            throw new InvalidCastException(J2N.SR.Format(SR.InvalidCast_FromTo, "Single", "DateTime"));
+        }
+
+        object IConvertible.ToType(Type type, IFormatProvider? provider)
+        {
+            return /*Convert.*/DefaultToType((IConvertible)this.value, type, provider);
         }
 
         #endregion
