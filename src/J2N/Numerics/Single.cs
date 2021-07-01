@@ -54,6 +54,8 @@ namespace J2N.Numerics
 
         // J2N: Removed other overloads because all of the constructors are deprecated in JDK 16
 
+        #region CompareTo
+
         /// <summary>
         /// Compares this instance to a specified <see cref="Single"/> and returns an indication of their relative values.
         /// </summary>
@@ -144,6 +146,8 @@ namespace J2N.Numerics
             return Compare(this.value, other.value);
         }
 
+        #endregion CompareTo
+
         /// <inheritdoc/>
         public override byte GetByteValue()
         {
@@ -156,16 +160,7 @@ namespace J2N.Numerics
             return value;
         }
 
-        /////**
-        //// * Compares this instance with the specified object and indicates if they
-        //// * are equal. In order to be equal, {@code object} must be an instance of
-        //// * {@code Float} and have the same float value as this object.
-        //// * 
-        //// * @param object
-        //// *            the object to compare this float with.
-        //// * @return {@code true} if the specified object is equal to this
-        //// *         {@code Float}; {@code false} otherwise.
-        //// */
+        #region Equals
 
         /// <summary>
         /// Returns a value indicating whether this instance and a specified <see cref="Single"/> object represent the same value.
@@ -283,7 +278,6 @@ namespace J2N.Numerics
                 || (BitConversion.SingleToInt32Bits(this.value) == BitConversion.SingleToInt32Bits(obj.value));
         }
 
-
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
@@ -319,6 +313,8 @@ namespace J2N.Numerics
                 || (obj is Single other)
                 && (BitConversion.SingleToInt32Bits(this.value) == BitConversion.SingleToInt32Bits(other.value));
         }
+
+        #endregion Equals
 
         /**
          * Converts the specified float value to a binary representation conforming
@@ -365,11 +361,15 @@ namespace J2N.Numerics
             return value;
         }
 
+        #region GetHashCode
+
         /// <inheritdoc/>
         public override int GetHashCode()
         {
             return SingleToInt32Bits(value);
         }
+
+        #endregion GetHashCode
 
         /**
          * Converts the specified IEEE 754 floating-point single precision bit
@@ -393,56 +393,157 @@ namespace J2N.Numerics
             return (int)value;
         }
 
-        /**
-         * Indicates whether this object represents an infinite value.
-         * 
-         * @return {@code true} if the value of this float is positive or negative
-         *         infinity; {@code false} otherwise.
-         */
+        #region IsFinite
+
+        /// <summary>
+        /// Determines whether this object's value is finite (zero, subnormal, or normal).
+        /// </summary>
+        /// <returns><c>true</c> if the value is finite (zero, subnormal or normal); otherwise <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsFinite()
+        {
+            return value.IsFinite();
+        }
+
+        #endregion
+
+        #region IsInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether this object's value evaluates to negative or positive infinity.
+        /// </summary>
+        /// <returns><c>true</c> if this object's value evaluates to <see cref="float.PositiveInfinity"/> or
+        /// <see cref="float.NegativeInfinity"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public bool IsInfinity()
         {
-            return IsInfinity(value);
+            return value.IsInfinity();
         }
 
-        /**
-         * Indicates whether the specified float represents an infinite value.
-         * 
-         * @param f
-         *            the float to check.
-         * @return {@code true} if the value of {@code f} is positive or negative
-         *         infinity; {@code false} otherwise.
-         */
-        public static bool IsInfinity(float f) // J2N: Do we need to expose this?
-        {
-            return float.IsInfinity(f);
-            // return (f == POSITIVE_INFINITY) || (f == NEGATIVE_INFINITY);
-        }
+        #endregion IsInfinity
 
-        /**
-         * Indicates whether this object is a <em>Not-a-Number (NaN)</em> value.
-         * 
-         * @return {@code true} if this float is <em>Not-a-Number</em>;
-         *         {@code false} if it is a (potentially infinite) float number.
-         */
+        #region IsNaN
+
+        /// <summary>
+        /// Returns a value that indicates whether this objects's value is not a number
+        /// (<see cref="float.NaN"/>).
+        /// </summary>
+        /// <returns><c>true</c> if this object's' value evaluates to <see cref="float.NaN"/>;
+        /// otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         public bool IsNaN()
         {
-            return IsNaN(value);
+            return value.IsNaN();
         }
 
-        /**
-         * Indicates whether the specified float is a <em>Not-a-Number (NaN)</em>
-         * value.
-         * 
-         * @param f
-         *            the float value to check.
-         * @return {@code true} if {@code f} is <em>Not-a-Number</em>;
-         *         {@code false} if it is a (potentially infinite) float number.
-         */
-        public static bool IsNaN(float f) // J2N: Do we need to expose this?
+        #endregion IsNaN
+
+        #region IsNegative
+
+        /// <summary>
+        /// Determines whether this object's value value is negative.
+        /// </summary>
+        /// <returns><c>true</c> if the value is negative; otherwise, <c>false</c>.</returns>
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNegative()
         {
-            return float.IsNaN(f);
-            //return f != f;
+            return value.IsNegative();
         }
+
+        #endregion IsNegative
+
+        #region IsNegativeInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether this object's value evaluates to negative
+        /// infinity.
+        /// </summary>
+        /// <returns><c>true</c> if the value evaluates to <see cref="float.NegativeInfinity"/>;
+        /// otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNegativeInfinity()
+        {
+            return value.IsNegativeInfinity();
+        }
+
+        #endregion IsNegativeInfinity
+
+        #region IsNegativeZero
+
+        /// <summary>
+        /// Gets a value indicating whether the current <see cref="float"/> has the value negative zero (<c>-0.0f</c>).
+        /// While negative zero is supported by the <see cref="float"/> datatype in .NET, comparisons and string formatting ignore
+        /// this feature. This method allows a simple way to check whether the current <see cref="float"/> has the value negative zero.
+        /// </summary>
+        /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNegativeZero()
+        {
+            return value.IsNegativeZero();
+        }
+
+        #endregion IsNegativeZero
+
+        #region IsNormal
+
+        /// <summary>
+        /// Determines whether this object's value specified value is normal.
+        /// </summary>
+        /// <returns><c>true</c> if the value is normal; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsNormal()
+        {
+            return value.IsNormal();
+        }
+
+        #endregion IsNormal
+
+        #region IsPositiveInfinity
+
+        /// <summary>
+        /// Returns a value indicating whether this object's value evaluates to positive infinity.
+        /// </summary>
+        /// <returns><c>true</c> if the value evaluates to <see cref="float.PositiveInfinity"/>; otherwise, <c>false</c>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsPositiveInfinity()
+        {
+            return value.IsPositiveInfinity();
+        }
+
+        #endregion IsPositiveInfinity
+
+        #region IsSubnormal
+
+        /// <summary>
+        /// Determines whether this object's value is subnormal.
+        /// </summary>
+        /// <returns><c>true</c> if the value is subnormal; <c>false</c> otherwise.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
+        public bool IsSubnormal()
+        {
+            return value.IsSubnormal();
+        }
+
+        #endregion IsSubnormal
 
         /// <inheritdoc/>
         public override long GetInt64Value()
@@ -2053,6 +2154,8 @@ namespace J2N.Numerics
             return ValueOf(Parse(value, style, provider));
         }
 
+        #region Compare
+
         /// <summary>
         /// Compares the two specified <see cref="float"/> values. There are two special cases:
         /// <list type="table">
@@ -2084,10 +2187,15 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// </returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static int Compare(float floatA, float floatB)
         {
             return JCG.Comparer<float>.Default.Compare(floatA, floatB);
         }
+
+        #endregion
 
         /**
          * Returns a {@code Float} instance for the specified float value.

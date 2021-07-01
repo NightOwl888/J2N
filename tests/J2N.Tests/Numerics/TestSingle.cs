@@ -291,8 +291,8 @@ namespace J2N.Numerics
         {
             // Test for method boolean java.lang.Float.isInfinite(float)
 
-            assertTrue("Infinity check failed", Single.IsInfinity(float.PositiveInfinity)
-                    && (Single.IsInfinity(float.NegativeInfinity)) && !(Single.IsInfinity(1.0f)));
+            assertTrue("Infinity check failed", float.PositiveInfinity.IsInfinity()
+                    && (float.NegativeInfinity.IsInfinity()) && !((1.0f).IsInfinity()));
         }
 
         /**
@@ -313,7 +313,240 @@ namespace J2N.Numerics
         public void Test_isNaNF()
         {
             // Test for method boolean java.lang.Float.isNaN(float)
-            assertTrue("NaN check failed", Single.IsNaN(float.NaN) && !(Single.IsNaN(12.09f)));
+            assertTrue("NaN check failed", float.NaN.IsNaN() && !((12.09f).IsNaN()));
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsInfinity_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, true);      // Negative Infinity
+                yield return new TestCaseData(float.MinValue, false);             // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, false);           // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, false);           // Min Negative Subnormal
+                yield return new TestCaseData(-float.Epsilon, false);             // Max Negative Subnormal (Negative Epsilon)
+                yield return new TestCaseData(-0.0f, false);                      // Negative Zero
+                yield return new TestCaseData(float.NaN, false);                  // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(float.Epsilon, false);              // Min Positive Subnormal (Positive Epsilon)
+                yield return new TestCaseData(1.17549421E-38f, false);            // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, false);            // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, false);             // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, true);      // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsInfinity_Data")]
+        public void Test_IsInfinity(float f, bool expected)
+        {  assertEquals(expected, Single.ValueOf(f).IsInfinity());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsNaN_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, false);     // Negative Infinity
+                yield return new TestCaseData(float.MinValue, false);             // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, false);           // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, false);           // Min Negative Subnormal
+                yield return new TestCaseData(-float.Epsilon, false);             // Max Negative Subnormal (Negative Epsilon)
+                yield return new TestCaseData(-0.0f, false);                      // Negative Zero
+                yield return new TestCaseData(float.NaN, true);                   // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(float.Epsilon, false);              // Min Positive Subnormal (Positive Epsilon)
+                yield return new TestCaseData(1.17549421E-38f, false);            // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, false);            // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, false);             // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, false);     // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsNaN_Data")]
+        public void Test_IsNaN(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsNaN());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsNegativeInfinity_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, true);      // Negative Infinity
+                yield return new TestCaseData(float.MinValue, false);             // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, false);           // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, false);           // Min Negative Subnormal
+                yield return new TestCaseData(-float.Epsilon, false);             // Max Negative Subnormal (Negative Epsilon)
+                yield return new TestCaseData(-0.0f, false);                      // Negative Zero
+                yield return new TestCaseData(float.NaN, false);                  // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(float.Epsilon, false);              // Min Positive Subnormal (Positive Epsilon)
+                yield return new TestCaseData(1.17549421E-38f, false);            // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, false);            // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, false);             // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, false);     // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsNegativeInfinity_Data")]
+        public void Test_IsNegativeInfinity(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsNegativeInfinity());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsPositiveInfinity_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, false);     // Negative Infinity
+                yield return new TestCaseData(float.MinValue, false);             // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, false);           // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, false);           // Min Negative Subnormal
+                yield return new TestCaseData(-float.Epsilon, false);             // Max Negative Subnormal (Negative Epsilon)
+                yield return new TestCaseData(-0.0f, false);                      // Negative Zero
+                yield return new TestCaseData(float.NaN, false);                  // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(float.Epsilon, false);              // Min Positive Subnormal (Positive Epsilon)
+                yield return new TestCaseData(1.17549421E-38f, false);            // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, false);            // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, false);             // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, true);      // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsPositiveInfinity_Data")]
+        public void Test_IsPositiveInfinity(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsPositiveInfinity());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsFinite_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, false);     // Negative Infinity
+                yield return new TestCaseData(float.MinValue, true);              // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, true);            // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, true);            // Min Negative Subnormal
+                yield return new TestCaseData(-1.401298E-45f, true);              // Max Negative Subnormal
+                yield return new TestCaseData(-0.0f, true);                       // Negative Zero
+                yield return new TestCaseData(float.NaN, false);                  // NaN
+                yield return new TestCaseData(0.0f, true);                        // Positive Zero
+                yield return new TestCaseData(1.401298E-45f, true);               // Min Positive Subnormal
+                yield return new TestCaseData(1.17549421E-38f, true);             // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, true);             // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, true);              // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, false);     // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsFinite_Data")]
+        public void Test_IsFinite(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsFinite());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsNegative_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, true);      // Negative Infinity
+                yield return new TestCaseData(float.MinValue, true);              // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, true);            // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, true);            // Min Negative Subnormal
+                yield return new TestCaseData(-1.401298E-45f, true);              // Max Negative Subnormal
+                yield return new TestCaseData(-0.0f, true);                       // Negative Zero
+                yield return new TestCaseData(float.NaN, true);                   // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(1.401298E-45f, false);              // Min Positive Subnormal
+                yield return new TestCaseData(1.17549421E-38f, false);            // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, false);            // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, false);             // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, false);     // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsNegative_Data")]
+        public void Test_IsNegative(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsNegative());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsNegativeZero_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, false);     // Negative Infinity
+                yield return new TestCaseData(float.MinValue, false);             // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, false);           // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, false);           // Min Negative Subnormal
+                yield return new TestCaseData(-1.401298E-45f, false);             // Max Negative Subnormal
+                yield return new TestCaseData(-0.0f, true);                       // Negative Zero
+                yield return new TestCaseData(float.NaN, false);                  // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(1.401298E-45f, false);              // Min Positive Subnormal
+                yield return new TestCaseData(1.17549421E-38f, false);            // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, false);            // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, false);             // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, false);     // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsNegativeZero_Data")]
+        public void Test_IsNegativeZero(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsNegativeZero());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsNormal_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, false);     // Negative Infinity
+                yield return new TestCaseData(float.MinValue, true);              // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, true);            // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, false);           // Min Negative Subnormal
+                yield return new TestCaseData(-1.401298E-45f, false);             // Max Negative Subnormal
+                yield return new TestCaseData(-0.0f, false);                      // Negative Zero
+                yield return new TestCaseData(float.NaN, false);                  // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(1.401298E-45f, false);              // Min Positive Subnormal
+                yield return new TestCaseData(1.17549421E-38f, false);            // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, true);             // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, true);              // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, false);     // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsNormal_Data")]
+        public void Test_IsNormal(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsNormal());
+        }
+
+        public static IEnumerable<TestCaseData> Test_IsSubnormal_Data
+        {
+            get
+            {
+                yield return new TestCaseData(float.NegativeInfinity, false);     // Negative Infinity
+                yield return new TestCaseData(float.MinValue, false);             // Min Negative Normal
+                yield return new TestCaseData(-1.17549435E-38f, false);           // Max Negative Normal
+                yield return new TestCaseData(-1.17549421E-38f, true);            // Min Negative Subnormal
+                yield return new TestCaseData(-1.401298E-45f, true);              // Max Negative Subnormal
+                yield return new TestCaseData(-0.0f, false);                      // Negative Zero
+                yield return new TestCaseData(float.NaN, false);                  // NaN
+                yield return new TestCaseData(0.0f, false);                       // Positive Zero
+                yield return new TestCaseData(1.401298E-45f, true);               // Min Positive Subnormal
+                yield return new TestCaseData(1.17549421E-38f, true);             // Max Positive Subnormal
+                yield return new TestCaseData(1.17549435E-38f, false);            // Min Positive Normal
+                yield return new TestCaseData(float.MaxValue, false);             // Max Positive Normal
+                yield return new TestCaseData(float.PositiveInfinity, false);     // Positive Infinity
+            }
+        }
+
+        [TestCaseSource(typeof(TestSingle), "Test_IsSubnormal_Data")]
+        public void Test_IsSubnormal(float f, bool expected)
+        {
+            assertEquals(expected, Single.ValueOf(f).IsSubnormal());
         }
 
         /**
