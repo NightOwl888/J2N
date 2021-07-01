@@ -128,7 +128,7 @@ namespace J2N.Numerics
             for (int i = 0; i < f.Length; i++)
             {
                 OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(f[i]);
-                assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString()} hexadecimal", expected: ofd.toJavaFormatString(), RyuSingle.FloatToString(f[i]));
+                assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: ofd.toJavaFormatString(), RyuSingle.FloatToString(f[i]));
             }
         }
 
@@ -161,10 +161,10 @@ namespace J2N.Numerics
 
             for (int i = 0; i < f.Length; i++)
             {
-                //assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString()} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[i]), actual: RyuFloat.FloatToString(f[i]));
+                //assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[i]), actual: RyuFloat.FloatToString(f[i]));
 
                 // Check for round-trip
-                assertEquals($"Failed to round trip: {f[i].ToString("R")} or {f[i].ToHexString()} hexadecimal", BitConversion.SingleToRawInt32Bits(f[i]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.FloatToString(f[i]))));
+                assertEquals($"Failed to round trip: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[i]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.FloatToString(f[i]))));
             }
         }
 
@@ -180,13 +180,13 @@ namespace J2N.Numerics
                 };
                 for (int j = 0; j < f.Length; j++)
                 {
-                    //assertEquals($"Original value: {f[j].ToString("R")} or {f[j].ToHexString()} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[j]), actual: RyuFloat.FloatToString(f[j], RoundingMode.RoundEven));
+                    //assertEquals($"Original value: {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[j]), actual: RyuFloat.FloatToString(f[j], RoundingMode.RoundEven));
 
                     // Check for round-trip
-                    assertEquals($"Failed to round trip: {f[j].ToString("R")} or {f[j].ToHexString()} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.FloatToString(f[j], RoundingMode.RoundEven))));
+                    assertEquals($"Failed to round trip: {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.FloatToString(f[j], RoundingMode.RoundEven))));
 
                     // Check for round-trip (.NET)
-                    assertEquals($"Failed to round trip (.NET): {f[j].ToString("R")} or {f[j].ToHexString()} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(float.Parse(RyuSingle.FloatToString(f[j], RoundingMode.RoundEven), CultureInfo.InvariantCulture)));
+                    assertEquals($"Failed to round trip (.NET): {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(float.Parse(RyuSingle.FloatToString(f[j], RoundingMode.RoundEven), CultureInfo.InvariantCulture)));
                 }
             }
         }
