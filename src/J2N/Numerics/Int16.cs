@@ -2522,21 +2522,24 @@ namespace J2N.Numerics
             return ValueOf(Parse(value, radix));
         }
 
-        /**
-         * Reverses the bytes of the specified short.
-         * 
-         * @param s
-         *            the short value for which to reverse bytes.
-         * @return the reversed value.
-         * @since 1.5
-         */
-        public static short ReverseBytes(short s) // J2N TODO: Move implementation to BitOperation
-        {
+        #region ReverseBytes
 
-            int high = (s >> 8) & 0xFF;
-            int low = (s & 0xFF) << 8;
-            return (short)(low | high);
+        /// <summary>
+        /// Returns the value obtained by reversing the order of the bytes in the
+        /// two's complement representation of the specified <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="short"/> value for which to reverse the byte order.</param>
+        /// <returns>The value obtained by reversing the bytes in the specified
+        /// <paramref name="value"/>.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static short ReverseBytes(short value) // J2N: Only used as a proxy for testing purposes
+        {
+            return value.ReverseBytes();
         }
+
+        #endregion ReverseBytes
 
         /**
          * Returns a {@code Short} instance for the specified short value.

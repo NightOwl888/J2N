@@ -1334,46 +1334,46 @@ namespace J2N.Numerics
         [Test]
         public void Test_numberOfLeadingZerosI()
         {
-            assertEquals(32, Int32.NumberOfLeadingZeros(0x0));
-            assertEquals(31, Int32.NumberOfLeadingZeros(0x1));
-            assertEquals(30, Int32.NumberOfLeadingZeros(0x2));
-            assertEquals(30, Int32.NumberOfLeadingZeros(0x3));
-            assertEquals(29, Int32.NumberOfLeadingZeros(0x4));
-            assertEquals(29, Int32.NumberOfLeadingZeros(0x5));
-            assertEquals(29, Int32.NumberOfLeadingZeros(0x6));
-            assertEquals(29, Int32.NumberOfLeadingZeros(0x7));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0x8));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0x9));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0xA));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0xB));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0xC));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0xD));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0xE));
-            assertEquals(28, Int32.NumberOfLeadingZeros(0xF));
-            assertEquals(27, Int32.NumberOfLeadingZeros(0x10));
-            assertEquals(24, Int32.NumberOfLeadingZeros(0x80));
-            assertEquals(24, Int32.NumberOfLeadingZeros(0xF0));
-            assertEquals(23, Int32.NumberOfLeadingZeros(0x100));
-            assertEquals(20, Int32.NumberOfLeadingZeros(0x800));
-            assertEquals(20, Int32.NumberOfLeadingZeros(0xF00));
-            assertEquals(19, Int32.NumberOfLeadingZeros(0x1000));
-            assertEquals(16, Int32.NumberOfLeadingZeros(0x8000));
-            assertEquals(16, Int32.NumberOfLeadingZeros(0xF000));
-            assertEquals(15, Int32.NumberOfLeadingZeros(0x10000));
-            assertEquals(12, Int32.NumberOfLeadingZeros(0x80000));
-            assertEquals(12, Int32.NumberOfLeadingZeros(0xF0000));
-            assertEquals(11, Int32.NumberOfLeadingZeros(0x100000));
-            assertEquals(8, Int32.NumberOfLeadingZeros(0x800000));
-            assertEquals(8, Int32.NumberOfLeadingZeros(0xF00000));
-            assertEquals(7, Int32.NumberOfLeadingZeros(0x1000000));
-            assertEquals(4, Int32.NumberOfLeadingZeros(0x8000000));
-            assertEquals(4, Int32.NumberOfLeadingZeros(0xF000000));
-            assertEquals(3, Int32.NumberOfLeadingZeros(0x10000000));
-            assertEquals(0, Int32.NumberOfLeadingZeros(unchecked((int)0x80000000)));
-            assertEquals(0, Int32.NumberOfLeadingZeros(unchecked((int)0xF0000000)));
+            assertEquals(32, Int32.LeadingZeroCount(0x0));
+            assertEquals(31, Int32.LeadingZeroCount(0x1));
+            assertEquals(30, Int32.LeadingZeroCount(0x2));
+            assertEquals(30, Int32.LeadingZeroCount(0x3));
+            assertEquals(29, Int32.LeadingZeroCount(0x4));
+            assertEquals(29, Int32.LeadingZeroCount(0x5));
+            assertEquals(29, Int32.LeadingZeroCount(0x6));
+            assertEquals(29, Int32.LeadingZeroCount(0x7));
+            assertEquals(28, Int32.LeadingZeroCount(0x8));
+            assertEquals(28, Int32.LeadingZeroCount(0x9));
+            assertEquals(28, Int32.LeadingZeroCount(0xA));
+            assertEquals(28, Int32.LeadingZeroCount(0xB));
+            assertEquals(28, Int32.LeadingZeroCount(0xC));
+            assertEquals(28, Int32.LeadingZeroCount(0xD));
+            assertEquals(28, Int32.LeadingZeroCount(0xE));
+            assertEquals(28, Int32.LeadingZeroCount(0xF));
+            assertEquals(27, Int32.LeadingZeroCount(0x10));
+            assertEquals(24, Int32.LeadingZeroCount(0x80));
+            assertEquals(24, Int32.LeadingZeroCount(0xF0));
+            assertEquals(23, Int32.LeadingZeroCount(0x100));
+            assertEquals(20, Int32.LeadingZeroCount(0x800));
+            assertEquals(20, Int32.LeadingZeroCount(0xF00));
+            assertEquals(19, Int32.LeadingZeroCount(0x1000));
+            assertEquals(16, Int32.LeadingZeroCount(0x8000));
+            assertEquals(16, Int32.LeadingZeroCount(0xF000));
+            assertEquals(15, Int32.LeadingZeroCount(0x10000));
+            assertEquals(12, Int32.LeadingZeroCount(0x80000));
+            assertEquals(12, Int32.LeadingZeroCount(0xF0000));
+            assertEquals(11, Int32.LeadingZeroCount(0x100000));
+            assertEquals(8, Int32.LeadingZeroCount(0x800000));
+            assertEquals(8, Int32.LeadingZeroCount(0xF00000));
+            assertEquals(7, Int32.LeadingZeroCount(0x1000000));
+            assertEquals(4, Int32.LeadingZeroCount(0x8000000));
+            assertEquals(4, Int32.LeadingZeroCount(0xF000000));
+            assertEquals(3, Int32.LeadingZeroCount(0x10000000));
+            assertEquals(0, Int32.LeadingZeroCount(unchecked((int)0x80000000)));
+            assertEquals(0, Int32.LeadingZeroCount(unchecked((int)0xF0000000)));
 
-            assertEquals(1, Int32.NumberOfLeadingZeros(int.MaxValue));
-            assertEquals(0, Int32.NumberOfLeadingZeros(int.MinValue));
+            assertEquals(1, Int32.LeadingZeroCount(int.MaxValue));
+            assertEquals(0, Int32.LeadingZeroCount(int.MinValue));
         }
 
         /**
@@ -1382,41 +1382,41 @@ namespace J2N.Numerics
         [Test]
         public void Test_numberOfTrailingZerosI()
         {
-            assertEquals(32, Int32.NumberOfTrailingZeros(0x0));
-            assertEquals(31, Int32.NumberOfTrailingZeros(int.MinValue));
-            assertEquals(0, Int32.NumberOfTrailingZeros(int.MaxValue));
+            assertEquals(32, Int32.TrailingZeroCount(0x0));
+            assertEquals(31, Int32.TrailingZeroCount(int.MinValue));
+            assertEquals(0, Int32.TrailingZeroCount(int.MaxValue));
 
-            assertEquals(0, Int32.NumberOfTrailingZeros(0x1));
-            assertEquals(3, Int32.NumberOfTrailingZeros(0x8));
-            assertEquals(0, Int32.NumberOfTrailingZeros(0xF));
+            assertEquals(0, Int32.TrailingZeroCount(0x1));
+            assertEquals(3, Int32.TrailingZeroCount(0x8));
+            assertEquals(0, Int32.TrailingZeroCount(0xF));
 
-            assertEquals(4, Int32.NumberOfTrailingZeros(0x10));
-            assertEquals(7, Int32.NumberOfTrailingZeros(0x80));
-            assertEquals(4, Int32.NumberOfTrailingZeros(0xF0));
+            assertEquals(4, Int32.TrailingZeroCount(0x10));
+            assertEquals(7, Int32.TrailingZeroCount(0x80));
+            assertEquals(4, Int32.TrailingZeroCount(0xF0));
 
-            assertEquals(8, Int32.NumberOfTrailingZeros(0x100));
-            assertEquals(11, Int32.NumberOfTrailingZeros(0x800));
-            assertEquals(8, Int32.NumberOfTrailingZeros(0xF00));
+            assertEquals(8, Int32.TrailingZeroCount(0x100));
+            assertEquals(11, Int32.TrailingZeroCount(0x800));
+            assertEquals(8, Int32.TrailingZeroCount(0xF00));
 
-            assertEquals(12, Int32.NumberOfTrailingZeros(0x1000));
-            assertEquals(15, Int32.NumberOfTrailingZeros(0x8000));
-            assertEquals(12, Int32.NumberOfTrailingZeros(0xF000));
+            assertEquals(12, Int32.TrailingZeroCount(0x1000));
+            assertEquals(15, Int32.TrailingZeroCount(0x8000));
+            assertEquals(12, Int32.TrailingZeroCount(0xF000));
 
-            assertEquals(16, Int32.NumberOfTrailingZeros(0x10000));
-            assertEquals(19, Int32.NumberOfTrailingZeros(0x80000));
-            assertEquals(16, Int32.NumberOfTrailingZeros(0xF0000));
+            assertEquals(16, Int32.TrailingZeroCount(0x10000));
+            assertEquals(19, Int32.TrailingZeroCount(0x80000));
+            assertEquals(16, Int32.TrailingZeroCount(0xF0000));
 
-            assertEquals(20, Int32.NumberOfTrailingZeros(0x100000));
-            assertEquals(23, Int32.NumberOfTrailingZeros(0x800000));
-            assertEquals(20, Int32.NumberOfTrailingZeros(0xF00000));
+            assertEquals(20, Int32.TrailingZeroCount(0x100000));
+            assertEquals(23, Int32.TrailingZeroCount(0x800000));
+            assertEquals(20, Int32.TrailingZeroCount(0xF00000));
 
-            assertEquals(24, Int32.NumberOfTrailingZeros(0x1000000));
-            assertEquals(27, Int32.NumberOfTrailingZeros(0x8000000));
-            assertEquals(24, Int32.NumberOfTrailingZeros(0xF000000));
+            assertEquals(24, Int32.TrailingZeroCount(0x1000000));
+            assertEquals(27, Int32.TrailingZeroCount(0x8000000));
+            assertEquals(24, Int32.TrailingZeroCount(0xF000000));
 
-            assertEquals(28, Int32.NumberOfTrailingZeros(0x10000000));
-            assertEquals(31, Int32.NumberOfTrailingZeros(unchecked((int)0x80000000)));
-            assertEquals(28, Int32.NumberOfTrailingZeros(unchecked((int)0xF0000000)));
+            assertEquals(28, Int32.TrailingZeroCount(0x10000000));
+            assertEquals(31, Int32.TrailingZeroCount(unchecked((int)0x80000000)));
+            assertEquals(28, Int32.TrailingZeroCount(unchecked((int)0xF0000000)));
         }
 
         /**
@@ -1425,30 +1425,30 @@ namespace J2N.Numerics
         [Test]
         public void Test_bitCountI()
         {
-            assertEquals(0, Int32.BitCount(0x0));
-            assertEquals(1, Int32.BitCount(0x1));
-            assertEquals(1, Int32.BitCount(0x2));
-            assertEquals(2, Int32.BitCount(0x3));
-            assertEquals(1, Int32.BitCount(0x4));
-            assertEquals(2, Int32.BitCount(0x5));
-            assertEquals(2, Int32.BitCount(0x6));
-            assertEquals(3, Int32.BitCount(0x7));
-            assertEquals(1, Int32.BitCount(0x8));
-            assertEquals(2, Int32.BitCount(0x9));
-            assertEquals(2, Int32.BitCount(0xA));
-            assertEquals(3, Int32.BitCount(0xB));
-            assertEquals(2, Int32.BitCount(0xC));
-            assertEquals(3, Int32.BitCount(0xD));
-            assertEquals(3, Int32.BitCount(0xE));
-            assertEquals(4, Int32.BitCount(0xF));
+            assertEquals(0, Int32.PopCount(0x0));
+            assertEquals(1, Int32.PopCount(0x1));
+            assertEquals(1, Int32.PopCount(0x2));
+            assertEquals(2, Int32.PopCount(0x3));
+            assertEquals(1, Int32.PopCount(0x4));
+            assertEquals(2, Int32.PopCount(0x5));
+            assertEquals(2, Int32.PopCount(0x6));
+            assertEquals(3, Int32.PopCount(0x7));
+            assertEquals(1, Int32.PopCount(0x8));
+            assertEquals(2, Int32.PopCount(0x9));
+            assertEquals(2, Int32.PopCount(0xA));
+            assertEquals(3, Int32.PopCount(0xB));
+            assertEquals(2, Int32.PopCount(0xC));
+            assertEquals(3, Int32.PopCount(0xD));
+            assertEquals(3, Int32.PopCount(0xE));
+            assertEquals(4, Int32.PopCount(0xF));
 
-            assertEquals(8, Int32.BitCount(0xFF));
-            assertEquals(12, Int32.BitCount(0xFFF));
-            assertEquals(16, Int32.BitCount(0xFFFF));
-            assertEquals(20, Int32.BitCount(0xFFFFF));
-            assertEquals(24, Int32.BitCount(0xFFFFFF));
-            assertEquals(28, Int32.BitCount(0xFFFFFFF));
-            assertEquals(32, Int32.BitCount(unchecked((int)0xFFFFFFFF)));
+            assertEquals(8, Int32.PopCount(0xFF));
+            assertEquals(12, Int32.PopCount(0xFFF));
+            assertEquals(16, Int32.PopCount(0xFFFF));
+            assertEquals(20, Int32.PopCount(0xFFFFF));
+            assertEquals(24, Int32.PopCount(0xFFFFFF));
+            assertEquals(28, Int32.PopCount(0xFFFFFFF));
+            assertEquals(32, Int32.PopCount(unchecked((int)0xFFFFFFFF)));
         }
 
         /**

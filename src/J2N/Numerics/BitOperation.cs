@@ -32,6 +32,8 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Returns the population count (number of set bits) of an <see cref="int"/> mask.
+        /// <para/>
+        /// Usage Note: This is the same operation as Integer.bitCount() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="int"/> to examine.</param>
         /// <returns>The number of one-bits in the two's complement binary
@@ -53,6 +55,8 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Returns the population count (number of set bits) of a <see cref="long"/> mask.
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.bitCount() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="long"/> to examine.</param>
         /// <returns>The number of one-bits in the two's complement binary
@@ -90,6 +94,8 @@ namespace J2N.Numerics
         ///     <item><description>floor(log<sub>2</sub>(x)) = <c>31 - x.LeadingZeroCount()</c></description></item>
         ///     <item><description>ceil(log<sub>2</sub>(x)) = <c>32 - (x - 1).LeadingZeroCount()</c></description></item>
         /// </list>
+        /// <para/>
+        /// Usage Note: This is the same operation as Integer.numberOfLeadingZeros() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="int"/> to examine.</param>
         /// <returns>The number of zero bits preceding the highest-order
@@ -130,6 +136,8 @@ namespace J2N.Numerics
         ///     <item><description>floor(log<sub>2</sub>(x)) = <c>63 - x.LeadingZeroCount()</c></description></item>
         ///     <item><description>ceil(log<sub>2</sub>(x)) = <c>64 - (x - 1).LeadingZeroCount()</c></description></item>
         /// </list>
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.numberOfLeadingZeros() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="long"/> to examine.</param>
         /// <returns>The number of zero bits preceding the highest-order
@@ -168,6 +176,8 @@ namespace J2N.Numerics
         /// <paramref name="value"/>. Returns 32 if the specified value has no
         /// one-bits in its two's complement representation, in other words if it is
         /// equal to zero.
+        /// <para/>
+        /// Usage Note: This is the same operation as Integer.numberOfTrailingZeros() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="int"/> to examine.</param>
         /// <returns>The number of zero bits following the lowest-order ("rightmost")
@@ -355,6 +365,20 @@ namespace J2N.Numerics
         #endregion
 
         #region ReverseBytes
+
+        /// <summary>
+        /// Returns the value obtained by reversing the order of the bytes in the
+        /// two's complement representation of the specified <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="short"/> value for which to reverse the byte order.</param>
+        /// <returns>The value obtained by reversing the bytes in the specified
+        /// <paramref name="value"/>.</returns>
+        public static short ReverseBytes(this short value)
+        {
+            int high = (value >> 8) & 0xFF;
+            int low = (value & 0xFF) << 8;
+            return (short)(low | high);
+        }
 
         /// <summary>
         /// Returns the value obtained by reversing the order of the bytes in the
