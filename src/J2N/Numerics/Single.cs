@@ -1005,7 +1005,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(ReadOnlySpan{char}, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
         public static bool TryParse(ReadOnlySpan<char> s, out float result)
         {
             return DotNetNumber.TryParseSingle(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
@@ -1564,7 +1564,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider)
         {
@@ -2219,22 +2219,22 @@ namespace J2N.Numerics
             //return org.apache.harmony.luni.util.NumberConverter.convert(f);
         }
 
-        ///**
-        // * Parses the specified string as a float value.
-        // * 
-        // * @param string
-        // *            the string representation of a float value.
-        // * @return a {@code Float} instance containing the float value represented
-        // *         by {@code string}.
-        // * @throws NumberFormatException
-        // *             if {@code string} is {@code null}, has a length of zero or
-        // *             can not be parsed as a float value.
-        // * @see #parseFloat(String)
-        // */
-        //public static Single ValueOf(string value)
-        //{
-        //    return ValueOf(ParseSingle(value));
-        //}
+        /////**
+        //// * Parses the specified string as a float value.
+        //// * 
+        //// * @param string
+        //// *            the string representation of a float value.
+        //// * @return a {@code Float} instance containing the float value represented
+        //// *         by {@code string}.
+        //// * @throws NumberFormatException
+        //// *             if {@code string} is {@code null}, has a length of zero or
+        //// *             can not be parsed as a float value.
+        //// * @see #parseFloat(String)
+        //// */
+        ////public static Single ValueOf(string value)
+        ////{
+        ////    return ValueOf(ParseSingle(value));
+        ////}
 
         /**
          * Parses the specified string as a float value.
