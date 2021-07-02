@@ -2500,15 +2500,15 @@ namespace J2N.Numerics
             {
                 return new Int16(s);
             }
-            return ValueOfCache.CACHE[s + 128];
+            return ValueOfCache.Cache[s + 128];
         }
 
-        private class ValueOfCache
+        private static class ValueOfCache
         {
-            /**
-             * A cache of instances used by {@link Short#valueOf(short)} and auto-boxing.
-             */
-            internal static readonly Int16[] CACHE = LoadCache();
+            /// <summary>
+            /// A cache of instances used by <see cref="ValueOf(short)"/> and auto-boxing.
+            /// </summary>
+            internal static readonly Int16[] Cache = LoadCache();
 
             private static Int16[] LoadCache()
             {

@@ -2822,17 +2822,16 @@ namespace J2N.Numerics
             {
                 return new Int32(i);
             }
-            return ValueOfCache.CACHE[i + 128];
+            return ValueOfCache.Cache[i + 128];
 
         }
 
-        static class ValueOfCache
+        private static class ValueOfCache
         {
-            /**
-             * <p>
-             * A cache of instances used by {@link Integer#valueOf(int)} and auto-boxing.
-             */
-            internal static readonly Int32[] CACHE = LoadCache();
+            /// <summary>
+            /// A cache of instances used by <see cref="ValueOf(int)"/> and auto-boxing.
+            /// </summary>
+            internal static readonly Int32[] Cache = LoadCache();
 
             private static Int32[] LoadCache()
             {

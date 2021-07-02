@@ -2716,12 +2716,11 @@ namespace J2N.Numerics
             return ValueOfCache.Cache[128 + (int)lng];
         }
 
-        static class ValueOfCache
+        private static class ValueOfCache
         {
-            /**
-             * <p>
-             * A cache of instances used by {@link Long#valueOf(long)} and auto-boxing.
-             */
+            /// <summary>
+            /// A cache of instances used by <see cref="ValueOf(long)"/> and auto-boxing.
+            /// </summary>
             internal static readonly Int64[] Cache = LoadCache();
 
             private static Int64[] LoadCache()
