@@ -150,6 +150,9 @@
   <data name="Argument_ArrayTooLarge" xml:space="preserve">
     <value>The input array length must not exceed Int32.MaxValue / {0}. Otherwise BitArray.Length would exceed Int32.MaxValue.</value>
   </data>
+  <data name="Argument_BadFormatSpecifier" xml:space="preserve">
+    <value>Format specifier was invalid.</value>
+  </data>
   <data name="Argument_CollectionMustNotBeThis" xml:space="preserve">
     <value>collection must not be the same instance as this.</value>
   </data>

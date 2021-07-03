@@ -1114,7 +1114,7 @@ namespace J2N.Numerics
             // Regression test for HARMONY-6261
             float f = Single.Parse("2147483648", J2N.Text.StringFormatter.InvariantCulture);
             //assertEquals("2.14748365E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture)); // J2N: Changed from "2.1474836E9" to "2.14748365E9" to match JDK behavior
-            assertEquals("2.1474836E9", Single.ToString(f, J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals("2.1474836E9", Single.ToString(f, null, J2N.Text.StringFormatter.InvariantCulture));
 
             // J2N: Moved to CharSequences
 
@@ -1171,12 +1171,176 @@ namespace J2N.Numerics
             ff = 12.90898f;
             answer = "12.90898";
             assertTrue("Incorrect String representation want " + answer + ", got "
-                    + Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture), Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+                    + Single.ToString(ff, null, J2N.Text.StringFormatter.InvariantCulture), Single.ToString(ff, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
 
             ff = float.MaxValue;
             answer = "3.4028235E38";
             assertTrue("Incorrect String representation want " + answer + ", got "
-                    + Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture), Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+                    + Single.ToString(ff, null, J2N.Text.StringFormatter.InvariantCulture), Single.ToString(ff, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+        }
+
+        public static IEnumerable<object[]> ToString_TestData()
+        {
+            yield return new object[] { -4567.0f, "G", null, "-4567" };
+            yield return new object[] { -4567.89101f, "G", null, "-4567.891" };
+            yield return new object[] { 0.0f, "G", null, "0" };
+            yield return new object[] { 4567.0f, "G", null, "4567" };
+            yield return new object[] { 4567.89101f, "G", null, "4567.891" };
+
+            yield return new object[] { float.NaN, "G", null, "NaN" };
+
+            yield return new object[] { 2468.0f, "N", null, "2,468.00" };
+
+            // Changing the negative pattern doesn't do anything without also passing in a format string
+            var customNegativePattern = new NumberFormatInfo() { NumberNegativePattern = 0 };
+            yield return new object[] { -6310.0f, "G", customNegativePattern, "-6310" };
+
+            var customNegativeSignDecimalGroupSeparator = new NumberFormatInfo()
+            {
+                NegativeSign = "#",
+                NumberDecimalSeparator = "~",
+                NumberGroupSeparator = "*"
+            };
+            yield return new object[] { -2468.0f, "N", customNegativeSignDecimalGroupSeparator, "#2*468~00" };
+            yield return new object[] { 2468.0f, "N", customNegativeSignDecimalGroupSeparator, "2*468~00" };
+
+            var customNegativeSignGroupSeparatorNegativePattern = new NumberFormatInfo()
+            {
+                NegativeSign = "xx", // Set to trash to make sure it doesn't show up
+                NumberGroupSeparator = "*",
+                NumberNegativePattern = 0
+            };
+            yield return new object[] { -2468.0f, "N", customNegativeSignGroupSeparatorNegativePattern, "(2*468.00)" };
+
+            NumberFormatInfo invariantFormat = NumberFormatInfo.InvariantInfo;
+            yield return new object[] { float.NaN, "G", invariantFormat, "NaN" };
+            yield return new object[] { float.PositiveInfinity, "G", invariantFormat, "Infinity" };
+            yield return new object[] { float.NegativeInfinity, "G", invariantFormat, "-Infinity" };
+
+
+            // the follow values comes from the Float Javadoc/Spec
+            yield return new object[] { 0.0F, "x", null, "0x0.0p0" };
+            yield return new object[] { -0.0F, "x", null, "-0x0.0p0" };
+            yield return new object[] { 1.0F, "x", null, "0x1.0p0" };
+            yield return new object[] { -1.0F, "x", null, "-0x1.0p0" };
+            yield return new object[] { 2.0F, "x", null, "0x1.0p1" };
+            yield return new object[] { 3.0F, "x", null, "0x1.8p1" };
+            yield return new object[] { 0.5F, "x", null, "0x1.0p-1" };
+            yield return new object[] { 0.25F, "x", null, "0x1.0p-2" };
+            yield return new object[] { float.MaxValue, "x", null, "0x1.fffffep127" };
+            yield return new object[] { float.Epsilon, "x", null, "0x0.000002p-126" }; // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
+
+            // test various numbers
+            yield return new object[] { -118.625F, "x", null, "-0x1.da8p6" };
+            yield return new object[] { 9743299.65F, "x", null, "0x1.295788p23" };
+            yield return new object[] { 9743299.65000F, "x", null, "0x1.295788p23" };
+            yield return new object[] { 9743299.650001234F, "x", null, "0x1.295788p23" };
+            yield return new object[] { 12349743299.65000F, "x", null, "0x1.700d1p33" };
+
+            // test HARMONY-2132
+            yield return new object[] { /*0x1.01p10f*/ 1028.0f, "x", null, "0x1.01p10" }; // .NET cannot represent this as a float literal
+        }
+
+        public static IEnumerable<object[]> ToString_TestData_NotNetFramework()
+        {
+            foreach (var testData in ToString_TestData())
+            {
+                yield return testData;
+            }
+
+            yield return new object[] { float.MinValue, "G", null, "-3.4028235E+38" };
+            yield return new object[] { float.MaxValue, "G", null, "3.4028235E+38" };
+
+            yield return new object[] { float.Epsilon, "G", null, "1E-45" };
+
+            NumberFormatInfo invariantFormat = NumberFormatInfo.InvariantInfo;
+            yield return new object[] { float.Epsilon, "G", invariantFormat, "1E-45" };
+        }
+
+#if NETCOREAPP3_0_OR_GREATER
+        [Test]
+        public static void Test_ToString_NotNetFramework()
+        {
+            using (new CultureContext(CultureInfo.InvariantCulture))
+            {
+                foreach (object[] testdata in ToString_TestData_NotNetFramework())
+                {
+                    ToString((float)testdata[0], (string)testdata[1], (IFormatProvider)testdata[2], (string)testdata[3]);
+                }
+            }
+        }
+#else
+        [Test]
+        public static void Test_ToString()
+        {
+            using (new CultureContext(CultureInfo.InvariantCulture))
+            {
+                foreach (object[] testdata in ToString_TestData())
+                {
+                    ToString((float)testdata[0], (string)testdata[1], (IFormatProvider)testdata[2], (string)testdata[3]);
+                }
+            }
+        }
+#endif
+
+        private static void ToString(float f, string format, IFormatProvider provider, string expected)
+        {
+            bool isDefaultProvider = (provider == null || provider == NumberFormatInfo.CurrentInfo);
+            if (/*string.IsNullOrEmpty(format) ||*/ format.ToUpperInvariant() == "G")
+            {
+                if (isDefaultProvider)
+                {
+                    assertEquals(expected, Single.ToString(f, format));
+                    assertEquals(expected, Single.ToString(f, format, (IFormatProvider)null));
+                }
+                assertEquals(expected, Single.ToString(f, format, provider));
+            }
+            // J2N: The default format is J rather than G
+            if (string.IsNullOrEmpty(format) || format.ToUpperInvariant() == "J")
+            {
+                if (isDefaultProvider)
+                {
+                    assertEquals(expected, Single.ToString(f));
+                    assertEquals(expected, Single.ToString(f, (IFormatProvider)null));
+                }
+                assertEquals(expected, Single.ToString(f, provider));
+            }
+            if (format.ToUpperInvariant() == "X")
+            {
+                var info = NumberFormatInfo.GetInstance(provider);
+                if (expected != info.NaNSymbol && expected != info.PositiveInfinitySymbol && expected != info.NegativeInfinitySymbol)
+                {
+                    if (isDefaultProvider)
+                    {
+                        assertEquals(expected.ToUpperInvariant(), Single.ToString(f, format.ToUpperInvariant())); // If format is upper case, then exponents are printed in upper case
+                        assertEquals(expected.ToLowerInvariant(), Single.ToString(f, format.ToLowerInvariant())); // If format is lower case, then exponents are printed in upper case
+                        assertEquals(expected.ToUpperInvariant(), Single.ToString(f, format.ToUpperInvariant(), null));
+                        assertEquals(expected.ToLowerInvariant(), Single.ToString(f, format.ToLowerInvariant(), null));
+                    }
+                    assertEquals(expected.ToUpperInvariant(), Single.ToString(f, format.ToUpperInvariant(), provider));
+                    assertEquals(expected.ToLowerInvariant(), Single.ToString(f, format.ToLowerInvariant(), provider));
+                }
+            }
+            else
+            {
+                if (isDefaultProvider)
+                {
+                    assertEquals(expected.Replace('e', 'E'), Single.ToString(f, format.ToUpperInvariant())); // If format is upper case, then exponents are printed in upper case
+                    assertEquals(expected.Replace('E', 'e'), Single.ToString(f, format.ToLowerInvariant())); // If format is lower case, then exponents are printed in upper case
+                    assertEquals(expected.Replace('e', 'E'), Single.ToString(f, format.ToUpperInvariant(), null));
+                    assertEquals(expected.Replace('E', 'e'), Single.ToString(f, format.ToLowerInvariant(), null));
+                }
+                assertEquals(expected.Replace('e', 'E'), Single.ToString(f, format.ToUpperInvariant(), provider));
+                assertEquals(expected.Replace('E', 'e'), Single.ToString(f, format.ToLowerInvariant(), provider));
+            }
+        }
+
+        [Test]
+        public static void ToString_InvalidFormat_ThrowsFormatException()
+        {
+            float f = 123.0f;
+            Assert.Throws<FormatException>(() => f.ToString("Y")); // Invalid format
+            Assert.Throws<FormatException>(() => f.ToString("Y", null)); // Invalid format
         }
 
         /**
@@ -1267,10 +1431,10 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.String java.lang.Double.toString(double)
             assertTrue("Incorrect String representation want " + answer + ", got ("
-                    + Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture) + ")", Single.ToString(ff, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+                    + Single.ToString(ff, null, J2N.Text.StringFormatter.InvariantCulture) + ")", Single.ToString(ff, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
             Single f = new Single(ff);
             assertTrue("Incorrect String representation want " + answer + ", got ("
-                    + Single.ToString(f.ToSingle(), J2N.Text.StringFormatter.InvariantCulture) + ")", Single.ToString(f.ToSingle(), J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    + Single.ToString(f.ToSingle(), null, J2N.Text.StringFormatter.InvariantCulture) + ")", Single.ToString(f.ToSingle(), null, J2N.Text.StringFormatter.InvariantCulture).Equals(
                     answer));
             assertTrue("Incorrect String representation want " + answer + ", got (" + f.ToString(J2N.Text.StringFormatter.InvariantCulture)
                     + ")", f.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));

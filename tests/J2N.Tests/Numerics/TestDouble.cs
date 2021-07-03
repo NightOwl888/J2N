@@ -191,9 +191,9 @@ namespace J2N.Numerics
 
         private void Test_toString(double dd, String answer)
         {
-            assertEquals(answer, Double.ToString(dd, J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(answer, Double.ToString(dd, null, J2N.Text.StringFormatter.InvariantCulture));
             Double d = new Double(dd);
-            assertEquals(answer, Double.ToString(d.ToDouble(), J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(answer, Double.ToString(d.ToDouble(), null, J2N.Text.StringFormatter.InvariantCulture));
             assertEquals(answer, d.ToString(J2N.Text.StringFormatter.InvariantCulture));
         }
 
@@ -1625,6 +1625,190 @@ namespace J2N.Numerics
             d = Double.Int64BitsToDouble(unchecked((long)0xda0000000000000eL));
             Test_toString(d, "-3.384606560206083E125");
         }
+
+        public static IEnumerable<object[]> ToString_TestData()
+        {
+            yield return new object[] { -4567.0, "G", null, "-4567" };
+            yield return new object[] { -4567.89101, "G", null, "-4567.89101" };
+            yield return new object[] { 0.0, "G", null, "0" };
+            yield return new object[] { 4567.0, "G", null, "4567" };
+            yield return new object[] { 4567.89101, "G", null, "4567.89101" };
+
+            yield return new object[] { double.NaN, "G", null, "NaN" };
+
+            yield return new object[] { 2468.0, "N", null, "2,468.00" };
+
+            // Changing the negative pattern doesn't do anything without also passing in a format string
+            var customNegativePattern = new NumberFormatInfo() { NumberNegativePattern = 0 };
+            yield return new object[] { -6310.0, "G", customNegativePattern, "-6310" };
+
+            var customNegativeSignDecimalGroupSeparator = new NumberFormatInfo()
+            {
+                NegativeSign = "#",
+                NumberDecimalSeparator = "~",
+                NumberGroupSeparator = "*"
+            };
+            yield return new object[] { -2468.0, "N", customNegativeSignDecimalGroupSeparator, "#2*468~00" };
+            yield return new object[] { 2468.0, "N", customNegativeSignDecimalGroupSeparator, "2*468~00" };
+
+            var customNegativeSignGroupSeparatorNegativePattern = new NumberFormatInfo()
+            {
+                NegativeSign = "xx", // Set to trash to make sure it doesn't show up
+                NumberGroupSeparator = "*",
+                NumberNegativePattern = 0,
+            };
+            yield return new object[] { -2468.0, "N", customNegativeSignGroupSeparatorNegativePattern, "(2*468.00)" };
+
+            NumberFormatInfo invariantFormat = NumberFormatInfo.InvariantInfo;
+            yield return new object[] { double.NaN, "G", invariantFormat, "NaN" };
+            yield return new object[] { double.PositiveInfinity, "G", invariantFormat, "Infinity" };
+            yield return new object[] { double.NegativeInfinity, "G", invariantFormat, "-Infinity" };
+
+
+            // Custom tests
+            yield return new object[] { -4567.0, "J", null, "-4567.0" };
+            yield return new object[] { -4567.89101, "J", null, "-4567.89101" };
+            yield return new object[] { 0.0, "J", null, "0.0" };
+            yield return new object[] { 4567.0, "J", null, "4567.0" };
+            yield return new object[] { 4567.89101, "J", null, "4567.89101" };
+
+            yield return new object[] { double.NaN, "J", null, "NaN" };
+
+            // Changing the negative pattern doesn't do anything without also passing in a format string
+            var customNegativePattern2 = new NumberFormatInfo() { NumberNegativePattern = 0 };
+            yield return new object[] { -6310.0, "J", customNegativePattern2, "-6310.0" };
+
+            yield return new object[] { 2.1847856458940424E+18, "J", null, "2.1847856458940424E18" };
+            yield return new object[] { 2.1847856458940424E+18, "J", new CultureInfo("de-DE"), "2,1847856458940424E18" };
+
+            // the follow values come from the Double Javadoc/Spec
+            yield return new object[] { 0.0D, "x", null, "0x0.0p0" };
+            yield return new object[] { -0.0D, "x", null, "-0x0.0p0" };
+            yield return new object[] { 1.0D, "x", null, "0x1.0p0" };
+            yield return new object[] { -1.0D, "x", null, "-0x1.0p0" };
+            yield return new object[] { 2.0D, "x", null, "0x1.0p1" };
+            yield return new object[] { 3.0D, "x", null, "0x1.8p1" };
+            yield return new object[] { 0.5D, "x", null, "0x1.0p-1" };
+            yield return new object[] { 0.25D, "x", null, "0x1.0p-2" };
+            yield return new object[] { double.MaxValue, "x", null, "0x1.fffffffffffffp1023" };
+            yield return new object[] { double.Epsilon, "x", null, "0x0.0000000000001p-1022" }; // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
+
+
+            // test edge cases
+            yield return new object[] { double.NaN, "x", null, "NaN" };
+            yield return new object[] { double.NegativeInfinity, "x", null, "-Infinity" };
+            yield return new object[] { double.PositiveInfinity, "x", null, "Infinity" };
+
+            // test various numbers
+            yield return new object[] { -118.625D, "x", null, "-0x1.da8p6" };
+            yield return new object[] { 9743299.65D, "x", null, "0x1.2957874cccccdp23" };
+            yield return new object[] { 9743299.65000D, "x", null, "0x1.2957874cccccdp23" };
+            yield return new object[] { 9743299.650001234D, "x", null, "0x1.2957874cccf63p23" };
+            yield return new object[] { 12349743299.65000D, "x", null, "0x1.700d1061d3333p33" };
+        }
+
+        public static IEnumerable<object[]> ToString_TestData_NotNetFramework()
+        {
+            foreach (var testData in ToString_TestData())
+            {
+                yield return testData;
+            }
+
+            yield return new object[] { double.MinValue, "G", null, "-1.7976931348623157E+308" };
+            yield return new object[] { double.MaxValue, "G", null, "1.7976931348623157E+308" };
+
+            yield return new object[] { double.Epsilon, "G", null, "5E-324" };
+
+            NumberFormatInfo invariantFormat = NumberFormatInfo.InvariantInfo;
+            yield return new object[] { double.Epsilon, "G", invariantFormat, "5E-324" };
+        }
+
+#if NETCOREAPP3_0_OR_GREATER
+        [Test]
+        public static void Test_ToString_NotNetFramework()
+        {
+            using (new CultureContext(CultureInfo.InvariantCulture))
+            {
+                foreach (object[] testdata in ToString_TestData_NotNetFramework())
+                {
+                    ToString((double)testdata[0], (string)testdata[1], (IFormatProvider)testdata[2], (string)testdata[3]);
+                }
+            }
+        }
+#else
+        [Test]
+        public static void Test_ToString()
+        {
+            using (new CultureContext(CultureInfo.InvariantCulture))
+            {
+                foreach (object[] testdata in ToString_TestData())
+                {
+                    ToString((double)testdata[0], (string)testdata[1], (IFormatProvider)testdata[2], (string)testdata[3]);
+                }
+            }
+        }
+#endif
+
+        private static void ToString(double d, string format, IFormatProvider provider, string expected)
+        {
+            bool isDefaultProvider = (provider == null || provider == NumberFormatInfo.CurrentInfo);
+            if (/*string.IsNullOrEmpty(format) ||*/ format.ToUpperInvariant() == "G")
+            {
+                if (isDefaultProvider)
+                {
+                    assertEquals(expected, Double.ToString(d, format));
+                    assertEquals(expected, Double.ToString(d, format, (IFormatProvider)null));
+                }
+                assertEquals(expected, Double.ToString(d, format, provider));
+            }
+            // J2N: The default format is J rather than G
+            if (string.IsNullOrEmpty(format) || format.ToUpperInvariant() == "J")
+            {
+                if (isDefaultProvider)
+                {
+                    assertEquals(expected, Double.ToString(d));
+                    assertEquals(expected, Double.ToString(d, (IFormatProvider)null));
+                }
+                assertEquals(expected, Double.ToString(d, provider));
+            }
+            if (format.ToUpperInvariant() == "X")
+            {
+                var info = NumberFormatInfo.GetInstance(provider);
+                if (expected != info.NaNSymbol && expected != info.PositiveInfinitySymbol && expected != info.NegativeInfinitySymbol)
+                {
+                    if (isDefaultProvider)
+                    {
+                        assertEquals(expected.ToUpperInvariant(), Double.ToString(d, format.ToUpperInvariant())); // If format is upper case, then exponents are printed in upper case
+                        assertEquals(expected.ToLowerInvariant(), Double.ToString(d, format.ToLowerInvariant())); // If format is lower case, then exponents are printed in upper case
+                        assertEquals(expected.ToUpperInvariant(), Double.ToString(d, format.ToUpperInvariant(), null));
+                        assertEquals(expected.ToLowerInvariant(), Double.ToString(d, format.ToLowerInvariant(), null));
+                    }
+                    assertEquals(expected.ToUpperInvariant(), Double.ToString(d, format.ToUpperInvariant(), provider));
+                    assertEquals(expected.ToLowerInvariant(), Double.ToString(d, format.ToLowerInvariant(), provider));
+                }
+            }
+            else
+            {
+                if (isDefaultProvider)
+                {
+                    assertEquals(expected.Replace('e', 'E'), Double.ToString(d, format.ToUpperInvariant())); // If format is upper case, then exponents are printed in upper case
+                    assertEquals(expected.Replace('E', 'e'), Double.ToString(d, format.ToLowerInvariant())); // If format is lower case, then exponents are printed in upper case
+                    assertEquals(expected.Replace('e', 'E'), Double.ToString(d, format.ToUpperInvariant(), null));
+                    assertEquals(expected.Replace('E', 'e'), Double.ToString(d, format.ToLowerInvariant(), null));
+                }
+                assertEquals(expected.Replace('e', 'E'), Double.ToString(d, format.ToUpperInvariant(), provider));
+                assertEquals(expected.Replace('E', 'e'), Double.ToString(d, format.ToLowerInvariant(), provider));
+            }
+        }
+
+        [Test]
+        public static void ToString_InvalidFormat_ThrowsFormatException()
+        {
+            double d = 123.0;
+            Assert.Throws<FormatException>(() => d.ToString("Y")); // Invalid format
+            Assert.Throws<FormatException>(() => d.ToString("Y", null)); // Invalid format
+        }
+
 
         /**
          * @tests java.lang.Double#valueOf(java.lang.String)
@@ -3867,7 +4051,7 @@ namespace J2N.Numerics
                         yield return new TestCaseData(unchecked((long)0xfe054218c295e43fL), "-1.1122233344455567E299",
                             "-111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000.92233720368547758079223372036854775807",
                             NumberStyle.Float, NumberFormatInfo.InvariantInfo);
-                        
+
                         yield return new TestCaseData(0x562ae7a25fe706ebL,
                             "1.234123412431233E107", "1.234123412431233E107", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(0x562ae7a25fe706ecL,
