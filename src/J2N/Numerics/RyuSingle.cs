@@ -19,12 +19,14 @@ using System.Numerics;
 namespace J2N.Numerics
 {
 
-    /**
-     * An implementation of Ryu for float.
-     */
+    /// <summary>
+    /// An implementation of Ryu for <see cref="float"/>.
+    /// </summary>
     internal sealed partial class RyuSingle
     {
+#if DEBUG
         private static bool DEBUG = false;
+#endif
 
         private const int FLOAT_MANTISSA_BITS = 23;
         private const int FLOAT_MANTISSA_MASK = (1 << FLOAT_MANTISSA_BITS) - 1;
@@ -45,10 +47,9 @@ namespace J2N.Numerics
         private const int POS_TABLE_SIZE = 47;
         private const int INV_TABLE_SIZE = 31;
 
+        #region Debug Tables
 #if DEBUG
         // Only for debugging.
-        //private static readonly BigInteger[] POW5 = new BigInteger[POS_TABLE_SIZE];
-        //private static readonly BigInteger[] POW5_INV = new BigInteger[INV_TABLE_SIZE];
         private static readonly BigInteger[] POW5 = new BigInteger[POS_TABLE_SIZE] {
             BigInteger.Parse("1"),
             BigInteger.Parse("5"),
@@ -118,6 +119,7 @@ namespace J2N.Numerics
             BigInteger.Parse("365375409332725730"),
         };
 #endif
+        #endregion Debug Tables
 
 
         private const int POW5_BITCOUNT = 61;
@@ -139,9 +141,6 @@ namespace J2N.Numerics
             1292469707114105741ul, 1615587133892632177ul, 2019483917365790221ul
         };
 
-
-        //private static readonly int[][] POW5_SPLIT = Arrays.NewRectangularArray<int>(POS_TABLE_SIZE, 2)!; // new int[POS_TABLE_SIZE][2];
-
         private const int POW5_INV_BITCOUNT = 59;
         private const int POW5_INV_HALF_BITCOUNT = 31;
 
@@ -157,49 +156,6 @@ namespace J2N.Numerics
             570899077082383953ul, 456719261665907162ul, 365375409332725730ul
         };
 
-        //private static readonly int[][] POW5_INV_SPLIT = Arrays.NewRectangularArray<int>(INV_TABLE_SIZE, 2)!; //new int[INV_TABLE_SIZE][2];
-
-        //private static readonly BigInteger MASK = BigInteger.One << POW5_HALF_BITCOUNT - 1;
-        //private static readonly BigInteger MASK_INV = BigInteger.One << POW5_INV_HALF_BITCOUNT - 1;
-
-        //static RyuFloat()
-        //{
-        //    //BigInteger mask = new BigInteger(1) << POW5_HALF_BITCOUNT - 1;
-        //    //BigInteger maskInv = new BigInteger(1) << POW5_INV_HALF_BITCOUNT - 1;
-        //    for (int i = 0; i < Math.Max(POW5.Length, POW5_INV.Length); i++)
-        //    {
-        //        BigInteger pow = BigInteger.Pow(new BigInteger(5), i);
-        //        int pow5len = (int)pow.GetBitLength();
-        //        int expectedPow5Bits = Pow5bits(i);
-        //        if (expectedPow5Bits != pow5len)
-        //        {
-        //            throw new InvalidOperationException(pow5len + " != " + expectedPow5Bits);
-        //        }
-        //        if (i < POW5.Length)
-        //        {
-        //            POW5[i] = pow;
-        //        }
-        //        //if (i < POW5_SPLIT.Length)
-        //        //{
-        //        //    POW5_SPLIT[i][0] = (int)pow >> (pow5len - POW5_BITCOUNT + POW5_HALF_BITCOUNT); //.intValueExact();
-        //        //    POW5_SPLIT[i][1] = (int)pow >> (pow5len - POW5_BITCOUNT & (int)mask); //.intValueExact();
-        //        //}
-
-        //        if (i < POW5_INV.Length)
-        //        {
-        //            int j = pow5len - 1 + POW5_INV_BITCOUNT;
-        //            BigInteger inv = BigInteger.One << (int)((j) / (pow) + (BigInteger.One));
-        //            POW5_INV[i] = inv;
-        //            //POW5_INV_SPLIT[i][0] = (int)(inv >> POW5_INV_HALF_BITCOUNT); // .intValueExact();
-        //            //POW5_INV_SPLIT[i][1] = (int)(inv & maskInv); //.intValueExact();
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// J2N TODO: Docs
-        ///// </summary>
-        ///// <param name="args"></param>
         //public static void Main(string[] args)
         //{
         //    float f = 0.33007812f;
@@ -588,10 +544,10 @@ namespace J2N.Numerics
             return e == 0 ? 1 : (int)((e * LOG2_5_NUMERATOR + LOG2_5_DENOMINATOR - 1) / LOG2_5_DENOMINATOR);
         }
 
-        /**
-         * Returns the exponent of the largest power of 5 that divides the given value, i.e., returns
-         * i such that value = 5^i * x, where x is an integer.
-         */
+        /// <summary>
+        /// Returns the exponent of the largest power of 5 that divides the given value, i.e., returns
+        /// i such that value = 5^i * x, where x is an integer.
+        /// </summary>
         private static int Pow5Factor(int value)
         {
             int count = 0;
@@ -607,30 +563,23 @@ namespace J2N.Numerics
             throw new ArgumentException("" + value);
         }
 
-        /**
-         * Compute the exact result of [m * 5^(-e_2) / 10^q] = [m * 5^(-e_2 - q) / 2^q]
-         * = [m * [5^(p - q)/2^k] / 2^(q - k)] = [m * POW5[i] / 2^j].
-         */
+        /// <summary>
+        /// Compute the exact result of [m * 5^(-e_2) / 10^q] = [m * 5^(-e_2 - q) / 2^q]
+        /// = [m * [5^(p - q)/2^k] / 2^(q - k)] = [m * POW5[i] / 2^j].
+        /// </summary>
         private static ulong MulPow5divPow2(int m, int i, int j)
         {
-
-
             if (j - POW5_HALF_BITCOUNT < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(j));
             }
             return MulShift(m, POW5_SPLIT[i], j);
-
-            //ulong bits0 = (ulong)m * POW5_SPLIT[i];
-            //ulong bits1 = (ulong)m * (ulong)(POW5_INV[i] & MASK_INV);
-            ////ulong bits1 = m * POW5_SPLIT[i][1];
-            //return (bits0 + (bits1 >> POW5_HALF_BITCOUNT)) >> (j - POW5_HALF_BITCOUNT);
         }
 
-        /**
-         * Compute the exact result of [m * 2^p / 10^q] = [m * 2^(p - q) / 5 ^ q]
-         * = [m * [2^k / 5^q] / 2^-(p - q - k)] = [m * POW5_INV[q] / 2^j].
-         */
+        /// <summary>
+        /// Compute the exact result of [m * 2^p / 10^q] = [m * 2^(p - q) / 5 ^ q]
+        /// = [m * [2^k / 5^q] / 2^-(p - q - k)] = [m * POW5_INV[q] / 2^j].
+        /// </summary>
         private static ulong MulPow5InvDivPow2(int m, int q, int j)
         {
             if (j - POW5_INV_HALF_BITCOUNT < 0)
@@ -638,13 +587,6 @@ namespace J2N.Numerics
                 throw new ArgumentOutOfRangeException(nameof(j));
             }
             return MulShift(m, POW5_INV_SPLIT[q], j);
-
-
-            ////long bits0 = m * (long)POW5_INV_SPLIT[q][0];
-            ////long bits1 = m * (long)POW5_INV_SPLIT[q][1];
-            //ulong bits0 = (ulong)m * POW5_INV_SPLIT[q];
-            //ulong bits1 = (ulong)m * (ulong)(POW5_INV_SPLIT[q] & MASK);
-            //return (bits0 + (bits1 >> POW5_INV_HALF_BITCOUNT)) >> (j - POW5_INV_HALF_BITCOUNT);
         }
 
         private static uint MulShift(int m, ulong factor, int shift)
