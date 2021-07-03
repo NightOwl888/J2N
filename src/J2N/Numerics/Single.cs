@@ -2124,134 +2124,832 @@ namespace J2N.Numerics
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Single
 
-        //public override string ToString()
-        //{
-        //    return Single.ToString(value);
-        //}
+        #region ToString
 
-        /// <inheritdoc/>
-        public override string ToString(string? format, IFormatProvider? provider) // .NETified
+        /// <summary>
+        /// Converts the numeric value of this instance to its equivalent string representation.
+        /// </summary>
+        /// <returns>The string representation of this instance.</returns>
+        /// <remarks>
+        /// The <see cref="ToString()"/> method formats the current instance in the default ("J", or Java)
+        /// format of the current culture. If you want to specify a different format, precision, or culture, use the
+        /// other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, IFormatProvider?)"/> or <see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float, string?)"/> or <see cref="ToString(string?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, string?, IFormatProvider?)"/> or <see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string of the form:
+        /// <para/>
+        /// [sign]integral-digits[.[fractional-digits]][E[sign]exponential-digits]
+        /// <para/>
+        /// Optional elements are framed in square brackets ([ and ]). Elements that contain the term "digits" consist of a series of numeric
+        /// characters ranging from 0 to 9. The elements listed in the following table are supported.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign or positive sign symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>integral-digits</i></term>
+        ///         <term>A series of digits specifying the integral part of the number. Integral-digits can be absent if there
+        ///         are fractional-digits.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'.'</i></term>
+        ///         <term>A culture-specific decimal point symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>fractional-digits</i></term>
+        ///         <term>A series of digits specifying the fractional part of the number.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'E'</i></term>
+        ///         <term>An uppercase character 'E', indicating exponential (scientific) notation.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>exponential-digits</i></term>
+        ///         <term>A series of digits specifying an exponent.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Some examples of the return value are "100", "-123,456,789", "123.45E+6", "500", "3.1416", "600", "-0.123", and "-Infinity".
+        /// <para/>
+        /// This instance is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// </remarks>
+        public override string ToString()
         {
-            return ToString(format, provider, value);
+            return DotNetNumber.FormatSingle(value, null, null);
         }
 
-        /**
-         * Returns a string containing a concise, human-readable description of the
-         * specified float value.
-         * 
-         * @param f
-         *             the float to convert to a string.
-         * @return a printable representation of {@code f}.
-         */
+        /// <summary>
+        /// Converts the numeric value of this instance to its equivalent string representation, using the specified format.
+        /// </summary>
+        /// <param name="format">A numeric format string.</param>
+        /// <returns>The string representation of the current instance as specified by <paramref name="format"/>.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(string?)"/> method formats the current instance in
+        /// a specified format by using the conventions of the current culture. If you want to specify a different format or culture,
+        /// use the other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float)"/> or <see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, IFormatProvider?)"/> or <see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, string?, IFormatProvider?)"/> or <see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string representation of a number, as specified by <paramref name="format"/>.
+        /// <para/>
+        /// The <paramref name="format"/> parameter can be any valid standard numeric format specifier except for D, as well as any
+        /// combination of custom numeric format specifiers. If <paramref name="format"/> is <c>null</c> or an empty string, the return value for this
+        /// instance is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// <para/>
+        /// In addition to the formats specified in the above articles, the Java ("J") format and ("X") hexadecimal format are also supported.
+        /// <para/>
+        /// <h2>Java format specifier ("J")</h2>
+        /// <para/>
+        /// The ("J") format follows the specification of the Java Language Specification. However, do note that it may not return exactly the same
+        /// number representation as the JDK due to precision and rounding differences. The ("J") format is similar to the ("R") format in that
+        /// it can be fully round tripped and it ignores the precision specifier. However, do note that on platforms lower than .NET Core 3.0, this
+        /// format can only be round-tripped using overloads of <see cref="Parse(string, IFormatProvider?)"/> and <see cref="TryParse(string?, out float)"/>
+        /// in J2N. On .NET Core 3.0 and higher overloads of <see cref="float.Parse(string)"/> and <see cref="float.TryParse(string, out float)"/> will
+        /// also successfully round trip the number back to the same set of bits.
+        /// <para/>
+        /// Although you can include a precision specifier, it is ignored. Round trips are given precedence over precision when using this specifier.
+        /// The result string is affected by the formatting information of the current <see cref="NumberFormatInfo"/> object. The following table lists
+        /// the <see cref="NumberFormatInfo"/> properties that control the formatting of the result string.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>NumberFormatInfo property</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NegativeSign"/></term>
+        ///         <term>Defines the string that indicates that a number is negative.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NumberDecimalSeparator"/></term>
+        ///         <term>Defines the string that separates integral digits from decimal digits.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the provider as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// <para/>
+        /// <h2>Hexadecimal format specifier ("X")</h2>
+        /// <para/>
+        /// The hexadecimal ("X") format is uses the same floating-point hexadecimal format as the JDK and is provided for interoperability
+        /// with Java 6 and higher. The hexadecimal form have an analogous syntax to the simple and scaled decimal forms with the following differences:
+        /// <list type="number">
+        ///     <item><description>Every hexadecimal floating point literal starts with a zero (0) and then an x or X.</description></item>
+        ///     <item><description>The digits of the number (but not the exponent part!) also include the hexadecimal digits a through f
+        ///     and their uppercase equivalents.</description></item>
+        ///     <item><description>The exponent is introduced by the letter p (or P) instead of an e or E. The exponent represents a
+        ///     scaling factor that is a power of 2 instead of a power of 10.</description></item>
+        /// </list>
+        /// <para/>
+        /// Here are some examples:
+        /// <code>
+        /// 0x0.0p0    // this is zero expressed in hexadecimal form (float)<br/>
+        /// 0xff.0p19   // this is 255.0 x 2^19 (double)
+        /// </code>
+        /// See the <see cref="ToHexString(IFormatProvider?)"/> for more information about the format.
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the provider as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// </remarks>
+        public override string ToString(string? format)
+        {
+            return DotNetNumber.FormatSingle(value, format, null);
+        }
+
+        /// <summary>
+        /// Converts the numeric value of the current instance to its equivalent string representation using the specified
+        /// culture-specific format information.
+        /// </summary>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>The string representation of the current instance as specified by <paramref name="provider"/>.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(IFormatProvider?)"/> method formats the current instance in
+        /// the default ("J") format of a specified culture. If you want to specify a different format or culture, use the
+        /// other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float)"/> or <see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float, string?)"/> or <see cref="ToString(string?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, string?, IFormatProvider?)"/> or <see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string of the form:
+        /// <para/>
+        /// [sign]integral-digits[.[fractional-digits]][E[sign]exponential-digits]
+        /// <para/>
+        /// Optional elements are framed in square brackets ([ and ]). Elements that contain the term "digits" consist of a series of numeric
+        /// characters ranging from 0 to 9. The elements listed in the following table are supported.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign or positive sign symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>integral-digits</i></term>
+        ///         <term>A series of digits specifying the integral part of the number. Integral-digits can be absent if there
+        ///         are fractional-digits.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'.'</i></term>
+        ///         <term>A culture-specific decimal point symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>fractional-digits</i></term>
+        ///         <term>A series of digits specifying the fractional part of the number.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'E'</i></term>
+        ///         <term>An uppercase character 'E', indicating exponential (scientific) notation.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>exponential-digits</i></term>
+        ///         <term>A series of digits specifying an exponent.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Some examples of the return value are "100", "-123,456,789", "123.45E+6", "500", "3.1416", "600", "-0.123", and "-Infinity".
+        /// <para/>
+        /// This instance is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
+        /// The provider parameter supplies culture-specific information used in formatting. If provider is <c>null</c>, the return value is formatted using
+        /// the <see cref="NumberFormatInfo"/> object for the current culture.
+        /// </remarks>
+        public override string ToString(IFormatProvider? provider)
+        {
+            return DotNetNumber.FormatSingle(value, null, provider);
+        }
+
+        /// <summary>
+        /// Converts the numeric value of this instance to its equivalent string representation using
+        /// the specified format and culture-specific format information.
+        /// </summary>
+        /// <param name="format">A numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>The string representation of the current instance as specified by <paramref name="format"/>
+        /// and <paramref name="provider"/>.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(string?, IFormatProvider?)"/> method formats the current instance in
+        /// a specified format of a specified culture. If you want to specify a different format or culture, use the
+        /// other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float)"/> or <see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, IFormatProvider?)"/> or <see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float, string?)"/> or <see cref="ToString(string?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string representation of a number, as specified by <paramref name="format"/>.
+        /// <para/>
+        /// The <paramref name="format"/> parameter can be any valid standard numeric format specifier except for D, as well as any
+        /// combination of custom numeric format specifiers. If <paramref name="format"/> is <c>null</c> or an empty string, the return value for this
+        /// instance is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
+        /// The provider parameter supplies culture-specific information used in formatting. If <paramref name="provider"/> is <c>null</c>, the return value
+        /// is formatted using the <see cref="NumberFormatInfo"/> object for the current culture.
+        /// <para/>
+        /// In addition to the formats specified in the above articles, the Java ("J") format and ("X") hexadecimal format are also supported.
+        /// <para/>
+        /// <h2>Java format specifier ("J")</h2>
+        /// <para/>
+        /// The ("J") format follows the specification of the Java Language Specification. However, do note that it may not return exactly the same
+        /// number representation as the JDK due to precision and rounding differences. The ("J") format is similar to the ("R") format in that
+        /// it can be fully round tripped and it ignores the precision specifier. However, do note that on platforms lower than .NET Core 3.0, this
+        /// format can only be round-tripped using overloads of <see cref="Parse(string, IFormatProvider?)"/> and <see cref="TryParse(string?, out float)"/>
+        /// in J2N. On .NET Core 3.0 and higher overloads of <see cref="float.Parse(string)"/> and <see cref="float.TryParse(string, out float)"/> will
+        /// also successfully round trip the number back to the same set of bits.
+        /// <para/>
+        /// Although you can include a precision specifier, it is ignored. Round trips are given precedence over precision when using this specifier.
+        /// The result string is affected by the formatting information of the current <see cref="NumberFormatInfo"/> object. The following table lists
+        /// the <see cref="NumberFormatInfo"/> properties that control the formatting of the result string.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>NumberFormatInfo property</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NegativeSign"/></term>
+        ///         <term>Defines the string that indicates that a number is negative.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NumberDecimalSeparator"/></term>
+        ///         <term>Defines the string that separates integral digits from decimal digits.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the <paramref name="provider"/> as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// <para/>
+        /// <h2>Hexadecimal format specifier ("X")</h2>
+        /// <para/>
+        /// The hexadecimal ("X") format is uses the same floating-point hexadecimal format as the JDK and is provided for interoperability
+        /// with Java 6 and higher. The hexadecimal form have an analogous syntax to the simple and scaled decimal forms with the following differences:
+        /// <list type="number">
+        ///     <item><description>Every hexadecimal floating point literal starts with a zero (0) and then an x or X.</description></item>
+        ///     <item><description>The digits of the number (but not the exponent part!) also include the hexadecimal digits a through f
+        ///     and their uppercase equivalents.</description></item>
+        ///     <item><description>The exponent is introduced by the letter p (or P) instead of an e or E. The exponent represents a
+        ///     scaling factor that is a power of 2 instead of a power of 10.</description></item>
+        /// </list>
+        /// <para/>
+        /// Here are some examples:
+        /// <code>
+        /// 0x0.0p0    // this is zero expressed in hexadecimal form (float)<br/>
+        /// 0xff.0p19   // this is 255.0 x 2^19 (double)
+        /// </code>
+        /// See the <see cref="ToHexString(IFormatProvider?)"/> for more information about the format.
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the <paramref name="provider"/> as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// </remarks>
+        public override string ToString(string? format, IFormatProvider? provider)
+        {
+            return DotNetNumber.FormatSingle(value, format, provider);
+        }
+
+
+        /// <summary>
+        /// Converts the numeric <paramref name="value"/> to its equivalent string representation.
+        /// </summary>
+        /// <param name="value">The <see cref="float"/> to convert.</param>
+        /// <returns>The string representation of the value.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(float)"/> method formats <paramref name="value"/> in the default ("J", or Java)
+        /// format of the current culture. If you want to specify a different format, precision, or culture, use the
+        /// other overloads of the <see cref="ToString(float, string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, IFormatProvider?)"/> or <see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float, string?)"/> or <see cref="ToString(string?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, string?, IFormatProvider?)"/> or <see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string of the form:
+        /// <para/>
+        /// [sign]integral-digits[.[fractional-digits]][E[sign]exponential-digits]
+        /// <para/>
+        /// Optional elements are framed in square brackets ([ and ]). Elements that contain the term "digits" consist of a series of numeric
+        /// characters ranging from 0 to 9. The elements listed in the following table are supported.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign or positive sign symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>integral-digits</i></term>
+        ///         <term>A series of digits specifying the integral part of the number. Integral-digits can be absent if there
+        ///         are fractional-digits.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'.'</i></term>
+        ///         <term>A culture-specific decimal point symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>fractional-digits</i></term>
+        ///         <term>A series of digits specifying the fractional part of the number.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'E'</i></term>
+        ///         <term>An uppercase character 'E', indicating exponential (scientific) notation.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>exponential-digits</i></term>
+        ///         <term>A series of digits specifying an exponent.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Some examples of the return value are "100", "-123,456,789", "123.45E+6", "500", "3.1416", "600", "-0.123", and "-Infinity".
+        /// <para/>
+        /// The value is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// </remarks>
         public static string ToString(float value)
         {
-            return ToString(value, null, null);
-            //return ToString(value, null, J2N.Text.StringFormatter.CurrentCulture);
-            //return org.apache.harmony.luni.util.NumberConverter.convert(f);
+            return DotNetNumber.FormatSingle(value, null, null);
         }
 
-        /**
-        * Returns a string containing a concise, human-readable description of the
-        * specified float value.
-        * 
-        * @param f
-        *             the float to convert to a string.
-        * @return a printable representation of {@code f}.
-        */
-        public static string ToString(float value, string format)
+        /// <summary>
+        /// Converts the numeric <paramref name="value"/> to its equivalent string representation, using the specified format.
+        /// </summary>
+        /// <param name="value">The <see cref="float"/> to convert.</param>
+        /// <param name="format">A numeric format string.</param>
+        /// <returns>The string representation of the value as specified by <paramref name="format"/>.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(float, string?)"/> method formats <paramref name="value"/> in
+        /// a specified format by using the conventions of the current culture. If you want to specify a different format or culture,
+        /// use the other overloads of the <see cref="ToString(float, string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float)"/> or <see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, IFormatProvider?)"/> or <see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, string?, IFormatProvider?)"/> or <see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string representation of a number, as specified by <paramref name="format"/>.
+        /// <para/>
+        /// The <paramref name="format"/> parameter can be any valid standard numeric format specifier except for D, as well as any
+        /// combination of custom numeric format specifiers. If <paramref name="format"/> is <c>null</c> or an empty string, the return value for this
+        /// instance is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// <para/>
+        /// In addition to the formats specified in the above articles, the Java ("J") format and ("X") hexadecimal format are also supported.
+        /// <para/>
+        /// <h2>Java format specifier ("J")</h2>
+        /// <para/>
+        /// The ("J") format follows the specification of the Java Language Specification. However, do note that it may not return exactly the same
+        /// number representation as the JDK due to precision and rounding differences. The ("J") format is similar to the ("R") format in that
+        /// it can be fully round tripped and it ignores the precision specifier. However, do note that on platforms lower than .NET Core 3.0, this
+        /// format can only be round-tripped using overloads of <see cref="Parse(string, IFormatProvider?)"/> and <see cref="TryParse(string?, out float)"/>
+        /// in J2N. On .NET Core 3.0 and higher overloads of <see cref="float.Parse(string)"/> and <see cref="float.TryParse(string, out float)"/> will
+        /// also successfully round trip the number back to the same set of bits.
+        /// <para/>
+        /// Although you can include a precision specifier, it is ignored. Round trips are given precedence over precision when using this specifier.
+        /// The result string is affected by the formatting information of the current <see cref="NumberFormatInfo"/> object. The following table lists
+        /// the <see cref="NumberFormatInfo"/> properties that control the formatting of the result string.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>NumberFormatInfo property</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NegativeSign"/></term>
+        ///         <term>Defines the string that indicates that a number is negative.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NumberDecimalSeparator"/></term>
+        ///         <term>Defines the string that separates integral digits from decimal digits.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the provider as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// <para/>
+        /// <h2>Hexadecimal format specifier ("X")</h2>
+        /// <para/>
+        /// The hexadecimal ("X") format is uses the same floating-point hexadecimal format as the JDK and is provided for interoperability
+        /// with Java 6 and higher. The hexadecimal form have an analogous syntax to the simple and scaled decimal forms with the following differences:
+        /// <list type="number">
+        ///     <item><description>Every hexadecimal floating point literal starts with a zero (0) and then an x or X.</description></item>
+        ///     <item><description>The digits of the number (but not the exponent part!) also include the hexadecimal digits a through f
+        ///     and their uppercase equivalents.</description></item>
+        ///     <item><description>The exponent is introduced by the letter p (or P) instead of an e or E. The exponent represents a
+        ///     scaling factor that is a power of 2 instead of a power of 10.</description></item>
+        /// </list>
+        /// <para/>
+        /// Here are some examples:
+        /// <code>
+        /// 0x0.0p0    // this is zero expressed in hexadecimal form (float)<br/>
+        /// 0xff.0p19   // this is 255.0 x 2^19 (double)
+        /// </code>
+        /// See the <see cref="ToHexString(IFormatProvider?)"/> for more information about the format.
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the provider as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// </remarks>
+        public static string ToString(float value, string? format)
         {
-            return ToString(value, format, null);
-            //return org.apache.harmony.luni.util.NumberConverter.convert(f);
+            return DotNetNumber.FormatSingle(value, format, null);
         }
 
-        /**
-        * Returns a string containing a concise, human-readable description of the
-        * specified float value.
-        * 
-        * @param f
-        *             the float to convert to a string.
-        * @return a printable representation of {@code f}.
-        */
-        public static string ToString(float value, IFormatProvider provider)
+        /// <summary>
+        /// Converts the numeric <paramref name="value"/> to its equivalent string representation using the specified
+        /// culture-specific format information.
+        /// </summary>
+        /// <param name="value">The <see cref="float"/> to convert.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>The string representation of the value as specified by <paramref name="provider"/>.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(float, IFormatProvider?)"/> method formats <paramref name="value"/> in
+        /// the default ("J") format of a specified culture. If you want to specify a different format or culture, use the
+        /// other overloads of the <see cref="ToString(float, string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float)"/> or <see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float, string?)"/> or <see cref="ToString(string?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, string?, IFormatProvider?)"/> or <see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string of the form:
+        /// <para/>
+        /// [sign]integral-digits[.[fractional-digits]][E[sign]exponential-digits]
+        /// <para/>
+        /// Optional elements are framed in square brackets ([ and ]). Elements that contain the term "digits" consist of a series of numeric
+        /// characters ranging from 0 to 9. The elements listed in the following table are supported.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign or positive sign symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>integral-digits</i></term>
+        ///         <term>A series of digits specifying the integral part of the number. Integral-digits can be absent if there
+        ///         are fractional-digits.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'.'</i></term>
+        ///         <term>A culture-specific decimal point symbol.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>fractional-digits</i></term>
+        ///         <term>A series of digits specifying the fractional part of the number.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>'E'</i></term>
+        ///         <term>An uppercase character 'E', indicating exponential (scientific) notation.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>exponential-digits</i></term>
+        ///         <term>A series of digits specifying an exponent.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Some examples of the return value are "100", "-123,456,789", "123.45E+6", "500", "3.1416", "600", "-0.123", and "-Infinity".
+        /// <para/>
+        /// The value is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
+        /// The provider parameter supplies culture-specific information used in formatting. If provider is <c>null</c>, the return value is formatted using
+        /// the <see cref="NumberFormatInfo"/> object for the current culture.
+        /// </remarks>
+        public static string ToString(float value, IFormatProvider? provider)
         {
-            return ToString(value, null, provider);
-            //return org.apache.harmony.luni.util.NumberConverter.convert(f);
+            return DotNetNumber.FormatSingle(value, null, provider);
         }
 
-        /**
-         * Returns a string containing a concise, human-readable description of the
-         * specified float value.
-         * 
-         * @param f
-         *             the float to convert to a string.
-         * @return a printable representation of {@code f}.
-         */
+        /// <summary>
+        /// Converts the numeric <paramref name="value"/> to its equivalent string representation using
+        /// the specified format and culture-specific format information.
+        /// </summary>
+        /// <param name="value">The <see cref="float"/> to convert.</param>
+        /// <param name="format">A numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>The string representation of the value as specified by <paramref name="format"/>
+        /// and <paramref name="provider"/>.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(float, string?, IFormatProvider?)"/> method formats <paramref name="value"/> in
+        /// a specified format of a specified culture. If you want to specify a different format or culture, use the
+        /// other overloads of the <see cref="ToString(float, string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float)"/> or <see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(float, IFormatProvider?)"/> or <see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(float, string?)"/> or <see cref="ToString(string?)"/></term>
+        ///     </item>
+        /// </list>
+        /// The return value can be <see cref="NumberFormatInfo.PositiveInfinitySymbol"/>, <see cref="NumberFormatInfo.NegativeInfinitySymbol"/>,
+        /// <see cref="NumberFormatInfo.NaNSymbol"/>, or the string representation of a number, as specified by <paramref name="format"/>.
+        /// <para/>
+        /// The <paramref name="format"/> parameter can be any valid standard numeric format specifier except for D, as well as any
+        /// combination of custom numeric format specifiers. If <paramref name="format"/> is <c>null</c> or an empty string, the return value for this
+        /// instance is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
+        /// The provider parameter supplies culture-specific information used in formatting. If <paramref name="provider"/> is <c>null</c>, the return value
+        /// is formatted using the <see cref="NumberFormatInfo"/> object for the current culture.
+        /// <para/>
+        /// In addition to the formats specified in the above articles, the Java ("J") format and ("X") hexadecimal format are also supported.
+        /// <para/>
+        /// <h2>Java format specifier ("J")</h2>
+        /// <para/>
+        /// The ("J") format follows the specification of the Java Language Specification. However, do note that it may not return exactly the same
+        /// number representation as the JDK due to precision and rounding differences. The ("J") format is similar to the ("R") format in that
+        /// it can be fully round tripped and it ignores the precision specifier. However, do note that on platforms lower than .NET Core 3.0, this
+        /// format can only be round-tripped using overloads of <see cref="Parse(string, IFormatProvider?)"/> and <see cref="TryParse(string?, out float)"/>
+        /// in J2N. On .NET Core 3.0 and higher overloads of <see cref="float.Parse(string)"/> and <see cref="float.TryParse(string, out float)"/> will
+        /// also successfully round trip the number back to the same set of bits.
+        /// <para/>
+        /// Although you can include a precision specifier, it is ignored. Round trips are given precedence over precision when using this specifier.
+        /// The result string is affected by the formatting information of the current <see cref="NumberFormatInfo"/> object. The following table lists
+        /// the <see cref="NumberFormatInfo"/> properties that control the formatting of the result string.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>NumberFormatInfo property</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NegativeSign"/></term>
+        ///         <term>Defines the string that indicates that a number is negative.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberFormatInfo.NumberDecimalSeparator"/></term>
+        ///         <term>Defines the string that separates integral digits from decimal digits.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the <paramref name="provider"/> as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// <para/>
+        /// <h2>Hexadecimal format specifier ("X")</h2>
+        /// <para/>
+        /// The hexadecimal ("X") format is uses the same floating-point hexadecimal format as the JDK and is provided for interoperability
+        /// with Java 6 and higher. The hexadecimal form have an analogous syntax to the simple and scaled decimal forms with the following differences:
+        /// <list type="number">
+        ///     <item><description>Every hexadecimal floating point literal starts with a zero (0) and then an x or X.</description></item>
+        ///     <item><description>The digits of the number (but not the exponent part!) also include the hexadecimal digits a through f
+        ///     and their uppercase equivalents.</description></item>
+        ///     <item><description>The exponent is introduced by the letter p (or P) instead of an e or E. The exponent represents a
+        ///     scaling factor that is a power of 2 instead of a power of 10.</description></item>
+        /// </list>
+        /// <para/>
+        /// Here are some examples:
+        /// <code>
+        /// 0x0.0p0    // this is zero expressed in hexadecimal form (float)<br/>
+        /// 0xff.0p19   // this is 255.0 x 2^19 (double)
+        /// </code>
+        /// See the <see cref="ToHexString(IFormatProvider?)"/> for more information about the format.
+        /// <para/>
+        /// Note that although this format follows the Java Language Specification, to exactly match the behavior as the JDK, it
+        /// must be in the invariant culture by specifying the <paramref name="provider"/> as <see cref="CultureInfo.InvariantCulture"/>,
+        /// <see cref="NumberFormatInfo.InvariantInfo"/> or <see cref="J2N.Text.StringFormatter.InvariantCulture"/>.
+        /// </remarks>
         public static string ToString(float value, string? format, IFormatProvider? provider)
         {
             return DotNetNumber.FormatSingle(value, format, provider);
-
-            //// Fast path for default format
-            //if (string.IsNullOrEmpty(format))
-            //{
-            //    return RyuSingle.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
-            //}
-
-            //return FormatSingleSlow(value, format, provider);
-
-            //static unsafe string FormatSingleSlow(float value, string? format, IFormatProvider provider)
-            //{
-            //    if (!value.IsFinite())
-            //    {
-            //        var info = NumberFormatInfo.GetInstance(provider);
-            //        if (double.IsNaN(value))
-            //        {
-            //            return info.NaNSymbol;
-            //        }
-
-            //        return value.IsNegative() ? info.NegativeInfinitySymbol : info.PositiveInfinitySymbol;
-            //    }
-
-            //    //char fmt = ParseFormatSpecifier(format, out int digits);
-            //    char fmt = format[0];
-            //    char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
-            //    if (fmtUpper == 'J')
-            //    {
-            //        return RyuSingle.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
-            //    }
-            //    else if (fmtUpper == 'X')
-            //    {
-            //        return value.ToHexString(provider);
-            //    }
-            //    else
-            //    {
-            //        return value.ToString(format, provider); // J2N TODO: Fix negative zero prior to .NET 3.0
-            //    }
-            //}
-
-
-            ////// Fast path: For standard .NET formatting using cultures, call IFormattable.ToString() to eliminate
-            ////// boxing associated with string.Format().
-            ////if (provider is null || provider is CultureInfo || provider is NumberFormatInfo)
-            ////{
-            ////    return f.ToString(provider);
-            ////}
-            ////// Built-in .NET numeric types don't support custom format providers, so we resort
-            ////// to using string.Format with some hacky format conversion in order to support them.
-            ////return string.Format(provider, "{0}", f);
-
-            //provider ??= CultureInfo.CurrentCulture;
-
-            //if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
-            //{
-            //    //return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
-            //    //return NumberConverter.Convert(f); // J2N TODO: Culture
-            //    //return RyuConversion.ToString(f);
-            //    return RyuSingle.ToString(f, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
-            //}
-
-            //return f.ToString(provider);
-            ////return org.apache.harmony.luni.util.NumberConverter.convert(f);
         }
+
+        #endregion ToString
 
         /////**
         //// * Parses the specified string as a float value.
