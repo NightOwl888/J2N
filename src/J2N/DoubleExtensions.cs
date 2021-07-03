@@ -271,22 +271,23 @@ namespace J2N
         public static string ToHexString(this double value, IFormatProvider? provider)
         {
             var info = NumberFormatInfo.GetInstance(provider);
+            if (!value.IsFinite())
+            {
+                if (double.IsNaN(value))
+                {
+                    return info.NaNSymbol;
+                }
+
+                return value.IsNegative() ? info.NegativeInfinitySymbol : info.PositiveInfinitySymbol;
+            }
+            return ToHexString(value, info, upperCase: false);
+        }
+
+        internal static string ToHexString(this double value, NumberFormatInfo info, bool upperCase)
+        {
             /*
              * Reference: http://en.wikipedia.org/wiki/IEEE_754
              */
-            if (double.IsNaN(value))
-            {
-                return info.NaNSymbol; //$NON-NLS-1$
-            }
-            if (double.IsPositiveInfinity(value))
-            {
-                return info.PositiveInfinitySymbol; //$NON-NLS-1$
-            }
-            if (double.IsNegativeInfinity(value))
-            {
-                return info.NegativeInfinitySymbol; //$NON-NLS-1$
-            }
-
             long bitValue = BitConversion.DoubleToInt64Bits(value);
 
             bool negative = (bitValue & unchecked((long)0x8000000000000000L)) != 0;
@@ -298,7 +299,10 @@ namespace J2N
 
             if (exponent == 0 && significand == 0)
             {
-                return string.Concat(negative ? info.NegativeSign : "", "0x0", info.NumberDecimalSeparator, "0p0"); //$NON-NLS-1$ //$NON-NLS-2$
+                if (upperCase)
+                    return string.Concat(negative ? info.NegativeSign : "", "0X0", info.NumberDecimalSeparator, "0P0"); //$NON-NLS-1$ //$NON-NLS-2$
+                else
+                    return string.Concat(negative ? info.NegativeSign : "", "0x0", info.NumberDecimalSeparator, "0p0"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
             StringBuilder hexString = new StringBuilder(10);
@@ -306,7 +310,7 @@ namespace J2N
             {
                 hexString.Append(info.NegativeSign);
             }
-            hexString.Append("0x"); //$NON-NLS-1$
+            hexString.Append(upperCase ? "0X" : "0x"); //$NON-NLS-1$
 
             if (exponent == 0)
             { // denormal (subnormal) value
@@ -321,8 +325,7 @@ namespace J2N
                     significand = significand.TripleShift(4);
                     fractionDigits--;
                 }
-                // this assumes long.ToHexString() returns lowercase characters
-                string hexSignificand = significand.ToHexString();
+                string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
 
                 // if there are digits left, then insert some '0' chars first
                 if (significand != 0 && fractionDigits > hexSignificand.Length)
@@ -334,7 +337,7 @@ namespace J2N
                     }
                 }
                 hexString.Append(hexSignificand);
-                hexString.Append("p-1022"); //$NON-NLS-1$
+                hexString.Append(upperCase ? "P-1022" : "p-1022"); //$NON-NLS-1$
             }
             else
             { // normal value
@@ -349,8 +352,7 @@ namespace J2N
                     significand = significand.TripleShift(4);
                     fractionDigits--;
                 }
-                // this assumes long.ToHexString() returns lowercase characters
-                string hexSignificand = significand.ToHexString();
+                string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
 
                 // if there are digits left, then insert some '0' chars first
                 if (significand != 0 && fractionDigits > hexSignificand.Length)
@@ -363,7 +365,7 @@ namespace J2N
                 }
 
                 hexString.Append(hexSignificand);
-                hexString.Append('p');
+                hexString.Append(upperCase ? "P" : "p"); //$NON-NLS-1$
                 // remove exponent's 'bias' and convert to a string
                 hexString.Append((exponent - 1023).ToString(CultureInfo.InvariantCulture));
             }
