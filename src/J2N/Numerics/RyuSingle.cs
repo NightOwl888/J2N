@@ -203,36 +203,41 @@ namespace J2N.Numerics
         //public static void Main(string[] args)
         //{
         //    float f = 0.33007812f;
-        //    string result = FloatToString(f, RoundingMode.RoundEven);
+        //    string result = ToString(f, RoundingMode.RoundEven);
         //    Console.WriteLine(result + " " + f);
         //}
 
-        /// <summary>
-        /// J2N TODO: Docs
-        /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        public static string FloatToString(float value)
+        public static string ToString(float value, NumberFormatInfo info)
         {
-            return FloatToString(value, RoundingMode.RoundEven);
+            return ToString(value, info, RoundingMode.RoundEven, upperCase: true);
         }
 
-        /// <summary>
-        /// J2N TODO: Docs
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="roundingMode"></param>
-        /// <returns></returns>
-        public static string FloatToString(float value, RoundingMode roundingMode)
+        public static string ToString(float value, NumberFormatInfo info, bool upperCase)
+        {
+            return ToString(value, info, RoundingMode.RoundEven, upperCase);
+        }
+
+        public static string ToString(float value, NumberFormatInfo info, RoundingMode roundingMode)
+        {
+            return ToString(value, info, roundingMode, upperCase: true);
+        }
+
+        public static string ToString(float value, NumberFormatInfo info, RoundingMode roundingMode, bool upperCase)
         {
             // Step 1: Decode the floating point number, and unify normalized and subnormal cases.
             // First, handle all the trivial cases.
-            if (float.IsNaN(value)) return "NaN";
-            if (value == float.PositiveInfinity) return "Infinity";
-            if (value == float.NegativeInfinity) return "-Infinity";
+            if (!value.IsFinite())
+            {
+                if (float.IsNaN(value))
+                {
+                    return info.NaNSymbol;
+                }
+
+                return value.IsNegative() ? info.NegativeInfinitySymbol : info.PositiveInfinitySymbol;
+            }
             int bits = BitConversion.SingleToRawInt32Bits(value); // J2N: Since we have checked for NaN above, it is quicker to call SingleToRawInt32Bits
-            if (bits == 0) return "0.0";
-            if (bits == unchecked((int)0x80000000)) return "-0.0";
+            if (bits == 0) return string.Concat("0", info.NumberDecimalSeparator, "0");
+            if (bits == unchecked((int)0x80000000)) return string.Concat(info.NegativeSign, "0", info.NumberDecimalSeparator, "0");
 
             // Otherwise extract the mantissa and exponent bits and run the full algorithm.
             int ieeeExponent = (bits >> FLOAT_MANTISSA_BITS) & FLOAT_EXPONENT_MASK;
@@ -456,11 +461,20 @@ namespace J2N.Numerics
 
             // Step 5: Print the decimal representation.
             // We follow Float.toString semantics here.
-            char[] result = new char[15];
+            //char[] result = new char[15];
+            string negSign = info.NegativeSign, decimalSeparator = info.NumberDecimalSeparator;
+            int negSignLength = (sign ? negSign.Length : 0), decimalSeparatorLength = decimalSeparator.Length;
+            // For the exp + 1 >= olength case, we use the max length of 15. The value is derived from
+            // the literal 11 + negSignLength + decimalSeparatorLength + 2.
+            char[] result = new char[Math.Min((exp < 0 ? dplength + 2 : (exp + 1 >= olength ? 11 : olength)) + negSignLength + decimalSeparatorLength + (scientificNotation ? 4 : 2), 13 + negSignLength + decimalSeparatorLength)];
             int index = 0;
             if (sign)
             {
-                result[index++] = '-';
+                //result[index++] = '-';
+                for (int i = 0; i < negSignLength; i++)
+                {
+                    result[index++] = negSign[i];
+                }
             }
 
             if (scientificNotation)
@@ -469,18 +483,24 @@ namespace J2N.Numerics
                 for (int i = 0; i < olength - 1; i++)
                 {
                     int c = output % 10; output /= 10;
-                    result[index + olength - i] = (char)('0' + c);
+                    //result[index + olength - i] = (char)('0' + c);
+                    result[index + olength - i + (decimalSeparatorLength - 1)] = (char)('0' + c);
                 }
                 result[index] = (char)('0' + output % 10);
-                result[index + 1] = '.';
-                index += olength + 1;
+                //result[index + 1] = '.';
+                //index += olength + 1;
+                for (int i = 0; i < decimalSeparatorLength; i++)
+                {
+                    result[index + 1 + i] = decimalSeparator[i];
+                }
+                index += olength + decimalSeparatorLength;
                 if (olength == 1)
                 {
                     result[index++] = '0';
                 }
 
                 // Print 'E', the exponent sign, and the exponent, which has at most two digits.
-                result[index++] = 'E';
+                result[index++] = upperCase ? 'E' : 'e';
                 if (exp < 0)
                 {
                     result[index++] = '-';
@@ -499,7 +519,11 @@ namespace J2N.Numerics
                 {
                     // Decimal dot is before any of the digits.
                     result[index++] = '0';
-                    result[index++] = '.';
+                    //result[index++] = '.';
+                    for (int i = 0; i < decimalSeparatorLength; i++)
+                    {
+                        result[index++] = decimalSeparator[i];
+                    }
                     for (int i = -1; i > exp; i--)
                     {
                         result[index++] = '0';
@@ -525,24 +549,35 @@ namespace J2N.Numerics
                     {
                         result[index++] = '0';
                     }
-                    result[index++] = '.';
+                    //result[index++] = '.';
+                    for (int i = 0; i < decimalSeparatorLength; i++)
+                    {
+                        result[index++] = decimalSeparator[i];
+                    }
                     result[index++] = '0';
                 }
                 else
                 {
                     // Decimal dot is somewhere between the digits.
-                    int current = index + 1;
+                    //int current = index + 1;
+                    int current = index + decimalSeparatorLength;
                     for (int i = 0; i < olength; i++)
                     {
                         if (olength - i - 1 == exp)
                         {
-                            result[current + olength - i - 1] = '.';
-                            current--;
+                            //result[current + olength - i - 1] = '.';
+                            //current--;
+                            for (int j = 0; j < decimalSeparatorLength; j++)
+                            {
+                                result[current + olength - i - decimalSeparatorLength + j] = decimalSeparator[j];
+                            }
+                            current -= decimalSeparatorLength;
                         }
                         result[current + olength - i - 1] = (char)('0' + output % 10);
                         output /= 10;
                     }
-                    index += olength + 1;
+                    //index += olength + 1;
+                    index += olength + decimalSeparatorLength;
                 }
             }
             return new string(result, 0, index);

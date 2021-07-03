@@ -1243,25 +1243,41 @@ namespace J2N.Numerics
         {
             DEBUG = true;
             double value = BitConversion.Int64BitsToDouble(0x7fefffffffffffffL);
-            string result = DoubleToString(value);
+            string result = ToString(value, NumberFormatInfo.InvariantInfo);
             Console.WriteLine(result + " " + value);
         }
 
-        public static string DoubleToString(double value)
+        public static string ToString(double value, NumberFormatInfo info)
         {
-            return DoubleToString(value, RoundingMode.RoundEven);
+            return ToString(value, info, RoundingMode.RoundEven, upperCase: true);
         }
 
-        public static string DoubleToString(double value, RoundingMode roundingMode)
+        public static string ToString(double value, NumberFormatInfo info, bool upperCase)
+        {
+            return ToString(value, info, RoundingMode.RoundEven, upperCase);
+        }
+
+        public static string ToString(double value, NumberFormatInfo info, RoundingMode roundingMode)
+        {
+            return ToString(value, info, roundingMode, upperCase: true);
+        }
+
+        public static string ToString(double value, NumberFormatInfo info, RoundingMode roundingMode, bool upperCase)
         {
             // Step 1: Decode the floating point number, and unify normalized and subnormal cases.
             // First, handle all the trivial cases.
-            if (double.IsNaN(value)) return "NaN";
-            if (value == double.PositiveInfinity) return "Infinity";
-            if (value == double.NegativeInfinity) return "-Infinity";
-            long bits = BitConversion.DoubleToInt64Bits(value); // J2N: Since we have checked for NaN above, it is quicker to call DoubleToRawInt64Bits
-            if (bits == 0) return "0.0";
-            if (bits == unchecked((long)0x8000000000000000L)) return "-0.0";
+            if (!value.IsFinite())
+            {
+                if (double.IsNaN(value))
+                {
+                    return info.NaNSymbol;
+                }
+
+                return value.IsNegative() ? info.NegativeInfinitySymbol : info.PositiveInfinitySymbol;
+            }
+            long bits = BitConversion.DoubleToRawInt64Bits(value); // J2N: Since we have checked for NaN above, it is quicker to call DoubleToRawInt64Bits
+            if (bits == 0) return string.Concat("0", info.NumberDecimalSeparator, "0");
+            if (bits == unchecked((long)0x8000000000000000L)) return string.Concat(info.NegativeSign, "0", info.NumberDecimalSeparator, "0");
 
             // Otherwise extract the mantissa and exponent bits and run the full algorithm.
             int ieeeExponent = (int)((bits.TripleShift(DOUBLE_MANTISSA_BITS)) & DOUBLE_EXPONENT_MASK);
@@ -1391,10 +1407,12 @@ namespace J2N.Numerics
                 dp = MulPow5divPow2(mp, i, j);
                 dm = MulPow5divPow2(mm, i, j);
                 e10 = q + e2;
+#if DEBUG
                 if (DEBUG)
                 {
                     Console.WriteLine(mv + " * 5^" + (-e2) + " / 10^" + q);
                 }
+#endif
                 if (q <= 1)
                 {
                     dvIsTrailingZeros = true;
@@ -1520,11 +1538,20 @@ namespace J2N.Numerics
 
             // Step 5: Print the decimal representation.
             // We follow Double.toString semantics here.
-            char[] result = new char[24];
+            //char[] result = new char[24];
+            string negSign = info.NegativeSign, decimalSeparator = info.NumberDecimalSeparator;
+            int negSignLength = (sign ? negSign.Length : 0), decimalSeparatorLength = decimalSeparator.Length;
+            // For the exp + 1 >= olength case, we use the max length of 24. The value is derived from
+            // the literal 20 + negSignLength + decimalSeparatorLength + 2.
+            char[] result = new char[Math.Min((exp < 0 ? vplength : (exp + 1 >= olength ? 20 : olength)) + negSignLength + decimalSeparatorLength + (scientificNotation ? 5 : 2), 22 + negSignLength + decimalSeparatorLength)];
             int index = 0;
             if (sign)
             {
-                result[index++] = '-';
+                //result[index++] = '-';
+                for (int i = 0; i < negSignLength; i++)
+                {
+                    result[index++] = negSign[i];
+                }
             }
 
             // Values in the interval [1E-3, 1E7) are special.
@@ -1534,18 +1561,24 @@ namespace J2N.Numerics
                 for (int i = 0; i < olength - 1; i++)
                 {
                     int c = (int)(output % 10); output /= 10;
-                    result[index + olength - i] = (char)('0' + c);
+                    //result[index + olength - i] = (char)('0' + c);
+                    result[index + olength - i + (decimalSeparatorLength - 1)] = (char)('0' + c);
                 }
                 result[index] = (char)('0' + output % 10);
-                result[index + 1] = '.';
-                index += olength + 1;
+                //result[index + 1] = '.';
+                //index += olength + 1;
+                for (int i = 0; i < decimalSeparatorLength; i++)
+                {
+                    result[index + 1 + i] = decimalSeparator[i];
+                }
+                index += olength + decimalSeparatorLength;
                 if (olength == 1)
                 {
                     result[index++] = '0';
                 }
 
                 // Print 'E', the exponent sign, and the exponent, which has at most three digits.
-                result[index++] = 'E';
+                result[index++] = upperCase ? 'E' : 'e';
                 if (exp < 0)
                 {
                     result[index++] = '-';
@@ -1571,7 +1604,11 @@ namespace J2N.Numerics
                 {
                     // Decimal dot is before any of the digits.
                     result[index++] = '0';
-                    result[index++] = '.';
+                    //result[index++] = '.';
+                    for (int i = 0; i < decimalSeparatorLength; i++)
+                    {
+                        result[index++] = decimalSeparator[i];
+                    }
                     for (int i = -1; i > exp; i--)
                     {
                         result[index++] = '0';
@@ -1597,24 +1634,35 @@ namespace J2N.Numerics
                     {
                         result[index++] = '0';
                     }
-                    result[index++] = '.';
+                    //result[index++] = '.';
+                    for (int i = 0; i < decimalSeparatorLength; i++)
+                    {
+                        result[index++] = decimalSeparator[i];
+                    }
                     result[index++] = '0';
                 }
                 else
                 {
                     // Decimal dot is somewhere between the digits.
-                    int current = index + 1;
+                    //int current = index + 1;
+                    int current = index + decimalSeparatorLength;
                     for (int i = 0; i < olength; i++)
                     {
                         if (olength - i - 1 == exp)
                         {
-                            result[current + olength - i - 1] = '.';
-                            current--;
+                            //result[current + olength - i - 1] = '.';
+                            //current--;
+                            for (int j = 0; j < decimalSeparatorLength; j++)
+                            {
+                                result[current + olength - i - decimalSeparatorLength + j] = decimalSeparator[j];
+                            }
+                            current -= decimalSeparatorLength;
                         }
                         result[current + olength - i - 1] = (char)('0' + output % 10);
                         output /= 10;
                     }
-                    index += olength + 1;
+                    //index += olength + 1;
+                    index += olength + decimalSeparatorLength;
                 }
                 return new string(result, 0, index);
             }

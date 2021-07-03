@@ -25,7 +25,7 @@ namespace J2N.Numerics
 
         internal override string f(float value, RoundingMode roundingMode)
         {
-            return RyuSingle.FloatToString(value, roundingMode);
+            return RyuSingle.ToString(value, NumberFormatInfo.InvariantInfo, roundingMode);
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace J2N.Numerics
         {
             float f = .123f;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             //assertEquals(".123", s);
             assertEquals("0.123", s); // Expected behavior of JDK 1.8
         }
@@ -43,7 +43,7 @@ namespace J2N.Numerics
         {
             float f = 123.45f;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             assertEquals("123.45", s); // Expected behavior of JDK 1.8
         }
 
@@ -53,7 +53,7 @@ namespace J2N.Numerics
         {
             float f = 1e7f;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             assertEquals("1.0E7", s); // Expected behavior of JDK 1.8
         }
 
@@ -62,7 +62,7 @@ namespace J2N.Numerics
         {
             float f = 1e7f + 1;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             assertEquals("1.0000001E7", s); // Expected behavior of JDK 1.8
         }
 
@@ -72,7 +72,7 @@ namespace J2N.Numerics
         {
             float f = 1e7f - 1;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             //assertEquals("9999999", s);
             assertEquals("9999999.0", s); // Expected behavior of JDK 1.8
         }
@@ -86,7 +86,7 @@ namespace J2N.Numerics
         {
             float f = 12.90898f;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             assertEquals("12.90898", s); // Expected behavior of JDK 1.8
         }
 
@@ -99,7 +99,7 @@ namespace J2N.Numerics
         {
             float f = 1.0e19f;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             assertEquals("1.0E19", s); // Expected behavior of JDK 1.8
         }
 
@@ -112,7 +112,7 @@ namespace J2N.Numerics
         {
             float f = 1.0E-36f;
 
-            string s = RyuSingle.FloatToString(f);
+            string s = RyuSingle.ToString(f, NumberFormatInfo.InvariantInfo);
             assertEquals("1.0E-36", s); // Expected behavior of JDK 1.8
         }
 
@@ -128,7 +128,7 @@ namespace J2N.Numerics
             for (int i = 0; i < f.Length; i++)
             {
                 OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(f[i]);
-                assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: ofd.toJavaFormatString(), RyuSingle.FloatToString(f[i]));
+                assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: ofd.toJavaFormatString(), RyuSingle.ToString(f[i], NumberFormatInfo.InvariantInfo, RoundingMode.Conservative));
             }
         }
 
@@ -145,7 +145,7 @@ namespace J2N.Numerics
         //        for (int j = 0; j < f.Length; j++)
         //        {
         //            OldFloatingDecimalForTest ofd = new OldFloatingDecimalForTest(f[j]);
-        //            assertEquals($"Original value: {f[j].ToString("R")} or {f[j].ToHexString()} hexadecimal", expected: ofd.toJavaFormatString(), RyuFloat.FloatToString(f[j]));
+        //            assertEquals($"Original value: {f[j].ToString("R")} or {f[j].ToHexString()} hexadecimal", expected: ofd.toJavaFormatString(), RyuFloat.ToString(f[j]));
         //        }
         //    }
         //}
@@ -161,10 +161,10 @@ namespace J2N.Numerics
 
             for (int i = 0; i < f.Length; i++)
             {
-                //assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[i]), actual: RyuFloat.FloatToString(f[i]));
+                //assertEquals($"Original value: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[i]), actual: RyuFloat.ToString(f[i]));
 
                 // Check for round-trip
-                assertEquals($"Failed to round trip: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[i]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.FloatToString(f[i]))));
+                assertEquals($"Failed to round trip: {f[i].ToString("R")} or {f[i].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[i]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.ToString(f[i], NumberFormatInfo.InvariantInfo, RoundingMode.Conservative))));
             }
         }
 
@@ -180,13 +180,13 @@ namespace J2N.Numerics
                 };
                 for (int j = 0; j < f.Length; j++)
                 {
-                    //assertEquals($"Original value: {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[j]), actual: RyuFloat.FloatToString(f[j], RoundingMode.RoundEven));
+                    //assertEquals($"Original value: {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", expected: FloatingDecimal.ToJavaFormatString(f[j]), actual: RyuFloat.ToString(f[j], RoundingMode.RoundEven));
 
                     // Check for round-trip
-                    assertEquals($"Failed to round trip: {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.FloatToString(f[j], RoundingMode.RoundEven))));
+                    assertEquals($"Failed to round trip: {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(FloatingDecimal.ParseFloat(RyuSingle.ToString(f[j], NumberFormatInfo.InvariantInfo, RoundingMode.Conservative))));
 
                     // Check for round-trip (.NET)
-                    assertEquals($"Failed to round trip (.NET): {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(float.Parse(RyuSingle.FloatToString(f[j], RoundingMode.RoundEven), CultureInfo.InvariantCulture)));
+                    assertEquals($"Failed to round trip (.NET): {f[j].ToString("R")} or {f[j].ToHexString(NumberFormatInfo.InvariantInfo)} hexadecimal", BitConversion.SingleToRawInt32Bits(f[j]), BitConversion.SingleToRawInt32Bits(Single.Parse(RyuSingle.ToString(f[j], NumberFormatInfo.InvariantInfo, RoundingMode.Conservative), CultureInfo.InvariantCulture)));
                 }
             }
         }
