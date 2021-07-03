@@ -2646,7 +2646,7 @@ namespace J2N.Numerics
 
             var number = new DoubleNumberBuffer(value.Length);
 
-            if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
+            if (!TryStringToFloatingPointHexNumber(value, styles, number, info!))
             {
                 string valueTrim = value.Trim();
 
@@ -2654,7 +2654,7 @@ namespace J2N.Numerics
                 // we don't so we'll check the existing cases first and then handle `PositiveSign` +
                 // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
 
-                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
+                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info!.PositiveInfinitySymbol))
                 {
                     result = double.PositiveInfinity;
                 }
@@ -3008,7 +3008,7 @@ namespace J2N.Numerics
 
             var number = new SingleHexNumberBuffer(value.Length);
 
-            if (!TryStringToFloatingPointHexNumber(value, styles, number, info))
+            if (!TryStringToFloatingPointHexNumber(value, styles, number, info!))
             {
                 string valueTrim = value.Trim();
 
@@ -3020,7 +3020,7 @@ namespace J2N.Numerics
                 // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
                 // that case so that we don't start parsing things like `++infini`.
 
-                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
+                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info!.PositiveInfinitySymbol))
                 {
                     result = float.PositiveInfinity;
                 }
@@ -3095,7 +3095,7 @@ namespace J2N.Numerics
             fixed (char* stringPointer = value)
             {
                 char* p = stringPointer;
-                if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info)
+                if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info!)
                     || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
                 {
                     number.CheckConsistency();
@@ -3132,7 +3132,7 @@ namespace J2N.Numerics
             fixed (char* stringPointer = value)
             {
                 char* p = stringPointer;
-                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info)
+                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info!)
                     || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
                 {
                     //number.CheckConsistency();
