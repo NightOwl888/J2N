@@ -21,13 +21,6 @@ namespace J2N.Benchmarks
 
 
         [Benchmark]
-        public void Format_Double_Small_NumberConverter()
-        {
-            for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.NumberConverter.Convert(SmallDouble);
-        }
-
-        [Benchmark]
         public void Format_Double_Small_Ryu_Conservative()
         {
             for (int i = 0; i < Iterations; i++)
@@ -111,14 +104,6 @@ namespace J2N.Benchmarks
         {
             for (int i = 0; i < Iterations; i++)
                 J2N.Numerics.Double.ToString(double.MaxValue, "G", NumberFormatInfo.InvariantInfo);
-        }
-
-
-        [Benchmark]
-        public void Format_Single_Small_NumberConverter()
-        {
-            for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.NumberConverter.Convert(SmallSingle);
         }
 
 
