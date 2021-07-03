@@ -31,7 +31,7 @@ namespace J2N.Benchmarks
         public void Format_Double_Small_Ryu_Conservative()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.RyuDouble.DoubleToString(SmallDouble, Numerics.RoundingMode.Conservative);
+                J2N.Numerics.RyuDouble.ToString(SmallDouble, NumberFormatInfo.InvariantInfo, Numerics.RoundingMode.Conservative);
         }
 
         [Benchmark]
@@ -42,10 +42,25 @@ namespace J2N.Benchmarks
         }
 
         [Benchmark]
+        public void Format_Double_Small_J2N_J_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Double.ToString(SmallDouble, NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Double_Small_J2N_G_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Double.ToString(SmallDouble, "G", NumberFormatInfo.InvariantInfo);
+        }
+
+
+        [Benchmark]
         public void Format_Double_Large_Ryu_Conservative()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.RyuDouble.DoubleToString(LargeDouble, Numerics.RoundingMode.Conservative);
+                J2N.Numerics.RyuDouble.ToString(LargeDouble, NumberFormatInfo.InvariantInfo, Numerics.RoundingMode.Conservative);
         }
 
         [Benchmark]
@@ -56,11 +71,48 @@ namespace J2N.Benchmarks
         }
 
         [Benchmark]
+        public void Format_Double_Large_J2N_J_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Double.ToString(LargeDouble, NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Double_Large_J2N_G_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Double.ToString(LargeDouble, "G", NumberFormatInfo.InvariantInfo);
+        }
+
+
+        [Benchmark]
         public void Format_Double_MaxValue_Ryu_Conservative()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.RyuDouble.DoubleToString(double.MaxValue, Numerics.RoundingMode.Conservative);
+                J2N.Numerics.RyuDouble.ToString(double.MaxValue, NumberFormatInfo.InvariantInfo, Numerics.RoundingMode.Conservative);
         }
+
+        [Benchmark]
+        public void Format_Double_MaxValue_DotNet()
+        {
+            for (int i = 0; i < Iterations; i++)
+                double.MaxValue.ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Double_MaxValue_J2N_J_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Double.ToString(double.MaxValue, NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Double_MaxValue_J2N_G_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Double.ToString(double.MaxValue, "G", NumberFormatInfo.InvariantInfo);
+        }
+
 
         [Benchmark]
         public void Format_Single_Small_NumberConverter()
@@ -69,11 +121,41 @@ namespace J2N.Benchmarks
                 J2N.Numerics.NumberConverter.Convert(SmallSingle);
         }
 
+
+        [Benchmark]
+        public void Format_Single_Small_Ryu_Conservative()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.RyuSingle.ToString(SmallSingle, NumberFormatInfo.InvariantInfo, Numerics.RoundingMode.Conservative);
+        }
+
+        [Benchmark]
+        public void Format_Single_Small_DotNet()
+        {
+            for (int i = 0; i < Iterations; i++)
+                LargeSingle.ToString(NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Single_Small_J2N_J_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Single.ToString(LargeSingle, NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Single_Small_J2N_G_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Single.ToString(LargeSingle, "G", NumberFormatInfo.InvariantInfo);
+        }
+
+
         [Benchmark]
         public void Format_Single_Large_Ryu_Conservative()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.RyuSingle.FloatToString(LargeSingle, Numerics.RoundingMode.Conservative);
+                J2N.Numerics.RyuSingle.ToString(LargeSingle, NumberFormatInfo.InvariantInfo, Numerics.RoundingMode.Conservative);
         }
 
         [Benchmark]
@@ -84,10 +166,25 @@ namespace J2N.Benchmarks
         }
 
         [Benchmark]
+        public void Format_Single_Large_J2N_J_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Single.ToString(LargeSingle, NumberFormatInfo.InvariantInfo);
+        }
+
+        [Benchmark]
+        public void Format_Single_Large_J2N_G_Format()
+        {
+            for (int i = 0; i < Iterations; i++)
+                J2N.Numerics.Single.ToString(LargeSingle, "G", NumberFormatInfo.InvariantInfo);
+        }
+
+
+        [Benchmark]
         public void Format_Single_MaxValue_Ryu_Conservative()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.RyuSingle.FloatToString(float.MaxValue, Numerics.RoundingMode.Conservative);
+                J2N.Numerics.RyuSingle.ToString(float.MaxValue, NumberFormatInfo.InvariantInfo, Numerics.RoundingMode.Conservative);
         }
 
         [Benchmark]
@@ -98,18 +195,20 @@ namespace J2N.Benchmarks
         }
 
         [Benchmark]
-        public void Format_Single_Small_Ryu_Conservative()
+        public void Format_Single_MaxValue_J2N_J_Format()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.RyuSingle.FloatToString(SmallSingle, Numerics.RoundingMode.Conservative);
+                J2N.Numerics.Single.ToString(float.MaxValue, NumberFormatInfo.InvariantInfo);
         }
 
         [Benchmark]
-        public void Format_Single_Small_DotNet()
+        public void Format_Single_MaxValue_J2N_G_Format()
         {
             for (int i = 0; i < Iterations; i++)
-                SmallSingle.ToString(NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.Single.ToString(float.MaxValue, "G", NumberFormatInfo.InvariantInfo);
         }
+
+
 
 
         //[Benchmark]
