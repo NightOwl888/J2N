@@ -2143,9 +2143,38 @@ namespace J2N.Numerics
          *             the float to convert to a string.
          * @return a printable representation of {@code f}.
          */
-        public static string ToString(float f)
+        public static string ToString(float value)
         {
-            return ToString(f, J2N.Text.StringFormatter.CurrentCulture);
+            return ToString(value, null, null);
+            //return ToString(value, null, J2N.Text.StringFormatter.CurrentCulture);
+            //return org.apache.harmony.luni.util.NumberConverter.convert(f);
+        }
+
+        /**
+        * Returns a string containing a concise, human-readable description of the
+        * specified float value.
+        * 
+        * @param f
+        *             the float to convert to a string.
+        * @return a printable representation of {@code f}.
+        */
+        public static string ToString(float value, string format)
+        {
+            return ToString(value, format, null);
+            //return org.apache.harmony.luni.util.NumberConverter.convert(f);
+        }
+
+        /**
+        * Returns a string containing a concise, human-readable description of the
+        * specified float value.
+        * 
+        * @param f
+        *             the float to convert to a string.
+        * @return a printable representation of {@code f}.
+        */
+        public static string ToString(float value, IFormatProvider provider)
+        {
+            return ToString(value, null, provider);
             //return org.apache.harmony.luni.util.NumberConverter.convert(f);
         }
 
@@ -2157,30 +2186,71 @@ namespace J2N.Numerics
          *             the float to convert to a string.
          * @return a printable representation of {@code f}.
          */
-        public static string ToString(float f, IFormatProvider? provider)
+        public static string ToString(float value, string? format, IFormatProvider? provider)
         {
-            //// Fast path: For standard .NET formatting using cultures, call IFormattable.ToString() to eliminate
-            //// boxing associated with string.Format().
-            //if (provider is null || provider is CultureInfo || provider is NumberFormatInfo)
+            return DotNetNumber.FormatSingle(value, format, provider);
+
+            //// Fast path for default format
+            //if (string.IsNullOrEmpty(format))
             //{
-            //    return f.ToString(provider);
+            //    return RyuSingle.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
             //}
-            //// Built-in .NET numeric types don't support custom format providers, so we resort
-            //// to using string.Format with some hacky format conversion in order to support them.
-            //return string.Format(provider, "{0}", f);
 
-            provider ??= CultureInfo.CurrentCulture;
+            //return FormatSingleSlow(value, format, provider);
 
-            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
-            {
-                //return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
-                //return NumberConverter.Convert(f); // J2N TODO: Culture
-                //return RyuConversion.FloatToString(f);
-                return RyuSingle.FloatToString(f, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
-            }
+            //static unsafe string FormatSingleSlow(float value, string? format, IFormatProvider provider)
+            //{
+            //    if (!value.IsFinite())
+            //    {
+            //        var info = NumberFormatInfo.GetInstance(provider);
+            //        if (double.IsNaN(value))
+            //        {
+            //            return info.NaNSymbol;
+            //        }
 
-            return f.ToString(provider);
-            //return org.apache.harmony.luni.util.NumberConverter.convert(f);
+            //        return value.IsNegative() ? info.NegativeInfinitySymbol : info.PositiveInfinitySymbol;
+            //    }
+
+            //    //char fmt = ParseFormatSpecifier(format, out int digits);
+            //    char fmt = format[0];
+            //    char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
+            //    if (fmtUpper == 'J')
+            //    {
+            //        return RyuSingle.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
+            //    }
+            //    else if (fmtUpper == 'X')
+            //    {
+            //        return value.ToHexString(provider);
+            //    }
+            //    else
+            //    {
+            //        return value.ToString(format, provider); // J2N TODO: Fix negative zero prior to .NET 3.0
+            //    }
+            //}
+
+
+            ////// Fast path: For standard .NET formatting using cultures, call IFormattable.ToString() to eliminate
+            ////// boxing associated with string.Format().
+            ////if (provider is null || provider is CultureInfo || provider is NumberFormatInfo)
+            ////{
+            ////    return f.ToString(provider);
+            ////}
+            ////// Built-in .NET numeric types don't support custom format providers, so we resort
+            ////// to using string.Format with some hacky format conversion in order to support them.
+            ////return string.Format(provider, "{0}", f);
+
+            //provider ??= CultureInfo.CurrentCulture;
+
+            //if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
+            //{
+            //    //return FloatingDecimal.ToJavaFormatString(f); // J2N TODO: Culture
+            //    //return NumberConverter.Convert(f); // J2N TODO: Culture
+            //    //return RyuConversion.ToString(f);
+            //    return RyuSingle.ToString(f, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
+            //}
+
+            //return f.ToString(provider);
+            ////return org.apache.harmony.luni.util.NumberConverter.convert(f);
         }
 
         /////**
@@ -2371,7 +2441,7 @@ namespace J2N.Numerics
         /// </list>
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A hex string representing <paramref name="value"/>.</returns>
+        /// <returns>A hex string representing the current instance.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif

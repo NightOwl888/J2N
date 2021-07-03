@@ -286,6 +286,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Format specifier was invalid..
+        /// </summary>
+        internal static string Argument_BadFormatSpecifier {
+            get {
+                return ResourceManager.GetString("Argument_BadFormatSpecifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to collection must not be the same instance as this..
         /// </summary>
         internal static string Argument_CollectionMustNotBeThis {

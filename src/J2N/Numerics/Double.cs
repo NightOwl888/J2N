@@ -2130,8 +2130,8 @@ namespace J2N.Numerics
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
-        //@Override
-        //public String toString()
+        ////@Override
+        //public override string ToString()
         //{
         //    //return Double.toString(value);
         //}
@@ -2150,9 +2150,9 @@ namespace J2N.Numerics
          *             the double to convert to a string.
          * @return a printable representation of {@code d}.
          */
-        public static string ToString(double d)
+        public static string ToString(double value)
         {
-            return ToString(d, J2N.Text.StringFormatter.CurrentCulture);
+            return ToString(value, null, null);
             //return org.apache.harmony.luni.util.NumberConverter.convert(d);
         }
 
@@ -2164,18 +2164,84 @@ namespace J2N.Numerics
          *             the double to convert to a string.
          * @return a printable representation of {@code d}.
          */
-        public static string ToString(double d, IFormatProvider? provider)
+        public static string ToString(double value, IFormatProvider? provider)
         {
-            provider ??= CultureInfo.CurrentCulture;
+            return ToString(value, null, provider);
+        }
 
-            if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
-            {
-                //return FloatingDecimal.ToJavaFormatString(d); // J2N TODO: Culture
-                return RyuDouble.DoubleToString(d, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
-            }
+        /**
+         * Returns a string containing a concise, human-readable description of the
+         * specified double value.
+         * 
+         * @param d
+         *             the double to convert to a string.
+         * @return a printable representation of {@code d}.
+         */
+        public static string ToString(double value, string? format)
+        {
+            return ToString(value, format, null);
+        }
 
-            return d.ToString(provider);
-            //return org.apache.harmony.luni.util.NumberConverter.convert(d);
+        /**
+         * Returns a string containing a concise, human-readable description of the
+         * specified double value.
+         * 
+         * @param d
+         *             the double to convert to a string.
+         * @return a printable representation of {@code d}.
+         */
+        public static string ToString(double value, string? format, IFormatProvider? provider)
+        {
+            return DotNetNumber.FormatDouble(value, format, provider);
+
+            //// Fast path for default format
+            //if (string.IsNullOrEmpty(format))
+            //{
+            //    return RyuDouble.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
+            //}
+
+            //return FormatDoubleSlow(value, format, provider);
+            
+            //static unsafe string FormatDoubleSlow(double value, string? format, IFormatProvider provider)
+            //{
+            //    if (!value.IsFinite())
+            //    {
+            //        var info = NumberFormatInfo.GetInstance(provider);
+            //        if (double.IsNaN(value))
+            //        {
+            //            return info.NaNSymbol;
+            //        }
+
+            //        return value.IsNegative() ? info.NegativeInfinitySymbol : info.PositiveInfinitySymbol;
+            //    }
+
+            //    //char fmt = ParseFormatSpecifier(format, out int digits);
+            //    char fmt = format[0];
+            //    char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
+            //    if (fmtUpper == 'J')
+            //    {
+            //        return RyuDouble.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
+            //    }
+            //    else if (fmtUpper == 'X')
+            //    {
+            //        return value.ToHexString(provider);
+            //    }
+            //    else
+            //    {
+            //        return value.ToString(format, provider); // J2N TODO: Fix negative zero prior to .NET 3.0
+            //    }
+            //}
+
+            //provider ??= CultureInfo.CurrentCulture;
+
+            //if (CultureInfo.InvariantCulture.NumberFormat.Equals(provider.GetFormat(typeof(NumberFormatInfo))))
+            //{
+            //    //return FloatingDecimal.ToJavaFormatString(d); // J2N TODO: Culture
+            //    return RyuDouble.ToString(d, RoundingMode.Conservative); // J2N: Conservative rounding is closer to the JDK
+            //}
+
+            //return d.ToString(provider);
+            ////return org.apache.harmony.luni.util.NumberConverter.convert(d);
         }
 
         /////**
@@ -2369,7 +2435,7 @@ namespace J2N.Numerics
         /// for <paramref name="provider"/>.
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>A hex string representing <paramref name="value"/>.</returns>
+        /// <returns>A hex string representing the current instance.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
