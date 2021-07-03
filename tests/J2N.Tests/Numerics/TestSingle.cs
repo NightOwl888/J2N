@@ -1257,7 +1257,7 @@ namespace J2N.Numerics
             yield return new object[] { float.Epsilon, "G", invariantFormat, "1E-45" };
         }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP3_0_OR_GREATER
         [Test]
         public static void Test_ToString_NotNetFramework()
         {

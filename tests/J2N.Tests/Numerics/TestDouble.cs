@@ -1723,7 +1723,7 @@ namespace J2N.Numerics
             yield return new object[] { double.Epsilon, "G", invariantFormat, "5E-324" };
         }
 
-#if !NETFRAMEWORK
+#if NETCOREAPP3_0_OR_GREATER
         [Test]
         public static void Test_ToString_NotNetFramework()
         {
@@ -2105,7 +2105,7 @@ namespace J2N.Numerics
         {
             public abstract class ParseTestCase : TestCase
             {
-#region Static_Test_Data
+                #region Static_Test_Data
 
                 /*
                  * A String, double pair
@@ -2984,9 +2984,9 @@ namespace J2N.Numerics
                     return result;
                 }
 
-#endregion Static_Test_Data
+                #endregion Static_Test_Data
 
-#region TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyle_Data
                 {
@@ -3276,9 +3276,9 @@ namespace J2N.Numerics
                     }
                 }
 
-#endregion
+                #endregion
 
-#region TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
                 {
@@ -3872,9 +3872,9 @@ namespace J2N.Numerics
                     }
                 }
 
-#endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyle_Data
 
-#region TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
                 {
@@ -3929,9 +3929,9 @@ namespace J2N.Numerics
                     }
                 }
 
-#endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForFloatStyleException_Data
 
-#region TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
                 {
@@ -4003,9 +4003,9 @@ namespace J2N.Numerics
                     }
                 }
 
-#endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForHexFloatStyleException_Data
 
-#region TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
+                #region TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
 
                 public static IEnumerable<TestCaseData> TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
                 {
@@ -4051,7 +4051,7 @@ namespace J2N.Numerics
                         yield return new TestCaseData(unchecked((long)0xfe054218c295e43fL), "-1.1122233344455567E299",
                             "-111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000111222333444555666777888999000.92233720368547758079223372036854775807",
                             NumberStyle.Float, NumberFormatInfo.InvariantInfo);
-                        
+
                         yield return new TestCaseData(0x562ae7a25fe706ebL,
                             "1.234123412431233E107", "1.234123412431233E107", NumberStyle.Float, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(0x562ae7a25fe706ecL,
@@ -4130,10 +4130,10 @@ namespace J2N.Numerics
                     }
                 }
 
-#endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
+                #endregion TestParse_CharSequence_NumberStyle_IFormatProvider_ForRawBits_Data
             }
 
-#region Parse_CharSequence_NumberStyle_IFormatProvider
+            #region Parse_CharSequence_NumberStyle_IFormatProvider
 
             public abstract class Parse_CharSequence_NumberStyle_IFormatProvider_TestCase : ParseTestCase
             {
@@ -4243,9 +4243,9 @@ namespace J2N.Numerics
             }
 #endif
 
-#endregion
+            #endregion
 
-#region Parse_CharSequence_IFormatProvider
+            #region Parse_CharSequence_IFormatProvider
 
             public abstract class Parse_CharSequence_IFormatProvider_TestCase : ParseTestCase
             {
@@ -4305,9 +4305,9 @@ namespace J2N.Numerics
                 }
             }
 
-#endregion
+            #endregion
 
-#region TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+            #region TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
             public abstract class TryParse_CharSequence_NumberStyle_IFormatProvider_Double_TestCase : ParseTestCase
             {
@@ -4410,9 +4410,9 @@ namespace J2N.Numerics
             }
 #endif
 
-#endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
+            #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
-#region TryParse_CharSequence_Double
+            #region TryParse_CharSequence_Double
 
             public abstract class TryParse_CharSequence_Double_TestCase : ParseTestCase
             {
@@ -4502,7 +4502,7 @@ namespace J2N.Numerics
             }
 #endif
 
-#endregion TryParse_CharSequence_Double
+            #endregion TryParse_CharSequence_Double
 
         }
     }
