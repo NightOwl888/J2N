@@ -234,21 +234,25 @@ namespace J2N
             while ((value /= radix) != 0)
                 count++;
 
-            char[] buffer = new char[count];
-            do
+            unsafe
             {
-                int ch = 0 - (j % radix);
-                if (ch > 9)
-                    ch = ch - 10 + 'a';
-                else
-                    ch += '0';
-                buffer[--count] = (char)ch;
-            } while ((j /= radix) != 0);
-            if (negative)
-            {
-                buffer[0] = '-';
+                int bufferLength = count;
+                char* buffer = stackalloc char[bufferLength];
+                do
+                {
+                    int ch = 0 - (j % radix);
+                    if (ch > 9)
+                        ch = ch - 10 + 'a';
+                    else
+                        ch += '0';
+                    buffer[--count] = (char)ch;
+                } while ((j /= radix) != 0);
+                if (negative)
+                {
+                    buffer[0] = '-';
+                }
+                return new string(buffer, 0, bufferLength);
             }
-            return new string(buffer, 0, buffer.Length);
         }
 
         /// <summary>
@@ -294,19 +298,23 @@ namespace J2N
             while ((value /= radix) != 0)
                 count++;
 
-            char[] buffer = new char[count];
-            do
+            unsafe
             {
-                int ch = 0 - (int)(j % radix);
-                if (ch > 9)
-                    ch = ch - 10 + 'a';
-                else
-                    ch += '0';
-                buffer[--count] = (char)ch;
-            } while ((j /= radix) != 0);
-            if (negative)
-                buffer[0] = '-';
-            return new string(buffer, 0, buffer.Length);
+                int bufferLength = count;
+                char* buffer = stackalloc char[bufferLength];
+                do
+                {
+                    int ch = 0 - (int)(j % radix);
+                    if (ch > 9)
+                        ch = ch - 10 + 'a';
+                    else
+                        ch += '0';
+                    buffer[--count] = (char)ch;
+                } while ((j /= radix) != 0);
+                if (negative)
+                    buffer[0] = '-';
+                return new string(buffer, 0, bufferLength);
+            }
         }
 
         #endregion ToString (radix)
