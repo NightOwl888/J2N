@@ -479,31 +479,32 @@ namespace J2N.Numerics
                     );
         }
 
-        /**
-         * @tests java.lang.Long#toString(long, int)
-         */
-        [Test]
-        public void Test_toStringJI()
-        {
-            // Test for method java.lang.String java.lang.Long.toString(long, int)
-            assertEquals("Returned incorrect dec string", "100000000", Int64.ToString(100000000L,
-                    10));
-            assertEquals("Returned incorrect hex string", "fffffffff", Int64.ToString(68719476735L,
-                    16));
-            assertEquals("Returned incorrect oct string", "77777777777", Int64.ToString(8589934591L,
-                    8));
-            assertEquals("Returned incorrect bin string",
-                    "1111111111111111111111111111111111111111111", Int64.ToString(
-                    8796093022207L, 2));
-            assertEquals("Returned incorrect min string", "-9223372036854775808", Int64.ToString(
-                    unchecked((long)0x8000000000000000L), 10));
-            assertEquals("Returned incorrect max string", "9223372036854775807", Int64.ToString(
-                    0x7fffffffffffffffL, 10));
-            assertEquals("Returned incorrect min string", "-8000000000000000", Int64.ToString(
-                    unchecked((long)0x8000000000000000L), 16));
-            assertEquals("Returned incorrect max string", "7fffffffffffffff", Int64.ToString(
-                    0x7fffffffffffffffL, 16));
-        }
+        // J2N: Moved to IntegralNumberExtensions
+        ///**
+        // * @tests java.lang.Long#toString(long, int)
+        // */
+        //[Test]
+        //public void Test_toStringJI()
+        //{
+        //    // Test for method java.lang.String java.lang.Long.toString(long, int)
+        //    assertEquals("Returned incorrect dec string", "100000000", Int64.ToString(100000000L,
+        //            10));
+        //    assertEquals("Returned incorrect hex string", "fffffffff", Int64.ToString(68719476735L,
+        //            16));
+        //    assertEquals("Returned incorrect oct string", "77777777777", Int64.ToString(8589934591L,
+        //            8));
+        //    assertEquals("Returned incorrect bin string",
+        //            "1111111111111111111111111111111111111111111", Int64.ToString(
+        //            8796093022207L, 2));
+        //    assertEquals("Returned incorrect min string", "-9223372036854775808", Int64.ToString(
+        //            unchecked((long)0x8000000000000000L), 10));
+        //    assertEquals("Returned incorrect max string", "9223372036854775807", Int64.ToString(
+        //            0x7fffffffffffffffL, 10));
+        //    assertEquals("Returned incorrect min string", "-8000000000000000", Int64.ToString(
+        //            unchecked((long)0x8000000000000000L), 16));
+        //    assertEquals("Returned incorrect max string", "7fffffffffffffff", Int64.ToString(
+        //            0x7fffffffffffffffL, 16));
+        //}
 
         /**
          * @tests java.lang.Long#valueOf(java.lang.String)
