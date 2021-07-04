@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
@@ -9,8 +10,8 @@ namespace J2N.Numerics
 
     /// <summary>
     /// The abstract superclass of the classes which represent numeric base types
-    /// (that is <see cref="Byte"/>, <see cref="System.Int16"/>, <see cref="Int32"/>,
-    /// <see cref="Int64"/>, <see cref="Single"/>, and <see cref="Double"/>).
+    /// (that is <see cref="System.Byte"/>, <see cref="System.SByte"/>, <see cref="System.Int16"/>, <see cref="System.Int32"/>,
+    /// <see cref="System.Int64"/>, <see cref="System.Single"/>, and <see cref="System.Double"/>).
     /// </summary>
 #if FEATURE_SERIALIZABLE
     [Serializable]
@@ -120,62 +121,248 @@ namespace J2N.Numerics
             return (short)ToInt32();
         }
 
+        #region ToString
+
         /// <summary>
-        /// Converts the numeric value of this instance to its equivalent string representation.
-        /// The format provider used is <see cref="StringFormatter.CurrentCulture"/> which contains formatting rules similar to Java.
+        /// Converts the value of the current object to its equivalent string representation.
         /// </summary>
-        /// <returns>The string representation of the value of this instance.</returns>
+        /// <returns>The string representation of the value of this object.</returns>
+        /// <remarks>
+        /// The <see cref="ToString()"/> method formats the current instance in the default ("J", or Java)
+        /// format of the current culture. If you want to specify a different format, precision, or culture, use the
+        /// other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(string?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// </remarks>
         public override string ToString()
         {
-            return ToString(null, StringFormatter.CurrentCulture);
+            return ToString(null, null);
         }
 
         /// <summary>
-        /// Converts the numeric value of this instance to its equivalent string representation, using the specified <paramref name="format"/>.
-        /// The format provider used is <see cref="StringFormatter.CurrentCulture"/> which contains formatting rules similar to Java.
+        /// Converts the value of the current object to its equivalent string representation
+        /// using the specified format.
         /// </summary>
-        /// <param name="format">A standard or custom numeric format string.</param>
-        /// <returns>The string representation of the value of this instance as specified by <paramref name="format"/>.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid or not supported.</exception>
+        /// <param name="format">A numeric format string.</param>
+        /// <returns>The string representation of the current object, formatted as specified by
+        /// the <paramref name="format"/> parameter.</returns>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> includes an unsupported specifier. Supported format specifiers are defined by the derived type.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="ToString(string?)"/> method formats the current instance in
+        /// a specified format by using the conventions of the current culture. If you want to specify a different format or culture,
+        /// use the other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// The format parameter can be either a standard or a custom numeric format string. If format is <c>null</c> or an empty string (""), 
+        /// the return value is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// The return value of this function is formatted using the <see cref="NumberFormatInfo"/> object for the thread current culture.
+        /// For information about the thread current culture, see <see cref="System.Threading.Thread.CurrentCulture"/>. To provide formatting information
+        /// for cultures other than the current culture, call the <see cref="ToString(string?, IFormatProvider?)"/> method.
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// </remarks>
         public virtual string ToString(string? format)
         {
-            return ToString(format, StringFormatter.CurrentCulture);
+            return ToString(format, null);
         }
 
         /// <summary>
-        /// Converts the numeric value of this instance to its equivalent string representation using the
-        /// specified culture-specific format information.
+        /// Converts the numeric value of the current object to its equivalent string representation using the
+        /// specified culture-specific formatting information.
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>The string representation of the value of this instance as specified by <paramref name="provider"/>.</returns>
+        /// <returns>The string representation of the value of this object in the format specified by the <paramref name="provider"/> parameter.</returns>
+        /// <remarks>
+        /// The <see cref="ToString(IFormatProvider?)"/> method formats the current instance in
+        /// the default ("J") format of a specified culture. If you want to specify a different format or culture, use the
+        /// other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(string?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(string?, IFormatProvider?)"/></term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// The return value is formatted with the Java numeric format specifier ("J").
+        /// <para/>
+        /// The <paramref name="provider"/> parameter is an object that implements the <see cref="IFormatProvider"/> interface. Its <see cref="IFormatProvider.GetFormat(Type?)"/>
+        /// method returns a <see cref="NumberFormatInfo"/> object that provides culture-specific information about the format of the string that is
+        /// returned by this method. The object that implements <see cref="IFormatProvider"/> can be any of the following:
+        /// <list type="bullet">
+        ///     <item><description>A <see cref="CultureInfo"/> object that represents the culture whose formatting rules are to be used.</description></item>
+        ///     <item><description>A <see cref="NumberFormatInfo"/> object that contains specific numeric formatting information for this value.</description></item>
+        ///     <item><description>A custom object that implements <see cref="IFormatProvider"/>.</description></item>
+        /// </list>
+        /// <para/>
+        /// If provider is <c>null</c> or a <see cref="NumberFormatInfo"/> object cannot be obtained from provider, the return value is formatted
+        /// using the <see cref="NumberFormatInfo"/> object for the thread current culture. For information about the thread current culture, see
+        /// <see cref="System.Threading.Thread.CurrentCulture"/>.
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// </remarks>
         public virtual string ToString(IFormatProvider? provider)
         {
             return ToString(null, provider);
         }
 
         /// <summary>
-        /// Converts the numeric value of this instance to its equivalent string representation using the
-        /// specified format and culture-specific format information.
+        /// Converts the value of the current object to its equivalent string representation using the specified format
+        /// and culture-specific formatting information.
         /// </summary>
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
-        /// <returns>The string representation of the value of this instance as specified by <paramref name="format"/> and <paramref name="provider"/>.</returns>
-        /// <exception cref="FormatException"><paramref name="format"/> is invalid or not supported.</exception>
+        /// <returns>The string representation of the current object, formatted as specified by the <paramref name="format"/>
+        /// and <paramref name="provider"/> parameters.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> includes an unsupported specifier.
+        /// Supported format specifiers are defined by the derived type.</exception>
+        /// <remarks>
+        /// The <see cref="ToString(string?, IFormatProvider?)"/> method formats the current instance in
+        /// a specified format of a specified culture. If you want to specify a different format or culture, use the
+        /// other overloads of the <see cref="ToString(string?, IFormatProvider?)"/> method, as follows:
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>To use format</term>
+        ///         <term>For culture</term>
+        ///         <term>Use the overload</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString()"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>Default ("J") format</term>
+        ///         <term>A specific culture</term>
+        ///         <term><see cref="ToString(IFormatProvider?)"/></term>
+        ///     </item>
+        ///     <item>
+        ///         <term>A specific format or precision</term>
+        ///         <term>Default (current) culture</term>
+        ///         <term><see cref="ToString(string?)"/></term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// The <see cref="ToString(string?, IFormatProvider?)"/> method formats a numeric value in a specified format
+        /// of a specified culture. To format a number by using the default ("J") format of the current culture, call the
+        /// <see cref="ToString()"/> method. To format a number by using a specified format of the current culture, call the
+        /// <see cref="ToString(string?)"/> method.
+        /// <para/>
+        /// The <paramref name="format"/> parameter can be either a standard or a custom numeric format string. If
+        /// <paramref name="format"/> is <c>null</c> or an empty string (""), the return value of this method is formatted
+        /// with the Java numeric format specifier ("J").
+        /// <para/>
+        /// The <paramref name="provider"/> parameter is an object that implements the <see cref="IFormatProvider"/> interface. Its <see cref="IFormatProvider.GetFormat(Type?)"/>
+        /// method returns a <see cref="NumberFormatInfo"/> object that provides culture-specific information about the format of the string that is
+        /// returned by this method. The object that implements <see cref="IFormatProvider"/> can be any of the following:
+        /// <list type="bullet">
+        ///     <item><description>A <see cref="CultureInfo"/> object that represents the culture whose formatting rules are to be used.</description></item>
+        ///     <item><description>A <see cref="NumberFormatInfo"/> object that contains specific numeric formatting information for this value.</description></item>
+        ///     <item><description>A custom object that implements <see cref="IFormatProvider"/>.</description></item>
+        /// </list>
+        /// <para/>
+        /// If provider is <c>null</c> or a <see cref="NumberFormatInfo"/> object cannot be obtained from provider, the return value is formatted
+        /// using the <see cref="NumberFormatInfo"/> object for the thread current culture. For information about the thread current culture, see
+        /// <see cref="System.Threading.Thread.CurrentCulture"/>.
+        /// <para/>
+        /// .NET provides extensive formatting support, which is described in greater detail in the following formatting topics:
+        /// <list type="bullet">
+        ///     <item><description>For more information about numeric format specifiers, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/standard-numeric-format-strings">Standard Numeric Format Strings</a>
+        ///     and <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/custom-numeric-format-strings">Custom Numeric Format Strings</a>.
+        ///     </description></item>
+        ///     <item><description>For more information about formatting, see
+        ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
+        /// </list>
+        /// </remarks>
         public abstract string ToString(string? format, IFormatProvider? provider);
 
-        internal string ToString(string? format, IFormatProvider? provider, IFormattable value)
-        {
-            // Fast path: For standard .NET formatting using cultures, call IFormattable.ToString() to eliminate
-            // boxing associated with string.Format().
-            if (provider is null || provider is CultureInfo || provider is NumberFormatInfo)
-            {
-                return value.ToString(format, provider);
-            }
-            // Built-in .NET numeric types don't support custom format providers, so we resort
-            // to using string.Format with some hacky format conversion in order to support them.
-            return string.Format(provider, format is null ? "{0}" : "{0:" + format + '}', value);
-        }
-
+        #endregion ToString
 
         // From System.Convert
         internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
@@ -232,6 +419,33 @@ namespace J2N.Numerics
                 throw new InvalidCastException(SR.InvalidCast_Empty);
 
             throw new InvalidCastException(J2N.SR.Format(SR.InvalidCast_FromTo, value.GetType().FullName, targetType.FullName));
+        }
+
+        /// <summary>
+        /// Converts "J" format to "G" and removes the precision specifier.
+        /// This is just so we can pass through the value to the built-in
+        /// .NET ToString() methods without them complaining. Someday this
+        /// format might morph into something else, in which case we will
+        /// remove this method. This is only intended for integral types
+        /// that do not actually support the "J" format.
+        /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static string? ConvertFormat(string? format)
+        {
+            if (string.IsNullOrEmpty(format))
+                return null;
+
+            char fmt = format![0];
+            // Remove any precision or other characters that are passed
+            // as we will ignore them
+            if (fmt == 'J')
+                return "G";
+            if (fmt == 'j')
+                return "g";
+
+            return format;
         }
     }
 }

@@ -2414,9 +2414,9 @@ namespace J2N.Numerics
         ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
         /// </list>
         /// <para/>
-        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
         /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
-        /// The provider parameter supplies culture-specific information used in formatting. If provider is <c>null</c>, the return value is formatted using
+        /// The <paramref name="provider"/> parameter supplies culture-specific information used in formatting. If provider is <c>null</c>, the return value is formatted using
         /// the <see cref="NumberFormatInfo"/> object for the current culture.
         /// </remarks>
         public override string ToString(IFormatProvider? provider)
@@ -2475,9 +2475,9 @@ namespace J2N.Numerics
         ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
         /// </list>
         /// <para/>
-        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
         /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
-        /// The provider parameter supplies culture-specific information used in formatting. If <paramref name="provider"/> is <c>null</c>, the return value
+        /// The <paramref name="provider"/> parameter supplies culture-specific information used in formatting. If <paramref name="provider"/> is <c>null</c>, the return value
         /// is formatted using the <see cref="NumberFormatInfo"/> object for the current culture.
         /// <para/>
         /// In addition to the formats specified in the above articles, the Java ("J") format and ("X") hexadecimal format are also supported.
@@ -2827,9 +2827,9 @@ namespace J2N.Numerics
         ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
         /// </list>
         /// <para/>
-        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
         /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
-        /// The provider parameter supplies culture-specific information used in formatting. If provider is <c>null</c>, the return value is formatted using
+        /// The <paramref name="provider"/> parameter supplies culture-specific information used in formatting. If provider is <c>null</c>, the return value is formatted using
         /// the <see cref="NumberFormatInfo"/> object for the current culture.
         /// </remarks>
         public static string ToString(double value, IFormatProvider? provider)
@@ -2889,9 +2889,9 @@ namespace J2N.Numerics
         ///     <a href="https://docs.microsoft.com/en-us/dotnet/standard/base-types/formatting-types">Formatting Types</a>.</description></item>
         /// </list>
         /// <para/>
-        /// The provider parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation whose <see cref="IFormatProvider.GetFormat(Type)"/> method returns
         /// a <see cref="NumberFormatInfo"/> object. Typically, provider is a <see cref="CultureInfo"/> object or a <see cref="NumberFormatInfo"/> object.
-        /// The provider parameter supplies culture-specific information used in formatting. If <paramref name="provider"/> is <c>null</c>, the return value
+        /// The <paramref name="provider"/> parameter supplies culture-specific information used in formatting. If <paramref name="provider"/> is <c>null</c>, the return value
         /// is formatted using the <see cref="NumberFormatInfo"/> object for the current culture.
         /// <para/>
         /// In addition to the formats specified in the above articles, the Java ("J") format and ("X") hexadecimal format are also supported.

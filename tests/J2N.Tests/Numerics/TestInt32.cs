@@ -667,45 +667,46 @@ namespace J2N.Numerics
             assertEquals("Returned incorrect octal String", "2000000008", Int32.ToString(2000000008));
         }
 
-        /**
-         * @tests java.lang.Integer#toString(int, int)
-         */
-        [Test]
-        public void Test_toStringII()
-        {
-            // Test for method java.lang.String java.lang.Integer.toString(int, int)
-            assertEquals("Returned incorrect octal string", "17777777777", Int32.ToString(
-                    2147483647, 8));
-            assertTrue("Returned incorrect hex string--wanted 7fffffff but got: "
-                    + Int32.ToString(2147483647, 16), Int32.ToString(
-                    2147483647, 16).Equals("7fffffff"));
-            assertEquals("Incorrect string returned", "1111111111111111111111111111111", Int32.ToString(2147483647, 2)
-                    );
-            assertEquals("Incorrect string returned", "2147483647", Int32
-                    .ToString(2147483647, 10));
+        // J2N: Moved to IntegralNumberExtensions
+        ///**
+        // * @tests java.lang.Integer#toString(int, int)
+        // */
+        //[Test]
+        //public void Test_toStringII()
+        //{
+        //    // Test for method java.lang.String java.lang.Integer.toString(int, int)
+        //    assertEquals("Returned incorrect octal string", "17777777777", Int32.ToString(
+        //            2147483647, 8));
+        //    assertTrue("Returned incorrect hex string--wanted 7fffffff but got: "
+        //            + Int32.ToString(2147483647, 16), Int32.ToString(
+        //            2147483647, 16).Equals("7fffffff"));
+        //    assertEquals("Incorrect string returned", "1111111111111111111111111111111", Int32.ToString(2147483647, 2)
+        //            );
+        //    assertEquals("Incorrect string returned", "2147483647", Int32
+        //            .ToString(2147483647, 10));
 
-            assertEquals("Returned incorrect octal string", "-17777777777", Int32.ToString(
-                    -2147483647, 8));
-            assertTrue("Returned incorrect hex string--wanted -7fffffff but got: "
-                    + Int32.ToString(-2147483647, 16), Int32.ToString(
-                    -2147483647, 16).Equals("-7fffffff"));
-            assertEquals("Incorrect string returned",
-                            "-1111111111111111111111111111111", Int32
-                    .ToString(-2147483647, 2));
-            assertEquals("Incorrect string returned", "-2147483647", Int32.ToString(-2147483647,
-                    10));
+        //    assertEquals("Returned incorrect octal string", "-17777777777", Int32.ToString(
+        //            -2147483647, 8));
+        //    assertTrue("Returned incorrect hex string--wanted -7fffffff but got: "
+        //            + Int32.ToString(-2147483647, 16), Int32.ToString(
+        //            -2147483647, 16).Equals("-7fffffff"));
+        //    assertEquals("Incorrect string returned",
+        //                    "-1111111111111111111111111111111", Int32
+        //            .ToString(-2147483647, 2));
+        //    assertEquals("Incorrect string returned", "-2147483647", Int32.ToString(-2147483647,
+        //            10));
 
-            assertEquals("Returned incorrect octal string", "-20000000000", Int32.ToString(
-                    -2147483648, 8));
-            assertTrue("Returned incorrect hex string--wanted -80000000 but got: "
-                    + Int32.ToString(-2147483648, 16), Int32.ToString(
-                    -2147483648, 16).Equals("-80000000"));
-            assertEquals("Incorrect string returned",
-                            "-10000000000000000000000000000000", Int32
-                    .ToString(-2147483648, 2));
-            assertEquals("Incorrect string returned", "-2147483648", Int32.ToString(-2147483648,
-                    10));
-        }
+        //    assertEquals("Returned incorrect octal string", "-20000000000", Int32.ToString(
+        //            -2147483648, 8));
+        //    assertTrue("Returned incorrect hex string--wanted -80000000 but got: "
+        //            + Int32.ToString(-2147483648, 16), Int32.ToString(
+        //            -2147483648, 16).Equals("-80000000"));
+        //    assertEquals("Incorrect string returned",
+        //                    "-10000000000000000000000000000000", Int32
+        //            .ToString(-2147483648, 2));
+        //    assertEquals("Incorrect string returned", "-2147483648", Int32.ToString(-2147483648,
+        //            10));
+        //}
 
         /**
          * @tests java.lang.Integer#valueOf(java.lang.String)

@@ -199,6 +199,20 @@ namespace J2N
         /// depending on the radix. If <paramref name="radix"/> is not in the interval defined
         /// by <see cref="Character.MinRadix"/> and <see cref="Character.MaxRadix"/> then 10 is
         /// used as the base for the conversion.
+        /// <para/>
+        /// Usage Note: This method is similar to <see cref="Convert.ToString(int, int)"/>, however
+        /// there are some key differences:
+        /// <list type="bullet">
+        ///     <item><description>Radix values supported are <see cref="Character.MinRadix"/> (2) to <see cref="Character.MaxRadix"/> (36).
+        ///     The <see cref="Convert.ToString(int, int)"/> method only supports fromBase (radix) of 2, 8, 10, and 16.</description></item>
+        ///     <item><description>Negative values are returned as the converted positive representation of the absolute value prefixed with
+        ///     a '-' character. For base 2, 8, and 16, the <see cref="Convert.ToString(int, int)"/> method uses the two's complement representation.
+        ///     This means that the high-order bit of the highest-order byte (bit 31) is interpreted as the sign bit. Negative representations
+        ///     returned from this method
+        ///     cannot be parsed using <see cref="Convert.ToInt32(string?, int)"/>, however, the <see cref="J2N.Numerics.Int32.Parse(string?, int)"/>
+        ///     method and other radix-based overloads support this format while also supporting the two's complement
+        ///     representation returned from <see cref="Convert.ToString(int, int)"/>.</description></item>
+        /// </list>
         /// </summary>
         /// <param name="value">The <see cref="int"/> to convert.</param>
         /// <param name="radix">The base to use for the conversion.</param>
@@ -244,6 +258,20 @@ namespace J2N
         /// 'z', depending on the radix. If <paramref name="radix"/> is not in the interval
         /// defined by <see cref="Character.MinRadix"/> and <see cref="Character.MaxRadix"/>
         /// then 10 is used as the base for the conversion.
+        /// <para/>
+        /// Usage Note: This method is similar to <see cref="Convert.ToString(long, int)"/>, however
+        /// there are some key differences:
+        /// <list type="bullet">
+        ///     <item><description>Radix values supported are <see cref="Character.MinRadix"/> (2) to <see cref="Character.MaxRadix"/> (36).
+        ///     The <see cref="Convert.ToString(long, int)"/> method only supports fromBase (radix) of 2, 8, 10, and 16.</description></item>
+        ///     <item><description>Negative values are returned as the converted positive representation of the absolute value prefixed with a
+        ///     '-' character. For base 2, 8, and 16, the <see cref="Convert.ToString(long, int)"/> method uses the two's complement representation.
+        ///     This means that the high-order bit of the highest-order byte (bit 63) is interpreted as the sign bit. Negative representations
+        ///     returned from this method
+        ///     cannot be parsed using <see cref="Convert.ToInt64(string?, int)"/>, however, the <see cref="J2N.Numerics.Int64.Parse(string?, int)"/>
+        ///     method and other radix-based overloads support this format while also supporting the two's complement
+        ///     representation returned from <see cref="Convert.ToString(long, int)"/>.</description></item>
+        /// </list>
         /// </summary>
         /// <param name="value">The long to convert.</param>
         /// <param name="radix">The base to use for the conversion.</param>
