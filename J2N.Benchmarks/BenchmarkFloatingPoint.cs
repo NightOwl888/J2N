@@ -27,6 +27,7 @@ namespace J2N.Benchmarks
                 J2N.Numerics.RyuDouble.ToString(SmallDouble, NumberFormatInfo.InvariantInfo, Numerics.RoundingMode.Conservative);
         }
 
+
         [Benchmark]
         public void Format_Double_Small_DotNet()
         {
@@ -118,21 +119,21 @@ namespace J2N.Benchmarks
         public void Format_Single_Small_DotNet()
         {
             for (int i = 0; i < Iterations; i++)
-                LargeSingle.ToString(NumberFormatInfo.InvariantInfo);
+                SmallSingle.ToString(NumberFormatInfo.InvariantInfo);
         }
 
         [Benchmark]
         public void Format_Single_Small_J2N_J_Format()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.Single.ToString(LargeSingle, NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.Single.ToString(SmallSingle, NumberFormatInfo.InvariantInfo);
         }
 
         [Benchmark]
         public void Format_Single_Small_J2N_G_Format()
         {
             for (int i = 0; i < Iterations; i++)
-                J2N.Numerics.Single.ToString(LargeSingle, "G", NumberFormatInfo.InvariantInfo);
+                J2N.Numerics.Single.ToString(SmallSingle, "G", NumberFormatInfo.InvariantInfo);
         }
 
 
