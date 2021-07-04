@@ -15,6 +15,7 @@
 using System;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
@@ -418,12 +419,41 @@ namespace J2N.Numerics
             // Step 5: Print the decimal representation.
             // We follow Float.toString semantics here.
             //char[] result = new char[15];
+            int index = 0;
             string negSign = info.NegativeSign, decimalSeparator = info.NumberDecimalSeparator;
             int negSignLength = (sign ? negSign.Length : 0), decimalSeparatorLength = decimalSeparator.Length;
             // For the exp + 1 >= olength case, we use the max length of 15. The value is derived from
             // the literal 11 + negSignLength + decimalSeparatorLength + 2.
-            char[] result = new char[Math.Min((exp < 0 ? dplength + 2 : (exp + 1 >= olength ? 11 : olength)) + negSignLength + decimalSeparatorLength + (scientificNotation ? 4 : 2), 13 + negSignLength + decimalSeparatorLength)];
-            int index = 0;
+            int bufferLength = Math.Min((exp < 0 ? dplength + 2 : (exp + 1 >= olength ? 11 : olength)) + negSignLength + decimalSeparatorLength + (scientificNotation ? 4 : 2), 13 + negSignLength + decimalSeparatorLength);
+            unsafe
+            {
+                const int MaximumStackSize = 64;
+                if (bufferLength <= MaximumStackSize)
+                {
+                    char* result = stackalloc char[bufferLength];
+                    WriteBuffer(result, ref index, output, olength, upperCase, sign, exp, scientificNotation, negSign, negSignLength, decimalSeparator, decimalSeparatorLength);
+                    return new string(result, 0, index);
+                }
+                else
+                {
+                    // Since negSignLength and decimalSeparatorLength are based on user input,
+                    // this is a fallback to prevent a stack overflow if these are abused.
+                    // This should not ever happen under normal usage.
+                    fixed (char* resultPtr = new char[bufferLength])
+                    {
+                        char* result = resultPtr;
+                        WriteBuffer(result, ref index, output, olength, upperCase, sign, exp, scientificNotation, negSign, negSignLength, decimalSeparator, decimalSeparatorLength);
+                        return new string(result, 0, index);
+                    }
+                }
+            }
+        }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private unsafe static void WriteBuffer(char* result, ref int index, int output, int olength, bool upperCase, bool sign, int exp, bool scientificNotation, string negSign, int negSignLength, string decimalSeparator, int decimalSeparatorLength)
+        {
             if (sign)
             {
                 //result[index++] = '-';
@@ -536,9 +566,11 @@ namespace J2N.Numerics
                     index += olength + decimalSeparatorLength;
                 }
             }
-            return new string(result, 0, index);
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static int Pow5Bits(int e)
         {
             return e == 0 ? 1 : (int)((e * LOG2_5_NUMERATOR + LOG2_5_DENOMINATOR - 1) / LOG2_5_DENOMINATOR);
@@ -603,6 +635,9 @@ namespace J2N.Numerics
             return (uint)shiftedSum;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] // J2N: Only called in one place
+#endif
         private static int DecimalLength(int v)
         {
             int length = 10;
