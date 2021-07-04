@@ -15,6 +15,7 @@
 using System;
 using System.Globalization;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
@@ -37,7 +38,7 @@ namespace J2N.Numerics
         private const int POS_TABLE_SIZE = 326;
         private const int NEG_TABLE_SIZE = 291;
 
-#region Debug Tables
+        #region Debug Tables
 #if DEBUG
         // Only for debugging.
         private static readonly BigInteger[] POW5 = new BigInteger[POS_TABLE_SIZE] {
@@ -519,7 +520,9 @@ namespace J2N.Numerics
         };
 
 #endif
-#endregion
+        #endregion
+
+        #region Production Tables
 
         private static readonly int POW5_BITCOUNT = 121; // max 3*31 = 124
         private static readonly int[][] POW5_SPLIT = new int[POS_TABLE_SIZE][] {
@@ -839,6 +842,8 @@ namespace J2N.Numerics
             new int[] { 418558049, 1464875201, 1856827309, 1740482705, },
         };
 
+        #endregion Production Tables
+
         //public static void Main(string[] args)
         //{
         //    DEBUG = true;
@@ -1139,12 +1144,41 @@ namespace J2N.Numerics
             // Step 5: Print the decimal representation.
             // We follow Double.toString semantics here.
             //char[] result = new char[24];
+            int index = 0;
             string negSign = info.NegativeSign, decimalSeparator = info.NumberDecimalSeparator;
             int negSignLength = (sign ? negSign.Length : 0), decimalSeparatorLength = decimalSeparator.Length;
             // For the exp + 1 >= olength case, we use the max length of 24. The value is derived from
             // the literal 20 + negSignLength + decimalSeparatorLength + 2.
-            char[] result = new char[Math.Min((exp < 0 ? vplength : (exp + 1 >= olength ? 20 : olength)) + negSignLength + decimalSeparatorLength + (scientificNotation ? 5 : 2), 22 + negSignLength + decimalSeparatorLength)];
-            int index = 0;
+            int bufferLength = Math.Min((exp < 0 ? vplength : (exp + 1 >= olength ? 20 : olength)) + negSignLength + decimalSeparatorLength + (scientificNotation ? 5 : 2), 22 + negSignLength + decimalSeparatorLength);
+            unsafe
+            {
+                const int MaximumStackSize = 64;
+                if (bufferLength <= MaximumStackSize)
+                {
+                    char* result = stackalloc char[bufferLength];
+                    WriteBuffer(result, ref index, output, olength, upperCase, sign, exp, scientificNotation, negSign, negSignLength, decimalSeparator, decimalSeparatorLength);
+                    return new string(result, 0, index);
+                }
+                else
+                {
+                    // Since negSignLength and decimalSeparatorLength are based on user input,
+                    // this is a fallback to prevent a stack overflow if these are abused.
+                    // This should not ever happen under normal usage.
+                    fixed (char* resultPtr = new char[bufferLength])
+                    {
+                        char* result = resultPtr;
+                        WriteBuffer(result, ref index, output, olength, upperCase, sign, exp, scientificNotation, negSign, negSignLength, decimalSeparator, decimalSeparatorLength);
+                        return new string(result, 0, index);
+                    }
+                }
+            }
+        }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private unsafe static void WriteBuffer(char* result, ref int index, long output, int olength, bool upperCase, bool sign, int exp, bool scientificNotation, string negSign, int negSignLength, string decimalSeparator, int decimalSeparatorLength)
+        {
             if (sign)
             {
                 //result[index++] = '-';
@@ -1195,7 +1229,6 @@ namespace J2N.Numerics
                     result[index++] = (char)('0' + exp / 10);
                 }
                 result[index++] = (char)('0' + exp % 10);
-                return new string(result, 0, index);
             }
             else
             {
@@ -1264,15 +1297,20 @@ namespace J2N.Numerics
                     //index += olength + 1;
                     index += olength + decimalSeparatorLength;
                 }
-                return new string(result, 0, index);
             }
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static int Pow5bits(int e)
         {
             return ((e * 1217359).TripleShift(19)) + 1;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)] // J2N: Only called in one place
+#endif
         private static int DecimalLength(long v)
         {
             if (v >= 1000000000000000000L) return 19;
@@ -1296,11 +1334,17 @@ namespace J2N.Numerics
             return 1;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static bool MultipleOfPowerOf5(long value, int q)
         {
             return Pow5Factor(value) >= q;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static int Pow5Factor(long value)
         {
             // We want to find the largest power of 5 that divides value.
