@@ -1,5 +1,6 @@
 ﻿using J2N.Text;
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -2532,6 +2533,8 @@ namespace J2N
         /// <param name="codePoints">An array of UTF-32 code points.</param>
         /// <returns>A string containing the UTF-16 character equivalent of <paramref name="codePoints"/>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="codePoints"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
+        /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
         public static string ToString(int[] codePoints)
         {
             if (codePoints is null)
@@ -2550,6 +2553,7 @@ namespace J2N
         /// <param name="startIndex">The index of the first code point to convert.</param>
         /// <param name="length">The number of code point elements to to convert to UTF-32 code units and include in the result.</param>
         /// <returns>A <see cref="string"/> containing the UTF-16 code units that correspond to the specified range of <paramref name="codePoints"/> elements.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="codePoints"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within <paramref name="codePoints"/>.
         /// <para/>
@@ -2557,7 +2561,8 @@ namespace J2N
         /// <para/>
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// </exception>
-        /// <exception cref="ArgumentNullException"><paramref name="codePoints"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
+        /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
         public static string ToString(int[] codePoints, int startIndex, int length)
         {
             if (codePoints is null)
@@ -2569,38 +2574,97 @@ namespace J2N
             if (startIndex > codePoints.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
-            int countThreashold = 1024; // If the number of chars exceeds this, we count them instead of allocating count * 2
-            
-            int arrayLength = 0;
-            // if we go over the threashold, count the number of 
-            // chars we will need so we can allocate the precise amount of memory
-            if (length > countThreashold)
+            const int CountThreshold = 1024; // If the number of code points exceeds this, we count them instead of allocating count * 2.
+            const int StackThreshold = 256; // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
+
+            if (length <= StackThreshold)
             {
-                int end = startIndex + length;
-                for (int j = startIndex; j < end; ++j)
+                unsafe
                 {
-                    arrayLength += CharCount(codePoints[j]);
+                    // Initialize our array on the stack with enough space
+                    // assuming the entire string consists of surrogate pairs
+                    // (worst case scenario).
+                    char* buffer = stackalloc char[length * 2];
+                    int stringLength = WriteCodePointsToCharBuffer(buffer, codePoints, startIndex, length);
+                    return new string(buffer, 0, stringLength);
                 }
             }
-            // If we don't have any characters at this point,
-            // as a last resort, assume each codepoint
-            // is 2 characters (since it cannot be longer than this)
-            if (arrayLength < 1)
-            {
-                arrayLength = length * 2;
-            }
 
-            // Initialize our array to our exact or oversized length.
-            // It is now safe to assume we have enough space for all of the characters.
-            char[] buffer = new char[arrayLength];
-            int totalLength = 0;
-            for (int i = startIndex; i < startIndex + length; i++)
+            return ToStringSlow(codePoints, startIndex, length);
+
+            static string ToStringSlow(int[] codePoints, int startIndex, int length)
             {
-                totalLength += ToChars(codePoints[i], buffer, totalLength);
+                int bufferLength = 0;
+                // If we go over the threshold, count the number of chars we
+                // will need so we can allocate the precise amount of memory
+                if (length > CountThreshold)
+                {
+                    int end = startIndex + length; // 1 past the end index
+                    for (int j = startIndex; j < end; ++j)
+                    {
+                        bufferLength += CharCount(codePoints[j]);
+                    }
+                }
+                // If we don't have any characters at this point,
+                // as a last resort, assume each codepoint
+                // is 2 characters (worst case scenario).
+                if (bufferLength < 1)
+                {
+                    bufferLength = length * 2;
+                }
+
+                unsafe
+                {
+                    // Initialize our array on the heap to our exact or oversized length.
+                    // It is now safe to assume we have enough space for all of the characters.
+                    fixed (char* buffer = new char[bufferLength])
+                    {
+                        int stringLength = WriteCodePointsToCharBuffer(buffer, codePoints, startIndex, length);
+                        return new string(buffer, 0, stringLength);
+                    }
+                }
             }
-            // Size the result to the exact length that is counted as the code points
-            // are converted.
-            return new string(buffer, 0, totalLength);
+        }
+
+        /// <summary>
+        /// Converts an an array <paramref name="codePoints"/> to a buffer of UTF-16 code units.
+        /// </summary>
+        /// <param name="buffer">A pointer to the first character of a <see cref="char"/> array.</param>
+        /// <param name="codePoints">An array of UTF-32 code points.</param>
+        /// <param name="startIndex">The index of the first code point to convert.</param>
+        /// <param name="length">The number of code point elements to to convert to UTF-32 code units and include in the result.</param>
+        /// <returns>The total number of <see cref="char"/>s copied to the buffer.</returns>
+        /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
+        /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private unsafe static int WriteCodePointsToCharBuffer(char* buffer, int[] codePoints, int startIndex, int length)
+        {
+            int index = 0;
+            int end = startIndex + length; // 1 past the end index
+            for (int i = startIndex; i < end; i++)
+            {
+                int codePoint = codePoints[i];
+                if (!IsValidCodePoint(codePoint))
+                    throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+
+                if (codePoint < MinSupplementaryCodePoint) // BMP char
+                {
+                    buffer[index++] = (char)codePoint;
+                }
+                else // Surrogate pair
+                {
+                    // See RFC 2781, Section 2.1
+                    // http://www.faqs.org/rfcs/rfc2781.html
+                    int cpPrime = codePoint - 0x10000;
+                    int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
+                    int low = 0xDC00 | (cpPrime & 0x3FF);
+                    buffer[index++] = (char)high;
+                    buffer[index++] = (char)low;
+                }
+            }
+            return index; // This is now the total length
         }
     }
 }
