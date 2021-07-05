@@ -7,7 +7,7 @@ namespace J2N.Benchmarks
     {
         static void Main(string[] args)
         {
-            BenchmarkRunner.Run<BenchmarkFloatingPoint>();
+            BenchmarkRunner.Run<BenchmarkCharacter>();
             //Console.WriteLine("Hello World!");
         }
     }
