@@ -1119,7 +1119,7 @@ namespace J2N.Numerics
         /// <paramref name="s"/> represents a number that is less than <see cref="long.MinValue"/> or greater than <see cref="long.MaxValue"/>.
         /// </exception>
         /// <seealso cref="TryParse(string?, int, out long)"/>
-        /// <seealso cref="Parse(string?, int)"/>
+        /// <seealso cref="GetInstance(string?, int)"/>
         public static long Parse(string? s, int radix) // J2N: Renamed from ParseLong()
         {
             return s != null ?
@@ -1251,7 +1251,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out long)"/>
-        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         public static long Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
             return Parse(s, NumberStyle.Integer, provider);
@@ -2778,80 +2778,6 @@ namespace J2N.Numerics
 
         #endregion ToString
 
-
-        /////**
-        //// * Parses the specified string as a signed decimal long value.
-        //// * 
-        //// * @param string
-        //// *            the string representation of a long value.
-        //// * @return a {@code Long} instance containing the long value represented by
-        //// *         {@code string}.
-        //// * @throws NumberFormatException
-        //// *             if {@code string} is {@code null}, has a length of zero or
-        //// *             can not be parsed as a long value.
-        //// * @see #parseLong(String)
-        //// */
-        ////public static Int64 GetInstance(string value)
-        ////{
-        ////    return GetInstance(Parse(value));
-        ////}
-
-        /**
-         * Parses the specified string as a signed decimal long value.
-         * 
-         * @param string
-         *            the string representation of a long value.
-         * @return a {@code Long} instance containing the long value represented by
-         *         {@code string}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null}, has a length of zero or
-         *             can not be parsed as a long value.
-         * @see #parseLong(String)
-         */
-        public static Int64 GetInstance(string value, IFormatProvider? provider)
-        {
-            return GetInstance(Parse(value, provider));
-        }
-
-        /**
-         * Parses the specified string as a signed decimal long value.
-         * 
-         * @param string
-         *            the string representation of a long value.
-         * @return a {@code Long} instance containing the long value represented by
-         *         {@code string}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null}, has a length of zero or
-         *             can not be parsed as a long value.
-         * @see #parseLong(String)
-         */
-        public static Int64 GetInstance(string value, NumberStyle style, IFormatProvider? provider)
-        {
-            return GetInstance(Parse(value, style, provider));
-        }
-
-        /**
-         * Parses the specified string as a signed long value using the specified
-         * radix.
-         * 
-         * @param string
-         *            the string representation of a long value.
-         * @param radix
-         *            the radix to use when parsing.
-         * @return a {@code Long} instance containing the long value represented by
-         *         {@code string} using {@code radix}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null} or has a length of zero,
-         *             {@code radix < Character.MIN_RADIX},
-         *             {@code radix > Character.MAX_RADIX}, or if {@code string}
-         *             can not be parsed as a long value.
-         * @see #parseLong(String, int)
-         */
-        public static Int64 GetInstance(string value, int radix)
-        {
-            return GetInstance(Parse(value, radix));
-        }
-
         #region HighestOneBit
 
         /// <summary>
@@ -3094,25 +3020,339 @@ namespace J2N.Numerics
 
         #endregion Signum
 
-        /**
-         * Returns a {@code Long} instance for the specified long value.
-         * <p>
-         * If it is not necessary to get a new {@code Long} instance, it is
-         * recommended to use this method instead of the constructor, since it
-         * maintains a cache of instances which may result in better performance.
-         *
-         * @param lng
-         *            the long value to store in the instance.
-         * @return a {@code Long} instance containing {@code lng}.
-         * @since 1.5
-         */
-        public static Int64 GetInstance(long lng)
+        #region GetInstance (ValueOf)
+
+        /// <summary>
+        /// Converts the string representation of a number in a specified culture-specific format to its
+        /// 64-bit signed integer equivalent.
+        /// </summary>
+        /// <param name="s">A string containing a number to convert.</param>
+        /// <param name="provider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information about <paramref name="s"/>.</param>
+        /// <returns>A 64-bit signed integer equivalent to the number specified in <paramref name="s"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException"><paramref name="s"/> is not in a valid <see cref="NumberStyle.Integer"/> format.</exception>
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number less than <see cref="long.MinValue"/> or greater than <see cref="long.MaxValue"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <paramref name="s"/> parameter contains a number of the form:
+        /// <para/>
+        /// [ws][sign]digits[ws]
+        /// <para/>
+        /// Elements in square brackets ([ and ]) are optional. The following table describes each element.
+        /// <para/>
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>ws</i></term>
+        ///         <term>A series of white-space characters.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>$</i></term>
+        ///         <term>A culture-specific currency symbol. Its position in the string is defined by the <see cref="NumberFormatInfo.CurrencyNegativePattern"/>
+        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the <see cref="NumberFormatInfo"/> object returned by the
+        ///             <see cref="IFormatProvider.GetFormat(Type?)"/> method of the <paramref name="provider"/> parameter. The current culture's currency symbol can
+        ///             appear in <paramref name="s"/> if style includes the <see cref="NumberStyle.AllowCurrencySymbol"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign symbol or a positive sign symbol as defined by the <see cref="NumberFormatInfo"/> object returned from the
+        ///         <see cref="IFormatProvider.GetFormat(Type?)"/> <paramref name="provider"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>digits</i></term>
+        ///         <term>A series of digits ranging from 0 to 9.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// The <paramref name="s"/> parameter is interpreted using the <see cref="NumberStyle.Integer"/> style. In addition to decimal digits, only
+        /// leading and trailing spaces together with a leading sign are allowed in <paramref name="s"/>. To explicitly define the style elements
+        /// together with the culture-specific formatting information that can be present in <paramref name="s"/>, use the
+        /// <see cref="GetInstance(string, NumberStyle, IFormatProvider?)"/> method.
+        /// <para/>
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
+        /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
+        /// method returns a <see cref="NumberFormatInfo"/> object. The <see cref="NumberFormatInfo"/> object provides culture-specific information about
+        /// the format of <paramref name="s"/>. When the <see cref="GetInstance(string, IFormatProvider)"/> method is invoked, it calls the provider parameter's
+        /// <see cref="IFormatProvider.GetFormat(Type?)"/> method and passes it a <see cref="Type"/> object that represents the <see cref="NumberFormatInfo"/> type.
+        /// The <see cref="IFormatProvider.GetFormat(Type?)"/> method then returns the <see cref="NumberFormatInfo"/> object that provides information about the
+        /// format of the <paramref name="s"/> parameter. There are three ways to use the <paramref name="provider"/> parameter to supply custom formatting
+        /// information to the parse operation:
+        /// <list type="bullet">
+        ///     <item><description>You can pass a <see cref="CultureInfo"/> object that represents the culture that supplies formatting information. Its
+        ///     <see cref="IFormatProvider.GetFormat(Type?)"/> method returns the <see cref="NumberFormatInfo"/> object that provides numeric formatting
+        ///     information for that culture.</description></item>
+        ///     <item><description>You can pass the actual <see cref="NumberFormatInfo"/> object that provides numeric formatting information. (Its
+        ///     implementation of <see cref="IFormatProvider.GetFormat(Type?)"/> just returns itself.)</description></item>
+        ///     <item><description>You can pass a custom object that implements <see cref="IFormatProvider"/>. Its <see cref="IFormatProvider.GetFormat(Type?)"/>
+        ///     method instantiates and returns the <see cref="NumberFormatInfo"/> object that provides formatting information.</description></item>
+        /// </list>
+        /// If <paramref name="provider"/> is <c>null</c> or a <see cref="NumberFormatInfo"/> object cannot be obtained, the <see cref="NumberFormatInfo"/>
+        /// object for the current culture is used.
+        /// </remarks>
+        /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out long)"/>
+        /// <seealso cref="Parse(string, IFormatProvider?)"/>
+        public static Int64 GetInstance(string s, IFormatProvider? provider)
         {
-            if (lng < -128 || lng > 127)
+            return GetInstance(Parse(s, provider));
+        }
+
+        /// <summary>
+        /// Converts the string representation of a number in a specified style and culture-specific format to its
+        /// <see cref="Int64"/> equivalent.
+        /// </summary>
+        /// <param name="s">A string containing a number to convert.</param>
+        /// <param name="style">A bitwise combination of enumeration values that indicates the style elements that can be
+        /// present in <paramref name="s"/>. A typical value to specify is <see cref="NumberStyle.Integer"/>.</param>
+        /// <param name="provider">An <see cref="IFormatProvider"/> that supplies culture-specific formatting information about <paramref name="s"/>.</param>
+        /// <returns>An immutable <see cref="Int64"/> instance equivalent to the number specified in <paramref name="s"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="style"/> is not a <see cref="NumberStyle"/> value.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="style"/> is not a combination of <see cref="NumberStyle.AllowHexSpecifier"/> and <see cref="NumberStyle.HexNumber"/> values.
+        /// </exception>
+        /// <exception cref="FormatException"><paramref name="s"/> is not in a format compliant with <paramref name="style"/>.</exception>
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number less than <see cref="long.MinValue"/> or greater than <see cref="long.MaxValue"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="s"/> includes non-zero fractional digits.
+        /// </exception>
+        /// <remarks>
+        /// The <paramref name="style"/> parameter defines the style elements (such as white space or the positive sign) that are allowed in the
+        /// <paramref name="s"/> parameter for the parse operation to succeed. It must be a combination of bit flags from the <see cref="NumberStyle"/>
+        /// enumeration. Depending on the value of <paramref name="style"/>, the <paramref name="s"/> parameter may include the following elements:
+        /// <para/>
+        /// [ws][$][sign][digits,]digits[.fractional-digits][e[sign]exponential-digits][ws]
+        /// <para/>
+        /// Or, if the <paramref name="style"/> parameter includes <see cref="NumberStyle.AllowHexSpecifier"/>:
+        /// <para/>
+        /// [ws]hexdigits[ws]
+        /// <para/>
+        /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
+        /// <para/>
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>ws</i></term>
+        ///         <term>A series of white-space characters. White space can appear at the beginning of <paramref name="s"/> if style includes the
+        ///             <see cref="NumberStyle.AllowLeadingWhite"/> flag, and it can appear at the end of <paramref name="s"/> if style includes the
+        ///             <see cref="NumberStyle.AllowTrailingWhite"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>$</i></term>
+        ///         <term>A culture-specific currency symbol. Its position in the string is defined by the <see cref="NumberFormatInfo.CurrencyNegativePattern"/>
+        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the <see cref="NumberFormatInfo"/> object returned by the
+        ///             <see cref="IFormatProvider.GetFormat(Type?)"/> method of the <paramref name="provider"/> parameter. The current culture's currency symbol can
+        ///             appear in <paramref name="s"/> if style includes the <see cref="NumberStyle.AllowCurrencySymbol"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign symbol (-) or a positive sign symbol (+). The sign can appear at the beginning of <paramref name="s"/> if
+        ///             <paramref name="style"/> includes the <see cref="NumberStyle.AllowLeadingSign"/> flag, and it can appear at the end of <paramref name="s"/>
+        ///             if <paramref name="style"/> includes the <see cref="NumberStyle.AllowTrailingSign"/> flag. Parentheses can be used in <paramref name="s"/>
+        ///             to indicate a negative value if <paramref name="style"/> includes the <see cref="NumberStyle.AllowParentheses"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>digits</i></term>
+        ///         <term>A series of digits ranging from 0 to 9.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>.</i></term>
+        ///         <term>A culture-specific decimal point symbol. The decimal point symbol of the culture specified by <paramref name="provider"/>
+        ///         can appear in <paramref name="s"/> if <paramref name="style"/> includes the <see cref="NumberStyle.AllowDecimalPoint"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>fractional-digits</i>
+        ///         </term>
+        ///         <term>A series of digits ranging from 0 to 9 that specify the fractional part of the number. Fractional digits can appear in
+        ///         <paramref name="s"/> if <paramref name="style"/> includes the <see cref="NumberStyle.AllowDecimalPoint"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>e</i></term>
+        ///         <term>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
+        ///         parameter can represent a number in exponential notation if <paramref name="style"/> includes the <see cref="NumberStyle.AllowExponent"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>exponential-digits</i></term>
+        ///         <term>A sequence of decimal digits from 0 through 9 that specify an exponent.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>hexdigits</i></term>
+        ///         <term>A sequence of hexadecimal digits from 0 through f, or 0 through F. Hexadecimal digits can appear in <paramref name="s"/>
+        ///         if <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/> flag.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// NOTE: Any terminating NUL (U+0000) characters in <paramref name="s"/> are ignored by the parsing operation, regardless of
+        /// the value of the <paramref name="style"/> argument.
+        /// <para/>
+        /// A string with decimal digits only (which corresponds to the <see cref="NumberStyle.None"/> flag) always parses successfully.
+        /// Most of the remaining <see cref="NumberStyle"/> members control elements that may be but are not required to be present in
+        /// this input string. The following table indicates how individual <see cref="NumberStyle"/> members affect the elements that may
+        /// be present in <paramref name="s"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Non-composite NumberStyle values</term>
+        ///         <term>Elements permitted in <paramref name="s"/> in addition to digits</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.None"/></term>
+        ///         <term>Decimal digits only.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowDecimalPoint"/></term>
+        ///         <term>The decimal point (.) and <i>fractional-digits</i> elements. However, <i>fractional-digits</i> must consist
+        ///         of only one or more 0 digits or the method returns <c>false</c>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowExponent"/></term>
+        ///         <term>The <paramref name="s"/> parameter can also use exponential notation. If <paramref name="s"/> represents a
+        ///         number in exponential notation, it must represent an integer within the range of the <see cref="long"/> data type
+        ///         without a non-zero, fractional component.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowLeadingWhite"/></term>
+        ///         <term>The <i>ws</i> element at the beginning of <paramref name="s"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowTrailingWhite"/></term>
+        ///         <term>The <i>ws</i> element at the end of <paramref name="s"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowLeadingSign"/></term>
+        ///         <term>A sign can appear before <i>digits</i>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowTrailingSign"/></term>
+        ///         <term>A sign can appear after <i>digits</i>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowParentheses"/></term>
+        ///         <term>The <i>sign</i> element in the form of parentheses enclosing the numeric value.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowThousands"/></term>
+        ///         <term>The thousands separator (,) element.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowCurrencySymbol"/></term>
+        ///         <term>The <i>$</i> element.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
+        /// <see cref="NumberStyleExtensions.ToNumberStyles(NumberStyle)"/> extension method.
+        /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
+        /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
+        /// <para/>
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
+        /// For example, "F3" parses successfully, but "0xF3" does not. The only other flags that can be present in <paramref name="style"/> are
+        /// <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/> enumeration
+        /// has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
+        /// <para/>
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
+        /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
+        /// method returns a <see cref="NumberFormatInfo"/> object. The <see cref="NumberFormatInfo"/> object provides culture-specific information about
+        /// the format of <paramref name="s"/>. When the <see cref="GetInstance(string, IFormatProvider)"/> method is invoked, it calls the provider parameter's
+        /// <see cref="IFormatProvider.GetFormat(Type?)"/> method and passes it a <see cref="Type"/> object that represents the <see cref="NumberFormatInfo"/> type.
+        /// The <see cref="IFormatProvider.GetFormat(Type?)"/> method then returns the <see cref="NumberFormatInfo"/> object that provides information about the
+        /// format of the <paramref name="s"/> parameter. There are three ways to use the <paramref name="provider"/> parameter to supply custom formatting
+        /// information to the parse operation:
+        /// <list type="bullet">
+        ///     <item><description>You can pass a <see cref="CultureInfo"/> object that represents the culture that supplies formatting information. Its
+        ///     <see cref="IFormatProvider.GetFormat(Type?)"/> method returns the <see cref="NumberFormatInfo"/> object that provides numeric formatting
+        ///     information for that culture.</description></item>
+        ///     <item><description>You can pass the actual <see cref="NumberFormatInfo"/> object that provides numeric formatting information. (Its
+        ///     implementation of <see cref="IFormatProvider.GetFormat(Type?)"/> just returns itself.)</description></item>
+        ///     <item><description>You can pass a custom object that implements <see cref="IFormatProvider"/>. Its <see cref="IFormatProvider.GetFormat(Type?)"/>
+        ///     method instantiates and returns the <see cref="NumberFormatInfo"/> object that provides formatting information.</description></item>
+        /// </list>
+        /// If <paramref name="provider"/> is <c>null</c> or a <see cref="NumberFormatInfo"/> object cannot be obtained, the <see cref="NumberFormatInfo"/>
+        /// object for the current culture is used.
+        /// </remarks>
+        /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out long)"/>
+        /// <seealso cref="Parse(string, NumberStyle, IFormatProvider?)"/>
+        public static Int64 GetInstance(string s, NumberStyle style, IFormatProvider? provider)
+        {
+            return GetInstance(Parse(s, style, provider));
+        }
+
+        /// <summary>
+        /// Parses the <see cref="string"/> argument as a signed <see cref="Int64"/> instance in the specified <paramref name="radix"/>. 
+        /// <para/>
+        /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method. It differs in that
+        /// it allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/>.
+        /// <para/>
+        /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
+        /// <para/>
+        /// This is the same operation as Long.valueOf(string) in the JDK when specifying a <paramref name="radix"/> of 10, or
+        /// Long.valueOf(string, int) for any valid <paramref name="radix"/>.
+        /// </summary>
+        /// <param name="s">The <see cref="string"/> containing the <see cref="long"/> representation to be parsed.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <returns>An immutable <see cref="Int64"/> instance that is equivalent to the number in <paramref name="s"/>, or 0 (zero) if
+        /// <paramref name="s"/> is <c>null</c>.</returns>
+        /// <remarks>
+        /// If <paramref name="radix"/> is 16, you can prefix the number specified by the <paramref name="s"/> parameter with "0x" or "0X".
+        /// <para/>
+        /// To specify a negative value for base (radix) 10 numeric representations, use the ASCII character \u002d ('-').
+        /// <para/>
+        /// For any other <paramref name="radix"/>,  negative values may either be specified with ASCII character \u002d ('-')
+        /// (as in Java) or by specifying the two's complement representation (as in .NET), but not both.
+        /// In the latter case, the highest-order binary bit of a long integer (bit 63) is interpreted as the sign bit.
+        /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="long"/>
+        /// data type is converted to an <see cref="long"/> value without the method throwing an exception.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="s"/> contains a character that is not a valid digit in the base specified by <paramref name="radix"/>.
+        /// The exception message indicates that there are no digits to convert if the first character in <paramref name="s"/> is invalid;
+        /// otherwise, the message indicates that <paramref name="s"/> contains invalid trailing characters.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="s"/> contains only a the ASCII character \u002d ('-') or \u002B ('+') sign and/or hexadecimal
+        /// prefix 0X or 0x with no digits.
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number that is less than <see cref="long.MinValue"/> or greater than <see cref="long.MaxValue"/>.
+        /// </exception>
+        /// <seealso cref="TryParse(string?, int, out long)"/>
+        /// <seealso cref="Parse(string?, int)"/>
+        public static Int64 GetInstance(string s, int radix)
+        {
+            return GetInstance(Parse(s, radix));
+        }
+
+        /// <summary>
+        /// Returns an immutable <see cref="Int64"/> instance for the specified <paramref name="value"/>.
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.valueOf() in the JDK.
+        /// </summary>
+        /// <param name="value">The <see cref="long"/> value the returned instance represents.</param>
+        /// <returns>An immutable <see cref="Int64"/> instance containing the <paramref name="value"/>,
+        /// which may be retrieved from a cache.</returns>
+        public static Int64 GetInstance(long value)
+        {
+            if (value < -128 || value > 127)
             {
-                return new Int64(lng);
+                return new Int64(value);
             }
-            return ValueOfCache.Cache[128 + (int)lng];
+            return ValueOfCache.Cache[128 + (int)value];
         }
 
         private static class ValueOfCache
@@ -3129,9 +3369,9 @@ namespace J2N.Numerics
                     cache[i + 128] = new Int64(i);
                 return cache;
             }
-
         }
 
+        #endregion GetInstance (ValueOf)
 
         // J2N: Support implicit conversion
 
