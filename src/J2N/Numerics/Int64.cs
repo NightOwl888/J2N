@@ -10,7 +10,45 @@ namespace J2N.Numerics
 {
     using SR = J2N.Resources.Strings;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// An immutable reference type that wraps the primitive <see cref="long"/> type.
+    /// <para/>
+    /// In addition, this class provides methods for converting a <see cref="long"/> to a <see cref="string"/> and
+    /// a <see cref="string"/> to a <see cref="long"/> that are compatible with Java.
+    /// <para/>
+    /// Instances of this class can be produced implicitly by setting a <see cref="long"/> value to a variable declared
+    /// as <see cref="Int64"/>
+    /// <code>
+    /// long value = 4;
+    /// Int64 instance = value;
+    /// </code>
+    /// Or explicitly by calling one of the <see cref="GetInstance(long)"/>, <see cref="Decode(string)"/>,
+    /// or <see cref="TryDecode(string, out Int64)"/> methods.
+    /// <para/>
+    /// The <see cref="long"/> value of an <see cref="Int64"/> can also be retrieved in several ways. For implicit
+    /// conversion, simply assign a <see cref="long"/> variable an instance of <see cref="Int64"/>.
+    /// <code>
+    /// Int64 instance = Int64.GetInstance(4);
+    /// long value = instance;
+    /// </code>
+    /// To explicitly get the value, call <see cref="ToInt64()"/> or use the <see cref="Convert"/> class.
+    /// <code>
+    /// long converted1 = instance.ToInt64();
+    /// long converted2 = Convert.ToInt64(instance, NumberFormatInfo.InvariantInfo);
+    /// </code>
+    /// <para/>
+    /// In most cases, the number types in .NET will suffice. The main reason for creating an object to wrap numeric types is to
+    /// provide a way to make strongly-typed instances that can co-exist in collections and arrays with reference types.
+    /// For example, when creating a table object that has columns with a mix of number and string data types.
+    /// When porting code from Java, there are sometimes cases where the design didn't factor in the use of value types,
+    /// so these classes can be used rather than reworking the design.
+    /// For more information about numbers classes, see
+    /// <a href="https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html">The Numbers Classes</a>.
+    /// </summary>
+    /// <seealso cref="Number"/>
+    /// <seealso cref="IConvertible"/>
+    /// <seealso cref="IFormattable"/>
+    /// <seealso cref="IComparable"/>
     public sealed class Int64 : Number, IComparable<Int64>, IComparable, IConvertible, IEquatable<Int64>
     {
         /// <summary>

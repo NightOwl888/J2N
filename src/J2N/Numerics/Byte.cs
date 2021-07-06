@@ -14,8 +14,44 @@ namespace J2N.Numerics
     using SR = J2N.Resources.Strings;
 
     /// <summary>
-    /// The wrapper for the primitive type <see cref="byte"/>.
+    /// An immutable reference type that wraps the primitive <see cref="byte"/> type.
+    /// <para/>
+    /// In addition, this class provides methods for converting a <see cref="byte"/> to a <see cref="string"/> and
+    /// a <see cref="string"/> to a <see cref="byte"/> that are compatible with Java.
+    /// <para/>
+    /// Instances of this class can be produced implicitly by setting a <see cref="byte"/> value to a variable declared
+    /// as <see cref="Byte"/>
+    /// <code>
+    /// byte value = 4;
+    /// Byte instance = value;
+    /// </code>
+    /// Or explicitly by calling one of the <see cref="GetInstance(byte)"/>, <see cref="Decode(string)"/>,
+    /// or <see cref="TryDecode(string, out Byte)"/> methods.
+    /// <para/>
+    /// The <see cref="byte"/> value of a <see cref="Byte"/> can also be retrieved in several ways. For implicit
+    /// conversion, simply assign a <see cref="byte"/> variable an instance of <see cref="Byte"/>.
+    /// <code>
+    /// Byte instance = Byte.GetInstance((byte)4);
+    /// byte value = instance;
+    /// </code>
+    /// To explicitly get the value, call <see cref="ToByte()"/> or use the <see cref="Convert"/> class.
+    /// <code>
+    /// byte converted1 = instance.ToByte();
+    /// byte converted2 = Convert.ToByte(instance, NumberFormatInfo.InvariantInfo);
+    /// </code>
+    /// <para/>
+    /// In most cases, the number types in .NET will suffice. The main reason for creating an object to wrap numeric types is to
+    /// provide a way to make strongly-typed instances that can co-exist in collections and arrays with reference types.
+    /// For example, when creating a table object that has columns with a mix of number and string data types.
+    /// When porting code from Java, there are sometimes cases where the design didn't factor in the use of value types,
+    /// so these classes can be used rather than reworking the design.
+    /// For more information about numbers classes, see
+    /// <a href="https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html">The Numbers Classes</a>.
     /// </summary>
+    /// <seealso cref="Number"/>
+    /// <seealso cref="IConvertible"/>
+    /// <seealso cref="IFormattable"/>
+    /// <seealso cref="IComparable"/>
     public sealed class Byte : Number, IComparable<Byte>, IComparable, IConvertible, IEquatable<Byte>
     {
         /// <summary>
