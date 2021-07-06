@@ -1225,7 +1225,7 @@ namespace J2N.Numerics
         /// <param name="s">The <see cref="string"/> containing the <see cref="byte"/> representation to be parsed.</param>
         /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
         /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
-        /// <returns>A 16-bit signed integer that is equivalent to the number in <paramref name="s"/>, or 0 (zero) if
+        /// <returns>An 8-bit unsigned integer that is equivalent to the number in <paramref name="s"/>, or 0 (zero) if
         /// <paramref name="s"/> is <c>null</c>.</returns>
         /// <remarks>
         /// If <paramref name="radix"/> is 16, you can prefix the number specified by the <paramref name="s"/> parameter with "0x" or "0X".
@@ -1348,9 +1348,9 @@ namespace J2N.Numerics
         #region Parse_CharSequence_IFormatProvider
 
         /// <summary>
-        /// Converts the span representation of a number in a specified style and culture-specific format to its <see cref="byte"/> equivalent.
+        /// Converts the string representation of a number in a specified style and culture-specific format to its <see cref="byte"/> equivalent.
         /// </summary>
-        /// <param name="s">A span containing the characters representing the value to convert. The string is interpreted using the <see cref="NumberStyle.Integer"/> style.
+        /// <param name="s">A string containing the characters representing the value to convert. The string is interpreted using the <see cref="NumberStyle.Integer"/> style.
         /// For compatibility with Java's byte (which is an 8-bit signed byte) the
         /// value may be from <c>"-127"</c> to <c>"255"</c>. Negative numbers in this range will overflow and become high-order positive numbers.</param>
         /// <param name="provider">An object that supplies culture-specific information about the format of <paramref name="s"/>. If provider is <c>null</c>,
@@ -1425,7 +1425,7 @@ namespace J2N.Numerics
         #region TryParse_CharSequence_Byte
 
         /// <summary>
-        /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed
+        /// Converts the string representation of a number in a specified style and culture-specific format to its 8-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
         /// <para/>
         /// Usage Note: When porting from Java, note that this is a culture-sensitive method. Java uses the invariant
@@ -1437,7 +1437,7 @@ namespace J2N.Numerics
         /// but Java only ever throws NumberFormatException in any of those cases. Using <see cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/>
         /// means a <see cref="FormatException"/> can be thrown in any of those error condtions when it returns <c>false</c>.
         /// </summary>
-        /// <param name="s">A span containing the characters that represent the number to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
+        /// <param name="s">A string containing the characters that represent the number to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
         /// value may be from <c>"-127"</c> to <c>"255"</c>. Negative numbers in this range will overflow and become high-order positive numbers.</param>
         /// <param name="result">When this method returns, contains the 8-bit signed integer value equivalent of
         /// the number contained in <paramref name="s"/>, if the conversion succeeded, or zero if the conversion failed.
@@ -1579,9 +1579,9 @@ namespace J2N.Numerics
         #region Parse_CharSequence_NumberStyle_IFormatProvider
 
         /// <summary>
-        /// Converts the span representation of a number in a specified style and culture-specific format to its <see cref="byte"/> equivalent.
+        /// Converts the string representation of a number in a specified style and culture-specific format to its <see cref="byte"/> equivalent.
         /// </summary>
-        /// <param name="s">A span containing the characters representing the value to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
+        /// <param name="s">A string containing the characters representing the value to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
         /// value may be from <c>"-127"</c> to <c>"255"</c>. Negative numbers in this range will overflow and become high-order positive numbers.</param>
         /// <param name="style">A bitwise combination of enumeration values that indicates the style elements that can be present in <paramref name="s"/>.
         /// A typical value to specify is <see cref="NumberStyle.Integer"/>.</param>
@@ -2951,112 +2951,343 @@ namespace J2N.Numerics
 
         #endregion ToString
 
-        /////**
-        //// * Parses the specified string as a signed decimal byte value.
-        //// * 
-        //// * @param string
-        //// *            the string representation of a single byte value.
-        //// * @return a {@code Byte} instance containing the byte value represented by
-        //// *         {@code string}.
-        //// * @throws NumberFormatException
-        //// *             if {@code string} is {@code null}, has a length of zero or
-        //// *             can not be parsed as a byte value.
-        //// * @see #parseByte(String)
-        //// */
-        ////public static Byte GetInstance(string value)
-        ////{
-        ////    return GetInstance(Parse(value));
-        ////}
+        #region GetInstance (ValueOf)
 
-        /**
-         * Parses the specified string as a signed decimal byte value.
-         * 
-         * @param string
-         *            the string representation of a single byte value.
-         * @return a {@code Byte} instance containing the byte value represented by
-         *         {@code string}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null}, has a length of zero or
-         *             can not be parsed as a byte value.
-         * @see #parseByte(String)
-         */
+        /// <summary>
+        /// Converts the string representation of a number in a specified style and culture-specific format to its <see cref="Byte"/> equivalent.
+        /// </summary>
+        /// <param name="s">A string containing the characters representing the value to convert. The string is interpreted using the <see cref="NumberStyle.Integer"/> style.
+        /// For compatibility with Java's byte (which is an 8-bit signed byte) the
+        /// value may be from <c>"-127"</c> to <c>"255"</c>. Negative numbers in this range will overflow and become high-order positive numbers.</param>
+        /// <param name="provider">An object that supplies culture-specific information about the format of <paramref name="s"/>. If provider is <c>null</c>,
+        /// the thread current culture is used.</param>
+        /// <returns>An immutable <see cref="Byte"/> instance that is equivalent to the number contained in <paramref name="s"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException"><paramref name="s"/> is not of the correct format.</exception>
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number less than <see cref="sbyte.MinValue"/> or <see cref="byte.MaxValue"/>.
+        /// </exception>
+        /// <remarks>
+        /// The s parameter contains a number of the form:
+        /// <para/>
+        /// [ws][sign]digits[ws]
+        /// <para/>
+        /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
+        /// <para/>
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>ws</i></term>
+        ///         <term>A series of white-space characters.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign symbol (-) or a positive sign symbol (+).</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>digits</i></term>
+        ///         <term>A series of digits ranging from 0 to 9.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// NOTE: Any terminating NUL (U+0000) characters in <paramref name="s"/> are ignored by the parsing operation.
+        /// <para/>
+        /// The <paramref name="s"/> parameter is interpreted using the <see cref="NumberStyle.Integer"/> style. In addition to the byte value's
+        /// decimal digits, only leading and trailing spaces together with a leading sign are allowed. To explicitly define the style elements
+        /// together with the culture-specific formatting information that can be present in <paramref name="s"/>, use the
+        /// <see cref="GetInstance(string, NumberStyle, IFormatProvider?)"/> method.
+        /// <para/>
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
+        /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
+        /// method returns a <see cref="NumberFormatInfo"/> object. The <see cref="NumberFormatInfo"/> object provides culture-specific information about
+        /// the format of <paramref name="s"/>. When the <see cref="GetInstance(string, IFormatProvider)"/> method is invoked, it calls the provider parameter's
+        /// <see cref="IFormatProvider.GetFormat(Type?)"/> method and passes it a <see cref="Type"/> object that represents the <see cref="NumberFormatInfo"/> type.
+        /// The <see cref="IFormatProvider.GetFormat(Type?)"/> method then returns the <see cref="NumberFormatInfo"/> object that provides information about the
+        /// format of the <paramref name="s"/> parameter. There are three ways to use the <paramref name="provider"/> parameter to supply custom formatting
+        /// information to the parse operation:
+        /// <list type="bullet">
+        ///     <item><description>You can pass a <see cref="CultureInfo"/> object that represents the culture that supplies formatting information. Its
+        ///     <see cref="IFormatProvider.GetFormat(Type?)"/> method returns the <see cref="NumberFormatInfo"/> object that provides numeric formatting
+        ///     information for that culture.</description></item>
+        ///     <item><description>You can pass the actual <see cref="NumberFormatInfo"/> object that provides numeric formatting information. (Its
+        ///     implementation of <see cref="IFormatProvider.GetFormat(Type?)"/> just returns itself.)</description></item>
+        ///     <item><description>You can pass a custom object that implements <see cref="IFormatProvider"/>. Its <see cref="IFormatProvider.GetFormat(Type?)"/>
+        ///     method instantiates and returns the <see cref="NumberFormatInfo"/> object that provides formatting information.</description></item>
+        /// </list>
+        /// If <paramref name="provider"/> is <c>null</c> or a <see cref="NumberFormatInfo"/> object cannot be obtained, the <see cref="NumberFormatInfo"/>
+        /// object for the current culture is used.
+        /// </remarks>
+        /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/>
+        /// <seealso cref="Parse(string, IFormatProvider?)"/>
         public static Byte GetInstance(string s, IFormatProvider? provider)
         {
             return GetInstance(Parse(s, provider));
         }
 
-        /**
-         * Parses the specified string as a signed decimal byte value.
-         * 
-         * @param string
-         *            the string representation of a single byte value.
-         * @return a {@code Byte} instance containing the byte value represented by
-         *         {@code string}.
-         * @throws NumberFormatException
-         *             if {@code string} is {@code null}, has a length of zero or
-         *             can not be parsed as a byte value.
-         * @see #parseByte(String)
-         */
+        /// <summary>
+        /// Converts the string representation of a number in a specified style and culture-specific format to its <see cref="Byte"/> equivalent.
+        /// </summary>
+        /// <param name="s">A string containing the characters representing the value to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
+        /// value may be from <c>"-127"</c> to <c>"255"</c>. Negative numbers in this range will overflow and become high-order positive numbers.</param>
+        /// <param name="style">A bitwise combination of enumeration values that indicates the style elements that can be present in <paramref name="s"/>.
+        /// A typical value to specify is <see cref="NumberStyle.Integer"/>.</param>
+        /// <param name="provider">An object that supplies culture-specific information about the format of <paramref name="s"/>. If provider is <c>null</c>,
+        /// the thread current culture is used.</param>
+        /// <returns>An immutable <see cref="Byte"/> instance that is equivalent to the number contained in <paramref name="s"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="s"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException"><paramref name="s"/> is not of the correct format.</exception>
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number less than <see cref="sbyte.MinValue"/> or <see cref="byte.MaxValue"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="s"/> includes non-zero, fractional digits.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="style"/> is not a <see cref="NumberStyle"/> value.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="style"/> is not a combination of <see cref="NumberStyle.AllowHexSpecifier"/> and <see cref="NumberStyle.HexNumber"/> values.
+        /// </exception>
+        /// <remarks>
+        /// The <paramref name="style"/> parameter defines the style elements (such as white space or the positive sign) that are allowed in the
+        /// <paramref name="s"/> parameter for the parse operation to succeed. It must be a combination of bit flags from the <see cref="NumberStyle"/>
+        /// enumeration. Depending on the value of <paramref name="style"/>, the <paramref name="s"/> parameter may include the following elements:
+        /// <para/>
+        /// [ws][$][sign]digits[.fractional-digits][e[sign]exponential-digits][ws]
+        /// <para/>
+        /// Or, if the <paramref name="style"/> parameter includes <see cref="NumberStyle.AllowHexSpecifier"/>:
+        /// <para/>
+        /// [ws]hexdigits[ws]
+        /// <para/>
+        /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
+        /// <para/>
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Element</term>
+        ///         <term>Description</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><i>ws</i></term>
+        ///         <term>A series of white-space characters. White space can appear at the beginning of <paramref name="s"/> if style includes the
+        ///             <see cref="NumberStyle.AllowLeadingWhite"/> flag, and it can appear at the end of <paramref name="s"/> if style includes the
+        ///             <see cref="NumberStyle.AllowTrailingWhite"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>$</i></term>
+        ///         <term>A culture-specific currency symbol. Its position in the string is defined by the <see cref="NumberFormatInfo.CurrencyNegativePattern"/>
+        ///             and <see cref="NumberFormatInfo.CurrencyPositivePattern"/> properties of the <see cref="NumberFormatInfo"/> object returned by the
+        ///             <see cref="IFormatProvider.GetFormat(Type?)"/> method of the <paramref name="provider"/> parameter. The current culture's currency symbol can
+        ///             appear in <paramref name="s"/> if style includes the <see cref="NumberStyle.AllowCurrencySymbol"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>sign</i></term>
+        ///         <term>A negative sign symbol (-) or a positive sign symbol (+). The sign can appear at the beginning of <paramref name="s"/> if
+        ///             <paramref name="style"/> includes the <see cref="NumberStyle.AllowLeadingSign"/> flag, and it can appear at the end of <paramref name="s"/>
+        ///             if <paramref name="style"/> includes the <see cref="NumberStyle.AllowTrailingSign"/> flag. Parentheses can be used in <paramref name="s"/>
+        ///             to indicate a negative value if <paramref name="style"/> includes the <see cref="NumberStyle.AllowParentheses"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>digits</i></term>
+        ///         <term>A series of digits ranging from 0 to 9.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>.</i></term>
+        ///         <term>A culture-specific decimal point symbol. The decimal point symbol of the culture specified by <paramref name="provider"/>
+        ///         can appear in <paramref name="s"/> if <paramref name="style"/> includes the <see cref="NumberStyle.AllowDecimalPoint"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>fractional-digits</i>
+        ///         </term>
+        ///         <term>A series of digits ranging from 0 to 9 that specify the fractional part of the number. Fractional digits can appear in
+        ///         <paramref name="s"/> if <paramref name="style"/> includes the <see cref="NumberStyle.AllowDecimalPoint"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>e</i></term>
+        ///         <term>The 'e' or 'E' character, which indicates that the value is represented in exponential notation. The <paramref name="s"/>
+        ///         parameter can represent a number in exponential notation if <paramref name="style"/> includes the <see cref="NumberStyle.AllowExponent"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>exponential-digits</i></term>
+        ///         <term>A sequence of decimal digits from 0 through 9 that specify an exponent.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>hexdigits</i></term>
+        ///         <term>A sequence of hexadecimal digits from 0 through f, or 0 through F. Hexadecimal digits can appear in <paramref name="s"/>
+        ///         if <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/> flag.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// NOTE: Any terminating NUL (U+0000) characters in <paramref name="s"/> are ignored by the parsing operation, regardless of
+        /// the value of the <paramref name="style"/> argument.
+        /// <para/>
+        /// A string with decimal digits only (which corresponds to the <see cref="NumberStyle.None"/> flag) always parses successfully.
+        /// Most of the remaining <see cref="NumberStyle"/> members control elements that may be but are not required to be present in
+        /// this input string. The following table indicates how individual <see cref="NumberStyle"/> members affect the elements that may
+        /// be present in <paramref name="s"/>.
+        /// <list type="table">
+        ///     <listheader>
+        ///         <term>Non-composite NumberStyle values</term>
+        ///         <term>Elements permitted in <paramref name="s"/> in addition to digits</term>
+        ///     </listheader>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.None"/></term>
+        ///         <term>Decimal digits only.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowDecimalPoint"/></term>
+        ///         <term>The decimal point (.) and <i>fractional-digits</i> elements. However, <i>fractional-digits</i> must consist
+        ///         of only one or more 0 digits or the method returns <c>false</c>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowExponent"/></term>
+        ///         <term>The <paramref name="s"/> parameter can also use exponential notation. If <paramref name="s"/> represents a
+        ///         number in exponential notation, it must represent an integer within the range of the <see cref="byte"/> data type
+        ///         without a non-zero, fractional component.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowLeadingWhite"/></term>
+        ///         <term>The <i>ws</i> element at the beginning of <paramref name="s"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowTrailingWhite"/></term>
+        ///         <term>The <i>ws</i> element at the end of <paramref name="s"/>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowLeadingSign"/></term>
+        ///         <term>A sign can appear before <i>digits</i>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowTrailingSign"/></term>
+        ///         <term>A sign can appear after <i>digits</i>.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowParentheses"/></term>
+        ///         <term>The <i>sign</i> element in the form of parentheses enclosing the numeric value.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowThousands"/></term>
+        ///         <term>The thousands separator (,) element.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowCurrencySymbol"/></term>
+        ///         <term>The <i>$</i> element.</term>
+        ///     </item>
+        /// </list>
+        /// <para/>
+        /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
+        /// <see cref="NumberStyleExtensions.ToNumberStyles(NumberStyle)"/> extension method.
+        /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
+        /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
+        /// <para/>
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
+        /// For example, "F3" parses successfully, but "0xF3" does not. The only other flags that can be present in <paramref name="style"/> are
+        /// <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/> enumeration
+        /// has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
+        /// <para/>
+        /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
+        /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
+        /// method returns a <see cref="NumberFormatInfo"/> object. The <see cref="NumberFormatInfo"/> object provides culture-specific information about
+        /// the format of <paramref name="s"/>. When the <see cref="GetInstance(string, IFormatProvider)"/> method is invoked, it calls the provider parameter's
+        /// <see cref="IFormatProvider.GetFormat(Type?)"/> method and passes it a <see cref="Type"/> object that represents the <see cref="NumberFormatInfo"/> type.
+        /// The <see cref="IFormatProvider.GetFormat(Type?)"/> method then returns the <see cref="NumberFormatInfo"/> object that provides information about the
+        /// format of the <paramref name="s"/> parameter. There are three ways to use the <paramref name="provider"/> parameter to supply custom formatting
+        /// information to the parse operation:
+        /// <list type="bullet">
+        ///     <item><description>You can pass a <see cref="CultureInfo"/> object that represents the culture that supplies formatting information. Its
+        ///     <see cref="IFormatProvider.GetFormat(Type?)"/> method returns the <see cref="NumberFormatInfo"/> object that provides numeric formatting
+        ///     information for that culture.</description></item>
+        ///     <item><description>You can pass the actual <see cref="NumberFormatInfo"/> object that provides numeric formatting information. (Its
+        ///     implementation of <see cref="IFormatProvider.GetFormat(Type?)"/> just returns itself.)</description></item>
+        ///     <item><description>You can pass a custom object that implements <see cref="IFormatProvider"/>. Its <see cref="IFormatProvider.GetFormat(Type?)"/>
+        ///     method instantiates and returns the <see cref="NumberFormatInfo"/> object that provides formatting information.</description></item>
+        /// </list>
+        /// If <paramref name="provider"/> is <c>null</c> or a <see cref="NumberFormatInfo"/> object cannot be obtained, the <see cref="NumberFormatInfo"/>
+        /// object for the current culture is used.
+        /// </remarks>
+        /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/>
+        /// <seealso cref="Parse(string, NumberStyle, IFormatProvider?)"/>
         public static Byte GetInstance(string s, NumberStyle style, IFormatProvider? provider)
         {
             return GetInstance(Parse(s, style, provider));
         }
 
         /// <summary>
-        /// Parses the specified string as a signed or unsigned byte value using the specified
-        /// radix.
+        /// Parses the <see cref="string"/> argument as a <see cref="Byte"/> in the specified <paramref name="radix"/>. 
         /// <para/>
-        /// Usage Note: In Java, the range allowed is from -128 to 127, however for compatibility
-        /// reasons we have extended the range from -128 to 255. The value of the returned instance
-        /// will be from 0 to 255, so if a negative value is required it is up to the user to
-        /// cast to <see cref="sbyte"/>.
+        /// Usage Note: The conversion operation is similar to the <see cref="Convert.ToByte(string?, int)"/> method. It differs in that
+        /// it allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/>.
+        /// <para/>
+        /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
+        /// <para/>
+        /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
+        /// but the value stored is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
+        /// <para/>
+        /// This is the same operation as Byte.valueOf(string) in the JDK when specifying a <paramref name="radix"/> of 10, or
+        /// Byte.valueOf(string, int) for any valid <paramref name="radix"/>.
         /// </summary>
-        /// <param name="s">The string representation of a single <see cref="byte"/> or <see cref="sbyte"/> value.</param>
-        /// <param name="radix">The radix to use when parsing. This is the same as <c>fromBase</c> in <see cref="Convert.ToInt32(string?, int)"/>,
-        /// except the range is expanded from <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/>, whereas <see cref="Convert.ToInt32(string?, int)"/>
-        /// only supports 2, 8, 10, or 16.</param>
-        /// <returns>A <see cref="Byte"/> instance containing the <see cref="byte"/> value represented by
-        /// <paramref name="s"/> using <paramref name="radix"/>.</returns>
-        /// <exception cref="FormatException">
-        /// <paramref name="s"/> is <c>null</c> or has a length of zero.
+        /// <param name="s">The <see cref="string"/> containing the <see cref="byte"/> representation to be parsed.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <returns>An immutable <see cref="Byte"/> instance that is equivalent to the number in <paramref name="s"/>, or 0 (zero) if
+        /// <paramref name="s"/> is <c>null</c>.</returns>
+        /// <remarks>
+        /// If <paramref name="radix"/> is 16, you can prefix the number specified by the <paramref name="s"/> parameter with "0x" or "0X".
         /// <para/>
-        /// -or-
+        /// To specify a negative value for base (radix) 10 numeric representations, use the ASCII character \u002d ('-').
         /// <para/>
+        /// For any other <paramref name="radix"/>,  negative values may either be specified with ASCII character \u002d ('-')
+        /// (as in Java) or by specifying the two's complement representation (as in .NET), but not both.
+        /// In the latter case, the highest-order binary bit of a long integer (bit 7) is interpreted as the sign bit.
+        /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="byte"/>
+        /// data type is converted to a <see cref="byte"/> value without the method throwing an exception.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="s"/> contains a character that is not a valid digit in the base specified by <paramref name="radix"/>.
+        /// The exception message indicates that there are no digits to convert if the first character in <paramref name="s"/> is invalid;
+        /// otherwise, the message indicates that <paramref name="s"/> contains invalid trailing characters.
         /// <para/>
         /// -or-
         /// <para/>
-        /// <paramref name="s"/> cannot be parsed as a <see cref="byte"/> or <see cref="sbyte"/> value.
+        /// <paramref name="s"/> contains only a the ASCII character \u002d ('-') or \u002B ('+') sign and/or hexadecimal
+        /// prefix 0X or 0x with no digits.
         /// </exception>
-        /// <seealso cref="Parse(string, int)"/>
-        public static Byte GetInstance(string s, int radix) // J2N TODO: Exception handling - throw ArgumentOutOfRangeException and ArgumentNullException? Accept null like Convert.ToInt32() does?
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number that is less than <see cref="sbyte.MinValue"/> or greater than <see cref="byte.MaxValue"/>.
+        /// </exception>
+        /// <seealso cref="TryParse(string?, int, out byte)"/>
+        /// <seealso cref="Parse(string?, int)"/>
+        public static Byte GetInstance(string s, int radix)
         {
             return GetInstance(Parse(s, radix));
         }
 
-        /**
-         * Returns a {@code Byte} instance for the specified byte value.
-         * <p>
-         * If it is not necessary to get a new {@code Byte} instance, it is
-         * recommended to use this method instead of the constructor, since it
-         * maintains a cache of instances which may result in better performance.
-         * 
-         * @param b
-         *            the byte value to store in the instance.
-         * @return a {@code Byte} instance containing {@code b}.
-         * @since 1.5
-         */
-        public static Byte GetInstance(byte b)
+        /// <summary>
+        /// Returns an immutable <see cref="Byte"/> instance for the specified <paramref name="value"/>.
+        /// <para/>
+        /// Usage Note: This is the same operation as Byte.valueOf() in the JDK.
+        /// </summary>
+        /// <param name="value">The <see cref="byte"/> value the returned instance represents.</param>
+        /// <returns>An immutable <see cref="Byte"/> instance containing the <paramref name="value"/>,
+        /// which may be retrieved from a cache.</returns>
+        public static Byte GetInstance(byte value)
         {
             lock (Cache)
             {
-                int idx = b - byte.MinValue;
+                int idx = value - byte.MinValue;
                 Byte result = Cache[idx];
-                return result ?? (Cache[idx] = new Byte(b));
+                return result ?? (Cache[idx] = new Byte(value));
             }
         }
 
-
+        #endregion GetInstance (ValueOf)
 
         // J2N: Support implicit conversion
 
