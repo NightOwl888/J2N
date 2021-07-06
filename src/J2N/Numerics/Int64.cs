@@ -438,8 +438,6 @@ namespace J2N.Numerics
         /// or \u002B ('+') in any <paramref name="radix"/>.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// </summary>
         /// <param name="s">The <see cref="ReadOnlySpan{Char}"/> containing the <see cref="long"/> representation to be parsed.</param>
         /// <param name="startIndex">The zero-based starting character position of a region in <paramref name="s"/>.</param>
@@ -514,8 +512,6 @@ namespace J2N.Numerics
         /// or \u002B ('+') in any <paramref name="radix"/>.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// </summary>
         /// <param name="s">The <see cref="string"/> containing the <see cref="long"/> representation to be parsed.</param>
         /// <param name="startIndex">The zero-based starting character position of a region in <paramref name="s"/>.</param>
@@ -591,8 +587,6 @@ namespace J2N.Numerics
         /// or \u002B ('+') in any <paramref name="radix"/>.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// </summary>
         /// <param name="s">The <see cref="T:char[]"/> containing the <see cref="long"/> representation to be parsed.</param>
         /// <param name="startIndex">The zero-based starting character position of a region in <paramref name="s"/>.</param>
@@ -668,8 +662,6 @@ namespace J2N.Numerics
         /// or \u002B ('+') in any <paramref name="radix"/>.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// </summary>
         /// <param name="s">The <see cref="StringBuilder"/> containing the <see cref="long"/> representation to be parsed.</param>
         /// <param name="startIndex">The zero-based starting character position of a region in <paramref name="s"/>.</param>
@@ -734,8 +726,6 @@ namespace J2N.Numerics
         /// or \u002B ('+') in any <paramref name="radix"/>.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// </summary>
         /// <param name="s">The <see cref="ICharSequence"/> containing the <see cref="long"/> representation to be parsed.</param>
         /// <param name="startIndex">The zero-based starting character position of a region in <paramref name="s"/>.</param>
@@ -834,8 +824,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// Since <see cref="Parse(ReadOnlySpan{char}, int, int, int)"/> throws many different exception types and in Java they are all normalized to
         /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
@@ -887,8 +875,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// Since <see cref="Parse(string, int, int, int)"/> throws many different exception types and in Java they are all normalized to
         /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
@@ -940,8 +926,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// Since <see cref="Parse(char[], int, int, int)"/> throws many different exception types and in Java they are all normalized to
         /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
@@ -993,8 +977,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// Since <see cref="Parse(StringBuilder, int, int, int)"/> throws many different exception types and in Java they are all normalized to
         /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
@@ -1046,8 +1028,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// Since <see cref="Parse(ICharSequence, int, int, int)"/> throws many different exception types and in Java they are all normalized to
         /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
@@ -1105,8 +1085,6 @@ namespace J2N.Numerics
         /// it allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/>.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// </summary>
         /// <param name="s">The <see cref="string"/> containing the <see cref="long"/> representation to be parsed.</param>
         /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
@@ -1161,8 +1139,6 @@ namespace J2N.Numerics
         /// <paramref name="radix"/> value from <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// Since <see cref="Parse(string?, int)"/> throws many different exception types and in Java they are all normalized to
         /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
