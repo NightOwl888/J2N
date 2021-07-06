@@ -1,6 +1,7 @@
 ﻿using J2N.Globalization;
 using J2N.Text;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -49,6 +50,7 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+    [DebuggerDisplay("{value}")]
     public sealed class Int16 : Number, IComparable<Int16>, IComparable, IConvertible, IEquatable<Int16>
     {
         /// <summary>

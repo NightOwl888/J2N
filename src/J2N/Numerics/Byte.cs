@@ -2,6 +2,7 @@
 using J2N.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
@@ -52,6 +53,7 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+    [DebuggerDisplay("{value}")]
     public sealed class Byte : Number, IComparable<Byte>, IComparable, IConvertible, IEquatable<Byte>
     {
         /// <summary>
