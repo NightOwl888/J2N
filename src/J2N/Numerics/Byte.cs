@@ -422,8 +422,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -508,8 +506,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -595,8 +591,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -682,8 +676,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -769,8 +761,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -869,8 +859,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -942,8 +930,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -1015,8 +1001,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -1088,8 +1072,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -1161,8 +1143,6 @@ namespace J2N.Numerics
         /// <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -1238,8 +1218,6 @@ namespace J2N.Numerics
         /// it allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/>.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
@@ -1307,8 +1285,6 @@ namespace J2N.Numerics
         /// <paramref name="radix"/> value from <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
         /// <para/>
         /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
-        /// However, supplementary digits must appear as surrogate pair UTF-16 characters (i.e. "\ud801\udca0") in
-        /// <paramref name="s"/>. Supplementary digits expressed as single UTF-32 characters (i.e. "\U000104A0") are not supported.
         /// <para/>
         /// For compatibility with Java, this method successfully parses values from <see cref="sbyte.MinValue"/> to <see cref="byte.MaxValue"/>,
         /// but the value returned is type <see cref="byte"/> and may need to be converted to <see cref="sbyte"/> depending on how it is used.
