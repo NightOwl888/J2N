@@ -19,15 +19,15 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfB()
         {
-            assertEquals(new Byte(byte.MinValue), Byte.ValueOf(byte.MinValue));
-            assertEquals(new Byte(byte.MaxValue), Byte.ValueOf(byte.MaxValue));
-            assertEquals(new Byte((byte)0), Byte.ValueOf((byte)0));
+            assertEquals(new Byte(byte.MinValue), Byte.GetInstance(byte.MinValue));
+            assertEquals(new Byte(byte.MaxValue), Byte.GetInstance(byte.MaxValue));
+            assertEquals(new Byte((byte)0), Byte.GetInstance((byte)0));
 
             byte b = byte.MinValue + 1;
             while (b < byte.MaxValue)
             {
-                assertEquals(new Byte(b), Byte.ValueOf(b));
-                assertSame(Byte.ValueOf(b), Byte.ValueOf(b));
+                assertEquals(new Byte(b), Byte.GetInstance(b));
+                assertSame(Byte.GetInstance(b), Byte.GetInstance(b));
                 b++;
             }
         }
@@ -35,7 +35,7 @@ namespace J2N.Numerics
         [Test]
         public void GetTypeCode_Invoke_ReturnsByte()
         {
-            assertEquals(TypeCode.Byte, Byte.ValueOf((byte)1).GetTypeCode());
+            assertEquals(TypeCode.Byte, Byte.GetInstance((byte)1).GetTypeCode());
         }
 
         /**
@@ -128,9 +128,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
-            assertEquals((object)new Byte((byte)0), Byte.ValueOf((byte)0));
-            assertEquals((object)new Byte((byte)1), Byte.ValueOf((byte)1));
-            assertEquals((object)new Byte(unchecked((byte)-1)), Byte.ValueOf(unchecked((byte)-1)));
+            assertEquals((object)new Byte((byte)0), Byte.GetInstance((byte)0));
+            assertEquals((object)new Byte((byte)1), Byte.GetInstance((byte)1));
+            assertEquals((object)new Byte(unchecked((byte)-1)), Byte.GetInstance(unchecked((byte)-1)));
 
             Byte fixture = new Byte((byte)25);
             assertEquals((object)fixture, (object)fixture);
@@ -145,14 +145,14 @@ namespace J2N.Numerics
         public void Test_equals_Byte()
         {
             // Implicit conversion
-            assertEquals(new Byte((byte)0), Byte.ValueOf((byte)0));
-            assertEquals(new Byte((byte)1), Byte.ValueOf((byte)1));
-            assertEquals(new Byte(unchecked((byte)-1)), Byte.ValueOf(unchecked((byte)-1)));
+            assertEquals(new Byte((byte)0), Byte.GetInstance((byte)0));
+            assertEquals(new Byte((byte)1), Byte.GetInstance((byte)1));
+            assertEquals(new Byte(unchecked((byte)-1)), Byte.GetInstance(unchecked((byte)-1)));
 
             // Explicit
-            assertTrue(new Byte((byte)0).Equals(Byte.ValueOf((byte)0)));
-            assertTrue(new Byte((byte)1).Equals(Byte.ValueOf((byte)1)));
-            assertTrue(new Byte(unchecked((byte)-1)).Equals(Byte.ValueOf(unchecked((byte)-1))));
+            assertTrue(new Byte((byte)0).Equals(Byte.GetInstance((byte)0)));
+            assertTrue(new Byte((byte)1).Equals(Byte.GetInstance((byte)1)));
+            assertTrue(new Byte(unchecked((byte)-1)).Equals(Byte.GetInstance(unchecked((byte)-1))));
 
             Byte fixture = new Byte((byte)25);
             assertEquals(fixture, fixture);
@@ -192,13 +192,13 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String()
         {
-            assertEquals(new Byte((byte)0), Byte.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Byte((byte)1), Byte.ValueOf("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Byte(unchecked((byte)-1)), Byte.ValueOf("-1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Byte((byte)0), Byte.GetInstance("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Byte((byte)1), Byte.GetInstance("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Byte(unchecked((byte)-1)), Byte.GetInstance("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                Byte.ValueOf("0x1", J2N.Text.StringFormatter.InvariantCulture);
+                Byte.GetInstance("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with hex string.");
             }
             catch (FormatException e)
@@ -207,7 +207,7 @@ namespace J2N.Numerics
 
             try
             {
-                Byte.ValueOf("9.2", J2N.Text.StringFormatter.InvariantCulture);
+                Byte.GetInstance("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with floating point string.");
             }
             catch (FormatException e)
@@ -216,7 +216,7 @@ namespace J2N.Numerics
 
             try
             {
-                Byte.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
+                Byte.GetInstance("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with empty string.");
             }
             catch (FormatException e)
@@ -225,7 +225,7 @@ namespace J2N.Numerics
 
             try
             {
-                Byte.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                Byte.GetInstance(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with null string.");
             }
             catch (ArgumentNullException e) // J2N: .NET throws ArgumentNullException rather than FormatException in this case
@@ -239,17 +239,17 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_StringI()
         {
-            assertEquals(new Byte((byte)0), Byte.ValueOf("0", 10));
-            assertEquals(new Byte((byte)1), Byte.ValueOf("1", 10));
-            assertEquals(new Byte(unchecked((byte)-1)), Byte.ValueOf("-1", 10));
+            assertEquals(new Byte((byte)0), Byte.GetInstance("0", 10));
+            assertEquals(new Byte((byte)1), Byte.GetInstance("1", 10));
+            assertEquals(new Byte(unchecked((byte)-1)), Byte.GetInstance("-1", 10));
 
             //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Byte.ValueOf("1", 2).ToByte());
-            assertEquals(Character.Digit('F', 16), Byte.ValueOf("F", 16).ToByte());
+            assertEquals(Character.Digit('1', 2), Byte.GetInstance("1", 2).ToByte());
+            assertEquals(Character.Digit('F', 16), Byte.GetInstance("F", 16).ToByte());
 
             try
             {
-                Byte.ValueOf("0x1", 10);
+                Byte.GetInstance("0x1", 10);
                 fail("Expected FormatException with hex string.");
             }
             catch (FormatException e)
@@ -258,7 +258,7 @@ namespace J2N.Numerics
 
             try
             {
-                Byte.ValueOf("9.2", 10);
+                Byte.GetInstance("9.2", 10);
                 fail("Expected FormatException with floating point string.");
             }
             catch (FormatException e)
@@ -267,7 +267,7 @@ namespace J2N.Numerics
 
             try
             {
-                Byte.ValueOf("", 10);
+                Byte.GetInstance("", 10);
                 fail("Expected FormatException with empty string.");
             }
             catch (FormatException e)
@@ -276,7 +276,7 @@ namespace J2N.Numerics
 
             //try
             //{
-            //    Byte.ValueOf(null, 10);
+            //    Byte.GetInstance(null, 10);
             //    fail("Expected FormatException with null string.");
             //}
             //catch (FormatException e)
@@ -284,7 +284,7 @@ namespace J2N.Numerics
             //}
 
             // J2N: Match .NET behavior and return 0 for a null string
-            assertEquals(new Byte(0), Byte.ValueOf(null, 10));
+            assertEquals(new Byte(0), Byte.GetInstance(null, 10));
         }
 
         /**
@@ -981,15 +981,15 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String2()
         {
-            assertEquals("Returned incorrect byte", 0, Byte.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture).ToByte());
-            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("127", J2N.Text.StringFormatter.InvariantCulture).ToByte());
-            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-127", J2N.Text.StringFormatter.InvariantCulture).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-128", J2N.Text.StringFormatter.InvariantCulture).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", 0, Byte.GetInstance("0", J2N.Text.StringFormatter.InvariantCulture).ToByte());
+            assertEquals("Returned incorrect byte", 127, Byte.GetInstance("127", J2N.Text.StringFormatter.InvariantCulture).ToByte());
+            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.GetInstance("-127", J2N.Text.StringFormatter.InvariantCulture).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.GetInstance("-128", J2N.Text.StringFormatter.InvariantCulture).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
 
             try
             {
-                //Byte.ValueOf("128");
-                Byte.ValueOf("256", J2N.Text.StringFormatter.InvariantCulture); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
+                //Byte.GetInstance("128");
+                Byte.GetInstance("256", J2N.Text.StringFormatter.InvariantCulture); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                 fail("Failed to throw exception when passes value > byte");
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
@@ -1003,18 +1003,18 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_StringI2()
         {
-            assertEquals("Returned incorrect byte", 10, Byte.ValueOf("A", 16).ToByte());
-            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("127", 10).ToByte());
-            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-127", 10).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-128", 10).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", 127, Byte.ValueOf("7f", 16).ToByte());
-            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.ValueOf("-7f", 16).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
-            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.ValueOf("-80", 16).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", 10, Byte.GetInstance("A", 16).ToByte());
+            assertEquals("Returned incorrect byte", 127, Byte.GetInstance("127", 10).ToByte());
+            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.GetInstance("-127", 10).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.GetInstance("-128", 10).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", 127, Byte.GetInstance("7f", 16).ToByte());
+            assertEquals("Returned incorrect byte", -127, (sbyte)Byte.GetInstance("-7f", 16).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
+            assertEquals("Returned incorrect byte", -128, (sbyte)Byte.GetInstance("-80", 16).ToByte()); // J2N: Parse allowed, but cast required to change the result to negative
 
             try
             {
-                //Byte.ValueOf("128", 10);
-                Byte.ValueOf("256", 10); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
+                //Byte.GetInstance("128", 10);
+                Byte.GetInstance("256", 10); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                 fail("Failed to throw exception when passes value > byte");
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case

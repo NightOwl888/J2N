@@ -218,7 +218,7 @@ namespace J2N.Numerics
         ///         float value2x = 0f;<br/>
         ///         for (int ctr = 0; ctr &lt; 10; ctr++)<br/>
         ///             value2x += .1f;<br/>
-        ///         Single value2 = Single.ValueOf(value2x);<br/>
+        ///         Single value2 = Single.GetInstance(value2x);<br/>
         ///         <br/>
         ///         Console.WriteLine("{0:R} = {1:R}: {2}", value1, value2,<br/>
         ///                           HasMinimalDifference(value1, value2, 1));<br/>
@@ -278,8 +278,8 @@ namespace J2N.Numerics
         /// value .3333 and the <see cref="Single"/> returned by dividing 1 by 3 are unequal.
         /// <code>
         /// // Initialize two singles with apparently identical values<br/>
-        /// Single float1 = Single.ValueOf(.33333f);<br/>
-        /// Single float2 = Single.ValueOf((float)1/3);<br/>
+        /// Single float1 = Single.GetInstance(.33333f);<br/>
+        /// Single float2 = Single.GetInstance((float)1/3);<br/>
         /// // Compare them for equality<br/>
         /// Console.WriteLine(float1.Equals(float2));    // displays false
         /// </code>
@@ -744,7 +744,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Some examples of <paramref name="s"/> are "100", "-123,456,789", "123.45e+6", "+500", "5e2", "3.1416", "600.", "-.123", and "-Infinity".
         /// </remarks>
-        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(string s, IFormatProvider? provider)
         {
@@ -858,7 +858,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         public static bool TryParse([NotNullWhen(true)] string? s, out float result)
         {
             if (s == null)
@@ -974,7 +974,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         public static bool TryParse(ReadOnlySpan<char> s, out float result)
         {
             return DotNetNumber.TryParseSingle(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
@@ -1255,7 +1255,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(string s, NumberStyle style, IFormatProvider? provider)
         {
@@ -1533,7 +1533,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider)
         {
@@ -2963,9 +2963,9 @@ namespace J2N.Numerics
         //// *             can not be parsed as a float value.
         //// * @see #parseFloat(String)
         //// */
-        ////public static Single ValueOf(string value)
+        ////public static Single GetInstance(string value)
         ////{
-        ////    return ValueOf(ParseSingle(value));
+        ////    return GetInstance(ParseSingle(value));
         ////}
 
         /**
@@ -2980,9 +2980,9 @@ namespace J2N.Numerics
          *             can not be parsed as a float value.
          * @see #parseFloat(String)
          */
-        public static Single ValueOf(string value, IFormatProvider? provider)
+        public static Single GetInstance(string value, IFormatProvider? provider)
         {
-            return ValueOf(Parse(value, NumberStyle.Float, provider));
+            return GetInstance(Parse(value, NumberStyle.Float, provider));
         }
 
 
@@ -2998,9 +2998,9 @@ namespace J2N.Numerics
          *             can not be parsed as a float value.
          * @see #parseFloat(String)
          */
-        public static Single ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        public static Single GetInstance(string value, NumberStyle style, IFormatProvider? provider)
         {
-            return ValueOf(Parse(value, style, provider));
+            return GetInstance(Parse(value, style, provider));
         }
 
         #region Compare
@@ -3054,7 +3054,7 @@ namespace J2N.Numerics
          * @return a {@code Float} instance containing {@code f}.
          * @since 1.5
          */
-        public static Single ValueOf(float f)
+        public static Single GetInstance(float f)
         {
             return new Single(f);
         }
@@ -3155,7 +3155,7 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator float(Single value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Single(float value) => ValueOf(value);
+        public static implicit operator Single(float value) => GetInstance(value);
 
         #region IConvertible implementation
 
