@@ -10,7 +10,45 @@ namespace J2N.Numerics
 {
     using SR = J2N.Resources.Strings;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// An immutable reference type that wraps the primitive <see cref="int"/> type.
+    /// <para/>
+    /// In addition, this class provides methods for converting a <see cref="int"/> to a <see cref="string"/> and
+    /// a <see cref="string"/> to a <see cref="int"/> that are compatible with Java.
+    /// <para/>
+    /// Instances of this class can be produced implicitly by setting a <see cref="int"/> value to a variable declared
+    /// as <see cref="Int32"/>
+    /// <code>
+    /// int value = 4;
+    /// Int32 instance = value;
+    /// </code>
+    /// Or explicitly by calling one of the <see cref="GetInstance(int)"/>, <see cref="Decode(string)"/>,
+    /// or <see cref="TryDecode(string, out Int32)"/> methods.
+    /// <para/>
+    /// The <see cref="int"/> value of an <see cref="Int32"/> can also be retrieved in several ways. For implicit
+    /// conversion, simply assign a <see cref="int"/> variable an instance of <see cref="Int32"/>.
+    /// <code>
+    /// Int32 instance = Int32.GetInstance(4);
+    /// int value = instance;
+    /// </code>
+    /// To explicitly get the value, call <see cref="ToInt32()"/> or use the <see cref="Convert"/> class.
+    /// <code>
+    /// int converted1 = instance.ToInt32();
+    /// int converted2 = Convert.ToInt32(instance, NumberFormatInfo.InvariantInfo);
+    /// </code>
+    /// <para/>
+    /// In most cases, the number types in .NET will suffice. The main reason for creating an object to wrap numeric types is to
+    /// provide a way to make strongly-typed instances that can co-exist in collections and arrays with reference types.
+    /// For example, when creating a table object that has columns with a mix of number and string data types.
+    /// When porting code from Java, there are sometimes cases where the design didn't factor in the use of value types,
+    /// so these classes can be used rather than reworking the design.
+    /// For more information about numbers classes, see
+    /// <a href="https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html">The Numbers Classes</a>.
+    /// </summary>
+    /// <seealso cref="Number"/>
+    /// <seealso cref="IConvertible"/>
+    /// <seealso cref="IFormattable"/>
+    /// <seealso cref="IComparable"/>
     public sealed class Int32 : Number, IComparable<Int32>, IComparable, IConvertible, IEquatable<Int32>
     {
         /// <summary>

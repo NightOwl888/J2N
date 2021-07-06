@@ -13,7 +13,46 @@ namespace J2N.Numerics
 {
     using SR = J2N.Resources.Strings;
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// An immutable reference type that wraps the primitive <see cref="float"/> type.
+    /// <para/>
+    /// In addition, this class provides methods for converting a <see cref="float"/> to a <see cref="string"/> and
+    /// a <see cref="string"/> to a <see cref="float"/> that are compatible with Java. These methods provide better performance
+    /// for .NET Core 3.0 and higher as well as patch the broken round-trip behavior and add support for negative zero for
+    /// .NET platforms prior to .NET Core 3.0.
+    /// <para/>
+    /// Instances of this class can be produced implicitly by setting a <see cref="float"/> value to a variable declared
+    /// as <see cref="Single"/>
+    /// <code>
+    /// float value = 4.4f;
+    /// Single instance = value;
+    /// </code>
+    /// Or explicitly by calling one of the <see cref="GetInstance(float)"/> methods.
+    /// <para/>
+    /// The <see cref="float"/> value of a <see cref="Single"/> can also be retrieved in several ways. For implicit
+    /// conversion, simply assign a <see cref="float"/> variable an instance of <see cref="Single"/>.
+    /// <code>
+    /// Single instance = Single.GetInstance(4.4f);
+    /// float value = instance;
+    /// </code>
+    /// To explicitly get the value, call <see cref="ToSingle()"/> or use the <see cref="Convert"/> class.
+    /// <code>
+    /// float converted1 = instance.ToSingle();
+    /// float converted2 = Convert.ToSingle(instance, NumberFormatInfo.InvariantInfo);
+    /// </code>
+    /// <para/>
+    /// In most cases, the number types in .NET will suffice. The main reason for creating an object to wrap numeric types is to
+    /// provide a way to make strongly-typed instances that can co-exist in collections and arrays with reference types.
+    /// For example, when creating a table object that has columns with a mix of number and string data types.
+    /// When porting code from Java, there are sometimes cases where the design didn't factor in the use of value types,
+    /// so these classes can be used rather than reworking the design.
+    /// For more information about numbers classes, see
+    /// <a href="https://docs.oracle.com/javase/tutorial/java/data/numberclasses.html">The Numbers Classes</a>.
+    /// </summary>
+    /// <seealso cref="Number"/>
+    /// <seealso cref="IConvertible"/>
+    /// <seealso cref="IFormattable"/>
+    /// <seealso cref="IComparable"/>
     public sealed class Single : Number, IComparable<Single>, IComparable, IConvertible, IEquatable<Single>
     {
         /// <summary>
