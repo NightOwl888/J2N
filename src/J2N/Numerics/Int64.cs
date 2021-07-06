@@ -201,7 +201,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    return ValueOf(0L);
+                    return GetInstance(0L);
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
                 {
@@ -236,7 +236,7 @@ namespace J2N.Numerics
             // Only allow negative if it was passed as a sign in the string
             if (r < 0 && sign > 0)
                 throw new OverflowException(SR.Overflow_Int64);
-            return ValueOf(r);
+            return GetInstance(r);
         }
 
         #endregion Decode
@@ -309,7 +309,7 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    result = ValueOf(0);
+                    result = GetInstance(0);
                     return true;
                 }
                 if ((firstDigit = s[i]) == 'x' || firstDigit == 'X')
@@ -346,7 +346,7 @@ namespace J2N.Numerics
                 return false;
             }
 
-            result = ValueOf(r);
+            result = GetInstance(r);
             return true;
         }
 
@@ -1275,7 +1275,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out long)"/>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         public static long Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
             return Parse(s, NumberStyle.Integer, provider);
@@ -1619,7 +1619,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out long)"/>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         public static long Parse(string s, NumberStyle style , IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
@@ -1810,7 +1810,7 @@ namespace J2N.Numerics
         /// object for the current culture is used.
         /// </remarks>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out long)"/>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         public static long Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
@@ -2815,9 +2815,9 @@ namespace J2N.Numerics
         //// *             can not be parsed as a long value.
         //// * @see #parseLong(String)
         //// */
-        ////public static Int64 ValueOf(string value)
+        ////public static Int64 GetInstance(string value)
         ////{
-        ////    return ValueOf(Parse(value));
+        ////    return GetInstance(Parse(value));
         ////}
 
         /**
@@ -2832,9 +2832,9 @@ namespace J2N.Numerics
          *             can not be parsed as a long value.
          * @see #parseLong(String)
          */
-        public static Int64 ValueOf(string value, IFormatProvider? provider)
+        public static Int64 GetInstance(string value, IFormatProvider? provider)
         {
-            return ValueOf(Parse(value, provider));
+            return GetInstance(Parse(value, provider));
         }
 
         /**
@@ -2849,9 +2849,9 @@ namespace J2N.Numerics
          *             can not be parsed as a long value.
          * @see #parseLong(String)
          */
-        public static Int64 ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        public static Int64 GetInstance(string value, NumberStyle style, IFormatProvider? provider)
         {
-            return ValueOf(Parse(value, style, provider));
+            return GetInstance(Parse(value, style, provider));
         }
 
         /**
@@ -2871,9 +2871,9 @@ namespace J2N.Numerics
          *             can not be parsed as a long value.
          * @see #parseLong(String, int)
          */
-        public static Int64 ValueOf(string value, int radix)
+        public static Int64 GetInstance(string value, int radix)
         {
-            return ValueOf(Parse(value, radix));
+            return GetInstance(Parse(value, radix));
         }
 
         #region HighestOneBit
@@ -3130,7 +3130,7 @@ namespace J2N.Numerics
          * @return a {@code Long} instance containing {@code lng}.
          * @since 1.5
          */
-        public static Int64 ValueOf(long lng)
+        public static Int64 GetInstance(long lng)
         {
             if (lng < -128 || lng > 127)
             {
@@ -3142,7 +3142,7 @@ namespace J2N.Numerics
         private static class ValueOfCache
         {
             /// <summary>
-            /// A cache of instances used by <see cref="ValueOf(long)"/> and auto-boxing.
+            /// A cache of instances used by <see cref="GetInstance(long)"/> and auto-boxing.
             /// </summary>
             internal static readonly Int64[] Cache = LoadCache();
 
@@ -3162,7 +3162,7 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator long(Int64 value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Int64(long value) => ValueOf(value);
+        public static implicit operator Int64(long value) => GetInstance(value);
 
         #region IConvertible implementation
 

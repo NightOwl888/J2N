@@ -342,7 +342,7 @@ namespace J2N.Numerics
         [Test]
         public void GetTypeCode_Invoke_ReturnsDouble()
         {
-            assertEquals(TypeCode.Double, Double.ValueOf(0.0).GetTypeCode());
+            assertEquals(TypeCode.Double, Double.GetInstance(0.0).GetTypeCode());
         }
 
         /**
@@ -451,7 +451,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsInfinity_Data")]
         public void Test_IsInfinity(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsInfinity());
+            assertEquals(expected, Double.GetInstance(d).IsInfinity());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNaN_Data
@@ -477,7 +477,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsNaN_Data")]
         public void Test_IsNaN(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsNaN());
+            assertEquals(expected, Double.GetInstance(d).IsNaN());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNegativeInfinity_Data
@@ -503,7 +503,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsNegativeInfinity_Data")]
         public void Test_IsNegativeInfinity(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsNegativeInfinity());
+            assertEquals(expected, Double.GetInstance(d).IsNegativeInfinity());
         }
 
         public static IEnumerable<TestCaseData> Test_IsPositiveInfinity_Data
@@ -529,7 +529,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsPositiveInfinity_Data")]
         public void Test_IsPositiveInfinity(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsPositiveInfinity());
+            assertEquals(expected, Double.GetInstance(d).IsPositiveInfinity());
         }
 
         public static IEnumerable<TestCaseData> Test_IsFinite_Data
@@ -555,7 +555,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsFinite_Data")]
         public void Test_IsFinite(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsFinite());
+            assertEquals(expected, Double.GetInstance(d).IsFinite());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNegative_Data
@@ -581,7 +581,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsNegative_Data")]
         public void Test_IsNegative(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsNegative());
+            assertEquals(expected, Double.GetInstance(d).IsNegative());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNegativeZero_Data
@@ -607,7 +607,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsNegativeZero_Data")]
         public void Test_IsNegativeZero(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsNegativeZero());
+            assertEquals(expected, Double.GetInstance(d).IsNegativeZero());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNormal_Data
@@ -633,7 +633,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsNormal_Data")]
         public void Test_IsNormal(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsNormal());
+            assertEquals(expected, Double.GetInstance(d).IsNormal());
         }
 
         public static IEnumerable<TestCaseData> Test_IsSubnormal_Data
@@ -659,7 +659,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestDouble), "Test_IsSubnormal_Data")]
         public void Test_IsSubnormal(double d, bool expected)
         {
-            assertEquals(expected, Double.ValueOf(d).IsSubnormal());
+            assertEquals(expected, Double.GetInstance(d).IsSubnormal());
         }
 
 
@@ -1818,12 +1818,12 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Double
             // java.lang.Double.valueOf(java.lang.String)
-            assertTrue("Incorrect double returned", Math.Abs(Double.ValueOf("999999999999.999", J2N.Text.StringFormatter.InvariantCulture)
+            assertTrue("Incorrect double returned", Math.Abs(Double.GetInstance("999999999999.999", J2N.Text.StringFormatter.InvariantCulture)
                     .ToDouble() - 999999999999.999d) < 1);
 
             try
             {
-                Double.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                Double.GetInstance(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected Double.valueOf(null) to throw NPE.");
             }
             catch (ArgumentNullException ex)
@@ -1833,7 +1833,7 @@ namespace J2N.Numerics
 
             try
             {
-                Double.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
+                Double.GetInstance("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected Double.valueOf(\"\") to throw NFE");
             }
             catch (FormatException e)
@@ -1841,38 +1841,38 @@ namespace J2N.Numerics
                 // expected
             }
 
-            Double pi = Double.ValueOf("3.141592654", J2N.Text.StringFormatter.InvariantCulture);
+            Double pi = Double.GetInstance("3.141592654", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals(3.141592654, pi.ToDouble(), 0D);
 
-            Double posZero = Double.ValueOf("+0.0", J2N.Text.StringFormatter.InvariantCulture);
-            Double negZero = Double.ValueOf("-0.0", J2N.Text.StringFormatter.InvariantCulture);
+            Double posZero = Double.GetInstance("+0.0", J2N.Text.StringFormatter.InvariantCulture);
+            Double negZero = Double.GetInstance("-0.0", J2N.Text.StringFormatter.InvariantCulture);
             assertFalse("Doubletest0", posZero.Equals(negZero));
 
             // J2N: .NET specific - testing specific cultures should also parse negative zero correctly
-            Double posZero_de = Double.ValueOf("+0,0", new CultureInfo("de-DE"));
-            Double negZero_de = Double.ValueOf("-0,0", new CultureInfo("de-DE"));
+            Double posZero_de = Double.GetInstance("+0,0", new CultureInfo("de-DE"));
+            Double negZero_de = Double.GetInstance("-0,0", new CultureInfo("de-DE"));
             assertFalse("Doubletest0", posZero_de.Equals(negZero_de));
 
             // Tests for double values by name.
             Double expectedNaN = new Double(double.NaN);
 
-            Double posNaN = Double.ValueOf("NaN", J2N.Text.StringFormatter.InvariantCulture);
+            Double posNaN = Double.GetInstance("NaN", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Doubletest1", posNaN.Equals(expectedNaN));
 
-            Double posNaNSigned = Double.ValueOf("+NaN", J2N.Text.StringFormatter.InvariantCulture);
+            Double posNaNSigned = Double.GetInstance("+NaN", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Doubletest2", posNaNSigned.Equals(expectedNaN));
 
-            Double negNaNSigned = Double.ValueOf("-NaN", J2N.Text.StringFormatter.InvariantCulture);
+            Double negNaNSigned = Double.GetInstance("-NaN", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Doubletest3", negNaNSigned.Equals(expectedNaN));
 
-            Double posInfinite = Double.ValueOf("Infinity", J2N.Text.StringFormatter.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Double posInfinite = Double.GetInstance("Infinity", J2N.Text.StringFormatter.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Doubletest4", posInfinite.Equals(new Double(double.PositiveInfinity)));
 
-            Double posInfiniteSigned = Double.ValueOf("+Infinity", J2N.Text.StringFormatter.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Double posInfiniteSigned = Double.GetInstance("+Infinity", J2N.Text.StringFormatter.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Doubletest5", posInfiniteSigned
                     .Equals(new Double(double.PositiveInfinity)));
 
-            Double negInfiniteSigned = Double.ValueOf("-Infinity", J2N.Text.StringFormatter.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Double negInfiniteSigned = Double.GetInstance("-Infinity", J2N.Text.StringFormatter.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Doubletest6", negInfiniteSigned
                     .Equals(new Double(double.NegativeInfinity)));
         }
@@ -2043,43 +2043,43 @@ namespace J2N.Numerics
         public void Test_toHexStringF()
         {
             // the follow values come from the Double Javadoc/Spec
-            assertEquals("0x0.0p0", Double.ValueOf(0.0D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("-0x0.0p0", Double.ValueOf(-0.0D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p0", Double.ValueOf(1.0D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("-0x1.0p0", Double.ValueOf(-1.0D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p1", Double.ValueOf(2.0D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.8p1", Double.ValueOf(3.0D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p-1", Double.ValueOf(0.5D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p-2", Double.ValueOf(0.25D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.fffffffffffffp1023", Double.ValueOf(double.MaxValue).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x0.0000000000001p-1022", Double.ValueOf(double.Epsilon).ToHexString(NumberFormatInfo.InvariantInfo)); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
+            assertEquals("0x0.0p0", Double.GetInstance(0.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x0.0p0", Double.GetInstance(-0.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p0", Double.GetInstance(1.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x1.0p0", Double.GetInstance(-1.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p1", Double.GetInstance(2.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.8p1", Double.GetInstance(3.0D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p-1", Double.GetInstance(0.5D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p-2", Double.GetInstance(0.25D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.fffffffffffffp1023", Double.GetInstance(double.MaxValue).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x0.0000000000001p-1022", Double.GetInstance(double.Epsilon).ToHexString(NumberFormatInfo.InvariantInfo)); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
 
             // test edge cases
-            assertEquals("NaN", Double.ValueOf(double.NaN).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("-Infinity", Double.ValueOf(double.NegativeInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("Infinity", Double.ValueOf(double.PositiveInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("NaN", Double.GetInstance(double.NaN).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-Infinity", Double.GetInstance(double.NegativeInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("Infinity", Double.GetInstance(double.PositiveInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
 
             // test various numbers
-            assertEquals("-0x1.da8p6", Double.ValueOf(-118.625D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.2957874cccccdp23", Double.ValueOf(9743299.65000D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.2957874cccf63p23", Double.ValueOf(9743299.650001234D).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.700d1061d3333p33", Double.ValueOf(12349743299.65000D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x1.da8p6", Double.GetInstance(-118.625D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.2957874cccccdp23", Double.GetInstance(9743299.65D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.2957874cccccdp23", Double.GetInstance(9743299.65000D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.2957874cccf63p23", Double.GetInstance(9743299.650001234D).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.700d1061d3333p33", Double.GetInstance(12349743299.65000D).ToHexString(NumberFormatInfo.InvariantInfo));
 
             // test HARMONY-2132
-            assertEquals("0x1.01p10", Double.ValueOf(/*0x1.01p10*/ 1028.0D).ToHexString(NumberFormatInfo.InvariantInfo)); // .NET cannot represent this as a float literal
+            assertEquals("0x1.01p10", Double.GetInstance(/*0x1.01p10*/ 1028.0D).ToHexString(NumberFormatInfo.InvariantInfo)); // .NET cannot represent this as a float literal
 
             // J2N: Test custom cultures
 
-            assertEquals("-0x1,0p0", Double.ValueOf(-1.0D).ToHexString(new CultureInfo("fr-FR")));
+            assertEquals("-0x1,0p0", Double.GetInstance(-1.0D).ToHexString(new CultureInfo("fr-FR")));
 
             // test edge cases
-            assertEquals("0x0,0p0", Double.ValueOf(0.0D).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
-            assertEquals("neg0x0,0p0", Double.ValueOf(-0.0D).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
+            assertEquals("0x0,0p0", Double.GetInstance(0.0D).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
+            assertEquals("neg0x0,0p0", Double.GetInstance(-0.0D).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
 
-            assertEquals("NotANumber", Double.ValueOf(double.NaN).ToHexString(new NumberFormatInfo { NaNSymbol = "NotANumber" }));
-            assertEquals("-∞", Double.ValueOf(double.NegativeInfinity).ToHexString(new NumberFormatInfo { NegativeInfinitySymbol = "-∞" }));
-            assertEquals("∞", Double.ValueOf(double.PositiveInfinity).ToHexString(new NumberFormatInfo { PositiveInfinitySymbol = "∞" }));
+            assertEquals("NotANumber", Double.GetInstance(double.NaN).ToHexString(new NumberFormatInfo { NaNSymbol = "NotANumber" }));
+            assertEquals("-∞", Double.GetInstance(double.NegativeInfinity).ToHexString(new NumberFormatInfo { NegativeInfinitySymbol = "-∞" }));
+            assertEquals("∞", Double.GetInstance(double.PositiveInfinity).ToHexString(new NumberFormatInfo { PositiveInfinitySymbol = "∞" }));
         }
 
         /**
@@ -2088,15 +2088,15 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfD()
         {
-            assertEquals(new Double(double.Epsilon), Double.ValueOf(double.Epsilon)); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
-            assertEquals(new Double(double.MaxValue), Double.ValueOf(double.MaxValue));
-            assertEquals(new Double(0), Double.ValueOf(0));
+            assertEquals(new Double(double.Epsilon), Double.GetInstance(double.Epsilon)); // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
+            assertEquals(new Double(double.MaxValue), Double.GetInstance(double.MaxValue));
+            assertEquals(new Double(0), Double.GetInstance(0));
 
             int s = -128;
             while (s < 128)
             {
-                assertEquals(new Double(s), Double.ValueOf(s));
-                assertEquals(new Double(s + 0.1D), Double.ValueOf(s + 0.1D));
+                assertEquals(new Double(s), Double.GetInstance(s));
+                assertEquals(new Double(s + 0.1D), Double.GetInstance(s + 0.1D));
                 s++;
             }
         }
@@ -4198,7 +4198,7 @@ namespace J2N.Numerics
                     string convertedString;
                     double result = GetResult(value, style, provider);
                     rawBits = BitConversion.DoubleToInt64Bits(result);
-                    convertedString = Double.ValueOf(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
+                    convertedString = Double.GetInstance(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
 
                     assertEquals(expectedRawBits, rawBits);
                     assertEquals(expectedString.ToLower(Locale_US), convertedString
@@ -4289,7 +4289,7 @@ namespace J2N.Numerics
                     string convertedString;
                     double result = GetResult(value, style, provider);
                     rawBits = BitConversion.DoubleToInt64Bits(result);
-                    convertedString = Double.ValueOf(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
+                    convertedString = Double.GetInstance(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
 
                     assertEquals(expectedRawBits, rawBits);
                     assertEquals(expectedString.ToLower(Locale_US), convertedString
@@ -4382,7 +4382,7 @@ namespace J2N.Numerics
                     string convertedString;
                     assertTrue(GetResult(value, style, provider, out double result));
                     rawBits = BitConversion.DoubleToInt64Bits(result);
-                    convertedString = Double.ValueOf(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
+                    convertedString = Double.GetInstance(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
 
                     assertEquals(expectedRawBits, rawBits);
                     assertEquals(expectedString.ToLower(Locale_US), convertedString
@@ -4473,7 +4473,7 @@ namespace J2N.Numerics
                         string convertedString;
                         assertTrue(GetResult(value, out double result));
                         rawBits = BitConversion.DoubleToInt64Bits(result);
-                        convertedString = Double.ValueOf(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
+                        convertedString = Double.GetInstance(result).ToString(J2N.Text.StringFormatter.InvariantCulture);
 
                         assertEquals(expectedRawBits, rawBits);
                         assertEquals(expectedString.ToLower(Locale_US), convertedString

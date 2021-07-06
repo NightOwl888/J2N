@@ -391,9 +391,9 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Short
             // java.lang.Short.valueOf(java.lang.String)
-            assertEquals("Returned incorrect short", -32768, Int16.ValueOf("-32768", J2N.Text.StringFormatter.InvariantCulture)
+            assertEquals("Returned incorrect short", -32768, Int16.GetInstance("-32768", J2N.Text.StringFormatter.InvariantCulture)
                     .ToInt16());
-            assertEquals("Returned incorrect short", 32767, Int16.ValueOf("32767", J2N.Text.StringFormatter.InvariantCulture)
+            assertEquals("Returned incorrect short", 32767, Int16.GetInstance("32767", J2N.Text.StringFormatter.InvariantCulture)
                     .ToInt16());
         }
 
@@ -406,29 +406,29 @@ namespace J2N.Numerics
             // Test for method java.lang.Short
             // java.lang.Short.valueOf(java.lang.String, int)
             bool aThrow = true;
-            assertEquals("Incorrectly parsed hex string", 255, Int16.ValueOf("FF", 16)
+            assertEquals("Incorrectly parsed hex string", 255, Int16.GetInstance("FF", 16)
                     .ToInt16());
-            assertEquals("Incorrectly parsed oct string", 16, Int16.ValueOf("20", 8)
+            assertEquals("Incorrectly parsed oct string", 16, Int16.GetInstance("20", 8)
                     .ToInt16());
-            assertEquals("Incorrectly parsed dec string", 20, Int16.ValueOf("20", 10)
+            assertEquals("Incorrectly parsed dec string", 20, Int16.GetInstance("20", 10)
                     .ToInt16());
-            assertEquals("Incorrectly parsed bin string", 4, Int16.ValueOf("100", 2)
+            assertEquals("Incorrectly parsed bin string", 4, Int16.GetInstance("100", 2)
                     .ToInt16());
-            assertEquals("Incorrectly parsed -hex string", -255, Int16.ValueOf("-FF", 16)
+            assertEquals("Incorrectly parsed -hex string", -255, Int16.GetInstance("-FF", 16)
                     .ToInt16());
-            assertEquals("Incorrectly parsed -oct string", -16, Int16.ValueOf("-20", 8)
+            assertEquals("Incorrectly parsed -oct string", -16, Int16.GetInstance("-20", 8)
                     .ToInt16());
-            assertEquals("Incorrectly parsed -bin string", -4, Int16.ValueOf("-100", 2)
+            assertEquals("Incorrectly parsed -bin string", -4, Int16.GetInstance("-100", 2)
                     .ToInt16());
-            assertTrue("Did not decode 32767 correctly", Int16.ValueOf("32767", 10)
+            assertTrue("Did not decode 32767 correctly", Int16.GetInstance("32767", 10)
                     .ToInt16() == (short)32767);
-            assertTrue("Did not decode -32767 correctly", Int16.ValueOf("-32767",
+            assertTrue("Did not decode -32767 correctly", Int16.GetInstance("-32767",
                     10).ToInt16() == (short)-32767);
-            assertTrue("Did not decode -32768 correctly", Int16.ValueOf("-32768",
+            assertTrue("Did not decode -32768 correctly", Int16.GetInstance("-32768",
                     10).ToInt16() == (short)-32768);
             try
             {
-                Int16.ValueOf("FF", 2);
+                Int16.GetInstance("FF", 2);
             }
             catch (FormatException e)
             {
@@ -442,7 +442,7 @@ namespace J2N.Numerics
             }
             try
             {
-                Int16.ValueOf("10000000000", 10);
+                Int16.GetInstance("10000000000", 10);
             }
             catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
             {
@@ -458,15 +458,15 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfS()
         {
-            assertEquals(new Int16(short.MinValue), Int16.ValueOf(short.MinValue));
-            assertEquals(new Int16(short.MaxValue), Int16.ValueOf(short.MaxValue));
-            assertEquals(new Int16((short)0), Int16.ValueOf((short)0));
+            assertEquals(new Int16(short.MinValue), Int16.GetInstance(short.MinValue));
+            assertEquals(new Int16(short.MaxValue), Int16.GetInstance(short.MaxValue));
+            assertEquals(new Int16((short)0), Int16.GetInstance((short)0));
 
             short s = -128;
             while (s < 128)
             {
-                assertEquals(new Int16(s), Int16.ValueOf(s));
-                assertSame(Int16.ValueOf(s), Int16.ValueOf(s));
+                assertEquals(new Int16(s), Int16.GetInstance(s));
+                assertSame(Int16.GetInstance(s), Int16.GetInstance(s));
                 s++;
             }
         }
@@ -474,7 +474,7 @@ namespace J2N.Numerics
         [Test]
         public void GetTypeCode_Invoke_ReturnsInt16()
         {
-            assertEquals(TypeCode.Int16, Int16.ValueOf((short)1).GetTypeCode());
+            assertEquals(TypeCode.Int16, Int16.GetInstance((short)1).GetTypeCode());
         }
 
         /**
@@ -559,9 +559,9 @@ namespace J2N.Numerics
         [Test]
         public void Test_equalsLjava_lang_Object()
         {
-            assertEquals((object)new Int16((short)0), (object)Int16.ValueOf((short)0));
-            assertEquals((object)new Int16((short)1), (object)Int16.ValueOf((short)1));
-            assertEquals((object)new Int16((short)-1), (object)Int16.ValueOf((short)-1));
+            assertEquals((object)new Int16((short)0), (object)Int16.GetInstance((short)0));
+            assertEquals((object)new Int16((short)1), (object)Int16.GetInstance((short)1));
+            assertEquals((object)new Int16((short)-1), (object)Int16.GetInstance((short)-1));
 
             Int16 fixture = new Int16((short)25);
             assertEquals((object)fixture, (object)fixture);
@@ -576,14 +576,14 @@ namespace J2N.Numerics
         public void Test_equals_Int16()
         {
             // Implicit conversion
-            assertEquals(new Int16((short)0), Int16.ValueOf((short)0));
-            assertEquals(new Int16((short)1), Int16.ValueOf((short)1));
-            assertEquals(new Int16((short)-1), Int16.ValueOf((short)-1));
+            assertEquals(new Int16((short)0), Int16.GetInstance((short)0));
+            assertEquals(new Int16((short)1), Int16.GetInstance((short)1));
+            assertEquals(new Int16((short)-1), Int16.GetInstance((short)-1));
 
             // Explicit
-            assertTrue(new Int16((short)0).Equals(Int16.ValueOf((short)0)));
-            assertTrue(new Int16((short)1).Equals(Int16.ValueOf((short)1)));
-            assertTrue(new Int16((short)-1).Equals(Int16.ValueOf((short)-1)));
+            assertTrue(new Int16((short)0).Equals(Int16.GetInstance((short)0)));
+            assertTrue(new Int16((short)1).Equals(Int16.GetInstance((short)1)));
+            assertTrue(new Int16((short)-1).Equals(Int16.GetInstance((short)-1)));
 
             Int16 fixture = new Int16((short)25);
             assertEquals(fixture, fixture);
@@ -621,34 +621,34 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String()
         {
-            assertEquals(new Int16((short)0), Int16.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int16((short)1), Int16.ValueOf("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int16((short)-1), Int16.ValueOf("-1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int16((short)0), Int16.GetInstance("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int16((short)1), Int16.GetInstance("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int16((short)-1), Int16.GetInstance("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                Int16.ValueOf("0x1", J2N.Text.StringFormatter.InvariantCulture);
+                Int16.GetInstance("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int16.ValueOf("9.2", J2N.Text.StringFormatter.InvariantCulture);
+                Int16.GetInstance("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int16.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
+                Int16.GetInstance("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int16.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                Int16.GetInstance(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected FormatException with null string.");
             }
             catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
@@ -660,44 +660,44 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_StringI()
         {
-            assertEquals(new Int16((short)0), Int16.ValueOf("0", 10));
-            assertEquals(new Int16((short)1), Int16.ValueOf("1", 10));
-            assertEquals(new Int16((short)-1), Int16.ValueOf("-1", 10));
+            assertEquals(new Int16((short)0), Int16.GetInstance("0", 10));
+            assertEquals(new Int16((short)1), Int16.GetInstance("1", 10));
+            assertEquals(new Int16((short)-1), Int16.GetInstance("-1", 10));
 
             //must be consistent with Character.digit()
-            assertEquals(Character.Digit('1', 2), Int16.ValueOf("1", 2).ToByte());
-            assertEquals(Character.Digit('F', 16), Int16.ValueOf("F", 16).ToByte());
+            assertEquals(Character.Digit('1', 2), Int16.GetInstance("1", 2).ToByte());
+            assertEquals(Character.Digit('F', 16), Int16.GetInstance("F", 16).ToByte());
 
             try
             {
-                Int16.ValueOf("0x1", 10);
+                Int16.GetInstance("0x1", 10);
                 fail("Expected FormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int16.ValueOf("9.2", 10);
+                Int16.GetInstance("9.2", 10);
                 fail("Expected FormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int16.ValueOf("", 10);
+                Int16.GetInstance("", 10);
                 fail("Expected FormatException with empty string.");
             }
             catch (FormatException e) { }
 
             //try
             //{
-            //    Int16.ValueOf(null, 10);
+            //    Int16.GetInstance(null, 10);
             //    fail("Expected FormatException with null string.");
             //}
             //catch (FormatException e) { }
 
             // J2N: Match .NET behavior where null will result in 0
-            assertEquals(0, Int16.ValueOf(null, 10));
+            assertEquals(0, Int16.GetInstance(null, 10));
         }
 
         // J2N: Moved to CharSequences

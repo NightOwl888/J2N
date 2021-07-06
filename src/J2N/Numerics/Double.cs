@@ -315,7 +315,7 @@ namespace J2N.Numerics
         ///         double value2x = 0;<br/>
         ///         for (int ctr = 0; ctr &lt; 10; ctr++)<br/>
         ///             value2x += .1;<br/>
-        ///         Double value2 = Double.ValueOf(value2x);<br/>
+        ///         Double value2 = Double.GetInstance(value2x);<br/>
         ///         <br/>
         ///         Console.WriteLine("{0:R} = {1:R}: {2}", value1, value2,<br/>
         ///                           HasMinimalDifference(value1, value2, 1));<br/>
@@ -747,7 +747,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Some examples of <paramref name="s"/> are "100", "-123,456,789", "123.45e+6", "+500", "5e2", "3.1416", "600.", "-.123", and "-Infinity".
         /// </remarks>
-        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
@@ -861,7 +861,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(string, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         public static bool TryParse([NotNullWhen(true)] string? s, out double result)
         {
             if (s == null)
@@ -977,7 +977,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
-        /// <seealso cref="ValueOf(string?, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string?, IFormatProvider?)"/>
         public static bool TryParse(ReadOnlySpan<char> s, out double result)
         {
             return DotNetNumber.TryParseDouble(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
@@ -1258,7 +1258,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
@@ -1538,7 +1538,7 @@ namespace J2N.Numerics
         /// <see cref="NumberFormatInfo.NumberDecimalSeparator"/>, <see cref="NumberFormatInfo.CurrencyGroupSeparator"/>, and
         /// <see cref="NumberFormatInfo.NumberGroupSeparator"/>.
         /// </remarks>
-        /// <seealso cref="ValueOf(string, NumberStyle, IFormatProvider?)"/>
+        /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
@@ -2969,7 +2969,7 @@ namespace J2N.Numerics
         //// *             can not be parsed as a double value.
         //// * @see #parseDouble(String)
         //// */
-        ////public static Double ValueOf(string value)
+        ////public static Double GetInstance(string value)
         ////{
         ////    return new Double(ParseDouble(value));
         ////}
@@ -2987,7 +2987,7 @@ namespace J2N.Numerics
          *             can not be parsed as a double value.
          * @see #parseDouble(String)
          */
-        public static Double ValueOf(string value, IFormatProvider? provider)
+        public static Double GetInstance(string value, IFormatProvider? provider)
         {
             return new Double(Parse(value, provider));
         }
@@ -3004,7 +3004,7 @@ namespace J2N.Numerics
          *             can not be parsed as a double value.
          * @see #parseDouble(String)
          */
-        public static Double ValueOf(string value, NumberStyle style, IFormatProvider? provider)
+        public static Double GetInstance(string value, NumberStyle style, IFormatProvider? provider)
         {
             return new Double(Parse(value, style, provider));
         }
@@ -3060,7 +3060,7 @@ namespace J2N.Numerics
          * @return a {@code Double} instance containing {@code d}.
          * @since 1.5
          */
-        public static Double ValueOf(double d)
+        public static Double GetInstance(double d)
         {
             return new Double(d);
         }
@@ -3164,7 +3164,7 @@ namespace J2N.Numerics
         /// <inheritdoc/>
         public static implicit operator double(Double value) => value.value;
         /// <inheritdoc/>
-        public static implicit operator Double(double value) => ValueOf(value);
+        public static implicit operator Double(double value) => GetInstance(value);
 
         #region IConvertible implementation
 

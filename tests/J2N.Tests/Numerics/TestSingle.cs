@@ -229,7 +229,7 @@ namespace J2N.Numerics
         [Test]
         public void GetTypeCode_Invoke_ReturnsSingle()
         {
-            assertEquals(TypeCode.Single, Single.ValueOf(0.0f).GetTypeCode());
+            assertEquals(TypeCode.Single, Single.GetInstance(0.0f).GetTypeCode());
         }
 
         /**
@@ -344,7 +344,7 @@ namespace J2N.Numerics
 
         [TestCaseSource(typeof(TestSingle), "Test_IsInfinity_Data")]
         public void Test_IsInfinity(float f, bool expected)
-        {  assertEquals(expected, Single.ValueOf(f).IsInfinity());
+        {  assertEquals(expected, Single.GetInstance(f).IsInfinity());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNaN_Data
@@ -370,7 +370,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsNaN_Data")]
         public void Test_IsNaN(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsNaN());
+            assertEquals(expected, Single.GetInstance(f).IsNaN());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNegativeInfinity_Data
@@ -396,7 +396,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsNegativeInfinity_Data")]
         public void Test_IsNegativeInfinity(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsNegativeInfinity());
+            assertEquals(expected, Single.GetInstance(f).IsNegativeInfinity());
         }
 
         public static IEnumerable<TestCaseData> Test_IsPositiveInfinity_Data
@@ -422,7 +422,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsPositiveInfinity_Data")]
         public void Test_IsPositiveInfinity(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsPositiveInfinity());
+            assertEquals(expected, Single.GetInstance(f).IsPositiveInfinity());
         }
 
         public static IEnumerable<TestCaseData> Test_IsFinite_Data
@@ -448,7 +448,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsFinite_Data")]
         public void Test_IsFinite(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsFinite());
+            assertEquals(expected, Single.GetInstance(f).IsFinite());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNegative_Data
@@ -474,7 +474,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsNegative_Data")]
         public void Test_IsNegative(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsNegative());
+            assertEquals(expected, Single.GetInstance(f).IsNegative());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNegativeZero_Data
@@ -500,7 +500,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsNegativeZero_Data")]
         public void Test_IsNegativeZero(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsNegativeZero());
+            assertEquals(expected, Single.GetInstance(f).IsNegativeZero());
         }
 
         public static IEnumerable<TestCaseData> Test_IsNormal_Data
@@ -526,7 +526,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsNormal_Data")]
         public void Test_IsNormal(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsNormal());
+            assertEquals(expected, Single.GetInstance(f).IsNormal());
         }
 
         public static IEnumerable<TestCaseData> Test_IsSubnormal_Data
@@ -552,7 +552,7 @@ namespace J2N.Numerics
         [TestCaseSource(typeof(TestSingle), "Test_IsSubnormal_Data")]
         public void Test_IsSubnormal(float f, bool expected)
         {
-            assertEquals(expected, Single.ValueOf(f).IsSubnormal());
+            assertEquals(expected, Single.GetInstance(f).IsSubnormal());
         }
 
         /**
@@ -1353,23 +1353,23 @@ namespace J2N.Numerics
             // java.lang.Float.valueOf(java.lang.String)
 
             Single wanted = new Single(432.1235f);
-            Single got = Single.ValueOf("432.1235", J2N.Text.StringFormatter.InvariantCulture);
+            Single got = Single.GetInstance("432.1235", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Incorrect float returned--wanted: " + wanted + " but got: " + got, got
                     .Equals(wanted));
 
             wanted = new Single(0f);
-            got = Single.ValueOf("0", J2N.Text.StringFormatter.InvariantCulture);
+            got = Single.GetInstance("0", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Incorrect float returned--wanted: " + wanted + " but got: " + got, got
                     .Equals(wanted));
 
             wanted = new Single(-1212.3232f);
-            got = Single.ValueOf("-1212.3232", J2N.Text.StringFormatter.InvariantCulture);
+            got = Single.GetInstance("-1212.3232", J2N.Text.StringFormatter.InvariantCulture);
             assertTrue("Incorrect float returned--wanted: " + wanted + " but got: " + got, got
                     .Equals(wanted));
 
             try
             {
-                Single.ValueOf(null, J2N.Text.StringFormatter.InvariantCulture);
+                Single.GetInstance(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected Float.valueOf(null) to throw NPE.");
             }
             catch (ArgumentNullException ex)
@@ -1379,7 +1379,7 @@ namespace J2N.Numerics
 
             try
             {
-                Single.ValueOf("", J2N.Text.StringFormatter.InvariantCulture);
+                Single.GetInstance("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected Single.valueOf(\"\") to throw NFE");
             }
             catch (FormatException e)
@@ -1387,13 +1387,13 @@ namespace J2N.Numerics
                 // expected
             }
 
-            Single posZero = Single.ValueOf("+0.0", J2N.Text.StringFormatter.InvariantCulture);
-            Single negZero = Single.ValueOf("-0.0", J2N.Text.StringFormatter.InvariantCulture);
+            Single posZero = Single.GetInstance("+0.0", J2N.Text.StringFormatter.InvariantCulture);
+            Single negZero = Single.GetInstance("-0.0", J2N.Text.StringFormatter.InvariantCulture);
             assertFalse("Floattest0", posZero.Equals(negZero));
 
             // J2N: .NET specific - testing specific cultures should also parse negative zero correctly
-            Single posZero_de = Single.ValueOf("+0,0", new CultureInfo("de-DE"));
-            Single negZero_de = Single.ValueOf("-0,0", new CultureInfo("de-DE"));
+            Single posZero_de = Single.GetInstance("+0,0", new CultureInfo("de-DE"));
+            Single negZero_de = Single.GetInstance("-0,0", new CultureInfo("de-DE"));
             assertFalse("Floattest0", posZero_de.Equals(negZero_de));
 
             assertTrue("Floattest1", 0.0f == -0.0f);
@@ -1401,29 +1401,29 @@ namespace J2N.Numerics
             // Tests for float values by name.
             Single expectedNaN = new Single(float.NaN);
 
-            Single posNaN = Single.ValueOf("NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
+            Single posNaN = Single.GetInstance("NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
             assertTrue("Floattest2", posNaN.Equals(expectedNaN));
 
-            Single posNaNSigned = Single.ValueOf("+NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
+            Single posNaNSigned = Single.GetInstance("+NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
             assertTrue("Floattest3", posNaNSigned.Equals(expectedNaN));
 
-            Single negNaNSigned = Single.ValueOf("-NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
+            Single negNaNSigned = Single.GetInstance("-NaN", CultureInfo.InvariantCulture); // J2N: Works in English, but need invariant to guarantee same behavior.
             assertTrue("Floattest4", negNaNSigned.Equals(expectedNaN));
 
-            Single posInfinite = Single.ValueOf("Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Single posInfinite = Single.GetInstance("Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Floattest5", posInfinite.Equals(new Single(float.PositiveInfinity)));
 
-            Single posInfiniteSigned = Single.ValueOf("+Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Single posInfiniteSigned = Single.GetInstance("+Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Floattest6", posInfiniteSigned.Equals(new Single(float.PositiveInfinity)));
 
-            Single negInfiniteSigned = Single.ValueOf("-Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
+            Single negInfiniteSigned = Single.GetInstance("-Infinity", CultureInfo.InvariantCulture); // J2N: Same behavior, but only if specifying invariant culture, other cultures throw FormatException in this case
             assertTrue("Floattest7", negInfiniteSigned.Equals(new Single(float.NegativeInfinity)));
 
             // test HARMONY-6641
-            posInfinite = Single.ValueOf("320.0E+2147483647", J2N.Text.StringFormatter.InvariantCulture);
+            posInfinite = Single.GetInstance("320.0E+2147483647", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Floattest8", float.PositiveInfinity, posInfinite, 0.0f);
 
-            negZero = Single.ValueOf("-1.4E-2147483314", J2N.Text.StringFormatter.InvariantCulture);
+            negZero = Single.GetInstance("-1.4E-2147483314", J2N.Text.StringFormatter.InvariantCulture);
             assertEquals("Floattest9", -0.0f, negZero, 0.0f);
         }
 
@@ -1607,43 +1607,43 @@ namespace J2N.Numerics
         public void Test_toHexStringF()
         {
             // the follow values comes from the Float Javadoc/Spec
-            assertEquals("0x0.0p0", Single.ValueOf(0.0F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("-0x0.0p0", Single.ValueOf(-0.0F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p0", Single.ValueOf(1.0F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("-0x1.0p0", Single.ValueOf(-1.0F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p1", Single.ValueOf(2.0F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.8p1", Single.ValueOf(3.0F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p-1", Single.ValueOf(0.5F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.0p-2", Single.ValueOf(0.25F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.fffffep127", Single.ValueOf(float.MaxValue).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x0.000002p-126", Single.ValueOf(float.Epsilon).ToHexString(NumberFormatInfo.InvariantInfo)); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
+            assertEquals("0x0.0p0", Single.GetInstance(0.0F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x0.0p0", Single.GetInstance(-0.0F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p0", Single.GetInstance(1.0F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x1.0p0", Single.GetInstance(-1.0F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p1", Single.GetInstance(2.0F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.8p1", Single.GetInstance(3.0F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p-1", Single.GetInstance(0.5F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.0p-2", Single.GetInstance(0.25F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.fffffep127", Single.GetInstance(float.MaxValue).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x0.000002p-126", Single.GetInstance(float.Epsilon).ToHexString(NumberFormatInfo.InvariantInfo)); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
 
             // test edge cases
-            assertEquals("NaN", Single.ValueOf(float.NaN).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("-Infinity", Single.ValueOf(float.NegativeInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("Infinity", Single.ValueOf(float.PositiveInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("NaN", Single.GetInstance(float.NaN).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-Infinity", Single.GetInstance(float.NegativeInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("Infinity", Single.GetInstance(float.PositiveInfinity).ToHexString(NumberFormatInfo.InvariantInfo));
 
             // test various numbers
-            assertEquals("-0x1.da8p6", Single.ValueOf(-118.625F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.295788p23", Single.ValueOf(9743299.65F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.295788p23", Single.ValueOf(9743299.65000F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.295788p23", Single.ValueOf(9743299.650001234F).ToHexString(NumberFormatInfo.InvariantInfo));
-            assertEquals("0x1.700d1p33", Single.ValueOf(12349743299.65000F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("-0x1.da8p6", Single.GetInstance(-118.625F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.295788p23", Single.GetInstance(9743299.65F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.295788p23", Single.GetInstance(9743299.65000F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.295788p23", Single.GetInstance(9743299.650001234F).ToHexString(NumberFormatInfo.InvariantInfo));
+            assertEquals("0x1.700d1p33", Single.GetInstance(12349743299.65000F).ToHexString(NumberFormatInfo.InvariantInfo));
 
             // test HARMONY-2132
-            assertEquals("0x1.01p10", Single.ValueOf(/*0x1.01p10f*/ 1028.0f).ToHexString(NumberFormatInfo.InvariantInfo)); // .NET cannot represent this as a float literal
+            assertEquals("0x1.01p10", Single.GetInstance(/*0x1.01p10f*/ 1028.0f).ToHexString(NumberFormatInfo.InvariantInfo)); // .NET cannot represent this as a float literal
 
             // J2N: Test custom cultures
 
-            assertEquals("-0x1,0p0", Single.ValueOf(-1.0f).ToHexString(new CultureInfo("fr-FR")));
+            assertEquals("-0x1,0p0", Single.GetInstance(-1.0f).ToHexString(new CultureInfo("fr-FR")));
 
             // test edge cases
-            assertEquals("0x0,0p0", Single.ValueOf(0.0f).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
-            assertEquals("neg0x0,0p0", Single.ValueOf(-0.0f).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
+            assertEquals("0x0,0p0", Single.GetInstance(0.0f).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
+            assertEquals("neg0x0,0p0", Single.GetInstance(-0.0f).ToHexString(new NumberFormatInfo { NegativeSign = "neg", NumberDecimalSeparator = "," }));
 
-            assertEquals("NotANumber", Single.ValueOf(float.NaN).ToHexString(new NumberFormatInfo { NaNSymbol = "NotANumber" }));
-            assertEquals("-∞", Single.ValueOf(float.NegativeInfinity).ToHexString(new NumberFormatInfo { NegativeInfinitySymbol = "-∞" }));
-            assertEquals("∞", Single.ValueOf(float.PositiveInfinity).ToHexString(new NumberFormatInfo { PositiveInfinitySymbol = "∞" }));
+            assertEquals("NotANumber", Single.GetInstance(float.NaN).ToHexString(new NumberFormatInfo { NaNSymbol = "NotANumber" }));
+            assertEquals("-∞", Single.GetInstance(float.NegativeInfinity).ToHexString(new NumberFormatInfo { NegativeInfinitySymbol = "-∞" }));
+            assertEquals("∞", Single.GetInstance(float.PositiveInfinity).ToHexString(new NumberFormatInfo { PositiveInfinitySymbol = "∞" }));
         }
 
         /**
@@ -1652,16 +1652,16 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfF()
         {
-            assertEquals(new Single(float.Epsilon), Single.ValueOf(float.Epsilon)); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
-            assertEquals(new Single(float.MaxValue), Single.ValueOf(float.MaxValue));
-            assertEquals(new Single(0), Single.ValueOf(0));
+            assertEquals(new Single(float.Epsilon), Single.GetInstance(float.Epsilon)); // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
+            assertEquals(new Single(float.MaxValue), Single.GetInstance(float.MaxValue));
+            assertEquals(new Single(0), Single.GetInstance(0));
 
             int s = -128;
             while (s < 128)
             {
-                assertEquals(new Single(s), Single.ValueOf(s));
-                assertEquals(new Single(s + 0.1F), Single.ValueOf(s + 0.1F));
-                assertEquals(Single.ValueOf(s + 0.1F), Single.ValueOf(s + 0.1F));
+                assertEquals(new Single(s), Single.GetInstance(s));
+                assertEquals(new Single(s + 0.1F), Single.GetInstance(s + 0.1F));
+                assertEquals(Single.GetInstance(s + 0.1F), Single.GetInstance(s + 0.1F));
                 s++;
             }
         }
