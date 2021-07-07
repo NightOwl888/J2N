@@ -1,5 +1,6 @@
 ﻿using J2N.Globalization;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -174,5 +175,55 @@ namespace J2N.Text
 
             assertEquals("IncrementToken() called while in wrong state: RESET", actual);
         }
+
+        /// <summary>
+        /// Ensures J format will work on <see cref="sbyte"/>, <see cref="byte"/>, <see cref="short"/>, <see cref="int"/>, and <see cref="long"/>
+        /// when using <see cref="StringFormatter"/>.
+        /// </summary>
+        [Test]
+        public void Test_J_Format_SupportedIntegralTypes()
+        {
+            string[] formats = new string[] { "j", "J", "j4", "J4", "", null };
+            object[] numbers = new object[] { (sbyte)123, (byte)123, (short)1234, (int)12345, (long)123456 };
+            string[] expecteds = new string[] { "123", "123", "1234", "12345", "123456" };
+
+            for (int i = 0; i < expecteds.Length; i++)
+            {
+                for (int j = 0; j < formats.Length; j++)
+                {
+                    if (formats[j] != null && formats[j].StartsWith("J", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Without StringFormatter, Java format should not be supported
+                        Assert.Throws<FormatException>(() => string.Format("{0:" + formats[j] + "}", numbers[i]));
+                    }
+
+                    assertEquals(expecteds[i], string.Format(J2N.Text.StringFormatter.InvariantCulture, "{0:" + formats[j] + "}", numbers[i]));
+
+                    // Culture should have no effect on integral types
+                    assertEquals(expecteds[i], string.Format(J2N.Text.StringFormatter.CurrentCulture, "{0:" + formats[j] + "}", numbers[i]));
+                }
+
+#if NET46_OR_GREATER || NETCOREAPP
+                // String interpolation
+                FormattableString message = $"{numbers[i]:j}"; // Dynamic formats are unsupported, so we hardcode "j"
+                assertEquals(expecteds[i], message.ToString(J2N.Text.StringFormatter.InvariantCulture));
+#endif
+            }
+        }
+
+        [Test]
+        public void Test_Mixed_SupportedAndUnsupportedTypes()
+        {
+            int i = 12345;
+            uint ui = 98765;
+            DateTime date = new DateTime(1970, 1, 1);
+            J2N.Numerics.Single f = 98.76543f;
+            float f2 = f;
+
+            string actual = string.Format(J2N.Text.StringFormatter.InvariantCulture, "The quick {0:J} brown fox {1:N} jumped over {2:f} the lazy {3:X} dog. {4:x}", i, ui, date, f, f2);
+            string expected = "The quick 12345 brown fox 98,765.00 jumped over Thursday, 01 January 1970 00:00 the lazy 0X1.8B0FCCP6 dog. 0x1.8b0fccp6";
+            assertEquals(expected, actual);
+        }
+
     }
 }

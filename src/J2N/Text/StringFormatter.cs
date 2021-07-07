@@ -187,6 +187,43 @@ namespace J2N.Text
             else if (arg is IStructuralFormattable sf)
                 return sf.ToString("{0}", this);
 
+            // J2N: Technically, none of the other numeric types are supported. But,
+            // we convert any request for "J" or "j" format into "G" or "g" (without any
+            // precision) respectfully. This will allow the blanket use of "J" and "j" for these
+            // types without throwing exceptions and leaves the door open for supporting that
+            // format should the need arise in the future.
+            else if (arg is int i)
+                return J2N.Numerics.Int32.ToString(i, format, formatProvider);
+            else if (arg is byte bt)
+                return J2N.Numerics.Byte.ToString(bt, format, formatProvider);
+            else if (arg is long l)
+                return J2N.Numerics.Int64.ToString(l, format, formatProvider);
+            else if (arg is short s)
+                return J2N.Numerics.Int16.ToString(s, format, formatProvider);
+            else if (arg is sbyte sb)
+                return J2N.Numerics.SByte.ToString(sb, format, formatProvider);
+
+//            // After this point, we don't have any implementations so we make the call
+//            // to ConvertFormat() explicitly.
+//            else if (arg is decimal dec)
+//                return dec.ToString(Number.ConvertFormat(format), formatProvider);
+//            else if (arg is ushort us)
+//                return us.ToString(Number.ConvertFormat(format), formatProvider);
+//            else if (arg is uint ui)
+//                return ui.ToString(Number.ConvertFormat(format), formatProvider);
+//            else if (arg is ulong ul)
+//                return ul.ToString(Number.ConvertFormat(format), formatProvider);
+//            else if (arg is System.Numerics.BigInteger bi)
+//                return bi.ToString(Number.ConvertFormat(format), formatProvider);
+//#if NET5_0_OR_GREATER
+//            else if (arg is nint ni)
+//                return ni.ToString(Number.ConvertFormat(format), formatProvider);
+//            else if (arg is nuint nui)
+//                return nui.ToString(Number.ConvertFormat(format), formatProvider);
+//            else if (arg is Half h)
+//                return h.ToString(Number.ConvertFormat(format), formatProvider);
+//#endif
+
             var argType = arg.GetType();
             if (argType.IsArray)
             {
