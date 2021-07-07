@@ -287,52 +287,53 @@ namespace J2N.Numerics
             assertEquals(new Byte(0), Byte.GetInstance(null, 10));
         }
 
-        /**
-         * @tests java.lang.Byte#parseByte(String)
-         */
-        [Test]
-        public void Test_parseByteLjava_lang_String()
-        {
-            assertEquals(0, Byte.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(1, Byte.Parse("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(-1, (sbyte)Byte.Parse("-1", J2N.Text.StringFormatter.InvariantCulture)); // J2N: Parse allowed, but cast required to change the result to negative
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Byte#parseByte(String)
+        // */
+        //[Test]
+        //public void Test_parseByteLjava_lang_String()
+        //{
+        //    assertEquals(0, Byte.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(1, Byte.Parse("1", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(-1, (sbyte)Byte.Parse("-1", J2N.Text.StringFormatter.InvariantCulture)); // J2N: Parse allowed, but cast required to change the result to negative
 
-            try
-            {
-                Byte.Parse("0x1", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with hex string.");
-            }
-            catch (FormatException e)
-            {
-            }
+        //    try
+        //    {
+        //        Byte.Parse("0x1", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with hex string.");
+        //    }
+        //    catch (FormatException e)
+        //    {
+        //    }
 
-            try
-            {
-                Byte.Parse("9.2", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with floating point string.");
-            }
-            catch (FormatException e)
-            {
-            }
+        //    try
+        //    {
+        //        Byte.Parse("9.2", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with floating point string.");
+        //    }
+        //    catch (FormatException e)
+        //    {
+        //    }
 
-            try
-            {
-                Byte.Parse("", J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with empty string.");
-            }
-            catch (FormatException e)
-            {
-            }
+        //    try
+        //    {
+        //        Byte.Parse("", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with empty string.");
+        //    }
+        //    catch (FormatException e)
+        //    {
+        //    }
 
-            try
-            {
-                Byte.Parse(null, J2N.Text.StringFormatter.InvariantCulture);
-                fail("Expected FormatException with null string.");
-            }
-            catch (ArgumentNullException e) // J2N: .NET throws ArgumentNullException rather than FormatException in this case
-            {
-            }
-        }
+        //    try
+        //    {
+        //        Byte.Parse(null, J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("Expected FormatException with null string.");
+        //    }
+        //    catch (ArgumentNullException e) // J2N: .NET throws ArgumentNullException rather than FormatException in this case
+        //    {
+        //    }
+        //}
 
         // J2N: Moved to CharSequences
         ///**
@@ -822,46 +823,47 @@ namespace J2N.Numerics
             assertEquals("Returned incorrect long value", 127L, new Byte((byte)127).ToInt64());
         }
 
-        /**
-         * @tests java.lang.Byte#parseByte(java.lang.String)
-         */
-        [Test]
-        public void Test_parseByteLjava_lang_String2()
-        {
-            assertEquals((byte)127, Byte.Parse("127", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(unchecked((byte)-128), Byte.Parse("-128", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals((byte)0, Byte.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals((byte)0x80, Byte.Parse("-128", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals((byte)0x7F, Byte.Parse("127", J2N.Text.StringFormatter.InvariantCulture));
+        // J2N: Moved to CharSequences
+        ///**
+        // * @tests java.lang.Byte#parseByte(java.lang.String)
+        // */
+        //[Test]
+        //public void Test_parseByteLjava_lang_String2()
+        //{
+        //    assertEquals((byte)127, Byte.Parse("127", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals(unchecked((byte)-128), Byte.Parse("-128", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals((byte)0, Byte.Parse("0", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals((byte)0x80, Byte.Parse("-128", J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals((byte)0x7F, Byte.Parse("127", J2N.Text.StringFormatter.InvariantCulture));
 
-            try
-            {
-                Byte.Parse("-1000", J2N.Text.StringFormatter.InvariantCulture);
-                fail("No FormatException");
-            }
-            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
-            {
-            }
+        //    try
+        //    {
+        //        Byte.Parse("-1000", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("No FormatException");
+        //    }
+        //    catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+        //    {
+        //    }
 
-            try
-            {
-                //Byte.ParseByte("128");
-                Byte.Parse("256", J2N.Text.StringFormatter.InvariantCulture); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
-                fail("No FormatException");
-            }
-            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
-            {
-            }
+        //    try
+        //    {
+        //        //Byte.ParseByte("128");
+        //        Byte.Parse("256", J2N.Text.StringFormatter.InvariantCulture); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
+        //        fail("No FormatException");
+        //    }
+        //    catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+        //    {
+        //    }
 
-            try
-            {
-                Byte.Parse("-129", J2N.Text.StringFormatter.InvariantCulture);
-                fail("No FormatException");
-            }
-            catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
-            {
-            }
-        }
+        //    try
+        //    {
+        //        Byte.Parse("-129", J2N.Text.StringFormatter.InvariantCulture);
+        //        fail("No FormatException");
+        //    }
+        //    catch (OverflowException e) // J2N: .NET throws OverflowException rather than FormatException in this case
+        //    {
+        //    }
+        //}
 
         // J2N: Moved to CharSequences
         ///**
@@ -1170,7 +1172,7 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(OverflowException), "-1000", 10);
                         yield return new TestCaseData(typeof(OverflowException), /*"128"*/ "256", 10); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                         yield return new TestCaseData(typeof(OverflowException), "-129", 10);
-                        yield return new TestCaseData(typeof(OverflowException), /*"80"*/ "100", 16); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
+                        yield return new TestCaseData(typeof(OverflowException), /*"80"*/ "100", 16); // J2N: We allow parsing two's complement for .NET compatibility
                         yield return new TestCaseData(typeof(OverflowException), "-81", 16);
 
                         // .NET 5
@@ -1336,7 +1338,7 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(OverflowException), "-1000", 0, 5, 10);
                         yield return new TestCaseData(typeof(OverflowException), /*"128"*/ "256", 0, 3, 10); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                         yield return new TestCaseData(typeof(OverflowException), "-129", 0, 4, 10);
-                        yield return new TestCaseData(typeof(OverflowException), /*"80"*/ "100", 0, 3, 16); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
+                        yield return new TestCaseData(typeof(OverflowException), /*"80"*/ "100", 0, 3, 16); // J2N: We allow parsing two's complement for .NET compatibility
                         yield return new TestCaseData(typeof(OverflowException), "-81", 0, 3, 16);
 
                         // .NET 5
@@ -1471,7 +1473,7 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(OverflowException), "-1000", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(typeof(OverflowException), /*"128"*/ "256", NumberStyle.Integer, NumberFormatInfo.InvariantInfo); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                         yield return new TestCaseData(typeof(OverflowException), "-129", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
-                        yield return new TestCaseData(typeof(OverflowException), /*"80"*/ "100", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
+                        yield return new TestCaseData(typeof(OverflowException), /*"80"*/ "100", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // J2N: We allow parsing two's complement for .NET compatibility
                         yield return new TestCaseData(typeof(OverflowException), "ff80", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // J2N: Converted to 2's complement
 
                         // Custom
@@ -2016,7 +2018,7 @@ namespace J2N.Numerics
 
                         yield return new TestCaseData(typeof(OverflowException), /*"128"*/ "256", "Failed to throw exception for MAX_VALUE + 1"); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
                         yield return new TestCaseData(typeof(OverflowException), "-129", "Failed to throw exception for MIN_VALUE - 1");
-                        yield return new TestCaseData(typeof(OverflowException), /*"0x80"*/ "0x0100", "Failed to throw exception for hex MAX_VALUE + 1"); // J2N: We allow parsing from sbyte.MinValue to byte.MaxValue for compatibility
+                        yield return new TestCaseData(typeof(OverflowException), /*"0x80"*/ "0x0100", "Failed to throw exception for hex MAX_VALUE + 1"); // J2N: We allow parsing two's complement for .NET compatibility
                         yield return new TestCaseData(typeof(OverflowException), "-0x81", "Failed to throw exception for hex MIN_VALUE - 1");
 
                         // Custom
