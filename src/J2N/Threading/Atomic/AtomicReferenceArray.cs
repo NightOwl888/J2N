@@ -1,5 +1,5 @@
 ﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
-/*Licensed to the Apache Software Foundation (ASF) under one or more
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
  *  The ASF licenses this file to You under the Apache License, Version 2.0
@@ -8,7 +8,7 @@
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *Unless required by applicable law or agreed to in writing, software
+ *  Unless required by applicable law or agreed to in writing, software
  *  distributed under the License is distributed on an "AS IS" BASIS,
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
@@ -17,9 +17,11 @@
 #endregion
 
 using J2N.Collections;
+using J2N.Text;
 using System;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
-
 
 namespace J2N.Threading.Atomic
 {
@@ -31,9 +33,10 @@ namespace J2N.Threading.Atomic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class AtomicReferenceArray<T> where T : class
+    public class AtomicReferenceArray<T> : IStructuralFormattable where T : class
     {
-        private readonly T[] array;
+        private readonly T?[] array;
+        private static readonly T Comparand = (T)FormatterServices.GetUninitializedObject(typeof(T)); //does not call ctor
 
         /// <summary>
         /// Creates a new <see cref="AtomicReferenceArray{T}"/> of given <paramref name="length"/>.
@@ -41,7 +44,7 @@ namespace J2N.Threading.Atomic
         /// <param name="length">The length of the array.</param>
         public AtomicReferenceArray(int length)
         {
-            this.array = new T[length];
+            this.array = new T?[length];
         }
 
         /// <summary>
@@ -50,24 +53,16 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="array">The array to copy elements from.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
-        public AtomicReferenceArray(T[] array)
+        public AtomicReferenceArray(T?[] array)
         {
             if (array == null)
                 throw new ArgumentNullException(nameof(array));
             int length = array.Length;
-            this.array = new T[length];
+            this.array = new T?[length];
             if (length > 0)
             {
-                int last = length - 1;
-                for (int i = 0; i < last; ++i)
+                for (int i = 0; i < length; ++i)
                     this.array[i] = array[i];
-                // Do the last write as volatile
-                T e = array[last];
-#if NET40
-                this.array[last] = e;
-#else
-                Volatile.Write(ref this.array[last], e);
-#endif
             }
         }
 
@@ -83,13 +78,8 @@ namespace J2N.Threading.Atomic
         /// <returns>The current value.</returns>
         public T? this[int index]
         {
-#if NET40
-            get => array[index];
-            set => array[index] = value!;
-#else
-            get => Volatile.Read(ref array[index]);
-            set => Volatile.Write(ref array[index]!, value);
-#endif
+            get => Interlocked.CompareExchange(ref array[index], Comparand, Comparand);
+            set => Interlocked.Exchange(ref array[index], value);
         }
 
         /// <summary>
@@ -99,7 +89,7 @@ namespace J2N.Threading.Atomic
         /// <param name="index">The index.</param>
         /// <param name="newValue">The new value.</param>
         /// <returns>The previous value.</returns>
-        public T GetAndSet(int index, T newValue)
+        public T? GetAndSet(int index, T? newValue)
         {
             return Interlocked.Exchange(ref array[index], newValue);
         }
@@ -113,7 +103,7 @@ namespace J2N.Threading.Atomic
         /// <param name="update">The new value.</param>
         /// <returns><c>true</c> if successful. A <c>false</c> return value indicates that the actual value
         /// was not equal to the expected value.</returns>
-        public bool CompareAndSet(int index, T expect, T update)
+        public bool CompareAndSet(int index, T? expect, T? update)
         {
             return Interlocked.CompareExchange(ref array[index], update, expect) == expect;
         }
@@ -124,7 +114,49 @@ namespace J2N.Threading.Atomic
         /// <returns>The <see cref="string"/> representation of the current values of array.</returns>
         public override string ToString()
         {
-            return Arrays.ToString(array);
+            return ToString(null);
+        }
+
+        /// <summary>
+        /// Returns the <see cref="string"/> representation of the current values of array using the
+        /// specified culture-specific formatting information.
+        /// </summary>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>The <see cref="string"/> representation of the current values of array.</returns>
+        public virtual string ToString(IFormatProvider? provider)
+        {
+            if (array.Length == 0)
+                return "[]"; //$NON-NLS-1$
+
+            provider ??= StringFormatter.CurrentCulture;
+            StringBuilder sb = new StringBuilder(2 + array.Length * 4);
+            sb.Append('[');
+            T? val = this[0];
+            if (val is null)
+                sb.Append("null");
+            else
+                sb.AppendFormat(provider, "{0}", val);
+            for (int i = 1; i < array.Length; i++)
+            {
+                sb.Append(", "); //$NON-NLS-1$
+                val = this[i];
+                if (val is null)
+                    sb.Append("null");
+                else
+                    sb.AppendFormat(provider, "{0}", val);
+            }
+            sb.Append(']');
+            return sb.ToString();
+        }
+
+        string IStructuralFormattable.ToString(string? format, IFormatProvider? provider)
+        {
+            return ToString(provider);
+        }
+
+        string IFormattable.ToString(string? format, IFormatProvider? provider)
+        {
+            return ToString(provider);
         }
     }
 }
