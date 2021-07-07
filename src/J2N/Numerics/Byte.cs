@@ -1481,7 +1481,7 @@ namespace J2N.Numerics
         #region TryParse_CharSequence_Byte
 
         /// <summary>
-        /// Converts the string representation of a number in a specified style and culture-specific format to its 8-bit signed
+        /// Converts the string representation of a number in a specified style and culture-specific format to its 8-bit unsigned
         /// integer equivalent. A return value indicates whether the conversion succeeded.
         /// <para/>
         /// Usage Note: When porting from Java, note that this is a culture-sensitive method. Java uses the invariant
@@ -1495,7 +1495,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <param name="s">A string containing the characters that represent the number to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
         /// value may be from <c>"-127"</c> to <c>"255"</c>. Negative numbers in this range will overflow and become high-order positive numbers.</param>
-        /// <param name="result">When this method returns, contains the 8-bit signed integer value equivalent of
+        /// <param name="result">When this method returns, contains the 8-bit unsigned integer value equivalent of
         /// the number contained in <paramref name="s"/>, if the conversion succeeded, or zero if the conversion failed.
         /// The conversion fails if the s parameter is <c>null</c> or <see cref="string.Empty"/>, is not of the correct format,
         /// or represents a number less than <see cref="byte.MinValue"/> or greater than <see cref="byte.MaxValue"/>. This parameter
@@ -1556,7 +1556,7 @@ namespace J2N.Numerics
 
 #if FEATURE_READONLYSPAN
         /// <summary>
-        /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed
+        /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit unsigned
         /// integer equivalent. A return value indicates whether the conversion succeeded.
         /// <para/>
         /// Usage Note: When porting from Java, note that this is a culture-sensitive method. Java uses the invariant
@@ -1570,7 +1570,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <param name="s">A span containing the characters that represent the number to convert. For compatibility with Java's byte (which is an 8-bit signed byte) the
         /// value may be from <c>"-127"</c> to <c>"255"</c>. Negative numbers in this range will overflow and become high-order positive numbers.</param>
-        /// <param name="result">When this method returns, contains the 8-bit signed integer value equivalent of
+        /// <param name="result">When this method returns, contains the 8-bit unsigned integer value equivalent of
         /// the number contained in <paramref name="s"/>, if the conversion succeeded, or zero if the conversion failed.
         /// The conversion fails if the s parameter is <c>null</c> or <see cref="string.Empty"/>, is not of the correct format,
         /// or represents a number less than <see cref="byte.MinValue"/> or greater than <see cref="byte.MaxValue"/>. This parameter
@@ -2055,7 +2055,7 @@ namespace J2N.Numerics
         #region TryParse_CharSequence_NumberStyle_IFormatProvider_Byte
 
         /// <summary>
-        /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed integer equivalent.
+        /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit unsigned integer equivalent.
         /// A return value indicates whether the conversion succeeded.
         /// <para/>
         /// Usage Note: To exactly match Java, use <see cref="NumberStyle.AllowLeadingSign"/> for <paramref name="style"/> and
@@ -2069,7 +2069,7 @@ namespace J2N.Numerics
         /// <param name="style">A bitwise combination of enumeration values that indicates the style elements that can be present in <paramref name="s"/>.
         /// A typical value to specify is <see cref="NumberStyle.Integer"/>.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information about <paramref name="s"/>.</param>
-        /// <param name="result">When this method returns, contains the 8-bit signed integer value equivalent of
+        /// <param name="result">When this method returns, contains the 8-bit unsigned integer value equivalent of
         /// the number contained in <paramref name="s"/>, if the conversion succeeded, or zero if the conversion failed.
         /// The conversion fails if the s parameter is <c>null</c> or <see cref="string.Empty"/>, is not of the correct format,
         /// or represents a number less than <see cref="byte.MinValue"/> or greater than <see cref="byte.MaxValue"/>. This parameter
@@ -2282,7 +2282,7 @@ namespace J2N.Numerics
 
 #if FEATURE_READONLYSPAN
         /// <summary>
-        /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed integer equivalent.
+        /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit unsigned integer equivalent.
         /// A return value indicates whether the conversion succeeded.
         /// <para/>
         /// Usage Note: To exactly match Java, use <see cref="NumberStyle.AllowLeadingSign"/> for <paramref name="style"/> and
@@ -2296,7 +2296,7 @@ namespace J2N.Numerics
         /// <param name="style">A bitwise combination of enumeration values that indicates the style elements that can be present in <paramref name="s"/>.
         /// A typical value to specify is <see cref="NumberStyle.Integer"/>.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information about <paramref name="s"/>.</param>
-        /// <param name="result">When this method returns, contains the 8-bit signed integer value equivalent of
+        /// <param name="result">When this method returns, contains the 8-bit unsigned integer value equivalent of
         /// the number contained in <paramref name="s"/>, if the conversion succeeded, or zero if the conversion failed.
         /// The conversion fails if the s parameter is <c>null</c> or <see cref="string.Empty"/>, is not of the correct format,
         /// or represents a number less than <see cref="sbyte.MinValue"/> or greater than <see cref="byte.MaxValue"/>. This parameter
