@@ -1493,17 +1493,25 @@ namespace J2N.Numerics
                 protected abstract bool GetResult(string value, int radix, out short result);
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Data")]
-                public virtual void TestParse_CharSequence_Int32(short expected, string value, int radix)
+                public virtual void TestTryParse_CharSequence_Int32(short expected, string value, int radix)
                 {
                     assertTrue(GetResult(value, radix, out short actual));
                     assertEquals($"Int16.TryParse(string, out short) failed. String: \"{value}\" Result: {actual}", expected, actual);
                 }
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_ForException_Data")]
-                public virtual void TestParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
+                public virtual void TestTryParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
-                    assertFalse(GetResult(value, radix, out short actual));
-                    assertEquals(0, actual);
+                    short actual = 0;
+                    if (expectedExceptionType != typeof(ArgumentOutOfRangeException))
+                    {
+                        assertFalse(GetResult(value, radix, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, radix, out actual));
+                    }
+                    assertEquals((short)0, actual);
                 }
             }
 
@@ -1539,7 +1547,7 @@ namespace J2N.Numerics
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Int32_Int32_Data")]
 
-                public virtual void TestParse_CharSequence_Int32_Int32_Int32(short expected, string value, int startIndex, int length, int radix)
+                public virtual void TestTryParse_CharSequence_Int32_Int32_Int32(short expected, string value, int startIndex, int length, int radix)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
 
@@ -1548,12 +1556,20 @@ namespace J2N.Numerics
                 }
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Int32_Int32_ForException_Data")]
-                public virtual void TestParse_CharSequence_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int startIndex, int length, int radix)
+                public virtual void TestTryParse_CharSequence_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int startIndex, int length, int radix)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
 
-                    assertFalse(GetResult(value, startIndex, length, radix, out short actual));
-                    assertEquals(0, actual);
+                    short actual = 0;
+                    if (expectedExceptionType != typeof(ArgumentOutOfRangeException))
+                    {
+                        assertFalse(GetResult(value, startIndex, length, radix, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, startIndex, length, radix, out actual));
+                    }
+                    assertEquals((short)0, actual);
                 }
             }
 

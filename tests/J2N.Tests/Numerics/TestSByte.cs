@@ -1572,17 +1572,25 @@ namespace J2N.Numerics
                 protected abstract bool GetResult(string value, int radix, out sbyte result);
 
                 [TestCaseSource("TestParse_CharSequence_Int32_Data")]
-                public virtual void TestParse_CharSequence_Int32(sbyte expected, string value, int radix)
+                public virtual void TestTryParse_CharSequence_Int32(sbyte expected, string value, int radix)
                 {
                     assertTrue(GetResult(value, radix, out sbyte actual));
                     assertEquals($"SByte.TryParse(string, out sbyte) failed. String: \"{value}\" Result: {actual}", expected, actual);
                 }
 
                 [TestCaseSource("TestParse_CharSequence_Int32_ForException_Data")]
-                public virtual void TestParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
+                public virtual void TestTryParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
-                    assertFalse(GetResult(value, radix, out sbyte actual));
-                    assertEquals(0, actual);
+                    sbyte actual = 0;
+                    if (expectedExceptionType != typeof(ArgumentOutOfRangeException))
+                    {
+                        assertFalse(GetResult(value, radix, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, radix, out actual));
+                    }
+                    assertEquals((sbyte)0, actual);
                 }
             }
 
@@ -1618,7 +1626,7 @@ namespace J2N.Numerics
 
                 [TestCaseSource("TestParse_CharSequence_Int32_Int32_Int32_Data")]
 
-                public virtual void TestParse_CharSequence_Int32_Int32_Int32(sbyte expected, string value, int startIndex, int length, int radix)
+                public virtual void TestTryParse_CharSequence_Int32_Int32_Int32(sbyte expected, string value, int startIndex, int length, int radix)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
 
@@ -1627,12 +1635,20 @@ namespace J2N.Numerics
                 }
 
                 [TestCaseSource("TestParse_CharSequence_Int32_Int32_Int32_ForException_Data")]
-                public virtual void TestParse_CharSequence_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int startIndex, int length, int radix)
+                public virtual void TestTryParse_CharSequence_Int32_Int32_Int32_ForException(Type expectedExceptionType, string value, int startIndex, int length, int radix)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
 
-                    assertFalse(GetResult(value, startIndex, length, radix, out sbyte actual));
-                    assertEquals(0, actual);
+                    sbyte actual = 0;
+                    if (expectedExceptionType != typeof(ArgumentOutOfRangeException))
+                    {
+                        assertFalse(GetResult(value, startIndex, length, radix, out actual));
+                    }
+                    else // Actual exception should be thrown
+                    {
+                        Assert.Throws(expectedExceptionType, () => GetResult(value, startIndex, length, radix, out actual));
+                    }
+                    assertEquals((sbyte)0, actual);
                 }
             }
 
@@ -1784,7 +1800,7 @@ namespace J2N.Numerics
 
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_Data")]
-                public void TestParse_CharSequence_NumberStyle_IFormatProvider(sbyte expected, string value, NumberStyle style, IFormatProvider provider)
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider(sbyte expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
 
@@ -1793,7 +1809,7 @@ namespace J2N.Numerics
                 }
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data")]
-                public void TestParse_CharSequence_NumberStyle_IFormatProvider_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
+                public void TestTryParse_CharSequence_NumberStyle_IFormatProvider_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
 
@@ -1842,7 +1858,7 @@ namespace J2N.Numerics
 
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_Data")]
-                public void TestParse_CharSequence(sbyte expected, string value, NumberStyle style, IFormatProvider provider)
+                public void TestTryParse_CharSequence(sbyte expected, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
                     Assume.That((style & ~NumberStyle.Integer) == 0, "Custom NumberStyles are not supported on this overload.");
@@ -1852,7 +1868,7 @@ namespace J2N.Numerics
                 }
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_NumberStyle_IFormatProvider_ForException_Data")]
-                public void TestParse_CharSequence_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
+                public void TestTryParse_CharSequence_ForException(Type expectedExceptionType, string value, NumberStyle style, IFormatProvider provider)
                 {
                     Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
                     Assume.That((style & ~NumberStyle.Integer) == 0, "Custom NumberStyles are not supported on this overload.");

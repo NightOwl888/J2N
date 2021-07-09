@@ -394,16 +394,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
@@ -493,16 +492,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
@@ -590,16 +588,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
@@ -687,16 +684,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
@@ -1143,16 +1139,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
@@ -1244,16 +1239,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
@@ -1343,16 +1337,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
@@ -1442,16 +1435,15 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if (i < 0)
+                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (i > s.Length - length) // Checks for int overflow
-                return false;
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (length == 0)
-                return false;
-
-            if (i < 0)
                 return false;
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
