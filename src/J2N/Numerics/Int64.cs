@@ -489,7 +489,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -563,7 +567,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -638,7 +646,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="T:char[]"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -713,7 +725,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="StringBuilder"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -777,7 +793,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="ICharSequence"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -874,7 +894,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -938,7 +962,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -1002,7 +1030,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="T:char[]"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -1066,7 +1098,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="StringBuilder"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
@@ -1130,7 +1166,11 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Parses the <see cref="ICharSequence"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
-        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>. 
+        /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="length"/> parameter
+        /// is a length rather than an exclusive end index as would be the case in Java. To translate from
+        /// Java, use <c>endIndex - beginIndex</c> to obtain the <paramref name="length"/>.
         /// <para/>
         /// Usage Note: This method is similar to the <see cref="Convert.ToInt64(string?, int)"/> method, however it allows conversion
         /// of the value without allocating a substring. It also differs in that it allows the use of the ASCII character \u002d ('-')
