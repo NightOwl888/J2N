@@ -1,4 +1,7 @@
-﻿namespace J2N.Numerics
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+namespace J2N.Numerics
 {
     internal static partial class DotNetNumber
     {
