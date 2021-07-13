@@ -1419,7 +1419,6 @@ namespace J2N.Numerics
         /// <param name="result">The <see cref="sbyte"/> represented by the subsequence in the specified <paramref name="radix"/>.</param>
         /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
         /// </exception>
         /// <remarks>
