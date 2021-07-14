@@ -32,6 +32,8 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Returns the population count (number of set bits) of an <see cref="int"/> mask.
+        /// <para/>
+        /// Usage Note: This is the same operation as Integer.bitCount() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="int"/> to examine.</param>
         /// <returns>The number of one-bits in the two's complement binary
@@ -53,6 +55,8 @@ namespace J2N.Numerics
 
         /// <summary>
         /// Returns the population count (number of set bits) of a <see cref="long"/> mask.
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.bitCount() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="long"/> to examine.</param>
         /// <returns>The number of one-bits in the two's complement binary
@@ -90,6 +94,8 @@ namespace J2N.Numerics
         ///     <item><description>floor(log<sub>2</sub>(x)) = <c>31 - x.LeadingZeroCount()</c></description></item>
         ///     <item><description>ceil(log<sub>2</sub>(x)) = <c>32 - (x - 1).LeadingZeroCount()</c></description></item>
         /// </list>
+        /// <para/>
+        /// Usage Note: This is the same operation as Integer.numberOfLeadingZeros() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="int"/> to examine.</param>
         /// <returns>The number of zero bits preceding the highest-order
@@ -130,6 +136,8 @@ namespace J2N.Numerics
         ///     <item><description>floor(log<sub>2</sub>(x)) = <c>63 - x.LeadingZeroCount()</c></description></item>
         ///     <item><description>ceil(log<sub>2</sub>(x)) = <c>64 - (x - 1).LeadingZeroCount()</c></description></item>
         /// </list>
+        /// <para/>
+        /// Usage Note: This is the same operation as Long.numberOfLeadingZeros() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="long"/> to examine.</param>
         /// <returns>The number of zero bits preceding the highest-order
@@ -168,6 +176,8 @@ namespace J2N.Numerics
         /// <paramref name="value"/>. Returns 32 if the specified value has no
         /// one-bits in its two's complement representation, in other words if it is
         /// equal to zero.
+        /// <para/>
+        /// Usage Note: This is the same operation as Integer.numberOfTrailingZeros() in the JDK.
         /// </summary>
         /// <param name="value">The <see cref="int"/> to examine.</param>
         /// <returns>The number of zero bits following the lowest-order ("rightmost")
@@ -269,6 +279,38 @@ namespace J2N.Numerics
 
         #endregion HighestOneBit
 
+        #region Log2
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static int Log2(this uint value)
+        {
+#if FEATURE_NUMERICBITOPERATIONS
+            return System.Numerics.BitOperations.Log2(value);
+#else
+            // The 0->0 contract is fulfilled by setting the LSB to 1.
+            // Log(1) is 0, and setting the LSB for values > 1 does not change the log2 result.
+            value |= 1;
+            return 31 ^ LeadingZeroCount((int)value);
+#endif
+        }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static int Log2(this ulong value)
+        {
+#if FEATURE_NUMERICBITOPERATIONS
+            return System.Numerics.BitOperations.Log2(value);
+#else
+            value |= 1;
+            return 63 ^ LeadingZeroCount((long)value);
+#endif
+        }
+
+        #endregion Log2
+
         #region LowestOneBit
 
         /// <summary>
@@ -284,7 +326,7 @@ namespace J2N.Numerics
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static int LowestOneBit(this int value)
         {
             // From Hacker's Delight, Section 2-1
@@ -304,7 +346,7 @@ namespace J2N.Numerics
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static long LowestOneBit(this long value)
         {
             // From Hacker's Delight, Section 2-1
@@ -355,6 +397,20 @@ namespace J2N.Numerics
         #endregion
 
         #region ReverseBytes
+
+        /// <summary>
+        /// Returns the value obtained by reversing the order of the bytes in the
+        /// two's complement representation of the specified <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">The <see cref="short"/> value for which to reverse the byte order.</param>
+        /// <returns>The value obtained by reversing the bytes in the specified
+        /// <paramref name="value"/>.</returns>
+        public static short ReverseBytes(this short value)
+        {
+            int high = (value >> 8) & 0xFF;
+            int low = (value & 0xFF) << 8;
+            return (short)(low | high);
+        }
 
         /// <summary>
         /// Returns the value obtained by reversing the order of the bytes in the
@@ -412,7 +468,7 @@ namespace J2N.Numerics
         /// specified number of bits.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static int RotateLeft(this int value, int distance)
         {
             if (distance == 0)
@@ -449,7 +505,7 @@ namespace J2N.Numerics
         /// specified number of bits.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static long RotateLeft(this long value, int distance)
         {
             if (distance == 0)
@@ -490,7 +546,7 @@ namespace J2N.Numerics
         /// specified number of bits.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static int RotateRight(this int value, int distance)
         {
             if (distance == 0)
@@ -527,7 +583,7 @@ namespace J2N.Numerics
         /// specified number of bits.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static long RotateRight(this long value, int distance)
         {
             if (distance == 0)
@@ -561,7 +617,7 @@ namespace J2N.Numerics
         // See http://stackoverflow.com/a/6625912
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static int TripleShift(this byte number, int bits)
         {
             return TripleShift((sbyte)number, bits);
@@ -578,7 +634,7 @@ namespace J2N.Numerics
         // See http://stackoverflow.com/a/6625912
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         [CLSCompliant(false)]
         public static int TripleShift(this sbyte number, int bits)
         {
@@ -598,7 +654,7 @@ namespace J2N.Numerics
         // See http://stackoverflow.com/a/6625912
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static int TripleShift(this char number, int bits)
         {
             if (number >= 0)
@@ -617,7 +673,7 @@ namespace J2N.Numerics
         // See http://stackoverflow.com/a/6625912
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static int TripleShift(this short number, int bits)
         {
             if (number >= 0)
@@ -636,7 +692,7 @@ namespace J2N.Numerics
         // See http://stackoverflow.com/a/6625912
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static int TripleShift(this int number, int bits)
         {
             if (number >= 0)
@@ -654,7 +710,7 @@ namespace J2N.Numerics
         /// <returns>The resulting number from the shift operation as <see cref="long"/>.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static long TripleShift(this long number, int bits)
         {
             return (long)((ulong)number >> bits);

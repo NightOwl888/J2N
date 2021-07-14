@@ -1696,6 +1696,19 @@ namespace J2N
             return -1;
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal static bool IsAsciiHexDigit(int c)
+        {
+            if (c < 128)
+            {
+                int value = ASCIIDigits[c];
+                return value != -1 && value < 16; // Max hex radix
+            }
+            return false;
+        }
+
         /// <summary>
         /// Search the sorted characters in the string and return the nearest index.
         /// </summary>

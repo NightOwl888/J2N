@@ -138,6 +138,9 @@
   <data name="ArgumentOutOfRange_NeedNonNegNum" xml:space="preserve">
     <value>Non-negative number required.</value>
   </data>
+  <data name="ArgumentOutOfRange_Radix" xml:space="preserve">
+    <value>Radix must be greater than or equal to Character.MinRadix and less than or equal to Character.MaxRadix.</value>
+  </data>
   <data name="ArgumentOutOfRange_SmallCapacity" xml:space="preserve">
     <value>capacity was less than the current size.</value>
   </data>
@@ -146,6 +149,9 @@
   </data>
   <data name="Argument_ArrayTooLarge" xml:space="preserve">
     <value>The input array length must not exceed Int32.MaxValue / {0}. Otherwise BitArray.Length would exceed Int32.MaxValue.</value>
+  </data>
+  <data name="Argument_BadFormatSpecifier" xml:space="preserve">
+    <value>Format specifier was invalid.</value>
   </data>
   <data name="Argument_CollectionMustNotBeThis" xml:space="preserve">
     <value>collection must not be the same instance as this.</value>
@@ -158,6 +164,9 @@
   </data>
   <data name="Argument_InvalidCodePoint" xml:space="preserve">
     <value>'{0}' is not a valid Unicode code point.</value>
+  </data>
+  <data name="Argument_InvalidNumberStyle" xml:space="preserve">
+    <value>An undefined NumberStyle value is being used: {0}.</value>
   </data>
   <data name="Argument_InvalidOffLen" xml:space="preserve">
     <value>Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection.</value>
@@ -186,6 +195,9 @@
   <data name="Arg_BitArrayTypeUnsupported" xml:space="preserve">
     <value>Only supported array types for CopyTo on BitArrays are Boolean[], Int32[] and Byte[].</value>
   </data>
+  <data name="Arg_ExponentRequiredIfTypeSpecifierUsed" xml:space="preserve">
+    <value>With the AllowHexSpecifier and AllowTypeSpecifier bits set in the enum bit field, the parser is unable to distinguish between a type specifier d, D, f, or F and a hexadecimal digit. Therefore, AllowExponent is also required to delineate between hexadecimal digits and type specifier and an exponent must be supplied if type specifier d, D, f, or F is used.</value>
+  </data>
   <data name="Arg_HSCapacityOverflow" xml:space="preserve">
     <value>HashSet capacity is too big.</value>
   </data>
@@ -198,8 +210,35 @@
   <data name="Arg_InvalidANSIString" xml:space="preserve">
     <value>The ANSI string passed in could not be converted from the default ANSI code page to Unicode.</value>
   </data>
+  <data name="Arg_InvalidHexFloatStyle" xml:space="preserve">
+    <value>With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexFloat or AllowTypeSpecifier. The bit(s) '{0}' were also specified, which are not allowed.</value>
+  </data>
+  <data name="Arg_InvalidHexStyle" xml:space="preserve">
+    <value>With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexNumber. The bit(s) '{0}' were also specified, which are not allowed.</value>
+  </data>
   <data name="Arg_KeyNotFoundWithKey" xml:space="preserve">
     <value>The given key '{0}' was not present in the dictionary.</value>
+  </data>
+  <data name="Arg_MustBeByte" xml:space="preserve">
+    <value>Object must be of type Byte.</value>
+  </data>
+  <data name="Arg_MustBeDouble" xml:space="preserve">
+    <value>Object must be of type Double.</value>
+  </data>
+  <data name="Arg_MustBeInt16" xml:space="preserve">
+    <value>Object must be of type Int16.</value>
+  </data>
+  <data name="Arg_MustBeInt32" xml:space="preserve">
+    <value>Object must be of type Int32.</value>
+  </data>
+  <data name="Arg_MustBeInt64" xml:space="preserve">
+    <value>Object must be of type Int16.</value>
+  </data>
+  <data name="Arg_MustBeSByte" xml:space="preserve">
+    <value>Object must be of type SByte.</value>
+  </data>
+  <data name="Arg_MustBeSingle" xml:space="preserve">
+    <value>Object must be of type Single.</value>
   </data>
   <data name="Arg_Need1DArray" xml:space="preserve">
     <value>Array was not a one-dimensional array.</value>
@@ -210,6 +249,9 @@
   <data name="Arg_RankMultiDimNotSupported" xml:space="preserve">
     <value>Only single dimensional arrays are supported for the requested action.</value>
   </data>
+  <data name="Arg_TypeSpecifierNotAllowedIfCurrencyUsed" xml:space="preserve">
+    <value>The AllowCurrencySymbol bit and AllowTypeSpecifier bit may not be combined.</value>
+  </data>
   <data name="Arg_WrongType" xml:space="preserve">
     <value>The value '{0}' is not of type '{1}' and cannot be used in this generic collection.</value>
   </data>
@@ -218,6 +260,15 @@
   </data>
   <data name="ExternalLinkedListNode" xml:space="preserve">
     <value>The LinkedList node does not belong to current LinkedList.</value>
+  </data>
+  <data name="Format_EmptyInputString" xml:space="preserve">
+    <value>Input string was either empty or contained only whitespace.</value>
+  </data>
+  <data name="Format_ExtraJunkAtEnd" xml:space="preserve">
+    <value>Additional non-parsable characters are at the end of the string.</value>
+  </data>
+  <data name="Format_InvalidString" xml:space="preserve">
+    <value>Input string was not in a correct format. Value: '{0}'.</value>
   </data>
   <data name="Format_InvalidUTFSpec2ndByte" xml:space="preserve">
     <value>Second byte at {0} does not match UTF8 Specification.</value>
@@ -233,6 +284,18 @@
   </data>
   <data name="Format_InvalidUTFTooLong" xml:space="preserve">
     <value>UTF8 data format too long.</value>
+  </data>
+  <data name="Format_NoParsibleDigits" xml:space="preserve">
+    <value>Could not find any recognizable digits.</value>
+  </data>
+  <data name="InvalidCast_DBNull" xml:space="preserve">
+    <value>Object cannot be cast to DBNull.</value>
+  </data>
+  <data name="InvalidCast_Empty" xml:space="preserve">
+    <value>Object cannot be cast to Empty.</value>
+  </data>
+  <data name="InvalidCast_FromTo" xml:space="preserve">
+    <value>Invalid cast from '{0}' to '{1}'.</value>
   </data>
   <data name="InvalidOperation_CannotEditNullObject" xml:space="preserve">
     <value>Cannot edit a null {0}.</value>
@@ -290,6 +353,36 @@
   </data>
   <data name="NotSupported_ValueCollectionSet" xml:space="preserve">
     <value>Mutating a value collection derived from a dictionary is not allowed.</value>
+  </data>
+  <data name="Overflow_Byte" xml:space="preserve">
+    <value>Value was either too large or too small for an unsigned byte.</value>
+  </data>
+  <data name="Overflow_Decimal" xml:space="preserve">
+    <value>Value was either too large or too small for a Decimal.</value>
+  </data>
+  <data name="Overflow_Int16" xml:space="preserve">
+    <value>Value was either too large or too small for an Int16.</value>
+  </data>
+  <data name="Overflow_Int32" xml:space="preserve">
+    <value>Value was either too large or too small for an Int32.</value>
+  </data>
+  <data name="Overflow_Int64" xml:space="preserve">
+    <value>Value was either too large or too small for an Int64.</value>
+  </data>
+  <data name="Overflow_NegativeUnsigned" xml:space="preserve">
+    <value>The string was being parsed as an unsigned number and could not have a negative sign.</value>
+  </data>
+  <data name="Overflow_SByte" xml:space="preserve">
+    <value>Value was either too large or too small for a signed byte.</value>
+  </data>
+  <data name="Overflow_UInt16" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt16.</value>
+  </data>
+  <data name="Overflow_UInt32" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt32.</value>
+  </data>
+  <data name="Overflow_UInt64" xml:space="preserve">
+    <value>Value was either too large or too small for a UInt64.</value>
   </data>
   <data name="Serialization_InvalidOnDeser" xml:space="preserve">
     <value>OnDeserialization method was called while the object was not being deserialized.</value>
