@@ -2434,7 +2434,7 @@ namespace J2N
 #endif
         public static bool IsWhiteSpace(char c)
         {
-            return char.IsWhiteSpace(c);
+            return IsWhiteSpace((int)c);
         }
 
         /// <summary>
@@ -2452,8 +2452,7 @@ namespace J2N
                 return true;
             if (codePoint < 0x2000 || codePoint == 0x2007)
                 return false;
-            return codePoint <= 0x200b || codePoint == 0x2028 || codePoint == 0x2029 || codePoint == 0x3000;
-            // Port Note: char.IsWhiteSpace(char.ConvertFromUtf32(codePoint)) incorrectly returns true for codepoint 160 (and possibly other cases)
+            return codePoint < 0x200b || codePoint == 0x2028 || codePoint == 0x2029 || codePoint == 0x205f || codePoint == 0x3000;
         }
 
         /// <summary>
