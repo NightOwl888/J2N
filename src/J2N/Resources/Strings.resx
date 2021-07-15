@@ -123,11 +123,17 @@
   <data name="ArgumentOutOfRange_BiggerThanCollection" xml:space="preserve">
     <value>Must be less than or equal to the size of the collection.</value>
   </data>
+  <data name="ArgumentOutOfRange_Count" xml:space="preserve">
+    <value>Count must be positive and count must refer to a location within the string/array/collection.</value>
+  </data>
   <data name="ArgumentOutOfRange_Index" xml:space="preserve">
     <value>Index was out of range. Must be non-negative and less than the size of the collection.</value>
   </data>
   <data name="ArgumentOutOfRange_IndexLength" xml:space="preserve">
     <value>Index and length must refer to a location within the string.</value>
+  </data>
+  <data name="ArgumentOutOfRange_ListInsert" xml:space="preserve">
+    <value>Index must be within the bounds of the List.</value>
   </data>
   <data name="ArgumentOutOfRange_NeedCapacityAtLeast1" xml:space="preserve">
     <value>capacity must be at least 1.</value>

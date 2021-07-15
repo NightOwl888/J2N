@@ -112,7 +112,8 @@ namespace J2N.Collections.Tests
                     Assert.Throws<ArgumentOutOfRangeException>(() => _ilist.Insert(bad[i], items[0])); //"ArgumentOutOfRangeException expected."
                 }
 
-                AssertExtensions.Throws<ArgumentException>("value", () => _ilist.Insert(0, new SCG.LinkedListNode<string>("blargh"))); //"ArgumentException expected."
+                // J2N: Actual parameter name may be "item"
+                AssertExtensions.Throws<ArgumentException>(/*"value",*/ () => _ilist.Insert(0, new SCG.LinkedListNode<string>("blargh"))); //"ArgumentException expected."
             }
 
             #endregion

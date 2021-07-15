@@ -412,6 +412,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Count must be positive and count must refer to a location within the string/array/collection..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Count {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Index was out of range. Must be non-negative and less than the size of the collection..
         /// </summary>
         internal static string ArgumentOutOfRange_Index {
@@ -426,6 +435,15 @@ namespace J2N.Resources {
         internal static string ArgumentOutOfRange_IndexLength {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_IndexLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Index must be within the bounds of the List..
+        /// </summary>
+        internal static string ArgumentOutOfRange_ListInsert {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_ListInsert", resourceCulture);
             }
         }
         
