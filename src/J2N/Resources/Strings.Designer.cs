@@ -88,6 +88,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to sort because the IComparer.Compare() method returns inconsistent results. Either a value does not compare equal to itself, or one value repeatedly compared to another value yields different results. IComparer: &apos;{0}&apos;..
+        /// </summary>
+        internal static string Arg_BogusIComparer {
+            get {
+                return ResourceManager.GetString("Arg_BogusIComparer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to With the AllowHexSpecifier and AllowTypeSpecifier bits set in the enum bit field, the parser is unable to distinguish between a type specifier d, D, f, or F and a hexadecimal digit. Therefore, AllowExponent is also required to delineate between hexadecimal digits and type specifier and an exponent must be supplied if type specifier d, D, f, or F is used..
         /// </summary>
         internal static string Arg_ExponentRequiredIfTypeSpecifierUsed {
@@ -714,6 +723,24 @@ namespace J2N.Resources {
         internal static string InvalidOperation_EnumOpCantHappen {
             get {
                 return ResourceManager.GetString("InvalidOperation_EnumOpCantHappen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Failed to compare two elements in the array..
+        /// </summary>
+        internal static string InvalidOperation_IComparerFailed {
+            get {
+                return ResourceManager.GetString("InvalidOperation_IComparerFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ancestral collection was modified after the view was instantiated..
+        /// </summary>
+        internal static string InvalidOperation_ViewFailedVersion {
+            get {
+                return ResourceManager.GetString("InvalidOperation_ViewFailedVersion", resourceCulture);
             }
         }
         
