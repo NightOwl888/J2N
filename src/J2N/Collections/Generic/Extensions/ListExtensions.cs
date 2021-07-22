@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-
 namespace J2N.Collections.Generic.Extensions
 {
     using SR = J2N.Resources.Strings;
@@ -228,6 +227,67 @@ namespace J2N.Collections.Generic.Extensions
         }
 
         #endregion
+
+        #region GetView
+
+        /// <summary>
+        /// Returns a view of a sublist in an <see cref="IList{T}"/>.
+        /// <para/>
+        /// IMPORTANT: This method uses .NET semantics. That is, the second parameter is a count rather than an exclusive end
+        /// index as would be the case in Java's subList() method. To translate from Java, use <c>toIndex - fromIndex</c> to
+        /// obtain the value of <paramref name="count"/>.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="list">The parent list to use to create a sublist.</param>
+        /// <param name="index">The first index in the view (inclusive).</param>
+        /// <param name="count">The number of elements to include in the view.</param>
+        /// <returns>A sublist view that contains only the values in the specified range.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> or <paramref name="count"/> is less than zero.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="index"/> and <paramref name="count"/> refer to a location outside of the list.
+        /// </exception>
+        /// <remarks>This method returns a view of the range of elements that are specified by <paramref name="index"/>
+        /// and <paramref name="count"/>. Unlike <see cref="List{T}.GetRange(int, int)"/>, this method does not copy elements from
+        /// the <see cref="IList{T}"/>, but provides a window into the underlying <see cref="IList{T}"/> itself.
+        /// <para/>
+        /// You can make changes to the view and create child views of the view.
+        /// <para/>
+        /// If the <see cref="IList{T}"/> implementation is either <see cref="List{T}"/> or a <see cref="ReadOnlyList{T}"/> that wraps <see cref="List{T}"/>,
+        /// any structural change to a parent view or the original <see cref="IList{T}"/> will cause all methods of the view or any enumerator based on the view
+        /// to throw an <see cref="InvalidOperationException"/>. Structural modifications are any edit that will change the <see cref="ICollection{T}.Count"/>
+        /// or otherwise perturb it in such a way that enumerations in progress will be invalid. A view is only valid until one of its ancestors
+        /// is structurally modified, at which point you will need to create a new view.
+        /// <para/>
+        /// If another <see cref="IList{T}"/> implementation is used, any structural change to the parent view or original <see cref="IList{T}"/> that changes
+        /// the <see cref="ICollection{T}.Count"/> property will cause all methods of the view or any enumerator based on the view to throw an
+        /// <see cref="InvalidOperationException"/>. While other structural modifications to any ancestor view do not cause exceptions, the behavior
+        /// of the view after such a modification is undefined. For this reason, it is recommended to use <see cref="List{T}"/> when possible.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
+        public static IList<T> GetView<T>(this IList<T> list, int index, int count)
+        {
+            if (list is null)
+                throw new ArgumentNullException(nameof(list));
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (list.Count - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
+            if (list is List<T> theList)
+                return theList.GetView(index, count);
+            if (list is ReadOnlyList<T> readOnlyList && readOnlyList.List is List<T> theInnerList)
+                return theInnerList.GetView(index, count).AsReadOnly();
+
+            return new SubList<T>(list, index, count);
+        }
+
+        #endregion GetView
 
         #region Shuffle
 

@@ -26,6 +26,7 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using Integer = J2N.Numerics.Int32;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
@@ -515,6 +516,12 @@ namespace J2N.Collections.Generic
                 for (int i = -50; i < 150; i++)
                     subList.Add(new Integer(i));
                 new Support_ListTest("", subList.GetView(50, 150 - 50)).RunTest();
+
+                // Test for GetView() extension method over SCG.List<T>
+                IList<Integer> subList2 = new SCG.List<Integer>();
+                for (int i = -50; i < 150; i++)
+                    subList2.Add(new Integer(i));
+                new Support_ListTest("", subList2.GetView(50, 150 - 50)).RunTest();
             }
 
             /**

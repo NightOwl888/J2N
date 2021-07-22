@@ -17,6 +17,7 @@
 #endregion
 
 using J2N.Collections.Generic;
+using J2N.Collections.Generic.Extensions;
 using System;
 //using System.Collections.Generic;
 using System.Linq;
@@ -29,14 +30,14 @@ namespace J2N.Collections
 {
     public class Support_ListTest : TestCase
     {
-        List<Integer> list; // must contain the Integers 0 to 99 in order
+        SCG.IList<Integer> list; // must contain the Integers 0 to 99 in order
 
         public Support_ListTest(String p1)
         //    : base(p1)
         {
         }
 
-        public Support_ListTest(String p1, List<Integer> l)
+        public Support_ListTest(String p1, SCG.IList<Integer> l)
         //    : base(p1)
         {
             list = l;
@@ -88,7 +89,23 @@ namespace J2N.Collections
             myList.Add(new Integer(501));
             myList.Add(new Integer(502));
 
-            list.InsertRange(50, myList);
+            if (list is List<Integer> j2nList)
+            {
+                j2nList.InsertRange(50, myList);
+            }
+            else if (list is SubList<Integer> j2nWrapperSubList)
+            {
+                //j2nWrapperSubList.InsertRange(50, myList);
+                for (int i = 0; i < myList.Count; i++)
+                    j2nWrapperSubList.Insert(i + 50, myList[i]);
+            }
+            else if (list is SCG.List<Integer> scgList)
+            {
+                scgList.InsertRange(50, myList);
+            }
+            else
+                throw new ArgumentException($"List type not supported in this test: {list.GetType().ToString()}");
+
             assertTrue("ListTest - a) addAll with index failed--did not insert",
                     list[50].Equals(new Integer(500)));
             assertTrue("ListTest - b) addAll with index failed--did not insert",
@@ -102,7 +119,7 @@ namespace J2N.Collections
                     "ListTest - e) addAll with index failed--affected previous elements",
                     list[49].Equals(new Integer(49)));
 
-            List<Integer> mySubList = list.GetView(50, 53 - 50);
+            SCG.IList<Integer> mySubList = list.GetView(50, 53 - 50);
             assertEquals(3, mySubList.Count);
             assertTrue(
                     "ListTest - a) sublist Failed--does not contain correct elements",
@@ -136,7 +153,7 @@ namespace J2N.Collections
 
         }
 
-        public void t_listIterator(List<Integer> list)
+        public void t_listIterator(SCG.IList<Integer> list)
         {
             //var li = list.listIterator(1);
             var li1 = list.Skip(1);
