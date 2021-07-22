@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Integer = J2N.Numerics.Int32;
 
 namespace J2N.Collections
 {
     public class Support_UnmodifiableMapTest : TestCase
     {
-        IDictionary<object, object> map;
+        IDictionary<string, Integer> map;
 
         // must be a map containing the string keys "0"-"99" paired with the Integer
         // values Integer(0) to Integer(99)
@@ -16,7 +17,7 @@ namespace J2N.Collections
         {
         }
 
-        public Support_UnmodifiableMapTest(String p1, IDictionary<object, object> m)
+        public Support_UnmodifiableMapTest(String p1, IDictionary<string, Integer> m)
         //: base(p1)
         {
             map = m;
@@ -60,7 +61,7 @@ namespace J2N.Collections
             assertTrue("UnmodifiableMapTest - getting \"50\" didn't return 0",
                     (int?)map["0"] == 0);
             assertNull("UnmodifiableMapTest - getting \"100\" didn't return null",
-                    map.TryGetValue("100", out object value) ? value : null);
+                    map.TryGetValue("100", out Integer value) ? value : null);
 
             // isEmpty
             assertTrue(
@@ -81,7 +82,7 @@ namespace J2N.Collections
 
         }
 
-        void t_KeySet(ICollection<object> keySet)
+        void t_KeySet(ICollection<string> keySet)
         {
             // keySet should be a set of the strings "0" to "99"
 
@@ -126,7 +127,7 @@ namespace J2N.Collections
                             + keySet.Count, keySet.Count == 100);
 
             // toArray
-            Object[] objArray;
+            string[] objArray;
             objArray = keySet.ToArray();
             it = keySet.GetEnumerator(); // J2N: Bug in Harmony, this needs to be reset to run
             for (int counter = 0; it.MoveNext(); counter++)
@@ -137,7 +138,7 @@ namespace J2N.Collections
             }
 
             // toArray (Object[])
-            objArray = new Object[100];
+            objArray = new string[100];
             keySet.CopyTo(objArray, 0);
             it = keySet.GetEnumerator(); // J2N: Bug in Harmony, this needs to be reset to run
             for (int counter = 0; it.MoveNext(); counter++)

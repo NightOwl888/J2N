@@ -2,25 +2,27 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Integer = J2N.Numerics.Int32;
+using Long = J2N.Numerics.Int64;
 
 namespace J2N.Collections.Generic.Extensions
 {
     public class TestUnmodifiableCollections : TestCase
     {
-        private IList<object> ll;
+        private IList<Integer> ll;
 
-        private ISet<object> s;
+        private ISet<Integer> s;
 
-        private IDictionary<object, object> hm;
+        private IDictionary<string, Integer> hm;
 
-        private static object[] objArray = LoadObjectArray();
+        private static Integer[] objArray = LoadObjectArray();
 
-        private static object[] LoadObjectArray()
+        private static Integer[] LoadObjectArray()
         {
-            var objArray = new object[1000];
+            var objArray = new Integer[1000];
             for (int i = 0; i < objArray.Length; i++)
             {
-                objArray[i] = new int?(i);
+                objArray[i] = new Integer(i);
             }
             return objArray;
         }
@@ -34,14 +36,14 @@ namespace J2N.Collections.Generic.Extensions
             // Test for method java.util.Collection
             // java.util.Collections.unmodifiableCollection(java.util.Collection)
             bool exception = false;
-            var c = (IList<object>)ll.AsReadOnly();
+            var c = (IList<Integer>)ll.AsReadOnly();
             assertTrue("Returned collection is of incorrect size", c.Count == ll.Count);
             var i = ll.GetEnumerator();
             while (i.MoveNext())
                 assertTrue("Returned list missing elements", c.Contains(i.Current));
             try
             {
-                c.Add(new object());
+                c.Add(new Integer(0));
             }
             catch (NotSupportedException e)
             {
@@ -55,7 +57,7 @@ namespace J2N.Collections.Generic.Extensions
 
             try
             {
-                c.Remove(new object());
+                c.Remove(new Integer(0));
                 fail("Allowed modification of collection");
             }
             catch (NotSupportedException e)
@@ -63,15 +65,15 @@ namespace J2N.Collections.Generic.Extensions
                 // Correct
             }
 
-            var myCollection = new List<object>();
-            myCollection.Add(new int?(20));
+            var myCollection = new List<Integer>();
+            myCollection.Add(new Integer(20));
             myCollection.Add(null);
             c = myCollection.AsReadOnly();
             assertTrue("Collection should contain null", c.Contains(null));
             assertTrue("Collection should contain Integer(20)", c
-                    .Contains(new int?(20)));
+                    .Contains(new Integer(20)));
 
-            myCollection = new List<object>();
+            myCollection = new List<Integer>();
             for (int counter = 0; counter < 100; counter++)
             {
                 myCollection.Add(objArray[counter]);
@@ -110,11 +112,11 @@ namespace J2N.Collections.Generic.Extensions
 
             // test with a Sequential Access List
             bool exception = false;
-            var c = (IList<object>)ll.AsReadOnly();
+            var c = (IList<Integer>)ll.AsReadOnly();
             // Ensure a NPE is thrown if the list is NULL
             try
             {
-                ((IList<object>)null).AsReadOnly();
+                ((IList<Integer>)null).AsReadOnly();
                 fail("Expected NullPointerException for null list parameter");
             }
             catch (ArgumentNullException e)
@@ -131,7 +133,7 @@ namespace J2N.Collections.Generic.Extensions
                 assertTrue("Returned list missing elements", c.Contains(i.Current));
             try
             {
-                c.Add(new Object());
+                c.Add(new Integer(0));
             }
             catch (NotSupportedException e)
             {
@@ -145,7 +147,7 @@ namespace J2N.Collections.Generic.Extensions
 
             try
             {
-                c.Remove(new Object());
+                c.Remove(new Integer(0));
                 fail("Allowed modification of list");
             }
             catch (NotSupportedException e)
@@ -157,37 +159,37 @@ namespace J2N.Collections.Generic.Extensions
             var smallList = new List<object>();
             smallList.Add(null);
             smallList.Add("yoink");
-            c = smallList.AsReadOnly();
-            assertNull("First element should be null", c[0]);
-            assertTrue("List should contain null", c.Contains(null));
+            var c2 = smallList.AsReadOnly();
+            assertNull("First element should be null", c2[0]);
+            assertTrue("List should contain null", c2.Contains(null));
             //assertTrue(
             //        "T1. Returned List should implement Random Access interface",
-            //        c instanceof RandomAccess);
+            //        c2 instanceof RandomAccess);
 
-            smallList = new List<object>();
+            var smallList2 = new List<Integer>();
             for (int counter = 0; counter < 100; counter++)
             {
-                smallList.Add(objArray[counter]);
+                smallList2.Add(objArray[counter]);
             }
-            var myList = smallList.AsReadOnly();
+            var myList = smallList2.AsReadOnly();
             assertTrue("List should not contain null", !myList.Contains(null));
             //assertTrue(
             //        "T2. Returned List should implement Random Access interface",
             //        myList instanceof RandomAccess);
 
             assertTrue("get failed on unmodifiable list", myList[50].Equals(
-                    new int?(50)));
+                    new Integer(50)));
             var listIterator = myList.GetEnumerator();
             for (int counter = 0; listIterator.MoveNext(); counter++)
             {
-                assertTrue("List has wrong elements", ((int?)listIterator
-                        .Current) == counter);
+                assertTrue("List has wrong elements", listIterator
+                        .Current == counter);
             }
-            new Support_UnmodifiableCollectionTest("", smallList).RunTest();
+            new Support_UnmodifiableCollectionTest("", smallList2).RunTest();
 
 #if FEATURE_SERIALIZABLE
             // Serialization
-            var col = smallList.AsReadOnly();
+            var col = smallList2.AsReadOnly();
             var clone = Clone(col);
 
             assertNotSame(col, clone);
@@ -214,18 +216,18 @@ namespace J2N.Collections.Generic.Extensions
             // Test for method java.util.Map
             // java.util.Collections.unmodifiableMap(java.util.Map)
             bool exception = false;
-            var c = (IDictionary<object, object>)hm.AsReadOnly();
+            var c = (IDictionary<string, Integer>)hm.AsReadOnly();
             assertTrue("Returned map is of incorrect size", c.Count == hm.Count);
             var i = hm.Keys.GetEnumerator();
             while (i.MoveNext())
             {
-                Object x = i.Current;
+                var x = i.Current;
                 assertTrue("Returned map missing elements", c[x].Equals(
                         hm[x]));
             }
             try
             {
-                c[new Object()] = "";
+                c[string.Empty] = new Integer(0);
             }
             catch (NotSupportedException e)
             {
@@ -237,7 +239,7 @@ namespace J2N.Collections.Generic.Extensions
             exception = false;
             try
             {
-                c.Remove(new Object());
+                c.Remove(string.Empty);
             }
             catch (NotSupportedException e)
             {
@@ -286,16 +288,16 @@ namespace J2N.Collections.Generic.Extensions
             //}
             //assertTrue("Allowed modification of array entry2", exception);
 
-            var smallMap = new Dictionary<object, object>(); // J2N TODO: Need HashDictionary so we can support null keys here
-            //smallMap[null] = new long?(30); // J2N TODO: Need HashDictionary so we can support null keys here
-            smallMap[new long?(25)] = null;
+            var smallMap = new Dictionary<string, Integer>();
+            smallMap[null] = new Integer(30);
+            //smallMap[new long?(25)] = null;
             var unmodMap = smallMap.AsReadOnly();
 
-            assertNull("Trying to use a null value in map failed", unmodMap[new long?(25)]);
-            //assertTrue("Trying to use a null key in map failed", unmodMap[null] // J2N TODO: Need HashDictionary so we can support null keys here
-            //        .Equals(new long?(30)));
+            //assertNull("Trying to use a null value in map failed", unmodMap[new long?(25)]);
+            assertTrue("Trying to use a null key in map failed", unmodMap[null]
+                    .Equals(new Integer(30)));
 
-            smallMap = new Dictionary<object, object>();
+            smallMap = new Dictionary<string, Integer>();
             for (int counter = 0; counter < 100; counter++)
             {
                 smallMap[objArray[counter].ToString()] = objArray[counter];
@@ -332,14 +334,14 @@ namespace J2N.Collections.Generic.Extensions
             // Test for method java.util.Set
             // java.util.Collections.unmodifiableSet(java.util.Set)
             bool exception = false;
-            ISet<object> c = s.AsReadOnly();
+            ISet<Integer> c = s.AsReadOnly();
             assertTrue("Returned set is of incorrect size", c.Count == s.Count);
             var i = ll.GetEnumerator();
             while (i.MoveNext())
                 assertTrue("Returned set missing elements", c.Contains(i.Current));
             try
             {
-                c.Add(new Object());
+                c.Add(new Integer(0));
             }
             catch (NotSupportedException e)
             {
@@ -352,7 +354,7 @@ namespace J2N.Collections.Generic.Extensions
             }
             try
             {
-                c.Remove(new Object());
+                c.Remove(new Integer(0));
                 fail("Allowed modification of set");
             }
             catch (NotSupportedException e)
@@ -360,12 +362,12 @@ namespace J2N.Collections.Generic.Extensions
                 // Correct
             }
 
-            ISet<object> mySet = new HashSet<object>().AsReadOnly();
+            ISet<Integer> mySet = new HashSet<Integer>().AsReadOnly();
             assertTrue("Should not contain null", !mySet.Contains(null));
-            mySet = (new HashSet<object> { null }).AsReadOnly();
+            mySet = (new HashSet<Integer> { null }).AsReadOnly();
             assertTrue("Should contain null", mySet.Contains(null));
 
-            mySet = new SortedSet<object>();
+            mySet = new SortedSet<Integer>();
             for (int counter = 0; counter < 100; counter++)
             {
                 mySet.Add(objArray[counter]);
@@ -415,14 +417,14 @@ namespace J2N.Collections.Generic.Extensions
          */
         public override void SetUp()
         {
-            ll = new List<object>();
+            ll = new List<Integer>();
             //myll = new List<object>();
-            s = new HashSet<object>();
+            s = new HashSet<Integer>();
             //mys = new HashSet<object>();
             //reversedLinkedList = new LinkedList(); // to be sorted in reverse order
             //myReversedLinkedList = new LinkedList(); // to be sorted in reverse
             // order
-            hm = new Dictionary<object, object>();
+            hm = new Dictionary<string, Integer>();
             for (int i = 0; i < objArray.Length; i++)
             {
                 ll.Add(objArray[i]);
