@@ -68,13 +68,16 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
     [DebuggerDisplay("{value}")]
     public sealed class Int16 : Number, IComparable<Int16>, IComparable, IConvertible, IEquatable<Int16>
     {
         /// <summary>
         /// The value which the receiver represents.
         /// </summary>
-        private readonly short value;
+        private readonly short value; // Do not rename (binary serialization)
 
         /// <summary>
         /// Constant for the number of bits needed to represent a <see cref="short"/> in

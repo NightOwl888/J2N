@@ -68,6 +68,9 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
     [DebuggerDisplay("{value}")]
     public sealed class Int32 : Number, IComparable<Int32>, IComparable, IConvertible, IEquatable<Int32>
     {
@@ -80,7 +83,7 @@ namespace J2N.Numerics
         /// <summary>
         /// The value which the receiver represents.
         /// </summary>
-        private readonly int value;
+        private readonly int value; // Do not rename (binary serialization)
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Int32"/> class.

@@ -71,13 +71,16 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
     [DebuggerDisplay("{value}")]
     public sealed class Byte : Number, IComparable<Byte>, IComparable, IConvertible, IEquatable<Byte>
     {
         /// <summary>
         /// The value which the receiver represents.
         /// </summary>
-        private readonly byte value;
+        private readonly byte value; // Do not rename (binary serialization)
 
         /// <summary>
         /// Constant for the number of bits needed to represent a <see cref="byte"/> in

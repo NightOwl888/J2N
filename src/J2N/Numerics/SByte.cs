@@ -71,6 +71,9 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
     [CLSCompliant(false)]
     [DebuggerDisplay("{value}")]
     public sealed class SByte : Number, IComparable<SByte>, IComparable, IConvertible, IEquatable<SByte>
@@ -78,7 +81,7 @@ namespace J2N.Numerics
         /// <summary>
         /// The value which the receiver represents.
         /// </summary>
-        private readonly sbyte value;
+        private readonly sbyte value; // Do not rename (binary serialization)
 
         /// <summary>
         /// Constant for the number of bits needed to represent a <see cref="sbyte"/> in
