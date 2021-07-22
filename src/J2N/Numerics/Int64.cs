@@ -68,13 +68,16 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
     [DebuggerDisplay("{value}")]
     public sealed class Int64 : Number, IComparable<Int64>, IComparable, IConvertible, IEquatable<Int64>
     {
         /// <summary>
         /// The value which the receiver represents.
         /// </summary>
-        private readonly long value;
+        private readonly long value; // Do not rename (binary serialization)
 
         /// <summary>
         /// Constant for the number of bits needed to represent a <see cref="long"/> in

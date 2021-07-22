@@ -72,13 +72,16 @@ namespace J2N.Numerics
     /// <seealso cref="IConvertible"/>
     /// <seealso cref="IFormattable"/>
     /// <seealso cref="IComparable"/>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
     [DebuggerDisplay("{value}")]
     public sealed class Single : Number, IComparable<Single>, IComparable, IConvertible, IEquatable<Single>
     {
         /// <summary>
         /// The value which the receiver represents.
         /// </summary>
-        private readonly float value;
+        private readonly float value; // Do not rename (binary serialization)
 
         /// <summary>
         /// Maximum exponent a finite <see cref="float"/> variable may have.
