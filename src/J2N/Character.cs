@@ -2424,25 +2424,71 @@ namespace J2N
         }
 
         /// <summary>
-        /// Indicates whether the specified character is a whitespace character in
-        /// .NET.
+        /// Indicates whether the specified character (Unicode code point) is a whitespace character according to Java.
+        /// A character is a Java whitespace character if and only if it satisfies one of the following criteria:
+        /// <list type="bullet">
+        ///     <item><description>It is a Unicode space character (<see cref="UnicodeCategory.SpaceSeparator"/>,
+        ///     <see cref="UnicodeCategory.LineSeparator"/>, or <see cref="UnicodeCategory.ParagraphSeparator"/>)
+        ///     but it is not also a non-breaking space ('\u00A0', '\u2007', '\u202F').</description></item>
+        ///     <item><description>It is '\t', U+0009 HORIZONTAL TABULATION.</description></item>
+        ///     <item><description>It is '\n', U+000A LINE FEED.</description></item>
+        ///     <item><description>It is '\u000B', U+000B VERTICAL TABULATION.</description></item>
+        ///     <item><description>It is '\f', U+000C FORM FEED.</description></item>
+        ///     <item><description>It is '\r', U+000D CARRIAGE RETURN.</description></item>
+        ///     <item><description>It is '\u001C', U+001C FILE SEPARATOR.</description></item>
+        ///     <item><description>It is '\u001D', U+001D GROUP SEPARATOR.</description></item>
+        ///     <item><description>It is '\u001E', U+001E RECORD SEPARATOR.</description></item>
+        ///     <item><description>It is '\u001F', U+001F UNIT SEPARATOR.</description></item>
+        /// </list>
+        /// <para/>
+        /// Usage Note: This method differs from <see cref="char.IsWhiteSpace(char)"/> in that it returns <c>false</c>
+        /// for the following characters:
+        /// <list type="bullet">
+        ///     <item><description>'\u0085', NEXT LINE</description></item>
+        ///     <item><description>'\u00A0', NO-BREAK SPACE</description></item>
+        ///     <item><description>'\u2007', FIGURE SPACE</description></item>
+        ///     <item><description>'\u202F', NARROW NO-BREAK SPACE</description></item>
+        /// </list>
         /// </summary>
         /// <param name="c">The character to check.</param>
-        /// <returns><c>true</c> if <paramref name="c"/> is a whitespace character, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if <paramref name="c"/> is a Java whitespace character, <c>false</c> otherwise.</returns>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public static bool IsWhiteSpace(char c)
         {
-            return char.IsWhiteSpace(c);
+            return IsWhiteSpace((int)c);
         }
 
         /// <summary>
-        /// Indicates whether the specified character is a whitespace character in
-        /// .NET.
+        /// Indicates whether the specified character (Unicode code point) is a whitespace character according to Java.
+        /// A character is a Java whitespace character if and only if it satisfies one of the following criteria:
+        /// <list type="bullet">
+        ///     <item><description>It is a Unicode space character (<see cref="UnicodeCategory.SpaceSeparator"/>,
+        ///     <see cref="UnicodeCategory.LineSeparator"/>, or <see cref="UnicodeCategory.ParagraphSeparator"/>)
+        ///     but it is not also a non-breaking space ('\u00A0', '\u2007', '\u202F').</description></item>
+        ///     <item><description>It is '\t', U+0009 HORIZONTAL TABULATION.</description></item>
+        ///     <item><description>It is '\n', U+000A LINE FEED.</description></item>
+        ///     <item><description>It is '\u000B', U+000B VERTICAL TABULATION.</description></item>
+        ///     <item><description>It is '\f', U+000C FORM FEED.</description></item>
+        ///     <item><description>It is '\r', U+000D CARRIAGE RETURN.</description></item>
+        ///     <item><description>It is '\u001C', U+001C FILE SEPARATOR.</description></item>
+        ///     <item><description>It is '\u001D', U+001D GROUP SEPARATOR.</description></item>
+        ///     <item><description>It is '\u001E', U+001E RECORD SEPARATOR.</description></item>
+        ///     <item><description>It is '\u001F', U+001F UNIT SEPARATOR.</description></item>
+        /// </list>
+        /// <para/>
+        /// Usage Note: This method differs from <see cref="char.IsWhiteSpace(string, int)"/> in that it returns <c>false</c>
+        /// for the following characters:
+        /// <list type="bullet">
+        ///     <item><description>'\u0085', NEXT LINE</description></item>
+        ///     <item><description>'\u00A0', NO-BREAK SPACE</description></item>
+        ///     <item><description>'\u2007', FIGURE SPACE</description></item>
+        ///     <item><description>'\u202F', NARROW NO-BREAK SPACE</description></item>
+        /// </list>
         /// </summary>
         /// <param name="codePoint">The character to check.</param>
-        /// <returns><c>true</c> if <paramref name="codePoint"/> is a whitespace character, <c>false</c> otherwise.</returns>
+        /// <returns><c>true</c> if <paramref name="codePoint"/> is a Java whitespace character, <c>false</c> otherwise.</returns>
         public static bool IsWhiteSpace(int codePoint)
         {
             // Optimized case for ASCII
@@ -2452,8 +2498,7 @@ namespace J2N
                 return true;
             if (codePoint < 0x2000 || codePoint == 0x2007)
                 return false;
-            return codePoint <= 0x200b || codePoint == 0x2028 || codePoint == 0x2029 || codePoint == 0x3000;
-            // Port Note: char.IsWhiteSpace(char.ConvertFromUtf32(codePoint)) incorrectly returns true for codepoint 160 (and possibly other cases)
+            return codePoint < 0x200b || codePoint == 0x2028 || codePoint == 0x2029 || codePoint == 0x205f || codePoint == 0x3000;
         }
 
         /// <summary>

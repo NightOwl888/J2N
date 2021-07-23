@@ -2502,8 +2502,67 @@ namespace J2N
         [Test]
         public void Test_isWhitespaceC()
         {
-            assertTrue("space returned false", Character.IsWhiteSpace('\n'));
-            assertTrue("non-space returned true", !Character.IsWhiteSpace('T'));
+            int[] javaGoodWhiteSpaceChars = new int[] {
+                0x0009,
+                0x000a, // '\n' 'T'
+                0x000b,
+                0x000c,
+                0x000d,
+                0x001c,
+                0x001d,
+                0x001e,
+                0x001f,
+                0x0020,
+                0x1680,
+                0x2000,
+                0x2001,
+                0x2002,
+                0x2003,
+                0x2004,
+                0x2005,
+                0x2006,
+                0x2008,
+                0x2009,
+                0x200a,
+                0x2028,
+                0x2029,
+                0x205f,
+                0x3000,
+            };
+
+            int[] javaBadWhiteSpaceChars = new int[] {
+                // These are official Unicode whitespace, but Java doesn't recognize them
+                0x0085,
+                0x00A0,
+                0x2007,
+                0x202F,
+
+                // From Harmony
+                'T',
+                0x110000, // Invalid Unicode code point
+                0xFEFF,
+
+                // Harmony bug
+                0x200b,
+            };
+
+            foreach (char c in javaGoodWhiteSpaceChars)
+            {
+                assertTrue($"0x{c:X4}", Character.IsWhiteSpace(c));
+            }
+
+            foreach (char c in javaBadWhiteSpaceChars)
+            {
+                assertFalse($"0x{c:X4}", Character.IsWhiteSpace(c));
+            }
+
+            for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
+            {
+                assertEquals($"0x{c:X4}", UChar.IsWhiteSpace((char)c), Character.IsWhiteSpace((char)c));
+            }
+
+            //assertTrue("space returned false", Character.IsWhiteSpace('\n'));
+            //assertTrue("non-space returned true", !Character.IsWhiteSpace('T'));
         }
 
         /**
@@ -2512,33 +2571,94 @@ namespace J2N
         [Test]
         public void Test_isWhitespace_I()
         {
-            assertTrue(Character.IsWhiteSpace((int)'\n'));
-            assertFalse(Character.IsWhiteSpace((int)'T'));
+            // J2N: Added more thorough tests because Harmony had differences from ICU4N
 
-            assertTrue(Character.IsWhiteSpace(0x0009));
-            assertTrue(Character.IsWhiteSpace(0x000A));
-            assertTrue(Character.IsWhiteSpace(0x000B));
-            assertTrue(Character.IsWhiteSpace(0x000C));
-            assertTrue(Character.IsWhiteSpace(0x000D));
-            assertTrue(Character.IsWhiteSpace(0x001C));
-            assertTrue(Character.IsWhiteSpace(0x001D));
-            assertTrue(Character.IsWhiteSpace(0x001F));
-            assertTrue(Character.IsWhiteSpace(0x001E));
+            int[] javaGoodWhiteSpaceChars = new int[] {
+                0x0009,
+                0x000a, // '\n' 'T'
+                0x000b,
+                0x000c,
+                0x000d,
+                0x001c,
+                0x001d,
+                0x001e,
+                0x001f,
+                0x0020,
+                0x1680,
+                0x2000,
+                0x2001,
+                0x2002,
+                0x2003,
+                0x2004,
+                0x2005,
+                0x2006,
+                0x2008,
+                0x2009,
+                0x200a,
+                0x2028,
+                0x2029,
+                0x205f,
+                0x3000,
+            };
 
-            assertTrue(Character.IsWhiteSpace(0x2000));
-            assertTrue(Character.IsWhiteSpace(0x200A));
+            int[] javaBadWhiteSpaceChars = new int[] {
+                // These are official Unicode whitespace, but Java doesn't recognize them
+                0x0085,
+                0x00A0,
+                0x2007,
+                0x202F,
 
-            assertTrue(Character.IsWhiteSpace(0x2028));
-            assertTrue(Character.IsWhiteSpace(0x2029));
+                // From Harmony
+                'T',
+                0x110000, // Invalid Unicode code point
+                0xFEFF,
 
-            assertFalse(Character.IsWhiteSpace(0x00A0));
-            assertFalse(Character.IsWhiteSpace(0x202F));
-            assertFalse(Character.IsWhiteSpace(0x110000));
+                // Harmony bug
+                0x200b,
+            };
 
-            assertFalse(Character.IsWhiteSpace(0xFEFF));
+            foreach (int c in javaGoodWhiteSpaceChars)
+            {
+                assertTrue($"0x{c:X4}", Character.IsWhiteSpace(c));
+            }
 
-            //FIXME depend on ICU4J
-            //assertFalse(Character.IsWhiteSpace(0x2007));
+            foreach (int c in javaBadWhiteSpaceChars)
+            {
+                assertFalse($"0x{c:X4}", Character.IsWhiteSpace(c));
+            }
+
+            for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
+            {
+                assertEquals($"0x{c:X4}", UChar.IsWhiteSpace(c), Character.IsWhiteSpace(c));
+            }
+
+            //assertTrue(Character.IsWhiteSpace((int)'\n'));
+            //assertFalse(Character.IsWhiteSpace((int)'T'));
+
+            //assertTrue(Character.IsWhiteSpace(0x0009));
+            //assertTrue(Character.IsWhiteSpace(0x000A));
+            //assertTrue(Character.IsWhiteSpace(0x000B));
+            //assertTrue(Character.IsWhiteSpace(0x000C));
+            //assertTrue(Character.IsWhiteSpace(0x000D));
+            //assertTrue(Character.IsWhiteSpace(0x001C));
+            //assertTrue(Character.IsWhiteSpace(0x001D));
+            //assertTrue(Character.IsWhiteSpace(0x001F));
+            //assertTrue(Character.IsWhiteSpace(0x001E));
+
+            //assertTrue(Character.IsWhiteSpace(0x2000));
+            //assertTrue(Character.IsWhiteSpace(0x200A));
+
+            //assertTrue(Character.IsWhiteSpace(0x2028));
+            //assertTrue(Character.IsWhiteSpace(0x2029));
+
+            //assertFalse(Character.IsWhiteSpace(0x00A0));
+            //assertFalse(Character.IsWhiteSpace(0x202F));
+            //assertFalse(Character.IsWhiteSpace(0x110000));
+
+            //assertFalse(Character.IsWhiteSpace(0xFEFF));
+
+            ////FIXME depend on ICU4J
+            ////assertFalse(Character.IsWhiteSpace(0x2007));
 
         }
 
