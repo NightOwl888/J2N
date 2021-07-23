@@ -20,6 +20,7 @@ using J2N.Collections.ObjectModel;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -288,6 +289,126 @@ namespace J2N.Collections.Generic.Extensions
         }
 
         #endregion GetView
+
+        #region RemoveAll
+
+        /// <summary>
+        /// Removes all the elements that match the conditions defined by the specified predicate.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="list">The <see cref="IList{T}"/> to remove elements from.</param>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the elements to remove.</param>
+        /// <returns>The number of elements removed from the <see cref="IList{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="list"/> or <paramref name="match"/> is <c>null</c>.</exception>
+        /// <remarks>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed
+        /// to it matches the conditions defined in the delegate. The elements of the current <see cref="IList{T}"/>
+        /// are individually passed to the <see cref="Predicate{T}"/> delegate, and the elements that match
+        /// the conditions are renived from the <see cref="IList{T}"/>.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where
+        /// <c>n</c> is <see cref="ICollection{T}.Count"/> of the supplied <paramref name="list"/>.
+        /// </remarks>
+        public static int RemoveAll<T>(this IList<T> list, Predicate<T> match)
+        {
+            if (list is null)
+                throw new ArgumentNullException(nameof(list));
+            if (list is List<T> jcgList)
+                return jcgList.RemoveAll(match); // Delegate remaining guard clauses
+            if (list is SCG.List<T> scgList)
+                return scgList.RemoveAll(match); // Delegate remaining guard clauses
+
+            return RemoveAllSlow(list, startIndex: 0, count: list.Count, match);
+        }
+
+        /// <summary>
+        /// Removes all the elements that match the conditions defined by the specified predicate.
+        /// </summary>
+        /// <typeparam name="T">The element type.</typeparam>
+        /// <param name="list">The <see cref="IList{T}"/> to remove elements from.</param>
+        /// <param name="startIndex">The zero-based starting index to begin removing matching items.</param>
+        /// <param name="count">The number of elements in the section to search.</param>
+        /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines the conditions
+        /// of the elements to remove.</param>
+        /// <returns>The number of elements removed from the <see cref="IList{T}"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="list"/> or <paramref name="match"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> and <paramref name="count"/> refer to a location outside of <paramref name="list"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="Predicate{T}"/> is a delegate to a method that returns <c>true</c> if the object passed
+        /// to it matches the conditions defined in the delegate. The elements of the current <see cref="IList{T}"/>
+        /// are individually passed to the <see cref="Predicate{T}"/> delegate, and the elements that match
+        /// the conditions are renived from the <see cref="IList{T}"/>.
+        /// <para/>
+        /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where
+        /// <c>n</c> is <paramref name="count"/> - <paramref name="startIndex"/>.
+        /// </remarks>
+        public static int RemoveAll<T>(this IList<T> list, int startIndex, int count, Predicate<T> match)
+        {
+            if (list is null)
+                throw new ArgumentNullException(nameof(list));
+            if (list is List<T> jcgList)
+                return jcgList.DoRemoveAll(startIndex, count, match); // Delegate remaining guard clauses
+
+            return RemoveAllSlow(list, startIndex, count, match);
+        }
+
+        private static int RemoveAllSlow<T>(this IList<T> list, int startIndex, int count, Predicate<T> match)
+        {
+            int size = list.Count;
+            if ((uint)startIndex > (uint)size)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+            if (count < 0 || startIndex > size - count)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+            if (match is null)
+                throw new ArgumentNullException(nameof(match));
+
+            int freeIndex = startIndex;   // the first free slot in items array
+            uint limit = (uint)startIndex + (uint)count; // The first index at the end of the range (this is outside of the valid range)
+
+            // Find the first item which needs to be removed.
+            while (freeIndex < limit && !match(list[freeIndex])) freeIndex++;
+            if (freeIndex >= limit) return 0;
+
+            int current = freeIndex + 1;
+            while (current < limit)
+            {
+                // Find the first item which needs to be kept.
+                while (current < limit && match(list[current])) current++;
+
+                if (current < limit)
+                {
+                    // copy item to the free slot.
+                    list[freeIndex++] = list[current++];
+                }
+            }
+
+            // Free up any remaining space in list
+            while (current < size)
+            {
+                // copy item to the free slot.
+                list[freeIndex++] = list[current++];
+            }
+
+            int result = size - freeIndex;
+
+            // Remove the tail of the list where we freed up space.
+            // We do this in reverse order so the underlying list doesn't have to move items.
+            for (int i = freeIndex + result - 1; i >= freeIndex; i--)
+            {
+                list.RemoveAt(i);
+            }
+
+            return result;
+        }
+
+        #endregion
 
         #region Shuffle
 
