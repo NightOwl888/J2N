@@ -133,16 +133,37 @@ namespace J2N.Collections.Generic.Extensions
         [Test]
         public void TestBinarySearch()
         {
-            IList<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            IList<int> jcgList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, jcgList.BinarySearch(7));
+            assertEquals(6, jcgList.BinarySearch(7, null));
+
+            IList<int> scgList = new SCG.List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, scgList.BinarySearch(7));
+            assertEquals(6, scgList.BinarySearch(7, null));
+
+            IList<int> list = new MockList<int>(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 });
             assertEquals(6, list.BinarySearch(7));
             assertEquals(6, list.BinarySearch(7, null));
+
+            IList<int> array = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, array.BinarySearch(7));
+            assertEquals(6, array.BinarySearch(7, null));
         }
 
         [Test]
         public void TestBinarySearchInRange()
         {
-            IList<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            IList<int> jcgList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, jcgList.BinarySearch(3, 4, 7, null));
+
+            IList<int> scgList = new SCG.List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, scgList.BinarySearch(3, 4, 7, null));
+
+            IList<int> list = new MockList<int>(new SCG.List<int> { 1, 2, 3, 4, 5, 6, 7, 8 });
             assertEquals(6, list.BinarySearch(3, 4, 7, null));
+
+            IList<int> array = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, array.BinarySearch(3, 4, 7, null));
         }
 
         /**

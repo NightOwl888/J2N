@@ -89,20 +89,30 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="list">The sorted <see cref="IList{T}"/> to search.</param>
         /// <param name="item">The element to find.</param>
         /// <param name="comparer">The comparer. If the comparer is <c>null</c> then the
-        /// search uses the objects' natural ordering.</param>
+        /// search uses the <see cref="J2N.Collections.Generic.Comparer{T}.Default"/> comparer, which
+        /// uses rules similar to Java's defaults.</param>
         /// <returns>the non-negative index of the element, or a negative index which
         /// is the <c>-index - 1</c> where the element would be inserted.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
         public static int BinarySearch<T>(this IList<T> list, T item, IComparer<T>? comparer)
         {
-            if (list == null)
+            if (list is null)
                 throw new ArgumentNullException(nameof(list));
 
-            if (comparer == null)
-            {
-                comparer = J2N.Collections.Generic.Comparer<T>.Default;
-            }
+            comparer ??= J2N.Collections.Generic.Comparer<T>.Default;
 
+            if (list is List<T> jcgList)
+                return jcgList.BinarySearch(item, comparer);
+            if (list is SCG.List<T> scgList)
+                return scgList.BinarySearch(item, comparer);
+            if (list is T[] array)
+                return Array.BinarySearch(array, item, comparer);
+
+            return BinarySearchSlow<T>(list, item, comparer);
+        }
+
+        private static int BinarySearchSlow<T>(this IList<T> list, T item, IComparer<T>? comparer)
+        {
             if (list.Count == 0)
                 return -1;
 
@@ -133,13 +143,14 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="count">The length of the range to search.</param>
         /// <param name="item">The element to find.</param>
         /// <param name="comparer">The comparer. If the comparer is <c>null</c> then the
-        /// search uses the objects' natural ordering.</param>
+        /// search uses the <see cref="J2N.Collections.Generic.Comparer{T}.Default"/> comparer, which
+        /// uses rules similar to Java's defaults.</param>
         /// <returns>the non-negative index of the element, or a negative index which
         /// is the <c>-index - 1</c> where the element would be inserted.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
         public static int BinarySearch<T>(this IList<T> list, int index, int count, T item, IComparer<T>? comparer)
         {
-            if (list == null)
+            if (list is null)
                 throw new ArgumentNullException(nameof(list));
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -148,11 +159,20 @@ namespace J2N.Collections.Generic.Extensions
             if (list.Count - index < count)
                 throw new ArgumentException(SR.Argument_InvalidOffLen);
 
-            if (comparer == null)
-            {
-                comparer = J2N.Collections.Generic.Comparer<T>.Default;
-            }
+            comparer ??= J2N.Collections.Generic.Comparer<T>.Default;
 
+            if (list is List<T> jcgList)
+                return jcgList.BinarySearch(index, count, item, comparer);
+            if (list is SCG.List<T> scgList)
+                return scgList.BinarySearch(index, count, item, comparer);
+            if (list is T[] array)
+                return Array.BinarySearch(array, index, count, item, comparer);
+
+            return BinarySearchSlow<T>(list, index, count, item, comparer);
+        }
+
+        private static int BinarySearchSlow<T>(this IList<T> list, int index, int count, T item, IComparer<T>? comparer)
+        {
             int lo = index;
             int hi = index + count - 1;
             while (lo <= hi)
