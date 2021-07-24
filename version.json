@@ -4,7 +4,7 @@
   "assemblyVersion": {
     "precision": "major"
   },
-  "versionHeightOffset": "-65",
+  "versionHeightOffset": "-81",
   "publicReleaseRefSpec": [
     "^refs/heads/main$",
     "^refs/heads/master$",
