@@ -111,7 +111,7 @@ namespace J2N.Collections.Generic.Extensions
             return BinarySearchSlow<T>(list, item, comparer);
         }
 
-        private static int BinarySearchSlow<T>(this IList<T> list, T item, IComparer<T>? comparer)
+        private static int BinarySearchSlow<T>(this IList<T> list, T item, IComparer<T> comparer)
         {
             if (list.Count == 0)
                 return -1;
@@ -171,7 +171,7 @@ namespace J2N.Collections.Generic.Extensions
             return BinarySearchSlow<T>(list, index, count, item, comparer);
         }
 
-        private static int BinarySearchSlow<T>(this IList<T> list, int index, int count, T item, IComparer<T>? comparer)
+        private static int BinarySearchSlow<T>(this IList<T> list, int index, int count, T item, IComparer<T> comparer)
         {
             int lo = index;
             int hi = index + count - 1;
