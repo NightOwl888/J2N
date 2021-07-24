@@ -228,9 +228,9 @@ namespace J2N.Collections.Generic.Extensions
         /// than the available space from <paramref name="destinationIndex"/> plus <paramref name="length"/>.</exception>
         public static void CopyTo<T>(this IList<T> source, int sourceIndex, IList<T> destination, int destinationIndex, int length)
         {
-            if (source == null)
+            if (source is null)
                 throw new ArgumentNullException(nameof(source));
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
             if (sourceIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex), sourceIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
