@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System;
 using System.Resources;
@@ -19,14 +18,14 @@ namespace J2N
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static bool UsingResourceKeys() => false;
 
-        internal static string GetResourceString(string resourceKey, string defaultString = null)
+        internal static string? GetResourceString(string resourceKey, string? defaultString = null)
         {
             if (UsingResourceKeys())
             {
                 return defaultString ?? resourceKey;
             }
 
-            string resourceString = null;
+            string? resourceString = null;
             try
             {
                 resourceString = Resources.Strings.ResourceManager.GetString(resourceKey);
@@ -41,7 +40,7 @@ namespace J2N
             return resourceString; // only null if missing resources
         }
 
-        internal static string Format(string resourceFormat, object p1)
+        internal static string Format(string resourceFormat, object? p1)
         {
             if (UsingResourceKeys())
             {
@@ -51,7 +50,7 @@ namespace J2N
             return string.Format(resourceFormat, p1);
         }
 
-        internal static string Format(string resourceFormat, object p1, object p2)
+        internal static string Format(string resourceFormat, object? p1, object? p2)
         {
             if (UsingResourceKeys())
             {
@@ -61,7 +60,7 @@ namespace J2N
             return string.Format(resourceFormat, p1, p2);
         }
 
-        internal static string Format(string resourceFormat, object p1, object p2, object p3)
+        internal static string Format(string resourceFormat, object? p1, object? p2, object? p3)
         {
             if (UsingResourceKeys())
             {
@@ -71,7 +70,7 @@ namespace J2N
             return string.Format(resourceFormat, p1, p2, p3);
         }
 
-        internal static string Format(string resourceFormat, params object[] args)
+        internal static string Format(string resourceFormat, params object?[] args)
         {
             if (args != null)
             {

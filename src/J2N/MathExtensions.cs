@@ -1,8 +1,26 @@
-﻿using J2N.Numerics;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Numerics;
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-#nullable enable
+
 
 namespace J2N
 {
@@ -154,7 +172,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If either argument is <see cref="double.NaN"/>, the result is <see cref="double.NaN"/>.</description></item>
         ///     <item><description>If both arguments are signed zeros, a value equivalent to <paramref name="direction"/> is returned.</description></item>
-        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="double.MinValue"/> and <paramref name="direction"/> has a value
+        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="double.Epsilon"/> and <paramref name="direction"/> has a value
         ///         such that the result should have a smaller magnitude, then a zero with the same sign as <paramref name="start"/> is returned.</description></item>
         ///     <item><description>If <paramref name="start"/> is infinite and <paramref name="direction"/> has a value such that the result
         ///     should have a smaller magnitude, <see cref="double.MaxValue"/> with the same sign as <paramref name="start"/> is returned.</description></item>
@@ -245,7 +263,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If either argument is <see cref="float.NaN"/>, the result is <see cref="float.NaN"/>.</description></item>
         ///     <item><description>If both arguments are signed zeros, a value equivalent to <paramref name="direction"/> is returned.</description></item>
-        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="float.MinValue"/> and <paramref name="direction"/> has a value
+        ///     <item><description>If <paramref name="start"/> is &#177;<see cref="float.Epsilon"/> and <paramref name="direction"/> has a value
         ///         such that the result should have a smaller magnitude, then a zero with the same sign as <paramref name="start"/> is returned.</description></item>
         ///     <item><description>If <paramref name="start"/> is infinite and <paramref name="direction"/> has a value such that the result
         ///     should have a smaller magnitude, <see cref="float.MaxValue"/> with the same sign as <paramref name="start"/> is returned.</description></item>
@@ -337,7 +355,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="double.NaN"/>, the result is <see cref="double.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="double.PositiveInfinity"/>, the result is <see cref="double.PositiveInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="double.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="double.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -366,7 +384,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="float.NaN"/>, the result is <see cref="float.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="float.PositiveInfinity"/>, the result is <see cref="float.PositiveInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="float.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="float.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -394,7 +412,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="double.NaN"/>, the result is <see cref="double.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="double.NegativeInfinity"/>, the result is <see cref="double.NegativeInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="double.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="double.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -406,7 +424,7 @@ namespace J2N
             else
             {
                 if (value == 0.0)
-                    return -double.MinValue;
+                    return -double.Epsilon; // J2N: In .NET double.Epsilon is the same as Double.MIN_VALUE in Java
                 else
                     return BitConversion.Int64BitsToDouble(BitConversion.DoubleToRawInt64Bits(value) +
                                                    ((value > 0.0d) ? -1L : +1L));
@@ -424,7 +442,7 @@ namespace J2N
         /// <list type="bullet">
         ///     <item><description>If the argument is <see cref="float.NaN"/>, the result is <see cref="float.NaN"/>.</description></item>
         ///     <item><description>If the argument is <see cref="float.NegativeInfinity"/>, the result is <see cref="float.NegativeInfinity"/>.</description></item>
-        ///     <item><description>If the argument is zero, the result is <see cref="float.MinValue"/>.</description></item>
+        ///     <item><description>If the argument is zero, the result is <see cref="float.Epsilon"/>.</description></item>
         /// </list>
         /// </summary>
         /// <param name="value">The starting floating-point value.</param>
@@ -436,11 +454,51 @@ namespace J2N
             else
             {
                 if (value == 0.0f)
-                    return -float.MinValue;
+                    return -float.Epsilon; // J2N: In .NET float.Epsilon is the same as Float.MIN_VALUE in Java
                 else
                     return BitConversion.Int32BitsToSingle(BitConversion.SingleToRawInt32Bits(value) +
                                                 ((value > 0.0f) ? -1 : +1));
             }
+        }
+
+        /// <summary>
+        /// Returns a value with the magnitude of <paramref name="x"/> and the sign of <paramref name="y"/>.
+        /// </summary>
+        /// <param name="x">A number whose magnitude is used in the result.</param>
+        /// <param name="y">A number whose sign is the used in the result.</param>
+        /// <returns>A value with the magnitude of <paramref name="x"/> and the sign of <paramref name="y"/>.</returns>
+        public static unsafe double CopySign(this double x, double y) // Cover .NET < .NET Standard 2.1
+        {
+            // This method is required to work for all inputs,
+            // including NaN, so we operate on the raw bits.
+
+            long xbits = BitConversion.DoubleToRawInt64Bits(x);
+            long ybits = BitConversion.DoubleToRawInt64Bits(y);
+
+            // If the sign bits of x and y are not the same,
+            // flip the sign bit of x and return the new value;
+            // otherwise, just return x
+
+            if ((xbits ^ ybits) < 0)
+            {
+                return BitConversion.Int64BitsToDouble(xbits ^ long.MinValue);
+            }
+
+            return x;
+        }
+
+        internal static uint DivRem(uint a, uint b, out uint result)
+        {
+            uint div = a / b;
+            result = a - (div * b);
+            return div;
+        }
+
+        internal static ulong DivRem(ulong a, ulong b, out ulong result)
+        {
+            ulong div = a / b;
+            result = a - (div * b);
+            return div;
         }
     }
 }

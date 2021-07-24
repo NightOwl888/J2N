@@ -1,6 +1,26 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Numerics;
+using System;
+using System.Diagnostics;
 using System.Threading;
-#nullable enable
+
 
 namespace J2N.Threading.Atomic
 {
@@ -18,7 +38,8 @@ namespace J2N.Threading.Atomic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class AtomicInt64 : IEquatable<AtomicInt64>, IEquatable<long>, IFormattable, IConvertible
+    [DebuggerDisplay("{Value}")]
+    public class AtomicInt64 : Number, IEquatable<AtomicInt64>, IEquatable<long>, IFormattable, IConvertible
     {
         private long value;
 
@@ -46,9 +67,15 @@ namespace J2N.Threading.Atomic
         /// long x = along;
         /// </code>
         /// </summary>
+        /// <remarks>
+        /// Properties are inherently not atomic. Operators such as ++ and -- should not
+        /// be used on <see cref="Value"/> because they perform both a separate get and a set operation. Instead,
+        /// use the atomic methods such as <see cref="IncrementAndGet()"/>, <see cref="GetAndIncrement()"/>
+        /// <see cref="DecrementAndGet()"/> and <see cref="GetAndDecrement()"/> to ensure atomicity.
+        /// </remarks>
         public long Value // Port Note: This is a replacement for Get() and Set()
         {
-            get => this.value; // read operations atomic in 64 bit
+            get => Interlocked.Read(ref this.value);
             set => Interlocked.Exchange(ref this.value, value);
         }
 
@@ -188,7 +215,7 @@ namespace J2N.Threading.Atomic
         /// and a sequence of digits ranging from 0 to 9 with no leading zeroes.</returns>
         public override string ToString()
         {
-            return Value.ToString();
+            return J2N.Numerics.Int64.ToString(Value);
         }
 
         /// <summary>
@@ -198,9 +225,9 @@ namespace J2N.Threading.Atomic
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <returns>The string representation of the value of this instance as specified
         /// by <paramref name="format"/>.</returns>
-        public virtual string ToString(string? format)
+        public override string ToString(string? format)
         {
-            return Value.ToString(format);
+            return J2N.Numerics.Int64.ToString(Value, format);
         }
 
         /// <summary>
@@ -209,9 +236,9 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by <paramref name="provider"/>.</returns>
-        public virtual string ToString(IFormatProvider? provider)
+        public override string ToString(IFormatProvider? provider)
         {
-            return Value.ToString(provider);
+            return J2N.Numerics.Int64.ToString(Value, provider);
         }
 
         /// <summary>
@@ -222,12 +249,55 @@ namespace J2N.Threading.Atomic
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by
         /// <paramref name="format"/> and <paramref name="provider"/>.</returns>
-        public virtual string ToString(string? format, IFormatProvider? provider)
+        public override string ToString(string? format, IFormatProvider? provider)
         {
-            return Value.ToString(format, provider);
+            return J2N.Numerics.Int64.ToString(Value, format, provider);
         }
 
         #region IConvertible Members
+
+        /// <inheritdoc/>
+        public override byte ToByte()
+        {
+            return (byte)Value;
+        }
+
+        /// <inheritdoc/>
+        [CLSCompliant(false)]
+        public override sbyte ToSByte()
+        {
+            return (sbyte)Value;
+        }
+
+        /// <inheritdoc/>
+        public override double ToDouble()
+        {
+            return Value;
+        }
+
+        /// <inheritdoc/>
+        public override float ToSingle()
+        {
+            return (float)Value;
+        }
+
+        /// <inheritdoc/>
+        public override int ToInt32()
+        {
+            return (int)Value;
+        }
+
+        /// <inheritdoc/>
+        public override long ToInt64()
+        {
+            return Value;
+        }
+
+        /// <inheritdoc/>
+        public override short ToInt16()
+        {
+            return (short)Value;
+        }
 
         /// <summary>
         /// Returns the <see cref="TypeCode"/> for value type <see cref="int"/>.

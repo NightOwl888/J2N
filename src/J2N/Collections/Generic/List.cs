@@ -1,19 +1,18 @@
-﻿using J2N.Collections.ObjectModel;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using J2N.Collections.ObjectModel;
 using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using SCG = System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-#if FEATURE_CONTRACTBLOCKS
-using System.Diagnostics.Contracts;
-#endif
 #if !FEATURE_CASEINSENSITIVECOMPARER
 using CaseInsensitiveComparer = System.StringComparer; // To fixup documentation - this type doesn't exist on .NET Standard 1.x
 #endif
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {
@@ -47,7 +46,7 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    public class List<T> : IList<T>, IList,
+    public partial class List<T> : IList<T>, IList,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyList<T>,
 #endif
@@ -57,22 +56,30 @@ namespace J2N.Collections.Generic
 #endif
     {
         private const int MaxArrayLength = 0X7FEFFFFF;
-        private const int defaultCapacity = 4;
+        private const int DefaultCapacity = 4;
+
+#if !FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
+        private static readonly bool TIsNullableType = typeof(T).IsNullableType();
+#endif
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private readonly SCG.List<T> list;
+        internal T[] _items;
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private int version;
+        internal int _size;
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private object? syncRoot;
+        internal int _version;
+
+#pragma warning disable CA1825 // avoid the extra generic instantiation for Array.Empty<T>()
+        private static readonly T[] s_emptyArray = new T[0];
+#pragma warning restore CA1825
 
 #if FEATURE_SERIALIZABLE
         private System.Runtime.Serialization.SerializationInfo? siInfo; //A temporary variable which we need during deserialization.
@@ -83,14 +90,16 @@ namespace J2N.Collections.Generic
         private const string VersionName = "Version"; // Do not rename (binary serialization)
 #endif
 
-
         #region Constructors
 
         /// <summary>
         /// Initializes a new instance of the <see cref="List{T}"/> class that is empty
         /// and has the default initial capacity.
         /// </summary>
-        public List() : this(0) { }
+        public List()
+        {
+            _items = s_emptyArray;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="List{T}"/> class that contains elements
@@ -101,7 +110,34 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
         public List(IEnumerable<T> collection)
         {
-            list = new SCG.List<T>(collection);
+            if (collection is null)
+                throw new ArgumentNullException(nameof(collection));
+
+            if (collection is ICollection<T> c)
+            {
+                int count = c.Count;
+                if (count == 0)
+                {
+                    _items = s_emptyArray;
+                }
+                else
+                {
+                    _items = new T[count];
+                    c.CopyTo(_items, 0);
+                    _size = count;
+                }
+            }
+            else
+            {
+                _items = s_emptyArray;
+                using (IEnumerator<T> en = collection!.GetEnumerator())
+                {
+                    while (en.MoveNext())
+                    {
+                        Add(en.Current);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -112,7 +148,13 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than 0.</exception>
         public List(int capacity)
         {
-            list = new SCG.List<T>(capacity);
+            if (capacity < 0)
+                throw new ArgumentOutOfRangeException(nameof(capacity), capacity, SR.ArgumentOutOfRange_NeedNonNegNum);
+
+            if (capacity == 0)
+                _items = s_emptyArray;
+            else
+                _items = new T[capacity];
         }
 
 #if FEATURE_SERIALIZABLE
@@ -131,11 +173,71 @@ namespace J2N.Collections.Generic
         {
             siInfo = info;
             int capacity = info.GetInt32(CountName);
-            list = new SCG.List<T>(capacity);
+            _items = new T[capacity];
         }
 #endif
 
         #endregion
+
+        #region Bounds Checking for SubList
+
+        // Tracks the lower bound of a SubList
+        internal virtual int Offset => 0;
+
+        // Tracks the length of a SubList
+        internal virtual int Size => _size;
+
+        internal virtual int AncestralVersion => _version;
+
+        internal virtual void CoModificationCheck()
+        {
+        }
+
+        #endregion Bounds Checking for SubList
+
+        #region GetView
+
+        /// <summary>
+        /// Returns a view of a sublist in a <see cref="List{T}"/>.
+        /// <para/>
+        /// IMPORTANT: This method uses .NET semantics. That is, the second parameter is a count rather than an exclusive end
+        /// index as would be the case in Java's subList() method. To translate from Java, use <c>toIndex - fromIndex</c> to
+        /// obtain the value of <paramref name="count"/>.
+        /// </summary>
+        /// <param name="index">The first index in the view (inclusive).</param>
+        /// <param name="count">The number of elements to include in the view.</param>
+        /// <returns>A sublist view that contains only the values in the specified range.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> or <paramref name="count"/> is less than zero.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="index"/> and <paramref name="count"/> refer to a location outside of the list.
+        /// </exception>
+        /// <remarks>This method returns a view of the range of elements that are specified by <paramref name="index"/>
+        /// and <paramref name="count"/>. Unlike <see cref="GetRange(int, int)"/>, this method does not copy elements from
+        /// the <see cref="List{T}"/>, but provides a window into the underlying <see cref="List{T}"/> itself.
+        /// You can make changes to the view and create child views of the view. However, any structural change to a parent view
+        /// or the original <see cref="List{T}"/> will cause all methods of the view or any enumerator based on the view
+        /// to throw an <see cref="InvalidOperationException"/>. Structural modifications are any edit that will change the <see cref="Count"/>
+        /// or otherwise perturb it in such a way that enumerations in progress will be invalid. A view is only valid until one of its ancestors
+        /// is structurally modified, at which point you will need to create a new view.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
+        public virtual List<T> GetView(int index, int count)
+        {
+            CoModificationCheck();
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (Size - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
+            return new SubList(this, index, count);
+        }
+
+        #endregion GetView
 
         #region SCG.List<T> Members
 
@@ -163,8 +265,37 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public int Capacity
         {
-            get => list.Capacity;
-            set => list.Capacity = value;
+            get => _items.Length;
+            set => DoSetCapacity(value); // Hack so we can override
+        }
+
+        // Returns true if we re-allocated the array
+        internal virtual bool DoSetCapacity(int value)
+        {
+            if (value < _size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(Capacity), value, SR.ArgumentOutOfRange_SmallCapacity);
+            }
+
+            if (value != _items.Length)
+            {
+                if (value > 0)
+                {
+                    T[] newItems = new T[value];
+                    if (_size > 0)
+                    {
+                        Array.Copy(_items, newItems, _size);
+                    }
+                    _items = newItems;
+                }
+                else
+                {
+                    _items = s_emptyArray;
+                }
+                _version++; // J2N: Unlike .NET, we consider reallocating the array a "modification" to the list to ensure sublists use the same array reference
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -181,34 +312,23 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Retrieving the value of this property is an O(1) operation.
         /// </remarks>
-        public int Count => list.Count;
+        public int Count => Size;
 
 
         bool IList.IsFixedSize => false;
 
 
         // Is this List read-only?
-        bool ICollection<T>.IsReadOnly => false;
+        internal virtual bool IsReadOnly => false;
+        bool ICollection<T>.IsReadOnly => IsReadOnly;
 
-        bool IList.IsReadOnly => false;
+        bool IList.IsReadOnly => IsReadOnly;
 
         // Is this List synchronized (thread-safe)?
         bool ICollection.IsSynchronized => false;
 
         // Synchronization root for this object.
-        object ICollection.SyncRoot
-        {
-            get
-            {
-                if (syncRoot == null)
-                {
-                    if (list is ICollection col)
-                        syncRoot = col.SyncRoot;
-                    System.Threading.Interlocked.CompareExchange<object?>(ref syncRoot, new object(), null);
-                }
-                return syncRoot;
-            }
-        }
+        object ICollection.SyncRoot => this;
 
         /// <summary>
         /// Gets or sets the element at the specified index.
@@ -234,21 +354,62 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public T this[int index]
         {
-            get => list[index];
-            set
+            get
             {
-                list[index] = value;
-                version++;
+                CoModificationCheck();
+                if ((uint)index >= (uint)Size)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                }
+                Debug.Assert(_size - Offset >= index);
+                return _items[index + Offset];
             }
+            set => DoSet(index, value);
+        }
+
+        internal virtual void DoSet(int index, T value)
+        {
+            if ((uint)index >= (uint)_size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+            }
+            _items[index] = value;
+            _version++;
+        }
+
+        private static bool IsCompatibleObject(object? value)
+        {
+            // Non-null values are fine.  Only accept nulls if T is a class or Nullable<U>.
+            // Note that default(T) is not equal to null for value types except when T is Nullable<U>.
+            return (value is T) || (value == null && default(T) == null);
+        }
+
+        // From System.ThrowHelper
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private static bool NullAndNullsAreIllegal(object? value)
+        {
+            // Note that default(T) is not equal to null for value types except when T is Nullable<U>.
+            return !(default(T) == null) && value == null;
         }
 
         object? IList.this[int index]
         {
-            get => ((IList)list)[index];
+            get => this[index];
             set
             {
-                ((IList)list)[index] = value;
-                version++;
+                if (NullAndNullsAreIllegal(value))
+                    throw new ArgumentNullException(nameof(value));
+
+                try
+                {
+                    this[index] = (T)value!;
+                }
+                catch (InvalidCastException)
+                {
+                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(T)), nameof(value));
+                }
             }
         }
 
@@ -272,16 +433,52 @@ namespace J2N.Collections.Generic
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public void Add(T item)
+            => DoAdd(item); // Hack so we can override
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        internal virtual void DoAdd(T item)
         {
-            list.Add(item);
-            version++;
+            _version++;
+            T[] array = _items;
+            int size = _size;
+            if ((uint)size < (uint)array.Length)
+            {
+                _size = size + 1;
+                array[size] = item;
+            }
+            else
+            {
+                AddWithResize(item);
+            }
+        }
+
+        // Non-inline from List.Add to improve its code quality as uncommon path
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void AddWithResize(T item)
+        {
+            int size = _size;
+            EnsureCapacity(size + 1);
+            _size = size + 1;
+            _items[size] = item;
         }
 
         int IList.Add(object? item)
         {
-            int result = ((IList)list).Add(item);
-            version++;
-            return result;
+            if (NullAndNullsAreIllegal(item))
+                throw new ArgumentNullException(nameof(item));
+
+            try
+            {
+                Add((T)item!);
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, item, typeof(T)), nameof(item));
+            }
+
+            return Count - 1;
         }
 
         /// <summary>
@@ -305,13 +502,7 @@ namespace J2N.Collections.Generic
         /// where <c>n</c> is the number of elements to be added and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
         public void AddRange(IEnumerable<T> collection)
-        {
-#if FEATURE_CONTRACTBLOCKS
-            Contract.Ensures(Count >= Contract.OldValue(Count));
-#endif
-
-            InsertRange(list.Count, collection);
-        }
+            => InsertRange(Size, collection);
 
         /// <summary>
         /// Returns a read-only <see cref="ReadOnlyList{T}"/> wrapper for the current collection.
@@ -326,9 +517,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public ReadOnlyList<T> AsReadOnly()
         {
-#if FEATURE_CONTRACTBLOCKS
-            Contract.Ensures(Contract.Result<ReadOnlyList<T>>() != null);
-#endif
+            CoModificationCheck();
             return new ReadOnlyList<T>(this);
         }
 
@@ -386,9 +575,18 @@ namespace J2N.Collections.Generic
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public int BinarySearch(int index, int count, T item, IComparer<T> comparer)
+        public int BinarySearch(int index, int count, T item, IComparer<T>? comparer)
         {
-            return list.BinarySearch(index, count, item, comparer ?? Comparer<T>.Default);
+            CoModificationCheck();
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (Size - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
+            int offset = Offset;
+            return Array.BinarySearch<T>(_items, index + offset, count, item, comparer ?? Comparer<T>.Default) - offset;
         }
 
         /// <summary>
@@ -424,13 +622,8 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public int BinarySearch(T item)
-        {
-            return BinarySearch(item, null);
-        }
+            => BinarySearch(0, Size, item, null);
 
         /// <summary>
         /// Searches the entire sorted <see cref="List{T}"/> for an element using the specified comparer and
@@ -477,13 +670,8 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public int BinarySearch(T item, IComparer<T>? comparer)
-        {
-            return list.BinarySearch(item, comparer ?? Comparer<T>.Default);
-        }
+            => BinarySearch(0, Size, item, comparer);
 
         /// <summary>
         /// Removes all elements from the <see cref="List{T}"/>.
@@ -503,9 +691,29 @@ namespace J2N.Collections.Generic
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public void Clear()
+            => DoClear(); // Hack so we can override
+
+        // NOTE: Don't call Clear() from SubList, call RemoveRange() instead
+        internal virtual void DoClear()
         {
-            list.Clear();
-            version++;
+            _version++;
+#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
+            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+#else
+            if (TIsNullableType)
+#endif
+            {
+                int size = _size;
+                _size = 0;
+                if (size > 0)
+                {
+                    Array.Clear(_items, 0, size); // Clear the elements so that the gc can reclaim the references.
+                }
+            }
+            else
+            {
+                _size = 0;
+            }
         }
 
         /// <summary>
@@ -519,14 +727,30 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public bool Contains(T item)
-            => list.Contains(item);
+        {
+            CoModificationCheck();
+
+            // PERF: IndexOf calls Array.IndexOf, which internally
+            // calls EqualityComparer<T>.Default.IndexOf, which
+            // is specialized for different types. This
+            // boosts performance since instead of making a
+            // virtual method call each iteration of the loop,
+            // via EqualityComparer<T>.Default.Equals, we
+            // only make one virtual call to EqualityComparer.IndexOf.
+
+            return _size != 0 && IndexOf(item) != -1;
+        }
 
         bool IList.Contains(object? item)
-            => ((IList)list).Contains(item);
+        {
+            CoModificationCheck();
+            if (IsCompatibleObject(item))
+            {
+                return Contains((T)item!);
+            }
+            return false;
+        }
 
 #if FEATURE_CONVERTER
         /// <summary>
@@ -551,19 +775,17 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter)
         {
-            if (converter == null)
+            CoModificationCheck();
+            if (converter is null)
                 throw new ArgumentNullException(nameof(converter));
 
-#if FEATURE_CONTRACTBLOCKS
-            Contract.EndContractBlock();
-#endif
-
-            int size = this.list.Count;
+            int size = Size;
             List<TOutput> list = new List<TOutput>(size);
-            for (int i = 0; i < size; i++)
+            for (int i = Offset; i < size; i++)
             {
-                list.Add(converter(this.list[i]));
+                list._items[i] = converter(_items[i]);
             }
+            list._size = size;
             return list;
         }
 #endif
@@ -586,10 +808,26 @@ namespace J2N.Collections.Generic
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
         public void CopyTo(T[] array)
-            => list.CopyTo(array);
+            => CopyTo(array, 0);
 
+        // Copies this List into array, which must be of a
+        // compatible array type.
         void ICollection.CopyTo(Array array, int arrayIndex)
-            => ((ICollection)list).CopyTo(array, arrayIndex);
+        {
+            CoModificationCheck();
+            if ((array != null) && (array.Rank != 1))
+                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+
+            try
+            {
+                // Array.Copy will check for NULL.
+                Array.Copy(_items, Offset, array!, arrayIndex, Size);
+            }
+            catch (ArrayTypeMismatchException)
+            {
+                throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+            }
+        }
 
         /// <summary>
         /// Copies a range of elements from the <see cref="List{T}"/> to a compatible
@@ -631,7 +869,14 @@ namespace J2N.Collections.Generic
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <paramref name="count"/>.
         /// </remarks>
         public void CopyTo(int index, T[] array, int arrayIndex, int count)
-            => list.CopyTo(index, array, arrayIndex, count);
+        {
+            CoModificationCheck();
+            if (Size - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
+            // Delegate rest of error checking to Array.Copy.
+            Array.Copy(_items, index + Offset, array, arrayIndex, count);
+        }
 
         /// <summary>
         /// Copies the entire <see cref="List{T}"/> to a compatible one-dimensional array, starting at the
@@ -653,23 +898,26 @@ namespace J2N.Collections.Generic
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
         public void CopyTo(T[] array, int arrayIndex)
-            => list.CopyTo(array, arrayIndex);
+        {
+            CoModificationCheck();
+            // Delegate rest of error checking to Array.Copy.
+            Array.Copy(_items, Offset, array, arrayIndex, Size);
+        }
 
         // Ensures that the capacity of this list is at least the given minimum
         // value. If the currect capacity of the list is less than min, the
         // capacity is increased to twice the current capacity or to min,
         // whichever is larger.
-        private void EnsureCapacity(int min)
+        internal void EnsureCapacity(int min) // J2N: Internal for testing
         {
-            int size = list.Count;
-            if (size < min)
+            if (_items.Length < min)
             {
-                int newCapacity = size == 0 ? defaultCapacity : size * 2;
+                int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
                 // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
                 // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
                 if ((uint)newCapacity > MaxArrayLength) newCapacity = MaxArrayLength;
                 if (newCapacity < min) newCapacity = min;
-                list.Capacity = newCapacity;
+                Capacity = newCapacity;
             }
         }
 
@@ -692,7 +940,7 @@ namespace J2N.Collections.Generic
         /// <see cref="Count"/>.
         /// </remarks>
         public bool Exists(Predicate<T> match)
-            => list.Exists(match);
+            => FindIndex(match) != -1;
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by the specified predicate,
@@ -720,7 +968,22 @@ namespace J2N.Collections.Generic
         /// </remarks>
         [return: MaybeNull]
         public T Find(Predicate<T> match)
-            => list.Find(match);
+        {
+            CoModificationCheck();
+            if (match is null)
+                throw new ArgumentNullException(nameof(match));
+
+            int offset = Offset;
+            int limit = Size + offset;
+            for (int i = offset; i < limit; i++)
+            {
+                if (match(_items[i]))
+                {
+                    return _items[i];
+                }
+            }
+            return default;
+        }
 
         /// <summary>
         /// Retrieves all the elements that match the conditions defined by the specified predicate.
@@ -741,19 +1004,18 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public List<T> FindAll(Predicate<T> match)
         {
-            if (match == null)
+            CoModificationCheck();
+            if (match is null)
                 throw new ArgumentNullException(nameof(match));
 
-#if FEATURE_CONTRACTBLOCKS
-            Contract.EndContractBlock();
-#endif
-
             List<T> list = new List<T>();
-            for (int i = 0; i < this.list.Count; i++)
+            int offset = Offset;
+            int limit = Size + offset;
+            for (int i = Offset; i < limit; i++)
             {
-                if (match(this.list[i]))
+                if (match(_items[i]))
                 {
-                    list.Add(this.list[i]);
+                    list.Add(_items[i]);
                 }
             }
             return list;
@@ -783,7 +1045,7 @@ namespace J2N.Collections.Generic
         /// <see cref="Count"/>.
         /// </remarks>
         public int FindIndex(Predicate<T> match)
-            => list.FindIndex(match);
+            => FindIndex(0, Size, match);
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by the specified predicate,
@@ -813,7 +1075,7 @@ namespace J2N.Collections.Generic
         /// the number of elements from <paramref name="startIndex"/> to the end of the <see cref="List{T}"/>.
         /// </remarks>
         public int FindIndex(int startIndex, Predicate<T> match)
-            => list.FindIndex(startIndex, match);
+            => FindIndex(startIndex, Size - startIndex, match);
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by the specified predicate,
@@ -855,7 +1117,23 @@ namespace J2N.Collections.Generic
         /// <paramref name="count"/>.
         /// </remarks>
         public int FindIndex(int startIndex, int count, Predicate<T> match)
-            => list.FindIndex(startIndex, count, match);
+        {
+            CoModificationCheck();
+            if ((uint)startIndex > (uint)Size)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+            if (count < 0 || startIndex > Size - count)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+            if (match is null)
+                throw new ArgumentNullException(nameof(match));
+
+            int offset = Offset;
+            int endIndex = startIndex + offset + count;
+            for (int i = startIndex + offset; i < endIndex; i++)
+            {
+                if (match(_items[i])) return i - offset;
+            }
+            return -1;
+        }
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by the specified predicate,
@@ -883,7 +1161,22 @@ namespace J2N.Collections.Generic
         /// </remarks>
         [return: MaybeNull]
         public T FindLast(Predicate<T> match)
-            => list.FindLast(match);
+        {
+            CoModificationCheck();
+            if (match is null)
+                throw new ArgumentNullException(nameof(match));
+
+            int offset = Offset;
+            int limit = Size + offset;
+            for (int i = limit - 1; i >= offset; i--)
+            {
+                if (match(_items[i]))
+                {
+                    return _items[i];
+                }
+            }
+            return default;
+        }
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by the specified predicate,
@@ -906,7 +1199,7 @@ namespace J2N.Collections.Generic
         /// <see cref="Count"/>.
         /// </remarks>
         public int FindLastIndex(Predicate<T> match)
-            => list.FindLastIndex(match);
+            => FindLastIndex(Size - 1, Size, match);
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by the specified predicate,
@@ -933,7 +1226,7 @@ namespace J2N.Collections.Generic
         /// the number of elements from the beginning of the <see cref="List{T}"/> to <paramref name="startIndex"/>.
         /// </remarks>
         public int FindLastIndex(int startIndex, Predicate<T> match)
-            => list.FindLastIndex(startIndex, match);
+            => FindLastIndex(startIndex, startIndex + 1, match);
 
         /// <summary>
         /// Searches for an element that matches the conditions defined by the specified predicate,
@@ -972,7 +1265,45 @@ namespace J2N.Collections.Generic
         /// <paramref name="count"/>.
         /// </remarks>
         public int FindLastIndex(int startIndex, int count, Predicate<T> match)
-            => list.FindLastIndex(startIndex, count, match);
+        {
+            CoModificationCheck();
+            if (match is null)
+                throw new ArgumentNullException(nameof(match));
+
+            if (Size == 0)
+            {
+                // Special case for 0 length List
+                if (startIndex != -1)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                }
+            }
+            else
+            {
+                // Make sure we're not out of range
+                if ((uint)startIndex >= (uint)Size)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                }
+            }
+
+            // 2nd have of this also catches when startIndex == MAXINT, so MAXINT - 0 + 1 == -1, which is < 0.
+            if (count < 0 || startIndex - count + 1 < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+            }
+
+            int offset = Offset;
+            int endIndex = startIndex + offset - count;
+            for (int i = startIndex + offset; i > endIndex; i--)
+            {
+                if (match(_items[i]))
+                {
+                    return i - offset;
+                }
+            }
+            return -1;
+        }
 
         /// <summary>
         /// Performs the specified action on each element of the <see cref="List{T}"/>.
@@ -991,7 +1322,27 @@ namespace J2N.Collections.Generic
         /// and causes undefined behavior.
         /// </remarks>
         public void ForEach(Action<T> action)
-            => list.ForEach(action);
+        {
+            CoModificationCheck();
+            if (action is null)
+                throw new ArgumentNullException(nameof(action));
+
+            int version = _version;
+            int offset = Offset;
+            int limit = Size + offset;
+
+            for (int i = offset; i < limit; i++)
+            {
+                if (version != _version)
+                {
+                    break;
+                }
+                action(_items[i]);
+            }
+
+            if (version != _version)
+                throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+        }
 
         /// <summary>
         /// Returns an enumerator that iterates through the <see cref="List{T}"/>.
@@ -1034,7 +1385,10 @@ namespace J2N.Collections.Generic
         /// This method is an O(1) operation.
         /// </remarks>
         public IEnumerator<T> GetEnumerator()
-            => new Enumerator(this);
+        {
+            CoModificationCheck();
+            return new Enumerator(this);
+        }
 
         IEnumerator IEnumerable.GetEnumerator()
             => GetEnumerator();
@@ -1071,20 +1425,17 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public List<T> GetRange(int index, int count)
         {
+            CoModificationCheck();
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (this.list.Count - index < count)
+            if (Size - index < count)
                 throw new ArgumentException(SR.Argument_InvalidOffLen);
 
-#if FEATURE_CONTRACTBLOCKS
-            Contract.Ensures(Contract.Result<List<T>>() != null);
-            Contract.EndContractBlock();
-#endif
             List<T> list = new List<T>(count);
-            for (int i = 0; i < count; i++)
-                list.Add(this.list[index + i]);
+            Array.Copy(_items, index + Offset, list._items, 0, count);
+            list._size = count;
             return list;
         }
 
@@ -1105,14 +1456,23 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
         /// is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public int IndexOf(T item)
-            => list.IndexOf(item);
+        {
+            CoModificationCheck();
+            int offset = Offset;
+            int result = Array.IndexOf(_items, item, offset, Size);
+            return result > -1 ? result - offset : result;
+        }
 
         int IList.IndexOf(object? item)
-            => ((IList)list).IndexOf(item);
+        {
+            CoModificationCheck();
+            if (IsCompatibleObject(item))
+            {
+                return IndexOf((T)item!);
+            }
+            return -1;
+        }
 
         /// <summary>
         /// Searches for the specified object and returns the zero-based index of the first occurrence within
@@ -1135,7 +1495,15 @@ namespace J2N.Collections.Generic
         /// is the number of elements from <paramref name="index"/> to the end of the <see cref="List{T}"/>.
         /// </remarks>
         public int IndexOf(T item, int index)
-            => list.IndexOf(item, index);
+        {
+            CoModificationCheck();
+            if ((uint)index > (uint)Size)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+
+            int offset = Offset;
+            int result = Array.IndexOf(_items, item, index + offset, Size - index);
+            return result > -1 ? result - offset : result;
+        }
 
         /// <summary>
         /// Searches for the specified object and returns the zero-based index of the first occurrence within
@@ -1169,7 +1537,17 @@ namespace J2N.Collections.Generic
         /// is <paramref name="count"/>.
         /// </remarks>
         public int IndexOf(T item, int index, int count)
-            => list.IndexOf(item, index, count);
+        {
+            CoModificationCheck();
+            if ((uint)index > (uint)Size)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+            if (count < 0 || index > Size - count)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+
+            int offset = Offset;
+            int result = Array.IndexOf(_items, item, index + offset, count);
+            return result > -1 ? result - offset : result;
+        }
 
         /// <summary>
         /// Inserts an element into the <see cref="List{T}"/> at the specified index.
@@ -1194,19 +1572,39 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Insert(int index, T item)
+            => DoInsert(index, item); // Hack so we can override
+
+        internal virtual void DoInsert(int index, T item)
         {
-            list.Insert(index, item);
-            version++;
+            // Note that insertions at the end are legal.
+            if ((uint)index > (uint)_size)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_ListInsert);
+            }
+            if (_size == _items.Length) EnsureCapacity(_size + 1);
+            if (index < _size)
+            {
+                Array.Copy(_items, index, _items, index + 1, _size - index);
+            }
+            _items[index] = item;
+            _size++;
+            _version++;
         }
 
         void IList.Insert(int index, object? item)
         {
-            ((IList)list).Insert(index, item);
-            version++;
+            if (NullAndNullsAreIllegal(item))
+                throw new ArgumentNullException(nameof(item));
+
+            try
+            {
+                Insert(index, (T)item!);
+            }
+            catch (InvalidCastException)
+            {
+                throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, item, typeof(T)), nameof(item));
+            }
         }
 
         /// <summary>
@@ -1240,42 +1638,73 @@ namespace J2N.Collections.Generic
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
         public void InsertRange(int index, IEnumerable<T> collection)
-        {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
-            int size = list.Count;
-            if ((uint)index > (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
-#if FEATURE_CONTRACTBLOCKS
-            Contract.EndContractBlock();
-#endif
+            => DoInsertRange(index, collection); // Hack so we can override
 
-            if (collection is ICollection<T> c)
-            {    // if collection is ICollection<T>
-                int count = c.Count;
+        internal virtual int DoInsertRange(int index, IEnumerable<T> collection)
+        {
+            if (collection is null)
+                throw new ArgumentNullException(nameof(collection));
+            if ((uint)index > (uint)_size)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+
+            int count = 0;
+            // A sublist that is a descendant of this list
+            if (collection is List<T>.SubList subList && subList._items == _items)
+            {
+                count = subList.Count;
                 if (count > 0)
                 {
-                    EnsureCapacity(size + count);
-                    if (index < size)
+                    int offset = Offset + subList.Offset;
+                    int subListIndex = index - offset;
+
+                    EnsureCapacity(_size + count);
+
+                    // We need to fixup our sublist reference if it is broken by EnsureCapacity
+                    if (subList._items != _items)
                     {
-                        Copy(list, index, list, index + count, size - index);
+                        subList._items = _items;
+                    }
+
+                    if (index < _size)
+                    {
+                        Array.Copy(_items, index, _items, index + count, _size - index);
+                    }
+
+                    // We're inserting a SubList which is a descendant into this list,
+                    // so we already have the elements in the local array.
+
+                    // Copy first part of _items to insert location
+                    Array.Copy(_items, offset, _items, index, subListIndex);
+                    // Copy last part of _items back to inserted location
+                    Array.Copy(_items, index + count, _items, subListIndex * 2, count - subListIndex);
+
+                    _size += count;
+                }
+            }
+            else if (collection is ICollection<T> c)
+            {
+                count = c.Count;
+                if (count > 0)
+                {
+                    EnsureCapacity(_size + count);
+                    if (index < _size)
+                    {
+                        Array.Copy(_items, index, _items, index + count, _size - index);
                     }
 
                     // If we're inserting a List into itself, we want to be able to deal with that.
                     if (this == c)
                     {
                         // Copy first part of _items to insert location
-                        Copy(list, 0, list, index, index);
+                        Array.Copy(_items, 0, _items, index, index);
                         // Copy last part of _items back to inserted location
-                        Copy(list, index + count, list, index * 2, size - index);
+                        Array.Copy(_items, index + count, _items, index * 2, _size - index);
                     }
                     else
                     {
-                        T[] itemsToInsert = new T[count];
-                        c.CopyTo(itemsToInsert, 0);
-                        Copy(itemsToInsert, 0, list, index, count);
+                        c.CopyTo(_items, index);
                     }
-                    // Internal size already set by Copy()
+                    _size += count;
                 }
             }
             else
@@ -1285,28 +1714,12 @@ namespace J2N.Collections.Generic
                     while (en.MoveNext())
                     {
                         Insert(index++, en.Current);
+                        count++;
                     }
                 }
             }
-            version++;
-        }
-
-        // For moving items between lists (same signature as Array.Copy())
-        private void Copy(IList<T> source, int sourceIndex, IList<T> destination, int destinationIndex, int count)
-        {
-            // Allocate any extra space needed at the end of the list.
-            int toAdd = (destinationIndex + count) - destination.Count;
-            while (toAdd-- > 0)
-            {
-                destination.Add(default!);
-            }
-
-            // Copy the items starting with the last index and ending with the first index in both source and destination.
-            // This ensures if we are copying the list to itself, we don't overwrite any items and copy them again.
-            for (int i = (destinationIndex + count) - 1, j = (sourceIndex + count) - 1; i >= destinationIndex; i--, j--)
-            {
-                destination[i] = source[j];
-            }
+            _version++;
+            return count;
         }
 
         /// <summary>
@@ -1326,11 +1739,19 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation, where <c>n</c>
         /// is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public int LastIndexOf(T item)
-            => list.LastIndexOf(item);
+        {
+            CoModificationCheck();
+            int size = Size;
+            if (size == 0)
+            {  // Special case for empty list
+                return -1;
+            }
+            else
+            {
+                return LastIndexOf(item, size - 1, size);
+            }
+        }
 
         /// <summary>
         /// Searches for the specified object and returns the zero-based index of the last occurrence within the range
@@ -1353,7 +1774,12 @@ namespace J2N.Collections.Generic
         /// is the number of elements from the beginning of the <see cref="List{T}"/> to <paramref name="index"/>.
         /// </remarks>
         public int LastIndexOf(T item, int index)
-            => list.LastIndexOf(item, index);
+        {
+            CoModificationCheck();
+            if (index >= Size)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+            return LastIndexOf(item, index, index + 1);
+        }
 
         /// <summary>
         /// Searches for the specified object and returns the zero-based index of the last occurrence within the range
@@ -1386,7 +1812,27 @@ namespace J2N.Collections.Generic
         /// is <paramref name="count"/>.
         /// </remarks>
         public int LastIndexOf(T item, int index, int count)
-            => list.LastIndexOf(item, index, count);
+        {
+            CoModificationCheck();
+            if ((Count != 0) && (index < 0))
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if ((Count != 0) && (count < 0))
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+
+            if (Size == 0)
+            {  // Special case for empty list
+                return -1;
+            }
+
+            if (index >= Size)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_BiggerThanCollection);
+            if (count > index + 1)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_BiggerThanCollection);
+
+            int offset = Offset;
+            int result = Array.LastIndexOf(_items, item, index + offset, count);
+            return result > -1 ? result - offset : result;
+        }
 
         /// <summary>
         /// Removes the first occurrence of a specific object from the <see cref="List{T}"/>.
@@ -1403,23 +1849,28 @@ namespace J2N.Collections.Generic
         /// This method performs a linear search; therefore, this method is an O(<c>n</c>) operation,
         /// where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public bool Remove(T item)
+            => DoRemove(item); // Hack so we can override
+
+        internal virtual bool DoRemove(T item)
         {
-            if (list.Remove(item))
+            int index = IndexOf(item);
+            if (index >= 0)
             {
-                version++;
+                RemoveAt(index);
                 return true;
             }
+
             return false;
         }
 
         void IList.Remove(object? item)
         {
-            ((IList)list).Remove(item);
-            version++;
+            CoModificationCheck();
+            if (IsCompatibleObject(item))
+            {
+                Remove((T)item!);
+            }
         }
 
         /// <summary>
@@ -1439,11 +1890,63 @@ namespace J2N.Collections.Generic
         /// <c>n</c> is <see cref="Count"/>.
         /// </remarks>
         public int RemoveAll(Predicate<T> match)
+            => DoRemoveAll(match); // Hack so we can override
+
+        internal virtual int DoRemoveAll(Predicate<T> match)
+            => DoRemoveAll(0, Size, match);
+
+        internal virtual int DoRemoveAll(int startIndex, int count, Predicate<T> match)
         {
-            int removed = list.RemoveAll(match);
-            if (removed > 0)
-                version++;
-            return removed;
+            int size = Size;
+            if ((uint)startIndex > (uint)size)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+            if (count < 0 || startIndex > size - count)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+            if (match is null)
+                throw new ArgumentNullException(nameof(match));
+
+            int offset = Offset;
+            int freeIndex = offset;   // the first free slot in items array
+            uint start = (uint)startIndex + (uint)offset;
+            uint limit = start + (uint)count; // The first index at the end of the range (this is outside of the valid range)
+
+            // Find the first item which needs to be removed.
+            while (freeIndex < start || freeIndex < limit && !match(_items[freeIndex])) freeIndex++;
+            if (freeIndex >= limit) return 0;
+
+            int current = freeIndex + 1;
+            while (current < limit)
+            {
+                // Find the first item which needs to be kept.
+                while (current < limit && match(_items[current])) current++;
+
+                if (current < limit)
+                {
+                    // copy item to the free slot.
+                    _items[freeIndex++] = _items[current++];
+                }
+            }
+
+            // Free up any remaining space in parent list
+            while (current < _size)
+            {
+                // copy item to the free slot.
+                _items[freeIndex++] = _items[current++];
+            }
+
+#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
+            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+#else
+            if (TIsNullableType)
+#endif
+            {
+                Array.Clear(_items, freeIndex, _size - freeIndex); // Clear the elements so that the gc can reclaim the references.
+            }
+
+            int result = _size - freeIndex;
+            _size = freeIndex;
+            _version++;
+            return result;
         }
 
         /// <summary>
@@ -1465,13 +1968,28 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is (<see cref="Count"/> - <paramref name="index"/>).
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void RemoveAt(int index)
+            => DoRemoveAt(index);
+
+        internal virtual void DoRemoveAt(int index)
         {
-            list.RemoveAt(index);
-            version++;
+            if ((uint)index >= (uint)_size)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+
+            _size--;
+            if (index < _size)
+            {
+                Array.Copy(_items, index + 1, _items, index, _size - index);
+            }
+#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
+            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+#else
+            if (TIsNullableType)
+#endif
+            {
+                _items[_size] = default!;
+            }
+            _version++;
         }
 
         /// <summary>
@@ -1495,10 +2013,35 @@ namespace J2N.Collections.Generic
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
         public void RemoveRange(int index, int count)
+            => DoRemoveRange(index, count); // Hack so we can override
+
+        internal virtual void DoRemoveRange(int index, int count)
         {
-            list.RemoveRange(index, count);
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (_size - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
             if (count > 0)
-                version++;
+            {
+                _size -= count;
+                if (index < _size)
+                {
+                    Array.Copy(_items, index + count, _items, index, _size - index);
+                }
+
+                _version++;
+#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
+                if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
+#else
+                if (TIsNullableType)
+#endif
+                {
+                    Array.Clear(_items, _size, count);
+                }
+            }
         }
 
         /// <summary>
@@ -1509,14 +2052,8 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Reverse()
-        {
-            list.Reverse();
-            version++;
-        }
+            => Reverse(0, Count);
 
         /// <summary>
         /// Reverses the order of the elements in the specified range.
@@ -1538,9 +2075,23 @@ namespace J2N.Collections.Generic
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
         public void Reverse(int index, int count)
+            => DoReverse(index, count); // Hack so we can override
+
+        internal virtual void DoReverse(int index, int count)
         {
-            list.Reverse(index, count);
-            version++;
+            CoModificationCheck();
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (Size - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
+            if (count > 1)
+            {
+                Array.Reverse(_items, index + Offset, count);
+            }
+            _version++;
         }
 
         /// <summary>
@@ -1577,14 +2128,51 @@ namespace J2N.Collections.Generic
         /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
         /// case it is an O(<c>n</c><sup>2</sup>) operation.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Sort()
-        {
-            list.Sort(Comparer<T>.Default);
-            version++;
-        }
+            => Sort(0, Count, null);
+
+        /// <summary>
+        /// Sorts the elements in the entire <see cref="List{T}"/> using the specified comparer.
+        /// </summary>
+        /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when
+        /// comparing elements, or <c>null</c> to use J2N's default comparer <see cref="Comparer{T}.Default"/>.</param>
+        /// <exception cref="InvalidOperationException"><paramref name="comparer"/> is <c>null</c>, and the default
+        /// comparer <see cref="Comparer{T}.Default"/> cannot find implementation of the <see cref="IComparable{T}"/>
+        /// generic interface or the <see cref="IComparable"/> interface for type <typeparamref name="T"/>.</exception>
+        /// <exception cref="ArgumentException">The implementation of <paramref name="comparer"/> caused an error during
+        /// the sort. For example, <paramref name="comparer"/> might not return 0 when comparing an item with itself.</exception>
+        /// <remarks>
+        /// If <paramref name="comparer"/> is provided, the elements of the <see cref="List{T}"/> are sorted using the specified
+        /// <see cref="IComparer{T}"/>.
+        /// <para/>
+        /// If <paramref name="comparer"/> is <c>null</c>, the default comparer <see cref="Comparer{T}.Default"/> checks whether
+        /// type <typeparamref name="T"/> implements the <see cref="IComparable{T}"/> generic interface and uses that implementation,
+        /// if available. If not, <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/> implements the
+        /// <see cref="IComparable"/> interface. If type <typeparamref name="T"/> does not implement either interface,
+        /// <see cref="Comparer{T}.Default"/> throws an <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// This method uses <see cref="Array.Sort(Array, int, int, IComparer)"/>, which applies the introspective sort as follows:
+        /// <list type="bullet">
+        ///     <item><description>
+        ///         If the partition size is less than or equal to 16 elements, it uses an insertion sort algorithm
+        ///     </description></item>
+        ///     <item><description>
+        ///         If the number of partitions exceeds 2 log <c>n</c>, where <c>n</c> is the range of the input array,
+        ///         it uses a <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a> algorithm.
+        ///     </description></item>
+        ///     <item><description>
+        ///         Otherwise, it uses a Quicksort algorithm.
+        ///     </description></item>
+        /// </list>
+        /// <para/>
+        /// This implementation performs an unstable sort; that is, if two elements are equal, their order might not be preserved.
+        /// In contrast, a stable sort preserves the order of elements that are equal.
+        /// <para/>
+        /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
+        /// case it is an O(<c>n</c><sup>2</sup>) operation.
+        /// </remarks>
+        public void Sort(IComparer<T>? comparer)
+            => Sort(0, Count, comparer);
 
         /// <summary>
         /// Sorts the elements in a range of elements in <see cref="List{T}"/> using the specified comparer.
@@ -1634,59 +2222,23 @@ namespace J2N.Collections.Generic
         /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
         /// case it is an O(<c>n</c><sup>2</sup>) operation.
         /// </remarks>
-        public void Sort(int index, int count, IComparer<T> comparer)
-        {
-            list.Sort(index, count, comparer ?? Comparer<T>.Default);
-            version++;
-        }
+        public void Sort(int index, int count, IComparer<T>? comparer)
+            => DoSort(index, count, comparer); // Hack so we can override
 
-        /// <summary>
-        /// Sorts the elements in the entire <see cref="List{T}"/> using the specified comparer.
-        /// </summary>
-        /// <param name="comparer">The <see cref="IComparer{T}"/> implementation to use when
-        /// comparing elements, or <c>null</c> to use J2N's default comparer <see cref="Comparer{T}.Default"/>.</param>
-        /// <exception cref="InvalidOperationException"><paramref name="comparer"/> is <c>null</c>, and the default
-        /// comparer <see cref="Comparer{T}.Default"/> cannot find implementation of the <see cref="IComparable{T}"/>
-        /// generic interface or the <see cref="IComparable"/> interface for type <typeparamref name="T"/>.</exception>
-        /// <exception cref="ArgumentException">The implementation of <paramref name="comparer"/> caused an error during
-        /// the sort. For example, <paramref name="comparer"/> might not return 0 when comparing an item with itself.</exception>
-        /// <remarks>
-        /// If <paramref name="comparer"/> is provided, the elements of the <see cref="List{T}"/> are sorted using the specified
-        /// <see cref="IComparer{T}"/>.
-        /// <para/>
-        /// If <paramref name="comparer"/> is <c>null</c>, the default comparer <see cref="Comparer{T}.Default"/> checks whether
-        /// type <typeparamref name="T"/> implements the <see cref="IComparable{T}"/> generic interface and uses that implementation,
-        /// if available. If not, <see cref="Comparer{T}.Default"/> checks whether type <typeparamref name="T"/> implements the
-        /// <see cref="IComparable"/> interface. If type <typeparamref name="T"/> does not implement either interface,
-        /// <see cref="Comparer{T}.Default"/> throws an <see cref="InvalidOperationException"/>.
-        /// <para/>
-        /// This method uses <see cref="Array.Sort(Array, int, int, IComparer)"/>, which applies the introspective sort as follows:
-        /// <list type="bullet">
-        ///     <item><description>
-        ///         If the partition size is less than or equal to 16 elements, it uses an insertion sort algorithm
-        ///     </description></item>
-        ///     <item><description>
-        ///         If the number of partitions exceeds 2 log <c>n</c>, where <c>n</c> is the range of the input array,
-        ///         it uses a <a href="https://en.wikipedia.org/wiki/Heapsort">Heapsort</a> algorithm.
-        ///     </description></item>
-        ///     <item><description>
-        ///         Otherwise, it uses a Quicksort algorithm.
-        ///     </description></item>
-        /// </list>
-        /// <para/>
-        /// This implementation performs an unstable sort; that is, if two elements are equal, their order might not be preserved.
-        /// In contrast, a stable sort preserves the order of elements that are equal.
-        /// <para/>
-        /// On average, this method is an O(<c>n</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>; in the worst
-        /// case it is an O(<c>n</c><sup>2</sup>) operation.
-        /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public void Sort(IComparer<T> comparer)
+        internal virtual void DoSort(int index, int count, IComparer<T>? comparer)
         {
-            list.Sort(comparer ?? Comparer<T>.Default);
-            version++;
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (Size - index < count)
+                throw new ArgumentException(SR.Argument_InvalidOffLen);
+
+            if (count > 1)
+            {
+                Array.Sort<T>(_items, index + Offset, count, comparer ?? Comparer<T>.Default);
+            }
+            _version++;
         }
 
         /// <summary>
@@ -1722,11 +2274,29 @@ namespace J2N.Collections.Generic
         /// case it is an O(<c>n</c><sup>2</sup>) operation.
         /// </remarks>
         /// <seealso cref="Comparison{T}"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Sort(Comparison<T> comparison)
-            => list.Sort(comparison);
+            => DoSort(0, Size, comparison); // Hack so we can override
+
+        internal virtual void DoSort(int index, int count, Comparison<T> comparison)
+        {
+            int size = Size;
+            if ((uint)index > (uint)size)
+                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+            if (count < 0 || index > size - count)
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+            if (comparison is null)
+                throw new ArgumentNullException(nameof(comparison));
+
+            if (size > 1)
+            {
+#if FEATURE_SPAN
+                ArraySortHelper<T>.Sort(new Span<T>(_items, index, count), comparison);
+#else
+                ArraySortHelper<T>.Sort(_items, index, count, comparison);
+#endif
+            }
+            _version++;
+        }
 
         /// <summary>
         /// Copies the elements of the <see cref="List{T}"/> to a new array.
@@ -1738,11 +2308,19 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public T[] ToArray()
-            => list.ToArray();
+        {
+            CoModificationCheck();
+            int size = Size;
+            if (size == 0)
+            {
+                return s_emptyArray;
+            }
+
+            T[] array = new T[size];
+            Array.Copy(_items, Offset, array, 0, size);
+            return array;
+        }
 
         /// <summary>
         /// Sets the capacity to the actual number of elements in the <see cref="List{T}"/>, if that
@@ -1765,11 +2343,15 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// The capacity can also be set using the <see cref="Capacity"/> property.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void TrimExcess()
-            => list.TrimExcess();
+        {
+            CoModificationCheck();
+            int threshold = (int)(((double)_items.Length) * 0.9);
+            if (_size < threshold)
+            {
+                Capacity = _size;
+            }
+        }
 
         /// <summary>
         /// Determines whether every element in the <see cref="List{T}"/> matches the
@@ -1791,9 +2373,23 @@ namespace J2N.Collections.Generic
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
         public bool TrueForAll(Predicate<T> match)
-            => list.TrueForAll(match);
+        {
+            CoModificationCheck();
+            if (match is null)
+                throw new ArgumentNullException(nameof(match));
 
-        #endregion
+            int size = Size;
+            for (int i = Offset; i < size; i++)
+            {
+                if (!match(_items[i]))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+#endregion
 
         #region Custom Serialization
 
@@ -1815,14 +2411,13 @@ namespace J2N.Collections.Generic
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
 
-            int count = list.Count;
-            info.AddValue(CountName, count);
-            info.AddValue(VersionName, version);
+            info.AddValue(CountName, _size);
+            info.AddValue(VersionName, _version);
 
-            if (count > 0)
+            if (_size > 0)
             {
-                T[] items = new T[count];
-                list.CopyTo(items, 0);
+                T[] items = new T[_size];
+                Array.Copy(_items, 0, items, 0, _size);
                 info.AddValue(ItemsName, items, typeof(T[]));
             }
         }
@@ -1844,25 +2439,22 @@ namespace J2N.Collections.Generic
                 return; // Somebody had a dependency on this class and fixed us up before the ObjectManager got to it.
             }
 
-            int savedCount = siInfo.GetInt32(CountName);
+            _size = siInfo.GetInt32(CountName);
 
-            if (savedCount != 0)
+            if (_size != 0)
             {
                 T[]? items = (T[]?)siInfo.GetValue(ItemsName, typeof(T[]));
 
-                if (items == null)
+                if (items is null)
                 {
                     throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MissingValues);
                 }
 
-                for (int i = 0; i < items.Length; i++)
-                {
-                    list.Add(items[i]);
-                }
+                Array.Copy(items, _items, _size);
             }
 
-            version = siInfo.GetInt32(VersionName);
-            if (list.Count != savedCount)
+            _version = siInfo.GetInt32(VersionName);
+            if (_items.Length != _size)
             {
                 throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MismatchedCount);
             }
@@ -1887,7 +2479,10 @@ namespace J2N.Collections.Generic
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public virtual bool Equals(object? other, IEqualityComparer comparer)
-            => ListEqualityComparer<T>.Equals(this, other, comparer);
+        {
+            CoModificationCheck();
+            return ListEqualityComparer<T>.Equals(this, other, comparer);
+        }
 
         /// <summary>
         /// Gets the hash code representing the current list using rules specified by the
@@ -1897,7 +2492,10 @@ namespace J2N.Collections.Generic
         /// the hash code.</param>
         /// <returns>A hash code representing the current list.</returns>
         public virtual int GetHashCode(IEqualityComparer comparer)
-            => ListEqualityComparer<T>.GetHashCode(this, comparer);
+        {
+            CoModificationCheck();
+            return ListEqualityComparer<T>.GetHashCode(this, comparer);
+        }
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current list
@@ -1937,7 +2535,10 @@ namespace J2N.Collections.Generic
         /// The index of a format item is not zero.
         /// </exception>
         public virtual string ToString(string? format, IFormatProvider? formatProvider)
-            => CollectionUtil.ToString(formatProvider, format, this);
+        {
+            CoModificationCheck();
+            return CollectionUtil.ToString(formatProvider, format, this);
+        }
 
         /// <summary>
         /// Returns a string that represents the current list using
@@ -1996,8 +2597,8 @@ namespace J2N.Collections.Generic
             internal Enumerator(List<T> list)
             {
                 this.list = list;
-                index = 0;
-                version = list.version;
+                index = list.Offset;
+                version = list._version;
                 current = default!;
             }
 
@@ -2008,10 +2609,10 @@ namespace J2N.Collections.Generic
             public bool MoveNext()
             {
                 List<T> localList = list;
-
-                if (version == localList.version && ((uint)index < (uint)localList.list.Count))
+                localList.CoModificationCheck();
+                if (version == localList._version && ((uint)index < ((uint)localList.Size + (uint)localList.Offset)))
                 {
-                    current = localList.list[index];
+                    current = localList._items[index];
                     index++;
                     return true;
                 }
@@ -2020,12 +2621,13 @@ namespace J2N.Collections.Generic
 
             private bool MoveNextRare()
             {
-                if (version != list.version)
+                List<T> localList = list;
+                if (version != localList._version)
                 {
                     throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
                 }
 
-                index = list.list.Count + 1;
+                index = localList.Size + localList.Offset + 1;
                 current = default!;
                 return false;
             }
@@ -2036,7 +2638,9 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    if (index == 0 || index == list.list.Count + 1)
+                    List<T> localList = list;
+                    int offset = localList.Offset;
+                    if (index == offset || index == localList.Size + offset + 1)
                     {
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
                     }
@@ -2046,12 +2650,13 @@ namespace J2N.Collections.Generic
 
             void IEnumerator.Reset()
             {
-                if (version != list.version)
+                list.CoModificationCheck();
+                if (version != list._version)
                 {
                     throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
                 }
 
-                index = 0;
+                index = list.Offset;
                 current = default!;
             }
         }

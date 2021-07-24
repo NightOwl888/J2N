@@ -87,6 +87,15 @@ namespace J2N.Text
             Assert.Less(0, target.CompareToOrdinal(new CharArrayCharSequence(null)));
             Assert.Less(0, target.CompareToOrdinal(new StringBuilderCharSequence(null)));
             Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(null)));
+
+            target = null;
+
+            Assert.AreEqual(0, target.CompareToOrdinal((char[])null));
+            Assert.AreEqual(0, target.CompareToOrdinal((StringBuilder)null));
+            Assert.AreEqual(0, target.CompareToOrdinal((string)null));
+            Assert.AreEqual(0, target.CompareToOrdinal(new CharArrayCharSequence(null)));
+            Assert.AreEqual(0, target.CompareToOrdinal(new StringBuilderCharSequence(null)));
+            Assert.AreEqual(0, target.CompareToOrdinal(new StringCharSequence(null)));
         }
     }
 }

@@ -1,5 +1,24 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
 using System.Text;
+
 
 namespace J2N.Text
 {
@@ -22,7 +41,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        IAppendable Append(string value);
+        IAppendable Append(string? value);
 
         /// <summary>
         /// Appends a copy of a specified substring to this instance.
@@ -48,14 +67,14 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
         /// </exception>
-        IAppendable Append(string value, int startIndex, int count);
+        IAppendable Append(string? value, int startIndex, int count);
 
         /// <summary>
         /// Appends a copy of the specified string to this instance.
         /// </summary>
         /// <param name="value">The <see cref="StringBuilder"/> that contains the string to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        IAppendable Append(StringBuilder value);
+        IAppendable Append(StringBuilder? value);
 
         /// <summary>
         /// Appends a copy of a specified substring to this instance.
@@ -81,14 +100,14 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
         /// </exception>
-        IAppendable Append(StringBuilder value, int startIndex, int count);
+        IAppendable Append(StringBuilder? value, int startIndex, int count);
 
         /// <summary>
         /// Appends the string representation of the Unicode characters in a specified array to this instance.
         /// </summary>
         /// <param name="value">The array of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        IAppendable Append(char[] value);
+        IAppendable Append(char[]? value);
 
         /// <summary>
         /// Appends the string representation of a specified subarray of Unicode characters to this instance.
@@ -114,14 +133,14 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
         /// </exception>
-        IAppendable Append(char[] value, int startIndex, int count);
+        IAppendable Append(char[]? value, int startIndex, int count);
 
         /// <summary>
         /// Appends the string representation of the Unicode characters in a specified <see cref="ICharSequence"/> to this instance.
         /// </summary>
         /// <param name="value">The <see cref="ICharSequence"/> containing the characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
-        IAppendable Append(ICharSequence value);
+        IAppendable Append(ICharSequence? value);
 
         /// <summary>
         /// Appends the string representation of a specified <see cref="ICharSequence"/> of Unicode characters to this instance.
@@ -147,6 +166,6 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
         /// </exception>
-        IAppendable Append(ICharSequence value, int startIndex, int count);
+        IAppendable Append(ICharSequence? value, int startIndex, int count);
     }
 }

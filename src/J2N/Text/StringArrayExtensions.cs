@@ -1,5 +1,24 @@
-﻿using System;
+﻿#region Copyright 2019-2021 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
 using System.Text.RegularExpressions;
+
 
 namespace J2N.Text
 {
@@ -32,9 +51,9 @@ namespace J2N.Text
         /// </summary>
         /// <param name="input">This string array.</param>
         /// <returns>The array with any null or empty elements removed from the end.</returns>
-        public static string[] TrimEnd(this string[] input)
+        public static string?[]? TrimEnd(this string?[]? input)
         {
-            if (input == null)
+            if (input is null)
                 return null;
             int end;
             int inputLength = input.Length;

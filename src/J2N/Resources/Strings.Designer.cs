@@ -88,6 +88,24 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Unable to sort because the IComparer.Compare() method returns inconsistent results. Either a value does not compare equal to itself, or one value repeatedly compared to another value yields different results. IComparer: &apos;{0}&apos;..
+        /// </summary>
+        internal static string Arg_BogusIComparer {
+            get {
+                return ResourceManager.GetString("Arg_BogusIComparer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With the AllowHexSpecifier and AllowTypeSpecifier bits set in the enum bit field, the parser is unable to distinguish between a type specifier d, D, f, or F and a hexadecimal digit. Therefore, AllowExponent is also required to delineate between hexadecimal digits and type specifier and an exponent must be supplied if type specifier d, D, f, or F is used..
+        /// </summary>
+        internal static string Arg_ExponentRequiredIfTypeSpecifierUsed {
+            get {
+                return ResourceManager.GetString("Arg_ExponentRequiredIfTypeSpecifierUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to HashSet capacity is too big..
         /// </summary>
         internal static string Arg_HSCapacityOverflow {
@@ -124,11 +142,92 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexFloat or AllowTypeSpecifier. The bit(s) &apos;{0}&apos; were also specified, which are not allowed..
+        /// </summary>
+        internal static string Arg_InvalidHexFloatStyle {
+            get {
+                return ResourceManager.GetString("Arg_InvalidHexFloatStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to With the AllowHexSpecifier bit set in the enum bit field, the only other valid bits that can be combined into the enum value must be a subset of those in HexNumber. The bit(s) &apos;{0}&apos; were also specified, which are not allowed..
+        /// </summary>
+        internal static string Arg_InvalidHexStyle {
+            get {
+                return ResourceManager.GetString("Arg_InvalidHexStyle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The given key &apos;{0}&apos; was not present in the dictionary..
         /// </summary>
         internal static string Arg_KeyNotFoundWithKey {
             get {
                 return ResourceManager.GetString("Arg_KeyNotFoundWithKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Byte..
+        /// </summary>
+        internal static string Arg_MustBeByte {
+            get {
+                return ResourceManager.GetString("Arg_MustBeByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Double..
+        /// </summary>
+        internal static string Arg_MustBeDouble {
+            get {
+                return ResourceManager.GetString("Arg_MustBeDouble", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Int16..
+        /// </summary>
+        internal static string Arg_MustBeInt16 {
+            get {
+                return ResourceManager.GetString("Arg_MustBeInt16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Int32..
+        /// </summary>
+        internal static string Arg_MustBeInt32 {
+            get {
+                return ResourceManager.GetString("Arg_MustBeInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Int16..
+        /// </summary>
+        internal static string Arg_MustBeInt64 {
+            get {
+                return ResourceManager.GetString("Arg_MustBeInt64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type SByte..
+        /// </summary>
+        internal static string Arg_MustBeSByte {
+            get {
+                return ResourceManager.GetString("Arg_MustBeSByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object must be of type Single..
+        /// </summary>
+        internal static string Arg_MustBeSingle {
+            get {
+                return ResourceManager.GetString("Arg_MustBeSingle", resourceCulture);
             }
         }
         
@@ -160,6 +259,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The AllowCurrencySymbol bit and AllowTypeSpecifier bit may not be combined..
+        /// </summary>
+        internal static string Arg_TypeSpecifierNotAllowedIfCurrencyUsed {
+            get {
+                return ResourceManager.GetString("Arg_TypeSpecifierNotAllowedIfCurrencyUsed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value &apos;{0}&apos; is not of type &apos;{1}&apos; and cannot be used in this generic collection..
         /// </summary>
         internal static string Arg_WrongType {
@@ -183,6 +291,15 @@ namespace J2N.Resources {
         internal static string Argument_ArrayTooLarge {
             get {
                 return ResourceManager.GetString("Argument_ArrayTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Format specifier was invalid..
+        /// </summary>
+        internal static string Argument_BadFormatSpecifier {
+            get {
+                return ResourceManager.GetString("Argument_BadFormatSpecifier", resourceCulture);
             }
         }
         
@@ -219,6 +336,15 @@ namespace J2N.Resources {
         internal static string Argument_InvalidCodePoint {
             get {
                 return ResourceManager.GetString("Argument_InvalidCodePoint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An undefined NumberStyle value is being used: {0}..
+        /// </summary>
+        internal static string Argument_InvalidNumberStyle {
+            get {
+                return ResourceManager.GetString("Argument_InvalidNumberStyle", resourceCulture);
             }
         }
         
@@ -295,6 +421,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Count must be positive and count must refer to a location within the string/array/collection..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Count {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Count", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Index was out of range. Must be non-negative and less than the size of the collection..
         /// </summary>
         internal static string ArgumentOutOfRange_Index {
@@ -309,6 +444,15 @@ namespace J2N.Resources {
         internal static string ArgumentOutOfRange_IndexLength {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_IndexLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Index must be within the bounds of the List..
+        /// </summary>
+        internal static string ArgumentOutOfRange_ListInsert {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_ListInsert", resourceCulture);
             }
         }
         
@@ -340,6 +484,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Radix must be greater than or equal to Character.MinRadix and less than or equal to Character.MaxRadix..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Radix {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Radix", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to capacity was less than the current size..
         /// </summary>
         internal static string ArgumentOutOfRange_SmallCapacity {
@@ -363,6 +516,33 @@ namespace J2N.Resources {
         internal static string ExternalLinkedListNode {
             get {
                 return ResourceManager.GetString("ExternalLinkedListNode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input string was either empty or contained only whitespace..
+        /// </summary>
+        internal static string Format_EmptyInputString {
+            get {
+                return ResourceManager.GetString("Format_EmptyInputString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Additional non-parsable characters are at the end of the string..
+        /// </summary>
+        internal static string Format_ExtraJunkAtEnd {
+            get {
+                return ResourceManager.GetString("Format_ExtraJunkAtEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Input string was not in a correct format. Value: &apos;{0}&apos;..
+        /// </summary>
+        internal static string Format_InvalidString {
+            get {
+                return ResourceManager.GetString("Format_InvalidString", resourceCulture);
             }
         }
         
@@ -408,6 +588,51 @@ namespace J2N.Resources {
         internal static string Format_InvalidUTFTooLong {
             get {
                 return ResourceManager.GetString("Format_InvalidUTFTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find any recognizable digits..
+        /// </summary>
+        internal static string Format_NoParsibleDigits {
+            get {
+                return ResourceManager.GetString("Format_NoParsibleDigits", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object cannot be cast to DBNull..
+        /// </summary>
+        internal static string InvalidCast_DBNull {
+            get {
+                return ResourceManager.GetString("InvalidCast_DBNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Object cannot be cast to Empty..
+        /// </summary>
+        internal static string InvalidCast_Empty {
+            get {
+                return ResourceManager.GetString("InvalidCast_Empty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid cast from &apos;{0}&apos; to &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidCast_FromTo {
+            get {
+                return ResourceManager.GetString("InvalidCast_FromTo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot edit a null {0}..
+        /// </summary>
+        internal static string InvalidOperation_CannotEditNullObject {
+            get {
+                return ResourceManager.GetString("InvalidOperation_CannotEditNullObject", resourceCulture);
             }
         }
         
@@ -502,6 +727,24 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Failed to compare two elements in the array..
+        /// </summary>
+        internal static string InvalidOperation_IComparerFailed {
+            get {
+                return ResourceManager.GetString("InvalidOperation_IComparerFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Ancestral collection was modified after the view was instantiated..
+        /// </summary>
+        internal static string InvalidOperation_ViewFailedVersion {
+            get {
+                return ResourceManager.GetString("InvalidOperation_ViewFailedVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The LinkedList is empty..
         /// </summary>
         internal static string LinkedListEmpty {
@@ -570,6 +813,96 @@ namespace J2N.Resources {
         internal static string NotSupported_ValueCollectionSet {
             get {
                 return ResourceManager.GetString("NotSupported_ValueCollectionSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an unsigned byte..
+        /// </summary>
+        internal static string Overflow_Byte {
+            get {
+                return ResourceManager.GetString("Overflow_Byte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a Decimal..
+        /// </summary>
+        internal static string Overflow_Decimal {
+            get {
+                return ResourceManager.GetString("Overflow_Decimal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an Int16..
+        /// </summary>
+        internal static string Overflow_Int16 {
+            get {
+                return ResourceManager.GetString("Overflow_Int16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an Int32..
+        /// </summary>
+        internal static string Overflow_Int32 {
+            get {
+                return ResourceManager.GetString("Overflow_Int32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for an Int64..
+        /// </summary>
+        internal static string Overflow_Int64 {
+            get {
+                return ResourceManager.GetString("Overflow_Int64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The string was being parsed as an unsigned number and could not have a negative sign..
+        /// </summary>
+        internal static string Overflow_NegativeUnsigned {
+            get {
+                return ResourceManager.GetString("Overflow_NegativeUnsigned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a signed byte..
+        /// </summary>
+        internal static string Overflow_SByte {
+            get {
+                return ResourceManager.GetString("Overflow_SByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a UInt16..
+        /// </summary>
+        internal static string Overflow_UInt16 {
+            get {
+                return ResourceManager.GetString("Overflow_UInt16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a UInt32..
+        /// </summary>
+        internal static string Overflow_UInt32 {
+            get {
+                return ResourceManager.GetString("Overflow_UInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value was either too large or too small for a UInt64..
+        /// </summary>
+        internal static string Overflow_UInt64 {
+            get {
+                return ResourceManager.GetString("Overflow_UInt64", resourceCulture);
             }
         }
         

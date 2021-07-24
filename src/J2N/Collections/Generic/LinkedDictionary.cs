@@ -1,10 +1,37 @@
-﻿using J2N.Text;
+﻿#region Copyright 2014 by matarillo, Licensed under the The MIT License (MIT)
+/*
+The MIT License (MIT)
+
+Copyright (c) 2014 matarillo
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+THE SOFTWARE.
+*/
+#endregion
+
+using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
+
 
 namespace J2N.Collections.Generic
 {
@@ -50,7 +77,9 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -72,11 +101,11 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private KeyCollection keys;
+        private KeyCollection? keys;
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private ValueCollection values;
+        private ValueCollection? values;
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
@@ -84,7 +113,7 @@ namespace J2N.Collections.Generic
         private int version;
 
 #if FEATURE_SERIALIZABLE
-        private System.Runtime.Serialization.SerializationInfo/*?*/ siInfo; //A temporary variable which we need during deserialization.
+        private System.Runtime.Serialization.SerializationInfo? siInfo; //A temporary variable which we need during deserialization.
 
         // names for serialization
         private const string EqualityComparerName = "EqualityComparer"; // Do not rename (binary serialization)
@@ -96,21 +125,21 @@ namespace J2N.Collections.Generic
         #region Constructors
 
         public LinkedDictionary()
-            : this(0, (IEqualityComparer<TKey>)null)
+            : this(0, (IEqualityComparer<TKey>?)null)
         {
         }
 
-        public LinkedDictionary(IEqualityComparer<TKey> comparer)
+        public LinkedDictionary(IEqualityComparer<TKey>? comparer)
             : this(0, comparer)
         {
         }
 
         public LinkedDictionary(int capacity)
-            : this(capacity, (IEqualityComparer<TKey>)null)
+            : this(capacity, (IEqualityComparer<TKey>?)null)
         {
         }
 
-        public LinkedDictionary(int capacity, IEqualityComparer<TKey> comparer)
+        public LinkedDictionary(int capacity, IEqualityComparer<TKey>? comparer)
         {
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity), capacity, SR.ArgumentOutOfRange_NeedNonNegNum);
@@ -119,9 +148,11 @@ namespace J2N.Collections.Generic
             list = new LinkedList<KeyValuePair<TKey, TValue>>();
         }
 
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LinkedDictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
 
-        public LinkedDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> comparer)
+        public LinkedDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer)
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             : this(dictionary != null ? dictionary.Count : 0, comparer)
         {
             if (dictionary == null)
@@ -135,7 +166,7 @@ namespace J2N.Collections.Generic
             : this(collection, null)
         { }
 
-        public LinkedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey> comparer)
+        public LinkedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer)
             : this(collection is ICollection<KeyValuePair<TKey, TValue>> col ? col.Count : 0, comparer)
         {
             if (collection == null)
@@ -163,7 +194,7 @@ namespace J2N.Collections.Generic
         {
             siInfo = info;
             int capacity = info.GetInt32(CountName);
-            var comparer = (IEqualityComparer<TKey>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<TKey>));
+            var comparer = (IEqualityComparer<TKey>?)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<TKey>));
             dictionary = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>(capacity, comparer);
             list = new LinkedList<KeyValuePair<TKey, TValue>>();
         }
@@ -206,7 +237,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool ContainsValue(TValue value)
         {
-            return ContainsValue(value, EqualityComparer<TValue>.Default);
+            return ContainsValue(value, null);
         }
 
         /// <summary>
@@ -224,8 +255,10 @@ namespace J2N.Collections.Generic
         /// is proportional to <see cref="Count"/>. That is, this method is an O(<c>n</c>) operation,
         /// where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public bool ContainsValue(TValue value, IEqualityComparer<TValue> valueComparer) // Overload added so end user can override J2N's equality comparer
+        public bool ContainsValue(TValue value, IEqualityComparer<TValue>? valueComparer) // Overload added so end user can override J2N's equality comparer
         {
+            valueComparer ??= EqualityComparer<TValue>.Default;
+
             foreach (var pair in dictionary)
             {
                 if (valueComparer.Equals(pair.Value.Value.Value, value))
@@ -321,7 +354,7 @@ namespace J2N.Collections.Generic
         /// The <see cref="System.Runtime.Serialization.SerializationInfo"/> object associated with the current
         /// <see cref="LinkedDictionary{TKey, TValue}"/> instance is invalid.</exception>
         /// <remarks>This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.</remarks>
-        public virtual void OnDeserialization(object sender)
+        public virtual void OnDeserialization(object? sender)
         {
             if (siInfo == null)
             {
@@ -331,7 +364,7 @@ namespace J2N.Collections.Generic
             int count = siInfo.GetInt32(CountName);
             if (count > 0)
             {
-                KeyValuePair<TKey, TValue>[] array = (KeyValuePair<TKey, TValue>[])
+                KeyValuePair<TKey, TValue>[]? array = (KeyValuePair<TKey, TValue>[]?)
                     siInfo.GetValue(KeyValuePairsName, typeof(KeyValuePair<TKey, TValue>[]));
 
                 if (array == null)
@@ -405,7 +438,7 @@ namespace J2N.Collections.Generic
         /// <see cref="TryAdd(TKey, TValue)"/> does nothing and returns <c>false</c>.</remarks>
         // J2N: Explicitly defined to undercut the extension method in CollectionExtensions that doesn't allow
         // null keys.
-        public bool TryAdd(TKey key, TValue value)
+        public bool TryAdd([AllowNull] TKey key, [AllowNull] TValue value)
         {
             if (!dictionary.ContainsKey(key))
             {
@@ -430,16 +463,16 @@ namespace J2N.Collections.Generic
         /// </remarks>
         // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
         // It is redefined here to ensure we have it in prior platforms.
-        public bool Remove(TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool Remove([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
-            if (dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+            if (dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
             {
                 value = node.Value.Value;
                 DoRemove(node);
                 return true;
             }
 
-            value = default!;
+            value = default;
             return false;
         }
 
@@ -582,23 +615,23 @@ namespace J2N.Collections.Generic
         /// Getting the value of this property is an O(log <c>n</c>) operation; setting the property is also
         /// an O(log <c>n</c>) operation.
         /// </remarks>
-        public TValue this[TKey key]
+        public TValue this[[AllowNull] TKey key]
         {
             get
             {
-                if (!dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+                if (!dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
                 {
                     throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
                 }
 
-                if (node == null)
-                    return default(TValue);
+                if (node is null)
+                    return default(TValue)!;
 
                 return node.Value.Value;
             }
             set
             {
-                if (!dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+                if (!dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
                 {
                     DoAdd(key, value);
                     return;
@@ -627,7 +660,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public void Add(TKey key, TValue value)
+        public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
             if (dictionary.ContainsKey(key))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
@@ -642,7 +675,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if the <see cref="LinkedDictionary{TKey, TValue}"/> contains an element
         /// with the specified key; otherwise, <c>false</c>.</returns>
         /// <remarks>This method is an O(log <c>n</c>) operation.</remarks>
-        public bool ContainsKey(TKey key)
+        public bool ContainsKey([AllowNull] TKey key)
             => dictionary.ContainsKey(key);
 
         /// <summary>
@@ -668,9 +701,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method approaches an O(1) operation.
         /// </remarks>
-        public bool TryGetValue(TKey key, out TValue value)
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
         {
-            if (dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+            if (dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
             {
                 value = node.Value.Value;
                 return true;
@@ -691,9 +726,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation.
         /// </remarks>
-        public bool Remove(TKey key)
+        public bool Remove([AllowNull] TKey key)
         {
-            if (!dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+            if (!dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
             {
                 return false;
             }
@@ -705,19 +740,19 @@ namespace J2N.Collections.Generic
 
         #region Private Helper Methods
 
-        private void DoAdd(TKey key, TValue value)
+        private void DoAdd([AllowNull] TKey key, [AllowNull] TValue value)
         {
             version++;
-            var pair = new KeyValuePair<TKey, TValue>(key, value);
+            var pair = new KeyValuePair<TKey, TValue>(key!, value!);
             var node = new LinkedListNode<KeyValuePair<TKey, TValue>>(pair);
             dictionary.Add(key, node);
             list.AddLast(node);
         }
 
-        private void DoSet(LinkedListNode<KeyValuePair<TKey, TValue>> node, TKey key, TValue value)
+        private void DoSet(LinkedListNode<KeyValuePair<TKey, TValue>> node, [AllowNull] TKey key, [AllowNull] TValue value)
         {
             version++;
-            var pair = new KeyValuePair<TKey, TValue>(key, value);
+            var pair = new KeyValuePair<TKey, TValue>(key!, value!);
             var newNode = new LinkedListNode<KeyValuePair<TKey, TValue>>(pair);
             dictionary[key] = newNode;
             list.AddAfter(node, newNode);
@@ -731,7 +766,7 @@ namespace J2N.Collections.Generic
             list.Remove(node);
         }
 
-        private static bool IsCompatibleKey(object key)
+        private static bool IsCompatibleKey(object? key)
         {
             if (key is null)
                 return typeof(TKey).IsNullableType();
@@ -739,9 +774,9 @@ namespace J2N.Collections.Generic
             return (key is TKey);
         }
 
-        private bool TryGetNode(TKey key, TValue value, out LinkedListNode<KeyValuePair<TKey, TValue>> node)
+        private bool TryGetNode([AllowNull] TKey key, [AllowNull] TValue value, [MaybeNullWhen(false)] out LinkedListNode<KeyValuePair<TKey, TValue>> node)
         {
-            if (dictionary.TryGetValue(key, out node) && EqualityComparer<TValue>.Default.Equals(value, node.Value.Value))
+            if (dictionary.TryGetValue(key, out node) && EqualityComparer<TValue>.Default.Equals(value!, node.Value.Value))
                 return true;
             node = null;
             return false;
@@ -795,7 +830,7 @@ namespace J2N.Collections.Generic
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
         {
-            if (!TryGetNode(item.Key, item.Value, out LinkedListNode<KeyValuePair<TKey, TValue>> node))
+            if (!TryGetNode(item.Key, item.Value, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
             {
                 return false;
             }
@@ -819,7 +854,7 @@ namespace J2N.Collections.Generic
 
         object ICollection.SyncRoot => ((IDictionary)dictionary).SyncRoot;
 
-        object IDictionary.this[object key]
+        object? IDictionary.this[object? key]
         {
             get
             {
@@ -846,7 +881,7 @@ namespace J2N.Collections.Generic
                     TKey tempKey = (TKey)key;
                     try
                     {
-                        this[tempKey] = (TValue)value;
+                        this[tempKey] = (TValue)value!;
                     }
                     catch (InvalidCastException)
                     {
@@ -860,7 +895,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        void IDictionary.Add(object key, object value)
+        void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
             if (key is null && !typeof(TKey).IsNullableType())
@@ -887,7 +922,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        bool IDictionary.Contains(object key)
+        bool IDictionary.Contains(object? key)
         {
             if (IsCompatibleKey(key))
             {
@@ -901,7 +936,7 @@ namespace J2N.Collections.Generic
             return new Enumerator(this, Enumerator.DictEntry);
         }
 
-        void IDictionary.Remove(object key)
+        void IDictionary.Remove(object? key)
         {
             if (IsCompatibleKey(key))
             {
@@ -929,7 +964,7 @@ namespace J2N.Collections.Generic
             else if (array is DictionaryEntry[] dictEntryArray)
             {
                 foreach (var item in this)
-                    dictEntryArray[index++] = new DictionaryEntry(item.Key, item.Value);
+                    dictEntryArray[index++] = new DictionaryEntry(item.Key!, item.Value);
             }
             else
             {
@@ -954,9 +989,11 @@ namespace J2N.Collections.Generic
 #if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary<TKey, TValue> Members
 
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
         #endregion IReadOnlyDictionary<TKey, TValue> Members
 #endif
@@ -973,7 +1010,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if <paramref name="other"/> is structurally equal to the current dictionary;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
-        public virtual bool Equals(object other, IEqualityComparer comparer)
+        public virtual bool Equals(object? other, IEqualityComparer comparer)
             => DictionaryEqualityComparer<TKey, TValue>.Equals(this, other, comparer);
 
         /// <summary>
@@ -995,7 +1032,7 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if the specified object implements <see cref="IDictionary{TKey, TValue}"/>
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
             => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
 
         /// <summary>
@@ -1024,7 +1061,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// The index of a format item is not zero.
         /// </exception>
-        public virtual string ToString(string format, IFormatProvider formatProvider)
+        public virtual string ToString(string? format, IFormatProvider? formatProvider)
             => CollectionUtil.ToString(formatProvider, format, this);
 
         /// <summary>
@@ -1219,7 +1256,7 @@ namespace J2N.Collections.Generic
 
                     if (_getEnumeratorRetType == DictEntry)
                     {
-                        return new DictionaryEntry(Current.Key, Current.Value);
+                        return new DictionaryEntry(Current.Key!, Current.Value);
                     }
                     else
                     {
@@ -1228,9 +1265,11 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            object IDictionaryEnumerator.Key
+            object? IDictionaryEnumerator.Key
             {
+#pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
+#pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 {
                     if (notStartedOrEnded)
                     {
@@ -1241,7 +1280,7 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            object IDictionaryEnumerator.Value
+            object? IDictionaryEnumerator.Value
             {
                 get
                 {
@@ -1263,7 +1302,7 @@ namespace J2N.Collections.Generic
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
                     }
 
-                    return new DictionaryEntry(Current.Key, Current.Value);
+                    return new DictionaryEntry(Current.Key!, Current.Value);
                 }
             }
         }
@@ -1353,12 +1392,13 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
-                    if (!(array is object[] objects))
+                    if (!(array is object?[]))
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
                     try
                     {
+                        object?[] objects = (object?[])array;
                         foreach (var item in this)
                             objects[index++] = item;
                     }
@@ -1392,7 +1432,7 @@ namespace J2N.Collections.Generic
 
                 public TKey Current => enumerator.Current.Key;
 
-                object IEnumerator.Current
+                object? IEnumerator.Current
                 {
                     get
                     {
@@ -1527,12 +1567,13 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
-                    if (!(array is object[] objects))
+                    if (!(array is object?[]))
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
                     try
                     {
+                        object?[] objects = (object?[])array;
                         foreach (var entry in this)
                             objects[index++] = entry;
                     }
@@ -1576,7 +1617,7 @@ namespace J2N.Collections.Generic
 
                 public TValue Current => enumerator.Current.Value;
 
-                object IEnumerator.Current
+                object? IEnumerator.Current
                 {
                     get
                     {

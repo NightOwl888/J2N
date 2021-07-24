@@ -6,6 +6,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_CHARARRAYPOINTERS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ENCODINGPROVIDERS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEINFORMATION</DefineConstants>
     
     <DebugType>portable</DebugType>
@@ -39,18 +40,22 @@
   <!-- Features in .NET Standard 2.1, .NET Core 3.x, and .NET 5.x only -->
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) ">
 
-    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
     
     <!--<DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ENUMERATOR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
-    
+
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_ENSURECAPACITY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_REMOVE_OUTVALUE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CONTAINS_CHAR</DefineConstants>
-    
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPENDJOIN</DefineConstants>
+
   </PropertyGroup>
 
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, and .NET 5.x -->
@@ -92,6 +97,14 @@
 
   </PropertyGroup>
 
+  <!-- Features in .NET Framework 4.6+ only -->
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net46')) Or $(TargetFramework.StartsWith('net47')) Or $(TargetFramework.StartsWith('net48'))">
+
+    <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
+
+  </PropertyGroup>
+
   <!-- Features in .NET Framework 4.5+ only -->
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
 
@@ -107,6 +120,7 @@
 
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>

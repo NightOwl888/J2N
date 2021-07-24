@@ -1,6 +1,27 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
+#if FEATURE_EXCEPTIONDISPATCHINFO
+using System.Runtime.ExceptionServices;
+#endif
 using System.Threading;
-#nullable enable
+
 
 namespace J2N.Threading
 {
@@ -290,7 +311,25 @@ namespace J2N.Threading
         /// control logic depends on the specific exception type being thrown. An alternative way to get the original
         /// <see cref="Exception.ToString()"/> message is to use <c>exception.Data["OriginalMessage"].ToString()</c>.
         /// </summary>
+#if FEATURE_EXCEPTIONDISPATCHINFO
+        [Obsolete("This setting no longer has any effect, as we are throwing the exception using ExceptionDispatchInfo so the stack trace is 'always on'.")]
+#endif
         public bool IsDebug { get; set; }
+
+        private void RethrowFirstException()
+        {
+            if (exception != null)
+            {
+#if FEATURE_EXCEPTIONDISPATCHINFO
+                ExceptionDispatchInfo.Capture(exception).Throw();
+#else
+                if (IsDebug)
+                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
+                else
+                    throw exception;
+#endif
+            }
+        }
 
         /// <summary>
         /// Blocks the calling thread until a thread terminates.
@@ -298,13 +337,7 @@ namespace J2N.Threading
         public void Join()
         {
             thread.Join();
-            if (exception != null)
-            {
-                if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
-                else
-                    throw exception;
-            }
+            RethrowFirstException();
         }
 
         /// <summary>
@@ -314,13 +347,7 @@ namespace J2N.Threading
         public void Join(long milliSeconds)
         {
             thread.Join(Convert.ToInt32(milliSeconds));
-            if (exception != null)
-            {
-                if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
-                else
-                    throw exception;
-            }
+            RethrowFirstException();
         }
 
         /// <summary>
@@ -333,13 +360,7 @@ namespace J2N.Threading
             int totalTime = Convert.ToInt32(milliSeconds + (nanoSeconds * 0.000001));
 
             thread.Join(totalTime);
-            if (exception != null)
-            {
-                if (IsDebug)
-                    throw new Exception(exception.Data["OriginalMessage"]!.ToString(), exception);
-                else
-                    throw exception;
-            }
+            RethrowFirstException();
         }
 
         /// <summary>

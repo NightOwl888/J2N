@@ -1,5 +1,6 @@
 ﻿using J2N.Globalization;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 
@@ -118,10 +119,11 @@ namespace J2N.Text
         [Test]
         public void TestDecimalPlaces_Float()
         {
-            // J2N TODO: The observed behavior for this test in Java 8 is "13.987755". However, we see
+            // J2N TODO: The observed behavior for this test in Java 8 is "13.987655". However, we see
             // 7 decimal places in Lucene.NET tests. Not sure which is correct, but leaving alone as it works in Lucene.NET now.
             // But need to revisit to find out why the behavior is different between Java 6 (Lucene) and Java 8 (ICU4J) tests.
             //assertEquals("13.9876543", string.Format(StringFormatter.InvariantCulture, "{0}", 13.9876543210987f));
+            assertEquals("13.987655", string.Format(StringFormatter.InvariantCulture, "{0}", 13.9876543210987f));
             assertEquals("22.0", string.Format(StringFormatter.InvariantCulture, "{0}", 22f));
         }
 
@@ -129,6 +131,14 @@ namespace J2N.Text
         public void TestDecimalPlaces_Double()
         {
             assertEquals("22.0", string.Format(StringFormatter.InvariantCulture, "{0}", 22d));
+        }
+
+        [Test]
+        public void Test_StandardFormat_Double()
+        {
+            assertEquals("22.0000000", string.Format(StringFormatter.InvariantCulture, "{0:F7}", 22d));
+            assertEquals("22.0", string.Format(StringFormatter.InvariantCulture, "{0:N1}", 22d));
+            assertEquals("22.5", string.Format(StringFormatter.InvariantCulture, "{0:N1}", 22.45678d));
         }
 
         [Test]
@@ -145,5 +155,75 @@ namespace J2N.Text
             assertEquals("[1, 2, 3, 4, 5, 6, 7]", string.Format(StringFormatter.InvariantCulture, "{0}", new int[] { 1, 2, 3, 4, 5, 6, 7 }));
             assertEquals("[1, 2, 3, 4, 5, 6, 7]", string.Format(StringFormatter.InvariantCulture, "{0}", (System.Array)new string[] { "1", "2", "3", "4", "5", "6", "7" }));
         }
+
+        private enum State
+        {
+            SETREADER, // consumer set a reader input either via ctor or via reset(Reader)
+            RESET, // consumer has called reset()
+            INCREMENT, // consumer is consuming, has called IncrementToken() == true
+            INCREMENT_FALSE, // consumer has called IncrementToken() which returned false
+            END, // consumer has called end() to perform end of stream operations
+            CLOSE // consumer has called close() to release any resources
+        }
+
+        [Test]
+        public void TestEnum()
+        {
+            var state = State.RESET;
+
+            var actual = string.Format(StringFormatter.InvariantCulture, "IncrementToken() called while in wrong state: {0}", state);
+
+            assertEquals("IncrementToken() called while in wrong state: RESET", actual);
+        }
+
+        /// <summary>
+        /// Ensures J format will work on <see cref="sbyte"/>, <see cref="byte"/>, <see cref="short"/>, <see cref="int"/>, and <see cref="long"/>
+        /// when using <see cref="StringFormatter"/>.
+        /// </summary>
+        [Test]
+        public void Test_J_Format_SupportedIntegralTypes()
+        {
+            string[] formats = new string[] { "j", "J", "j4", "J4", "", null };
+            object[] numbers = new object[] { (sbyte)123, (byte)123, (short)1234, (int)12345, (long)123456 };
+            string[] expecteds = new string[] { "123", "123", "1234", "12345", "123456" };
+
+            for (int i = 0; i < expecteds.Length; i++)
+            {
+                for (int j = 0; j < formats.Length; j++)
+                {
+                    if (formats[j] != null && formats[j].StartsWith("J", StringComparison.OrdinalIgnoreCase))
+                    {
+                        // Without StringFormatter, Java format should not be supported
+                        Assert.Throws<FormatException>(() => string.Format("{0:" + formats[j] + "}", numbers[i]));
+                    }
+
+                    assertEquals(expecteds[i], string.Format(J2N.Text.StringFormatter.InvariantCulture, "{0:" + formats[j] + "}", numbers[i]));
+
+                    // Culture should have no effect on integral types
+                    assertEquals(expecteds[i], string.Format(J2N.Text.StringFormatter.CurrentCulture, "{0:" + formats[j] + "}", numbers[i]));
+                }
+
+#if NET46_OR_GREATER || NETCOREAPP
+                // String interpolation
+                FormattableString message = $"{numbers[i]:j}"; // Dynamic formats are unsupported, so we hardcode "j"
+                assertEquals(expecteds[i], message.ToString(J2N.Text.StringFormatter.InvariantCulture));
+#endif
+            }
+        }
+
+        [Test]
+        public void Test_Mixed_SupportedAndUnsupportedTypes()
+        {
+            int i = 12345;
+            uint ui = 98765;
+            DateTime date = new DateTime(1970, 1, 1);
+            J2N.Numerics.Single f = 98.76543f;
+            float f2 = f;
+
+            string actual = string.Format(J2N.Text.StringFormatter.InvariantCulture, "The quick {0:J} brown fox {1:N} jumped over {2:f} the lazy {3:X} dog. {4:x}", i, ui, date, f, f2);
+            string expected = "The quick 12345 brown fox 98,765.00 jumped over Thursday, 01 January 1970 00:00 the lazy 0X1.8B0FCCP6 dog. 0x1.8b0fccp6";
+            assertEquals(expected, actual);
+        }
+
     }
 }

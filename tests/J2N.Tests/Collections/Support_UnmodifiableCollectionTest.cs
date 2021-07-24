@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Integer = J2N.Numerics.Int32;
 
 namespace J2N.Collections
 {
     public class Support_UnmodifiableCollectionTest : TestCase
     {
-        ICollection<object> col;
+        ICollection<Integer> col;
 
         // must be a collection containing the Integers 0 to 99 (which will iterate
         // in order)
@@ -16,7 +17,7 @@ namespace J2N.Collections
         {
         }
 
-        public Support_UnmodifiableCollectionTest(String p1, ICollection<object> c)
+        public Support_UnmodifiableCollectionTest(String p1, ICollection<Integer> c)
         //: base(p1)
         {
             col = c;
@@ -27,31 +28,31 @@ namespace J2N.Collections
 
             // contains
             assertTrue("UnmodifiableCollectionTest - should contain 0", col
-                    .Contains(new int?(0)));
+                    .Contains(new Integer(0)));
             assertTrue("UnmodifiableCollectionTest - should contain 50", col
-                    .Contains(new int?(50)));
+                    .Contains(new Integer(50)));
             assertTrue("UnmodifiableCollectionTest - should not contain 100", !col
-                    .Contains(new int?(100)));
+                    .Contains(new Integer(100)));
 
             // containsAll
             HashSet<object> hs = new HashSet<object>();
-            hs.Add(new int?(0));
-            hs.Add(new int?(25));
-            hs.Add(new int?(99));
+            hs.Add(new Integer(0));
+            hs.Add(new Integer(25));
+            hs.Add(new Integer(99));
             assertTrue(
                     "UnmodifiableCollectionTest - should contain set of 0, 25, and 99",
                     col.Intersect(hs).Count() == hs.Count); // Contains all
-            hs.Add(new int?(100));
+            hs.Add(new Integer(100));
             assertTrue(
                     "UnmodifiableCollectionTest - should not contain set of 0, 25, 99 and 100",
                     col.Intersect(hs).Count() != hs.Count); // Doesn't contain all
 
             // isEmpty
-            assertTrue("UnmodifiableCollectionTest - should not be empty", col.Any());
+            assertTrue("UnmodifiableCollectionTest - should not be empty", col.Count > 0);
 
             // iterator
-            IEnumerator<object> it = col.GetEnumerator();
-            SortedSet<object> ss = new SortedSet<object>();
+            IEnumerator<Integer> it = col.GetEnumerator();
+            SortedSet<Integer> ss = new SortedSet<Integer>();
             while (it.MoveNext())
             {
                 ss.Add(it.Current);
@@ -59,7 +60,7 @@ namespace J2N.Collections
             it = ss.GetEnumerator();
             for (int counter = 0; it.MoveNext(); counter++)
             {
-                int nextValue = ((int?)it.Current).Value;
+                int nextValue = it.Current;
                 assertTrue(
                         "UnmodifiableCollectionTest - Iterator returned wrong value.  Wanted: "
                                 + counter + " got: " + nextValue,
@@ -79,11 +80,11 @@ namespace J2N.Collections
             {
                 assertTrue(
                         "UnmodifiableCollectionTest - toArray returned incorrect array",
-                        objArray[counter] == it.Current);
+                        (Integer)objArray[counter] == it.Current);
             }
 
             // toArray (Object[])
-            var intArray = new object[100];
+            var intArray = new Integer[100];
             col.CopyTo(intArray, 0);
             it = ss.GetEnumerator(); // J2N: Bug in Harmony, this needs to be reset to run
             for (int counter = 0; it.MoveNext(); counter++)

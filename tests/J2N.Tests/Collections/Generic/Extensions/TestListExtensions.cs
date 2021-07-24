@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic.Extensions
 {
@@ -132,16 +133,37 @@ namespace J2N.Collections.Generic.Extensions
         [Test]
         public void TestBinarySearch()
         {
-            IList<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            IList<int> jcgList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, jcgList.BinarySearch(7));
+            assertEquals(6, jcgList.BinarySearch(7, null));
+
+            IList<int> scgList = new SCG.List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, scgList.BinarySearch(7));
+            assertEquals(6, scgList.BinarySearch(7, null));
+
+            IList<int> list = new MockList<int>(new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 });
             assertEquals(6, list.BinarySearch(7));
             assertEquals(6, list.BinarySearch(7, null));
+
+            IList<int> array = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, array.BinarySearch(7));
+            assertEquals(6, array.BinarySearch(7, null));
         }
 
         [Test]
         public void TestBinarySearchInRange()
         {
-            IList<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            IList<int> jcgList = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, jcgList.BinarySearch(3, 4, 7, null));
+
+            IList<int> scgList = new SCG.List<int> { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, scgList.BinarySearch(3, 4, 7, null));
+
+            IList<int> list = new MockList<int>(new SCG.List<int> { 1, 2, 3, 4, 5, 6, 7, 8 });
             assertEquals(6, list.BinarySearch(3, 4, 7, null));
+
+            IList<int> array = new int[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+            assertEquals(6, array.BinarySearch(3, 4, 7, null));
         }
 
         /**
@@ -373,8 +395,8 @@ namespace J2N.Collections.Generic.Extensions
 
             try
             {
-                smallList.Swap(6, 11);
-                fail("Expected ArgumentOutOfRangeException for 11");
+                smallList.Swap(6, 10); // J2N: We need to test against Count, not Count + 1, since that is the minimum error case
+                fail("Expected ArgumentOutOfRangeException for 10");
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -383,8 +405,8 @@ namespace J2N.Collections.Generic.Extensions
 
             try
             {
-                smallList.Swap(11, 6);
-                fail("Expected ArgumentOutOfRangeException for 11");
+                smallList.Swap(10, 6); // J2N: We need to test against Count, not Count + 1, since that is the minimum error case
+                fail("Expected ArgumentOutOfRangeException for 10");
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -439,6 +461,114 @@ namespace J2N.Collections.Generic.Extensions
             var l = Enumerable.Repeat(false, 100).ToList().AsReadOnly();
 
             Assert.Throws<NotSupportedException>(() => l.Swap(0, 1));
+        }
+
+        [Test]
+        public void TestRemoveAll_Predicate()
+        {
+            var toRemove = new HashSet<int> { 5, 10, 15, 20, 25, 30, 35, 40, 45 };
+            var range = Enumerable.Range(1, 50);
+            IList<int> actual = new SCG.List<int>(range);
+            IList<int> expected = new SCG.List<int> { 1, 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 16, 17, 18, 19, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32, 33, 34, 36, 37, 38, 39, 41, 42, 43, 44, 46, 47, 48, 49, 50 };
+
+            actual.RemoveAll((value) => toRemove.Contains(value));
+            assertEquals(expected, actual);
+
+            // Reset and use "unknown" implementation of IList<T>
+            // This will test our slow path.
+            actual = new MockList<int>(new SCG.List<int>(range));
+
+            actual.RemoveAll((value) => toRemove.Contains(value));
+            assertEquals(expected, actual);
+        }
+
+        [Test]
+        public void TestRemoveAll_Int32_Int32_Predicate()
+        {
+            var toRemove = new HashSet<int> { 5, 10, 15, 20, 25, 30, 35, 40, 45 };
+            var range = Enumerable.Range(1, 50);
+            IList<int> actual = new SCG.List<int>(range);
+            IList<int> expected = new SCG.List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 26, 27, 28, 29, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50 };
+
+            actual.RemoveAll(startIndex: 19, count: 14, (value) => toRemove.Contains(value));
+            assertEquals(expected, actual);
+
+            // Reset and use "unknown" implementation of IList<T>
+            // This will test our slow path.
+            actual = new MockList<int>(new SCG.List<int>(range));
+
+            actual.RemoveAll(startIndex: 19, count: 14, (value) => toRemove.Contains(value));
+            assertEquals(expected, actual);
+        }
+
+        // Just a hack so we can test an "unknown" implementation of IList<T>
+        private class MockList<T> : IList<T>
+        {
+            private readonly IList<T> innerList;
+            public MockList(IList<T> innerList)
+            {
+                this.innerList = innerList;
+            }
+
+            public T this[int index]
+            {
+                get => innerList[index];
+                set => innerList[index] = value;
+            }
+
+            public int Count => innerList.Count;
+
+            public bool IsReadOnly => innerList.IsReadOnly;
+
+            public void Add(T item)
+            {
+                innerList.Add(item);
+            }
+
+            public void Clear()
+            {
+                innerList.Clear();
+            }
+
+            public bool Contains(T item)
+            {
+                return innerList.Contains(item);
+            }
+
+            public void CopyTo(T[] array, int arrayIndex)
+            {
+                innerList.CopyTo(array, arrayIndex);
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                return innerList.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public int IndexOf(T item)
+            {
+                return innerList .IndexOf(item);
+            }
+
+            public void Insert(int index, T item)
+            {
+                innerList.Insert(index, item);
+            }
+
+            public bool Remove(T item)
+            {
+                return innerList.Remove(item);
+            }
+
+            public void RemoveAt(int index)
+            {
+                innerList.RemoveAt(index);
+            }
         }
 
 

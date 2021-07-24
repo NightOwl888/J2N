@@ -14,6 +14,8 @@
     <NoWarn Label="Member 'member1' overrides obsolete member 'member2. Add the Obsolete attribute to 'member1'">$(NoWarn);CS0672</NoWarn>
     <NoWarn Label="Obsolete member 'memberA' overrides non-obsolete member 'memberB'.">$(NoWarn);CS0809</NoWarn>
     <NoWarn Label="Missing XML comment for publicly visible type or member 'Type_or_Member'">$(NoWarn);CS1591</NoWarn>
+
+    <NoWarn Label="Naming rule violation: Must begin with upper case characters">$(NoWarn);IDE1006</NoWarn>
     
     <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>

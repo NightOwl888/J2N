@@ -165,9 +165,9 @@ namespace J2N.Threading.Atomic
         public void TestToString()
         {
             AtomicBoolean ai = new AtomicBoolean();
-            assertEquals(ai.ToString(), (false).ToString());
+            assertEquals(ai.ToString(), "false");
             ai.Value = (true);
-            assertEquals(ai.ToString(), (true).ToString());
+            assertEquals(ai.ToString(), "true");
         }
 
     }

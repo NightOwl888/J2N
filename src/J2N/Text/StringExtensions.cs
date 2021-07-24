@@ -1,8 +1,27 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+
 
 namespace J2N.Text
 {
@@ -19,7 +38,7 @@ namespace J2N.Text
         /// Convenience method to wrap a string in a <see cref="StringCharSequence"/>
         /// so a <see cref="string"/> can be used as <see cref="ICharSequence"/> in .NET.
         /// </summary>
-        public static ICharSequence AsCharSequence(this string text)
+        public static ICharSequence AsCharSequence(this string? text)
         {
             return new StringCharSequence(text);
         }
@@ -46,12 +65,11 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this string str, ICharSequence value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this string? str, ICharSequence? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (value is StringCharSequence && object.ReferenceEquals(str, value)) return 0;
-            if (str == null) return -1;
-            if (value == null) return 1;
-            if (!value.HasValue) return 1;
+            if (str is null) return (value is null || !value.HasValue) ? 0 : -1;
+            if (value is null || !value.HasValue) return 1;
 
             int length = Math.Min(str.Length, value.Length);
             int result;
@@ -84,10 +102,10 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this string str, char[] value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this string? str, char[]? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (str == null) return -1;
-            if (value == null) return 1;
+            if (str is null) return (value is null) ? 0 : -1;
+            if (value is null) return 1;
 
             int length = Math.Min(str.Length, value.Length);
             int result;
@@ -120,10 +138,10 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this string str, StringBuilder value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this string? str, StringBuilder? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (str == null) return -1;
-            if (value == null) return 1;
+            if (str is null) return (value is null) ? 0 : -1;
+            if (value is null) return 1;
 
             // Materialize the string. It is faster to loop through
             // a string than a StringBuilder.
@@ -160,7 +178,7 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this string str, string value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this string? str, string? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return string.CompareOrdinal(str, value);
         }
@@ -205,7 +223,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
         public static bool Contains(this string input, char value) // For compatibility with < .NET Standard 2.1
         {
-            if (input == null)
+            if (input is null)
                 throw new ArgumentNullException(nameof(input));
 
             for (int i = 0; i < input.Length; i++)
@@ -237,7 +255,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string text, ICharSequence charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, ICharSequence? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -259,7 +277,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string text, char[] charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, char[]? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -281,7 +299,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string text, StringBuilder charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, StringBuilder? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -303,7 +321,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string text, string charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, string? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -322,11 +340,11 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string text, ICharSequence charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, ICharSequence? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
-                return charSequence == null;
-            if (charSequence == null)
+            if (text is null)
+                return charSequence is null || !charSequence.HasValue;
+            if (charSequence is null || !charSequence.HasValue)
                 return false;
 
             int len = charSequence.Length;
@@ -352,11 +370,11 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string text, char[] charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, char[]? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
-                return charSequence == null;
-            if (charSequence == null)
+            if (text is null)
+                return charSequence is null;
+            if (charSequence is null)
                 return false;
 
             int len = charSequence.Length;
@@ -382,11 +400,11 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string text, StringBuilder charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, StringBuilder? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
-                return charSequence == null;
-            if (charSequence == null)
+            if (text is null)
+                return charSequence is null;
+            if (charSequence is null)
                 return false;
 
             int len = charSequence.Length;
@@ -412,11 +430,11 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string text, string charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, string? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
-                return charSequence == null;
-            if (charSequence == null)
+            if (text is null)
+                return charSequence is null;
+            if (charSequence is null)
                 return false;
 
             int len = charSequence.Length;
@@ -439,11 +457,12 @@ namespace J2N.Text
         /// <param name="text">This <see cref="string"/>.</param>
         /// <param name="encoding">A supported <see cref="Encoding"/>.</param>
         /// <returns>The resultant byte array.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="encoding"/> is <c>null</c>.</exception>
         public static byte[] GetBytes(this string text, Encoding encoding)
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (encoding == null)
+            if (encoding is null)
                 throw new ArgumentNullException(nameof(encoding));
 
             return encoding.GetBytes(text);
@@ -527,7 +546,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static int IndexOf(this string text, int codePoint, int startIndex)
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
             if (startIndex < 0)
@@ -600,7 +619,7 @@ namespace J2N.Text
 #if FEATURE_STRINGINTERN
             return string.Intern(text);
 #else
-            return interner.Intern(text);
+            return interner.Intern(text); // J2N: This is for compatibility with .NET flavors that don't support string interning (.NET Standard 1.x)
 #endif
         }
 
@@ -621,7 +640,7 @@ namespace J2N.Text
             {
                 internal /*private*/ string str;
                 internal /*private*/ int hash;
-                internal /*private*/ Entry next;
+                internal /*private*/ Entry? next;
                 internal Entry(string str, int hash, Entry next)
                 {
                     this.str = str;
@@ -666,11 +685,11 @@ namespace J2N.Text
                 int slot = h & (cache.Length - 1);
 
                 Entry first = this.cache[slot];
-                Entry nextToLast = null;
+                Entry? nextToLast = null;
 
                 int chainLength = 0;
 
-                for (Entry e = first; e != null; e = e.next)
+                for (Entry? e = first; e != null; e = e.next)
                 {
                     if (ReferenceEquals(e.str, s) || (e.hash == h && string.CompareOrdinal(e.str, s) == 0))
                     {
@@ -687,7 +706,7 @@ namespace J2N.Text
 
                 // insertion-order cache: add new entry at head
                 this.cache[slot] = new Entry(s, h, first);
-                if (chainLength >= maxChainLength)
+                if (chainLength >= maxChainLength && nextToLast != null)
                 {
                     // prune last entry
                     nextToLast.next = null;
@@ -730,7 +749,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static int LastIndexOf(this string text, int codePoint)
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
             return LastIndexOf(text, codePoint, text.Length - 1);
@@ -771,7 +790,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static int LastIndexOf(this string text, int codePoint, int startIndex)
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
             if (codePoint < Character.MinSupplementaryCodePoint)
@@ -830,9 +849,9 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, ICharSequence other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (other == null)
+            if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
@@ -891,9 +910,9 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, char[] other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (other == null)
+            if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
@@ -952,9 +971,9 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, StringBuilder other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (other == null)
+            if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
@@ -1013,9 +1032,9 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, string other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (other == null)
+            if (other is null)
                 throw new ArgumentNullException(nameof(other));
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
@@ -1075,9 +1094,9 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool StartsWith(this string text, string prefix, int startIndex, StringComparison comparisonType)
         {
-            if (text == null)
+            if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (prefix == null)
+            if (prefix is null)
                 throw new ArgumentNullException(nameof(prefix));
 
             return RegionMatches(text, startIndex, prefix, 0, prefix.Length, comparisonType);
@@ -1108,10 +1127,10 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// </exception>
-        public static ICharSequence Subsequence(this string text, int startIndex, int length)
+        public static ICharSequence Subsequence(this string? text, int startIndex, int length)
         {
             // From Apache Harmony String class
-            if (text == null || (startIndex == 0 && length == text.Length))
+            if (text is null || (startIndex == 0 && length == text.Length))
             {
                 return text.AsCharSequence();
             }

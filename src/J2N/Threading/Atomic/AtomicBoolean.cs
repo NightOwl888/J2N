@@ -1,6 +1,25 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
+using System.Diagnostics;
 using System.Threading;
-#nullable enable
+
 
 namespace J2N.Threading.Atomic
 {
@@ -16,9 +35,18 @@ namespace J2N.Threading.Atomic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerDisplay("{Value}")]
     public class AtomicBoolean : IEquatable<AtomicBoolean>, IEquatable<bool>
     {
         private int value = 0;
+
+        // The true value.
+        //
+        internal const int True = 1;
+
+        // The false value.
+        //
+        internal const int False = 0;
 
         /// <summary>
         /// Creates a new <see cref="AtomicBoolean"/> with initial value of <c>false</c>.
@@ -33,7 +61,7 @@ namespace J2N.Threading.Atomic
         /// <param name="value">The inital value.</param>
         public AtomicBoolean(bool value)
         {
-            this.value = value ? 1 : 0;
+            this.value = value ? True : False;
         }
 
         /// <summary>
@@ -46,8 +74,8 @@ namespace J2N.Threading.Atomic
         /// </summary>
         public bool Value
         {
-            get => value == 1 ? true : false;  // read operations atomic in 64 bit
-            set => Interlocked.Exchange(ref this.value, value ? 1 : 0);
+            get => Interlocked.CompareExchange(ref value, 0, 0) == True ? true : false;
+            set => Interlocked.Exchange(ref this.value, value ? True : False);
         }
 
         /// <summary>
@@ -60,8 +88,8 @@ namespace J2N.Threading.Atomic
         /// the actual value was not equal to the expected value.</returns>
         public bool CompareAndSet(bool expect, bool update)
         {
-            int e = expect ? 1 : 0;
-            int u = update ? 1 : 0;
+            int e = expect ? True : False;
+            int u = update ? True : False;
 
             int original = Interlocked.CompareExchange(ref value, u, e);
 
@@ -75,7 +103,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The previous value.</returns>
         public bool GetAndSet(bool newValue)
         {
-            return Interlocked.Exchange(ref value, newValue ? 1 : 0) == 1;
+            return Interlocked.Exchange(ref value, newValue ? 1 : 0) == True;
         }
 
         /// <summary>
@@ -131,7 +159,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The <see cref="string"/> representation of the current value.</returns>
         public override string ToString()
         {
-            return value == 1 ? bool.TrueString : bool.FalseString;
+            return Value ? "true" : "false";
         }
 
         #region Operator Overrides

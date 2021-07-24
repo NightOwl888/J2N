@@ -1,6 +1,24 @@
-﻿using System;
+﻿#region Copyright 2019-2021 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
 using System.Collections.Generic;
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {
@@ -45,41 +63,58 @@ namespace J2N.Collections.Generic
 
         internal class DoubleComparer : System.Collections.Generic.EqualityComparer<double>, IComparer<double>
         {
-            /// <summary>
-            /// Accounts for signed zero (.NET does not, but Java does)
-            /// </summary>
-            private int CompareZero(double x, double y)
-            {
-                long a = BitConversion.DoubleToInt64Bits(x);
-                long b = BitConversion.DoubleToInt64Bits(y);
-                if (a > b)
-                    return 1;
-                else if (a < b)
-                    return -1;
-
-                return 0;
-            }
-
             public int Compare(double x, double y)
             {
-                if (double.IsNaN(x) && double.IsNaN(y))
+                // Non-zero, non-NaN checking.
+                if (x > y)
+                {
+                    return 1;
+                }
+                if (y > x)
+                {
+                    return -1;
+                }
+                if (x == y && 0.0d != x)
+                {
                     return 0;
+                }
 
-                if (x != 0 && y != 0)
-                    return x.CompareTo(y);
+                // NaNs are equal to other NaNs and larger than any other double
+                if (double.IsNaN(x))
+                {
+                    if (double.IsNaN(y)) return 0;
+                    return 1;
+                }
+                else if (double.IsNaN(y))
+                {
+                    return -1;
+                }
 
-                return CompareZero(x, y);
+                // Deal with +0.0 and -0.0
+                long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
+                long d2 = BitConversion.DoubleToRawInt64Bits(y);
+                // The below expression is equivalent to:
+                // (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
+                return (int)((d1 >> 63) - (d2 >> 63));
             }
 
             public override bool Equals(double x, double y)
             {
+                if (x < y || x > y)
+                    return false;
+
+                if (0.0d != x && x == y)
+                    return true;
+
                 if (double.IsNaN(x) && double.IsNaN(y))
                     return true;
 
-                if (x != 0 && y != 0)
-                    return x.Equals(y);
-
-                return CompareZero(x, y) == 0;
+                // Deal with +0.0 and -0.0
+                long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
+                long d2 = BitConversion.DoubleToRawInt64Bits(y);
+                // The below expression is equivalent to:
+                // (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
+                return (int)((d1 >> 63) - (d2 >> 63)) == 0;
             }
 
             public override int GetHashCode(double obj)
@@ -87,49 +122,67 @@ namespace J2N.Collections.Generic
                 if (obj != 0 && !double.IsNaN(obj))
                     return obj.GetHashCode();
 
-                // Make positive zero and negative zero have differnt hash codes,
-                // and NaN always have the same hash code
+                // Make positive zero and negative zero have different hash codes,
+                // and NaN always have the same hash code.
+                // We intentionlly call the non "raw" overload here to get that behavior.
                 return BitConversion.DoubleToInt64Bits(obj).GetHashCode();
             }
         }
 
         internal class SingleComparer : System.Collections.Generic.EqualityComparer<float>, IComparer<float>
         {
-            /// <summary>
-            /// Accounts for signed zero (.NET does not, but Java does)
-            /// </summary>
-            private int CompareZero(float x, float y)
-            {
-                int a = BitConversion.SingleToInt32Bits(x);
-                int b = BitConversion.SingleToInt32Bits(y);
-                if (a > b)
-                    return 1;
-                else if (a < b)
-                    return -1;
-
-                return 0;
-            }
-
             public int Compare(float x, float y)
             {
-                if (float.IsNaN(x) && float.IsNaN(y))
+                // Non-zero, non-NaN checking.
+                if (x > y)
+                {
+                    return 1;
+                }
+                if (y > x)
+                {
+                    return -1;
+                }
+                if (x == y && 0.0f != x)
+                {
                     return 0;
+                }
 
-                if (x != 0 && y != 0)
-                    return x.CompareTo(y);
+                // NaNs are equal to other NaNs and larger than any other float
+                if (float.IsNaN(x))
+                {
+                    if (float.IsNaN(y)) return 0;
+                    return 1;
+                }
+                else if (float.IsNaN(y))
+                {
+                    return -1;
+                }
 
-                return CompareZero(x, y);
+                // Deal with +0.0 and -0.0
+                int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here
+                int f2 = BitConversion.SingleToRawInt32Bits(y);
+                // The below expression is equivalent to:
+                // (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
+                return (f1 >> 31) - (f2 >> 31);
             }
 
             public override bool Equals(float x, float y)
             {
+                if (x < y || x > y)
+                    return false;
+
+                if (0.0f != x && x == y)
+                    return true;
+
                 if (float.IsNaN(x) && float.IsNaN(y))
                     return true;
 
-                if (x != 0 && y != 0)
-                    return x.Equals(y);
-
-                return CompareZero(x, y) == 0;
+                // Deal with +0.0 and -0.0
+                int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here
+                int f2 = BitConversion.SingleToRawInt32Bits(y);
+                // The below expression is equivalent to:
+                // (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
+                return (f1 >> 31) - (f2 >> 31) == 0;
             }
 
             public override int GetHashCode(float obj)
@@ -137,8 +190,9 @@ namespace J2N.Collections.Generic
                 if (obj != 0 && !float.IsNaN(obj))
                     return obj.GetHashCode();
 
-                // Make positive zero and negative zero have differnt hash codes,
-                // and NaN always have the same hash code
+                // Make positive zero and negative zero have different hash codes,
+                // and NaN always have the same hash code.
+                // We intentionlly call the non "raw" overload here to get that behavior.
                 return BitConversion.SingleToInt32Bits(obj).GetHashCode();
             }
         }

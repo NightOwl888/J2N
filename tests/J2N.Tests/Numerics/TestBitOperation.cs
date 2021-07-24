@@ -499,7 +499,7 @@ namespace J2N.Numerics
         }
 
         /*
-        public void testTripleShift_Integer() throws Exception {
+        public void TestTripleShift_Integer() throws Exception {
 
             int num = Integer.MIN_VALUE;
             assertEquals(134217728, num >>> 4);
@@ -579,7 +579,7 @@ namespace J2N.Numerics
         }
 
         /*
-          public void testTripleShift_Long() throws Exception {
+          public void TestTripleShift_Long() throws Exception {
               long num = Long.MIN_VALUE;
               assertEquals(576460752303423488L, num >>> 4);
               assertEquals(140737488355328L, num >>> 16);
@@ -657,7 +657,7 @@ namespace J2N.Numerics
         }
 
         /*
-        public void testTripleShift_Short() throws Exception {
+        public void TestTripleShift_Short() throws Exception {
               short num = Short.MIN_VALUE;
               assertEquals(268433408, num >>> 4);
               assertEquals(67108352, num >>> 6);
@@ -735,7 +735,7 @@ namespace J2N.Numerics
         }
 
         /*
-        public void testTripleShift_Char() throws Exception {
+        public void TestTripleShift_Char() throws Exception {
               char num = Character.MIN_VALUE;
               assertEquals(0, num >>> 1);
               assertEquals(0, num >>> 3);
@@ -815,7 +815,7 @@ namespace J2N.Numerics
 
 
         /*
-        public void testTripleShift_Byte() throws Exception {
+        public void TestTripleShift_Byte() throws Exception {
               byte num = Byte.MIN_VALUE;
               assertEquals(2147483584, num >>> 1);
               assertEquals(536870896, num >>> 3);

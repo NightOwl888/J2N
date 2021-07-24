@@ -1,11 +1,29 @@
-﻿using J2N.Text;
+﻿#region Copyright 2019-2021 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using SCG = System.Collections.Generic;
-#nullable enable
+
 
 namespace J2N.Collections.Generic
 {
@@ -506,8 +524,8 @@ namespace J2N.Collections.Generic
             int count = siInfo.GetInt32(CountName);
             if (count > 0)
             {
-                KeyValuePair<TKey, TValue>[] array = (KeyValuePair<TKey, TValue>[])
-                    siInfo.GetValue(KeyValuePairsName, typeof(KeyValuePair<TKey, TValue>[]))!;
+                KeyValuePair<TKey, TValue>[]? array = (KeyValuePair<TKey, TValue>[]?)
+                    siInfo.GetValue(KeyValuePairsName, typeof(KeyValuePair<TKey, TValue>[]));
 
                 if (array == null)
                 {
@@ -772,7 +790,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation.
         /// </remarks>
-        public bool Remove(TKey key)
+        public bool Remove([AllowNull] TKey key)
         {
             if (TKeyIsNullable && key is null)
             {
@@ -784,7 +802,7 @@ namespace J2N.Collections.Generic
                 version++;
                 return true;
             }
-            else if (dictionary.Remove(key))
+            else if (dictionary.Remove(key!))
             {
                 version++;
                 return true;
@@ -927,13 +945,13 @@ namespace J2N.Collections.Generic
         /// </remarks>
         // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
         // It is redefined here to ensure we have it in prior platforms.
-        public bool Remove(TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool Remove([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (TKeyIsNullable && key is null)
             {
                 if (!hasNullKey)
                 {
-                    value = default!;
+                    value = default;
                     return false;
                 }
 
@@ -941,9 +959,9 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            if (dictionary.TryGetValue(key, out value))
+            if (dictionary.TryGetValue(key!, out value))
             {
-                dictionary.Remove(key);
+                dictionary.Remove(key!);
                 return true;
             }
 
@@ -1036,7 +1054,7 @@ namespace J2N.Collections.Generic
                         if (hasNullKey)
                             return nullEntry.Value;
                     }
-                    else if (TryGetValue((TKey)key!, out TValue value))
+                    else if (TryGetValue((TKey)key, out TValue value))
                     {
                         return value;
                     }
@@ -1053,7 +1071,7 @@ namespace J2N.Collections.Generic
 
                 try
                 {
-                    TKey tempKey = (TKey)key!;
+                    TKey tempKey = (TKey)key;
 
                     try
                     {
@@ -1081,11 +1099,11 @@ namespace J2N.Collections.Generic
 
             try
             {
-                TKey tempKey = (TKey)key!;
+                TKey tempKey = (TKey)key;
 
                 try
                 {
-                    Add(tempKey, (TValue)value!);
+                    Add(tempKey, (TValue)value);
                 }
                 catch (InvalidCastException)
                 {
@@ -1102,7 +1120,7 @@ namespace J2N.Collections.Generic
         {
             if (IsCompatibleKey(key))
             {
-                return ContainsKey((TKey)key!);
+                return ContainsKey((TKey)key);
             }
             return false;
         }
@@ -1115,7 +1133,7 @@ namespace J2N.Collections.Generic
             return ((IDictionary)dictionary).GetEnumerator();
         }
 
-        void IDictionary.Remove(object key)
+        void IDictionary.Remove(object? key)
         {
             if (IsCompatibleKey(key))
             {
@@ -1388,15 +1406,16 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
-                    if (!(array is object[] objects))
+                    if (!(array is object?[]))
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
                     try
                     {
+                        object?[] objects = (object?[])array;
                         // Null check not needed because we are enumerating this
                         foreach (var item in this)
-                            objects[index++] = item!;
+                            objects[index++] = item;
                     }
                     catch (ArrayTypeMismatchException)
                     {
@@ -1541,16 +1560,17 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
-                    if (!(array is object[] objects))
+                    if (!(array is object?[]))
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
 
                     try
                     {
+                        object?[] objects = (object?[])array;
                         // Null check not needed because we are enumerating this
                         foreach (var entry in this)
-                            objects[index++] = entry!;
+                            objects[index++] = entry;
                     }
                     catch (ArrayTypeMismatchException)
                     {

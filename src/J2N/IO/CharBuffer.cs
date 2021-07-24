@@ -1,8 +1,26 @@
-﻿using J2N.Text;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Text;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
-#nullable enable
+
 
 namespace J2N.IO
 {
@@ -862,7 +880,7 @@ namespace J2N.IO
         /// <returns>This buffer.</returns>
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than the length of <paramref name="value"/>.</exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(char[] value)
+        public virtual CharBuffer Append(char[]? value)
         {
             if (value != null)
             {
@@ -894,7 +912,7 @@ namespace J2N.IO
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
         /// </exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(char[] value, int startIndex, int count)
+        public virtual CharBuffer Append(char[]? value, int startIndex, int count)
         {
             ICharSequence cs;
             if (value is null)
@@ -921,7 +939,7 @@ namespace J2N.IO
         /// <returns>This buffer.</returns>
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than the length of <paramref name="value"/>.</exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(StringBuilder value)
+        public virtual CharBuffer Append(StringBuilder? value)
         {
             if (value != null)
             {
@@ -953,7 +971,7 @@ namespace J2N.IO
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
         /// </exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(StringBuilder value, int startIndex, int count)
+        public virtual CharBuffer Append(StringBuilder? value, int startIndex, int count)
         {
             string cs;
             if (value is null)
@@ -981,7 +999,7 @@ namespace J2N.IO
         /// <returns>This buffer.</returns>
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than the length of <paramref name="value"/>.</exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(string value)
+        public virtual CharBuffer Append(string? value)
         {
             if (value != null)
             {
@@ -1013,7 +1031,7 @@ namespace J2N.IO
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
         /// </exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(string value, int startIndex, int count)
+        public virtual CharBuffer Append(string? value, int startIndex, int count)
         {
             if (value is null)
                 value = "null";
@@ -1039,7 +1057,7 @@ namespace J2N.IO
         /// <returns>This buffer.</returns>
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than the length of <paramref name="value"/>.</exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(ICharSequence value)
+        public virtual CharBuffer Append(ICharSequence? value)
         {
             if (value != null)
             {
@@ -1071,7 +1089,7 @@ namespace J2N.IO
         /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
         /// </exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
-        public virtual CharBuffer Append(ICharSequence value, int startIndex, int count)
+        public virtual CharBuffer Append(ICharSequence? value, int startIndex, int count)
         {
             if (value is null)
             {
@@ -1131,21 +1149,21 @@ namespace J2N.IO
 
         IAppendable IAppendable.Append(char value) => Append(value);
 
-        IAppendable IAppendable.Append(string value) => Append(value);
+        IAppendable IAppendable.Append(string? value) => Append(value);
 
-        IAppendable IAppendable.Append(string value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(string? value, int startIndex, int count) => Append(value, startIndex, count);
 
-        IAppendable IAppendable.Append(StringBuilder value) => Append(value);
+        IAppendable IAppendable.Append(StringBuilder? value) => Append(value);
 
-        IAppendable IAppendable.Append(StringBuilder value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(StringBuilder? value, int startIndex, int count) => Append(value, startIndex, count);
 
-        IAppendable IAppendable.Append(char[] value) => Append(value);
+        IAppendable IAppendable.Append(char[]? value) => Append(value);
 
-        IAppendable IAppendable.Append(char[] value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(char[]? value, int startIndex, int count) => Append(value, startIndex, count);
 
-        IAppendable IAppendable.Append(ICharSequence value) => Append(value);
+        IAppendable IAppendable.Append(ICharSequence? value) => Append(value);
 
-        IAppendable IAppendable.Append(ICharSequence value, int startIndex, int count) => Append(value, startIndex, count);
+        IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count) => Append(value, startIndex, count);
 
         #endregion
     }

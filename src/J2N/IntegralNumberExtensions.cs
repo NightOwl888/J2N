@@ -1,6 +1,24 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
 using System.Runtime.CompilerServices;
-#nullable enable
+
 
 namespace J2N
 {
@@ -181,6 +199,20 @@ namespace J2N
         /// depending on the radix. If <paramref name="radix"/> is not in the interval defined
         /// by <see cref="Character.MinRadix"/> and <see cref="Character.MaxRadix"/> then 10 is
         /// used as the base for the conversion.
+        /// <para/>
+        /// Usage Note: This method is similar to <see cref="Convert.ToString(int, int)"/>, however
+        /// there are some key differences:
+        /// <list type="bullet">
+        ///     <item><description>Radix values supported are <see cref="Character.MinRadix"/> (2) to <see cref="Character.MaxRadix"/> (36).
+        ///     The <see cref="Convert.ToString(int, int)"/> method only supports fromBase (radix) of 2, 8, 10, and 16.</description></item>
+        ///     <item><description>Negative values are returned as the converted positive representation of the absolute value prefixed with
+        ///     a '-' character. For base 2, 8, and 16, the <see cref="Convert.ToString(int, int)"/> method uses the two's complement representation.
+        ///     This means that the high-order bit of the highest-order byte (bit 31) is interpreted as the sign bit. Negative representations
+        ///     returned from this method
+        ///     cannot be parsed using <see cref="Convert.ToInt32(string?, int)"/>, however, the <see cref="J2N.Numerics.Int32.Parse(string?, int)"/>
+        ///     method and other radix-based overloads support this format while also supporting the two's complement
+        ///     representation returned from <see cref="Convert.ToString(int, int)"/>.</description></item>
+        /// </list>
         /// </summary>
         /// <param name="value">The <see cref="int"/> to convert.</param>
         /// <param name="radix">The base to use for the conversion.</param>
@@ -202,21 +234,25 @@ namespace J2N
             while ((value /= radix) != 0)
                 count++;
 
-            char[] buffer = new char[count];
-            do
+            unsafe
             {
-                int ch = 0 - (j % radix);
-                if (ch > 9)
-                    ch = ch - 10 + 'a';
-                else
-                    ch += '0';
-                buffer[--count] = (char)ch;
-            } while ((j /= radix) != 0);
-            if (negative)
-            {
-                buffer[0] = '-';
+                int bufferLength = count;
+                char* buffer = stackalloc char[bufferLength];
+                do
+                {
+                    int ch = 0 - (j % radix);
+                    if (ch > 9)
+                        ch = ch - 10 + 'a';
+                    else
+                        ch += '0';
+                    buffer[--count] = (char)ch;
+                } while ((j /= radix) != 0);
+                if (negative)
+                {
+                    buffer[0] = '-';
+                }
+                return new string(buffer, 0, bufferLength);
             }
-            return new string(buffer, 0, buffer.Length);
         }
 
         /// <summary>
@@ -226,6 +262,20 @@ namespace J2N
         /// 'z', depending on the radix. If <paramref name="radix"/> is not in the interval
         /// defined by <see cref="Character.MinRadix"/> and <see cref="Character.MaxRadix"/>
         /// then 10 is used as the base for the conversion.
+        /// <para/>
+        /// Usage Note: This method is similar to <see cref="Convert.ToString(long, int)"/>, however
+        /// there are some key differences:
+        /// <list type="bullet">
+        ///     <item><description>Radix values supported are <see cref="Character.MinRadix"/> (2) to <see cref="Character.MaxRadix"/> (36).
+        ///     The <see cref="Convert.ToString(long, int)"/> method only supports fromBase (radix) of 2, 8, 10, and 16.</description></item>
+        ///     <item><description>Negative values are returned as the converted positive representation of the absolute value prefixed with a
+        ///     '-' character. For base 2, 8, and 16, the <see cref="Convert.ToString(long, int)"/> method uses the two's complement representation.
+        ///     This means that the high-order bit of the highest-order byte (bit 63) is interpreted as the sign bit. Negative representations
+        ///     returned from this method
+        ///     cannot be parsed using <see cref="Convert.ToInt64(string?, int)"/>, however, the <see cref="J2N.Numerics.Int64.Parse(string?, int)"/>
+        ///     method and other radix-based overloads support this format while also supporting the two's complement
+        ///     representation returned from <see cref="Convert.ToString(long, int)"/>.</description></item>
+        /// </list>
         /// </summary>
         /// <param name="value">The long to convert.</param>
         /// <param name="radix">The base to use for the conversion.</param>
@@ -248,19 +298,23 @@ namespace J2N
             while ((value /= radix) != 0)
                 count++;
 
-            char[] buffer = new char[count];
-            do
+            unsafe
             {
-                int ch = 0 - (int)(j % radix);
-                if (ch > 9)
-                    ch = ch - 10 + 'a';
-                else
-                    ch += '0';
-                buffer[--count] = (char)ch;
-            } while ((j /= radix) != 0);
-            if (negative)
-                buffer[0] = '-';
-            return new string(buffer, 0, buffer.Length);
+                int bufferLength = count;
+                char* buffer = stackalloc char[bufferLength];
+                do
+                {
+                    int ch = 0 - (int)(j % radix);
+                    if (ch > 9)
+                        ch = ch - 10 + 'a';
+                    else
+                        ch += '0';
+                    buffer[--count] = (char)ch;
+                } while ((j /= radix) != 0);
+                if (negative)
+                    buffer[0] = '-';
+                return new string(buffer, 0, bufferLength);
+            }
         }
 
         #endregion ToString (radix)

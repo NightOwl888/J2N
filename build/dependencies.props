@@ -1,11 +1,14 @@
 <Project>
   <PropertyGroup Label="NuGet Package Reference Versions">
+    <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
     <NerdBankGitVersioningPackageReferenceVersion>[3.3.37]</NerdBankGitVersioningPackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>
+    <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8-beta-0001</RandomizedTestingGeneratorsPackageReferenceVersion>
+    <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>4.5.0</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
     <XunitPackageReferenceVersion>2.4.1</XunitPackageReferenceVersion>
     <XunitRunnerVisualStudioPackageReferenceVersion>$(XunitPackageReferenceVersion)</XunitRunnerVisualStudioPackageReferenceVersion>

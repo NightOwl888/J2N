@@ -127,6 +127,12 @@ namespace J2N.Text
             Assert.IsFalse(target.Equals(new StringBuilderCharSequence(new StringBuilder(String2))));
             Assert.IsFalse(target.Equals(new CharArrayCharSequence(String2.ToCharArray())));
 
+            Assert.IsTrue(nullTarget.Equals((string)null));
+            Assert.IsTrue(nullTarget.Equals((char[])null));
+            Assert.IsTrue(nullTarget.Equals(new StringCharSequence(null)));
+            Assert.IsTrue(nullTarget.Equals(new StringBuilderCharSequence(null)));
+            Assert.IsTrue(nullTarget.Equals(new CharArrayCharSequence(null)));
+
 
             Assert.IsTrue(target.Equals((object)String1));
             Assert.IsTrue(target.Equals((object)String1.ToCharArray()));
@@ -141,6 +147,13 @@ namespace J2N.Text
             Assert.IsFalse(target.Equals((object)new StringCharSequence(String2)));
             Assert.IsFalse(target.Equals((object)new StringBuilderCharSequence(new StringBuilder(String2))));
             Assert.IsFalse(target.Equals((object)new CharArrayCharSequence(String2.ToCharArray())));
+
+            Assert.IsTrue(nullTarget.Equals((object)null));
+            Assert.IsTrue(nullTarget.Equals((object)(string)null));
+            Assert.IsTrue(nullTarget.Equals((object)(char[])null));
+            Assert.IsTrue(nullTarget.Equals((object)new StringCharSequence(null)));
+            Assert.IsTrue(nullTarget.Equals((object)new StringBuilderCharSequence(null)));
+            Assert.IsTrue(nullTarget.Equals((object)new CharArrayCharSequence(null)));
         }
 
         [Test]
@@ -193,6 +206,16 @@ namespace J2N.Text
             Assert.Less(0, target.CompareTo((string)null));
             Assert.Less(0, target.CompareTo((StringBuilder)null));
             Assert.Less(0, target.CompareTo((char[])null));
+
+            Assert.AreEqual(0, nullTarget.CompareTo((string)null));
+            Assert.AreEqual(0, nullTarget.CompareTo((StringBuilder)null));
+            Assert.AreEqual(0, nullTarget.CompareTo((StringBuffer)null));
+            Assert.AreEqual(0, nullTarget.CompareTo((char[])null));
+            Assert.AreEqual(0, nullTarget.CompareTo((ICharSequence)null));
+            Assert.AreEqual(0, nullTarget.CompareTo(new StringBuilderCharSequence(null)));
+            Assert.AreEqual(0, nullTarget.CompareTo(new StringCharSequence(null)));
+            Assert.AreEqual(0, nullTarget.CompareTo(new CharArrayCharSequence(null)));
+            Assert.AreEqual(0, nullTarget.CompareTo((object)null));
         }
     }
 }

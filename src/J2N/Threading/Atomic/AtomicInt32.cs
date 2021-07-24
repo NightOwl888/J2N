@@ -1,6 +1,26 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using J2N.Numerics;
+using System;
+using System.Diagnostics;
 using System.Threading;
-#nullable enable
+
 
 namespace J2N.Threading.Atomic
 {
@@ -18,9 +38,10 @@ namespace J2N.Threading.Atomic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class AtomicInt32 : IEquatable<AtomicInt32>, IEquatable<int>, IFormattable, IConvertible
+    [DebuggerDisplay("{Value}")]
+    public class AtomicInt32 : Number, IEquatable<AtomicInt32>, IEquatable<int>, IFormattable, IConvertible
     {
-        private int _value;
+        private int value;
 
         /// <summary>
         /// Creates a new <see cref="AtomicInt32"/> with the default inital value, <c>0</c>.
@@ -35,7 +56,7 @@ namespace J2N.Threading.Atomic
         /// <param name="value">The initial value.</param>
         public AtomicInt32(int value)
         {
-            _value = value;
+            this.value = value;
         }
 
         /// <summary>
@@ -46,10 +67,16 @@ namespace J2N.Threading.Atomic
         /// int x = aint;
         /// </code>
         /// </summary>
+        /// <remarks>
+        /// Properties are inherently not atomic. Operators such as ++ and -- should not
+        /// be used on <see cref="Value"/> because they perform both a separate get and a set operation. Instead,
+        /// use the atomic methods such as <see cref="IncrementAndGet()"/>, <see cref="GetAndIncrement()"/>
+        /// <see cref="DecrementAndGet()"/> and <see cref="GetAndDecrement()"/> to ensure atomicity.
+        /// </remarks>
         public int Value // Port Note: This is a replacement for Get() and Set()
         {
-            get => this._value;  // read operations atomic in 64 bit
-            set => Interlocked.Exchange(ref this._value, value);
+            get => Interlocked.CompareExchange(ref value, 0, 0);
+            set => Interlocked.Exchange(ref this.value, value);
         }
 
         /// <summary>
@@ -59,7 +86,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The previous value.</returns>
         public int GetAndSet(int newValue)
         {
-            return Interlocked.Exchange(ref _value, newValue);
+            return Interlocked.Exchange(ref value, newValue);
         }
 
         /// <summary>
@@ -72,7 +99,7 @@ namespace J2N.Threading.Atomic
         /// was not equal to the expected value.</returns>
         public bool CompareAndSet(int expect, int update)
         {
-            int rc = Interlocked.CompareExchange(ref _value, update, expect);
+            int rc = Interlocked.CompareExchange(ref value, update, expect);
             return rc == expect;
         }
 
@@ -82,7 +109,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The previous value, before the increment.</returns>
         public int GetAndIncrement()
         {
-            return Interlocked.Increment(ref _value) - 1;
+            return Interlocked.Increment(ref value) - 1;
         }
 
         /// <summary>
@@ -91,7 +118,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The previous value, before the decrement.</returns>
         public int GetAndDecrement()
         {
-            return Interlocked.Decrement(ref _value) + 1;
+            return Interlocked.Decrement(ref value) + 1;
         }
 
         /// <summary>
@@ -101,7 +128,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The previous value, before the addition.</returns>
         public int GetAndAdd(int value)
         {
-            return Interlocked.Add(ref this._value, value) - value;
+            return Interlocked.Add(ref this.value, value) - value;
         }
 
         /// <summary>
@@ -110,7 +137,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The updated value.</returns>
         public int IncrementAndGet()
         {
-            return Interlocked.Increment(ref _value);
+            return Interlocked.Increment(ref value);
         }
 
         /// <summary>
@@ -119,7 +146,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The updated value.</returns>
         public int DecrementAndGet()
         {
-            return Interlocked.Decrement(ref _value);
+            return Interlocked.Decrement(ref value);
         }
 
         /// <summary>
@@ -129,7 +156,7 @@ namespace J2N.Threading.Atomic
         /// <returns>The updated value.</returns>
         public int AddAndGet(int value)
         {
-            return Interlocked.Add(ref this._value, value);
+            return Interlocked.Add(ref this.value, value);
         }
 
         /// <summary>
@@ -187,7 +214,7 @@ namespace J2N.Threading.Atomic
         /// and a sequence of digits ranging from 0 to 9 with no leading zeroes.</returns>
         public override string ToString()
         {
-            return Value.ToString();
+            return J2N.Numerics.Int32.ToString(Value);
         }
 
         /// <summary>
@@ -197,9 +224,9 @@ namespace J2N.Threading.Atomic
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <returns>The string representation of the value of this instance as specified
         /// by <paramref name="format"/>.</returns>
-        public string ToString(string? format)
+        public override string ToString(string? format)
         {
-            return Value.ToString(format);
+            return J2N.Numerics.Int32.ToString(Value, format);
         }
 
         /// <summary>
@@ -208,9 +235,9 @@ namespace J2N.Threading.Atomic
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by <paramref name="provider"/>.</returns>
-        public string ToString(IFormatProvider? provider)
+        public override string ToString(IFormatProvider? provider)
         {
-            return Value.ToString(provider);
+            return J2N.Numerics.Int32.ToString(Value, provider);
         }
 
         /// <summary>
@@ -221,18 +248,61 @@ namespace J2N.Threading.Atomic
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>The string representation of the value of this instance as specified by
         /// <paramref name="format"/> and <paramref name="provider"/>.</returns>
-        public string ToString(string? format, IFormatProvider? provider)
+        public override string ToString(string? format, IFormatProvider? provider)
         {
-            return Value.ToString(format, provider);
+            return J2N.Numerics.Int32.ToString(Value, format, provider);
         }
 
         #region IConvertible Members
+
+        /// <inheritdoc/>
+        public override byte ToByte()
+        {
+            return (byte)Value;
+        }
+
+        /// <inheritdoc/>
+        [CLSCompliant(false)]
+        public override sbyte ToSByte()
+        {
+            return (sbyte)Value;
+        }
+
+        /// <inheritdoc/>
+        public override double ToDouble()
+        {
+            return Value;
+        }
+
+        /// <inheritdoc/>
+        public override float ToSingle()
+        {
+            return Value;
+        }
+
+        /// <inheritdoc/>
+        public override int ToInt32()
+        {
+            return Value;
+        }
+
+        /// <inheritdoc/>
+        public override long ToInt64()
+        {
+            return Value;
+        }
+
+        /// <inheritdoc/>
+        public override short ToInt16()
+        {
+            return (short)Value;
+        }
 
         /// <summary>
         /// Returns the <see cref="TypeCode"/> for value type <see cref="int"/>.
         /// </summary>
         /// <returns></returns>
-        public TypeCode GetTypeCode() => ((IConvertible)Value).GetTypeCode();
+        public TypeCode GetTypeCode() => TypeCode.Int32;
 
         bool IConvertible.ToBoolean(IFormatProvider? provider) => Convert.ToBoolean(Value);
 

@@ -1,26 +1,41 @@
-﻿using System;
+﻿#region Copyright 2010 by Apache Harmony, Licensed under the Apache License, Version 2.0
+/*  Licensed to the Apache Software Foundation (ASF) under one or more
+ *  contributor license agreements.  See the NOTICE file distributed with
+ *  this work for additional information regarding copyright ownership.
+ *  The ASF licenses this file to You under the Apache License, Version 2.0
+ *  (the "License"); you may not use this file except in compliance with
+ *  the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+#endregion
+
+using System;
+using System.Diagnostics;
+using System.Runtime.Serialization;
 using System.Threading;
-#nullable enable
 
 namespace J2N.Threading.Atomic
 {
-#if NET40
-    /// <summary>
-    /// An object reference that may be updated atomically.
-    /// </summary>
-#else
     /// <summary>
     /// An object reference that may be updated atomically.
     /// <para/>
-    /// Uses <see cref="Volatile"/> to enforce ordering of writes without any explicit locking.
+    /// Uses <see cref="Interlocked"/> to enforce ordering of writes without any explicit locking.
     /// </summary>
-#endif
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
+    [DebuggerDisplay("{Value}")]
     public class AtomicReference<T> where T : class
     {
         private T? value;
+        private static readonly T Comparand = (T)FormatterServices.GetUninitializedObject(typeof(T)); //does not call ctor
 
         /// <summary>
         /// Creates a new <see cref="AtomicReference{T}"/> with the given initial <paramref name="value"/>.
@@ -51,13 +66,8 @@ namespace J2N.Threading.Atomic
         /// </summary>
         public T? Value
         {
-#if NET40
-            get => value;
-            set => this.value = value;
-#else
-            get => Volatile.Read(ref value);
-            set => Volatile.Write(ref this.value, value);
-#endif
+            get => Interlocked.CompareExchange(ref value, Comparand, Comparand);
+            set => Interlocked.Exchange(ref this.value, value);
         }
 
         /// <summary>
