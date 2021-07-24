@@ -22,6 +22,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Collections\Generic\legacy-list-int.bin" />
+    <None Remove="Collections\Generic\legacy-list-string.bin" />
     <None Remove="hyts_PropertiesTest.properties" />
     <None Remove="IO\ReadFully.txt" />
     <None Remove="test_resource.txt" />
@@ -32,6 +34,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Collections\Generic\legacy-list-int.bin" />
+    <EmbeddedResource Include="Collections\Generic\legacy-list-string.bin" />
     <EmbeddedResource Include="hyts_PropertiesTest.properties" />
     <EmbeddedResource Include="IO\ReadFully.txt" />
     <EmbeddedResource Include="test_resource.txt" />

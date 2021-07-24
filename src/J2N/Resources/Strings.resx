@@ -123,11 +123,17 @@
   <data name="ArgumentOutOfRange_BiggerThanCollection" xml:space="preserve">
     <value>Must be less than or equal to the size of the collection.</value>
   </data>
+  <data name="ArgumentOutOfRange_Count" xml:space="preserve">
+    <value>Count must be positive and count must refer to a location within the string/array/collection.</value>
+  </data>
   <data name="ArgumentOutOfRange_Index" xml:space="preserve">
     <value>Index was out of range. Must be non-negative and less than the size of the collection.</value>
   </data>
   <data name="ArgumentOutOfRange_IndexLength" xml:space="preserve">
     <value>Index and length must refer to a location within the string.</value>
+  </data>
+  <data name="ArgumentOutOfRange_ListInsert" xml:space="preserve">
+    <value>Index must be within the bounds of the List.</value>
   </data>
   <data name="ArgumentOutOfRange_NeedCapacityAtLeast1" xml:space="preserve">
     <value>capacity must be at least 1.</value>
@@ -194,6 +200,9 @@
   </data>
   <data name="Arg_BitArrayTypeUnsupported" xml:space="preserve">
     <value>Only supported array types for CopyTo on BitArrays are Boolean[], Int32[] and Byte[].</value>
+  </data>
+  <data name="Arg_BogusIComparer" xml:space="preserve">
+    <value>Unable to sort because the IComparer.Compare() method returns inconsistent results. Either a value does not compare equal to itself, or one value repeatedly compared to another value yields different results. IComparer: '{0}'.</value>
   </data>
   <data name="Arg_ExponentRequiredIfTypeSpecifierUsed" xml:space="preserve">
     <value>With the AllowHexSpecifier and AllowTypeSpecifier bits set in the enum bit field, the parser is unable to distinguish between a type specifier d, D, f, or F and a hexadecimal digit. Therefore, AllowExponent is also required to delineate between hexadecimal digits and type specifier and an exponent must be supplied if type specifier d, D, f, or F is used.</value>
@@ -329,6 +338,12 @@
   </data>
   <data name="InvalidOperation_EnumOpCantHappen" xml:space="preserve">
     <value>Enumeration has either not started or has already finished.</value>
+  </data>
+  <data name="InvalidOperation_IComparerFailed" xml:space="preserve">
+    <value>Failed to compare two elements in the array.</value>
+  </data>
+  <data name="InvalidOperation_ViewFailedVersion" xml:space="preserve">
+    <value>Ancestral collection was modified after the view was instantiated.</value>
   </data>
   <data name="LinkedListEmpty" xml:space="preserve">
     <value>The LinkedList is empty.</value>
