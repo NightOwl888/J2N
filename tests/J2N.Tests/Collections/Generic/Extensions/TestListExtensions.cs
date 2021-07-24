@@ -374,8 +374,8 @@ namespace J2N.Collections.Generic.Extensions
 
             try
             {
-                smallList.Swap(6, 11);
-                fail("Expected ArgumentOutOfRangeException for 11");
+                smallList.Swap(6, 10); // J2N: We need to test against Count, not Count + 1, since that is the minimum error case
+                fail("Expected ArgumentOutOfRangeException for 10");
             }
             catch (ArgumentOutOfRangeException e)
             {
@@ -384,8 +384,8 @@ namespace J2N.Collections.Generic.Extensions
 
             try
             {
-                smallList.Swap(11, 6);
-                fail("Expected ArgumentOutOfRangeException for 11");
+                smallList.Swap(10, 6); // J2N: We need to test against Count, not Count + 1, since that is the minimum error case
+                fail("Expected ArgumentOutOfRangeException for 10");
             }
             catch (ArgumentOutOfRangeException e)
             {

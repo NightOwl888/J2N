@@ -468,7 +468,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <paramref name="index2"/>.</param>
         /// <param name="index2">Position of the other element.</param>
         /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index1"/> or <paramref name="index2"/> is greater than <c><paramref name="list"/>.Count</c>.
+        /// <paramref name="index1"/> or <paramref name="index2"/> is greater than or equal to <c><paramref name="list"/>.Count</c>.
         /// <para/>
         /// -or-
         /// <para/>
@@ -477,21 +477,17 @@ namespace J2N.Collections.Generic.Extensions
         /// <exception cref="ArgumentNullException">If <paramref name="list"/> is <c>null</c>.</exception>
         public static void Swap<T>(this IList<T> list, int index1, int index2)
         {
-            //Contract.Requires<ArgumentNullException>(list != null);
-            //Contract.Requires<ArgumentOutOfRangeException>(index1 >= 0 && index1 < list.Count);
-            //Contract.Requires<ArgumentOutOfRangeException>(index2 >= 0 && index2 < list.Count);
-
-            if (list == null)
+            if (list is null)
                 throw new ArgumentNullException(nameof(list));
             int size = list.Count;
-            if (index1 < 0 || index1 > size)
-                throw new ArgumentOutOfRangeException(nameof(index1));
-            if (index2 < 0 || index2 > size)
-                throw new ArgumentOutOfRangeException(nameof(index2));
+            if (index1 < 0 || index1 >= size)
+                throw new ArgumentOutOfRangeException(nameof(index1), index1, SR.ArgumentOutOfRange_Index);
+            if (index2 < 0 || index2 >= size)
+                throw new ArgumentOutOfRangeException(nameof(index2), index2, SR.ArgumentOutOfRange_Index);
 
-            T tmp = list[index1];
+            T temp = list[index1];
             list[index1] = list[index2];
-            list[index2] = tmp;
+            list[index2] = temp;
         }
 
         #endregion
