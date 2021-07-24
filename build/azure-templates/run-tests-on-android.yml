@@ -54,7 +54,7 @@ steps:
             [string]$ramSize = '4096',
             [string]$diskDataPartitionSize = '2G',
             [string]$sdCardSize = '4G',
-            [string]$vmHeapSize = '512'
+            [string]$vmHeapSize = '768'
         )
 
         # Move the file to a temporary location
