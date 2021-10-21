@@ -195,7 +195,11 @@ namespace J2N
         /// </summary>
         /// <returns>A random <see cref="float"/> number between [0.0 and 1.0).</returns>
         /// <seealso cref="NextDouble()"/>
+#if FEATURE_RANDOM_NEXTSINGLE
+        public override float NextSingle()
+#else
         public virtual float NextSingle()
+#endif
         {
             return (NextInt(24) / 16777216f);
         }
@@ -312,7 +316,11 @@ namespace J2N
         /// <seealso cref="Next()"/>
         /// <seealso cref="Next(int)"/>
         /// <seealso cref="Next(int, int)"/>
+#if FEATURE_RANDOM_NEXTINT64
+        public override long NextInt64()
+#else
         public virtual long NextInt64()
+#endif
         {
             return ((long)NextInt(32) << 32) + NextInt(32);
         }
