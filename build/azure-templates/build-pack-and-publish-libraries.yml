@@ -15,6 +15,7 @@ parameters:
   fileVersion: '' # The AssemblyFileVersion that will be passed to dotnet build.
   assemblyVersion: '' # The AssemblyVersion that will be passed to dotnet build.
   packageVersion: '' # The NuGet version that will be passed to dotnet pack.
+  buildSdkVersion: '' # The SDK version to use to run the build
   buildConfiguration: 'Release' # Defines the build configuration. Default 'Release'.
   buildPlatform: 'Any CPU' # Defines the build platform. Default 'Any CPU'.
   nugetArtifactName: 'nuget' # The name of the Azure DevOps build artifact where the NuGet assets (.nupkg and .pdb files) will be output. Default 'nuget'.
@@ -36,6 +37,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.fileVersion }}', 'fileVersion')
     EnsureNotNullOrEmpty('${{ parameters.assemblyVersion }}', 'assemblyVersion')
     EnsureNotNullOrEmpty('${{ parameters.packageVersion }}', 'packageVersion')
+    EnsureNotNullOrEmpty('${{ parameters.buildSdkVersion }}', 'buildSdkVersion')
     EnsureNotNullOrEmpty('${{ parameters.buildConfiguration }}', 'buildConfiguration')
     EnsureNotNullOrEmpty('${{ parameters.buildPlatform }}', 'buildPlatform')
     EnsureNotNullOrEmpty('${{ parameters.nugetArtifactName }}', 'nugetArtifactName')
@@ -44,9 +46,16 @@ steps:
   displayName: 'Validate Template Parameters'
 
 - task: UseDotNet@2
-  displayName: 'Use .NET sdk 5.0.100'
+  displayName: 'Use .NET sdk ${{ parameters.buildSdkVersion }}'
   inputs:
-    version: 5.0.100
+    packageType: 'sdk'
+    version: ${{ parameters.buildSdkVersion }}
+
+# Fix errors with not being able to locate SDK: https://developercommunity.visualstudio.com/t/nuget-restore-fails-because-net-core-sdk-cannot-be/598541
+- pwsh: dotnet new globaljson --sdk-version '${{ parameters.buildSdkVersion }}'
+
+#- template: 'show-all-files.yml' # Uncomment for debugging
+#- template: 'show-all-environment-variables.yml' # Uncomment for debugging
 
   # Runs dotnet build 
 - task: DotNetCoreCLI@2

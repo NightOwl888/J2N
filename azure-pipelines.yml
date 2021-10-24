@@ -18,7 +18,9 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 
 variables:
 - name: TestTargetFrameworks
-  value: 'net5.0;netcoreapp3.1;netcoreapp3.0;netcoreapp2.1;net461;net452'
+  value: 'net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;net48;net461;net452'
+- name: BuildSDKVersion
+  value: '6.0.100-rc.2.21505.57'
 - name: BinaryArtifactName
   value: 'testbinaries'
 - name: NuGetArtifactName
@@ -59,6 +61,7 @@ stages:
         fileVersion: '$(FileVersion)' # Output from gitversioning-increment-and-persist-versions.yml
         assemblyVersion: '$(AssemblyVersion)' # Output from gitversioning-increment-and-persist-versions.yml
         packageVersion: '$(PackageVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        buildSdkVersion: '$(BuildSDKVersion)'
         buildConfiguration: '$(BuildConfiguration)'
         buildPlatform: '$(BuildPlatform)'
         nugetArtifactName: '$(NuGetArtifactName)'
@@ -101,6 +104,62 @@ stages:
   displayName: 'Test Stage:'
   jobs:
 
+  - job: Test_net6_0_x64
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    strategy:
+      matrix:
+        Windows:
+          osName: 'Windows'
+          imageName: 'windows-2019'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        Linux:
+          osName: 'Linux'
+          imageName: 'ubuntu-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        macOS:
+          osName: 'macOS'
+          imageName: 'macOS-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+    displayName: 'Test net6.0,x64 on'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - template: 'build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: $(osName)
+        testTargetFrameworks: 'net6.0'
+        vsTestPlatform: 'x64'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: $(maximumAllowedFailures)
+
+  - job: Test_net6_0_x86 # Only run if explicitly enabled with RunX86Tests
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
+    strategy:
+      matrix:
+        Windows:
+          osName: 'Windows'
+          imageName: 'windows-2019'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        Linux:
+          osName: 'Linux'
+          imageName: 'ubuntu-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        macOS:
+          osName: 'macOS'
+          imageName: 'macOS-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+    displayName: 'Test net6.0,x86 on'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - template: 'build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: $(osName)
+        testTargetFrameworks: 'net6.0'
+        vsTestPlatform: 'x86'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: $(maximumAllowedFailures)
+
   - job: Test_net5_0_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
     strategy:
@@ -111,11 +170,11 @@ stages:
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         Linux:
           osName: 'Linux'
-          imageName: 'ubuntu-20.04'
+          imageName: 'ubuntu-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         macOS:
           osName: 'macOS'
-          imageName: 'macOS-10.15'
+          imageName: 'macOS-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
     displayName: 'Test net5.0,x64 on'
     pool:
@@ -139,11 +198,11 @@ stages:
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         Linux:
           osName: 'Linux'
-          imageName: 'ubuntu-20.04'
+          imageName: 'ubuntu-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         macOS:
           osName: 'macOS'
-          imageName: 'macOS-10.15'
+          imageName: 'macOS-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
     displayName: 'Test net5.0,x86 on'
     pool:
@@ -167,11 +226,11 @@ stages:
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         Linux:
           osName: 'Linux'
-          imageName: 'ubuntu-20.04'
+          imageName: 'ubuntu-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         macOS:
           osName: 'macOS'
-          imageName: 'macOS-10.15'
+          imageName: 'macOS-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
     displayName: 'Test netcoreapp3.1,x64 on'
     pool:
@@ -195,11 +254,11 @@ stages:
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         Linux:
           osName: 'Linux'
-          imageName: 'ubuntu-20.04'
+          imageName: 'ubuntu-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         macOS:
           osName: 'macOS'
-          imageName: 'macOS-10.15'
+          imageName: 'macOS-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
     displayName: 'Test netcoreapp3.1,x86 on'
     pool:
@@ -223,11 +282,11 @@ stages:
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         Linux:
           osName: 'Linux'
-          imageName: 'ubuntu-20.04'
+          imageName: 'ubuntu-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         macOS:
           osName: 'macOS'
-          imageName: 'macOS-10.15'
+          imageName: 'macOS-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
     displayName: 'Test netcoreapp3.0,x64 on'
     pool:
@@ -251,11 +310,11 @@ stages:
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         Linux:
           osName: 'Linux'
-          imageName: 'ubuntu-20.04'
+          imageName: 'ubuntu-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         macOS:
           osName: 'macOS'
-          imageName: 'macOS-10.15'
+          imageName: 'macOS-latest'
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
     displayName: 'Test netcoreapp3.0,x86 on'
     pool:
@@ -269,61 +328,33 @@ stages:
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
 
-  - job: Test_netcoreapp2_1_x64
+  - job: Test_net48_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    strategy:
-      matrix:
-        Windows:
-          osName: 'Windows'
-          imageName: 'windows-2019'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        Linux:
-          osName: 'Linux'
-          imageName: 'ubuntu-20.04'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        macOS:
-          osName: 'macOS'
-          imageName: 'macOS-10.15'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-    displayName: 'Test netcoreapp2.1,x64 on'
+    displayName: 'Test net48,x64 on Windows'
     pool:
-      vmImage: $(imageName)
+      vmImage: 'windows-2019'
     steps:
     - template: 'build/azure-templates/run-tests-on-os.yml'
       parameters:
-        osName: $(osName)
-        testTargetFrameworks: 'netcoreapp2.1'
+        osName: 'Windows'
+        testTargetFrameworks: 'net48'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: $(maximumAllowedFailures)
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
 
-  - job: Test_netcoreapp2_1_x86 # Only run if explicitly enabled with RunX86Tests
+  - job: Test_net48_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
-    strategy:
-      matrix:
-        Windows:
-          osName: 'Windows'
-          imageName: 'windows-2019'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        Linux:
-          osName: 'Linux'
-          imageName: 'ubuntu-20.04'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        macOS:
-          osName: 'macOS'
-          imageName: 'macOS-10.15'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-    displayName: 'Test netcoreapp2.1,x86 on'
+    displayName: 'Test net48,x86 on Windows'
     pool:
-      vmImage: $(imageName)
+      vmImage: 'windows-2019'
     steps:
     - template: 'build/azure-templates/run-tests-on-os.yml'
       parameters:
-        osName: $(osName)
-        testTargetFrameworks: 'netcoreapp2.1'
+        osName: 'Windows'
+        testTargetFrameworks: 'net48'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: $(maximumAllowedFailures)
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
 
   - job: Test_net461_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -385,7 +416,7 @@ stages:
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
     displayName: 'Test MonoAndroid90,x86_64 on macOS'
     pool:
-      vmImage: 'macOS-10.15'
+      vmImage: 'macOS-latest'
     steps:
     - template: 'build/azure-templates/run-tests-on-android.yml'
       parameters:
@@ -399,7 +430,7 @@ stages:
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
     displayName: 'Test MonoAndroid90,x86 on macOS'
     pool:
-      vmImage: 'macOS-10.15'
+      vmImage: 'macOS-latest'
     steps:
     - template: 'build/azure-templates/run-tests-on-android.yml'
       parameters:
@@ -413,7 +444,7 @@ stages:
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
     displayName: 'Test MonoAndroid100,x86_64 on macOS'
     pool:
-      vmImage: 'macOS-10.15'
+      vmImage: 'macOS-latest'
     steps:
     - template: 'build/azure-templates/run-tests-on-android.yml'
       parameters:
@@ -427,7 +458,7 @@ stages:
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
     displayName: 'Test MonoAndroid100,x86 on macOS'
     pool:
-      vmImage: 'macOS-10.15'
+      vmImage: 'macOS-latest'
     steps:
     - template: 'build/azure-templates/run-tests-on-android.yml'
       parameters:
