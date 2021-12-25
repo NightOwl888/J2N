@@ -40,6 +40,9 @@ namespace J2N.Collections.Generic
         ///         which differs from the default .NET behavior, where NaN is never equal to NaN.
         ///     </description></item>
         ///     <item><description>
+        ///         <see cref="double"/>? and <see cref="float"/>? are first compared for <c>null</c> prior to applying the above rules.
+        ///     </description></item>
+        ///     <item><description>
         ///         <see cref="string"/> uses culture-insensitive comparison using <see cref="StringComparer.Ordinal"/>.
         ///     </description></item>
         /// </list>
@@ -50,11 +53,22 @@ namespace J2N.Collections.Generic
         {
             Type genericClosingType = typeof(T);
 
+            if (genericClosingType.IsGenericType && genericClosingType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                // Special cases to match Java equality behavior
+                if (typeof(double?).Equals(genericClosingType))
+                    return (IComparer<T>)NullableDoubleComparer.Default;
+                else if (typeof(float?).Equals(genericClosingType))
+                    return (IComparer<T>)NullableSingleComparer.Default;
+
+                return System.Collections.Generic.Comparer<T>.Default;
+            }
+
             // Special cases to match Java equality behavior
             if (typeof(double).Equals(genericClosingType))
-                return (IComparer<T>)new EqualityComparer<T>.DoubleComparer();
+                return (IComparer<T>)DoubleComparer.Default;
             else if (typeof(float).Equals(genericClosingType))
-                return (IComparer<T>)new EqualityComparer<T>.SingleComparer();
+                return (IComparer<T>)SingleComparer.Default;
             else if (typeof(string).Equals(genericClosingType))
                 return (IComparer<T>)StringComparer.Ordinal;
 
