@@ -52,16 +52,6 @@ namespace J2N.Text
         /// </summary>
         public static StringFormatter CurrentUICulture { get; } = new StringFormatter(CultureType.CurrentUICulture);
 
-        ///// <summary>
-        ///// Gets a <see cref="StringFormatter"/> that uses the default culture for threads in the current application domain to format values.
-        ///// </summary>
-        //public static StringFormatter DefaultThreadCurrentCulture { get; } = new StringFormatter(CultureType.DefaultThreadCurrentCulture);
-
-        ///// <summary>
-        ///// Gets a <see cref="StringFormatter"/> that uses the default UI culture for threads in the current application domain to format values.
-        ///// </summary>
-        //public static StringFormatter DefaultThreadCurrentUICulture { get; } = new StringFormatter(CultureType.DefaultThreadCurrentUICulture);
-
         /// <summary>
         /// Gets a <see cref="StringFormatter"/> that uses the invariant culture to format values.
         /// This is the default setting in Java.
@@ -116,14 +106,6 @@ namespace J2N.Text
                         return CultureInfo.CurrentCulture;
                     case CultureType.CurrentUICulture:
                         return CultureInfo.CurrentUICulture;
-#if FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE
-                    case CultureType.DefaultThreadCurrentCulture:
-                        return CultureInfo.DefaultThreadCurrentCulture ?? CultureInfo.CurrentCulture;
-#endif
-#if FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE
-                    case CultureType.DefaultThreadCurrentUICulture:
-                        return CultureInfo.DefaultThreadCurrentUICulture ?? CultureInfo.CurrentUICulture;
-#endif
                     default:
                         return CultureInfo.CurrentCulture;
                 }
@@ -134,8 +116,6 @@ namespace J2N.Text
         {
             CurrentCulture,
             CurrentUICulture,
-            DefaultThreadCurrentCulture,
-            DefaultThreadCurrentUICulture,
             InvariantCulture,
             CustomCulture
         }
