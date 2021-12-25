@@ -65,6 +65,8 @@ namespace J2N.Text
         private CultureInfo? culture; // not readonly for deserialization
         private readonly CultureType? cultureType;
 
+        private IFormatProvider? formatProvider; // NOTE: This needs to be [Serializable] to support serialization. Note on .NET Core serialization has been dropped on these implementations.
+
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/>.
         /// </summary>
@@ -74,6 +76,10 @@ namespace J2N.Text
 
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/> with the specified <paramref name="culture"/>.
+        /// <para/>
+        /// <b>NOTE:</b> This overload only supports serialization of built-in cultures. If you require serialization and have a custom implementation,
+        /// you will need to provide a serializable wrapper to the <see cref="StringFormatter.StringFormatter(IFormatProvider)"/> constructor. Note that
+        /// on .NET Core and newer .NET platforms serialization is not supported for <see cref="CultureInfo"/>, <see cref="NumberFormatInfo"/> and <see cref="DateTimeFormatInfo"/>.
         /// </summary>
         /// <param name="culture">A <see cref="CultureInfo"/> that specifies the culture-specific rules that will be used for formatting.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
@@ -84,6 +90,21 @@ namespace J2N.Text
             this.cultureSymbol = this.culture.Name.ToCharArray(); // For deserialization
         }
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="StringFormatter"/> with the specified <paramref name="formatProvider"/>.
+        /// <para/>
+        /// <b>NOTE:</b> If binary serialization is required, the type passed must be annotated with the <see cref="SerializableAttribute"/> and otherwise be
+        /// setup for serialization and deserialization. However, note that on .NET Core and newer .NET platforms serialization is not supported for
+        /// <see cref="CultureInfo"/>, <see cref="NumberFormatInfo"/> and <see cref="DateTimeFormatInfo"/>.
+        /// </summary>
+        /// <param name="formatProvider">An <see cref="IFormatProvider"/> that specifies the culture-specific rules that will be used for formatting.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="formatProvider"/> is <c>null</c>.</exception>
+        public StringFormatter(IFormatProvider formatProvider)
+            : this(CultureType.IFormatProvider)
+        {
+            this.formatProvider = formatProvider ?? throw new ArgumentNullException(nameof(formatProvider));
+        }
+
         internal StringFormatter(CultureType cultureType)
         {
             this.cultureType = cultureType;
@@ -92,6 +113,7 @@ namespace J2N.Text
         /// <summary>
         /// Gets the culture of the current instance.
         /// </summary>
+        [Obsolete("Store the CultureInfo in your subclass from the CultureInfo constructor. Note that .NET doesn't provide a reliable way to get from IFormatProvider > CultureInfo, so this will return the current cultue when using the IFormatProvider constructor.")]
         protected virtual CultureInfo Culture
         {
             get
@@ -112,12 +134,38 @@ namespace J2N.Text
             }
         }
 
+        /// <summary>
+        /// Gets the <see cref="IFormatProvider"/> of the current instance.
+        /// </summary>
+        private IFormatProvider FormatProvider
+        {
+            get
+            {
+                switch (cultureType)
+                {
+                    case CultureType.IFormatProvider:
+                        return formatProvider!;
+                    case CultureType.CustomCulture:
+                        return culture!;
+                    case CultureType.InvariantCulture:
+                        return CultureInfo.InvariantCulture;
+                    case CultureType.CurrentCulture:
+                        return CultureInfo.CurrentCulture;
+                    case CultureType.CurrentUICulture:
+                        return CultureInfo.CurrentUICulture;
+                    default:
+                        return CultureInfo.CurrentCulture;
+                }
+            }
+        }
+
         internal enum CultureType
         {
             CurrentCulture,
             CurrentUICulture,
             InvariantCulture,
-            CustomCulture
+            CustomCulture,
+            IFormatProvider
         }
 
         /// <summary>
@@ -130,9 +178,9 @@ namespace J2N.Text
             if (typeof(ICustomFormatter).Equals(formatType))
                 return this;
             if (typeof(NumberFormatInfo).Equals(formatType))
-                return NumberFormatInfo.GetInstance(Culture);
+                return NumberFormatInfo.GetInstance(FormatProvider);
             if (typeof(DateTimeFormatInfo).Equals(formatType))
-                return DateTimeFormatInfo.GetInstance(Culture);
+                return DateTimeFormatInfo.GetInstance(FormatProvider);
 
             return null;
         }
@@ -230,10 +278,15 @@ namespace J2N.Text
         {
             // We only need to deserialize custom cultures. Note that if it is not a built-in
             // culture, this will fail.
-            // J2N TODO: On newer .NET platforms, there is an overload that accepts a predefinedOnly parameter
-            // that when set to false allows retrieving made-up cultures. Need to investigate.
             if (cultureType == CultureType.CustomCulture)
-                this.culture = CultureInfo.GetCultureInfo(new string(this.cultureSymbol!));
+            {
+                this.culture = CultureInfo.GetCultureInfo(new string(this.cultureSymbol!)
+#if FEATURE_CULTUREINFO_PREDEFINEDONLY
+                    , predefinedOnly: true // We only support predefined cultures for serialization. End users must provide their own serializable IFormatProvider implementation for other types.
+#endif
+                    );
+            }
+
         }
 #endif
 

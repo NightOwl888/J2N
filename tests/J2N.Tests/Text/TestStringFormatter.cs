@@ -131,6 +131,16 @@ namespace J2N.Text
         public void TestDecimalPlaces_Double()
         {
             assertEquals("22.0", string.Format(StringFormatter.InvariantCulture, "{0}", 22d));
+
+            assertEquals("22,0", string.Format(new StringFormatter(new CultureInfo("fr-FR")), "{0}", 22d));
+        }
+
+        [Test]
+        public void TestIFormatProvider_Double()
+        {
+            assertEquals("22.0", string.Format((IFormatProvider)StringFormatter.InvariantCulture, "{0}", 22d));
+
+            assertEquals("22,0", string.Format(new StringFormatter((IFormatProvider)new CultureInfo("fr-FR")), "{0}", 22d));
         }
 
         [Test]
