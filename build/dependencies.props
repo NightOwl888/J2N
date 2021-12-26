@@ -3,6 +3,8 @@
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
+    <MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>1.1.1</MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>
+    <MicrosoftSourceLinkGitHubPackageReferenceVersion>$(MicrosoftSourceLinkAzureReposGitPackageReferenceVersion)</MicrosoftSourceLinkGitHubPackageReferenceVersion>
     <NerdBankGitVersioningPackageReferenceVersion>[3.3.37]</NerdBankGitVersioningPackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
