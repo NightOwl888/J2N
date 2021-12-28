@@ -20,7 +20,7 @@ variables:
 - name: TestTargetFrameworks
   value: 'net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;net48;net461;net452'
 - name: BuildSDKVersion
-  value: '6.0.100-rc.2.21505.57'
+  value: '6.0.101'
 - name: BinaryArtifactName
   value: 'testbinaries'
 - name: NuGetArtifactName
