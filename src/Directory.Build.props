@@ -7,13 +7,6 @@
     <SolutionDir Condition=" '$(SolutionDir)' == '' ">$(MSBuildThisFileDirectory)../</SolutionDir>
   </PropertyGroup>
 
-  <Import Project="$(RepositoryRoot)build/nuget.props" />
-
-  <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning">
-      <Version>$(NerdBankGitVersioningPackageReferenceVersion)</Version>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+  <Import Project="$(RepositoryRoot).build/nuget.props" />
   
 </Project>

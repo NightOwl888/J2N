@@ -38,7 +38,7 @@ Much of what is here has been tested pretty thoroughly already and the APIs are 
 Install-Package J2N -Pre
 ```
 
-### Contributing
+## Contributing
 
 We love getting contributions! If you need something from the JDK that we don't have, this is the right place to submit it. Basically, the following are things that would be a good fit for this library:
 
@@ -46,7 +46,11 @@ We love getting contributions! If you need something from the JDK that we don't 
 2. Features that make J2N easier to work with in .NET such as extension methods and adapters
 3. Features that make .NET interoperate with Java better
 
-### Giving Back
+## Building and Testing
+
+To build the project from source, see the [Building and Testing documentation](https://github.com/NightOwl888/J2N/blob/main/docs/building-and-testing.md).
+
+## Saying Thanks
 
 If you find this library to be useful, please star us on GitHub and consider a sponsorship so we can continue bringing you great free tools like this one.
 

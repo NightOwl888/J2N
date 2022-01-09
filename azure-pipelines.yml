@@ -11,15 +11,20 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 # DevOps Setup: Define the following pipeline level variables in Azure DevOps build pipeline
 #
 # ArtifactFeedID: (Optional - set to your Azure DevOps Artifact (NuGet) feed. If not provided, publish job will be skipped.)
-# BuildConfiguration: 'Release'
-# BuildPlatform: 'Any CPU'
+# BuildConfiguration: 'Release' (Optional - the solution build configuration to run.)
+# BuildPlatform: 'Any CPU' (Optional - the build platform to use when compiling assemblies.)
 # RunTests: 'true' (Optional - set to 'false' to disable test jobs - useful for debugging. If not provided, tests will be run.)
 # RunX86Tests: 'false' (Optional - set to 'true' to enable x86 tests)
+#
+# PackageVersion: '' (Optional. Will be generated from nbgv if not provided. The version of the NuGet package.)
+# AssemblyVersion: '' (Optional. Will be generated from nbgv if not provided. The assembly version (affects binary compatibility). This should always be the same as the previous version unless a binary breaking change happens (i.e. porting a new version).)
+# FileVersion: '' (Optional. Will be generated from nbgv if not provided. The version that is visible on the assembly file.)
+# InformationalVersion: '' (Optional. Will be generated from nbgv if not provided. If provided, the git commit hash will be appended to the end of the value.)
 
 variables:
 - name: TestTargetFrameworks
   value: 'net6.0;net5.0;netcoreapp3.1;netcoreapp3.0;net48;net461;net452'
-- name: BuildSDKVersion
+- name: DotNetSDKVersion
   value: '6.0.101'
 - name: BinaryArtifactName
   value: 'testbinaries'
@@ -46,22 +51,44 @@ stages:
       vmImage: 'windows-2019'
 
     steps:
-    - template: 'build/azure-templates/gitversioning-increment-and-persist-versions.yml'
+    - pwsh: |
+        $configuration = if ($env:BUILDCONFIGURATION) { $env:BUILDCONFIGURATION } else { "Release" }
+        Write-Host "##vso[task.setvariable variable=BuildConfiguration;]$configuration"
+        $platform = if ($env:BUILDPLATFORM) { $env:BUILDPLATFORM } else { "Any CPU" }
+        Write-Host "##vso[task.setvariable variable=BuildPlatform;]$platform"
+        $informationalVersion = if ($env:INFORMATIONALVERSION) { $env:INFORMATIONALVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=InformationalVersion;]$informationalVersion"
+        $fileVersion = if ($env:FILEVERSION) { $env:FILEVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=FileVersion;]$fileVersion"
+        $assemblyVersion = if ($env:ASSEMBLYVERSION) { $env:ASSEMBLYVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=AssemblyVersion;]$assemblyVersion"
+        $packageVersion = if ($env:PACKAGEVERSION) { $env:PACKAGEVERSION } else { '' }
+        Write-Host "##vso[task.setvariable variable=PackageVersion;]$packageVersion"
+      displayName: 'Setup Default Variable Values'
+
+    - template: '.build/azure-templates/install-dotnet-sdk.yml'
       parameters:
+        sdkVersion: '$(DotNetSDKVersion)'
+    
+    - template: '.build/azure-templates/gitversioning-increment-and-persist-versions.yml'
+      parameters:
+        informationalVersion: '$(InformationalVersion)' # Input passed in from pipeline
+        fileVersion: '$(FileVersion)' # Input passed in from pipeline
+        assemblyVersion: '$(AssemblyVersion)' # Input passed in from pipeline
+        packageVersion: '$(PackageVersion)' # Input passed in from pipeline
         versionArtifactName: '$(VersionArtifactName)'
         packageVersionFileName: '$(PackageVersionFileName)'
         fileVersionFileName: '$(FileVersionFileName)'
         buildNumberFileName: '$(BuildNumberFileName)'
 
-    - template: 'build/azure-templates/build-pack-and-publish-libraries.yml'
+    - template: '.build/azure-templates/build-pack-and-publish-libraries.yml'
       parameters:
         artifactFeedID: '$(ArtifactFeedID)'
         testTargetFrameworks: '$(TestTargetFrameworks)'
-        informationalVersion: '$(InformationalVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        fileVersion: '$(FileVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        assemblyVersion: '$(AssemblyVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        packageVersion: '$(PackageVersion)' # Output from gitversioning-increment-and-persist-versions.yml
-        buildSdkVersion: '$(BuildSDKVersion)'
+        informationalVersion: '$(CI_InformationalVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        fileVersion: '$(CI_FileVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        assemblyVersion: '$(CI_AssemblyVersion)' # Output from gitversioning-increment-and-persist-versions.yml
+        packageVersion: '$(CI_PackageVersion)' # Output from gitversioning-increment-and-persist-versions.yml
         buildConfiguration: '$(BuildConfiguration)'
         buildPlatform: '$(BuildPlatform)'
         nugetArtifactName: '$(NuGetArtifactName)'
@@ -124,13 +151,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net6.0'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net6_0_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -152,13 +180,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net6.0'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net5_0_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -180,13 +209,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net5.0'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net5_0_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -208,13 +238,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'net5.0'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_netcoreapp3_1_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -236,13 +267,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'netcoreapp3.1'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_netcoreapp3_1_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -264,13 +296,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'netcoreapp3.1'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_netcoreapp3_0_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -292,13 +325,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'netcoreapp3.0'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_netcoreapp3_0_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -320,13 +354,14 @@ stages:
     pool:
       vmImage: $(imageName)
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
         testTargetFrameworks: 'netcoreapp3.0'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net48_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -334,13 +369,14 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net48'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net48_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -348,13 +384,14 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net48'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net461_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -362,13 +399,14 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net461'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net461_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -376,13 +414,14 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net461'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net452_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -390,13 +429,14 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net452'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_net452_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -404,13 +444,14 @@ stages:
     pool:
       vmImage: 'windows-2019'
     steps:
-    - template: 'build/azure-templates/run-tests-on-os.yml'
+    - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
         testTargetFrameworks: 'net452'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_MonoAndroid90_x86_64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -418,13 +459,14 @@ stages:
     pool:
       vmImage: 'macOS-latest'
     steps:
-    - template: 'build/azure-templates/run-tests-on-android.yml'
+    - template: '.build/azure-templates/run-tests-on-android.yml'
       parameters:
         osName: 'Android'
         testTargetFrameworks: 'MonoAndroid90'
         androidAbi: 'x86_64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_MonoAndroid90_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -432,13 +474,14 @@ stages:
     pool:
       vmImage: 'macOS-latest'
     steps:
-    - template: 'build/azure-templates/run-tests-on-android.yml'
+    - template: '.build/azure-templates/run-tests-on-android.yml'
       parameters:
         osName: 'Android'
         testTargetFrameworks: 'MonoAndroid90'
         androidAbi: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_MonoAndroid100_x86_64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
@@ -446,13 +489,14 @@ stages:
     pool:
       vmImage: 'macOS-latest'
     steps:
-    - template: 'build/azure-templates/run-tests-on-android.yml'
+    - template: '.build/azure-templates/run-tests-on-android.yml'
       parameters:
         osName: 'Android'
         testTargetFrameworks: 'MonoAndroid100'
         androidAbi: 'x86_64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_MonoAndroid100_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
@@ -460,13 +504,14 @@ stages:
     pool:
       vmImage: 'macOS-latest'
     steps:
-    - template: 'build/azure-templates/run-tests-on-android.yml'
+    - template: '.build/azure-templates/run-tests-on-android.yml'
       parameters:
         osName: 'Android'
         testTargetFrameworks: 'MonoAndroid100'
         androidAbi: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
 
 
 - stage: Publish_Stage
@@ -478,7 +523,7 @@ stages:
       vmImage: 'windows-2019'
 
     steps:
-    - template: 'build/azure-templates/show-all-environment-variables.yml'
+    - template: '.build/azure-templates/show-all-environment-variables.yml'
 
     - task: DownloadBuildArtifacts@0
       displayName: 'Download Build Artifacts: $(VersionArtifactName)'
@@ -494,9 +539,9 @@ stages:
         Write-Host "##vso[build.updatebuildnumber]$version"
       displayName: 'Read PackageVersion from File to Build.BuildNumber'
 
-    - template: 'build/azure-templates/show-all-environment-variables.yml'
+    - template: '.build/azure-templates/show-all-environment-variables.yml'
 
-    - template: 'build/azure-templates/publish-nuget-packages.yml'
+    - template: '.build/azure-templates/publish-nuget-packages.yml'
       parameters:
         artifactFeedID: '$(ArtifactFeedID)'
         nugetArtifactName: '$(NuGetArtifactName)'
