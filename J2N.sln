@@ -19,32 +19,39 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N", "src\J2N\J2N.csproj",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Tests", "tests\J2N.Tests\J2N.Tests.csproj", "{B5C3F10C-5760-4F55-9C43-9D27393F6614}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{216D6502-628E-401D-AACE-1E0687164325}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{216D6502-628E-401D-AACE-1E0687164325}"
 	ProjectSection(SolutionItems) = preProject
 		azure-pipelines.yml = azure-pipelines.yml
-		build\dependencies.props = build\dependencies.props
-		build\nuget.props = build\nuget.props
-		build\TestReferences.Common.targets = build\TestReferences.Common.targets
-		build\TestTargetFramework.props = build\TestTargetFramework.props
+		.build\dependencies.props = .build\dependencies.props
+		.build\nuget.props = .build\nuget.props
+		.build\runbuild.ps1 = .build\runbuild.ps1
+		.build\TestReferences.Common.targets = .build\TestReferences.Common.targets
+		.build\TestTargetFramework.props = .build\TestTargetFramework.props
 		version.json = version.json
+		.build\version.ps1 = .build\version.ps1
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-templates", "azure-templates", "{878BB8E3-6B5F-4600-B93F-5EA45A4E7DDA}"
 	ProjectSection(SolutionItems) = preProject
-		build\azure-templates\build-pack-and-publish-libraries.yml = build\azure-templates\build-pack-and-publish-libraries.yml
-		build\azure-templates\gitversioning-increment-and-persist-versions.yml = build\azure-templates\gitversioning-increment-and-persist-versions.yml
-		build\azure-templates\publish-nuget-packages.yml = build\azure-templates\publish-nuget-packages.yml
-		build\azure-templates\publish-test-results-for-target-frameworks.yml = build\azure-templates\publish-test-results-for-target-frameworks.yml
-		build\azure-templates\publish-test-results-for-test-projects.yml = build\azure-templates\publish-test-results-for-test-projects.yml
-		build\azure-templates\publish-test-results.yml = build\azure-templates\publish-test-results.yml
-		build\azure-templates\run-tests-on-android.yml = build\azure-templates\run-tests-on-android.yml
-		build\azure-templates\run-tests-on-os.yml = build\azure-templates\run-tests-on-os.yml
-		build\azure-templates\show-all-environment-variables.yml = build\azure-templates\show-all-environment-variables.yml
-		build\azure-templates\show-all-files.yml = build\azure-templates\show-all-files.yml
+		.build\azure-templates\build-pack-and-publish-libraries.yml = .build\azure-templates\build-pack-and-publish-libraries.yml
+		.build\azure-templates\gitversioning-increment-and-persist-versions.yml = .build\azure-templates\gitversioning-increment-and-persist-versions.yml
+		.build\azure-templates\publish-nuget-packages.yml = .build\azure-templates\publish-nuget-packages.yml
+		.build\azure-templates\publish-test-results-for-target-frameworks.yml = .build\azure-templates\publish-test-results-for-target-frameworks.yml
+		.build\azure-templates\publish-test-results-for-test-projects.yml = .build\azure-templates\publish-test-results-for-test-projects.yml
+		.build\azure-templates\publish-test-results.yml = .build\azure-templates\publish-test-results.yml
+		.build\azure-templates\run-tests-on-android.yml = .build\azure-templates\run-tests-on-android.yml
+		.build\azure-templates\run-tests-on-os.yml = .build\azure-templates\run-tests-on-os.yml
+		.build\azure-templates\show-all-environment-variables.yml = .build\azure-templates\show-all-environment-variables.yml
+		.build\azure-templates\show-all-files.yml = .build\azure-templates\show-all-files.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BFCFA4F8-C7D3-44C2-8734-8B6EEE90B037}"
 	ProjectSection(SolutionItems) = preProject
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		build = build
+		build.bat = build.bat
+		build.ps1 = build.ps1
 		Directory.Build.props = Directory.Build.props
 		Directory.Build.targets = Directory.Build.targets
 		FUNDING.yml = FUNDING.yml
@@ -70,6 +77,12 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Tests.MonoAndroid90.xUnit", "tests\Xamarin\Android\J2N.Tests.MonoAndroid90.xUnit\J2N.Tests.MonoAndroid90.xUnit.csproj", "{9FD44903-EE22-4437-9AB9-A3E19DCD03EE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Tests.MonoAndroid100.xUnit", "tests\Xamarin\Android\J2N.Tests.MonoAndroid100.xUnit\J2N.Tests.MonoAndroid100.xUnit.csproj", "{0599CD31-2FA8-4283-A777-155F81B5DB9A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docs", "docs", "{5AE94CD7-F1E4-42B1-9B9B-C624FE4841DE}"
+	ProjectSection(SolutionItems) = preProject
+		docs\building-and-testing.md = docs\building-and-testing.md
+		docs\make-release.md = docs\make-release.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
