@@ -27,15 +27,10 @@ That is why we created J2N. If you like this idea, please be sure to star our re
 4. **Equality:** Compare collections for structural equality with behaviors that are specific to each collection family, and provide .NET equality comparers for other types that differ in behavior.
 5. **Localization:** Bridge the gap between .NET's culture-aware and Java's culture-neutral defaults.
 
-
-### Status: Beta
-
-Much of what is here has been tested pretty thoroughly already and the APIs are pretty stable. We anticipate the beta period to be quite short.
-
 ## NuGet
 
 ```
-Install-Package J2N -Pre
+Install-Package J2N
 ```
 
 ## Contributing
