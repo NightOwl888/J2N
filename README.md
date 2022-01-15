@@ -47,6 +47,6 @@ To build the project from source, see the [Building and Testing documentation](h
 
 ## Saying Thanks
 
-If you find this library to be useful, please star us on GitHub and consider a sponsorship so we can continue bringing you great free tools like this one.
+If you find this library to be useful, please star us [on GitHub](https://github.com/NightOwl888/J2N) and consider a sponsorship so we can continue bringing you great free tools like this one.
 
 [![GitHub Sponsors](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/NightOwl888)
