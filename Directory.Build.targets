@@ -1,4 +1,7 @@
 ﻿<Project>
+
+  <Import Project="$(MSBuildThisFileDirectory)/.build/dependencies.props" Condition="Exists('$(MSBuildThisFileDirectory)/.build/dependencies.props')" />
+  
   <!-- Features in .NET Standard, .NET Core, .NET 5.x, and .NET 6.x only (no .NET Framework support) -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
 
@@ -22,7 +25,8 @@
 
   <!-- Features in .NET 5.x and .NET 6.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
-    
+
+    <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_PREDEFINEDONLY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ICU</DefineConstants>
   
@@ -132,8 +136,6 @@
   <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
   <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
 
-    <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTCULTURE</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_DEFAULTTHREADCURRENTUICULTURE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
@@ -155,5 +157,36 @@
       </AssemblyAttribute>
     </ItemGroup>
   </Target>
+
+  <Target Name="PrintTargetFrameworks" Label="Prints the value for the $(TargetFrameworks) property or 'none' if no frameworks apply. Pass TestProjectsOnly=true to get results only if this is a test project.">
+    <PropertyGroup>
+      <DoOutputTargetFrameworks Condition=" '$(TestProjectsOnly)' != 'true' Or ('$(TestProjectsOnly)' == 'true' And '$(IsTestProject)' == 'true')">true</DoOutputTargetFrameworks>
+      <OutputTargetFrameworks Condition=" '$(DoOutputTargetFrameworks)' == 'true' ">$(TargetFramework)</OutputTargetFrameworks>
+      <!-- Fallback to TargetFrameworks field if TargetFramework is empty -->
+      <OutputTargetFrameworks Condition=" '$(DoOutputTargetFrameworks)' == 'true' And '$(OutputTargetFrameworks)' == '' ">$(TargetFrameworks)</OutputTargetFrameworks>
+      <OutputTargetFrameworks Condition=" '$(OutputTargetFrameworks)' == '' ">none</OutputTargetFrameworks>
+    </PropertyGroup>
+    <Message Text="$(OutputTargetFrameworks)" Importance="high"/>
+  </Target>
+
+  <!-- Global PackageReferences -->
   
+  <ItemGroup>
+    <!-- This is to allow the .NET Framework references to be machine-indepenedent so builds can happen without installing prerequisites -->
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="$(MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion)" PrivateAssets="All" />
+  </ItemGroup>
+
+  <!-- This is for testing only, we use SourceLink from any Azure DevOps git repo -->
+  <ItemGroup Condition=" '$(BUILD_REPOSITORY_PROVIDER)' == 'TfsGit' " Label="SourceLink Packages (experimental Azure Repos)">
+    <PackageReference Include="Microsoft.SourceLink.AzureRepos.Git" Version="$(MicrosoftSourceLinkAzureReposGitPackageReferenceVersion)" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(BUILD_REPOSITORY_PROVIDER)' == 'GitHub' " Label="SourceLink Packages (main repo)">
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubPackageReferenceVersion)" PrivateAssets="All"/>
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(SkipGitVersioning.ToLower())' != 'true' And '$(TF_BUILD.ToLower())' != 'true' ">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="$(NerdBankGitVersioningPackageReferenceVersion)" PrivateAssets="All" />
+  </ItemGroup>
+
 </Project>

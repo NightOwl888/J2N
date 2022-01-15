@@ -12,6 +12,7 @@ parameters:
   testResultsFileName: 'TestResults.trx' # The name of the file (not path) of the test results. Default 'TestResults.trx'.
   maximumParallelJobs: 8
   maximumAllowedFailures: 0
+  dotNetSdkVersion: '' # The .NET SDK version to install
 
 steps:
 - pwsh: |
@@ -29,25 +30,24 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.testBinaryFilesPattern }}', 'testBinaryFilesPattern')
     EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
     EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
+    EnsureNotNullOrEmpty('${{ parameters.dotNetSdkVersion }}', 'dotNetSdkVersion')
   displayName: 'Validate Template Parameters'
 
+- template: 'install-dotnet-sdk.yml'
+  parameters:
+    sdkVersion: '${{ parameters.dotNetSdkVersion }}'
+
 - task: UseDotNet@2
-  displayName: 'Use .NET Core sdk 3.1.404'
+  displayName: 'Use .NET Core sdk 3.1.416'
   inputs:
-    version: 3.1.404
+    version: 3.1.416
   condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'netcoreapp3.'))
 
 - task: UseDotNet@2
-  displayName: 'Use .NET sdk 5.0.100'
+  displayName: 'Use .NET sdk 5.0.404'
   inputs:
-    version: 5.0.100
-
-- task: UseDotNet@2
-  displayName: 'Use .NET sdk 6.0.100-rc.2'
-  inputs:
-    packageType: 'sdk'
-    version: '6.0.100-rc.2.21505.57'
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net6.')) # When this is not a pre-release, we can remove this line and make net5.0 conditional
+    version: 5.0.404
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net5.'))
 
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts: ${{ parameters.binaryArtifactName }}'
@@ -69,7 +69,7 @@ steps:
         if ($IsWindows -eq $null) {
             $IsWindows = $env:OS.StartsWith('Win')
         }
-        if (!$IsWindows -and $framework.StartsWith('net4')) {
+        if (!$IsWindows -and ($framework.StartsWith('net4') -or $framework.StartsWith('net3'))) {
             return $false
         }
         return $true

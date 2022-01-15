@@ -2,8 +2,11 @@
   <PropertyGroup Label="NuGet Package Reference Versions">
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
+    <MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>1.0.2</MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
-    <NerdBankGitVersioningPackageReferenceVersion>[3.3.37]</NerdBankGitVersioningPackageReferenceVersion>
+    <MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>1.1.1</MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>
+    <MicrosoftSourceLinkGitHubPackageReferenceVersion>$(MicrosoftSourceLinkAzureReposGitPackageReferenceVersion)</MicrosoftSourceLinkGitHubPackageReferenceVersion>
+    <NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>

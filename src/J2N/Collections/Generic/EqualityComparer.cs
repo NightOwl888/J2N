@@ -18,7 +18,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.Generic
 {
@@ -40,6 +40,9 @@ namespace J2N.Collections.Generic
         ///         which differs from the default .NET behavior, where NaN is never equal to NaN.
         ///     </description></item>
         ///     <item><description>
+        ///         <see cref="double"/>? and <see cref="float"/>? are first compared for <c>null</c> prior to applying the above rules.
+        ///     </description></item>
+        ///     <item><description>
         ///         <see cref="string"/> uses culture-insensitive equality comparison using <see cref="StringComparer.Ordinal"/>.
         ///     </description></item>
         /// </list>
@@ -50,151 +53,266 @@ namespace J2N.Collections.Generic
         {
             Type genericClosingType = typeof(T);
 
+            if (genericClosingType.IsGenericType && genericClosingType.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                // Special cases to match Java equality behavior
+                if (typeof(double?).Equals(genericClosingType))
+                    return (IEqualityComparer<T>)NullableDoubleComparer.Default;
+                else if (typeof(float?).Equals(genericClosingType))
+                    return (IEqualityComparer<T>)NullableSingleComparer.Default;
+
+                return System.Collections.Generic.EqualityComparer<T>.Default;
+            }
+
             // Special cases to match Java equality behavior
             if (typeof(double).Equals(genericClosingType))
-                return (IEqualityComparer<T>)new DoubleComparer();
+                return (IEqualityComparer<T>)DoubleComparer.Default;
             else if (typeof(float).Equals(genericClosingType))
-                return (IEqualityComparer<T>)new SingleComparer();
+                return (IEqualityComparer<T>)SingleComparer.Default;
             else if (typeof(string).Equals(genericClosingType))
                 return (IEqualityComparer<T>)StringComparer.Ordinal;
 
             return System.Collections.Generic.EqualityComparer<T>.Default;
         }
+    }
 
-        internal class DoubleComparer : System.Collections.Generic.EqualityComparer<double>, IComparer<double>
+    internal class NullableDoubleComparer : System.Collections.Generic.EqualityComparer<double?>, IComparer<double?>
+    {
+        private NullableDoubleComparer() { } // Singleton only
+
+        new public static readonly NullableDoubleComparer Default = new NullableDoubleComparer();
+
+        public int Compare(double? x, double? y)
         {
-            public int Compare(double x, double y)
+            if (x.HasValue)
             {
-                // Non-zero, non-NaN checking.
-                if (x > y)
-                {
-                    return 1;
-                }
-                if (y > x)
-                {
-                    return -1;
-                }
-                if (x == y && 0.0d != x)
-                {
-                    return 0;
-                }
-
-                // NaNs are equal to other NaNs and larger than any other double
-                if (double.IsNaN(x))
-                {
-                    if (double.IsNaN(y)) return 0;
-                    return 1;
-                }
-                else if (double.IsNaN(y))
-                {
-                    return -1;
-                }
-
-                // Deal with +0.0 and -0.0
-                long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
-                long d2 = BitConversion.DoubleToRawInt64Bits(y);
-                // The below expression is equivalent to:
-                // (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
-                return (int)((d1 >> 63) - (d2 >> 63));
+                if (y.HasValue) return DoubleComparer.Default.Compare(x.Value, y.Value);
+                return 1;
             }
-
-            public override bool Equals(double x, double y)
-            {
-                if (x < y || x > y)
-                    return false;
-
-                if (0.0d != x && x == y)
-                    return true;
-
-                if (double.IsNaN(x) && double.IsNaN(y))
-                    return true;
-
-                // Deal with +0.0 and -0.0
-                long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
-                long d2 = BitConversion.DoubleToRawInt64Bits(y);
-                // The below expression is equivalent to:
-                // (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
-                return (int)((d1 >> 63) - (d2 >> 63)) == 0;
-            }
-
-            public override int GetHashCode(double obj)
-            {
-                if (obj != 0 && !double.IsNaN(obj))
-                    return obj.GetHashCode();
-
-                // Make positive zero and negative zero have different hash codes,
-                // and NaN always have the same hash code.
-                // We intentionlly call the non "raw" overload here to get that behavior.
-                return BitConversion.DoubleToInt64Bits(obj).GetHashCode();
-            }
+            if (y.HasValue) return -1;
+            return 0;
         }
 
-        internal class SingleComparer : System.Collections.Generic.EqualityComparer<float>, IComparer<float>
+        public override bool Equals(double? x, double? y)
         {
-            public int Compare(float x, float y)
+            if (x.HasValue)
             {
-                // Non-zero, non-NaN checking.
-                if (x > y)
-                {
-                    return 1;
-                }
-                if (y > x)
-                {
-                    return -1;
-                }
-                if (x == y && 0.0f != x)
-                {
-                    return 0;
-                }
-
-                // NaNs are equal to other NaNs and larger than any other float
-                if (float.IsNaN(x))
-                {
-                    if (float.IsNaN(y)) return 0;
-                    return 1;
-                }
-                else if (float.IsNaN(y))
-                {
-                    return -1;
-                }
-
-                // Deal with +0.0 and -0.0
-                int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here
-                int f2 = BitConversion.SingleToRawInt32Bits(y);
-                // The below expression is equivalent to:
-                // (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
-                return (f1 >> 31) - (f2 >> 31);
+                if (y.HasValue) return DoubleComparer.Default.Equals(x.Value, y.Value);
+                return false;
             }
-
-            public override bool Equals(float x, float y)
-            {
-                if (x < y || x > y)
-                    return false;
-
-                if (0.0f != x && x == y)
-                    return true;
-
-                if (float.IsNaN(x) && float.IsNaN(y))
-                    return true;
-
-                // Deal with +0.0 and -0.0
-                int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here
-                int f2 = BitConversion.SingleToRawInt32Bits(y);
-                // The below expression is equivalent to:
-                // (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
-                return (f1 >> 31) - (f2 >> 31) == 0;
-            }
-
-            public override int GetHashCode(float obj)
-            {
-                if (obj != 0 && !float.IsNaN(obj))
-                    return obj.GetHashCode();
-
-                // Make positive zero and negative zero have different hash codes,
-                // and NaN always have the same hash code.
-                // We intentionlly call the non "raw" overload here to get that behavior.
-                return BitConversion.SingleToInt32Bits(obj).GetHashCode();
-            }
+            if (y.HasValue) return false;
+            return true;
         }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public override int GetHashCode(double? obj) => obj.HasValue ? DoubleComparer.Default.GetHashCode(obj.Value) : 0;
+
+        // Equals method for the comparer itself.
+        public override bool Equals(object? obj) =>
+            obj != null && GetType() == obj.GetType();
+
+        public override int GetHashCode() =>
+            GetType().GetHashCode();
+    }
+
+    internal class NullableSingleComparer : System.Collections.Generic.EqualityComparer<float?>, IComparer<float?>
+    {
+        private NullableSingleComparer() { } // Singleton only
+
+        new public static readonly NullableSingleComparer Default = new NullableSingleComparer();
+
+        public int Compare(float? x, float? y)
+        {
+            if (x.HasValue)
+            {
+                if (y.HasValue) return SingleComparer.Default.Compare(x.Value, y.Value);
+                return 1;
+            }
+            if (y.HasValue) return -1;
+            return 0;
+        }
+
+        public override bool Equals(float? x, float? y)
+        {
+            if (x.HasValue)
+            {
+                if (y.HasValue) return SingleComparer.Default.Equals(x.Value, y.Value);
+                return false;
+            }
+            if (y.HasValue) return false;
+            return true;
+        }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public override int GetHashCode(float? obj) => obj.HasValue ? SingleComparer.Default.GetHashCode(obj.Value) : 0;
+
+        // Equals method for the comparer itself.
+        public override bool Equals(object? obj) =>
+            obj != null && GetType() == obj.GetType();
+
+        public override int GetHashCode() =>
+            GetType().GetHashCode();
+    }
+
+    internal class DoubleComparer : System.Collections.Generic.EqualityComparer<double>, IComparer<double>
+    {
+        private DoubleComparer() { } // Singleton only
+
+        new public static readonly DoubleComparer Default = new DoubleComparer();
+
+        public int Compare(double x, double y)
+        {
+            // Non-zero, non-NaN checking.
+            if (x > y)
+            {
+                return 1;
+            }
+            if (y > x)
+            {
+                return -1;
+            }
+            if (x == y && 0.0d != x)
+            {
+                return 0;
+            }
+
+            // NaNs are equal to other NaNs and larger than any other double
+            if (double.IsNaN(x))
+            {
+                if (double.IsNaN(y)) return 0;
+                return 1;
+            }
+            else if (double.IsNaN(y))
+            {
+                return -1;
+            }
+
+            // Deal with +0.0 and -0.0
+            long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
+            long d2 = BitConversion.DoubleToRawInt64Bits(y);
+            // The below expression is equivalent to:
+            // (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
+            return (int)((d1 >> 63) - (d2 >> 63));
+        }
+
+        public override bool Equals(double x, double y)
+        {
+            if (x < y || x > y)
+                return false;
+
+            if (0.0d != x && x == y)
+                return true;
+
+            if (double.IsNaN(x) && double.IsNaN(y))
+                return true;
+
+            // Deal with +0.0 and -0.0
+            long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
+            long d2 = BitConversion.DoubleToRawInt64Bits(y);
+            // The below expression is equivalent to:
+            // (d1 == d2) ? 0 : (d1 < d2) ? -1 : 1
+            return (int)((d1 >> 63) - (d2 >> 63)) == 0;
+        }
+
+        public override int GetHashCode(double obj)
+        {
+            if (obj != 0 && !double.IsNaN(obj))
+                return obj.GetHashCode();
+
+            // Make positive zero and negative zero have different hash codes,
+            // and NaN always have the same hash code.
+            // We intentionlly call the non "raw" overload here to get that behavior.
+            return BitConversion.DoubleToInt64Bits(obj).GetHashCode();
+        }
+
+        // Equals method for the comparer itself.
+        public override bool Equals(object? obj) =>
+            obj != null && GetType() == obj.GetType();
+
+        public override int GetHashCode() =>
+            GetType().GetHashCode();
+    }
+
+    internal class SingleComparer : System.Collections.Generic.EqualityComparer<float>, IComparer<float>
+    {
+        private SingleComparer() { } // Singleton only
+
+        new public static readonly SingleComparer Default = new SingleComparer();
+
+        public int Compare(float x, float y)
+        {
+            // Non-zero, non-NaN checking.
+            if (x > y)
+            {
+                return 1;
+            }
+            if (y > x)
+            {
+                return -1;
+            }
+            if (x == y && 0.0f != x)
+            {
+                return 0;
+            }
+
+            // NaNs are equal to other NaNs and larger than any other float
+            if (float.IsNaN(x))
+            {
+                if (float.IsNaN(y)) return 0;
+                return 1;
+            }
+            else if (float.IsNaN(y))
+            {
+                return -1;
+            }
+
+            // Deal with +0.0 and -0.0
+            int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here
+            int f2 = BitConversion.SingleToRawInt32Bits(y);
+            // The below expression is equivalent to:
+            // (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
+            return (f1 >> 31) - (f2 >> 31);
+        }
+
+        public override bool Equals(float x, float y)
+        {
+            if (x < y || x > y)
+                return false;
+
+            if (0.0f != x && x == y)
+                return true;
+
+            if (float.IsNaN(x) && float.IsNaN(y))
+                return true;
+
+            // Deal with +0.0 and -0.0
+            int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here
+            int f2 = BitConversion.SingleToRawInt32Bits(y);
+            // The below expression is equivalent to:
+            // (f1 == f2) ? 0 : (f1 < f2) ? -1 : 1
+            return (f1 >> 31) - (f2 >> 31) == 0;
+        }
+
+        public override int GetHashCode(float obj)
+        {
+            if (obj != 0 && !float.IsNaN(obj))
+                return obj.GetHashCode();
+
+            // Make positive zero and negative zero have different hash codes,
+            // and NaN always have the same hash code.
+            // We intentionlly call the non "raw" overload here to get that behavior.
+            return BitConversion.SingleToInt32Bits(obj).GetHashCode();
+        }
+
+        // Equals method for the comparer itself.
+        public override bool Equals(object? obj) =>
+            obj != null && GetType() == obj.GetType();
+
+        public override int GetHashCode() =>
+            GetType().GetHashCode();
     }
 }

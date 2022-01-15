@@ -3,14 +3,17 @@
     <IsPackable>true</IsPackable>
     <PackageTags>java;dotnet;charsequence;bytebuffer;collections;stringbuffer;linkedhashset;linkedhashmap;comparable;structural-equality;treemap;treeset;stringtokenizer;appendable;contentequals;codepoint;bit-twiddle;lru-cache</PackageTags>
     <Authors>NightOwl888</Authors>
-    <RepositoryUrl>https://github.com/NightOwl888/J2N/</RepositoryUrl>
-    <PackageProjectUrl>https://github.com/NightOwl888/J2N/</PackageProjectUrl>
-    <PackageIconUrl>https://raw.githubusercontent.com/NightOwl888/J2N/main/branding/j2n-icon-100x100.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/$(GitHubOrganization)/$(GitHubProject)/</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/$(GitHubOrganization)/$(GitHubProject)/main/branding/j2n-icon-100x100.png</PackageIconUrl>
     <PackageIcon>j2n-icon-100x100.png</PackageIcon>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <ReleaseNotesUrl Condition=" '$(PackageVersion)' != '' ">https://github.com/$(GitHubOrganization)/$(GitHubProject)/releases/tag/$(PackageVersion)</ReleaseNotesUrl>
+    <PackageReleaseNotes Condition=" '$(ReleaseNotesUrl)' != '' ">$(ReleaseNotesUrl)</PackageReleaseNotes>
+    <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(SolutionDir)$(PackageLicenseFile)" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+    <None Include="$(SolutionDir)README.md" Pack="true" PackagePath="\readme.md"/>
     <None Include="$(SolutionDir)branding\$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)"/>
   </ItemGroup>
 </Project>

@@ -27,18 +27,13 @@ That is why we created J2N. If you like this idea, please be sure to star our re
 4. **Equality:** Compare collections for structural equality with behaviors that are specific to each collection family, and provide .NET equality comparers for other types that differ in behavior.
 5. **Localization:** Bridge the gap between .NET's culture-aware and Java's culture-neutral defaults.
 
-
-### Status: Beta
-
-Much of what is here has been tested pretty thoroughly already and the APIs are pretty stable. We anticipate the beta period to be quite short.
-
 ## NuGet
 
 ```
-Install-Package J2N -Pre
+Install-Package J2N
 ```
 
-### Contributing
+## Contributing
 
 We love getting contributions! If you need something from the JDK that we don't have, this is the right place to submit it. Basically, the following are things that would be a good fit for this library:
 
@@ -46,8 +41,12 @@ We love getting contributions! If you need something from the JDK that we don't 
 2. Features that make J2N easier to work with in .NET such as extension methods and adapters
 3. Features that make .NET interoperate with Java better
 
-### Giving Back
+## Building and Testing
 
-If you find this library to be useful, please star us on GitHub and consider a sponsorship so we can continue bringing you great free tools like this one.
+To build the project from source, see the [Building and Testing documentation](https://github.com/NightOwl888/J2N/blob/main/docs/building-and-testing.md).
+
+## Saying Thanks
+
+If you find this library to be useful, please star us [on GitHub](https://github.com/NightOwl888/J2N) and consider a sponsorship so we can continue bringing you great free tools like this one.
 
 [![GitHub Sponsors](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/NightOwl888)
