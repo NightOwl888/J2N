@@ -2,8 +2,8 @@ J2N - Java-like Components for .NET
 =========
 
 [![Nuget](https://img.shields.io/nuget/dt/J2N)](https://www.nuget.org/packages/J2N)
-[![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/NightOwl888/b2719dac-eeb4-46ff-9380-13b45ff0277b/1/release/v2.0)](https://dev.azure.com/NightOwl888/J2N/_build?definitionId=1)
-[![GitHub](https://img.shields.io/github/license/NightOwl888/J2N)](https://github.com/NightOwl888/J2N/blob/master/LICENSE.txt)
+[![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/NightOwl888/b2719dac-eeb4-46ff-9380-13b45ff0277b/1/main)](https://dev.azure.com/NightOwl888/J2N/_build?definitionId=1)
+[![GitHub](https://img.shields.io/github/license/NightOwl888/J2N)](https://github.com/NightOwl888/J2N/blob/main/LICENSE.txt)
 [![GitHub Sponsors](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/NightOwl888)
 
 J2N is a library that helps bridge the gap between .NET and Java.
