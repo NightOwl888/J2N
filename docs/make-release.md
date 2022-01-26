@@ -75,7 +75,7 @@ nbgv get-version
 
 > **NOTE:** At the time of this writing Nerdbank.GitVersioning doesn't support 4-component version numbers for NuGet package version or informational version. This may be added in the future. See https://github.com/dotnet/Nerdbank.GitVersioning/issues/709. However, our build is setup to create these numbers so if a 4-component number needs to be created, it is a good idea to do an actual build to determine if the version numbers are correct.
 
-Then open the `version.json` file at the repository root, and set the `versionHeightOffset` using the formula `versionHeightOffset - (versionHeight - desiredHeight) - 1`. For example, if the current version is 2.0.1-beta-0014 and we want to release 2.0.1-beta-0005 (because the last version released was 2.0.1-beta-0004), and the `versionHeightOffset` is set to -21:
+Then open the `version.json` file at the repository root, and set the `versionHeightOffset` using the formula `versionHeightOffset - ((versionHeight - desiredHeight) + 1)`. For example, if the current version is 2.0.1-beta-0014 and we want to release 2.0.1-beta-0005 (because the last version released was 2.0.1-beta-0004), and the `versionHeightOffset` is set to -21:
 
 ###### Calculating versionHeightOffset
 ```
