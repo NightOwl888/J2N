@@ -7,7 +7,7 @@
     <PackageIconUrl>https://raw.githubusercontent.com/$(GitHubOrganization)/$(GitHubProject)/main/branding/j2n-icon-100x100.png</PackageIconUrl>
     <PackageIcon>j2n-icon-100x100.png</PackageIcon>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-    <ReleaseNotesUrl Condition=" '$(PackageVersion)' != '' ">https://github.com/$(GitHubOrganization)/$(GitHubProject)/releases/tag/$(PackageVersion)</ReleaseNotesUrl>
+    <ReleaseNotesUrl Condition=" '$(PackageVersion)' != '' ">https://github.com/$(GitHubOrganization)/$(GitHubProject)/releases/tag/v$(PackageVersion)</ReleaseNotesUrl>
     <PackageReleaseNotes Condition=" '$(ReleaseNotesUrl)' != '' ">$(ReleaseNotesUrl)</PackageReleaseNotes>
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
