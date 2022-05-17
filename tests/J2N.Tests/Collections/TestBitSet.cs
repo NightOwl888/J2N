@@ -1867,7 +1867,7 @@ namespace J2N.Collections
 
                     // Set a random number of bits in random places
                     // up to a random maximum
-                    int nextBitToSet = 0;
+                    int nextBitToSet; // J2N: Removed unnecessary assignment
                     int numberOfSetBits = generator.Next(100) + 1;
                     int highestPossibleSetBit = generator.Next(1000) + 1;
                     for (int x = 0; x < numberOfSetBits; x++)
@@ -2060,7 +2060,7 @@ namespace J2N.Collections
                     int[] history = new int[20];
 
                     // Set some random bits in first set and remember them
-                    int nextBitToSet = 0;
+                    int nextBitToSet; // J2N: Removed unnecessary assignment
                     for (int x = 0; x < 10; x++)
                     {
                         nextBitToSet = generator.Next(255);
@@ -2149,7 +2149,8 @@ namespace J2N.Collections
                 report("Xor                         ", failCount);
             }
 
-            private static void TestEquals()
+            [Test]
+            public static void TestEquals()
             {
                 int failCount = 0;
 
@@ -2458,7 +2459,7 @@ namespace J2N.Collections
                     BitSet b2 = new BitSet(256);
 
                     // Set some random bits in first set
-                    int nextBitToSet = 0;
+                    int nextBitToSet; // J2N: Removed unnecessary assignment
                     for (int x = 0; x < 30; x++)
                     {
                         nextBitToSet = generator.Next(255);
@@ -2533,7 +2534,7 @@ namespace J2N.Collections
                 if (!b1.IsEmpty)
                     failCount++;
 
-                int nextBitToSet = 0;
+                int nextBitToSet; // J2N: Removed unnecessary assignment
                 int numberOfSetBits = generator.Next(100) + 1;
                 int highestPossibleSetBit = generator.Next(1000) + 1;
                 for (int x = 0; x < numberOfSetBits; x++)
