@@ -85,7 +85,6 @@
     <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_THREADINTERRUPT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADYIELD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADPRIORITY</DefineConstants>
 

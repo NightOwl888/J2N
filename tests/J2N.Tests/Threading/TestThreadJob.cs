@@ -49,22 +49,18 @@ namespace J2N.Threading
 
             public void Run()
             {
-#if FEATURE_THREADINTERRUPT
                 try
                 {
-#endif
                     lock (this)
                     {
                         Monitor.Pulse(this);
                         Monitor.Wait(this, delay);
                     }
-#if FEATURE_THREADINTERRUPT
                 }
                 catch (ThreadInterruptedException e)
                 {
                     return;
                 }
-#endif
             }
 
             public SimpleThread(int d)
@@ -117,37 +113,28 @@ namespace J2N.Threading
                         ThreadJob.Sleep(100);
                     }
                 }
-#if FEATURE_THREADINTERRUPT
                 catch (ThreadInterruptedException e)
                 {
                     return;
                 }
-#endif
                 catch (BogusException e)
                 {
-#if FEATURE_THREADINTERRUPT
                     try
                     {
-#endif
                         // Give parent a chance to sleep
                         ThreadJob.Sleep(500);
-#if FEATURE_THREADINTERRUPT
                     }
                     catch (ThreadInterruptedException x)
                     {
                     }
                     parent.Interrupt();
                     //while (!Thread.CurrentThread.IsInterrupted())
-#endif
                     while (true)
                     {
                         // Don't hog the CPU
-#if FEATURE_THREADINTERRUPT
                         try
                         {
-#endif
                             ThreadJob.Sleep(50);
-#if FEATURE_THREADINTERRUPT
                         }
                         catch (ThreadInterruptedException x)
                         {
@@ -155,7 +142,6 @@ namespace J2N.Threading
                             // away!
                             break;
                         }
-#endif
                     }
                 }
             }
@@ -656,22 +642,16 @@ namespace J2N.Threading
                     lock (syncLock)
                     {
                         Monitor.Pulse(syncLock);
-#if FEATURE_THREADINTERRUPT
                         try
                         {
-#endif
                             Monitor.Wait(syncLock);
-#if FEATURE_THREADINTERRUPT
                         }
                         catch (ThreadInterruptedException e)
                         {
                         }
-#endif
                     }
                 }
-#if FEATURE_THREADINTERRUPT
                 parent.Interrupt();
-#endif
             }
 
             public ChildThread1(ThreadJob p, String name, bool sync, object syncLock)
@@ -683,7 +663,6 @@ namespace J2N.Threading
             }
         }
 
-#if FEATURE_THREADINTERRUPT
         /**
          * @tests java.lang.Thread#interrupt()
          */
@@ -744,7 +723,6 @@ namespace J2N.Threading
             assertTrue("Interrupted returned true for non-interrupted thread", ThreadJob.Interrupted());
             assertFalse("Failed to clear interrupted flag", ThreadJob.Interrupted());
         }
-#endif
 
         /**
          * @tests java.lang.Thread#isAlive()
@@ -759,32 +737,24 @@ namespace J2N.Threading
             lock (simple)
             {
                 st.Start();
-#if FEATURE_THREADINTERRUPT
                 try
                 {
-#endif
                     //simple.Wait();
                     Monitor.Wait(simple);
-#if FEATURE_THREADINTERRUPT
                 }
                 catch (ThreadInterruptedException e)
                 {
                 }
-#endif
             }
             assertTrue("Started thread returned false", st.IsAlive);
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 st.Join();
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Thread did not die");
             }
-#endif
             assertTrue("Stopped thread returned true", !st.IsAlive);
         }
 
@@ -849,10 +819,8 @@ namespace J2N.Threading
         {
             // Test for method void java.lang.Thread.join()
             SimpleThread simple = new SimpleThread(100);
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 st = new ThreadJob(() => simple.Run());
                 // cause isAlive() to be compiled by the JIT, as it must be called
                 // within 100ms below.
@@ -864,13 +832,11 @@ namespace J2N.Threading
                     Monitor.Wait(simple);
                 }
                 st.Join();
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Join failed ");
             }
-#endif
             assertTrue("Joined thread is still alive", !st.IsAlive);
             bool result = true;
             ThreadJob th = new ThreadJob("test");
@@ -878,12 +844,10 @@ namespace J2N.Threading
             {
                 th.Join();
             }
-#if FEATURE_THREADINTERRUPT
             catch (ThreadInterruptedException e)
             {
                 result = false;
             }
-#endif
             catch (ThreadStateException e) // .NET specific - a ThreadStateException is thrown when the thread is not started
             {
                 // expected
@@ -903,24 +867,20 @@ namespace J2N.Threading
             }
             public override void Run()
             {
-#if FEATURE_THREADINTERRUPT
                 try
                 {
-#endif
                     lock (syncLock)
                     {
                         //lock.notify();
                         Monitor.Pulse(syncLock);
                     }
                     ThreadJob.Sleep(100);
-#if FEATURE_THREADINTERRUPT
                 }
                 catch (ThreadInterruptedException e)
                 {
                     return;
                 }
                 main.Interrupt();
-#endif
             }
         }
 
@@ -932,10 +892,8 @@ namespace J2N.Threading
         {
             // Test for method void java.lang.Thread.join(long)
             SimpleThread simple = new SimpleThread(1000);
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 st = new ThreadJob(simple.Run, "SimpleThread12");
                 // cause isAlive() to be compiled by the JIT, as it must be called
                 // within 100ms below.
@@ -947,20 +905,16 @@ namespace J2N.Threading
                     Monitor.Wait(simple);
                 }
                 st.Join(10);
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Join failed ");
             }
-#endif
             assertTrue("Join failed to timeout", st.IsAlive);
-#if FEATURE_THREADINTERRUPT
             st.Interrupt();
 
             try
             {
-#endif
                 simple = new SimpleThread(100);
                 st = new ThreadJob(() => simple.Run(), "SimpleThread13");
                 lock (simple)
@@ -970,14 +924,12 @@ namespace J2N.Threading
                     Monitor.Wait(simple);
                 }
                 st.Join(1000);
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Join failed : " + e.Message);
                 return;
             }
-#endif
             assertTrue("Joined thread is still alive", !st.IsAlive);
 
             Object syncLock = new Object();
@@ -996,19 +948,15 @@ namespace J2N.Threading
                 th.Join(200);
 
             }
-#if FEATURE_THREADINTERRUPT
             catch (ThreadInterruptedException e)
             {
                 result = false;
             }
-#endif
             catch (ThreadStateException e) // .NET specific - a ThreadStateException is thrown when the thread is not started
             {
                 // expected
             }
-#if FEATURE_THREADINTERRUPT
             killer.Interrupt();
-#endif
             assertTrue("Hung joining a non-started thread", result);
             th.Start();
         }
@@ -1024,24 +972,20 @@ namespace J2N.Threading
             }
             public override void Run()
             {
-#if FEATURE_THREADINTERRUPT
                 try
                 {
-#endif
                     lock (syncLock)
                     {
                         //lock.notify();
                         Monitor.Pulse(syncLock);
                     }
                     ThreadJob.Sleep(100);
-#if FEATURE_THREADINTERRUPT
                 }
                 catch (ThreadInterruptedException e)
                 {
                     return;
                 }
                 main.Interrupt();
-#endif
             }
         }
 
@@ -1070,9 +1014,7 @@ namespace J2N.Threading
                                             + firstRead + "=" + (secondRead - firstRead), secondRead
                                             - firstRead <= 1000); // In .NET, we don't have nanosecond precision, so increased from 300 to 1000 to ensure test passes
             assertTrue("Joined thread is not alive", st.IsAlive);
-#if FEATURE_THREADINTERRUPT
             st.Interrupt();
-#endif
 
             Object syncLock = new Object();
             ThreadJob main = ThreadJob.CurrentThread;
@@ -1089,19 +1031,15 @@ namespace J2N.Threading
                 }
                 th.Join(200, 20);
             }
-#if FEATURE_THREADINTERRUPT
             catch (ThreadInterruptedException e)
             {
                 result = false;
             }
-#endif
             catch (ThreadStateException e) // .NET specific - a ThreadStateException is thrown when the thread is not started
             {
                 // expected
             }
-#if FEATURE_THREADINTERRUPT
             killer.Interrupt();
-#endif
             assertTrue("Hung joining a non-started thread", result);
             th.Start();
         }
@@ -1117,10 +1055,8 @@ namespace J2N.Threading
 //            int orgval;
 //            ResSupThread res;
 //            Thread t;
-//#if FEATURE_THREADINTERRUPT
 //            try
 //            {
-//#endif
 //                res = new ResSupThread(Thread.CurrentThread);
 //                t = new Thread(() => res.Run());
 //                lock (t)
@@ -1141,14 +1077,12 @@ namespace J2N.Threading
 //                // Wait to be sure the resume has occurred.
 //                ThreadJob.Sleep(500);
 //                assertTrue("Failed to resume thread", orgval != res.getCheckVal());
-//#if FEATURE_THREADINTERRUPT
 //                ct.Interrupt();
 //            }
 //            catch (ThreadInterruptedException e)
 //            {
 //                fail("Unexpected interrupt occurred : " + e.Message);
 //            }
-//#endif
 //        }
 
         private class RunThread //: IRunnable
@@ -1172,10 +1106,8 @@ namespace J2N.Threading
 
             RunThread rt = new RunThread();
             ThreadJob t = new ThreadJob(() => rt.Run());
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 t.Start();
                 int count = 0;
                 while (!rt.didThreadRun && count < 20)
@@ -1185,13 +1117,11 @@ namespace J2N.Threading
                 }
                 assertTrue("Thread did not run", rt.didThreadRun);
                 t.Join();
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
                 assertTrue("Joined thread was interrupted", true);
             }
-#endif
             assertTrue("Joined thread is still alive", !t.IsAlive);
         }
 
@@ -1259,20 +1189,16 @@ namespace J2N.Threading
 
             // TODO : Test needs enhancing.
             long stime = 0, ftime = 0;
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 stime = Time.CurrentTimeMilliseconds();
                 ThreadJob.Sleep(1000);
                 ftime = Time.CurrentTimeMilliseconds();
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Unexpected interrupt received");
             }
-#endif
             assertTrue("Failed to sleep long enough", (ftime - stime) >= 800);
         }
 
@@ -1287,20 +1213,16 @@ namespace J2N.Threading
 
             // TODO : Test needs revisiting.
             long stime = 0, ftime = 0;
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 stime = Time.CurrentTimeMilliseconds();
                 ThreadJob.Sleep(1000 + 1/*, 999999*/);
                 ftime = Time.CurrentTimeMilliseconds();
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Unexpected interrupt received");
             }
-#endif
             long result = ftime - stime;
             assertTrue("Failed to sleep long enough: " + result, result >= 900
                     && result <= 1100);
@@ -1314,10 +1236,8 @@ namespace J2N.Threading
         public void Test_start()
         {
             // Test for method void java.lang.Thread.start()
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 ResSupThread t = new ResSupThread(Thread.CurrentThread);
                 lock (t)
                 {
@@ -1331,14 +1251,12 @@ namespace J2N.Threading
                 int orgval = t.getCheckVal();
                 ThreadJob.Sleep(150);
                 assertTrue("Thread is not running2", orgval != t.getCheckVal());
-#if FEATURE_THREADINTERRUPT
                 ct.Interrupt();
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Unexpected interrupt occurred");
             }
-#endif
         }
 
         /////**
@@ -1568,10 +1486,8 @@ namespace J2N.Threading
             // Test for method void java.lang.Thread.suspend()
             int orgval;
             ResSupThread t = new ResSupThread(Thread.CurrentThread);
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 lock (t)
                 {
                     ct = new ThreadJob(t.Run, "Interupt Test6");
@@ -1590,21 +1506,17 @@ namespace J2N.Threading
                 // Wait to be sure the resume has occurred.
                 ThreadJob.Sleep(500);
                 assertTrue("Failed to resume thread", orgval != t.getCheckVal());
-#if FEATURE_THREADINTERRUPT
                 ct.Interrupt();
             }
             catch (ThreadInterruptedException e)
             {
                 fail("Unexpected interrupt occurred");
             }
-#endif
 
             Object notify = new Object();
             ThreadJob t1 = new NotifyThread(notify);
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 lock (notify)
                 {
                     t1.Start();
@@ -1616,12 +1528,10 @@ namespace J2N.Threading
                 assertTrue("Thread should be alive", t1.IsAlive);
                 t1.Resume();
                 t1.Join();
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
             }
-#endif
         }
 
         /**
@@ -1643,17 +1553,13 @@ namespace J2N.Threading
             assertTrue("Returned incorrect string: " + stString + "\t(expecting :"
                     + expected + ")", stString.Equals(expected));
             st.Start();
-#if FEATURE_THREADINTERRUPT
             try
             {
-#endif
                 st.Join();
-#if FEATURE_THREADINTERRUPT
             }
             catch (ThreadInterruptedException e)
             {
             }
-#endif
             //tg.destroy();
         }
 
@@ -1775,7 +1681,6 @@ namespace J2N.Threading
 
         public override void TearDown()
         {
-#if FEATURE_THREADINTERRUPT
             try
             {
                 if (st != null)
@@ -1800,7 +1705,6 @@ namespace J2N.Threading
             catch (Exception e)
             {
             }
-#endif
 
             try
             {

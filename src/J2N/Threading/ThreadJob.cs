@@ -184,7 +184,6 @@ namespace J2N.Threading
             thread.Start();
         }
 
-#if FEATURE_THREADINTERRUPT
         /// <summary>
         /// Interrupts a thread that is in the <see cref="ThreadState.WaitSleepJoin"/> thread state.
         /// </summary>
@@ -192,7 +191,6 @@ namespace J2N.Threading
         {
             thread.Interrupt();
         }
-#endif
 
         /// <summary>
         /// Gets an object that can be used to synchronize with this instance.
@@ -421,7 +419,6 @@ namespace J2N.Threading
             Monitor.Wait(SyncRoot);
         }
 
-#if FEATURE_THREADINTERRUPT
         /// <summary>
         /// Causes the thread which sent this message to sleep for the given interval
         /// of time (given in milliseconds). The precision is not guaranteed - the
@@ -429,14 +426,6 @@ namespace J2N.Threading
         /// </summary>
         /// <param name="milliSeconds">The time to sleep in milliseconds.</param>
         /// <seealso cref="Interrupt()"/>
-#else
-        /// <summary>
-        /// Causes the thread which sent this message to sleep for the given interval
-        /// of time (given in milliseconds). The precision is not guaranteed - the
-        /// <see cref="Thread"/> may sleep more or less than requested.
-        /// </summary>
-        /// <param name="milliSeconds">The time to sleep in milliseconds.</param>
-#endif
         public static void Sleep(long milliSeconds)
         {
             // casting long ms to int ms could lose resolution, however unlikely
@@ -468,7 +457,6 @@ namespace J2N.Threading
         /// milliseconds.</exception>
         public static void Sleep(TimeSpan timeout) => Thread.Sleep(timeout);
 
-#if FEATURE_THREADINTERRUPT
         /// <summary>
         /// Java has Thread.interrupted() which returns, and clears, the interrupt
         /// flag of the current thread. .NET has no such method, so we're calling
@@ -488,7 +476,6 @@ namespace J2N.Threading
             }
             return false;
         }
-#endif
 
         /// <summary>
         /// Compares <paramref name="t1"/> and <paramref name="t2"/> for equality.
