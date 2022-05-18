@@ -97,7 +97,6 @@ namespace J2N.IO.MemoryMappedFiles
             return this;
         }
 
-#if FEATURE_MEMORYMAPPEDVIEWACCESSOR_READWRITEARRAY
         /*
          * Override ByteBuffer.put(byte[], int, int) to improve performance.
          * 
@@ -132,7 +131,6 @@ namespace J2N.IO.MemoryMappedFiles
             }
             return this;
         }
-#endif
 
         public override ByteBuffer PutDouble(double value)
         {
