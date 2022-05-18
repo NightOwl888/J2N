@@ -86,7 +86,6 @@
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREADYIELD</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_THREADPRIORITY</DefineConstants>
 
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->

@@ -559,7 +559,6 @@ namespace J2N.Threading
             st.Start();
         }
 
-#if FEATURE_THREADPRIORITY
         /**
          * @tests java.lang.Thread#getPriority()
          */
@@ -573,7 +572,6 @@ namespace J2N.Threading
                     st.Priority == ThreadPriority.Highest);
             st.Start();
         }
-#endif
 
         /////**
         //// * @tests java.lang.Thread#getThreadGroup()
@@ -1163,7 +1161,6 @@ namespace J2N.Threading
             st.Start();
         }
 
-#if FEATURE_THREADPRIORITY
         /**
          * @tests java.lang.Thread#setPriority(int)
          */
@@ -1177,7 +1174,6 @@ namespace J2N.Threading
                     st.Priority == ThreadPriority.Highest);
             st.Start();
         }
-#endif
 
         /**
          * @tests java.lang.Thread#sleep(long)
@@ -1545,11 +1541,7 @@ namespace J2N.Threading
             //st = new Thread(tg, new SimpleThread(1), "SimpleThread17");
             st = new ThreadJob(() => new SimpleThread(1).Run(), "SimpleThread17");
             string stString = st.ToString();
-#if FEATURE_THREADPRIORITY
             string expected = "Thread[SimpleThread17,Normal]";
-#else
-            string expected = "Thread[SimpleThread17]";
-#endif
             assertTrue("Returned incorrect string: " + stString + "\t(expecting :"
                     + expected + ")", stString.Equals(expected));
             st.Start();

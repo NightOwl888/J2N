@@ -255,7 +255,6 @@ namespace J2N.Threading
         //    thread.IsBackground = isDaemon;
         //}
 
-#if FEATURE_THREADPRIORITY
         /// <summary>
         /// Gets or sets a value indicating the scheduling priority of a thread.
         /// </summary>
@@ -281,7 +280,6 @@ namespace J2N.Threading
                 catch { }
             }
         }
-#endif
 
         /// <summary>
         /// Gets a value indicating the execution status of the current thread
@@ -553,11 +551,7 @@ namespace J2N.Threading
         /// <returns>A <see cref="string"/> that represents the current object.</returns>
         public override string ToString()
         {
-#if FEATURE_THREADPRIORITY
             return "Thread[" + Name + "," + Priority.ToString() + "]";
-#else
-            return "Thread[" + Name + "]";
-#endif
         }
     }
 }
