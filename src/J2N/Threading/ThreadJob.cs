@@ -393,7 +393,6 @@ namespace J2N.Threading
             thread.Abort(stateInfo);
         }
 #endif
-#if FEATURE_THREADYIELD
 
         /// <summary>
         /// Causes the calling <see cref="Thread"/> to yield execution time to another <see cref="Thread"/> that
@@ -403,7 +402,6 @@ namespace J2N.Threading
         {
             Thread.Yield();
         }
-#endif
 
         /// <summary>
         /// Suspends the thread. This is a no-op if the receiver is already suspended.

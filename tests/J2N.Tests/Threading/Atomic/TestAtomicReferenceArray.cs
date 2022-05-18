@@ -156,7 +156,6 @@ namespace J2N.Threading.Atomic
             }
         }
 
-#if FEATURE_THREADYIELD
         /**
          * compareAndSet in one thread enables another waiting for value
          * to succeed
@@ -183,7 +182,6 @@ namespace J2N.Threading.Atomic
                 unexpectedException();
             }
         }
-#endif
 
         /////**
         //// * repeated weakCompareAndSet succeeds in changing value when equal
