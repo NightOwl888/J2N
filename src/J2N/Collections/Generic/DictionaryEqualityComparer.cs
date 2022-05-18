@@ -41,17 +41,9 @@ namespace J2N.Collections.Generic
 #endif
     public abstract class DictionaryEqualityComparer<TKey, TValue> : IEqualityComparer<IDictionary<TKey, TValue>>, IEqualityComparer, IDictionaryEqualityComparer
     {
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-        private static readonly bool TKeyIsValueType = typeof(TKey).GetTypeInfo().IsValueType;
-#else
         private static readonly bool TKeyIsValueType = typeof(TKey).IsValueType;
-#endif
         private static readonly bool TKeyIsObject = typeof(TKey).Equals(typeof(object));
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-        private static readonly bool TValueIsValueType = typeof(TValue).GetTypeInfo().IsValueType;
-#else
         private static readonly bool TValueIsValueType = typeof(TValue).IsValueType;
-#endif
         private static readonly bool TValueIsObject = typeof(TValue).Equals(typeof(object));
 
         private readonly StructuralEqualityComparer structuralEqualityComparer;

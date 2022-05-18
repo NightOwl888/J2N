@@ -94,7 +94,6 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard1.')) Or $(TargetFramework.StartsWith('netcoreapp1.')) ">
 
     <DefineConstants>$(DefineConstants);NETCOREAPP1_X</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_TYPEEXTENSIONS_GETTYPEINFO</DefineConstants>
 
   </PropertyGroup>
 
