@@ -84,7 +84,6 @@
     
     <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_STRINGINTERN</DefineConstants>
 
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->
