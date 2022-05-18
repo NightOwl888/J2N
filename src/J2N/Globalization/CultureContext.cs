@@ -38,7 +38,6 @@ namespace J2N.Globalization
     /// </summary>
     public sealed class CultureContext : IDisposable
     {
-#if FEATURE_CULTUREINFO_LCID
         /// <summary>
         /// Initializes a new instance of <see cref="CultureInfo"/>
         /// based on the culture specified by the <paramref name="culture"/> identifier.
@@ -65,7 +64,6 @@ namespace J2N.Globalization
             : this(new CultureInfo(culture), new CultureInfo(uiCulture))
         {
         }
-#endif
 
         /// <summary>
         /// Initializes a new instance of <see cref="CultureInfo"/>
