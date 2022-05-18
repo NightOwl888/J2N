@@ -749,7 +749,6 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-#if FEATURE_CONVERTER
         /// <summary>
         /// Converts the elements in the current <see cref="List{T}"/> to another type, and
         /// returns a list containing the converted elements.
@@ -785,7 +784,6 @@ namespace J2N.Collections.Generic
             list._size = size;
             return list;
         }
-#endif
 
         /// <summary>
         /// Copies the entire <see cref="List{T}"/> to a compatible one-dimensional array, starting
