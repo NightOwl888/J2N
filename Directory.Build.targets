@@ -125,6 +125,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_THREAD_ISENTERED</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
     
   </PropertyGroup>
