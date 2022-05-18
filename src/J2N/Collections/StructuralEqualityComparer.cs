@@ -107,12 +107,7 @@ namespace J2N.Collections
         private bool ArrayEquals(Array arrayX, Array arrayY)
         {
             Type? elementTypeX = arrayX.GetType().GetElementType();
-            bool isPrimitive = elementTypeX != null &&
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                elementTypeX.GetTypeInfo().IsPrimitive;
-#else
-                elementTypeX.IsPrimitive;
-#endif
+            bool isPrimitive = elementTypeX != null && elementTypeX.IsPrimitive;
             if (isPrimitive && elementTypeX!.Equals(arrayY.GetType().GetElementType()))
             {
                 return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementTypeX).Equals(arrayX, arrayY);
@@ -188,12 +183,7 @@ namespace J2N.Collections
         private int GetArrayHashCode(Array array)
         {
             Type? elementType = array.GetType().GetElementType();
-            bool isPrimitive = elementType != null &&
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                elementType.GetTypeInfo().IsPrimitive;
-#else
-                elementType.IsPrimitive;
-#endif
+            bool isPrimitive = elementType != null && elementType.IsPrimitive;
             if (isPrimitive)
                 return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).GetHashCode(array);
 

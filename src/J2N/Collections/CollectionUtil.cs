@@ -114,12 +114,8 @@ namespace J2N.Collections
             if (objA is Array arrayA && arrayA.Rank == 1 && objB is Array arrayB && arrayB.Rank == 1)
             {
                 Type? elementType = tA.GetElementType();
-                bool isPrimitive = elementType != null &&
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                    elementType.GetTypeInfo().IsPrimitive;
-#else
-                    elementType.IsPrimitive;
-#endif
+                bool isPrimitive = elementType != null && elementType.IsPrimitive;
+
                 if (isPrimitive)
                     return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).Equals(objA, objB);
 
@@ -137,12 +133,7 @@ namespace J2N.Collections
             else if (objA is IStructuralEquatable seObj)
                 return seObj.Equals(objB, StructuralEqualityComparer.Aggressive);
 
-            bool isGenericType =
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                tA.GetTypeInfo().IsGenericType;
-#else
-                tA.IsGenericType;
-#endif
+            bool isGenericType = tA.IsGenericType;
             if (isGenericType)
             {
                 bool shouldReturn = false;
@@ -259,12 +250,7 @@ namespace J2N.Collections
             if (obj is Array array && array.Rank == 1)
             {
                 Type? elementType = t.GetElementType();
-                bool isPrimitive = elementType != null &&
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                    elementType.GetTypeInfo().IsPrimitive;
-#else
-                    elementType.IsPrimitive;
-#endif
+                bool isPrimitive = elementType != null && elementType.IsPrimitive;
                 if (isPrimitive)
                     return ArrayEqualityUtil.GetPrimitiveOneDimensionalArrayEqualityComparer(elementType!).GetHashCode(obj);
 
@@ -287,13 +273,7 @@ namespace J2N.Collections
             }
             else if (obj is IStructuralEquatable seObj)
                 return seObj.GetHashCode(StructuralEqualityComparer.Aggressive);
-            else if (
- #if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                t.GetTypeInfo().IsGenericType
-#else
-                t.IsGenericType
-#endif
-                && (t.ImplementsGenericInterface(typeof(IList<>))
+            else if (t.IsGenericType && (t.ImplementsGenericInterface(typeof(IList<>))
                 || t.ImplementsGenericInterface(typeof(ISet<>))
                 || t.ImplementsGenericInterface(typeof(IDictionary<,>))))
             {
@@ -446,13 +426,7 @@ namespace J2N.Collections
         {
             if (obj is null) return "null";
             Type t = obj.GetType();
-            if (
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-                t.GetTypeInfo().IsGenericType
-#else
-                t.IsGenericType
-#endif
-                && (t.ImplementsGenericInterface(typeof(ICollection<>)))
+            if (t.IsGenericType && (t.ImplementsGenericInterface(typeof(ICollection<>)))
                 || t.ImplementsGenericInterface(typeof(IDictionary<,>)))
             {
                 return ToStringImpl(obj, t, provider);

@@ -45,11 +45,7 @@ namespace J2N.Collections.ObjectModel
 #endif
     public class ReadOnlyList<T> : System.Collections.ObjectModel.ReadOnlyCollection<T>, IStructuralEquatable, IStructuralFormattable
     {
-#if FEATURE_TYPEEXTENSIONS_GETTYPEINFO
-        private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).GetTypeInfo().IsValueType || typeof(IStructuralEquatable).GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo()) || typeof(string).Equals(typeof(T));
-#else
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
-#endif
 
         private readonly ListEqualityComparer<T> structuralEqualityComparer;
         private readonly IFormatProvider toStringFormatProvider;
