@@ -79,7 +79,6 @@
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_LCID</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_FILESTREAM_LOCK</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMAPPEDVIEWACCESSOR_READWRITEARRAY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_INTERNALCALL</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
     
     <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
