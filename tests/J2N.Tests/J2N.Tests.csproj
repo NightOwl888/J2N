@@ -5,6 +5,14 @@
   
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn Label="Do not ignore method results">$(NoWarn);CA1806</NoWarn>
+    <NoWarn Label="Consider using String.Contains instead of String.IndexOf">$(NoWarn);CA2249</NoWarn>
+    
+    <NoWarn Label="Use compound assignment">$(NoWarn);IDE0054</NoWarn>
+    
     <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 

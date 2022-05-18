@@ -21,8 +21,8 @@ namespace J2N.Collections.Generic
         internal class SubList : List<T>
         {
             internal List<T> parent; // Internal for testing
-            private int parentOffset; // Tracks the diff between current offset and parent's offset (for calls to parent)
-            private int offset; // Keeps track of the total offset of the current SubList (calls not overridden in List<T> use this)
+            private readonly int parentOffset; // Tracks the diff between current offset and parent's offset (for calls to parent)
+            private readonly int offset; // Keeps track of the total offset of the current SubList (calls not overridden in List<T> use this)
             private int size; // Locally keeps track of the length of this SubList (including edits)
 
             public SubList(List<T> list, int startIndex, int count)

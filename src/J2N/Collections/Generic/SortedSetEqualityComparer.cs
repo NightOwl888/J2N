@@ -4,13 +4,14 @@
 // Dependency of SortedSet, SortedDictionary
 
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
 
 namespace J2N.Collections.Generic
 {
     /// <summary>
     /// A comparer for two <see cref="SortedSet{T}"/>.
     /// </summary>
+    [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Using Microsoft's code styles")]
     internal sealed class SortedSetEqualityComparer<T> : IEqualityComparer<SortedSet<T>>
     {
         private readonly IComparer<T> _comparer;

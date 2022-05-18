@@ -7,6 +7,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System.IO;
     using System.Runtime.Serialization;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
@@ -295,7 +296,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
                 case "TestCase.FullyQualifiedName":
                     this.FullyQualifiedName = (string)value; return;
                 case "TestCase.Id":
-                    this.Id = value is Guid ? (Guid)value : Guid.Parse((string)value); return;
+                    this.Id = value is Guid guid ? guid : Guid.Parse((string)value); return;
                 case "TestCase.LineNumber":
                     this.LineNumber = (int)value; return;
                 case "TestCase.Source":
@@ -312,6 +313,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     /// Well-known TestCase properties
     /// </summary>
+    [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2104 doesn't fire on all target frameworks")]
     public static class TestCaseProperties
     {
         #region Private Constants
@@ -330,27 +332,21 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #endregion
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+#pragma warning disable CA2104 // DoNotDeclareReadOnlyMutableReferenceTypes
         public static readonly TestProperty Id = TestProperty.Register("TestCase.Id", IdLabel, string.Empty, string.Empty, typeof(Guid), ValidateGuid, TestPropertyAttributes.Hidden, typeof(TestCase));
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty FullyQualifiedName = TestProperty.Register("TestCase.FullyQualifiedName", FullyQualifiedNameLabel, string.Empty, string.Empty, typeof(string), ValidateName, TestPropertyAttributes.Hidden, typeof(TestCase));
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty DisplayName = TestProperty.Register("TestCase.DisplayName", NameLabel, string.Empty, string.Empty, typeof(string), ValidateDisplay, TestPropertyAttributes.None, typeof(TestCase));
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty ExecutorUri = TestProperty.Register("TestCase.ExecutorUri", ExecutorUriLabel, string.Empty, string.Empty, typeof(Uri), ValidateExecutorUri, TestPropertyAttributes.Hidden, typeof(TestCase));
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty Source = TestProperty.Register("TestCase.Source", SourceLabel, typeof(string), typeof(TestCase));
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty CodeFilePath = TestProperty.Register("TestCase.CodeFilePath", FilePathLabel, typeof(string), typeof(TestCase));
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
         public static readonly TestProperty LineNumber = TestProperty.Register("TestCase.LineNumber", LineNumberLabel, typeof(int), TestPropertyAttributes.Hidden, typeof(TestCase));
-
+#pragma warning restore CA2104 // DoNotDeclareReadOnlyMutableReferenceTypes
         internal static TestProperty[] Properties { get; } =
         {
             CodeFilePath,

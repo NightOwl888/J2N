@@ -1334,6 +1334,7 @@ namespace J2N.Numerics
         /// </remarks>
         /// <seealso cref="Parse(ICharSequence, int, int, int)"/>
         /// <seealso cref="Parse(string?, int)"/>
+        [SuppressMessage("Style", "IDE0018:Inline variable declaration", Justification = "Readability")]
         public static bool TryParse(ICharSequence s, int startIndex, int length, int radix, out byte result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
             result = default;

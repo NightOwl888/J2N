@@ -244,6 +244,7 @@ namespace J2N.Threading
         /// </summary>
         public ThreadState State => thread.ThreadState;
 
+
         // TODO: Add extension method
         ///// <summary>
         ///// Set if the receiver is a daemon thread or not. This can only be done
@@ -258,7 +259,7 @@ namespace J2N.Threading
         /// <summary>
         /// Gets or sets a value indicating the scheduling priority of a thread.
         /// </summary>
-        public ThreadPriority Priority
+        public ThreadPriority Priority // J2N TODO: Remove try/catch when setting here - we may need feedback. Need to test against Lucene.NET.
         {
             get
             {
@@ -466,10 +467,12 @@ namespace J2N.Threading
             {
                 Thread.Sleep(0);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (ThreadInterruptedException)
             {
                 return true;
             }
+#pragma warning restore CA1031 // Do not catch general exception types
             return false;
         }
 

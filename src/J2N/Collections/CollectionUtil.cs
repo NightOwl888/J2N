@@ -28,6 +28,7 @@ using System.Text;
 
 namespace J2N.Collections
 {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
     /// <summary>
@@ -320,25 +321,23 @@ namespace J2N.Collections
 
             provider ??= StringFormatter.CurrentCulture;
 
-            using (var it = collection.GetEnumerator())
+            using var it = collection.GetEnumerator();
+            StringBuilder sb = new StringBuilder();
+            sb.Append('[');
+            it.MoveNext();
+            while (true)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.Append('[');
-                it.MoveNext();
-                while (true)
+                T e = it.Current;
+                sb.Append(object.ReferenceEquals(e, collection) ?
+                    "(this Collection)" :
+                    (e is IStructuralFormattable formattable ?
+                        formattable.ToString(SingleFormatArgument, provider) :
+                        string.Format(provider, SingleFormatArgument, e)));
+                if (!it.MoveNext())
                 {
-                    T e = it.Current;
-                    sb.Append(object.ReferenceEquals(e, collection) ? 
-                        "(this Collection)" : 
-                        (e is IStructuralFormattable formattable ? 
-                            formattable.ToString(SingleFormatArgument, provider) : 
-                            string.Format(provider, SingleFormatArgument, e)));
-                    if (!it.MoveNext())
-                    {
-                        return sb.Append(']').ToString();
-                    }
-                    sb.Append(',').Append(' ');
+                    return sb.Append(']').ToString();
                 }
+                sb.Append(',').Append(' ');
             }
         }
 
@@ -377,33 +376,31 @@ namespace J2N.Collections
 
             provider ??= StringFormatter.CurrentCulture;
 
-            using (var i = dictionary.GetEnumerator())
+            using var i = dictionary.GetEnumerator();
+            StringBuilder sb = new StringBuilder();
+            sb.Append('{');
+            i.MoveNext();
+            while (true)
             {
-                StringBuilder sb = new StringBuilder();
-                sb.Append('{');
-                i.MoveNext();
-                while (true)
+                KeyValuePair<TKey, TValue> e = i.Current;
+                TKey key = e.Key;
+                TValue value = e.Value;
+                sb.Append(ReferenceEquals(key, dictionary) ?
+                    "(this Dictionary)" :
+                    (key is IStructuralFormattable formattableKey ?
+                        formattableKey.ToString(SingleFormatArgument, provider) :
+                        string.Format(provider, SingleFormatArgument, key)));
+                sb.Append('=');
+                sb.Append(ReferenceEquals(value, dictionary) ?
+                    "(this Dictionary)" :
+                    (value is IStructuralFormattable formattableValue ?
+                        formattableValue.ToString(SingleFormatArgument, provider) :
+                        string.Format(provider, SingleFormatArgument, value)));
+                if (!i.MoveNext())
                 {
-                    KeyValuePair<TKey, TValue> e = i.Current;
-                    TKey key = e.Key;
-                    TValue value = e.Value;
-                    sb.Append(ReferenceEquals(key, dictionary) ? 
-                        "(this Dictionary)" : 
-                        (key is IStructuralFormattable formattableKey ?
-                            formattableKey.ToString(SingleFormatArgument, provider) :
-                            string.Format(provider, SingleFormatArgument, key)));
-                    sb.Append('=');
-                    sb.Append(ReferenceEquals(value, dictionary) ?
-                        "(this Dictionary)" :
-                        (value is IStructuralFormattable formattableValue ?
-                            formattableValue.ToString(SingleFormatArgument, provider) :
-                            string.Format(provider, SingleFormatArgument, value)));
-                    if (!i.MoveNext())
-                    {
-                        return sb.Append('}').ToString();
-                    }
-                    sb.Append(',').Append(' ');
+                    return sb.Append('}').ToString();
                 }
+                sb.Append(',').Append(' ');
             }
         }
 
@@ -440,7 +437,7 @@ namespace J2N.Collections
             dynamic? genericType = Convert.ChangeType(obj, type);
             return ToString(genericType, provider);
         }
-    }
-
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
+    }
 }

@@ -1,6 +1,11 @@
 ﻿<Project>
 
   <Import Project="$(MSBuildThisFileDirectory)/.build/dependencies.props" Condition="Exists('$(MSBuildThisFileDirectory)/.build/dependencies.props')" />
+
+  <PropertyGroup Label="Warnings to be Disabled in Solution">
+    <!-- .NET Framework doesn't support range operators -->
+    <NoWarn Label="Use range operator">$(NoWarn);IDE0057</NoWarn>
+  </PropertyGroup>
   
   <!-- Features in .NET Standard, .NET Core, .NET 5.x, and .NET 6.x only (no .NET Framework support) -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">

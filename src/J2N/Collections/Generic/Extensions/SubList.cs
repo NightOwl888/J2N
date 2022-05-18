@@ -25,7 +25,7 @@ namespace J2N.Collections.Generic
     internal class SubList<T> : IList<T>, IStructuralEquatable, IStructuralFormattable
     {
         internal IList<T> parent; // Internal for testing
-        private int parentOffset; // Tracks the diff between current offset and parent's offset (for calls to parent)
+        private readonly int parentOffset; // Tracks the diff between current offset and parent's offset (for calls to parent)
         private int size; // Locally keeps track of the length of this SubList (including edits)
         private int version; // Tracks changes to the current SubList (for enumerators)
         private int parentCount; // Best effort to track changes to parent (blow up if the Count changes, but it is expensive to determine if an unknown IList<T> has mutated beyond that)

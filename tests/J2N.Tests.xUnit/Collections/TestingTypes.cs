@@ -267,6 +267,7 @@ namespace J2N.Collections.Tests
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "by design")]
     public class GenericComparable : IComparable<GenericComparable>
     {
         private readonly int _value;
@@ -279,6 +280,7 @@ namespace J2N.Collections.Tests
         public int CompareTo(GenericComparable other) => _value.CompareTo(other._value);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "by design")]
     public class NonGenericComparable : IComparable
     {
         private readonly GenericComparable _inner;
@@ -299,6 +301,7 @@ namespace J2N.Collections.Tests
         public int CompareTo(object other) => -1;
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "by design")]
     public class MutatingComparable : IComparable<MutatingComparable>, IComparable
     {
         private int _state;
@@ -324,6 +327,7 @@ namespace J2N.Collections.Tests
         }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "by design")]
     public struct ValueComparable<T> : IComparable<ValueComparable<T>> where T : IComparable<T>
     {
         public ValueComparable(T value)
@@ -337,6 +341,8 @@ namespace J2N.Collections.Tests
             Value.CompareTo(other.Value);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1067:Override Object.Equals(object) when implementing IEquatable<T>", Justification = "by design")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1067 doesn't fire on all target frameworks")]
     public class Equatable : IEquatable<Equatable>
     {
         public Equatable(int value)
@@ -367,6 +373,8 @@ namespace J2N.Collections.Tests
         public int Value { get; set; }
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1067:Override Object.Equals(object) when implementing IEquatable<T>", Justification = "by design")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1067 doesn't fire on all target frameworks")]
     public class DelegateEquatable : IEquatable<DelegateEquatable>
     {
         public DelegateEquatable()
@@ -379,6 +387,8 @@ namespace J2N.Collections.Tests
         public bool Equals(DelegateEquatable other) => EqualsWorker(other);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1067:Override Object.Equals(object) when implementing IEquatable<T>", Justification = "by design")]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1067 doesn't fire on all target frameworks")]
     public struct ValueDelegateEquatable : IEquatable<ValueDelegateEquatable>
     {
         public Func<ValueDelegateEquatable, bool> EqualsWorker { get; set; }

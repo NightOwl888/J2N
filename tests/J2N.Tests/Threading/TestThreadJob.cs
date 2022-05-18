@@ -7,18 +7,19 @@ namespace J2N.Threading
     public class TestThreadJob : TestCase
     {
         [Test]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1840 doesn't fire on all target frameworks")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", "CA1840:Use 'Environment.CurrentManagedThreadId'", Justification = "<Pending>")]
         public void TestBasic()
         {
             ThreadJob thread = new ThreadJob();
 
             //Compare Current Thread Ids
-            Assert.IsTrue(ThreadJob.CurrentThread.Instance.ManagedThreadId == System.Threading.Thread.CurrentThread.ManagedThreadId);
-
+            Assert.IsTrue(ThreadJob.CurrentThread.Instance.ManagedThreadId == Thread.CurrentThread.ManagedThreadId);
 
             //Compare instances of ThreadClass
             MyThread mythread = new MyThread();
             mythread.Start();
-            while (mythread.Result == null) System.Threading.Thread.Sleep(1);
+            while (mythread.Result == null) Thread.Sleep(1);
             Assert.IsTrue((bool)mythread.Result);
 
 
@@ -42,8 +43,7 @@ namespace J2N.Threading
 
         internal class SimpleThread //: IRunnable
         {
-
-            int delay;
+            readonly int delay;
 
 
 
@@ -93,7 +93,7 @@ namespace J2N.Threading
 
         internal class ResSupThread //: IRunnable
         {
-            Thread parent;
+            readonly Thread parent;
 
             volatile int checkVal = -1;
 
@@ -627,11 +627,9 @@ namespace J2N.Threading
 
         internal class ChildThread1 : ThreadJob
         {
-            ThreadJob parent;
-
-            bool sync;
-
-            object syncLock;
+            readonly ThreadJob parent;
+            readonly bool sync;
+            readonly object syncLock;
 
             public override void Run()
             {

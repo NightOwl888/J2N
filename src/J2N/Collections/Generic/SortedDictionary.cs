@@ -17,6 +17,7 @@ namespace J2N.Collections.Generic
 {
     using SR = J2N.Resources.Strings;
 
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
     /// <summary>
@@ -52,6 +53,7 @@ namespace J2N.Collections.Generic
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Using Microsoft's code styles")]
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
 #if FEATURE_SERIALIZABLE
@@ -672,6 +674,8 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method approaches an O(1) operation.
         /// </remarks>
+
+
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
@@ -1020,7 +1024,7 @@ namespace J2N.Collections.Generic
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
         public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
         {
-            private IEnumerator<KeyValuePair<TKey, TValue>> _treeEnum;
+            private readonly IEnumerator<KeyValuePair<TKey, TValue>> _treeEnum;
             private readonly int _getEnumeratorRetType;  // What should Enumerator.Current return?
 
             internal const int KeyValuePair = 1;
@@ -1227,11 +1231,7 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public KeyCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                if (dictionary == null)
-                {
-                    throw new ArgumentNullException(nameof(dictionary));
-                }
-                _dictionary = dictionary;
+                _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
             }
 
             /// <summary>
@@ -1565,11 +1565,7 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public ValueCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                if (dictionary == null)
-                {
-                    throw new ArgumentNullException(nameof(dictionary));
-                }
-                _dictionary = dictionary;
+                _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
             }
 
             /// <summary>
@@ -1790,7 +1786,7 @@ namespace J2N.Collections.Generic
             [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
             internal struct Enumerator : IEnumerator<TValue>, IEnumerator
             {
-                private SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
+                private readonly SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
 
                 internal Enumerator(SortedDictionary<TKey, TValue> dictionary)
                 {
@@ -1947,4 +1943,5 @@ namespace J2N.Collections.Generic
     }
 
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
 }

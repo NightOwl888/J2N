@@ -14,7 +14,6 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     /// <summary>
     ///  Base class for test related classes.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1012:AbstractTypesShouldNotHaveConstructors")]
     [DataContract]
     public abstract class TestObject
     {
@@ -22,49 +21,49 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Fields
 
-        private static CustomKeyValueConverter keyValueConverter = new CustomKeyValueConverter();
-        private static CustomStringArrayConverter stringArrayConverter = new CustomStringArrayConverter();
+        private static readonly CustomKeyValueConverter keyValueConverter = new CustomKeyValueConverter();
+        private static readonly CustomStringArrayConverter stringArrayConverter = new CustomStringArrayConverter();
 
         /// <summary>
         /// The store for all the properties registered.
         /// </summary>
         private readonly Dictionary<TestProperty, object> store;
 
-        /// <summary>
-        /// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
-        /// by default doesn't provide the required object representation. <c>List of KeyValuePair</c> on the
-        /// other hand provides a clean Key, Value entries for <c>TestProperty</c> and it's value.
-        /// </summary>
-        [DataMember(Name = "Properties")]
-        private List<KeyValuePair<TestProperty, object>> StoreKeyValuePairs
-        {
-            get
-            {
-                return this.store.ToList();
-            }
+        ///// <summary>
+        ///// Property used for Json (de)serialization of store dictionary. Serialization of dictionaries
+        ///// by default doesn't provide the required object representation. <c>List of KeyValuePair</c> on the
+        ///// other hand provides a clean Key, Value entries for <c>TestProperty</c> and it's value.
+        ///// </summary>
+        //[DataMember(Name = "Properties")]
+        //private List<KeyValuePair<TestProperty, object>> StoreKeyValuePairs
+        //{
+        //    get
+        //    {
+        //        return this.store.ToList();
+        //    }
 
-            set
-            {
-                // Receive the <TestProperty, String> key value pairs from deserialized entity.
-                // Store each property and value in the property data store.
-                foreach (var property in value)
-                {
-                    TestProperty.Register(
-                        property.Key.Id,
-                        property.Key.Label,
-                        property.Key.Category,
-                        property.Key.Description,
-                        property.Key.GetValueType(),
-                        null,
-                        property.Key.Attributes,
-                        typeof(TestObject));
+        //    set
+        //    {
+        //        // Receive the <TestProperty, String> key value pairs from deserialized entity.
+        //        // Store each property and value in the property data store.
+        //        foreach (var property in value)
+        //        {
+        //            TestProperty.Register(
+        //                property.Key.Id,
+        //                property.Key.Label,
+        //                property.Key.Category,
+        //                property.Key.Description,
+        //                property.Key.GetValueType(),
+        //                null,
+        //                property.Key.Attributes,
+        //                typeof(TestObject));
 
-                    // Do not call SetPropertyValue(TestProperty property, object value) as it does not
-                    // invoke ConvertPropertyFrom and does not store the properties in correct types.
-                    this.SetPropertyValue(property.Key, property.Value, CultureInfo.InvariantCulture);
-                }
-            }
-        }
+        //            // Do not call SetPropertyValue(TestProperty property, object value) as it does not
+        //            // invoke ConvertPropertyFrom and does not store the properties in correct types.
+        //            this.SetPropertyValue(property.Key, property.Value, CultureInfo.InvariantCulture);
+        //        }
+        //    }
+        //}
 
         public IEnumerable<KeyValuePair<TestProperty, object>> GetProperties()
         {
@@ -188,8 +187,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             if (property is null)
                 throw new ArgumentNullException(nameof(property));
 
-            object value;
-            if (this.store.TryGetValue(property, out value))
+            if (this.store.TryGetValue(property, out _))
             {
                 this.store.Remove(property);
             }
@@ -254,8 +252,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             if (property is null)
                 throw new ArgumentNullException(nameof(property));
 
-            object value;
-            if (!this.store.TryGetValue(property, out value))
+            if (!this.store.TryGetValue(property, out object value))
             {
                 value = defaultValue;
             }
@@ -335,10 +332,12 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
+
         /// <summary>
         /// Convert passed in value into the specified type when property is registered.
         /// </summary>
         /// <returns>Converted object</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0034:Simplify 'default' expression", Justification = "Following Microsoft's code style")]
         private static T ConvertPropertyTo<T>(TestProperty property, CultureInfo culture, object value)
         {
             if (property is null)
@@ -352,9 +351,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             {
                 return default(T);
             }
-            else if (value is T)
+            else if (value is T t)
             {
-                return (T)value;
+                return t;
             }
             //else if (lazyValue != null)
             //{

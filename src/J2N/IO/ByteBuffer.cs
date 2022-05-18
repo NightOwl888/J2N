@@ -667,10 +667,12 @@ namespace J2N.IO
             return this;
         }
 
+
         /// <summary>
         /// Child class implements this method to realize <see cref="Array"/>.
         /// </summary>
         /// <seealso cref="Array"/>
+        [SuppressMessage("Performance", "CA1819:Properties should not return arrays", Justification = "Design requires some array properties")]
         protected abstract byte[] ProtectedArray { get; }
 
         /// <summary>

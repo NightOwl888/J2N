@@ -1559,7 +1559,11 @@ namespace J2N
             if (count < 0)
                 throw new ArgumentOutOfRangeException(nameof(count));
             if (count > seq.Length - start || index < start || index > start + count)
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
                 throw new ArgumentOutOfRangeException();
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
             return OffsetByCodePointsImpl(seq, start, count, index, codePointOffset);
         }

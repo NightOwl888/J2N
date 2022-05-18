@@ -196,9 +196,8 @@ namespace J2N.Collections.ObjectModel
                 // we can't figure out if we can successfully copy the element beforehand.
                 //
 
-#pragma warning disable CS8604 // Possible null reference argument.
+
                 Type targetType = array.GetType();
-#pragma warning restore CS8604 // Possible null reference argument.
                 Type sourceType = typeof(T);
 
                 if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))

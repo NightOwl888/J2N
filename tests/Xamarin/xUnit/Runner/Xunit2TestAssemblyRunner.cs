@@ -47,7 +47,7 @@ namespace Xunit.Runner
         }
 
 
-        List<ITestCase> GetTestCases(AssemblyRunInfo runInfo, ITestFrameworkDiscoverer discoverer)
+        static List<ITestCase> GetTestCases(AssemblyRunInfo runInfo, ITestFrameworkDiscoverer discoverer)
         {
             string assemblyFileName = runInfo.AssemblyFileName;
             // Xunit needs the file name
@@ -216,7 +216,7 @@ namespace Xunit.Runner
             return new Guid(b);
         }
 
-        IList<DiscoveredTestCase> GetVsTestCases(string source, ITestFrameworkDiscoverer discoverer, List<ITestCase> testCases /*, VsExecutionDiscoverySink visitor, LoggerHelper logger, TestPlatformContext testPlatformContext*/)
+        static IList<DiscoveredTestCase> GetVsTestCases(string source, ITestFrameworkDiscoverer discoverer, List<ITestCase> testCases /*, VsExecutionDiscoverySink visitor, LoggerHelper logger, TestPlatformContext testPlatformContext*/)
         {
             var descriptorProvider = (discoverer as ITestCaseDescriptorProvider) ?? new DefaultTestCaseDescriptorProvider(discoverer);
             //var testCases = visitor.TestCases;

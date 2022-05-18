@@ -401,16 +401,16 @@ namespace J2N
             assertEquals(1, props.Count);
         }
 
-        private String comment1 = "comment1";
+        private readonly string comment1 = "comment1";
 
-        private String comment2 = "comment2";
+        private readonly string comment2 = "comment2";
 
-        private void validateOutput(String[] expectStrings, byte[] output)
+        private void validateOutput(string[] expectStrings, byte[] output)
         {
             MemoryStream bais = new MemoryStream(output);
             TextReader br = new StreamReader(bais,
                     Encoding.GetEncoding("ISO-8859-1"));
-            foreach (String expectString in expectStrings)
+            foreach (string expectString in expectStrings)
             {
                 assertEquals(expectString, br.ReadLine());
             }
@@ -425,7 +425,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\r' + comment2);
-            validateOutput(new String[] { "#comment1", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -436,7 +436,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\n' + comment2);
-            validateOutput(new String[] { "#comment1", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -447,7 +447,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\r' + '\n' + comment2);
-            validateOutput(new String[] { "#comment1", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -458,7 +458,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\n' + '\r' + comment2);
-            validateOutput(new String[] { "#comment1", "#", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -469,7 +469,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\r' + '#' + comment2);
-            validateOutput(new String[] { "#comment1", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -480,7 +480,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\r' + '!' + comment2);
-            validateOutput(new String[] { "#comment1", "!comment2" },
+            validateOutput(new string[] { "#comment1", "!comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -491,7 +491,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\n' + '#' + comment2);
-            validateOutput(new String[] { "#comment1", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -502,7 +502,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\n' + '!' + comment2);
-            validateOutput(new String[] { "#comment1", "!comment2" },
+            validateOutput(new string[] { "#comment1", "!comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -513,7 +513,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\r' + '\n' + '#' + comment2);
-            validateOutput(new String[] { "#comment1", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -524,7 +524,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\n' + '\r' + '#' + comment2);
-            validateOutput(new String[] { "#comment1", "#", "#comment2" },
+            validateOutput(new string[] { "#comment1", "#", "#comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -535,7 +535,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\r' + '\n' + '!' + comment2);
-            validateOutput(new String[] { "#comment1", "!comment2" },
+            validateOutput(new string[] { "#comment1", "!comment2" },
                     baos.ToArray());
             baos.Dispose();
         }
@@ -546,7 +546,7 @@ namespace J2N
             MemoryStream baos = new MemoryStream();
             Dictionary<string, string> props = new Dictionary<string, string>();
             props.SaveProperties(baos, comment1 + '\n' + '\r' + '!' + comment2);
-            validateOutput(new String[] { "#comment1", "#", "!comment2" },
+            validateOutput(new string[] { "#comment1", "#", "!comment2" },
                     baos.ToArray());
             baos.Dispose();
         }

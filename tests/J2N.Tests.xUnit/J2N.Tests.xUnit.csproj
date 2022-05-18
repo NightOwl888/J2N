@@ -4,6 +4,8 @@
 
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
+
+    <NoWarn Label="Use Length/Count property instead of Enumerable.Count method">$(NoWarn);CA1829</NoWarn>
     <NoWarn Label="Do not use equality check to check for collection size.">$(NoWarn);xUnit2013</NoWarn>
     <NoWarn Label="Do not use typeof() expression to check the exception type.">$(NoWarn);xUnit2015</NoWarn>
     <NoWarn Label="Do not use Contains() to check if a value exists in a collection.">$(NoWarn);xUnit2017</NoWarn>

@@ -7,7 +7,7 @@ namespace J2N.Collections
 {
     public class Support_UnmodifiableMapTest : TestCase
     {
-        IDictionary<string, Integer> map;
+        readonly IDictionary<string, Integer> map;
 
         // must be a map containing the string keys "0"-"99" paired with the Integer
         // values Integer(0) to Integer(99)

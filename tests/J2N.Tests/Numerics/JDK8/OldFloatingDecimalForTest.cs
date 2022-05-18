@@ -32,8 +32,8 @@ namespace J2N.Numerics
 {
     public class OldFloatingDecimalForTest
     {
-        bool isExceptional;
-        bool isNegative;
+        readonly bool isExceptional;
+        readonly bool isNegative;
         int decExponent;
         char[] digits;
         int nDigits;
@@ -142,7 +142,7 @@ namespace J2N.Numerics
          */
         private static OldFDBigIntForTest[] b5p;
 
-        private static object syncLock = new object();
+        private static readonly object syncLock = new object();
 
         private static OldFDBigIntForTest big5pow(int p)
         {
@@ -1158,7 +1158,7 @@ namespace J2N.Numerics
         }
 
         // Per-thread buffer for string/stringbuffer conversion
-        private static ThreadLocal<char[]> perThreadBuffer = new ThreadLocal<char[]>(() => new char[26]);
+        private static readonly ThreadLocal<char[]> perThreadBuffer = new ThreadLocal<char[]>(() => new char[26]);
 
 
         public void appendTo(IAppendable buf)
@@ -2301,7 +2301,7 @@ namespace J2N.Numerics
 
                         // Turn "integer.fraction" into "integer"+"fraction"
                         significandString =
-                            ((group6 == null) ? "" : group6) + // is the null
+                            (group6 ?? string.Empty) + // is the null
                                                                // check necessary?
                             group7;
                     }

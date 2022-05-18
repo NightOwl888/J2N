@@ -74,6 +74,8 @@ namespace J2N.Text
 
 #if FEATURE_SERIALIZABLE_STRINGS
         [NonSerialized]
+#else
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "not readonly for serilization")]
 #endif
         private object syncRoot = new object(); // not readonly for serilization
 

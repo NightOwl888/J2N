@@ -20,6 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities
         /// to a new Guid.
         /// </summary>
         [SuppressMessage("Microsoft.Cryptographic.Standard", "CA5354:SHA1CannotBeUsed", Justification = "Hash Algorithm is used only to generate unique testcase id.")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA5354 doesn't fire on all target frameworks")]
         public static Guid GuidFromString(string data)
         {
             Debug.Assert(data != null);

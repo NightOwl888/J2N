@@ -519,8 +519,8 @@ namespace J2N.Collections.Concurrent
 
         class KeyValueEquality<TKey, TValue> : IEqualityComparer<KeyValuePair<TKey, TValue>>
         {
-            IEqualityComparer<TKey> KeyComparer = EqualityComparer<TKey>.Default;
-            IEqualityComparer<TValue> ValueComparer = EqualityComparer<TValue>.Default;
+            readonly IEqualityComparer<TKey> KeyComparer = EqualityComparer<TKey>.Default;
+            readonly IEqualityComparer<TValue> ValueComparer = EqualityComparer<TValue>.Default;
             public bool Equals(KeyValuePair<TKey, TValue> x, KeyValuePair<TKey, TValue> y)
             {
                 return KeyComparer.Equals(x.Key, y.Key) && ValueComparer.Equals(x.Value, y.Value);

@@ -384,33 +384,17 @@ namespace J2N.IO
                         }
                         else
                         {
-                            switch (c1)
+                            peekOne = c1 switch
                             {
-                                case 'a':
-                                    peekOne = 0x7;
-                                    break;
-                                case 'b':
-                                    peekOne = 0x8;
-                                    break;
-                                case 'f':
-                                    peekOne = 0xc;
-                                    break;
-                                case 'n':
-                                    peekOne = 0xA;
-                                    break;
-                                case 'r':
-                                    peekOne = 0xD;
-                                    break;
-                                case 't':
-                                    peekOne = 0x9;
-                                    break;
-                                case 'v':
-                                    peekOne = 0xB;
-                                    break;
-                                default:
-                                    peekOne = c1;
-                                    break;
-                            }
+                                'a' => 0x7,
+                                'b' => 0x8,
+                                'f' => 0xc,
+                                'n' => 0xA,
+                                'r' => 0xD,
+                                't' => 0x9,
+                                'v' => 0xB,
+                                _ => c1,
+                            };
                         }
                     }
                     if (readPeek)

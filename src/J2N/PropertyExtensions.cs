@@ -481,12 +481,8 @@ namespace J2N
             if (output == null)
                 throw new ArgumentNullException(nameof(output));
 
-#if NET40
-            using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024))
-#else
-            using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024, true))
-#endif
-                Store0(properties, sw, null, true);
+            using var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), bufferSize: 1024);
+            Store0(properties, sw, null, true);
         }
 
         /// <summary>
@@ -548,12 +544,8 @@ namespace J2N
             if (comments == null)
                 throw new ArgumentNullException(nameof(comments));
 
-#if NET40
-            using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024))
-#else
-            using (var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), 1024, true))
-#endif
-                Store0(properties, sw, comments, true);
+            using var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), bufferSize: 1024);
+            Store0(properties, sw, comments, true);
         }
 
         /// <summary>
@@ -700,7 +692,7 @@ namespace J2N
 
             while ((limit = lr.ReadLine()) >= 0)
             {
-                c = (char)0;
+                //c = (char)0; // J2N: Unnecessary variable assignment
                 keyLen = 0;
                 valueStart = limit;
                 hasSep = false;
@@ -786,7 +778,7 @@ namespace J2N
             internal int ReadLine()
             {
                 int len = 0;
-                char c = (char)0;
+                char c; // J2N: Removed unnecesary value assignment
 
                 bool skipWhiteSpace = true;
                 bool isCommentLine = false;

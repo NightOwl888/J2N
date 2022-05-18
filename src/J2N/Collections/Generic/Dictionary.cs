@@ -833,9 +833,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method approaches an O(1) operation.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             if (TKeyIsNullable && key is null)
             {
@@ -1197,11 +1199,13 @@ namespace J2N.Collections.Generic
 #if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary<TKey, TValue> Members
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => ((IReadOnlyDictionary<TKey, TValue>)dictionary).Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => ((IReadOnlyDictionary<TKey, TValue>)dictionary).Values;
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion IReadOnlyDictionary<TKey, TValue> Members
 #endif
@@ -1697,7 +1701,7 @@ namespace J2N.Collections.Generic
 
             public Enumerator(Dictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
             {
-                this.dictionary = dictionary ?? throw new ArgumentException(nameof(dictionary));
+                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
                 this.enumerator = dictionary.dictionary.GetEnumerator();
                 this.getEnumeratorRetType = getEnumeratorRetType;
                 version = dictionary.version;
@@ -1772,9 +1776,11 @@ namespace J2N.Collections.Generic
 
             object? IDictionaryEnumerator.Key
             {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
 #pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
                 {
                     if (index == 0 || (index == dictionary.Count + 1))
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
@@ -1806,9 +1812,11 @@ namespace J2N.Collections.Generic
         /// which is an interface that is used to expose all of the members of <see cref="SCG.Dictionary{TKey, TValue}"/>
         /// and <see cref="SCG.IDictionary{TKey, TValue}"/>.
         /// </summary>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         internal class ConcreteDictionary : SCG.Dictionary<TKey, TValue>, IConcreteDictionary<TKey, TValue>
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             public ConcreteDictionary(int capacity, IEqualityComparer<TKey> comparer) : base(capacity, comparer ?? EqualityComparer<TKey>.Default) { }
         }
@@ -1823,9 +1831,11 @@ namespace J2N.Collections.Generic
     /// Interface to expose all of the members of the concrete <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/> type,
     /// so we can duplicate them in other types without having to cast.
     /// </summary>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     internal interface IConcreteDictionary<TKey, TValue> : IDictionary<TKey, TValue>
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
     {
         IEqualityComparer<TKey> Comparer { get; }
 

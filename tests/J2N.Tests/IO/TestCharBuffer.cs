@@ -17,7 +17,7 @@ namespace J2N.IO
 
         protected CharBuffer buf;
 
-        private static char[] chars = "123456789a".ToCharArray();
+        private static readonly char[] chars = "123456789a".ToCharArray();
 
         public override void SetUp()
         {

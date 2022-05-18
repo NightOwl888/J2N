@@ -66,7 +66,7 @@ namespace J2N.IO
         {
             if (index < 0 || index >= limit)
             {
-                throw new ArgumentOutOfRangeException();
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             return backingArray[offset + index];
         }

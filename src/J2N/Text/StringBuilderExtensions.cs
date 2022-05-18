@@ -491,17 +491,12 @@ namespace J2N.Text
             if (value.Length == 0)
                 return 0;
 
-            switch (comparisonType)
+            return comparisonType switch
             {
-                case StringComparison.Ordinal:
-                    return IndexOfOrdinal(text, value, startIndex);
-
-                case StringComparison.OrdinalIgnoreCase:
-                    return IndexOfOrdinalIgnoreCase(text, value, startIndex);
-
-                default:
-                    return text.ToString().IndexOf(value, startIndex, comparisonType);
-            }
+                StringComparison.Ordinal => IndexOfOrdinal(text, value, startIndex),
+                StringComparison.OrdinalIgnoreCase => IndexOfOrdinalIgnoreCase(text, value, startIndex),
+                _ => text.ToString().IndexOf(value, startIndex, comparisonType),
+            };
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -889,15 +884,12 @@ namespace J2N.Text
             if (value.Length == 0)
                 return text.Length;
 
-            switch (comparisonType)
+            return comparisonType switch
             {
-                case StringComparison.Ordinal:
-                    return LastIndexOfOrdinal(text, value, startIndex);
-                case StringComparison.OrdinalIgnoreCase:
-                    return LastIndexOfOrdinalIgnoreCase(text, value, startIndex);
-                default:
-                    return text.ToString().LastIndexOf(value, startIndex, comparisonType);
-            }
+                StringComparison.Ordinal => LastIndexOfOrdinal(text, value, startIndex),
+                StringComparison.OrdinalIgnoreCase => LastIndexOfOrdinalIgnoreCase(text, value, startIndex),
+                _ => text.ToString().LastIndexOf(value, startIndex, comparisonType),
+            };
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING

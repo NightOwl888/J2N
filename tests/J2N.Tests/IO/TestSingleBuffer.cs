@@ -761,10 +761,10 @@ namespace J2N.IO
         public virtual void TestToString()
         {
             String str = buf.ToString();
-            assertTrue(str.IndexOf("Single") >= 0 || str.IndexOf("float") >= 0);
-            assertTrue(str.IndexOf("" + buf.Position) >= 0);
-            assertTrue(str.IndexOf("" + buf.Limit) >= 0);
-            assertTrue(str.IndexOf("" + buf.Capacity) >= 0);
+            assertTrue(str.IndexOf("Single", StringComparison.InvariantCulture) >= 0 || str.IndexOf("float", StringComparison.InvariantCulture) >= 0);
+            assertTrue(str.IndexOf("" + buf.Position, StringComparison.InvariantCulture) >= 0);
+            assertTrue(str.IndexOf("" + buf.Limit, StringComparison.InvariantCulture) >= 0);
+            assertTrue(str.IndexOf("" + buf.Capacity, StringComparison.InvariantCulture) >= 0);
         }
 
         internal void loadTestData1(float[] array, int offset, int length)

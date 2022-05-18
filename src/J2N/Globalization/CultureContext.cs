@@ -117,9 +117,9 @@ namespace J2N.Globalization
         /// to the <see cref="CultureInfo.CurrentUICulture"/>.</param>
         public CultureContext(CultureInfo culture, CultureInfo uiCulture)
         {
-            if (culture == null)
+            if (culture is null)
                 throw new ArgumentNullException(nameof(culture));
-            if (uiCulture == null)
+            if (uiCulture is null)
                 throw new ArgumentNullException(nameof(uiCulture));
 
             // Record the current culture settings so they can be restored later.

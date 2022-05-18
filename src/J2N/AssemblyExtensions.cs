@@ -349,10 +349,12 @@ namespace J2N
 
             public bool Equals(TypeAndResource other)
             {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8604 // Possible null reference argument. We allow null values.
                 return EqualityComparer<Type>.Default.Equals(this.type, other.type) &&
                     EqualityComparer<string>.Default.Equals(this.name, other.name);
 #pragma warning restore CS8604 // Possible null reference argument.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             }
 
             public override int GetHashCode()

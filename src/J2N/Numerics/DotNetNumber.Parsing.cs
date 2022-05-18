@@ -1054,7 +1054,7 @@ namespace J2N.Numerics
         {
             Debug.Assert((styles & ~NumberStyle.Integer) == 0, "Only handles subsets of Integer format");
 
-            if (value == string.Empty)
+            if (value.Length == 0)
                 goto FalseExit;
 
             int index = 0;
@@ -1769,7 +1769,7 @@ namespace J2N.Numerics
         {
             Debug.Assert((styles & ~NumberStyle.HexNumber) == 0, "Only handles subsets of HexNumber format");
 
-            if (value == string.Empty)
+            if (value.Length == 0)
                 goto FalseExit;
 
             int index = 0;
@@ -3204,7 +3204,8 @@ namespace J2N.Numerics
             return null;
         }
 
-        // Ternary op is a workaround for https://github.com/dotnet/runtime/issues/4207
+
+        [SuppressMessage("Style", "IDE0075:Simplify conditional expression", Justification = "Ternary op is a workaround for https://github.com/dotnet/runtime/issues/4207")]
         internal static bool IsWhite(int ch) => ch == 0x20 || (uint)(ch - 0x09) <= (0x0D - 0x09) ? true : false;
 
         private static bool IsDigit(int ch) => ((uint)ch - '0') <= 9;
@@ -3448,7 +3449,9 @@ namespace J2N.Numerics
 
                 // The ternary operator below seems redundant but helps RyuJIT generate more optimal code.
                 // See https://github.com/dotnet/runtime/issues/4207.
+#pragma warning disable IDE0075 // Simplify conditional expression
                 return (valueA == (valueB | 0x20u)) ? true : false;
+#pragma warning restore IDE0075 // Simplify conditional expression
             }
 
             Debug.Assert(length == 0);

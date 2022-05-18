@@ -44,15 +44,12 @@ namespace J2N.Numerics
         /// <returns></returns>
         public static bool AcceptUpperBound(this RoundingMode roundingMode, bool even)
         {
-            switch (roundingMode)
+            return roundingMode switch
             {
-                case RoundingMode.Conservative:
-                    return false;
-                case RoundingMode.RoundEven:
-                    return even;
-                default:
-                    return false;
-            }
+                RoundingMode.Conservative => false,
+                RoundingMode.RoundEven => even,
+                _ => false,
+            };
         }
 
         /// <summary>
@@ -63,15 +60,12 @@ namespace J2N.Numerics
         /// <returns></returns>
         public static bool AcceptLowerBound(this RoundingMode roundingMode, bool even)
         {
-            switch (roundingMode)
+            return roundingMode switch
             {
-                case RoundingMode.Conservative:
-                    return false;
-                case RoundingMode.RoundEven:
-                    return even;
-                default:
-                    return false;
-            }
+                RoundingMode.Conservative => false,
+                RoundingMode.RoundEven => even,
+                _ => false,
+            };
         }
     }
 }

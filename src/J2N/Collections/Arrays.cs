@@ -19,6 +19,7 @@
 using J2N.Text;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SR2 = J2N.Resources.Strings;
@@ -340,11 +341,11 @@ namespace J2N.Collections
 #endif
         }
 
+#if !FEATURE_ARRAYEMPTY
         private static class EmptyArrayHolder<T>
         {
-#pragma warning disable CA1825 // Avoid zero-length array allocations.
             public static readonly T[] Empty = new T[0];
-#pragma warning restore CA1825 // Avoid zero-length array allocations.
         }
+#endif
     }
 }

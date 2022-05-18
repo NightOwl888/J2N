@@ -42,6 +42,8 @@ namespace J2N.Collections.Generic
     /// call <c>ToString(StringFormatter.InvariantCulture)</c>.
     /// </summary>
     /// <typeparam name="T">The type of elements in the set.</typeparam>
+    [SuppressMessage("Style", "IDE0018:Inline variable declaration", Justification = "Following Microsoft's code style")]
+    [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Following Microsoft's code style")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
@@ -2306,7 +2308,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        private int InternalGetHashCode(int hashCode)
+        private static int InternalGetHashCode(int hashCode)
         {
             return hashCode & Lower31BitMask;
         }

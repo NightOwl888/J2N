@@ -9,7 +9,7 @@ namespace J2N.IO
     /// </summary>
     public class TestInt16Buffer2 : BaseBufferTestCase
     {
-        private static short[] VALUES = {
+        private static readonly short[] VALUES = {
             short.MinValue,
             (short) -1,
             (short) 0,

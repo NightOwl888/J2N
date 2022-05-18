@@ -27,6 +27,7 @@ namespace J2N.Collections.Generic
 {
     // J2N: For some reason, Microsoft decided that no implementation of IDictionary<TKey, TValue> should be allowed to use a null key according
     // to the nullable constraints. Fortunately, we can ignore this, but it doesn't make for the best user experience, since we allow nulls.
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
     /// <summary>
@@ -336,6 +337,7 @@ namespace J2N.Collections.Generic
         }
     }
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
     // A simple interface used to identify a dictionary equality comparer without knowing its
     // generic closing types.

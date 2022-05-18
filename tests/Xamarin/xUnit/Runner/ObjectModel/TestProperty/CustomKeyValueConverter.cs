@@ -25,8 +25,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var keyValuePairs = value as KeyValuePair<string, string>[];
-            if (keyValuePairs != null)
+            if (value is KeyValuePair<string, string>[] keyValuePairs)
             {
                 return keyValuePairs;
             }
@@ -38,8 +37,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             // KeyValuePairs are used for traits. 
-            var data = value as string;
-            if (data != null)
+            if (value is string data)
             {
                 using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(data)))
                 {

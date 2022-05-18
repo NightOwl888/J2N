@@ -20,8 +20,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// <inheritdoc/>
         public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
         {
-            var strings = value as string[];
-            if (strings != null)
+            if (value is string[] strings)
             {
                 return strings;
             }
@@ -33,8 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
             // String[] are used by adapters. E.g. TestCategory[]
-            var data = value as string;
-            if (data != null)
+            if (value is string data)
             {
                 using (var stream = new MemoryStream(Encoding.Unicode.GetBytes(data)))
                 {

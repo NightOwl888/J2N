@@ -14,8 +14,8 @@ namespace J2N.Collections.Generic.Extensions
 
         IList<IComparable<object>> myReversedLinkedList;
 
-        static object[] objArray = LoadObjArray();
-        static IComparable<object>[] myobjArray = LoadMyObjArray();
+        static readonly object[] objArray = LoadObjArray();
+        static readonly IComparable<object>[] myobjArray = LoadMyObjArray();
 
         private static object[] LoadObjArray()
         {

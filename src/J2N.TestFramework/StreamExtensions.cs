@@ -84,9 +84,11 @@ namespace J2N
                 lockPosition = stream.Position;
                 lockLength = source.Remaining;
                 fileStream = stream as FileStream;
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CA1416 // This call site is reachable on all platforms. 'FileStream.Lock(long, long)' is unsupported on: 'macOS/OSX'.
                 fileStream.Lock(lockPosition, lockLength);
 #pragma warning restore CA1416 // This call site is reachable on all platforms. 'FileStream.Lock(long, long)' is unsupported on: 'macOS/OSX'.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             }
             try
             {
@@ -102,9 +104,11 @@ namespace J2N
             }
             finally
             {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CA1416 // This call site is reachable on all platforms. 'FileStream.UnLock(long, long)' is unsupported on: 'macOS/OSX'.
                 fileStream?.Unlock(lockPosition, lockLength);
 #pragma warning restore CA1416 // This call site is reachable on all platforms. 'FileStream.UnLock(long, long)' is unsupported on: 'macOS/OSX'.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             }
             return written;
         }
