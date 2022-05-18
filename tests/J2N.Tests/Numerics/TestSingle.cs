@@ -1678,16 +1678,17 @@ namespace J2N.Numerics
                  */
                 public class PairSD
                 {
-                    public String s;
+                    public string s;
                     public float f;
-                    PairSD(String s, float f)
+
+                    internal PairSD(string s, float f)
                     {
                         this.s = s;
                         this.f = f;
                     }
                 }
 
-                private static string[] badStrings = {
+                private static readonly string[] badStrings = {
                     "",
                     "+",
                     "-",
@@ -1743,7 +1744,7 @@ namespace J2N.Numerics
                     "\u0967e\u0967" // 1e1 in Devanagari digits
                 };
 
-                private static string[] badHexStrings = {
+                private static readonly string[] badHexStrings = {
                     "",
                     "+",
                     "-",
@@ -1800,7 +1801,7 @@ namespace J2N.Numerics
                 };
 
 
-                private static string[] goodStrings = {
+                private static readonly string[] goodStrings = {
                     "NaN",
                     "+NaN",
                     "-NaN",
@@ -1846,7 +1847,7 @@ namespace J2N.Numerics
                     "-9223372036854775810"
                 };
 
-                private static float[] goodStringExpecteds = new float[] {
+                private static readonly float[] goodStringExpecteds = new float[] {
                     float.NaN,
                     float.NaN,
                     float.NaN,
@@ -1892,7 +1893,7 @@ namespace J2N.Numerics
                     -9.223372E+18f,
                 };
 
-                private static string[] goodHexStrings = {
+                private static readonly string[] goodHexStrings = {
                     "NaN",
                     "+NaN",
                     "-NaN",
@@ -1938,7 +1939,7 @@ namespace J2N.Numerics
                     "-9223372036854775810"
                 };
 
-                private static float[] goodHexStringsExpecteds = new float[] {
+                private static readonly float[] goodHexStringsExpecteds = new float[] {
                     float.NaN,
                     float.NaN,
                     float.NaN,
@@ -1985,12 +1986,12 @@ namespace J2N.Numerics
                 };
 
                 // J2N: The .NET parser doesn't remove the \u0001 or \u001f characters, so we are omitting them in tests
-                private static string pad = " \t\n\r\f\u000b"; /* " \t\n\r\f\u0001\u000b\u001f"; */
+                private static readonly string pad = " \t\n\r\f\u000b"; /* " \t\n\r\f\u0001\u000b\u001f"; */
 
-                private static string[] paddedBadStrings = LoadPaddedBadStrings();
-                private static string[] paddedBadHexStrings = LoadPaddedBadHexStrings();
-                private static string[] paddedGoodStrings = LoadPaddedGoodStrings();
-                private static string[] paddedGoodHexStrings = LoadPaddedGoodHexStrings();
+                private static readonly string[] paddedBadStrings = LoadPaddedBadStrings();
+                private static readonly string[] paddedBadHexStrings = LoadPaddedBadHexStrings();
+                private static readonly string[] paddedGoodStrings = LoadPaddedGoodStrings();
+                private static readonly string[] paddedGoodHexStrings = LoadPaddedGoodHexStrings();
 
                 private static string[] LoadPaddedBadStrings()
                 {

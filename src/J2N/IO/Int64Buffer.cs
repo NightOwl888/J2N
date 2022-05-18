@@ -49,7 +49,7 @@ namespace J2N.IO
         public static Int64Buffer Allocate(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentException(nameof(capacity));
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
 
             return new ReadWriteInt64ArrayBuffer(capacity);
         }

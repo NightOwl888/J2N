@@ -6,13 +6,14 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Diagnostics.CodeAnalysis;
 
 namespace J2N.Collections.Generic
 {
     /// <summary>
     /// Internal helper functions for working with enumerables.
     /// </summary>
+    [SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Using Microsoft's code styles")]
     internal static partial class EnumerableHelpers
     {
         /// <summary>Converts an enumerable to an array using the same logic as <see cref="List{T}"/>.</summary>

@@ -7,7 +7,7 @@ namespace J2N.Collections
 {
     public class Support_UnmodifiableCollectionTest : TestCase
     {
-        ICollection<Integer> col;
+        readonly ICollection<Integer> col;
 
         // must be a collection containing the Integers 0 to 99 (which will iterate
         // in order)

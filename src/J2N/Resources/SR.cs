@@ -30,7 +30,9 @@ namespace J2N
             {
                 resourceString = Resources.Strings.ResourceManager.GetString(resourceKey);
             }
+#pragma warning disable CA1031 // Do not catch general exception types
             catch (MissingManifestResourceException) { }
+#pragma warning restore CA1031 // Do not catch general exception types
 
             if (defaultString != null && resourceKey.Equals(resourceString))
             {

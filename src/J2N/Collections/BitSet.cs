@@ -19,8 +19,8 @@
 using J2N.Numerics;
 using System;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
-
 
 namespace J2N.Collections
 {
@@ -275,6 +275,7 @@ namespace J2N.Collections
             return false;
         }
 
+
         /// <summary>
         /// Retrieves the bits starting from <paramref name="position1"/> to <paramref name="position2"/> and returns
         /// back a new bitset made of these bits. Grows the <see cref="BitSet"/> if
@@ -286,6 +287,8 @@ namespace J2N.Collections
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="position1"/> or <paramref name="position2"/> is negative.</exception>
         /// <exception cref="ArgumentException"><paramref name="position1"/> is greater than <paramref name="position2"/>.</exception>
         /// <seealso cref="Get(int)"/>
+        [SuppressMessage("Style", "IDE0056:Use index operator", Justification = "Aligning code style with Apache Harmony")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0056 doesn't fire on all platforms")]
         public virtual BitSet Get(int position1, int position2)
         {
             if (position1 < 0)
@@ -293,7 +296,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             int last = actualArrayLength << Offset;
             if (position1 >= last || position1 == position2)
@@ -422,7 +425,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             if (position1 == position2)
             {
@@ -550,7 +553,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             if (!needClear)
             {
@@ -633,7 +636,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (position2 < position1)
-                throw new ArgumentException(nameof(position1), J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
             if (position1 == position2)
             {
@@ -1118,7 +1121,8 @@ namespace J2N.Collections
             }
         }
 
-        private int Pop(long x)
+        [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
+        private static int Pop(long x)
         {
             x = x - (x.TripleShift(1) & 0x55555555);
             x = (x & 0x33333333) + ((x.TripleShift(2)) & 0x33333333);

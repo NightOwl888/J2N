@@ -161,7 +161,6 @@ namespace J2N.IO
 
         public override ByteOrder Order => byteBuffer.Order;
 
-        [SuppressMessage("Microsoft.Performance", "CA1819", Justification = "design requires some writable array properties")]
         protected override long[] ProtectedArray
         {
             get { throw new NotSupportedException(); }

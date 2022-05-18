@@ -846,7 +846,7 @@ namespace J2N.Collections.Generic
 
             private int size = 0;
 
-            private Object[] elements = new Object[CAPACITY];
+            private readonly object[] elements = new object[CAPACITY];
 
             public override IEnumerator<E> GetEnumerator()
             {

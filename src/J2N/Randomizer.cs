@@ -63,10 +63,10 @@ namespace J2N
 
 #if FEATURE_SERIALIZABLE_RANDOM
         [NonSerialized]
+#else
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Not readonly for serialization")]
 #endif
-#pragma warning disable IDE0044 // Add readonly modifier
         private object syncRoot = new object(); // Not readonly for serializer
-#pragma warning restore IDE0044 // Add readonly modifier
 
         /// <summary>
         /// The backing field for the user. This is the value the user sets, and

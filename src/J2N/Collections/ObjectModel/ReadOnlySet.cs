@@ -21,6 +21,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 
@@ -42,6 +43,7 @@ namespace J2N.Collections.ObjectModel
     /// you can lock the collection during the entire enumeration. To allow the collection to be
     /// accessed by multiple threads for reading and writing, you must implement your own synchronization.
     /// </remarks>
+    [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Following Microsoft's code style")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif

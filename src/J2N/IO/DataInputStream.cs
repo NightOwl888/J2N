@@ -41,7 +41,7 @@ namespace J2N.IO
     /// </summary>
     public class DataInputStream : IDataInput, IDisposable
     {
-        private byte[] buff;
+        private readonly byte[] buff;
 
         private readonly Stream input;
         private char[]? lineBuffer;
@@ -353,15 +353,9 @@ namespace J2N.IO
                         int c2 = input.ReadByte();
                         if ((c2 != '\n') && (c2 != -1))
                         {
-                            using (StreamReader reader = new StreamReader(input))
-                            {
-                                c2 = reader.Peek();
-                            }
-                            // http://stackoverflow.com/a/8021738/181087
-                            //if (!(in is PushbackInputStream)) {
-                            //    this.in = new PushbackInputStream(in);
-                            //}
-                            //((PushbackInputStream)in).unread(c2);
+                            // Replacement for PushbackInputStream: http://stackoverflow.com/a/8021738
+                            using StreamReader reader = new StreamReader(input);
+                            c2 = reader.Peek();
                         }
                         goto loop;
 

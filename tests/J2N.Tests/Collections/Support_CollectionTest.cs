@@ -10,7 +10,7 @@ namespace J2N.Collections
 {
     public class Support_CollectionTest : TestCase
     {
-        ICollection<Integer> col; // must contain the Integers 0 to 99
+        readonly ICollection<Integer> col; // must contain the Integers 0 to 99
 
         public Support_CollectionTest(String p1)
             //: base(p1)

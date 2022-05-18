@@ -38,6 +38,7 @@ namespace J2N.Numerics
         private static readonly FDBigInteger MUTABLE_ZERO = FDBigInteger.ValueOfPow52(0, 0).LeftInplaceSub(FDBigInteger.ValueOfPow52(0, 0));
         private static readonly FDBigInteger IMMUTABLE_ZERO = FDBigInteger.ValueOfPow52(0, 0).LeftInplaceSub(FDBigInteger.ValueOfPow52(0, 0)).MakeImmutable();
         private static readonly FDBigInteger IMMUTABLE_MILLION = genMillion1().MakeImmutable();
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Exists in the JDK")]
         private static readonly FDBigInteger IMMUTABLE_BILLION = genBillion1().MakeImmutable();
         private static readonly FDBigInteger IMMUTABLE_TEN18 = genTen18().MakeImmutable();
 
@@ -51,6 +52,7 @@ namespace J2N.Numerics
             return new FDBigInteger(0, chars, 0, chars.Length).MultByPow52(0, offset * 32);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Exists in the JDK")]
         private static FDBigInteger immutable(String hex, int offset)
         {
             FDBigInteger fd = mutable(hex, offset);

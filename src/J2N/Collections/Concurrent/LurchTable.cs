@@ -56,15 +56,19 @@ namespace J2N.Collections.Concurrent
     /// </summary>
     /// <typeparam name="TKey">The type of keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of values in the dictionary.</typeparam>
+    [SuppressMessage("Style", "IDE0034:Simplify 'default' expression", Justification = "Following Microsoft's code styles")]
+    [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Using Microsoft's code styles")]
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     public class LurchTable<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
         IDisposable
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
     {
         /// <summary> Method signature for the ItemUpdated event </summary>
         public delegate void ItemUpdatedMethod(KeyValuePair<TKey, TValue> previous, KeyValuePair<TKey, TValue> next);
@@ -271,9 +275,11 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary) : this(dictionary, LurchTableOrder.None, null) { }
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements
@@ -301,9 +307,11 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering) : this(dictionary, ordering, null) { }
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements copied
@@ -336,9 +344,11 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer) : this(dictionary, LurchTableOrder.None, comparer) { }
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements copied
@@ -372,9 +382,11 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, IEqualityComparer<TKey>? comparer)
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
             : this(dictionary, ordering, int.MaxValue, comparer) { }
 
         /// <summary>
@@ -410,9 +422,11 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
             : this(dictionary is null ? 0 : dictionary.Count, ordering, limit, comparer)
         {
             if (dictionary == null)
@@ -993,9 +1007,11 @@ namespace J2N.Collections.Concurrent
         /// <c>true</c> if the object that implements <see cref="T:System.Collections.Generic.IDictionary`2"/>
         /// contains an element with the specified key; otherwise, <c>false</c>.
         /// </returns>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
         public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             int hash = GetHash(key);
             return InternalGetValue(hash, key, out value);
@@ -1426,6 +1442,7 @@ namespace J2N.Collections.Concurrent
         /// </remarks>
         [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1815 and CA1034 don't fire on all target frameworks")]
         public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
         {
             private readonly LurchTable<TKey, TValue> _owner;
@@ -1522,9 +1539,11 @@ namespace J2N.Collections.Concurrent
 
             object? IDictionaryEnumerator.Key
             {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
 #pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
                 {
                     int index = _state.Current;
                     if (index <= 0)
@@ -1741,8 +1760,6 @@ namespace J2N.Collections.Concurrent
             /// <para/>
             /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
             /// </remarks>
-            [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
-            [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
             public struct Enumerator : IEnumerator<TKey>, IEnumerator
             {
                 private readonly LurchTable<TKey, TValue> _owner;
@@ -1857,8 +1874,9 @@ namespace J2N.Collections.Concurrent
         /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the
         /// keys of the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </summary>
-        public KeyCollection Keys => _keyCollection ?? (_keyCollection = new KeyCollection(this));
+        public KeyCollection Keys => _keyCollection ??= new KeyCollection(this);
 
+#pragma warning disable IDE0079 // Remove unnecessary supppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
@@ -1866,6 +1884,7 @@ namespace J2N.Collections.Concurrent
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 #endif
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         #endregion
 
@@ -2043,6 +2062,7 @@ namespace J2N.Collections.Concurrent
             /// </remarks>
             [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
             [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
+            [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1815 and CA1034 don't fire on all target frameworks")]
             public struct Enumerator : IEnumerator<TValue>, IEnumerator
             {
                 private readonly LurchTable<TKey, TValue> _owner;
@@ -2157,8 +2177,9 @@ namespace J2N.Collections.Concurrent
         /// <summary>
         /// Gets an <see cref="T:System.Collections.Generic.ICollection`1"/> containing the values in the <see cref="T:System.Collections.Generic.IDictionary`2"/>.
         /// </summary>
-        public ValueCollection Values => _valueCollection ?? (_valueCollection = new ValueCollection(this));
+        public ValueCollection Values => _valueCollection ??= new ValueCollection(this);
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
@@ -2166,6 +2187,7 @@ namespace J2N.Collections.Concurrent
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 #endif
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion
 
@@ -2243,6 +2265,7 @@ namespace J2N.Collections.Concurrent
         {
             return TryDequeue(null, out value);
         }
+
 
         /// <summary>
         /// Removes the oldest entry in the collection based on the ordering supplied to the constructor.

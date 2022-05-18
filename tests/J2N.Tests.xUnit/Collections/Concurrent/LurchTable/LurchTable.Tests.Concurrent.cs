@@ -20,7 +20,7 @@ namespace J2N.Collections.Concurrent.Tests
     public class LurchTable_Tests_Concurrent // From ConcurrentDictionaryTests
     {
         [Fact]
-        public static void TestBasicScenarios()
+        public void TestBasicScenarios()
         {
             LurchTable<int, int> cd = new LurchTable<int, int>();
 
@@ -63,7 +63,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAddNullValue_ConcurrentDictionaryOfString_null()
+        public void TestAddNullValue_ConcurrentDictionaryOfString_null()
         {
             // using ConcurrentDictionary<TKey, TValue> class
             LurchTable<string, string> dict1 = new LurchTable<string, string>();
@@ -71,7 +71,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAddNullValue_IDictionaryOfString_null()
+        public void TestAddNullValue_IDictionaryOfString_null()
         {
             // using IDictionary<TKey, TValue> interface
             IDictionary<string, string> dict2 = new LurchTable<string, string>();
@@ -80,7 +80,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAddNullValue_IDictionary_ReferenceType_null()
+        public void TestAddNullValue_IDictionary_ReferenceType_null()
         {
             // using IDictionary interface
             IDictionary dict3 = new LurchTable<string, string>();
@@ -89,7 +89,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAddNullValue_IDictionary_ValueType_null_indexer()
+        public void TestAddNullValue_IDictionary_ValueType_null_indexer()
         {
             // using IDictionary interface and value type values
             Action action = () =>
@@ -101,7 +101,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAddNullValue_IDictionary_ValueType_null_add()
+        public void TestAddNullValue_IDictionary_ValueType_null_add()
         {
             Action action = () =>
             {
@@ -112,7 +112,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAddValueOfDifferentType()
+        public void TestAddValueOfDifferentType()
         {
             Action action = () =>
             {
@@ -130,7 +130,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAdd()
+        public void TestAdd()
         {
             TestAdd1(1, 1, 1, 10000);
             TestAdd1(5, 1, 1, 10000);
@@ -199,7 +199,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestUpdate()
+        public void TestUpdate()
         {
             TestUpdate1(1, 1, 10000);
             TestUpdate1(5, 1, 10000);
@@ -267,7 +267,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestRead()
+        public void TestRead()
         {
             TestRead1(1, 1, 10000);
             TestRead1(5, 1, 10000);
@@ -315,7 +315,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestRemove()
+        public void TestRemove()
         {
             TestRemove1(1, 1, 10000);
             TestRemove1(5, 1, 1000);
@@ -387,7 +387,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestRemove_2()
+        public void TestRemove_2()
         {
             TestRemove2(1);
             TestRemove2(10);
@@ -443,7 +443,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestRemove3()
+        public void TestRemove3()
         {
             LurchTable<int, int> dict = new LurchTable<int, int>();
 
@@ -473,7 +473,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TryRemove_KeyValuePair_ArgumentValidation()
+        public void TryRemove_KeyValuePair_ArgumentValidation()
         {
             Assert.Null(Record.Exception(() => new LurchTable<string, int>().TryRemove(new KeyValuePair<string, int>(null, 42)))); // no error with null key
             new LurchTable<int, int>().TryRemove(new KeyValuePair<int, int>(0, 0)); // no error when using default value type
@@ -481,7 +481,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TryRemove_KeyValuePair_RemovesSuccessfullyAsAppropriate()
+        public void TryRemove_KeyValuePair_RemovesSuccessfullyAsAppropriate()
         {
             var dict = new LurchTable<string, int>();
 
@@ -500,7 +500,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TryRemove_KeyValuePair_MatchesKeyWithDefaultComparer()
+        public void TryRemove_KeyValuePair_MatchesKeyWithDefaultComparer()
         {
             var dict = new LurchTable<string, string>(StringComparer.OrdinalIgnoreCase);
             dict.TryAdd("key", "value");
@@ -509,7 +509,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestGetOrAdd()
+        public void TestGetOrAdd()
         {
             TestGetOrAddOrUpdate(1, 1, 1, 10000, true);
             TestGetOrAddOrUpdate(5, 1, 1, 10000, true);
@@ -522,7 +522,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestAddOrUpdate()
+        public void TestAddOrUpdate()
         {
             TestGetOrAddOrUpdate(1, 1, 1, 10000, false);
             TestGetOrAddOrUpdate(5, 1, 1, 10000, false);
@@ -617,7 +617,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestBugFix669376()
+        public void TestBugFix669376()
         {
             var cd = new LurchTable<string, int>(new OrdinalStringComparer());
             cd["test"] = 10;
@@ -640,7 +640,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestConstructor()
+        public void TestConstructor()
         {
             var dictionary = new LurchTable<int, int>(new[] { new KeyValuePair<int, int>(1, 1) });
             Assert.False(dictionary.IsEmpty);
@@ -649,7 +649,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestDebuggerAttributes()
+        public void TestDebuggerAttributes()
         {
             DebuggerAttributes.ValidateDebuggerDisplayReferences(new LurchTable<string, int>());
             LurchTable<string, int> dict = new LurchTable<string, int>();
@@ -662,7 +662,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestDebuggerAttributes_Null()
+        public void TestDebuggerAttributes_Null()
         {
             Type proxyType = DebuggerAttributes.GetProxyType(new LurchTable<string, int>());
             TargetInvocationException tie = Assert.Throws<TargetInvocationException>(() => Activator.CreateInstance(proxyType, (object)null));
@@ -670,7 +670,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestNullComparer()
+        public void TestNullComparer()
         {
             AssertDefaultComparerBehavior(new LurchTable<EqualityApiSpy, int>((IEqualityComparer<EqualityApiSpy>)null));
 
@@ -714,7 +714,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestConstructor_Negative()
+        public void TestConstructor_Negative()
         {
             Assert.Throws<ArgumentNullException>(
                () => new LurchTable<int, int>((ICollection<KeyValuePair<int, int>>)null));
@@ -746,7 +746,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestExceptions()
+        public void TestExceptions()
         {
             var dictionary = new LurchTable<string, int>();
             Assert.Null(Record.Exception(
@@ -817,7 +817,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestIDictionary()
+        public void TestIDictionary()
         {
             IDictionary dictionary = new LurchTable<string, int>();
             Assert.False(dictionary.IsReadOnly);
@@ -869,7 +869,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestIDictionary_Negative()
+        public void TestIDictionary_Negative()
         {
             IDictionary dictionary = new LurchTable<string, int>();
             Assert.Null(Record.Exception(
@@ -907,14 +907,14 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void IDictionary_Remove_NullKeyInKeyValuePair_ThrowsArgumentNullException()
+        public void IDictionary_Remove_NullKeyInKeyValuePair_ThrowsArgumentNullException()
         {
             IDictionary<string, int> dictionary = new LurchTable<string, int>();
             Assert.Null(Record.Exception(() => dictionary.Remove(new KeyValuePair<string, int>(null, 0))));
         }
 
         [Fact]
-        public static void TestICollection()
+        public void TestICollection()
         {
             ICollection dictionary = new LurchTable<int, int>();
             Assert.False(dictionary.IsSynchronized, "TestICollection:  FAILED.  IsSynchronized returned true!");
@@ -942,7 +942,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestICollection_Negative()
+        public void TestICollection_Negative()
         {
             ICollection dictionary = new LurchTable<int, int>();
             Assert.False(dictionary.IsSynchronized, "TestICollection:  FAILED.  IsSynchronized returned true!");
@@ -961,7 +961,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestClear()
+        public void TestClear()
         {
             var dictionary = new LurchTable<int, int>();
             for (int i = 0; i < 10; i++)
@@ -978,7 +978,7 @@ namespace J2N.Collections.Concurrent.Tests
         }
 
         [Fact]
-        public static void TestTryUpdate()
+        public void TestTryUpdate()
         {
             var dictionary = new LurchTable<string, int>();
             Assert.Null(Record.Exception(

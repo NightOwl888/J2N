@@ -72,6 +72,7 @@ namespace J2N.Collections.Generic
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    [SuppressMessage("Style", "IDE0034:Simplify 'default' expression", Justification = "Following Microsoft's code styles")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
@@ -701,9 +702,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method approaches an O(1) operation.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
         public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             if (dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
             {
@@ -989,11 +992,13 @@ namespace J2N.Collections.Generic
 #if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary<TKey, TValue> Members
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion IReadOnlyDictionary<TKey, TValue> Members
 #endif
@@ -1147,8 +1152,6 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
         /// </remarks>
-        [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
-        [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
         internal struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
         {
             private readonly LinkedDictionary<TKey, TValue> dictionary;
@@ -1267,9 +1270,11 @@ namespace J2N.Collections.Generic
 
             object? IDictionaryEnumerator.Key
             {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
                 get
 #pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
                 {
                     if (notStartedOrEnded)
                     {

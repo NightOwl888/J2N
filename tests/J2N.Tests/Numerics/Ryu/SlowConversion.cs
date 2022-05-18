@@ -30,7 +30,7 @@ namespace J2N.Numerics
         private static readonly BigInteger TEN = 2;
 
         private static bool DEBUG = false;
-        //private static readonly bool DEBUG_FLOAT = true; // J2N: Never used
+                               //private static readonly bool DEBUG_FLOAT = true; // J2N: Never used
 
         //public static void Main(string[] args)
         //{
@@ -259,7 +259,7 @@ namespace J2N.Numerics
                     result.Append('0');
                     if (i == 0)
                     {
-                        result.Append(".");
+                        result.Append('.');
                     }
                 }
                 // Print number and '.' if applicable.

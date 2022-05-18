@@ -4,6 +4,7 @@
 using System;
 //using System.Buffers.Text;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -242,6 +243,7 @@ namespace J2N.Numerics
     // PositiveInfinitySymbol, or NegativeInfinitySymbol property of
     // the NumberFormatInfo used to format the number.
 
+    [SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "Following Microsoft's code styles")]
     internal static partial class DotNetNumber
     {
         internal const int DecimalPrecision = 29; // Decimal.DecCalc also uses this value
@@ -2440,7 +2442,9 @@ namespace J2N.Numerics
 
                                 groupSizeCount += groupDigits[groupSizeIndex];
                                 if (groupSizeCount < 0 || bufferSize < 0)
+#pragma warning disable CA2208 // Instantiate argument exceptions correctly
                                     throw new ArgumentOutOfRangeException(); // If we overflow
+#pragma warning restore CA2208 // Instantiate argument exceptions correctly
                             }
 
                             groupSize = groupSizeCount == 0 ? 0 : groupDigits[0]; // If you passed in an array with one entry as 0, groupSizeCount == 0

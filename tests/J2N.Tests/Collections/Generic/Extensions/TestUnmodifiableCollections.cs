@@ -15,7 +15,7 @@ namespace J2N.Collections.Generic.Extensions
 
         private IDictionary<string, Integer> hm;
 
-        private static Integer[] objArray = LoadObjectArray();
+        private static readonly Integer[] objArray = LoadObjectArray();
 
         private static Integer[] LoadObjectArray()
         {

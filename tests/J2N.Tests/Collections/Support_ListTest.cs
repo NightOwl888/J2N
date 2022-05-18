@@ -30,7 +30,7 @@ namespace J2N.Collections
 {
     public class Support_ListTest : TestCase
     {
-        SCG.IList<Integer> list; // must contain the Integers 0 to 99 in order
+        readonly SCG.IList<Integer> list; // must contain the Integers 0 to 99 in order
 
         public Support_ListTest(String p1)
         //    : base(p1)
@@ -104,7 +104,7 @@ namespace J2N.Collections
                 scgList.InsertRange(50, myList);
             }
             else
-                throw new ArgumentException($"List type not supported in this test: {list.GetType().ToString()}");
+                throw new ArgumentException($"List type not supported in this test: {list.GetType()}");
 
             assertTrue("ListTest - a) addAll with index failed--did not insert",
                     list[50].Equals(new Integer(500)));

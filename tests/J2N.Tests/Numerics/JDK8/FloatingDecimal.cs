@@ -1092,6 +1092,7 @@ namespace J2N.Numerics
                 }
             }
 
+            [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Original JDK code")]
             private static int InsignificantDigits(int insignificant)
             {
                 int i;
@@ -1320,9 +1321,9 @@ namespace J2N.Numerics
          */
         internal class ASCIIToBinaryBuffer : IASCIIToBinaryConverter
         {
-            private bool isNegative;
-            private int decExponent;
-            private char[] digits;
+            private readonly bool isNegative;
+            private readonly int decExponent;
+            private readonly char[] digits;
             private int nDigits;
 
             internal ASCIIToBinaryBuffer(bool negSign, int decExponent, char[]
@@ -3053,7 +3054,7 @@ namespace J2N.Numerics
         private static string StripLeadingZeros(string s)
         {
             //        return  s.replaceFirst("^0+", "");
-            if (s != string.Empty && s[0] == '0')
+            if (s.Length > 0 && s[0] == '0')
             {
                 for (int i = 1; i < s.Length; i++)
                 {

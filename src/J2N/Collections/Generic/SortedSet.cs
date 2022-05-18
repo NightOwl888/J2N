@@ -77,6 +77,10 @@ namespace J2N.Collections.Generic
     /// </summary>
     /// <typeparam name="T">The type of elements in the set.</typeparam>
     [SuppressMessage("Microsoft.Naming", "CA1710:IdentifiersShouldHaveCorrectSuffix", Justification = "by design name choice")]
+    [SuppressMessage("Style", "IDE0018:Inline variable declaration", Justification = "Following Microsoft's code style")]
+    [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Following Microsoft's code style")]
+    [SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "Following Microsoft's code style")]
+    [SuppressMessage("Style", "IDE0017:Simplify object initialization", Justification = "Following Microsoft's code styles")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
@@ -162,6 +166,7 @@ namespace J2N.Collections.Generic
         /// in the <paramref name="collection"/> parameter.
         /// </remarks>
         public SortedSet(IEnumerable<T> collection) : this(collection, Comparer<T>.Default) { }
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SortedSet{T}"/> class that contains elements copied
@@ -2079,6 +2084,7 @@ namespace J2N.Collections.Generic
         /// debug status to be checked whenever any operation is called
         /// </summary>
         /// <returns></returns>
+        [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "Following Microsoft's code styles")]
         internal virtual bool versionUpToDate()
         {
             return true;
@@ -2466,7 +2472,6 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
         internal struct Enumerator : IEnumerator<T>, IEnumerator
 #if FEATURE_SERIALIZABLE
             , ISerializable, IDeserializationCallback
@@ -2482,7 +2487,9 @@ namespace J2N.Collections.Generic
             private bool _reverse;
 
 #if FEATURE_SERIALIZABLE
+#pragma warning disable IDE0044 // Add readonly modifier
             private SerializationInfo? _siInfo;
+#pragma warning restore IDE0044 // Add readonly modifier
 #endif
 
             internal Enumerator(SortedSet<T> set)
@@ -2584,6 +2591,7 @@ namespace J2N.Collections.Generic
                     }
                 }
             }
+
 
             /// <summary>
             /// Advances the enumerator to the next element of the <see cref="SortedSet{T}"/> collection.

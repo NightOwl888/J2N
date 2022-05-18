@@ -1,6 +1,8 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace J2N.Numerics
 {
     internal static partial class DotNetNumber
@@ -181,6 +183,7 @@ namespace J2N.Numerics
                 }
             }
 
+            [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
             private void ProcessNormalNumber()
             {
                 int desiredWidth = FloatingPointInfo.NormalMantissaBits + 1;
@@ -189,6 +192,7 @@ namespace J2N.Numerics
                 mantissa = mantissa & (long)FloatingPointInfo.DenormalMantissaMask;
             }
 
+            [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
             private void ProcessSubNormalNumber()
             {
                 int desiredWidth = FloatingPointInfo.DenormalMantissaBits + 1;
@@ -293,7 +297,7 @@ namespace J2N.Numerics
                 return true;
             }
 
-            private int CountBitsLength(long value)
+            private static int CountBitsLength(long value)
             {
                 int leadingZeros = BitOperation.LeadingZeroCount(value);
                 return Int64.Size - leadingZeros;

@@ -205,6 +205,8 @@ namespace J2N.Collections.Concurrent
             public int Count;
         };
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1067:Override Object.Equals(object) when implementing IEquatable<T>", Justification = "by design")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1067 doesn't fire on all target frameworks")]
         internal struct HashCollider : IEquatable<HashCollider>
         {
             public int Value;

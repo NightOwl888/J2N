@@ -65,7 +65,9 @@ namespace J2N.Text
         private CultureInfo? culture; // not readonly for deserialization
         private readonly CultureType? cultureType;
 
+#pragma warning disable IDE0044 // Add readonly modifier
         private IFormatProvider? formatProvider; // NOTE: This needs to be [Serializable] to support serialization. Note on .NET Core serialization has been dropped on these implementations.
+#pragma warning restore IDE0044 // Add readonly modifier
 
         /// <summary>
         /// Initializes a new instance of <see cref="StringFormatter"/>.
@@ -118,19 +120,14 @@ namespace J2N.Text
         {
             get
             {
-                switch (cultureType)
+                return cultureType switch
                 {
-                    case CultureType.CustomCulture:
-                        return culture!;
-                    case CultureType.InvariantCulture:
-                        return CultureInfo.InvariantCulture;
-                    case CultureType.CurrentCulture:
-                        return CultureInfo.CurrentCulture;
-                    case CultureType.CurrentUICulture:
-                        return CultureInfo.CurrentUICulture;
-                    default:
-                        return CultureInfo.CurrentCulture;
-                }
+                    CultureType.CustomCulture => culture!,
+                    CultureType.InvariantCulture => CultureInfo.InvariantCulture,
+                    CultureType.CurrentCulture => CultureInfo.CurrentCulture,
+                    CultureType.CurrentUICulture => CultureInfo.CurrentUICulture,
+                    _ => CultureInfo.CurrentCulture,
+                };
             }
         }
 
@@ -141,21 +138,15 @@ namespace J2N.Text
         {
             get
             {
-                switch (cultureType)
+                return cultureType switch
                 {
-                    case CultureType.IFormatProvider:
-                        return formatProvider!;
-                    case CultureType.CustomCulture:
-                        return culture!;
-                    case CultureType.InvariantCulture:
-                        return CultureInfo.InvariantCulture;
-                    case CultureType.CurrentCulture:
-                        return CultureInfo.CurrentCulture;
-                    case CultureType.CurrentUICulture:
-                        return CultureInfo.CurrentUICulture;
-                    default:
-                        return CultureInfo.CurrentCulture;
-                }
+                    CultureType.IFormatProvider => formatProvider!,
+                    CultureType.CustomCulture => culture!,
+                    CultureType.InvariantCulture => CultureInfo.InvariantCulture,
+                    CultureType.CurrentCulture => CultureInfo.CurrentCulture,
+                    CultureType.CurrentUICulture => CultureInfo.CurrentUICulture,
+                    _ => CultureInfo.CurrentCulture,
+                };
             }
         }
 

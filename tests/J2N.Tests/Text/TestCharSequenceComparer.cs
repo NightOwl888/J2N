@@ -8,6 +8,7 @@ using System.Threading;
 namespace J2N.Text
 {
     [TestFixture]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Use static for consistency")]
     public class TestCharSequenceComparer
     {
         private static readonly string String1 = "This is a portriat of a Turkish czar";

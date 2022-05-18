@@ -73,7 +73,6 @@ namespace J2N.IO
         public override bool IsReadOnly => false;
 
 
-        [SuppressMessage("Microsoft.Performance", "CA1819", Justification = "design requires some writable array properties")]
         protected override int[] ProtectedArray => backingArray;
 
         protected override int ProtectedArrayOffset => offset;

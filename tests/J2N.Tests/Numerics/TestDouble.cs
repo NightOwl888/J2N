@@ -2178,7 +2178,7 @@ namespace J2N.Numerics
 
                 }
 
-                private static string[] badStrings = {
+                private static readonly string[] badStrings = {
                     "",
                     "+",
                     "-",
@@ -2331,7 +2331,7 @@ namespace J2N.Numerics
                     "0xp22"
                 };
 
-                private static string[] badHexStrings = {
+                private static readonly string[] badHexStrings = {
                     "",
                     "+",
                     "-",
@@ -2484,7 +2484,7 @@ namespace J2N.Numerics
                     "0xp22"
                 };
 
-                private static string[] goodStrings = {
+                private static readonly string[] goodStrings = {
                     "NaN",
                     "+NaN",
                     "-NaN",
@@ -2594,7 +2594,7 @@ namespace J2N.Numerics
                     "2.2250738585072012e-308",    // near Double.MIN_NORMAL
                 };
 
-                private static double[] goodStringsExpecteds = new double[] {
+                private static readonly double[] goodStringsExpecteds = new double[] {
                     double.NaN,
                     double.NaN,
                     double.NaN,
@@ -2705,7 +2705,7 @@ namespace J2N.Numerics
 
                 };
 
-                private static string[] goodHexStrings = new string[] {
+                private static readonly string[] goodHexStrings = new string[] {
                     "NaN",
                     "+NaN",
                     "-NaN",
@@ -2826,7 +2826,7 @@ namespace J2N.Numerics
                     "0x001.100p1",
                 };
 
-                private static double[] goodHexStringsExpecteds = new double[]
+                private static readonly double[] goodHexStringsExpecteds = new double[]
                 {
                     double.NaN,
                     double.NaN,
@@ -2945,12 +2945,12 @@ namespace J2N.Numerics
                 };
 
                 // J2N: The .NET parser doesn't remove the \u0001 or \u001f characters, so we are omitting them in tests
-                private static string pad = " \t\n\r\f\u000b"; /* " \t\n\r\f\u0001\u000b\u001f"; */
+                private static readonly string pad = " \t\n\r\f\u000b"; /* " \t\n\r\f\u0001\u000b\u001f"; */
 
-                private static string[] paddedBadStrings = LoadPaddedBadStrings();
-                private static string[] paddedBadHexStrings = LoadPaddedBadHexStrings();
-                private static string[] paddedGoodStrings = LoadPaddedGoodStrings();
-                private static string[] paddedGoodHexStrings = LoadPaddedGoodHexStrings();
+                private static readonly string[] paddedBadStrings = LoadPaddedBadStrings();
+                private static readonly string[] paddedBadHexStrings = LoadPaddedBadHexStrings();
+                private static readonly string[] paddedGoodStrings = LoadPaddedGoodStrings();
+                private static readonly string[] paddedGoodHexStrings = LoadPaddedGoodHexStrings();
 
                 private static string[] LoadPaddedBadStrings()
                 {

@@ -3087,9 +3087,7 @@ namespace J2N
                     Assert.AreEqual(cpString.Substring(rs, rc), str);
                     continue;
                 }
-#pragma warning disable 168, IDE0059
                 catch (ArgumentException e2)
-#pragma warning restore 168, IDE0059
                 {
                     // Ignored.
                 }

@@ -18,6 +18,7 @@
 
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO.MemoryMappedFiles;
 
 
@@ -311,6 +312,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// </summary>
         /// <param name="index">The index to begin reading bytes.</param>
         /// <returns>The <see cref="int"/> at the specified index.</returns>
+        [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
         protected int LoadInt32(int index)
         {
             int baseOffset = offset + index;
@@ -342,6 +344,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// </summary>
         /// <param name="index">The index to begin reading bytes.</param>
         /// <returns>The <see cref="long"/> at the specified index.</returns>
+        [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
         protected long LoadInt64(int index)
         {
             int baseOffset = offset + index;
@@ -376,7 +379,7 @@ namespace J2N.IO.MemoryMappedFiles
         protected short LoadInt16(int index)
         {
             int baseOffset = offset + index;
-            short bytes = 0;
+            short bytes; // J2N: Unnecessary variable assignment
             if (order == Endianness.BigEndian)
             {
                 bytes = (short)(accessor.ReadByte(baseOffset) << 8);

@@ -6,7 +6,6 @@ using System.Diagnostics;
 
 namespace J2N.Numerics
 {
-#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     internal unsafe partial class DotNetNumber
     {
         public readonly struct FloatingPointInfo

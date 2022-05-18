@@ -17,7 +17,10 @@ namespace Xunit.Runner
     public class TrxTestResultRecorder : ITestResultRecorder
     {
         private int passed, failed, skipped, inconclusive, total;
-        private DateTime creationTime = DateTime.MinValue, queuingTime = DateTime.MinValue, startTime = DateTime.MinValue, endTime = DateTime.MinValue;
+        private readonly DateTime creationTime;
+        private readonly DateTime queuingTime;
+        private DateTime startTime = DateTime.MinValue;
+        private DateTime endTime = DateTime.MinValue;
         private readonly Guid executionId;
         private readonly string executionPath;
         private readonly IDictionary<Guid, VsTestResult> testResults = new Dictionary<Guid, VsTestResult>();

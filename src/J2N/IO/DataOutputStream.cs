@@ -324,19 +324,20 @@ namespace J2N.IO
             }
         }
 
-        private int WriteInt64ToBuffer(long value,
-                          byte[] buffer, int offset)
-        {
-            buffer[offset++] = (byte)(value >> 56);
-            buffer[offset++] = (byte)(value >> 48);
-            buffer[offset++] = (byte)(value >> 40);
-            buffer[offset++] = (byte)(value >> 32);
-            buffer[offset++] = (byte)(value >> 24);
-            buffer[offset++] = (byte)(value >> 16);
-            buffer[offset++] = (byte)(value >> 8);
-            buffer[offset++] = (byte)value;
-            return offset;
-        }
+        //// J2N: Not Used
+        ////private static int WriteInt64ToBuffer(long value,
+        ////                  byte[] buffer, int offset)
+        ////{
+        ////    buffer[offset++] = (byte)(value >> 56);
+        ////    buffer[offset++] = (byte)(value >> 48);
+        ////    buffer[offset++] = (byte)(value >> 40);
+        ////    buffer[offset++] = (byte)(value >> 32);
+        ////    buffer[offset++] = (byte)(value >> 24);
+        ////    buffer[offset++] = (byte)(value >> 16);
+        ////    buffer[offset++] = (byte)(value >> 8);
+        ////    buffer[offset++] = (byte)value;
+        ////    return offset;
+        ////}
 
         /// <summary>
         /// Writes the specified 16-bit <see cref="short"/> to the target stream. Only the lower
@@ -359,7 +360,7 @@ namespace J2N.IO
             }
         }
 
-        private int WriteInt16ToBuffer(int value,
+        private static int WriteInt16ToBuffer(int value,
                            byte[] buffer, int offset)
         {
             buffer[offset++] = (byte)(value >> 8);
@@ -416,7 +417,7 @@ namespace J2N.IO
             return utfCount;
         }
 
-        private int WriteUTFBytesToBuffer(string value, long count,
+        private static int WriteUTFBytesToBuffer(string value, long count,
                               byte[] buffer, int offset)
         {
             int length = value.Length;

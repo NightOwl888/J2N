@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace J2N.Collections
 {
@@ -1621,7 +1622,7 @@ namespace J2N.Collections
         /// </summary>
         public class JDKBSMethods : TestCase
         {
-            private static Random generator = new Random();
+            private static readonly Random generator = new Random();
             //private static bool failure = false;
 
             //private static void fail(String diagnostic)
@@ -1698,6 +1699,7 @@ namespace J2N.Collections
                     check(cardinality1 >= 0, "cardinality >= 0");
                 }
             }
+
 
             //public static void main(String[] args)
             //{

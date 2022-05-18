@@ -60,7 +60,6 @@ namespace J2N.IO
 
         public override bool IsReadOnly => true;
 
-        [SuppressMessage("Microsoft.Performance", "CA1819", Justification = "design requires some writable array properties")]
         protected override char[] ProtectedArray
         {
             get { throw new ReadOnlyBufferException(); }

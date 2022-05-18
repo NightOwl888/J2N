@@ -19,6 +19,7 @@
 using J2N.Numerics;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 
@@ -183,6 +184,7 @@ namespace J2N
         /// <param name="start">The starting floating-point value.</param>
         /// <param name="direction">A value indicating which of <paramref name="start"/>'s neighbors or <paramref name="start"/> should be returned.</param>
         /// <returns>The floating-point number adjacent to <paramref name="start"/> in the direction of <paramref name="direction"/>.</returns>
+        [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
         public static double NextAfter(this double start, double direction)
         {
             /*
@@ -274,6 +276,7 @@ namespace J2N
         /// <param name="start">The starting floating-point value.</param>
         /// <param name="direction">A value indicating which of <paramref name="start"/>'s neighbors or <paramref name="start"/> should be returned.</param>
         /// <returns>The floating-point number adjacent to <paramref name="start"/> in the direction of <paramref name="direction"/>.</returns>
+        [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
         public static float NextAfter(this float start, double direction)
         {
             /*

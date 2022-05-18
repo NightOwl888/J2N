@@ -28,7 +28,9 @@ namespace J2N.Numerics
     internal sealed partial class RyuSingle
     {
 #if DEBUG
+#pragma warning disable IDE0044 // Add readonly modifier
         private static bool DEBUG = false;
+#pragma warning restore IDE0044 // Add readonly modifier
 #endif
 
         private const int FLOAT_MANTISSA_BITS = 23;

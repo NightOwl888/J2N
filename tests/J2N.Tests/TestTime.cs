@@ -35,10 +35,10 @@ namespace J2N
         }
 
 
-        public static long SHORT_DELAY_MS;
-        public static long SMALL_DELAY_MS;
-        public static long MEDIUM_DELAY_MS;
-        public static long LONG_DELAY_MS;
+        private static long SHORT_DELAY_MS;
+        //private static long SMALL_DELAY_MS;
+        //private static long MEDIUM_DELAY_MS;
+        //private static long LONG_DELAY_MS;
 
         /**
          * Returns the shortest timed delay. This could
@@ -56,9 +56,9 @@ namespace J2N
         protected void setDelays()
         {
             SHORT_DELAY_MS = getShortDelay();
-            SMALL_DELAY_MS = SHORT_DELAY_MS * 5;
-            MEDIUM_DELAY_MS = SHORT_DELAY_MS * 10;
-            LONG_DELAY_MS = SHORT_DELAY_MS * 50;
+            //SMALL_DELAY_MS = SHORT_DELAY_MS * 5;
+            //MEDIUM_DELAY_MS = SHORT_DELAY_MS * 10;
+            //LONG_DELAY_MS = SHORT_DELAY_MS * 50;
         }
 
         /**

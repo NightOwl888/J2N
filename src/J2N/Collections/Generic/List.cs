@@ -38,6 +38,7 @@ namespace J2N.Collections.Generic
     /// call <c>ToString(StringFormatter.InvariantCulture)</c>.
     /// </summary>
     /// <typeparam name="T">The type of elements in the list.</typeparam>
+    [SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Using Microsoft's code styles")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
@@ -74,9 +75,7 @@ namespace J2N.Collections.Generic
 #endif
         internal int _version;
 
-#pragma warning disable CA1825 // avoid the extra generic instantiation for Array.Empty<T>()
-        private static readonly T[] s_emptyArray = new T[0];
-#pragma warning restore CA1825
+        private static readonly T[] s_emptyArray = Arrays.Empty<T>();
 
 #if FEATURE_SERIALIZABLE
         private System.Runtime.Serialization.SerializationInfo? siInfo; //A temporary variable which we need during deserialization.

@@ -363,7 +363,7 @@ namespace J2N.Collections.Generic
 
         public class JDK7Basic : TestCase
         {
-            static Random rnd = new Random(666);
+            static readonly Random rnd = new Random(666);
 
             [Test]
             public void TestBasic()

@@ -42,6 +42,7 @@ namespace Xunit.Runner
 
         public ManualResetEvent Finished { get; } = new ManualResetEvent(initialState: false);
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "xUnit implemented Dispose() pattern wrong.")]
         public override void Dispose()
         {
             ((IDisposable)Finished).Dispose();
@@ -57,7 +58,10 @@ namespace Xunit.Runner
             return null;
         }
 
-        private void TryAndReport(string actionDescription, string displayName, Action action)
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "May add log someday")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "May add log someday")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0060 doesn't fire on all target frameworks")]
+        private static void TryAndReport(string actionDescription, string displayName, Action action)
         {
             try
             {
@@ -66,11 +70,11 @@ namespace Xunit.Runner
 #pragma warning disable CS0168 // Variable is declared but never used
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
 #pragma warning restore CS0168 // Variable is declared but never used
             {
                 //logger.LogError(testCase, "Error occured while {0} for test case {1}: {2}", actionDescription, displayName, ex);
             }
-#pragma warning restore CA1031 // Do not catch general exception types
         }
 
         void HandleTestCaseStarting(MessageHandlerArgs<ITestCaseStarting> args)
@@ -197,7 +201,7 @@ namespace Xunit.Runner
             return result;
         }
 
-        VsTestOutcome GetAggregatedTestOutcome(ITestAssemblyFinished testAssemblyFinished)
+        static VsTestOutcome GetAggregatedTestOutcome(ITestAssemblyFinished testAssemblyFinished)
         {
             if (testAssemblyFinished.TestsRun == 0)
                 return VsTestOutcome.NotFound;
@@ -209,7 +213,7 @@ namespace Xunit.Runner
                 return VsTestOutcome.Passed;
         }
 
-        VsTestOutcome GetAggregatedTestOutcome(ITestCaseFinished testCaseFinished)
+        static VsTestOutcome GetAggregatedTestOutcome(ITestCaseFinished testCaseFinished)
         {
             if (testCaseFinished.TestsRun == 0)
                 return VsTestOutcome.NotFound;

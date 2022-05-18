@@ -12,8 +12,8 @@ namespace J2N.Numerics
 {
     public class TestInt16 : TestCase
     {
-        private Int16 sp = new Int16((short)18000);
-        private Int16 sn = new Int16((short)-19000);
+        private readonly Int16 sp = new Int16((short)18000);
+        private readonly Int16 sn = new Int16((short)-19000);
 
         /**
          * @tests java.lang.Short#byteValue()
