@@ -51,10 +51,15 @@ namespace J2N.Threading
             {
                 try
                 {
-                    lock (this)
+                    UninterruptableMonitor.Enter(this);
+                    try
                     {
                         Monitor.Pulse(this);
                         Monitor.Wait(this, delay);
+                    }
+                    finally
+                    {
+                        UninterruptableMonitor.Exit(this);
                     }
                 }
                 catch (ThreadInterruptedException e)
@@ -102,9 +107,14 @@ namespace J2N.Threading
             {
                 try
                 {
-                    lock (this)
+                    UninterruptableMonitor.Enter(this);
+                    try
                     {
                         Monitor.Pulse(this);
+                    }
+                    finally
+                    {
+                        UninterruptableMonitor.Exit(this);
                     }
                     while (true)
                     {
@@ -157,8 +167,15 @@ namespace J2N.Threading
 
             public int getCheckVal()
             {
-                lock (this)
+                UninterruptableMonitor.Enter(this);
+                try
+                {
                     return checkVal;
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(this);
+                }
             }
         }
 
@@ -227,7 +244,6 @@ namespace J2N.Threading
             var simple = new SimpleThread(10);
             ct = new ThreadJob(() => simple.Run());
             ct.Start();
-            //ct.Join();
         }
 
         /**
@@ -635,7 +651,8 @@ namespace J2N.Threading
             {
                 if (sync)
                 {
-                    lock (syncLock)
+                    UninterruptableMonitor.Enter(syncLock);
+                    try
                     {
                         Monitor.Pulse(syncLock);
                         try
@@ -645,6 +662,10 @@ namespace J2N.Threading
                         catch (ThreadInterruptedException e)
                         {
                         }
+                    }
+                    finally
+                    {
+                        UninterruptableMonitor.Exit(syncLock);
                     }
                 }
                 parent.Interrupt();
@@ -674,10 +695,15 @@ namespace J2N.Threading
             {
                 ct = new ChildThread1(ThreadJob.CurrentThread, "Interrupt Test1",
                         false, syncLock);
-                lock (syncLock)
+                UninterruptableMonitor.Enter(syncLock);
+                try
                 {
                     ct.Start();
                     Monitor.Wait(syncLock);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(syncLock);
                 }
             }
             catch (ThreadInterruptedException e)
@@ -691,11 +717,16 @@ namespace J2N.Threading
             {
                 ct = new ChildThread1(ThreadJob.CurrentThread, "Interrupt Test2",
                         true, syncLock);
-                lock (syncLock)
+                UninterruptableMonitor.Enter(syncLock);
+                try
                 {
                     ct.Start();
                     Monitor.Wait(syncLock);
                     Monitor.Pulse(syncLock);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(syncLock);
                 }
                 ThreadJob.Sleep(20000);
             }
@@ -730,7 +761,8 @@ namespace J2N.Threading
             SimpleThread simple = new SimpleThread(500);
             st = new ThreadJob(() => simple.Run());
             assertFalse("A thread that wasn't started is alive.", st.IsAlive);
-            lock (simple)
+            UninterruptableMonitor.Enter(simple);
+            try
             {
                 st.Start();
                 try
@@ -741,6 +773,10 @@ namespace J2N.Threading
                 catch (ThreadInterruptedException e)
                 {
                 }
+            }
+            finally
+            {
+                UninterruptableMonitor.Exit(simple);
             }
             assertTrue("Started thread returned false", st.IsAlive);
             try
@@ -821,11 +857,16 @@ namespace J2N.Threading
                 // cause isAlive() to be compiled by the JIT, as it must be called
                 // within 100ms below.
                 assertTrue("Thread is alive", !st.IsAlive);
-                lock (simple)
+                UninterruptableMonitor.Enter(simple);
+                try
                 {
                     st.Start();
                     //simple.wait();
                     Monitor.Wait(simple);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(simple);
                 }
                 st.Join();
             }
@@ -865,10 +906,15 @@ namespace J2N.Threading
             {
                 try
                 {
-                    lock (syncLock)
+                    UninterruptableMonitor.Enter(syncLock);
+                    try
                     {
                         //lock.notify();
                         Monitor.Pulse(syncLock);
+                    }
+                    finally
+                    {
+                        UninterruptableMonitor.Exit(syncLock);
                     }
                     ThreadJob.Sleep(100);
                 }
@@ -894,11 +940,16 @@ namespace J2N.Threading
                 // cause isAlive() to be compiled by the JIT, as it must be called
                 // within 100ms below.
                 assertTrue("Thread is alive", !st.IsAlive);
-                lock (simple)
+                UninterruptableMonitor.Enter(simple);
+                try
                 {
                     st.Start();
                     //simple.wait();
                     Monitor.Wait(simple);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(simple);
                 }
                 st.Join(10);
             }
@@ -913,11 +964,16 @@ namespace J2N.Threading
             {
                 simple = new SimpleThread(100);
                 st = new ThreadJob(() => simple.Run(), "SimpleThread13");
-                lock (simple)
+                UninterruptableMonitor.Enter(simple);
+                try
                 {
                     st.Start();
                     //simple.wait();
                     Monitor.Wait(simple);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(simple);
                 }
                 st.Join(1000);
             }
@@ -935,11 +991,16 @@ namespace J2N.Threading
             ThreadJob th = new ThreadJob("test");
             try
             {
-                lock (syncLock)
+                UninterruptableMonitor.Enter(syncLock);
+                try
                 {
                     killer.Start();
                     //lock.wait();
                     Monitor.Wait(syncLock);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(syncLock);
                 }
                 th.Join(200);
 
@@ -970,10 +1031,15 @@ namespace J2N.Threading
             {
                 try
                 {
-                    lock (syncLock)
+                    UninterruptableMonitor.Enter(syncLock);
+                    try
                     {
                         //lock.notify();
                         Monitor.Pulse(syncLock);
+                    }
+                    finally
+                    {
+                        UninterruptableMonitor.Exit(syncLock);
                     }
                     ThreadJob.Sleep(100);
                 }
@@ -996,11 +1062,16 @@ namespace J2N.Threading
             SimpleThread simple = new SimpleThread(1000);
             st = new ThreadJob(simple.Run, "Squawk1");
             assertTrue("Thread is alive", !st.IsAlive);
-            lock (simple)
+            UninterruptableMonitor.Enter(simple);
+            try
             {
                 st.Start();
                 //simple.wait();
                 Monitor.Wait(simple);
+            }
+            finally
+            {
+                UninterruptableMonitor.Exit(simple);
             }
 
             long firstRead = Time.CurrentTimeMilliseconds();
@@ -1019,11 +1090,16 @@ namespace J2N.Threading
             ThreadJob th = new ThreadJob("test");
             try
             {
-                lock (syncLock)
+                UninterruptableMonitor.Enter(syncLock);
+                try
                 {
                     killer.Start();
                     //lock.wait();
                     Monitor.Wait(syncLock);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(syncLock);
                 }
                 th.Join(200, 20);
             }
@@ -1040,46 +1116,51 @@ namespace J2N.Threading
             th.Start();
         }
 
-//        /**
-//         * @tests java.lang.Thread#resume()
-//         */
-//        [Test]
-//        [Ignore("TODO: Fix this test")]
-//        public void Test_resume()
-//        {
-//            // Test for method void java.lang.Thread.resume()
-//            int orgval;
-//            ResSupThread res;
-//            Thread t;
-//            try
-//            {
-//                res = new ResSupThread(Thread.CurrentThread);
-//                t = new Thread(() => res.Run());
-//                lock (t)
-//                {
-//                    ct = new ThreadJob(t, "Interrupt Test2");
-//                    ct.Start();
-//                    //t.wait();
-//                    Monitor.Wait(t);
-//                }
-//                ct.Suspend();
-//                // Wait to be sure the suspend has occurred
-//                ThreadJob.Sleep(500);
-//                orgval = res.getCheckVal();
-//                // Wait to be sure the thread is suspended
-//                ThreadJob.Sleep(500);
-//                assertTrue("Failed to suspend thread", orgval == res.getCheckVal());
-//                ct.Resume();
-//                // Wait to be sure the resume has occurred.
-//                ThreadJob.Sleep(500);
-//                assertTrue("Failed to resume thread", orgval != res.getCheckVal());
-//                ct.Interrupt();
-//            }
-//            catch (ThreadInterruptedException e)
-//            {
-//                fail("Unexpected interrupt occurred : " + e.Message);
-//            }
-//        }
+        // J2N: Suspend() and Resume() are deprecated in .NET, so was removed from ThreadJob
+        /////**
+        //// * @tests java.lang.Thread#resume()
+        //// */
+        ////[Test]
+        ////public void Test_resume()
+        ////{
+        ////    // Test for method void java.lang.Thread.resume()
+        ////    int orgval;
+        ////    ResSupThread res;
+        ////    Thread t;
+        ////    try
+        ////    {
+        ////        res = new ResSupThread(Thread.CurrentThread);
+        ////        t = new Thread(() => res.Run());
+        ////        UninterruptableMonitor.Enter(t);
+        ////        try
+        ////        {
+        ////            ct = new ThreadJob(() => t.Run(), "Interrupt Test2");
+        ////            ct.Start();
+        ////            //t.wait();
+        ////            Monitor.Wait(t);
+        ////        }
+        ////        finally
+        ////        {
+        ////            UninterruptableMonitor.Exit(t);
+        ////        }
+        ////        ct.Suspend();
+        ////        // Wait to be sure the suspend has occurred
+        ////        ThreadJob.Sleep(500);
+        ////        orgval = res.getCheckVal();
+        ////        // Wait to be sure the thread is suspended
+        ////        ThreadJob.Sleep(500);
+        ////        assertTrue("Failed to suspend thread", orgval == res.getCheckVal());
+        ////        ct.Resume();
+        ////        // Wait to be sure the resume has occurred.
+        ////        ThreadJob.Sleep(500);
+        ////        assertTrue("Failed to resume thread", orgval != res.getCheckVal());
+        ////        ct.Interrupt();
+        ////    }
+        ////    catch (ThreadInterruptedException e)
+        ////    {
+        ////        fail("Unexpected interrupt occurred : " + e.Message);
+        ////    }
+        ////}
 
         private class RunThread //: IRunnable
         {
@@ -1101,7 +1182,7 @@ namespace J2N.Threading
             // Test for method void java.lang.Thread.run()
 
             RunThread rt = new RunThread();
-            ThreadJob t = new ThreadJob(() => rt.Run());
+            ThreadJob t = new ThreadJob(rt.Run);
             try
             {
                 t.Start();
@@ -1200,7 +1281,6 @@ namespace J2N.Threading
          * @tests java.lang.Thread#sleep(long, int)
          */
         [Test]
-        [Ignore("TODO: Fix this test")]
         public void Test_sleepJI()
         {
             // Test for method void java.lang.Thread.sleep(long, int)
@@ -1226,19 +1306,23 @@ namespace J2N.Threading
          * @tests java.lang.Thread#start()
          */
         [Test]
-        [Ignore("TODO: Fix this test")]
         public void Test_start()
         {
             // Test for method void java.lang.Thread.start()
             try
             {
                 ResSupThread t = new ResSupThread(Thread.CurrentThread);
-                lock (t)
+                UninterruptableMonitor.Enter(t);
+                try
                 {
-                    ct = new ThreadJob(() => t.Run(), "Interrupt Test4");
+                    ct = new ThreadJob(t.Run, "Interrupt Test4");
                     ct.Start();
                     //t.wait();
                     Monitor.Wait(t);
+                }
+                finally
+                {
+                    UninterruptableMonitor.Exit(t);
                 }
                 assertTrue("Thread is not running1", ct.IsAlive);
                 // Let the child thread get going.
@@ -1461,72 +1545,88 @@ namespace J2N.Threading
             }
             public override void Run()
             {
-                lock (notify)
+                UninterruptableMonitor.Enter(notify);
+                try
                 {
                     //notify.Notify();
                     Monitor.Pulse(notify);
                 }
-                ThreadJob.CurrentThread.Suspend();
+                finally
+                {
+                    UninterruptableMonitor.Exit(notify);
+                }
+                //ThreadJob.CurrentThread.Suspend();
+                Monitor.Wait(SyncRoot);
             }
         }
 
-        /**
-         * @tests java.lang.Thread#suspend()
-         */
-        [Test]
-        [Ignore("TODO: Fix this test")]
-        public void Test_suspend()
-        {
-            // Test for method void java.lang.Thread.suspend()
-            int orgval;
-            ResSupThread t = new ResSupThread(Thread.CurrentThread);
-            try
-            {
-                lock (t)
-                {
-                    ct = new ThreadJob(t.Run, "Interupt Test6");
-                    ct.Start();
-                    //t.wait();
-                    Monitor.Wait(t);
-                }
-                ct.Suspend();
-                // Wait to be sure the suspend has occurred
-                ThreadJob.Sleep(500);
-                orgval = t.getCheckVal();
-                // Wait to be sure the thread is suspended
-                ThreadJob.Sleep(500);
-                assertTrue("Failed to suspend thread", orgval == t.getCheckVal());
-                ct.Resume();
-                // Wait to be sure the resume has occurred.
-                ThreadJob.Sleep(500);
-                assertTrue("Failed to resume thread", orgval != t.getCheckVal());
-                ct.Interrupt();
-            }
-            catch (ThreadInterruptedException e)
-            {
-                fail("Unexpected interrupt occurred");
-            }
+        // J2N: Suspend() and Resume() are deprecated in .NET, so was removed from ThreadJob
+        /////**
+        //// * @tests java.lang.Thread#suspend()
+        //// */
+        ////[Test]
+        ////public void Test_suspend()
+        ////{
+        ////    // Test for method void java.lang.Thread.suspend()
+        ////    int orgval;
+        ////    ResSupThread t = new ResSupThread(Thread.CurrentThread);
+        ////    try
+        ////    {
+        ////        ct = new ThreadJob(t.Run, "Interupt Test6");
+        ////        UninterruptableMonitor.Enter(ct.SyncRoot);
+        ////        try
+        ////        {
+        ////            ct.Start();
+        ////            //t.wait();
+        ////            Monitor.Wait(ct.SyncRoot);
+        ////        }
+        ////        finally
+        ////        {
+        ////            UninterruptableMonitor.Exit(ct.SyncRoot);
+        ////        }
+        ////        ct.Suspend();
+        ////        // Wait to be sure the suspend has occurred
+        ////        ThreadJob.Sleep(500);
+        ////        orgval = t.getCheckVal();
+        ////        // Wait to be sure the thread is suspended
+        ////        ThreadJob.Sleep(500);
+        ////        assertTrue("Failed to suspend thread", orgval == t.getCheckVal());
+        ////        ct.Resume();
+        ////        // Wait to be sure the resume has occurred.
+        ////        ThreadJob.Sleep(500);
+        ////        assertTrue("Failed to resume thread", orgval != t.getCheckVal());
+        ////        ct.Interrupt();
+        ////    }
+        ////    catch (ThreadInterruptedException e)
+        ////    {
+        ////        fail("Unexpected interrupt occurred");
+        ////    }
 
-            Object notify = new Object();
-            ThreadJob t1 = new NotifyThread(notify);
-            try
-            {
-                lock (notify)
-                {
-                    t1.Start();
-                    //notify.wait();
-                    Monitor.Wait(notify);
-                }
-                // wait for Thread to suspend
-                ThreadJob.Sleep(500);
-                assertTrue("Thread should be alive", t1.IsAlive);
-                t1.Resume();
-                t1.Join();
-            }
-            catch (ThreadInterruptedException e)
-            {
-            }
-        }
+        ////    Object notify = new Object();
+        ////    ThreadJob t1 = new NotifyThread(notify);
+        ////    try
+        ////    {
+        ////        UninterruptableMonitor.Enter(notify);
+        ////        try
+        ////        {
+        ////            t1.Start();
+        ////            //notify.wait();
+        ////            Monitor.Wait(notify);
+        ////        }
+        ////        finally
+        ////        {
+        ////            UninterruptableMonitor.Exit(notify);
+        ////        }
+        ////        // wait for Thread to suspend
+        ////        ThreadJob.Sleep(500);
+        ////        assertTrue("Thread should be alive", t1.IsAlive);
+        ////        t1.Resume();
+        ////        t1.Join();
+        ////    }
+        ////    catch (ThreadInterruptedException e)
+        ////    {
+        ////    }
+        ////}
 
         /**
          * @tests java.lang.Thread#toString()

@@ -365,6 +365,7 @@ namespace J2N.Threading
         /// was never suspended, or suspended and already resumed. If the receiver is
         /// suspended, this method remumes at the point where it was when it was suspended.
         /// </summary>
+        [Obsolete("Resume() is not supported in .NET Core. Use Monitor.PulseAll(SyncLock) instead. This method will be removed in J2N 3.0.")]
         public void Resume()
         {
             Monitor.PulseAll(SyncRoot);
@@ -411,6 +412,7 @@ namespace J2N.Threading
         /// Suspend requests are not queued, which means that N requests are equivalent to
         /// just one - only one resume request is needed in this case.
         /// </summary>
+        [Obsolete("Suspend() is not supported in .NET Core. Use Monitor.Wait(SyncLock) instead. This method will be removed in J2N 3.0.")]
         public void Suspend()
         {
             Monitor.Wait(SyncRoot);
