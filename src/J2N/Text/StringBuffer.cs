@@ -3,9 +3,7 @@
 
 using System;
 using System.Collections.Generic;
-#if FEATURE_CONTRACTBLOCKS
 using System.Diagnostics.Contracts;
-#endif
 using System.Text;
 
 
@@ -159,9 +157,7 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
-#if FEATURE_CONTRACTBLOCKS
             Contract.EndContractBlock();
-#endif
 
             string stringValue;
             if (value is null)
@@ -227,9 +223,7 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
-#if FEATURE_CONTRACTBLOCKS
             Contract.EndContractBlock();
-#endif
 
             string stringValue;
             if (value is null)
@@ -295,9 +289,7 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
-#if FEATURE_CONTRACTBLOCKS
             Contract.EndContractBlock();
-#endif
 
             string stringValue;
             if (value is null)
