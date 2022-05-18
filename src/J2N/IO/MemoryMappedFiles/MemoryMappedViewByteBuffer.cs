@@ -78,7 +78,6 @@ namespace J2N.IO.MemoryMappedFiles
             this.offset = offset;
         }
 
-#if FEATURE_MEMORYMAPPEDVIEWACCESSOR_READWRITEARRAY
         /// <summary>
         /// Reads bytes from the current position into the specified byte array,
         /// starting at the specified offset, and increases the position by the
@@ -128,7 +127,6 @@ namespace J2N.IO.MemoryMappedFiles
 
             return this;
         }
-#endif
 
         /// <summary>
         /// Returns the byte at the current position and increases the position by 1.
