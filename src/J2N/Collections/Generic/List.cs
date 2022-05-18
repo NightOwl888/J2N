@@ -9,9 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-#if !FEATURE_CASEINSENSITIVECOMPARER
-using CaseInsensitiveComparer = System.StringComparer; // To fixup documentation - this type doesn't exist on .NET Standard 1.x
-#endif
 
 
 namespace J2N.Collections.Generic
