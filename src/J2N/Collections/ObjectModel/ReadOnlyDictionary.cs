@@ -8,9 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-#if FEATURE_CONTRACTBLOCKS
 using System.Diagnostics.Contracts;
-#endif
 using System.Reflection;
 
 
@@ -104,9 +102,7 @@ namespace J2N.Collections.ObjectModel
         {
             get
             {
-#if FEATURE_CONTRACTBLOCKS
                 Contract.Ensures(Contract.Result<KeyCollection>() != null);
-#endif
                 if (keys == null)
                 {
                     keys = new KeyCollection(dictionary.Keys);
@@ -122,9 +118,7 @@ namespace J2N.Collections.ObjectModel
         {
             get
             {
-#if FEATURE_CONTRACTBLOCKS
                 Contract.Ensures(Contract.Result<ValueCollection>() != null);
-#endif
                 if (values == null)
                 {
                     values = new ValueCollection(dictionary.Values);
