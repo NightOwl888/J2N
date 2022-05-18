@@ -11,8 +11,6 @@ namespace J2N.Collections.Tests
     public abstract partial class List_Generic_Tests<T> : IList_Generic_Tests<T>
     {
 
-#if FEATURE_CONVERTER
-
         [Fact]
         public void ConvertAll()
         {
@@ -29,7 +27,5 @@ namespace J2N.Collections.Tests
                 Assert.Equal(before[i] * 10, after[i]);
             }
         }
-
-#endif
     }
 }
