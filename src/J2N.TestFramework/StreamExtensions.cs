@@ -28,7 +28,6 @@ namespace J2N
     /// </summary>
     public static class StreamExtensions
     {
-#if FEATURE_FILESTREAM_LOCK
         private static readonly bool IsLinux = LoadIsLinux();
         private static readonly bool IsWindows = LoadIsWindows();
         private static readonly bool IsFileStreamLockingPlatform = IsWindows || IsLinux;
@@ -56,7 +55,6 @@ namespace J2N
             return pid == PlatformID.Win32NT || pid == PlatformID.Win32Windows;
 #endif
         }
-#endif // FEATURE_FILESTREAM_LOCK
 
         /// <summary>
         /// Writes bytes from the given byte buffer to this <see cref="Stream"/>.
@@ -78,7 +76,6 @@ namespace J2N
 
             const int bufferSize = 8192;
             int written = 0;
-#if FEATURE_FILESTREAM_LOCK
             long lockPosition = 0;
             long lockLength = 0;
             FileStream fileStream = null;
@@ -93,8 +90,7 @@ namespace J2N
             }
             try
             {
-#endif
-            byte[] buffer = new byte[Math.Min(bufferSize, source.Remaining)];
+                byte[] buffer = new byte[Math.Min(bufferSize, source.Remaining)];
                 while (source.Remaining > 0)
                 {
                     if (buffer.Length > source.Remaining)
@@ -103,8 +99,6 @@ namespace J2N
                     stream.Write(buffer, 0, buffer.Length);
                     written += buffer.Length;
                 }
-
-#if FEATURE_FILESTREAM_LOCK
             }
             finally
             {
@@ -112,7 +106,6 @@ namespace J2N
                 fileStream?.Unlock(lockPosition, lockLength);
 #pragma warning restore CA1416 // This call site is reachable on all platforms. 'FileStream.UnLock(long, long)' is unsupported on: 'macOS/OSX'.
             }
-#endif
             return written;
         }
     }
