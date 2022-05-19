@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace J2N.Threading
@@ -27,6 +28,7 @@ namespace J2N.Threading
     /// </summary>
     public static class UninterruptableMonitor
     {
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "by design")]
         public static void Enter(object obj, ref bool lockTaken)
         {
             // enter the lock and ignore any System.Threading.ThreadInterruptedException
@@ -44,6 +46,7 @@ namespace J2N.Threading
             }
         }
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "by design")]
         private static void RetryEnter(object obj, ref bool lockTaken)
         {
             try
@@ -58,6 +61,7 @@ namespace J2N.Threading
             }
         }
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "by design")]
         public static void Enter(object obj)
         {
             // enter the lock and ignore any System.Threading.ThreadInterruptedException
@@ -75,6 +79,7 @@ namespace J2N.Threading
             }
         }
 
+        [SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "by design")]
         private static void RetryEnter(object obj)
         {
             try

@@ -67,9 +67,11 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     public class Dictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -247,9 +249,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public Dictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that contains elements copied
@@ -282,9 +286,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public Dictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer)
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             : this(dictionary != null ? dictionary.Count : 0, comparer)
         {
             if (dictionary == null)

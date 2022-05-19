@@ -63,7 +63,7 @@ namespace J2N.Text
         [NonSerialized]
 #endif
         private CultureInfo? culture; // not readonly for deserialization
-        private readonly CultureType? cultureType;
+        private readonly CultureType cultureType;
 
 #pragma warning disable IDE0044 // Add readonly modifier
         private IFormatProvider? formatProvider; // NOTE: This needs to be [Serializable] to support serialization. Note on .NET Core serialization has been dropped on these implementations.

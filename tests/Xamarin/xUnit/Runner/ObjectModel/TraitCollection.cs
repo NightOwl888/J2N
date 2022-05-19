@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
     /// <summary>
@@ -17,7 +18,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
     public class TraitCollection : IEnumerable<Trait>
     {
         internal const string TraitPropertyId = "TestObject.Traits";
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        [SuppressMessage("Microsoft.Security", "CA2104:DoNotDeclareReadOnlyMutableReferenceTypes")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2104 doesn't fire on all target frameworks")]
         private static readonly TestProperty TraitsProperty = TestProperty.Register(
             TraitPropertyId,
 #if !NET451

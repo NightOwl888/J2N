@@ -5,6 +5,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Reflection;
     using System.Runtime.Serialization;
@@ -168,7 +169,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
         /// </summary>
         /// <remarks>Only works for the valueType that is in the currently executing assembly or in Mscorlib.dll. The default valueType is of string valueType.</remarks>
         /// <returns>The valueType of the test property</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This could take a bit time, is not simple enough to be a property.")]
+        [SuppressMessage("Microsoft.Design", "CA1024:UsePropertiesWhereAppropriate", Justification = "This could take a bit time, is not simple enough to be a property.")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1024 doesn't fire on all target frameworks")]
         public Type GetValueType()
         {
             if (this.valueType == null)
@@ -179,8 +181,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return this.valueType;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Use this in the body in debug mode")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We use the default type whenever exception thrown")]
+        [SuppressMessage("Microsoft.Performance", "CA1822:MarkMembersAsStatic", Justification = "Use this in the body in debug mode")]
+        [SuppressMessage("Microsoft.Design", "CA1031:DoNotCatchGeneralExceptionTypes", Justification = "We use the default type whenever exception thrown")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA1822 and CA1031 don't fire on all target frameworks")]
         private Type GetType(string typeName)
         {
             if (typeName is null)
@@ -261,8 +264,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Static Fields
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
-        private static Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> s_properties = new Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>>();
+        [SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies", Justification = "Following Microsoft's code style")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA908 doesn't fire on all target frameworks")]
+        private static readonly Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>> s_properties = new Dictionary<string, KeyValuePair<TestProperty, HashSet<Type>>>();
 
 #if FullCLR
         private static string s_visualStudioPKT = "b03f5f7f11d50a3a";
@@ -273,7 +277,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #region Static Methods
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
+        [SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies", Justification = "Following Microsoft's code style")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA908 doesn't fire on all target frameworks")]
         public static void ClearRegisteredProperties()
         {
             lock (s_properties)
@@ -282,7 +287,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
+        [SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies", Justification = "Following Microsoft's code style")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA908 doesn't fire on all target frameworks")]
+        [SuppressMessage("Style", "IDE0018:Inline variable declaration", Justification = "Following Microsoft's code style")]
         public static TestProperty Find(string id)
         {
             if (id is null)
@@ -330,7 +337,9 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
             return Register(id, label, string.Empty, string.Empty, valueType, null, attributes, owner);
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies")]
+        [SuppressMessage("Microsoft.MSInternal", "CA908:AvoidTypesThatRequireJitCompilationInPrecompiledAssemblies", Justification = "Following Microsoft's code style")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA908 doesn't fire on all target frameworks")]
+        [SuppressMessage("Style", "IDE0018:Inline variable declaration", Justification = "Following Microsoft's code style")]
         public static TestProperty Register(string id, string label, string category, string description, Type valueType, ValidateValueCallback validateValueCallback, TestPropertyAttributes attributes, Type owner)
         {
             if (string.IsNullOrEmpty(id))
@@ -410,6 +419,8 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel
 
         #endregion Static Methods
 
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Following xUnit's code style")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0034 doesn't fire on all target frameworks")]
         public object GetRealObject(StreamingContext context)
         {
             var registeredProperty = TestProperty.Find(this.Id);

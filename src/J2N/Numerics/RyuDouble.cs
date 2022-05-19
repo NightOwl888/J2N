@@ -528,7 +528,7 @@ namespace J2N.Numerics
 
         #region Production Tables
 
-        private static readonly int POW5_BITCOUNT = 121; // max 3*31 = 124
+        private const int POW5_BITCOUNT = 121; // max 3*31 = 124
         private static readonly int[][] POW5_SPLIT = new int[POS_TABLE_SIZE][] {
             new int[] { 134217728,          0,          0,          0, }, new int[] { 167772160,          0,          0,          0, },
             new int[] { 209715200,          0,          0,          0, }, new int[] { 262144000,          0,          0,          0, },
@@ -695,7 +695,7 @@ namespace J2N.Numerics
             new int[] { 165780921,  363272413,  632299147,   81069709, }, new int[] { 207226151,  990961428, 1327244845, 1711949873, },
         };
 
-        private static readonly int POW5_INV_BITCOUNT = 122; // max 3*31 = 124
+        private const int POW5_INV_BITCOUNT = 122; // max 3*31 = 124
 
         private static readonly int[][] POW5_INV_SPLIT = new int[NEG_TABLE_SIZE][] {
             new int[] { 536870912,          0,          0,          1, }, new int[] { 429496729, 1288490188, 1717986918,  858993460, },

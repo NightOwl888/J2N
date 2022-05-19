@@ -1991,6 +1991,7 @@ namespace J2N.Numerics
                 private static readonly string[] paddedBadStrings = LoadPaddedBadStrings();
                 private static readonly string[] paddedBadHexStrings = LoadPaddedBadHexStrings();
                 private static readonly string[] paddedGoodStrings = LoadPaddedGoodStrings();
+                [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0052:Remove unread private members", Justification = "Following JDK convention")]
                 private static readonly string[] paddedGoodHexStrings = LoadPaddedGoodHexStrings();
 
                 private static string[] LoadPaddedBadStrings()

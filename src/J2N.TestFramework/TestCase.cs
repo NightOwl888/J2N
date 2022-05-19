@@ -200,6 +200,7 @@ namespace J2N
             DeleteFile(fileInfo.FullName);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1031:Do not catch general exception types", Justification = "File deletion is less critical than test failure")]
         public static void DeleteFile(string filePath)
         {
             try

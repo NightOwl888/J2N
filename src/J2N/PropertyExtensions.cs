@@ -1088,7 +1088,13 @@ namespace J2N
                 if (c > '\u00ff' || c == '\n' || c == '\r')
                 {
                     if (last != current)
+                    {
+#if FEATURE_SPAN
+                        bw.Write(comments.AsSpan(last, current - last)); // end - start
+#else
                         bw.Write(comments.Substring(last, current - last)); // end - start
+#endif
+                    }
                     if (c > '\u00ff')
                     {
                         uu[2] = ToHex((c >> 12) & 0xf);
@@ -1116,7 +1122,13 @@ namespace J2N
                 current++;
             }
             if (last != current)
+            {
+#if FEATURE_SPAN
+                bw.Write(comments.AsSpan(last, current - last)); // end - start
+#else
                 bw.Write(comments.Substring(last, current - last)); // end - start
+#endif
+            }
             bw.WriteLine();
         }
 

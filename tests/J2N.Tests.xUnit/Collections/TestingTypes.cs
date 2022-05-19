@@ -294,6 +294,7 @@ namespace J2N.Collections.Tests
             _inner.CompareTo(((NonGenericComparable)other)._inner);
     }
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1036:Override methods on comparable types", Justification = "by design")]
     public class BadlyBehavingComparable : IComparable<BadlyBehavingComparable>, IComparable
     {
         public int CompareTo(BadlyBehavingComparable other) => 1;

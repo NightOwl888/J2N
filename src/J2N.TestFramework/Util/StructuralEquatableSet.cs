@@ -18,9 +18,12 @@
 
 using J2N.Collections.Generic;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace J2N.Util
 {
+    [SuppressMessage("Usage", "CA2237:Mark ISerializable types with serializable", Justification = "serialization not required for testing")]
+    [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2237 doesn't fire on all target frameworks")]
     public class StructuralEquatableSet<T> : System.Collections.Generic.HashSet<T>, IStructuralEquatable
     {
         public bool Equals(object other, IEqualityComparer comparer)

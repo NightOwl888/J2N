@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using Xunit;
 
 namespace J2N.Collections.ObjectModel.Tests
@@ -144,6 +145,7 @@ namespace J2N.Collections.ObjectModel.Tests
 
 
         [Flags]
+        [SuppressMessage("Usage", "CA2217:Do not mark enums with FlagsAttribute", Justification = "Following Microsoft's code style")]
         protected enum ISetApi
         {
             None = 0,

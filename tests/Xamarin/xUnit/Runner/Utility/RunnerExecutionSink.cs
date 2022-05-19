@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using Xunit.Abstractions;
@@ -11,6 +12,7 @@ using VsTestResultMessage = Microsoft.VisualStudio.TestPlatform.ObjectModel.Test
 
 namespace Xunit.Runner
 {
+    [SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Following xUnit's conventions")]
     public class RunnerExecutionSink : TestMessageSink, IExecutionSink, IDisposable
     {
         private readonly TextWriter blameWriter;
@@ -42,7 +44,7 @@ namespace Xunit.Runner
 
         public ManualResetEvent Finished { get; } = new ManualResetEvent(initialState: false);
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "xUnit implemented Dispose() pattern wrong.")]
+        [SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "xUnit implemented Dispose() pattern wrong.")]
         public override void Dispose()
         {
             ((IDisposable)Finished).Dispose();

@@ -75,9 +75,10 @@ namespace J2N.Collections.Generic
 
 #if FEATURE_SERIALIZABLE
             [SuppressMessage("Microsoft.Usage", "CA2236:CallBaseClassMethodsOnISerializableTypes", Justification = "special case TreeSubSet serialization")]
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+            [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2236 doesn't fire on all target frameworks")]
+#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
             private TreeSubSet(SerializationInfo info, StreamingContext context)
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
             {
                 siInfo = info;
                 OnDeserializationImpl(info);
@@ -468,6 +469,8 @@ namespace J2N.Collections.Generic
                 OnDeserializationImpl(sender);
             }
 
+            [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Following Microsoft's code style")]
+            [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0060 doesn't fire on all target frameworks")]
             private void OnDeserializationImpl(object? sender)
             {
                 if (siInfo == null)

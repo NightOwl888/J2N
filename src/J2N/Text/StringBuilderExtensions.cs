@@ -792,7 +792,11 @@ namespace J2N.Text
             if (startIndex > value.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
+#if FEATURE_SPAN
+            return text.Insert(index, value.AsSpan(startIndex, charCount));
+#else
             return text.Insert(index, value.Substring(startIndex, charCount));
+#endif
         }
 
         #endregion
@@ -894,7 +898,7 @@ namespace J2N.Text
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         private static int LastIndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;
@@ -945,7 +949,7 @@ namespace J2N.Text
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         private static int LastIndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;
