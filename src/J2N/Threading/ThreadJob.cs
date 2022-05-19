@@ -258,28 +258,17 @@ namespace J2N.Threading
 
         /// <summary>
         /// Gets or sets a value indicating the scheduling priority of a thread.
+        /// <para/>
+        /// Usage Note: In Java, the priority numbers are 1 to 10 but in .NET they are 
+        /// <see cref="ThreadPriority.Lowest"/> (0) to <see cref="ThreadPriority.Highest"/> (5).
+        /// If set to a value higher than <see cref="ThreadPriority.Highest"/>, the priority will be <see cref="ThreadPriority.Highest"/>.
+        /// If set to a value lower than <see cref="ThreadPriority.Lowest"/>, the priority will be <see cref="ThreadPriority.Lowest"/>.
         /// </summary>
-        public ThreadPriority Priority // J2N TODO: Remove try/catch when setting here - we may need feedback. Need to test against Lucene.NET.
+        /// <exception cref="ThreadStateException">The thread has reached a final state, such as <see cref="ThreadState.Aborted"/>.</exception>
+        public ThreadPriority Priority
         {
-            get
-            {
-                try
-                {
-                    return thread.Priority;
-                }
-                catch
-                {
-                    return ThreadPriority.Normal;
-                }
-            }
-            set
-            {
-                try
-                {
-                    thread.Priority = value;
-                }
-                catch { }
-            }
+            get => thread.Priority;
+            set => thread.Priority = (ThreadPriority)Math.Min(Math.Max((int)value, (int)ThreadPriority.Lowest), (int)ThreadPriority.Highest);
         }
 
         /// <summary>
