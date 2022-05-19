@@ -19,3 +19,4 @@
 using System;
 
 [assembly: CLSCompliant(true)]
+[assembly: System.Resources.NeutralResourcesLanguage("", System.Resources.UltimateResourceFallbackLocation.MainAssembly)]
