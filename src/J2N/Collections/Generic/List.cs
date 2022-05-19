@@ -265,7 +265,10 @@ namespace J2N.Collections.Generic
             set => DoSetCapacity(value); // Hack so we can override
         }
 
+
         // Returns true if we re-allocated the array
+        [SuppressMessage("Usage", "CA2208:Instantiate argument exceptions correctly", Justification = "Using property name for clarity for end user")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2208 doesn't fire on all target frameworks")]
         internal virtual bool DoSetCapacity(int value)
         {
             if (value < _size)

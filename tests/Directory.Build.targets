@@ -6,8 +6,11 @@
     <NoWarn Label="Do not catch general exception types">$(NoWarn);CA1031</NoWarn>
     <NoWarn Label="Implement standard exception constructors">$(NoWarn);CA1032</NoWarn>
     <NoWarn Label="Nested types should not be visible">$(NoWarn);CA1034</NoWarn>
+    <NoWarn Label="Static holder types should be Static or NotInheritable">$(NoWarn);CA1052</NoWarn>
     <NoWarn Label="Use Literals Where Appropriate">$(NoWarn);CA1802</NoWarn>
     <NoWarn Label="Override equals and operator equals on value types">$(NoWarn);CA1815</NoWarn>
+    <NoWarn Label="Properties should not return arrays">$(NoWarn);CA1819</NoWarn>
+    <NoWarn Label="Test for empty strings using string length">$(NoWarn);CA1820</NoWarn>
     <NoWarn Label="Mark members as static">$(NoWarn);CA1822</NoWarn>
     <NoWarn Label="Avoid zero-length array allocations">$(NoWarn);CA1825</NoWarn>
     <NoWarn Label="Do not use Count/LongCount when Any can be used">$(NoWarn);CA1827</NoWarn>

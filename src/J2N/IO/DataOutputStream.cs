@@ -17,8 +17,8 @@
 #endregion
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-
 
 namespace J2N.IO
 {
@@ -395,7 +395,7 @@ namespace J2N.IO
             Write(buffer, 0, offset);
         }
 
-        private long CountUTFBytes(string value)
+        private static long CountUTFBytes(string value) // J2N specific - marked static
         {
             int utfCount = 0, length = value.Length;
             for (int i = 0; i < length; i++)
@@ -417,6 +417,8 @@ namespace J2N.IO
             return utfCount;
         }
 
+        [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Parameter exists in Apache Harmony")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0060 doesn't fire on all target frameworks")]
         private static int WriteUTFBytesToBuffer(string value, long count,
                               byte[] buffer, int offset)
         {

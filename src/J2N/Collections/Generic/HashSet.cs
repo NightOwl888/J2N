@@ -65,6 +65,8 @@ namespace J2N.Collections.Generic
         // store lower 31 bits of hash code
         private const int Lower31BitMask = 0x7FFFFFFF;
         // cutoff point, above which we won't do stackallocs. This corresponds to 100 integers.
+        [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Following Microsoft's code style")]
+        [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0051 doesn't fire on all target frameworks")]
         private const int StackAllocThreshold = 100;
         // when constructing a hashset from an existing collection, it may contain duplicates,
         // so this is used as the max acceptable excess ratio of capacity to count. Note that

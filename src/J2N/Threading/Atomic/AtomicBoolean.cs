@@ -18,6 +18,7 @@
 
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 
@@ -64,6 +65,7 @@ namespace J2N.Threading.Atomic
             this.value = value ? True : False;
         }
 
+
         /// <summary>
         /// Gets or sets the current value. Note that these operations can be done
         /// implicitly by setting the <see cref="AtomicInt32"/> to an <see cref="int"/>.
@@ -72,6 +74,7 @@ namespace J2N.Threading.Atomic
         /// bool x = abool;
         /// </code>
         /// </summary>
+        [SuppressMessage("Style", "IDE0075:Simplify conditional expression", Justification = "Other classes use this approach as a JIT optimization")]
         public bool Value
         {
             get => Interlocked.CompareExchange(ref value, 0, 0) == True ? true : false;

@@ -1433,6 +1433,7 @@ namespace J2N.Collections.Generic
             [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
             internal struct Enumerator : IEnumerator<TKey>, IEnumerator
             {
+                [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Following Microsoft's code style")]
                 private SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
 
                 internal Enumerator(SortedDictionary<TKey, TValue> dictionary)

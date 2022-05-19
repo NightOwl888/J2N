@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Threading;
 using Xunit.Abstractions;
@@ -12,6 +13,7 @@ namespace Xunit.Runner
     /// <para/>
     /// This execution sink requires that the tests be run sequentially.
     /// </summary>
+    [SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Following xUnit's conventions")]
     public class BlameCrashExecutionSink : TestMessageSink, IExecutionSink, IDisposable
     {
         private readonly TextWriter blameWriter;

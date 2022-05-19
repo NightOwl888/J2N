@@ -78,9 +78,12 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8714 // The type 'TKey' cannot be used as type parameter 'TKey' in the generic type or method 'IDictionary<TKey, TValue>'. Nullability of type argument 'TKey' doesn't match 'notnull' constraint.
     public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore CS8714 // The type 'TKey' cannot be used as type parameter 'TKey' in the generic type or method 'IDictionary<TKey, TValue>'. Nullability of type argument 'TKey' doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -149,11 +152,13 @@ namespace J2N.Collections.Generic
             list = new LinkedList<KeyValuePair<TKey, TValue>>();
         }
 
+#pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LinkedDictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
 
         public LinkedDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer)
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             : this(dictionary != null ? dictionary.Count : 0, comparer)
         {
             if (dictionary == null)
@@ -1158,6 +1163,7 @@ namespace J2N.Collections.Generic
             private readonly IEnumerator<KeyValuePair<TKey, TValue>> enumerator;
             private readonly int _getEnumeratorRetType;  // What should Enumerator.Current return?
             private bool notStartedOrEnded;
+            [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Following Microsoft's code style")]
             private int version;
 
             internal const int KeyValuePair = 1;

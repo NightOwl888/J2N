@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace J2N.Collections.Generic.Extensions
@@ -156,9 +157,11 @@ namespace J2N.Collections.Generic.Extensions
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
+
         /// <summary>
         /// Test enumerator - returns int values from 1 to 5 inclusive.
         /// </summary>
+        [SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Following Microsoft's code style")]
         protected class TestEnumerator : IEnumerable<int>, IEnumerator<int>
         {
             private int _current = 0;
@@ -167,6 +170,7 @@ namespace J2N.Collections.Generic.Extensions
 
             object IEnumerator.Current => Current;
 
+            [SuppressMessage("Design", "CA1063:Implement IDisposable Correctly", Justification = "Following Microsoft's code style")]
             public void Dispose() { }
 
             public virtual IEnumerator<int> GetEnumerator() => this;
@@ -248,6 +252,7 @@ namespace J2N.Collections.Generic.Extensions
         protected struct StringWithIntArray
         {
             public string name { get; set; }
+
             public int?[] total { get; set; }
         }
 
@@ -345,7 +350,7 @@ namespace J2N.Collections.Generic.Extensions
 
             void IEnumerator.Reset() => _reset();
 
-            void IDisposable.Dispose() => _dispose();
+            public void Dispose() => _dispose();
         }
     }
 }

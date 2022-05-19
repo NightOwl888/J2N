@@ -175,6 +175,7 @@ namespace J2N.Numerics
             0x7ea665f8bf806e42L, 0x7edbff76ef6089d2L, 0x7f117faa559c5623L, 0x7f45df94eb036bacL,
             0x7f7b577a25c44697L, 0x7fb116ac579aac1fL, 0x7fe55c576d815726L, 0x7ff0000000000000L };
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Used in Apache Harmony (may need someday)")]
         private void doTestCompareRawBits(string originalDoubleString, long expectedRawBits,
                 string expectedString)
         {
@@ -2127,6 +2128,7 @@ namespace J2N.Numerics
                              Replace('d', 'D').Replace('e', 'E').Replace('f', 'F');
                 }
 
+                [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "This turned out to be too slow - run manually")]
                 private static IEnumerable<TestCaseData> TestCases(string input, double expected)
                 {
                     // Try different combination of letter components

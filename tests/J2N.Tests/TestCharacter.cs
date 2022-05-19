@@ -3050,6 +3050,7 @@ namespace J2N
             assertEquals(expected, actual);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Useful debug utility")]
         private string ConvertToUtf16Escaped(string input) // Utility useful for escaping long strings (because VS cannot attach a debugger when they are too long)
         {
             var sb = new StringBuilder();

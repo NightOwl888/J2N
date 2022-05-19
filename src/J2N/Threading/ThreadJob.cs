@@ -149,7 +149,7 @@ namespace J2N.Threading
             }
         }
 
-        private bool IsThreadingException(Exception e)
+        private static bool IsThreadingException(Exception e) // J2N specific - marked static
         {
             // NOTE: We don't swallow ThreadAbortException because we don't want
             // to interfere with normal operation of the thread.

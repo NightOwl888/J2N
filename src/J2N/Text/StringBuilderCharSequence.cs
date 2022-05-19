@@ -604,7 +604,13 @@ namespace J2N.Text
                 throw new InvalidOperationException(J2N.SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(StringBuilder)));
 
             if (value != null)
+            {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                Value.Append(value); // J2N: This overload uses GetChunks() to transfer the chars
+#else
                 Value.Append(value.ToString());
+#endif
+            }
             return this;
         }
 

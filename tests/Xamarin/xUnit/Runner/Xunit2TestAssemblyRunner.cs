@@ -167,6 +167,7 @@ namespace Xunit.Runner
             //}
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0059:Unnecessary assignment of a value", Justification = "Will add logging someday")]
         public static VsTestCase CreateVsTestCase(string source,
                                                TestCaseDescriptor descriptor)
         {
@@ -190,9 +191,7 @@ namespace Xunit.Runner
 
                 return result;
             }
-#pragma warning disable CA1031, IDE0059, CS0168 // Do not catch general exception types, Unnecessary assignment of a value, Variable is declared but never used
             catch (Exception ex)
-#pragma warning restore CA1031, IDE0059, CS0168 // Do not catch general exception types, Unnecessary assignment of a value, Variable is declared but never used
             {
                 //logger.LogErrorWithSource(source, "Error creating Visual Studio test case for {0}: {1}", descriptor.DisplayName, ex);
                 return null;
