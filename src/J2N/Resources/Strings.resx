@@ -127,7 +127,10 @@
     <value>Count must be positive and count must refer to a location within the string/array/collection.</value>
   </data>
   <data name="ArgumentOutOfRange_Index" xml:space="preserve">
-    <value>Index was out of range. Must be non-negative and less than the size of the collection.</value>
+    <value>Index was out of range. Must be non-negative and less than the size of the string/array/collection.</value>
+  </data>
+  <data name="ArgumentOutOfRange_IndexBefore" xml:space="preserve">
+    <value>Index was out of range. Must be at least 1 and less than or equal to the size of the string/array/collection.</value>
   </data>
   <data name="ArgumentOutOfRange_IndexLength" xml:space="preserve">
     <value>Index and length must refer to a location within the string.</value>
