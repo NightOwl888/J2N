@@ -19,7 +19,7 @@ namespace J2N.Resources {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Strings {
@@ -430,11 +430,20 @@ namespace J2N.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Index was out of range. Must be non-negative and less than the size of the collection..
+        ///   Looks up a localized string similar to Index was out of range. Must be non-negative and less than the size of the string/array/collection..
         /// </summary>
         internal static string ArgumentOutOfRange_Index {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_Index", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Index was out of range. Must be at least 1 and less than or equal to the size of the string/array/collection..
+        /// </summary>
+        internal static string ArgumentOutOfRange_IndexBefore {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_IndexBefore", resourceCulture);
             }
         }
         

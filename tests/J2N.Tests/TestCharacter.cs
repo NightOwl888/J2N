@@ -295,6 +295,41 @@ namespace J2N
             }
         }
 
+#if FEATURE_SPAN
+        [Test]
+        public void Test_codePointAt_ReadOnlySpanI()
+        {
+
+            assertEquals('a', Character.CodePointAt("abc".AsSpan(), 0));
+            assertEquals('b', Character.CodePointAt("abc".AsSpan(), 1));
+            assertEquals('c', Character.CodePointAt("abc".AsSpan(), 2));
+            assertEquals(0x10000, Character.CodePointAt(
+                    "\uD800\uDC00".AsSpan(), 0));
+            assertEquals('\uDC00', Character.CodePointAt(
+                    "\uD800\uDC00".AsSpan(), 1));
+
+            // J2N: ReadOnlySpan<char> is a value type - null not allowed
+
+            try
+            {
+                Character.CodePointAt("abc".AsSpan(), -1);
+                fail("No IOOBE, negative index.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.CodePointAt("abc".AsSpan(), 4);
+                fail("No IOOBE, index too large.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+        }
+#endif
+
         [Test]
         public void Test_codePointAt_CI()
         {
@@ -555,8 +590,40 @@ namespace J2N
             }
         }
 
+#if FEATURE_SPAN
+        [Test]
+        public void Test_codePointBefore_ReadOnlySpanI()
+        {
 
+            assertEquals('a', Character.CodePointBefore("abc".AsSpan(), 1));
+            assertEquals('b', Character.CodePointBefore("abc".AsSpan(), 2));
+            assertEquals('c', Character.CodePointBefore("abc".AsSpan(), 3));
+            assertEquals(0x10000, Character.CodePointBefore(
+                    "\uD800\uDC00".AsSpan(), 2));
+            assertEquals('\uD800', Character.CodePointBefore(
+                    "\uD800\uDC00".AsSpan(), 1));
 
+            // J2N: ReadOnlySpan<char> is a value type - null not allowed
+
+            try
+            {
+                Character.CodePointBefore("abc".AsSpan(), 0);
+                fail("No IOOBE, index below one.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.CodePointBefore("abc".AsSpan(), 4);
+                fail("No IOOBE, index too large.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+        }
+#endif
 
 
         [Test]
@@ -930,6 +997,20 @@ namespace J2N
             }
         }
 
+#if FEATURE_SPAN
+        [Test]
+        public void Test_codePointCount_ReadOnlySpanII()
+        {
+            assertEquals(1, Character.CodePointCount("\uD800\uDC00".AsSpan(0, 2 - 0))); // end - start
+            assertEquals(1, Character.CodePointCount("\uD800\uDC01".AsSpan(0, 2 - 0))); // end - start
+            assertEquals(1, Character.CodePointCount("\uD801\uDC01".AsSpan(0, 2 - 0))); // end - start
+            assertEquals(1, Character.CodePointCount("\uDBFF\uDFFF".AsSpan(0, 2 - 0))); // end - start
+
+            assertEquals(3, Character.CodePointCount("a\uD800\uDC00b".AsSpan(0, 4 - 0))); // end - start
+            assertEquals(4, Character.CodePointCount("a\uD800\uDC00b\uD800".AsSpan(0, 5 - 0))); // end - start
+        }
+#endif
+
         [Test]
         public void Test_offsetByCodePoints_ICharSequenceII()
         {
@@ -1222,6 +1303,73 @@ namespace J2N
             }
         }
 
+#if FEATURE_SPAN
+        [Test]
+        public void Test_offsetByCodePoints_ReadOnlySpanII()
+        {
+            int result = Character.OffsetByCodePoints("a\uD800\uDC00b".AsSpan(), 0, 2);
+            assertEquals(3, result);
+
+            result = Character.OffsetByCodePoints("abcd".AsSpan(), 3, -1);
+            assertEquals(2, result);
+
+            result = Character.OffsetByCodePoints("a\uD800\uDC00b".AsSpan(), 0, 3);
+            assertEquals(4, result);
+
+            result = Character.OffsetByCodePoints("a\uD800\uDC00b".AsSpan(), 3, -1);
+            assertEquals(1, result);
+
+            result = Character.OffsetByCodePoints("a\uD800\uDC00b".AsSpan(), 3, 0);
+            assertEquals(3, result);
+
+            result = Character.OffsetByCodePoints("\uD800\uDC00bc".AsSpan(), 3, 0);
+            assertEquals(3, result);
+
+            result = Character.OffsetByCodePoints("a\uDC00bc".AsSpan(), 3, -1);
+            assertEquals(2, result);
+
+            result = Character.OffsetByCodePoints("a\uD800bc".AsSpan(), 3, -1);
+            assertEquals(2, result);
+
+            // J2N: ReadOnlySpan<char> is a value type - null not allowed
+
+            try
+            {
+                Character.OffsetByCodePoints("abc".AsSpan(), -1, 1);
+                fail();
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.OffsetByCodePoints("abc".AsSpan(), 4, 1);
+                fail();
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.OffsetByCodePoints("abc".AsSpan(), 1, 3);
+                fail();
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.OffsetByCodePoints("abc".AsSpan(), 1, -2);
+                fail();
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+        }
+#endif
 
 
         [Test]
