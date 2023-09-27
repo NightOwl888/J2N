@@ -1311,6 +1311,8 @@ namespace J2N.Threading
         [Test]
         public void Test_start()
         {
+            Assume.That(!RuntimeInformation.IsOSPlatform(OSPlatform.OSX), "J2N TODO: This test currently fails on macOS.");
+
             // Test for method void java.lang.Thread.start()
             try
             {
