@@ -110,6 +110,7 @@ stages:
         outputDirectory: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)/MonoAndroid90'
         configuration: '$(BuildConfiguration)'
         target: 'SignAndroidPackage'
+        msbuildVersionOption: '16.0'
       displayName: 'Build XamarinAndroid90'
 
     - task: XamarinAndroid@1
@@ -118,6 +119,7 @@ stages:
         outputDirectory: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)/MonoAndroid100'
         configuration: '$(BuildConfiguration)'
         target: 'SignAndroidPackage'
+        msbuildVersionOption: '16.0'
       displayName: 'Build XamarinAndroid100'
 
     - task: PublishBuildArtifacts@1
