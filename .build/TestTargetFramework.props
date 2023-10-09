@@ -19,7 +19,7 @@
     
     <!-- Test Client to DLL target works as follows:
       Test Client       | Target Under Test
-      net6.0            | net5.0
+      net6.0            | net6.0
       net5.0            | net5.0
       netcoreapp3.1     | netcoreapp3.0
       netcoreapp3.0     | netstandard2.1
