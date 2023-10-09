@@ -56,16 +56,6 @@ steps:
 
 - template: publish-test-results.yml
   parameters:
-    framework: 'netcoreapp3.0'
-    testProjectName: '${{ parameters.testProjectName }}'
-    osName: '${{ parameters.osName }}'
-    testPlatform: '${{ parameters.testPlatform }}'
-    testResultsFormat: '${{ parameters.testResultsFormat }}'
-    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
-    testResultsFileName: '${{ parameters.testResultsFileName }}'
-
-- template: publish-test-results.yml
-  parameters:
     framework: 'net48'
     testProjectName: '${{ parameters.testProjectName }}'
     osName: '${{ parameters.osName }}'
