@@ -11,6 +11,7 @@
   <!-- Features in .NET Standard, .NET Core, .NET 5.x, and .NET 6.x only (no .NET Framework support) -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
 
+    <DefineConstants>$(DefineConstants);FEATURE_APPCONTEXT_BASEDIRECTORY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CHARARRAYPOINTERS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER</DefineConstants>
@@ -100,6 +101,7 @@
   <!-- Features in .NET Framework 4.6+ only -->
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net46')) Or $(TargetFramework.StartsWith('net47')) Or $(TargetFramework.StartsWith('net48'))">
 
+    <DefineConstants>$(DefineConstants);FEATURE_APPCONTEXT_BASEDIRECTORY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
 
