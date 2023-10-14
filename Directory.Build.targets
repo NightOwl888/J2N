@@ -181,7 +181,8 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubPackageReferenceVersion)" PrivateAssets="All"/>
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(SkipGitVersioning.ToLower())' != 'true' And '$(TF_BUILD.ToLower())' != 'true' ">
+  <!-- J2N will always use semantic versioning, there is no need for a 4 component version number so we don't always have to skip this on Azure DevOps -->
+  <ItemGroup Condition=" '$(SkipGitVersioning.ToLower())' != 'true' ">
     <PackageReference Include="Nerdbank.GitVersioning" Version="$(NerdBankGitVersioningPackageReferenceVersion)" PrivateAssets="All" />
   </ItemGroup>
 
