@@ -320,7 +320,7 @@ stages:
         testTargetFrameworks: 'MonoAndroid90'
         androidAbi: 'x86_64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_MonoAndroid90_x86 # Only run if explicitly enabled with RunX86Tests
@@ -335,7 +335,7 @@ stages:
         testTargetFrameworks: 'MonoAndroid90'
         androidAbi: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_MonoAndroid100_x86_64
@@ -350,7 +350,7 @@ stages:
         testTargetFrameworks: 'MonoAndroid100'
         androidAbi: 'x86_64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
   - job: Test_MonoAndroid100_x86 # Only run if explicitly enabled with RunX86Tests
@@ -365,7 +365,7 @@ stages:
         testTargetFrameworks: 'MonoAndroid100'
         androidAbi: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 9 # Maximum allowed failures for a successful build
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
 
