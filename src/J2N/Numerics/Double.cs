@@ -935,7 +935,7 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseDouble(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
 
         /// <summary>
         /// Converts the string representation of a number in a character span to its double-precision floating-point number equivalent.
@@ -1331,7 +1331,7 @@ namespace J2N.Numerics
             return DotNetNumber.ParseDouble(s, style, NumberFormatInfo.GetInstance(provider));
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts a character span that contains the string representation of a number in a specified style and culture-specific format to
         /// its double-precision floating-point number equivalent.
@@ -1904,7 +1904,7 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseDouble(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to
         /// its double-precision floating-point number equivalent. A return value indicates whether the

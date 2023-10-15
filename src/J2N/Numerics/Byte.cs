@@ -469,7 +469,7 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a <see cref="byte"/> in the specified <paramref name="radix"/>, beginning at the
@@ -926,7 +926,7 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32_Int32_Byte
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a <see cref="byte"/> in the specified <paramref name="radix"/>, beginning at the
@@ -1670,7 +1670,7 @@ namespace J2N.Numerics
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit unsigned
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1939,7 +1939,7 @@ namespace J2N.Numerics
             if (s is null)
                 throw new ArgumentNullException(nameof(s));
 #if FEATURE_READONLYSPAN
-            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i);
+            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i);
 #else
             DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i);
 #endif
@@ -1961,7 +1961,7 @@ namespace J2N.Numerics
             return (byte)i;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its <see cref="byte"/> equivalent.
         /// </summary>
@@ -2380,7 +2380,7 @@ namespace J2N.Numerics
 #if FEATURE_READONLYSPAN
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
             // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
-            if (DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
+            if (DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
                 || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
 #else
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
@@ -2396,7 +2396,7 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit unsigned integer equivalent.
         /// A return value indicates whether the conversion succeeded.

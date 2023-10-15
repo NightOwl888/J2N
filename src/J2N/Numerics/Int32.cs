@@ -486,7 +486,7 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>, beginning at the
@@ -896,7 +896,7 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32_Int32_Int32
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>, beginning at the
@@ -1505,7 +1505,7 @@ namespace J2N.Numerics
             return int.TryParse(s, out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 32-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1773,7 +1773,7 @@ namespace J2N.Numerics
             return int.Parse(s, style.ToNumberStyles(), provider);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to its
         /// 32-bit signed integer equivalent.
@@ -2174,7 +2174,7 @@ namespace J2N.Numerics
         }
 
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 32-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
@@ -2376,7 +2376,7 @@ namespace J2N.Numerics
         /// <seealso cref="NumberStyle"/>
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out int result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
