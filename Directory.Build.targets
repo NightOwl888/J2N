@@ -65,16 +65,19 @@
     <!--<DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ENUMERATOR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
 
+    <DefineConstants>$(DefineConstants);FEATURE_BIGINTEGER_CTOR_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_ENSURECAPACITY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_REMOVE_OUTVALUE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_READONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_NUMBER_PARSE_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CONTAINS_CHAR</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPENDJOIN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_EQUALS_READONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_INSERT_READONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_TEXTWRITER_WRITE_READONLYSPAN</DefineConstants>
 
   </PropertyGroup>
 
@@ -129,6 +132,9 @@
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_ISENTERED</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
 
