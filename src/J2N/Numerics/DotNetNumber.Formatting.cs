@@ -859,7 +859,7 @@ namespace J2N.Numerics
 
             if (source.AsSpan().TryCopyTo(destination))
             {
-                charsWritten = source.Length;
+                charsWritten = source!.Length;
                 return true;
             }
 
@@ -2055,6 +2055,7 @@ namespace J2N.Numerics
 
 #if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
+            {
 #else
             fixed (byte* digPtr = &number.Digits[0])
             {
@@ -2411,9 +2412,7 @@ namespace J2N.Numerics
                         }
                     }
                 }
-#if !FEATURE_SPAN
             }
-#endif
 
             if (number.IsNegative && (section == 0) && (number.Scale == 0) && (sb.Length > 0))
                 sb.Insert(0, info.NegativeSign);
@@ -2451,6 +2450,7 @@ namespace J2N.Numerics
 
 #if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
+            {
 #else
             fixed (byte* digPtr = &number.Digits[0])
             {
@@ -2566,9 +2566,7 @@ namespace J2N.Numerics
                         nMaxDigits--;
                     }
                 }
-#if !FEATURE_SPAN
             }
-#endif
         }
 
         private static void FormatNumber(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
@@ -2598,6 +2596,7 @@ namespace J2N.Numerics
         {
 #if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
+            {
 #else
             fixed (byte* digPtr = &number.Digits[0])
             {
@@ -2611,9 +2610,7 @@ namespace J2N.Numerics
 
                 while (--nMaxDigits > 0)
                     sb.Append((*dig != 0) ? (char)(*dig++) : '0');
-#if !FEATURE_SPAN
             }
-#endif
 
             int e = number.Digits[0] == 0 ? 0 : number.Scale - 1;
             FormatExponent(ref sb, info, e, expChar, 3, true);
@@ -2670,6 +2667,7 @@ namespace J2N.Numerics
 
 #if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
+            {
 #else
             fixed (byte* digPtr = &number.Digits[0])
             {
@@ -2701,9 +2699,7 @@ namespace J2N.Numerics
                     while (*dig != 0)
                         sb.Append((char)(*dig++));
                 }
-#if !FEATURE_SPAN
             }
-#endif
 
             if (scientific)
                 FormatExponent(ref sb, info, number.Scale - 1, expChar, 2, true);
@@ -2739,6 +2735,7 @@ namespace J2N.Numerics
         {
 #if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
+            {
 #else
             fixed (byte* digPtr = &number.Digits[0])
             {
@@ -2784,9 +2781,7 @@ namespace J2N.Numerics
                 dig[i] = (byte)('\0');
                 number.DigitsCount = i;
                 number.CheckConsistency();
-#if !FEATURE_SPAN
             }
-#endif
 
             static bool ShouldRoundUp(byte* dig, int i, NumberBufferKind numberKind, bool isCorrectlyRounded)
             {
