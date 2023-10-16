@@ -1425,12 +1425,7 @@ namespace J2N.Numerics
         /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         public static int Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            return DotNetNumber.ParseInt32(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
+            return Parse(s, NumberStyle.Integer, provider);
         }
 
         #endregion
@@ -1507,13 +1502,7 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse([NotNullWhen(true)] string? s, out int result)
         {
-            if (s == null)
-            {
-                result = 0;
-                return false;
-            }
-
-            return DotNetNumber.TryParseInt32IntegerStyle(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
+            return int.TryParse(s, out result);
         }
 
 #if FEATURE_READONLYSPAN
@@ -1587,7 +1576,11 @@ namespace J2N.Numerics
 #endif 
         public static bool TryParse(ReadOnlySpan<char> s, out int result)
         {
-            return DotNetNumber.TryParseInt32IntegerStyle(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
+            return int.TryParse(s, out result);
+#else
+            return int.TryParse(s.ToString(), out result); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
 
@@ -1781,12 +1774,7 @@ namespace J2N.Numerics
         public static int Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            if (s == null) throw new ArgumentNullException(nameof(s));
-            return DotNetNumber.ParseInt32(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider));
+            return int.Parse(s, style.ToNumberStyles(), provider);
         }
 
 #if FEATURE_READONLYSPAN
@@ -1975,7 +1963,11 @@ namespace J2N.Numerics
         public static int Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            return DotNetNumber.ParseInt32(s, style, NumberFormatInfo.GetInstance(provider));
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
+            return int.Parse(s, style.ToNumberStyles(), provider);
+#else
+            return int.Parse(s.ToString(), style.ToNumberStyles(), provider); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
@@ -2186,18 +2178,7 @@ namespace J2N.Numerics
         public static bool TryParse([NotNullWhen(true)] string? s, NumberStyle style, IFormatProvider? provider, out int result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-
-            if (s == null)
-            {
-                result = 0;
-                return false;
-            }
-
-            return DotNetNumber.TryParseInt32(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
+            return int.TryParse(s, style.ToNumberStyles(), provider, out result);
         }
 
 
@@ -2407,7 +2388,11 @@ namespace J2N.Numerics
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out int result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            return DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
+            return int.TryParse(s, style.ToNumberStyles(), provider, out result);
+#else
+            return int.TryParse(s.ToString(), style.ToNumberStyles(), provider, out result); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
 

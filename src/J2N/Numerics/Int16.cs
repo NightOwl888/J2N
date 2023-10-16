@@ -1542,12 +1542,7 @@ namespace J2N.Numerics
         /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         public static short Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
-            if (s is null) throw new ArgumentNullException(nameof(s));
-            return Parse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
+            return short.Parse(s, provider);
         }
 
         #endregion Parse_CharSequence_IFormatProvider
@@ -1623,17 +1618,7 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse([NotNullWhen(true)] string? s, out short result)
         {
-            if (s == null)
-            {
-                result = 0;
-                return false;
-            }
-
-            return TryParse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
+            return short.TryParse(s, out result);
         }
 
 #if FEATURE_READONLYSPAN
@@ -1707,7 +1692,11 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse(ReadOnlySpan<char> s, out short result)
         {
-            return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
+            return short.TryParse(s, out result);
+#else
+            return short.TryParse(s.ToString(), out result); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
 
@@ -1901,12 +1890,7 @@ namespace J2N.Numerics
         public static short Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            if (s is null) throw new ArgumentNullException(nameof(s));
-            return Parse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider));
+            return short.Parse(s, style.ToNumberStyles(), provider);
         }
 
 #if FEATURE_READONLYSPAN
@@ -2095,64 +2079,14 @@ namespace J2N.Numerics
         public static short Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            return Parse(s, style, NumberFormatInfo.GetInstance(provider));
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
+            return short.Parse(s, style.ToNumberStyles(), provider);
+#else
+            return short.Parse(s.ToString(), style.ToNumberStyles(), provider); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
-
 #endif
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
-
-        #region Parse_CharSequence_NumberStyle_NumberFormatInfo
-
-#if FEATURE_SPAN
-        private static short Parse(ReadOnlySpan<char> s, NumberStyle style, NumberFormatInfo info)
-#else
-        private static short Parse(string s, NumberStyle style, NumberFormatInfo info)
-#endif
-        {
-            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, info, out int i);
-            if (status != DotNetNumber.ParsingStatus.OK)
-            {
-                if (status == DotNetNumber.ParsingStatus.Overflow)
-                    DotNetNumber.ThrowOverflowException(TypeCode.Int16);
-                else
-                    DotNetNumber.ThrowFormatException(s.ToString());
-            }
-
-            // For hex number styles AllowHexSpecifier << 6 == 0x8000 and cancels out MinValue so the check is effectively: (uint)i > ushort.MaxValue
-            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > ushort.MaxValue
-            if ((uint)(i - short.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) << 6)) > ushort.MaxValue)
-            {
-                DotNetNumber.ThrowOverflowException(TypeCode.Int16);
-            }
-            return (short)i;
-        }
-
-        #endregion Parse_CharSequence_NumberStyle_NumberFormatInfo
-
-        #region TryParse_CharSequence_NumberStyle_NumberFormatInfo_Int16
-
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-#if FEATURE_SPAN
-        private static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, NumberFormatInfo info, out short result)
-#else
-        private static bool TryParse(string s, NumberStyle style, NumberFormatInfo info, out short result)
-#endif
-        {
-            // For hex number styles AllowHexSpecifier << 6 == 0x8000 and cancels out MinValue so the check is effectively: (uint)i > ushort.MaxValue
-            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > ushort.MaxValue
-            if (DotNetNumber.TryParseInt32(s, style, info, out int i) != DotNetNumber.ParsingStatus.OK
-                || (uint)(i - short.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) << 6)) > ushort.MaxValue)
-            {
-                result = 0;
-                return false;
-            }
-            result = (short)i;
-            return true;
-        }
-
-        #endregion TryParse_CharSequence_NumberStyle_NumberFormatInfo_Int16
 
         #region TryParse_CharSequence_NumberStyle_IFormatProvider_Int16
 
@@ -2360,19 +2294,9 @@ namespace J2N.Numerics
         public static bool TryParse([NotNullWhen(true)] string? s, NumberStyle style, IFormatProvider? provider, out short result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-
-            if (s == null)
-            {
-                result = 0;
-                return false;
-            }
-
-            return TryParse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider), out result);
+            return short.TryParse(s, style.ToNumberStyles(), provider, out result);
         }
+
 
 #if FEATURE_READONLYSPAN
         /// <summary>
@@ -2580,7 +2504,11 @@ namespace J2N.Numerics
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out short result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            return TryParse(s, style, NumberFormatInfo.GetInstance(provider), out result);
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
+            return short.TryParse(s, style.ToNumberStyles(), provider, out result);
+#else
+            return short.TryParse(s.ToString(), style.ToNumberStyles(), provider, out result); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
 
