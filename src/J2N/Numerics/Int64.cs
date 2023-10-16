@@ -1577,7 +1577,11 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse(ReadOnlySpan<char> s, out long result)
         {
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
             return long.TryParse(s, out result);
+#else
+            return long.TryParse(s.ToString(), out result); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
 
@@ -1963,7 +1967,11 @@ namespace J2N.Numerics
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
             NumberStyleExtensions.ValidateParseStyleInteger(style);
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
             return long.Parse(s, style.ToNumberStyles(), provider);
+#else
+            return long.Parse(s.ToString(), style.ToNumberStyles(), provider); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
@@ -2386,7 +2394,11 @@ namespace J2N.Numerics
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
             NumberStyleExtensions.ValidateParseStyleInteger(style);
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
             return long.TryParse(s, style.ToNumberStyles(), provider, out result);
+#else
+            return long.TryParse(s.ToString(), style.ToNumberStyles(), provider, out result);
+#endif
         }
 #endif
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int64

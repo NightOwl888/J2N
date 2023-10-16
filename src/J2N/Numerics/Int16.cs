@@ -1692,7 +1692,11 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse(ReadOnlySpan<char> s, out short result)
         {
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
             return short.TryParse(s, out result);
+#else
+            return short.TryParse(s.ToString(), out result); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
 
@@ -2075,7 +2079,11 @@ namespace J2N.Numerics
         public static short Parse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
             return short.Parse(s, style.ToNumberStyles(), provider);
+#else
+            return short.Parse(s.ToString(), style.ToNumberStyles(), provider); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
@@ -2496,7 +2504,11 @@ namespace J2N.Numerics
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out short result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
+#if FEATURE_NUMBER_PARSE_READONLYSPAN
             return short.TryParse(s, style.ToNumberStyles(), provider, out result);
+#else
+            return short.TryParse(s.ToString(), style.ToNumberStyles(), provider, out result); // ICU4N TODO: ReadOnlySpan<char> implementation
+#endif
         }
 #endif
 
