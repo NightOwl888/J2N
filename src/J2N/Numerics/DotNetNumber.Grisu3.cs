@@ -424,7 +424,7 @@ namespace J2N.Numerics
                 return result;
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             // The counted version of Grisu3 only generates requestedDigits number of digits.
             // This version does not generate the shortest representation, and with enough requested digits 0.1 will at some point print as 0.9999999...
             // Grisu3 is too imprecise for real halfway cases (1.5 will not work) and therefore the rounding strategy for halfway cases is irrelevant.
@@ -503,7 +503,7 @@ namespace J2N.Numerics
                 return result;
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             // Provides a decimal representation of v.
             // Returns true if it succeeds; otherwise, the result cannot be trusted.
             //
@@ -656,7 +656,7 @@ namespace J2N.Numerics
                 return power;
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             // Generates (at most) requestedDigits of input number w.
             //
             // w is a floating-point number (DiyFp), consisting of a significand and an exponent.
@@ -950,7 +950,7 @@ namespace J2N.Numerics
             }
 
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
 
             // Generates the digits of input number w.
             //
@@ -1327,7 +1327,7 @@ namespace J2N.Numerics
                 return new DiyFp(s_CachedPowersSignificand[index], s_CachedPowersBinaryExponent[index]);
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             // Rounds the buffer upwards if the result is closer to v by possibly adding 1 to the buffer.
             // If the precision of the calculation is not sufficient to round correctly, return false.
             //
@@ -1467,7 +1467,7 @@ namespace J2N.Numerics
                 return false;
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             // Adjusts the last digit of the generated number and screens out generated solutions that may be inaccurate.
             // A solution may be inaccurate if it is outside the safe interval or if we cannot provide that it is closer to the input than a neighboring representation of the same length.
             //

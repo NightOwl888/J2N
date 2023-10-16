@@ -1477,7 +1477,7 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload (not supported in .NET anyway)
-            //#if FEATURE_READONLYSPAN
+            //#if FEATURE_SPAN
             //            public class Parse_ReadOnlySpan_Int32 : Parse_CharSequence_Int32_TestCase
             //            {
             //                protected override short GetResult(string s, int radix)
@@ -1551,7 +1551,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_Int32_Int32_Int32_Int32 : Parse_CharSequence_Int32_Int32_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -1603,7 +1603,7 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload (not supported in .NET anyway)
-            //#if FEATURE_READONLYSPAN
+            //#if FEATURE_SPAN
             //            public class TryParse_ReadOnlySpan_Int32 : TryParse_CharSequence_Int32_TestCase
             //            {
             //                protected override bool GetResult(string s, int radix, out sbyte result)
@@ -1686,7 +1686,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_Int32_Int32_Int32_Int32 : TryParse_CharSequence_Int32_Int32_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -1776,7 +1776,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -1834,7 +1834,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : TryParse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -1894,7 +1894,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_TestCase : TryParse_CharSequence_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2033,7 +2033,7 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload
-            //#if FEATURE_READONLYSPAN
+            //#if FEATURE_SPAN
             //            public class Decode_ReadOnlySpan : Decode_CharSequence_TestCase
             //            {
             //                protected override SByte GetResult(string s)
@@ -2075,7 +2075,7 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload
-            //#if FEATURE_READONLYSPAN
+            //#if FEATURE_SPAN
             //            public class TryDecode_ReadOnlySpan : TryDecode_CharSequence_TestCase
             //            {
             //                protected override bool GetResult(string s, out SByte result)

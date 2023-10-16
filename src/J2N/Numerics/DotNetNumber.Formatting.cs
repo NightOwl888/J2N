@@ -429,7 +429,7 @@ namespace J2N.Numerics
             }
         }
 
-//#if FEATURE_READONLYSPAN
+//#if FEATURE_SPAN
 //        public static bool TryFormatDouble(double value, ReadOnlySpan<char> format, NumberFormatInfo info, Span<char> destination, out int charsWritten)
 //        {
 //            //var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
@@ -679,7 +679,7 @@ namespace J2N.Numerics
             }
         }
 
-//#if FEATURE_READONLYSPAN
+//#if FEATURE_SPAN
 //        public static bool TryFormatSingle(float value, ReadOnlySpan<char> format, NumberFormatInfo info, Span<char> destination, out int charsWritten)
 //        {
 //            //var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
@@ -852,7 +852,7 @@ namespace J2N.Numerics
         //        sb.TryCopyTo(destination, out charsWritten);
         //}
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         private static bool TryCopyTo(string source, Span<char> destination, out int charsWritten)
         {
             Debug.Assert(source != null);
@@ -1759,7 +1759,7 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static unsafe char ParseFormatSpecifier(ReadOnlySpan<char> format, out int digits)
         {
             char c = default;
@@ -2816,7 +2816,7 @@ namespace J2N.Numerics
             }
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         private static unsafe int FindSection(ReadOnlySpan<char> format, int section)
         {
             int src;

@@ -835,7 +835,7 @@ namespace J2N.Numerics
             return false;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -885,7 +885,7 @@ namespace J2N.Numerics
         }
 
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         private static unsafe ParsingStatus TryParseInt32Number(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         {
             result = 0;
@@ -924,7 +924,7 @@ namespace J2N.Numerics
             return ParsingStatus.OK;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         /// <summary>Parses int limited to styles that make up NumberStyle.Integer.</summary>
         internal static ParsingStatus TryParseInt32IntegerStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         {
@@ -1916,7 +1916,7 @@ namespace J2N.Numerics
         //    goto DoneAtEndButPotentialOverflow;
         //}
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         /// <summary>Parses uint limited to styles that make up NumberStyle.HexNumber.</summary>
         private static ParsingStatus TryParseUInt32HexNumberStyle(ReadOnlySpan<char> value, NumberStyle styles, out uint result)
         {
@@ -2769,7 +2769,7 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static double ParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         {
             if (!TryParseDouble(value, styles, info, out double result))
@@ -2791,7 +2791,7 @@ namespace J2N.Numerics
             return result;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static float ParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         {
             if (!TryParseSingle(value, styles, info, out float result))
@@ -2843,7 +2843,7 @@ namespace J2N.Numerics
         //    return ParsingStatus.OK;
         //}
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static unsafe bool TryParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
@@ -2865,7 +2865,7 @@ namespace J2N.Numerics
             return TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static unsafe bool TryParseDoubleFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             byte* pDigits = stackalloc byte[DoubleNumberBufferLength];
@@ -2991,7 +2991,7 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
 
         internal static unsafe bool TryParseDoubleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
@@ -3189,7 +3189,7 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static unsafe bool TryParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
@@ -3212,7 +3212,7 @@ namespace J2N.Numerics
         }
 
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static unsafe bool TryParseSingleFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             byte* pDigits = stackalloc byte[SingleNumberBufferLength];
@@ -3348,7 +3348,7 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
 
         internal static unsafe bool TryParseSingleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
@@ -3489,7 +3489,7 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static unsafe bool TryStringToNumber(ReadOnlySpan<char> value, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
@@ -3526,7 +3526,7 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         internal static unsafe bool TryStringToFloatingPointHexNumber(ReadOnlySpan<char> value, NumberStyle styles, FloatingPointHexNumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
@@ -3563,7 +3563,7 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         private static bool TrailingZeros(ReadOnlySpan<char> value, int index)
         {
             // For compatibility, we need to allow trailing zeros at the end of a number string
@@ -3760,7 +3760,7 @@ namespace J2N.Numerics
 
     internal static class MemoryExtensions
     {
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         // From MemoryExtensions class in .NET Runtime
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static bool EqualsOrdinalIgnoreCase(this ReadOnlySpan<char> span, ReadOnlySpan<char> value)
@@ -3775,7 +3775,7 @@ namespace J2N.Numerics
 
         // J2N: For now, we are just calling this on .NET Standard 2.1+
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         // From Ordinal class in .NET Runtime
         internal static unsafe bool EqualsIgnoreCase(ref char charA, ReadOnlySpan<char> spanA, ref char charB, ReadOnlySpan<char> spanB, int length)
         {

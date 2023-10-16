@@ -133,7 +133,6 @@
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_ISENTERED</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
