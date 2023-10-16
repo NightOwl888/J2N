@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Text;
 using System;
 //using System.Buffers.Text;
 using System.Diagnostics;
@@ -9,6 +10,11 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+#if !FEATURE_SPAN
+// J2N NOTE: We are passing by reference in this case only to prevent having to conditionally
+// compile around "ref" everywhere only to support net40
+using ValueStringBuilder = System.Text.StringBuilder;
+#endif
 
 namespace J2N.Numerics
 {
@@ -390,11 +396,11 @@ namespace J2N.Numerics
                 return RyuDouble.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
             }
 
-            return FormatDoubleSlow(value, format, provider);
+            return FormatDoubleSlow(value, format!, provider);
 
-            static unsafe string FormatDoubleSlow(double value, string? format, IFormatProvider? provider)
+            static unsafe string FormatDoubleSlow(double value, string format, IFormatProvider? provider)
             {
-                char fmt = format![0];
+                char fmt = format[0];
                 char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
                 if (fmtUpper == 'J')
                 {
@@ -409,9 +415,13 @@ namespace J2N.Numerics
                 // Slow path for special cases
                 if (fmtUpper == 'R' || value.IsNegativeZero())
                 {
-                    //var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+#if FEATURE_SPAN
+                    var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+                    return FormatDouble(ref sb, value, format.AsSpan(), NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+#else
                     var sb = new StringBuilder(CharStackBufferSize);
-                    return FormatDouble(/*ref */sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+                    return FormatDouble(ref sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+#endif
                 }
 #endif
 
@@ -556,8 +566,13 @@ namespace J2N.Numerics
         /// Non-null if an existing string can be returned, in which case the builder will be unmodified.
         /// Null if no existing string was returned, in which case the formatted output is in the builder.
         /// </returns>
-        //private static unsafe string? FormatDouble(ref ValueStringBuilder sb, double value, ReadOnlySpan<char> format, NumberFormatInfo info)
-        private static unsafe string? FormatDouble(StringBuilder sb, double value, string format, NumberFormatInfo info)
+        private static unsafe string? FormatDouble(ref ValueStringBuilder sb, double value,
+#if FEATURE_SPAN
+            ReadOnlySpan<char> format,
+#else
+            string format,
+#endif
+            NumberFormatInfo info)
         {
             if (!value.IsFinite())
             {
@@ -613,12 +628,12 @@ namespace J2N.Numerics
 
                     nMaxDigits = Math.Max(number.DigitsCount, DoublePrecision);
                 }
-                NumberToString(/*ref */sb, ref number, fmt, nMaxDigits, info);
+                NumberToString(ref sb, ref number, fmt, nMaxDigits, info);
             }
             else
             {
                 Debug.Assert(precision == DoublePrecisionCustomFormat);
-                NumberToStringFormat(/*ref */sb, ref number, format, info);
+                NumberToStringFormat(ref sb, ref number, format, info);
             }
             return null;
         }
@@ -631,11 +646,11 @@ namespace J2N.Numerics
                 return RyuSingle.ToString(value, NumberFormatInfo.GetInstance(provider), RoundingMode.Conservative);
             }
 
-            return FormatSingleSlow(value, format, provider);
+            return FormatSingleSlow(value, format!, provider);
 
-            static unsafe string FormatSingleSlow(float value, string? format, IFormatProvider? provider)
+            static unsafe string FormatSingleSlow(float value, string format, IFormatProvider? provider)
             {
-                char fmt = format![0];
+                char fmt = format[0];
                 char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
                 if (fmtUpper == 'J')
                 {
@@ -650,9 +665,13 @@ namespace J2N.Numerics
                 // Slow path for special cases
                 if (fmtUpper == 'R' || value.IsNegativeZero())
                 {
-                    //var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+#if FEATURE_SPAN
+                    var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+                    return FormatSingle(ref sb, value, format.AsSpan(), NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+#else
                     var sb = new StringBuilder(CharStackBufferSize);
-                    return FormatSingle(/*ref */sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+                    return FormatSingle(ref sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+#endif
                 }
 #endif
 
@@ -677,8 +696,13 @@ namespace J2N.Numerics
         /// Non-null if an existing string can be returned, in which case the builder will be unmodified.
         /// Null if no existing string was returned, in which case the formatted output is in the builder.
         /// </returns>
-        //private static unsafe string? FormatSingle(ref ValueStringBuilder sb, float value, ReadOnlySpan<char> format, NumberFormatInfo info)
-        private static unsafe string? FormatSingle(StringBuilder sb, float value, string format, NumberFormatInfo info)
+        private static unsafe string? FormatSingle(ref ValueStringBuilder sb, float value,
+#if FEATURE_SPAN
+            ReadOnlySpan<char> format,
+#else
+            string format,
+#endif
+            NumberFormatInfo info)
         {
             if (!value.IsFinite())
             {
@@ -734,12 +758,12 @@ namespace J2N.Numerics
 
                     nMaxDigits = Math.Max(number.DigitsCount, SinglePrecision);
                 }
-                NumberToString(/*ref */sb, ref number, fmt, nMaxDigits, info);
+                NumberToString(ref sb, ref number, fmt, nMaxDigits, info);
             }
             else
             {
                 Debug.Assert(precision == SinglePrecisionCustomFormat);
-                NumberToStringFormat(/*ref */sb, ref number, format, info);
+                NumberToStringFormat(ref sb, ref number, format, info);
             }
             return null;
         }
@@ -1868,8 +1892,7 @@ namespace J2N.Numerics
                 '\0';
         }
 
-        //internal static unsafe void NumberToString(ref ValueStringBuilder sb, ref NumberBuffer number, char format, int nMaxDigits, NumberFormatInfo info)
-        internal static unsafe void NumberToString(StringBuilder sb, ref NumberBuffer number, char format, int nMaxDigits, NumberFormatInfo info)
+        internal static unsafe void NumberToString(ref ValueStringBuilder sb, ref NumberBuffer number, char format, int nMaxDigits, NumberFormatInfo info)
         {
             number.CheckConsistency();
             bool isCorrectlyRounded = (number.Kind == NumberBufferKind.FloatingPoint);
@@ -1884,7 +1907,7 @@ namespace J2N.Numerics
 
                         RoundNumber(ref number, number.Scale + nMaxDigits, isCorrectlyRounded); // Don't change this line to use digPos since digCount could have its sign changed.
 
-                        FormatCurrency(/*ref */sb, ref number, nMaxDigits, info);
+                        FormatCurrency(ref sb, ref number, nMaxDigits, info);
 
                         break;
                     }
@@ -1900,7 +1923,7 @@ namespace J2N.Numerics
                         if (number.IsNegative)
                             sb.Append(info.NegativeSign);
 
-                        FormatFixed(/*ref */sb, ref number, nMaxDigits, null, info.NumberDecimalSeparator, null);
+                        FormatFixed(ref sb, ref number, nMaxDigits, null, info.NumberDecimalSeparator, null);
 
                         break;
                     }
@@ -1913,7 +1936,7 @@ namespace J2N.Numerics
 
                         RoundNumber(ref number, number.Scale + nMaxDigits, isCorrectlyRounded);
 
-                        FormatNumber(/*ref */sb, ref number, nMaxDigits, info);
+                        FormatNumber(ref sb, ref number, nMaxDigits, info);
 
                         break;
                     }
@@ -1930,7 +1953,7 @@ namespace J2N.Numerics
                         if (number.IsNegative)
                             sb.Append(info.NegativeSign);
 
-                        FormatScientific(/*ref */sb, ref number, nMaxDigits, info, format);
+                        FormatScientific(ref sb, ref number, nMaxDigits, info, format);
 
                         break;
                     }
@@ -1967,7 +1990,7 @@ namespace J2N.Numerics
                             sb.Append(info.NegativeSign);
 
                         SkipSign:
-                        FormatGeneral(/*ref */sb, ref number, nMaxDigits, info, (char)(format - ('G' - 'E')), noRounding);
+                        FormatGeneral(ref sb, ref number, nMaxDigits, info, (char)(format - ('G' - 'E')), noRounding);
 
                         break;
                     }
@@ -1981,7 +2004,7 @@ namespace J2N.Numerics
 
                         RoundNumber(ref number, number.Scale + nMaxDigits, isCorrectlyRounded);
 
-                        FormatPercent(/*ref */sb, ref number, nMaxDigits, info);
+                        FormatPercent(ref sb, ref number, nMaxDigits, info);
 
                         break;
                     }
@@ -2004,8 +2027,13 @@ namespace J2N.Numerics
             }
         }
 
-        //internal static unsafe void NumberToStringFormat(ref ValueStringBuilder sb, ref NumberBuffer number, ReadOnlySpan<char> format, NumberFormatInfo info)
-        internal static unsafe void NumberToStringFormat(StringBuilder sb, ref NumberBuffer number, string format, NumberFormatInfo info)
+        internal static unsafe void NumberToStringFormat(ref ValueStringBuilder sb, ref NumberBuffer number,
+#if FEATURE_SPAN
+            ReadOnlySpan<char> format,
+#else
+            string format,
+#endif
+            NumberFormatInfo info)
         {
             number.CheckConsistency();
 
@@ -2023,12 +2051,15 @@ namespace J2N.Numerics
 
             int section;
             int src;
-            //byte* dig = number.GetDigitsPointer();
             char ch;
 
+#if FEATURE_SPAN
+            byte* dig = number.GetDigitsPointer();
+#else
             fixed (byte* digPtr = &number.Digits[0])
             {
                 byte* dig = digPtr;
+#endif
 
                 section = FindSection(format, dig[0] == 0 ? 2 : number.IsNegative ? 1 : 0);
 
@@ -2044,8 +2075,11 @@ namespace J2N.Numerics
                     scaleAdjust = 0;
                     src = section;
 
-                    //fixed (char* pFormat = &MemoryMarshal.GetReference(format))
+#if FEATURE_SPAN
+                    fixed (char* pFormat = &MemoryMarshal.GetReference(format))
+#else
                     fixed (char* pFormat = format)
+#endif
                     {
                         while (src < format.Length && (ch = pFormat[src++]) != 0 && ch != ';')
                         {
@@ -2220,8 +2254,11 @@ namespace J2N.Numerics
 
                 bool decimalWritten = false;
 
-                //fixed (char* pFormat = &MemoryMarshal.GetReference(format))
+#if FEATURE_SPAN
+                fixed (char* pFormat = &MemoryMarshal.GetReference(format))
+#else
                 fixed (char* pFormat = format)
+#endif
                 {
                     byte* cur = dig;
 
@@ -2352,7 +2389,7 @@ namespace J2N.Numerics
                                             i = 10;
 
                                         int exp = dig[0] == 0 ? 0 : number.Scale - decimalPos;
-                                        FormatExponent(/*ref */sb, info, exp, ch, i, positiveSign);
+                                        FormatExponent(ref sb, info, exp, ch, i, positiveSign);
                                         scientific = false;
                                     }
                                     else
@@ -2374,14 +2411,15 @@ namespace J2N.Numerics
                         }
                     }
                 }
+#if !FEATURE_SPAN
             }
+#endif
 
             if (number.IsNegative && (section == 0) && (number.Scale == 0) && (sb.Length > 0))
                 sb.Insert(0, info.NegativeSign);
         }
 
-        //private static void FormatCurrency(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
-        private static void FormatCurrency(StringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
+        private static void FormatCurrency(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
         {
             string fmt = number.IsNegative ?
                 s_negCurrencyFormats[info.CurrencyNegativePattern] :
@@ -2392,7 +2430,7 @@ namespace J2N.Numerics
                 switch (ch)
                 {
                     case '#':
-                        FormatFixed(/*ref */sb, ref number, nMaxDigits, info.CurrencyGroupSizes, info.CurrencyDecimalSeparator, info.CurrencyGroupSeparator);
+                        FormatFixed(ref sb, ref number, nMaxDigits, info.CurrencyGroupSizes, info.CurrencyDecimalSeparator, info.CurrencyGroupSeparator);
                         break;
                     case '-':
                         sb.Append(info.NegativeSign);
@@ -2407,14 +2445,17 @@ namespace J2N.Numerics
             }
         }
 
-        //private static unsafe void FormatFixed(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, int[]? groupDigits, string? sDecimal, string? sGroup)
-        private static unsafe void FormatFixed(StringBuilder sb, ref NumberBuffer number, int nMaxDigits, int[]? groupDigits, string? sDecimal, string? sGroup)
+        private static unsafe void FormatFixed(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, int[]? groupDigits, string? sDecimal, string? sGroup)
         {
             int digPos = number.Scale;
-            //byte* dig = number.GetDigitsPointer();
+
+#if FEATURE_SPAN
+            byte* dig = number.GetDigitsPointer();
+#else
             fixed (byte* digPtr = &number.Digits[0])
             {
                 byte* dig = digPtr;
+#endif
 
                 if (digPos > 0)
                 {
@@ -2455,9 +2496,12 @@ namespace J2N.Numerics
                         int digLength = number.DigitsCount;
                         int digStart = (digPos < digLength) ? digPos : digLength;
 
-                        //fixed (char* spanPtr = &MemoryMarshal.GetReference(sb.AppendSpan(bufferSize)))
+#if FEATURE_SPAN
+                        fixed (char* spanPtr = &MemoryMarshal.GetReference(sb.AppendSpan(bufferSize)))
+#else
                         char[] buffer = new char[bufferSize];
                         fixed (char* spanPtr = &buffer[0])
+#endif
                         {
                             char* p = spanPtr + bufferSize - 1;
                             for (int i = digPos - 1; i >= 0; i--)
@@ -2485,8 +2529,10 @@ namespace J2N.Numerics
                             Debug.Assert(p >= spanPtr - 1, "Underflow");
                             dig += digStart;
                         }
+#if !FEATURE_SPAN
                         // J2N: Append buffer to StringBuilder last
                         sb.Append(buffer);
+#endif
                     }
                     else
                     {
@@ -2520,11 +2566,12 @@ namespace J2N.Numerics
                         nMaxDigits--;
                     }
                 }
+#if !FEATURE_SPAN
             }
+#endif
         }
 
-        //private static void FormatNumber(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
-        private static void FormatNumber(StringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
+        private static void FormatNumber(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
         {
             string fmt = number.IsNegative ?
                 s_negNumberFormats[info.NumberNegativePattern] :
@@ -2535,7 +2582,7 @@ namespace J2N.Numerics
                 switch (ch)
                 {
                     case '#':
-                        FormatFixed(/*ref */sb, ref number, nMaxDigits, info.NumberGroupSizes, info.NumberDecimalSeparator, info.NumberGroupSeparator);
+                        FormatFixed(ref sb, ref number, nMaxDigits, info.NumberGroupSizes, info.NumberDecimalSeparator, info.NumberGroupSeparator);
                         break;
                     case '-':
                         sb.Append(info.NegativeSign);
@@ -2547,13 +2594,15 @@ namespace J2N.Numerics
             }
         }
 
-        //private static unsafe void FormatScientific(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar)
-        private static unsafe void FormatScientific(StringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar)
+        private static unsafe void FormatScientific(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar)
         {
-            //byte* dig = number.GetDigitsPointer();
+#if FEATURE_SPAN
+            byte* dig = number.GetDigitsPointer();
+#else
             fixed (byte* digPtr = &number.Digits[0])
             {
                 byte* dig = digPtr;
+#endif
 
                 sb.Append((*dig != 0) ? (char)(*dig++) : '0');
 
@@ -2562,14 +2611,15 @@ namespace J2N.Numerics
 
                 while (--nMaxDigits > 0)
                     sb.Append((*dig != 0) ? (char)(*dig++) : '0');
+#if !FEATURE_SPAN
             }
+#endif
 
             int e = number.Digits[0] == 0 ? 0 : number.Scale - 1;
-            FormatExponent(/*ref */sb, info, e, expChar, 3, true);
+            FormatExponent(ref sb, info, e, expChar, 3, true);
         }
 
-        //private static unsafe void FormatExponent(ref ValueStringBuilder sb, NumberFormatInfo info, int value, char expChar, int minDigits, bool positiveSign)
-        private static unsafe void FormatExponent(StringBuilder sb, NumberFormatInfo info, int value, char expChar, int minDigits, bool positiveSign)
+        private static unsafe void FormatExponent(ref ValueStringBuilder sb, NumberFormatInfo info, int value, char expChar, int minDigits, bool positiveSign)
         {
             sb.Append(expChar);
 
@@ -2586,8 +2636,11 @@ namespace J2N.Numerics
 
             char* digits = stackalloc char[MaxUInt32DecDigits];
             char* p = UInt32ToDecChars(digits + MaxUInt32DecDigits, (uint)value, minDigits);
-            //sb.Append(p, (int)(digits + MaxUInt32DecDigits - p)); // J2N TODO: This is optimal for modern platforms
+#if FEATURE_SPAN
+            sb.Append(p, (int)(digits + MaxUInt32DecDigits - p));
+#else
             sb.Append(Create<char>(p, (int)(digits + MaxUInt32DecDigits - p)));
+#endif
         }
 
         // Converts a pointer of a given length into an array (hack for older platforms)
@@ -2600,8 +2653,7 @@ namespace J2N.Numerics
             return array;
         }
 
-        //private static unsafe void FormatGeneral(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar, bool bSuppressScientific)
-        private static unsafe void FormatGeneral(StringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar, bool bSuppressScientific)
+        private static unsafe void FormatGeneral(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar, bool bSuppressScientific)
         {
             int digPos = number.Scale;
             bool scientific = false;
@@ -2616,10 +2668,13 @@ namespace J2N.Numerics
                 }
             }
 
-            //byte* dig = number.GetDigitsPointer();
+#if FEATURE_SPAN
+            byte* dig = number.GetDigitsPointer();
+#else
             fixed (byte* digPtr = &number.Digits[0])
             {
                 byte* dig = digPtr;
+#endif
 
                 if (digPos > 0)
                 {
@@ -2646,14 +2701,15 @@ namespace J2N.Numerics
                     while (*dig != 0)
                         sb.Append((char)(*dig++));
                 }
+#if !FEATURE_SPAN
             }
+#endif
 
             if (scientific)
-                FormatExponent(/*ref */sb, info, number.Scale - 1, expChar, 2, true);
+                FormatExponent(ref sb, info, number.Scale - 1, expChar, 2, true);
         }
 
-        //private static void FormatPercent(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
-        private static void FormatPercent(StringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
+        private static void FormatPercent(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info)
         {
             string fmt = number.IsNegative ?
                 s_negPercentFormats[info.PercentNegativePattern] :
@@ -2664,7 +2720,7 @@ namespace J2N.Numerics
                 switch (ch)
                 {
                     case '#':
-                        FormatFixed(/*ref */sb, ref number, nMaxDigits, info.PercentGroupSizes, info.PercentDecimalSeparator, info.PercentGroupSeparator);
+                        FormatFixed(ref sb, ref number, nMaxDigits, info.PercentGroupSizes, info.PercentDecimalSeparator, info.PercentGroupSeparator);
                         break;
                     case '-':
                         sb.Append(info.NegativeSign);
@@ -2681,10 +2737,13 @@ namespace J2N.Numerics
 
         internal static unsafe void RoundNumber(ref NumberBuffer number, int pos, bool isCorrectlyRounded)
         {
-            //byte* dig = number.GetDigitsPointer();
+#if FEATURE_SPAN
+            byte* dig = number.GetDigitsPointer();
+#else
             fixed (byte* digPtr = &number.Digits[0])
             {
                 byte* dig = digPtr;
+#endif
 
                 int i = 0;
                 while (i < pos && dig[i] != '\0')
@@ -2725,7 +2784,9 @@ namespace J2N.Numerics
                 dig[i] = (byte)('\0');
                 number.DigitsCount = i;
                 number.CheckConsistency();
+#if !FEATURE_SPAN
             }
+#endif
 
             static bool ShouldRoundUp(byte* dig, int i, NumberBufferKind numberKind, bool isCorrectlyRounded)
             {

@@ -148,8 +148,11 @@ namespace J2N.Numerics
         {
             BigInteger.SetZero(out result);
 
-            //byte* src = number.GetDigitsPointer() + firstIndex;
+#if FEATURE_SPAN
+            byte* src = number.GetDigitsPointer() + firstIndex;
+#else
             fixed (byte* src = &number.Digits[firstIndex])
+#endif
             {
                 uint remaining = lastIndex - firstIndex;
                 uint offset = 0;
