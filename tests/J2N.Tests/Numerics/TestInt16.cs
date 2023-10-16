@@ -375,11 +375,11 @@ namespace J2N.Numerics
         public void Test_toStringS2()
         {
             // Test for method java.lang.String java.lang.Short.toString(short)
-            assertEquals("Returned incorrect string", "32767", Int16.ToString((short)32767, CultureInfo.InvariantCulture)
+            assertEquals("Returned incorrect string", "32767", Int16.ToString((short)32767)
                     );
-            assertEquals("Returned incorrect string", "-32767", Int16.ToString((short)-32767, CultureInfo.InvariantCulture)
+            assertEquals("Returned incorrect string", "-32767", Int16.ToString((short)-32767)
                     );
-            assertEquals("Returned incorrect string", "-32768", Int16.ToString((short)-32768, CultureInfo.InvariantCulture)
+            assertEquals("Returned incorrect string", "-32768", Int16.ToString((short)-32768)
                     );
         }
 
@@ -391,9 +391,9 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.Short
             // java.lang.Short.valueOf(java.lang.String)
-            assertEquals("Returned incorrect short", -32768, Int16.GetInstance("-32768", CultureInfo.InvariantCulture)
+            assertEquals("Returned incorrect short", -32768, Int16.GetInstance("-32768", J2N.Text.StringFormatter.InvariantCulture)
                     .ToInt16());
-            assertEquals("Returned incorrect short", 32767, Int16.GetInstance("32767", CultureInfo.InvariantCulture)
+            assertEquals("Returned incorrect short", 32767, Int16.GetInstance("32767", J2N.Text.StringFormatter.InvariantCulture)
                     .ToInt16());
         }
 

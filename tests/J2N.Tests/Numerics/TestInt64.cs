@@ -770,10 +770,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_toString()
         {
-            assertEquals("-1", new Int64(-1).ToString(CultureInfo.InvariantCulture));
-            assertEquals("0", new Int64(0).ToString(CultureInfo.InvariantCulture));
-            assertEquals("1", new Int64(1).ToString(CultureInfo.InvariantCulture));
-            assertEquals("-1", new Int64(unchecked((int)0xFFFFFFFF)).ToString(CultureInfo.InvariantCulture));
+            assertEquals("-1", new Int64(-1).ToString());
+            assertEquals("0", new Int64(0).ToString());
+            assertEquals("1", new Int64(1).ToString());
+            assertEquals("-1", new Int64(unchecked((int)0xFFFFFFFF)).ToString());
         }
 
         /**
@@ -782,10 +782,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_toStringJ()
         {
-            assertEquals("-1", Int64.ToString(-1), CultureInfo.InvariantCulture);
-            assertEquals("0", Int64.ToString(0), CultureInfo.InvariantCulture);
-            assertEquals("1", Int64.ToString(1), CultureInfo.InvariantCulture);
-            assertEquals("-1", Int64.ToString(unchecked((int)0xFFFFFFFF)), CultureInfo.InvariantCulture);
+            assertEquals("-1", Int64.ToString(-1));
+            assertEquals("0", Int64.ToString(0));
+            assertEquals("1", Int64.ToString(1));
+            assertEquals("-1", Int64.ToString(unchecked((int)0xFFFFFFFF)));
         }
 
         /**
@@ -794,34 +794,34 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String()
         {
-            assertEquals(new Int64(0), Int64.GetInstance("0", CultureInfo.InvariantCulture));
-            assertEquals(new Int64(1), Int64.GetInstance("1", CultureInfo.InvariantCulture));
-            assertEquals(new Int64(-1), Int64.GetInstance("-1", CultureInfo.InvariantCulture));
+            assertEquals(new Int64(0), Int64.GetInstance("0", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(1), Int64.GetInstance("1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int64(-1), Int64.GetInstance("-1", J2N.Text.StringFormatter.InvariantCulture));
 
             try
             {
-                Int64.GetInstance("0x1", CultureInfo.InvariantCulture);
+                Int64.GetInstance("0x1", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetInstance("9.2", CultureInfo.InvariantCulture);
+                Int64.GetInstance("9.2", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetInstance("", CultureInfo.InvariantCulture);
+                Int64.GetInstance("", J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int64.GetInstance(null, CultureInfo.InvariantCulture);
+                Int64.GetInstance(null, J2N.Text.StringFormatter.InvariantCulture);
                 fail("Expected NumberFormatException with null string.");
             }
             catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
