@@ -1012,10 +1012,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_toStringI() // J2N TODO: Culture tests
         {
-            assertEquals("-1", Int32.ToString(-1));
-            assertEquals("0", Int32.ToString(0));
-            assertEquals("1", Int32.ToString(1));
-            assertEquals("-1", Int32.ToString(unchecked((int)0xFFFFFFFF)));
+            assertEquals("-1", Int32.ToString(-1), CultureInfo.InvariantCulture);
+            assertEquals("0", Int32.ToString(0), CultureInfo.InvariantCulture);
+            assertEquals("1", Int32.ToString(1), CultureInfo.InvariantCulture);
+            assertEquals("-1", Int32.ToString(unchecked((int)0xFFFFFFFF)), CultureInfo.InvariantCulture);
         }
 
         /**
@@ -1024,34 +1024,34 @@ namespace J2N.Numerics
         [Test]
         public void Test_valueOfLjava_lang_String()
         {
-            assertEquals(new Int32(0), Int32.GetInstance("0", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int32(1), Int32.GetInstance("1", J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals(new Int32(-1), Int32.GetInstance("-1", J2N.Text.StringFormatter.InvariantCulture));
+            assertEquals(new Int32(0), Int32.GetInstance("0", CultureInfo.InvariantCulture));
+            assertEquals(new Int32(1), Int32.GetInstance("1", CultureInfo.InvariantCulture));
+            assertEquals(new Int32(-1), Int32.GetInstance("-1", CultureInfo.InvariantCulture));
 
             try
             {
-                Int32.GetInstance("0x1", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetInstance("0x1", CultureInfo.InvariantCulture);
                 fail("Expected FormatException with hex string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.GetInstance("9.2", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetInstance("9.2", CultureInfo.InvariantCulture);
                 fail("Expected FormatException with floating point string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.GetInstance("", J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetInstance("", CultureInfo.InvariantCulture);
                 fail("Expected FormatException with empty string.");
             }
             catch (FormatException e) { }
 
             try
             {
-                Int32.GetInstance(null, J2N.Text.StringFormatter.InvariantCulture);
+                Int32.GetInstance(null, CultureInfo.InvariantCulture);
                 fail("Expected FormatException with null string.");
             }
             catch (ArgumentNullException e) { } // J2N: .NET throws ArgumentNullException rather than FormatException in this case
