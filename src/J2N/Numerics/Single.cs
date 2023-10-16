@@ -932,7 +932,7 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseSingle(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
 
         /// <summary>
         /// Converts the string representation of a number in a character span to its single-precision floating-point number equivalent.
@@ -1327,7 +1327,7 @@ namespace J2N.Numerics
             return DotNetNumber.ParseSingle(s, style, NumberFormatInfo.GetInstance(provider));
         }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
         /// <summary>
         /// Converts a character span that contains the string representation of a number in a specified style and culture-specific format to
         /// its single-precision floating-point number equivalent.
@@ -1898,7 +1898,7 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseSingle(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to
         /// its single-precision floating-point number equivalent. A return value indicates whether the

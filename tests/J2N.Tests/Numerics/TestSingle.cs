@@ -2889,7 +2889,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
             public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider
             {
                 protected override bool IsNullableType => false;
@@ -3055,7 +3055,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
             public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_Single : TryParse_CharSequence_NumberStyle_IFormatProvider_Single_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -3143,7 +3143,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
             public class TryParse_ReadOnlySpan_Single : TryParse_CharSequence_Single_TestCase
             {
                 protected override bool IsNullableType => false;

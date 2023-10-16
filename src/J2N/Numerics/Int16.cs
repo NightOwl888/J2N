@@ -455,7 +455,7 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>, beginning at the
@@ -897,7 +897,7 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32_Int32_Int16
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>, beginning at the
@@ -1621,7 +1621,7 @@ namespace J2N.Numerics
             return short.TryParse(s, out result);
         }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 16-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1889,7 +1889,7 @@ namespace J2N.Numerics
             return short.Parse(s, style.ToNumberStyles(), provider);
         }
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to its
         /// 16-bit signed integer equivalent.
@@ -2290,7 +2290,7 @@ namespace J2N.Numerics
         }
 
 
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
+#if FEATURE_READONLYSPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 16-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
