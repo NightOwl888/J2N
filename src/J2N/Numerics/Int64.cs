@@ -1426,7 +1426,12 @@ namespace J2N.Numerics
         /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         public static long Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
-            return Parse(s, NumberStyle.Integer, provider);
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            return DotNetNumber.ParseInt64(s
+#if FEATURE_SPAN
+                .AsSpan()
+#endif
+                , NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
         }
 
         #endregion Parse_CharSequence_IFormatProvider
@@ -1577,11 +1582,7 @@ namespace J2N.Numerics
 #endif
         public static bool TryParse(ReadOnlySpan<char> s, out long result)
         {
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
-            return long.TryParse(s, out result);
-#else
-            return long.TryParse(s.ToString(), out result); // ICU4N TODO: ReadOnlySpan<char> implementation
-#endif
+            return DotNetNumber.TryParseInt64IntegerStyle(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
         }
 #endif
 
@@ -1776,7 +1777,13 @@ namespace J2N.Numerics
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            return long.Parse(s, style.ToNumberStyles(), provider);
+            if (s == null) throw new ArgumentNullException(nameof(s));
+            return DotNetNumber.ParseInt64(s
+#if FEATURE_SPAN
+                .AsSpan()
+#endif
+                , style, NumberFormatInfo.GetInstance(provider));
+
         }
 
 #if FEATURE_READONLYSPAN
@@ -1967,11 +1974,7 @@ namespace J2N.Numerics
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
-            return long.Parse(s, style.ToNumberStyles(), provider);
-#else
-            return long.Parse(s.ToString(), style.ToNumberStyles(), provider); // ICU4N TODO: ReadOnlySpan<char> implementation
-#endif
+            return DotNetNumber.ParseInt64(s, style, NumberFormatInfo.GetInstance(provider));
         }
 #endif
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
@@ -2183,7 +2186,18 @@ namespace J2N.Numerics
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            return long.TryParse(s, style.ToNumberStyles(), provider, out result);
+
+            if (s == null)
+            {
+                result = 0;
+                return false;
+            }
+
+            return DotNetNumber.TryParseInt64(s
+#if FEATURE_SPAN
+                .AsSpan()
+#endif
+                , style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
         }
 
 
@@ -2394,11 +2408,7 @@ namespace J2N.Numerics
         {
             // J2N TODO: Support NumberStyle.AllowTypeSuffix ("l" or "L")
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-#if FEATURE_NUMBER_PARSE_READONLYSPAN
-            return long.TryParse(s, style.ToNumberStyles(), provider, out result);
-#else
-            return long.TryParse(s.ToString(), style.ToNumberStyles(), provider, out result);
-#endif
+            return DotNetNumber.TryParseInt64(s, style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
         }
 #endif
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int64

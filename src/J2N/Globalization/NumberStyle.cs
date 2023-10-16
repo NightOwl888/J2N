@@ -254,7 +254,7 @@ namespace J2N.Globalization
             // Check for undefined flags or invalid hex number flags.
             // Since we are cascading the call to .NET in this case, we must not allow any custom J2N flags here.
             if ((style & (~ValidNumberStyles | NumberStyle.AllowHexSpecifier)) != 0
-                && (style & ~NumberStyle.HexNumber) != 0)
+                && (style & ~NumberStyle.HexNumber) != 0) // J2N TODO: Allow AllowTypeSpecifier for integral types
             {
                 throwInvalid(style);
 
