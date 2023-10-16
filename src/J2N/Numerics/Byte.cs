@@ -1939,7 +1939,7 @@ namespace J2N.Numerics
             if (s is null)
                 throw new ArgumentNullException(nameof(s));
 #if FEATURE_READONLYSPAN
-            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i);
+            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i);
 #else
             DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i);
 #endif
@@ -2380,7 +2380,7 @@ namespace J2N.Numerics
 #if FEATURE_READONLYSPAN
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
             // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
-            if (DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
+            if (DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
                 || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
 #else
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
