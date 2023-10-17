@@ -17,11 +17,9 @@
 #endregion
 
 using J2N.Numerics;
-using J2N.Text;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace J2N
 {
@@ -288,112 +286,7 @@ namespace J2N
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A hex string representing <paramref name="value"/>.</returns>
         public static string ToHexString(this double value, IFormatProvider? provider)
-        {
-            var info = NumberFormatInfo.GetInstance(provider);
-            if (!value.IsFinite())
-            {
-                if (double.IsNaN(value))
-                {
-                    return info.NaNSymbol;
-                }
-
-                return value.IsNegative() ? info.NegativeInfinitySymbol : info.PositiveInfinitySymbol;
-            }
-            return ToHexString(value, info, upperCase: false);
-        }
-
-        internal static string ToHexString(this double value, NumberFormatInfo info, bool upperCase)
-        {
-            /*
-             * Reference: http://en.wikipedia.org/wiki/IEEE_754
-             */
-            long bitValue = BitConversion.DoubleToInt64Bits(value);
-
-            bool negative = (bitValue & unchecked((long)0x8000000000000000L)) != 0;
-            // mask exponent bits and shift down
-            long exponent = (bitValue & 0x7FF0000000000000L).TripleShift(52);
-            // mask significand bits and shift up
-            long significand = bitValue & 0x000FFFFFFFFFFFFFL;
-
-
-            if (exponent == 0 && significand == 0)
-            {
-                if (upperCase)
-                    return string.Concat(negative ? info.NegativeSign : "", "0X0", info.NumberDecimalSeparator, "0P0"); //$NON-NLS-1$ //$NON-NLS-2$
-                else
-                    return string.Concat(negative ? info.NegativeSign : "", "0x0", info.NumberDecimalSeparator, "0p0"); //$NON-NLS-1$ //$NON-NLS-2$
-            }
-
-#if FEATURE_SPAN
-            ValueStringBuilder hexString = new ValueStringBuilder(stackalloc char[32]);
-#else
-            StringBuilder hexString = new StringBuilder(10);
-#endif
-            if (negative)
-            {
-                hexString.Append(info.NegativeSign);
-            }
-            hexString.Append(upperCase ? "0X" : "0x"); //$NON-NLS-1$
-
-            if (exponent == 0)
-            { // denormal (subnormal) value
-                hexString.Append('0'); //$NON-NLS-1$
-                hexString.Append(info.NumberDecimalSeparator);
-                // significand is 52-bits, so there can be 13 hex digits
-                int fractionDigits = 13;
-                // remove trailing hex zeros, so long.ToHexString() won't print
-                // them
-                while ((significand != 0) && ((significand & 0xF) == 0))
-                {
-                    significand = significand.TripleShift(4);
-                    fractionDigits--;
-                }
-                string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
-
-                // if there are digits left, then insert some '0' chars first
-                if (significand != 0 && fractionDigits > hexSignificand.Length)
-                {
-                    int digitDiff = fractionDigits - hexSignificand.Length;
-                    while (digitDiff-- != 0)
-                    {
-                        hexString.Append('0');
-                    }
-                }
-                hexString.Append(hexSignificand);
-                hexString.Append(upperCase ? "P-1022" : "p-1022"); //$NON-NLS-1$
-            }
-            else
-            { // normal value
-                hexString.Append('1'); //$NON-NLS-1$
-                hexString.Append(info.NumberDecimalSeparator);
-                // significand is 52-bits, so there can be 13 hex digits
-                int fractionDigits = 13;
-                // remove trailing hex zeros, so long.ToHexString() won't print
-                // them
-                while ((significand != 0) && ((significand & 0xF) == 0))
-                {
-                    significand = significand.TripleShift(4);
-                    fractionDigits--;
-                }
-                string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
-
-                // if there are digits left, then insert some '0' chars first
-                if (significand != 0 && fractionDigits > hexSignificand.Length)
-                {
-                    int digitDiff = fractionDigits - hexSignificand.Length;
-                    while (digitDiff-- != 0)
-                    {
-                        hexString.Append('0');
-                    }
-                }
-
-                hexString.Append(hexSignificand);
-                hexString.Append(upperCase ? "P" : "p"); //$NON-NLS-1$
-                // remove exponent's 'bias' and convert to a string
-                hexString.Append((exponent - 1023).ToString(CultureInfo.InvariantCulture));
-            }
-            return hexString.ToString();
-        }
+            => DotNetNumber.DoubleToHexStr(value, NumberFormatInfo.GetInstance(provider), upperCase: false);
 
         #endregion ToHexString
     }
