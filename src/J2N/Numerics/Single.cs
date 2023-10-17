@@ -3013,6 +3013,20 @@ namespace J2N.Numerics
 
         #endregion ToString
 
+        #region TryFormat
+
+#if FEATURE_SPAN
+
+        // J2N TODO: Make public and add docs when all of the number types have an implementation, implement ISpanFormattable in net6+
+        internal bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatSingle(value, format, provider, destination, out charsWritten);
+        }
+
+#endif
+
+        #endregion TryFormat
+
         #region Compare
 
         /// <summary>

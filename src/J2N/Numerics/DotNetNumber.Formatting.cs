@@ -398,7 +398,7 @@ namespace J2N.Numerics
 
             return FormatDoubleSlow(value, format!, provider);
 
-            static unsafe string FormatDoubleSlow(double value, string format, IFormatProvider? provider)
+            static string FormatDoubleSlow(double value, string format, IFormatProvider? provider)
             {
                 char fmt = format[0];
                 char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
@@ -411,6 +411,7 @@ namespace J2N.Numerics
                     return DoubleToHexStr(value, NumberFormatInfo.GetInstance(provider), upperCase: fmt == 'X');
                 }
 
+                // .NET Core 3.x was when Microsoft finally fixed round tripping
 #if !NETCOREAPP3_0_OR_GREATER
                 // Slow path for special cases
                 if (fmtUpper == 'R' || value.IsNegativeZero())
@@ -429,20 +430,60 @@ namespace J2N.Numerics
             }
         }
 
-//#if FEATURE_SPAN
-//        public static bool TryFormatDouble(double value, ReadOnlySpan<char> format, NumberFormatInfo info, Span<char> destination, out int charsWritten)
-//        {
-//            //var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
-//            var sb = new StringBuilder(CharStackBufferSize);
-//            string? s = FormatDouble(/*ref */sb, value, format, info);
-//            return s != null ?
-//                TryCopyTo(s, destination, out charsWritten) :
-//                sb.TryCopyTo(destination, out charsWritten);
-//        }
-//#endif
-
 #if FEATURE_SPAN
-        internal static bool TryDoubleToHexStr(double value, NumberFormatInfo info, bool upperCase, Span<char> destination, out int charsWritten)
+        public static bool TryFormatDouble(double value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
+        {
+            // Fast path for default format
+            if (format.Length == 0)
+            {
+                return TryDoubleToJavaStr(value, NumberFormatInfo.GetInstance(provider), upperCase: true, destination, out charsWritten);
+            }
+
+            return TryFormatDoubleSlow(value, format, provider, destination, out charsWritten);
+
+            static bool TryFormatDoubleSlow(double value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
+            {
+                char fmt = format[0];
+                char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
+                if (fmtUpper == 'J')
+                {
+                    return TryDoubleToJavaStr(value, NumberFormatInfo.GetInstance(provider), upperCase: fmt == 'J', destination, out charsWritten);
+                }
+                else if (fmtUpper == 'X')
+                {
+                    return TryDoubleToHexStr(value, NumberFormatInfo.GetInstance(provider), upperCase: fmt == 'X', destination, out charsWritten);
+                }
+
+#if FEATURE_NUMBER_TRYFORMAT
+                return value.TryFormat(destination, out charsWritten, format, provider);
+#else
+                return TryFormatDouble(value, format, NumberFormatInfo.GetInstance(provider), destination, out charsWritten);
+#endif
+            }
+        }
+
+        private static bool TryFormatDouble(double value, ReadOnlySpan<char> format, NumberFormatInfo info, Span<char> destination, out int charsWritten)
+        {
+            var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+            string? s = FormatDouble(ref sb, value, format, info);
+            return s != null ?
+                TryCopyTo(s, destination, out charsWritten) :
+                sb.TryCopyTo(destination, out charsWritten);
+        }
+
+        private static bool TryDoubleToJavaStr(double value, NumberFormatInfo info, bool upperCase, Span<char> destination, out int charsWritten)
+        {
+            ValueStringBuilder sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+
+            string? s = RyuDouble.FormatDouble(ref sb, value, info, RoundingMode.Conservative, upperCase);
+            bool success = s != null ?
+                TryCopyTo(s, destination, out charsWritten) :
+                sb.TryCopyTo(destination, out charsWritten);
+
+            return success;
+        }
+
+        private static bool TryDoubleToHexStr(double value, NumberFormatInfo info, bool upperCase, Span<char> destination, out int charsWritten)
         {
             ValueStringBuilder sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
 
@@ -469,7 +510,7 @@ namespace J2N.Numerics
         /// Implements Java's decimal hexadecimal format  (sourced from Apache Harmony) for <see cref="double"/>. See <see cref="DoubleExtensions.ToHexString(double, IFormatProvider?)"/> for documentation.
         /// </summary>
         /// <returns>Returns a value if not finite, NaN, positive or negative zero. Othewise, writes the formatted value to <paramref name="sb"/>.</returns>
-        internal static string? FormatDoubleHex(ref ValueStringBuilder sb, double value, NumberFormatInfo info, bool upperCase)
+        private static string? FormatDoubleHex(ref ValueStringBuilder sb, double value, NumberFormatInfo info, bool upperCase)
         {
             if (!value.IsFinite())
             {
@@ -787,6 +828,7 @@ namespace J2N.Numerics
                     return SingleToHexStr(value, NumberFormatInfo.GetInstance(provider), upperCase: fmt == 'X');
                 }
 
+                // .NET Core 3.x was when Microsoft finally fixed round tripping
 #if !NETCOREAPP3_0_OR_GREATER
                 // Slow path for special cases
                 if (fmtUpper == 'R' || value.IsNegativeZero())
@@ -805,20 +847,61 @@ namespace J2N.Numerics
             }
         }
 
-//#if FEATURE_SPAN
-//        public static bool TryFormatSingle(float value, ReadOnlySpan<char> format, NumberFormatInfo info, Span<char> destination, out int charsWritten)
-//        {
-//            //var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
-//            var sb = new StringBuilder(CharStackBufferSize);
-//            string? s = FormatSingle(/*ref */sb, value, format, info);
-//            return s != null ?
-//                TryCopyTo(s, destination, out charsWritten) :
-//                sb.TryCopyTo(destination, out charsWritten);
-//        }
-//#endif
-
 #if FEATURE_SPAN
-        internal static bool TrySingleToHexStr(float value, NumberFormatInfo info, bool upperCase, Span<char> destination, out int charsWritten)
+
+        public static bool TryFormatSingle(float value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
+        {
+            // Fast path for default format
+            if (format.Length == 0)
+            {
+                return TrySingleToJavaStr(value, NumberFormatInfo.GetInstance(provider), upperCase: true, destination, out charsWritten);
+            }
+
+            return TryFormatSingleSlow(value, format, provider, destination, out charsWritten);
+
+            static bool TryFormatSingleSlow(float value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
+            {
+                char fmt = format[0];
+                char fmtUpper = (char)(fmt & 0xFFDF); // ensure fmt is upper-cased for purposes of comparison 
+                if (fmtUpper == 'J')
+                {
+                    return TrySingleToJavaStr(value, NumberFormatInfo.GetInstance(provider), upperCase: fmt == 'J', destination, out charsWritten);
+                }
+                else if (fmtUpper == 'X')
+                {
+                    return TrySingleToHexStr(value, NumberFormatInfo.GetInstance(provider), upperCase: fmt == 'X', destination, out charsWritten);
+                }
+
+#if FEATURE_NUMBER_TRYFORMAT
+                return value.TryFormat(destination, out charsWritten, format, provider);
+#else
+                return TryFormatSingle(value, format, NumberFormatInfo.GetInstance(provider), destination, out charsWritten);
+#endif
+            }
+        }
+
+        private static bool TryFormatSingle(float value, ReadOnlySpan<char> format, NumberFormatInfo info, Span<char> destination, out int charsWritten)
+        {
+            var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+            string? s = FormatSingle(ref sb, value, format, info);
+            return s != null ?
+                TryCopyTo(s, destination, out charsWritten) :
+                sb.TryCopyTo(destination, out charsWritten);
+        }
+
+        private static bool TrySingleToJavaStr(float value, NumberFormatInfo info, bool upperCase, Span<char> destination, out int charsWritten)
+        {
+            ValueStringBuilder sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+
+            string? s = RyuSingle.FormatSingle(ref sb, value, info, RoundingMode.Conservative, upperCase);
+            bool success = s != null ?
+                TryCopyTo(s, destination, out charsWritten) :
+                sb.TryCopyTo(destination, out charsWritten);
+
+            return success;
+        }
+
+        private static bool TrySingleToHexStr(float value, NumberFormatInfo info, bool upperCase, Span<char> destination, out int charsWritten)
         {
             ValueStringBuilder sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
 
@@ -845,7 +928,7 @@ namespace J2N.Numerics
         /// Implements Java's decimal hexadecimal format (sourced from Apache Harmony) for <see cref="float"/>. See <see cref="SingleExtensions.ToHexString(float, IFormatProvider?)"/> for documentation.
         /// </summary>
         /// <returns>Returns a value if not finite, NaN, positive or negative zero. Othewise, writes the formatted value to <paramref name="sb"/>.</returns>
-        internal static string? SingleToHexStr(ref ValueStringBuilder sb, float value, NumberFormatInfo info, bool upperCase)
+        private static string? SingleToHexStr(ref ValueStringBuilder sb, float value, NumberFormatInfo info, bool upperCase)
         {
             if (!value.IsFinite())
             {
@@ -1106,7 +1189,7 @@ namespace J2N.Numerics
         //}
 
 #if FEATURE_SPAN
-        private static bool TryCopyTo(string source, Span<char> destination, out int charsWritten)
+        internal static bool TryCopyTo(string source, Span<char> destination, out int charsWritten)
         {
             Debug.Assert(source != null);
 

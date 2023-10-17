@@ -14,10 +14,12 @@
 // limitations under the License.
 #endregion
 
+using J2N.Text;
 using System;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace J2N.Numerics
 {
@@ -26,6 +28,8 @@ namespace J2N.Numerics
     /// </summary>
     internal sealed partial class RyuDouble
     {
+        private const int CharStackBufferSize = 32;
+
 #if DEBUG
 #pragma warning disable IDE0044 // Add readonly modifier
         private static bool DEBUG = false;
@@ -873,6 +877,20 @@ namespace J2N.Numerics
 
         public static string ToString(double value, NumberFormatInfo info, RoundingMode roundingMode, bool upperCase)
         {
+#if FEATURE_SPAN
+            var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
+            return FormatDouble(ref sb, value, info, roundingMode, upperCase) ?? sb.ToString();
+#else
+            return FormatDouble(value, info, roundingMode, upperCase)!;
+#endif
+        }
+
+        public static string? FormatDouble(
+#if FEATURE_SPAN
+            ref ValueStringBuilder sb,
+#endif
+            double value, NumberFormatInfo info, RoundingMode roundingMode, bool upperCase)
+        {
             // Step 1: Decode the floating point number, and unify normalized and subnormal cases.
             // First, handle all the trivial cases.
             if (!value.IsFinite())
@@ -1156,6 +1174,16 @@ namespace J2N.Numerics
             int bufferLength = Math.Min((exp < 0 ? vplength : (exp + 1 >= olength ? 20 : olength)) + negSignLength + decimalSeparatorLength + (scientificNotation ? 5 : 2), 22 + negSignLength + decimalSeparatorLength);
             unsafe
             {
+#if FEATURE_SPAN
+                fixed (char* ptr = &MemoryMarshal.GetReference(sb.AppendSpan(bufferLength)))
+                {
+                    char* result = ptr;
+                    WriteBuffer(result, ref index, output, olength, upperCase, sign, exp, scientificNotation, negSign, negSignLength, decimalSeparator, decimalSeparatorLength);
+                }
+                int excess = bufferLength - index;
+                sb.Length -= excess;
+                return null;
+#else
                 const int MaximumStackSize = 64;
                 if (bufferLength <= MaximumStackSize)
                 {
@@ -1175,6 +1203,7 @@ namespace J2N.Numerics
                         return new string(result, 0, index);
                     }
                 }
+#endif
             }
         }
 

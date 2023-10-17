@@ -196,6 +196,13 @@ namespace J2N.Numerics
             Double d = new Double(dd);
             assertEquals(answer, Double.ToString(d.ToDouble(), null, J2N.Text.StringFormatter.InvariantCulture));
             assertEquals(answer, d.ToString(J2N.Text.StringFormatter.InvariantCulture));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(d.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals(answer, actual);
+#endif
         }
 
         /**

@@ -1269,7 +1269,7 @@ namespace J2N.Numerics
                 }
             }
         }
-#else
+#endif
         [Test]
         public static void Test_ToString()
         {
@@ -1281,7 +1281,6 @@ namespace J2N.Numerics
                 }
             }
         }
-#endif
 
         private static void ToString(float f, string format, IFormatProvider provider, string expected)
         {
@@ -1438,6 +1437,13 @@ namespace J2N.Numerics
                     answer));
             assertTrue("Incorrect String representation want " + answer + ", got (" + f.ToString(J2N.Text.StringFormatter.InvariantCulture)
                     + ")", f.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(f.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+#endif
         }
 
         /**
