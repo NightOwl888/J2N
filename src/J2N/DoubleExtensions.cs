@@ -17,6 +17,7 @@
 #endregion
 
 using J2N.Numerics;
+using J2N.Text;
 using System;
 using System.Globalization;
 using System.Runtime.CompilerServices;
@@ -323,7 +324,11 @@ namespace J2N
                     return string.Concat(negative ? info.NegativeSign : "", "0x0", info.NumberDecimalSeparator, "0p0"); //$NON-NLS-1$ //$NON-NLS-2$
             }
 
+#if FEATURE_SPAN
+            ValueStringBuilder hexString = new ValueStringBuilder(stackalloc char[32]);
+#else
             StringBuilder hexString = new StringBuilder(10);
+#endif
             if (negative)
             {
                 hexString.Append(info.NegativeSign);
