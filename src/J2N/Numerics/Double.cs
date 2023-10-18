@@ -3029,6 +3029,12 @@ namespace J2N.Numerics
             return DotNetNumber.TryFormatDouble(value, format, provider, destination, out charsWritten);
         }
 
+        // J2N TODO: Make public and add docs when all of the number types have an implementation, implement ISpanFormattable in net6+
+        internal static bool TryFormat(double value, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatDouble(value, format, provider, destination, out charsWritten);
+        }
+
 #endif
 
         #endregion TryFormat

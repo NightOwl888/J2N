@@ -199,8 +199,12 @@ namespace J2N.Numerics
 
 #if FEATURE_SPAN
             Span<char> buffer = stackalloc char[64];
-            assertTrue(d.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            assertTrue(d.TryFormat(buffer, out int charsWritten, provider: CultureInfo.InvariantCulture));
             string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals(answer, actual);
+
+            assertTrue(Double.TryFormat(dd, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
             assertEquals(answer, actual);
 #endif
         }

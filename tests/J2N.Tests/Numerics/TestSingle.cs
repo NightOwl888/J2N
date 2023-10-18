@@ -1443,6 +1443,10 @@ namespace J2N.Numerics
             assertTrue(f.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
             string actual = buffer.Slice(0, charsWritten).ToString();
             assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+
+            assertTrue(Single.TryFormat(ff, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
 #endif
         }
 
