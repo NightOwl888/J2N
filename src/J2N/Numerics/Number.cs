@@ -35,6 +35,9 @@ namespace J2N.Numerics
     [Serializable]
 #endif
     public abstract class Number : IFormattable
+#if FEATURE_SPAN
+        , ISpanFormattable
+#endif
     {
         // From System.Convert
 
@@ -382,8 +385,56 @@ namespace J2N.Numerics
 
         #endregion ToString
 
-        // From System.Convert
-        internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
+        #region TryFormat
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Tries to format the value of the current number instance into the provided span of characters.
+        /// <para/>
+        /// <b>Note to Inheritors:</b> This method implementation returns the value of <see cref="ToString(string?, IFormatProvider?)"/>
+        /// which will cause a heap allocation. It is highly recommended to override this method to provide an optimal implementation.
+        /// </summary>
+        /// <param name="destination">The span in which to write this instance's value formatted as a span of characters.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters that were written in
+        /// <paramref name="destination"/>.</param>
+        /// <param name="format">A span containing the characters that represent a standard or custom format string that
+        /// defines the acceptable format for <paramref name="destination"/>.</param>
+        /// <param name="provider">An optional object that supplies culture-specific formatting information for
+        /// <paramref name="destination"/>.</param>
+        /// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+        public virtual bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format, IFormatProvider? provider)
+        {
+            charsWritten = 0;
+            string result = ToString(format.ToString(), provider);
+#if NET6_0_OR_GREATER
+            bool success = result.TryCopyTo(destination);
+            if (success)
+            {
+                charsWritten = result.Length;
+            }
+            return success;
+#else
+            if (result.Length > destination.Length)
+            {
+                return false;
+            }
+            for (int i = 0; i < result.Length; i++)
+            {
+                destination[i] = result[i];
+                charsWritten++;
+            }
+            return true;
+#endif
+
+        }
+
+#endif
+
+#endregion
+
+            // From System.Convert
+            internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
         {
             Debug.Assert(value != null, "[Convert.DefaultToType]value!=null");
             if (targetType == null)

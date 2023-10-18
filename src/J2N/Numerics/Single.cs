@@ -3017,14 +3017,35 @@ namespace J2N.Numerics
 
 #if FEATURE_SPAN
 
-        // J2N TODO: Make public and add docs when all of the number types have an implementation, implement ISpanFormattable in net6+
-        internal bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        /// <summary>
+        /// Tries to format the value of the current single instance into the provided span of characters.
+        /// </summary>
+        /// <param name="destination">The span in which to write this instance's value formatted as a span of characters.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters that were written in
+        /// <paramref name="destination"/>.</param>
+        /// <param name="format">A span containing the characters that represent a standard or custom format string that
+        /// defines the acceptable format for <paramref name="destination"/>.</param>
+        /// <param name="provider">An optional object that supplies culture-specific formatting information for
+        /// <paramref name="destination"/>.</param>
+        /// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+        public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
         {
             return DotNetNumber.TryFormatSingle(value, format, provider, destination, out charsWritten);
         }
 
-        // J2N TODO: Make public and add docs when all of the number types have an implementation, implement ISpanFormattable in net6+
-        internal static bool TryFormat(float value, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        /// <summary>
+        /// Tries to format the value of the <paramref name="value"/> into the provided span of characters.
+        /// </summary>
+        /// <param name="value">The single number to format.</param>
+        /// <param name="destination">The span in which to write this instance's value formatted as a span of characters.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters that were written in
+        /// <paramref name="destination"/>.</param>
+        /// <param name="format">A span containing the characters that represent a standard or custom format string that
+        /// defines the acceptable format for <paramref name="destination"/>.</param>
+        /// <param name="provider">An optional object that supplies culture-specific formatting information for
+        /// <paramref name="destination"/>.</param>
+        /// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+        public static bool TryFormat(float value, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
         {
             return DotNetNumber.TryFormatSingle(value, format, provider, destination, out charsWritten);
         }
