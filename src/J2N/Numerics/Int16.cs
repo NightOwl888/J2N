@@ -3093,6 +3093,25 @@ namespace J2N.Numerics
 
         #endregion ToString
 
+        #region TryFormat
+
+#if FEATURE_SPAN
+        // J2N TODO: Make public and add docs when all of the number types have an implementation, implement ISpanFormattable in net6+
+        internal bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatInt32(value, 0x0000FFFF, format, provider, destination, out charsWritten);
+        }
+
+        // J2N TODO: Make public and add docs when all of the number types have an implementation, implement ISpanFormattable in net6+
+        internal static bool TryFormat(short value, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatInt32(value, 0x0000FFFF, format, provider, destination, out charsWritten);
+        }
+
+#endif
+
+        #endregion TryFormat
+
         #region ReverseBytes
 
         /// <summary>

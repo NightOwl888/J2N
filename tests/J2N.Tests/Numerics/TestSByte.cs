@@ -160,29 +160,61 @@ namespace J2N.Numerics
             //assertFalse(fixture.Equals("Not a SByte"));
         }
 
+        // J2N: Centralizes ToString()/TryFormat() logic to allow testing all overloads
+
+        private void Test_toString(sbyte bb, string answer)
+        {
+            // Test for method java.lang.String java.lang.Double.toString(double)
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + SByte.ToString(bb, null, J2N.Text.StringFormatter.InvariantCulture) + ")", SByte.ToString(bb, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+            SByte b = new SByte(bb);
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + SByte.ToString(b.ToSByte(), null, J2N.Text.StringFormatter.InvariantCulture) + ")", SByte.ToString(b.ToSByte(), null, J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    answer));
+            assertTrue("Incorrect String representation want " + answer + ", got (" + b.ToString(J2N.Text.StringFormatter.InvariantCulture)
+                    + ")", b.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(b.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+
+            assertTrue(SByte.TryFormat(bb, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+#endif
+        }
+
         /**
          * @tests java.lang.Byte#toString()
          */
         [Test]
         public void Test_toString()
         {
-            assertEquals("-1", new SByte((sbyte)-1).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("0", new SByte((sbyte)0).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("1", new SByte((sbyte)1).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("-1", new SByte(unchecked((sbyte)0xFF)).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("-1", new SByte((sbyte)-1).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("0", new SByte((sbyte)0).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("1", new SByte((sbyte)1).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("-1", new SByte(unchecked((sbyte)0xFF)).ToString(J2N.Text.StringFormatter.InvariantCulture));
+
+            Test_toString((sbyte)-1, "-1");
+            Test_toString((sbyte)0, "0");
+            Test_toString((sbyte)1, "1");
+            Test_toString(unchecked((sbyte)0xFF), "-1");
         }
 
-        /**
-         * @tests java.lang.Byte#toString(byte)
-         */
-        [Test]
-        public void Test_toStringB()
-        {
-            assertEquals("-1", SByte.ToString((sbyte)-1, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("0", SByte.ToString((sbyte)0, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("1", SByte.ToString((sbyte)1, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("-1", SByte.ToString(unchecked((sbyte)0xFF), J2N.Text.StringFormatter.InvariantCulture));
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Byte#toString(byte)
+        // */
+        //[Test]
+        //public void Test_toStringB()
+        //{
+        //    assertEquals("-1", SByte.ToString((sbyte)-1, J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals("0", SByte.ToString((sbyte)0, J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals("1", SByte.ToString((sbyte)1, J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals("-1", SByte.ToString(unchecked((sbyte)0xFF), J2N.Text.StringFormatter.InvariantCulture));
+        //}
 
         /**
          * @tests java.lang.Byte#valueOf(String)
@@ -913,21 +945,26 @@ namespace J2N.Numerics
         [Test]
         public void Test_toString2()
         {
-            assertEquals("Returned incorrect String", "127", new SByte((sbyte)127).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "-127", new SByte((sbyte)-127).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "-128", new SByte((sbyte)-128).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("Returned incorrect String", "127", new SByte((sbyte)127).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("Returned incorrect String", "-127", new SByte((sbyte)-127).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("Returned incorrect String", "-128", new SByte((sbyte)-128).ToString(J2N.Text.StringFormatter.InvariantCulture));
+
+            Test_toString((sbyte)127, "127");
+            Test_toString((sbyte)-127, "-127");
+            Test_toString((sbyte)-128, "-128");
         }
 
-        /**
-         * @tests java.lang.Byte#toString(byte)
-         */
-        [Test]
-        public void Test_toStringB2()
-        {
-            assertEquals("Returned incorrect String", "127", SByte.ToString((sbyte)127, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "-127", SByte.ToString((sbyte)-127, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "-128", SByte.ToString((sbyte)-128, J2N.Text.StringFormatter.InvariantCulture));
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Byte#toString(byte)
+        // */
+        //[Test]
+        //public void Test_toStringB2()
+        //{
+        //    assertEquals("Returned incorrect String", "127", SByte.ToString((sbyte)127, J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals("Returned incorrect String", "-127", SByte.ToString((sbyte)-127, J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals("Returned incorrect String", "-128", SByte.ToString((sbyte)-128, J2N.Text.StringFormatter.InvariantCulture));
+        //}
 
         /**
          * @tests java.lang.Byte#valueOf(java.lang.String)

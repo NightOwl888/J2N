@@ -637,7 +637,7 @@ namespace J2N.Numerics
 
             Int32 i = new Int32(-80001);
 
-            assertEquals("Returned incorrect String", "-80001", i.ToString());
+            assertEquals("Returned incorrect String", "-80001", i.ToString(CultureInfo.InvariantCulture));
         }
 
         /**
@@ -648,23 +648,37 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.String java.lang.Integer.toString(int)
 
-            assertEquals("Returned incorrect String", "-80765", Int32.ToString(-80765)
-                    );
-            assertEquals("Returned incorrect octal string", "2147483647", Int32.ToString(
-                    int.MaxValue));
-            assertEquals("Returned incorrect octal string", "-2147483647", Int32.ToString(
-                    -int.MaxValue));
-            assertEquals("Returned incorrect octal string", "-2147483648", Int32.ToString(
-                    int.MinValue));
+            //assertEquals("Returned incorrect String", "-80765", Int32.ToString(-80765)
+            //        );
+            //assertEquals("Returned incorrect octal string", "2147483647", Int32.ToString(
+            //        int.MaxValue));
+            //assertEquals("Returned incorrect octal string", "-2147483647", Int32.ToString(
+            //        -int.MaxValue));
+            //assertEquals("Returned incorrect octal string", "-2147483648", Int32.ToString(
+            //        int.MinValue));
+
+            //// Test for HARMONY-6068
+            //assertEquals("Returned incorrect octal String", "-1000", Int32.ToString(-1000));
+            //assertEquals("Returned incorrect octal String", "1000", Int32.ToString(1000));
+            //assertEquals("Returned incorrect octal String", "0", Int32.ToString(0));
+            //assertEquals("Returned incorrect octal String", "708", Int32.ToString(708));
+            //assertEquals("Returned incorrect octal String", "-100", Int32.ToString(-100));
+            //assertEquals("Returned incorrect octal String", "-1000000008", Int32.ToString(-1000000008));
+            //assertEquals("Returned incorrect octal String", "2000000008", Int32.ToString(2000000008));
+
+            Test_toString(-80765, "-80765");
+            Test_toString(int.MaxValue, "2147483647");
+            Test_toString(-int.MaxValue, "-2147483647");
+            Test_toString(int.MinValue, "-2147483648");
 
             // Test for HARMONY-6068
-            assertEquals("Returned incorrect octal String", "-1000", Int32.ToString(-1000));
-            assertEquals("Returned incorrect octal String", "1000", Int32.ToString(1000));
-            assertEquals("Returned incorrect octal String", "0", Int32.ToString(0));
-            assertEquals("Returned incorrect octal String", "708", Int32.ToString(708));
-            assertEquals("Returned incorrect octal String", "-100", Int32.ToString(-100));
-            assertEquals("Returned incorrect octal String", "-1000000008", Int32.ToString(-1000000008));
-            assertEquals("Returned incorrect octal String", "2000000008", Int32.ToString(2000000008));
+            Test_toString(-1000, "-1000");
+            Test_toString(1000, "1000");
+            Test_toString(0, "0");
+            Test_toString(708, "708");
+            Test_toString(-100, "-100");
+            Test_toString(-1000000008, "-1000000008");
+            Test_toString(2000000008, "2000000008");
         }
 
         // J2N: Moved to IntegralNumberExtensions
@@ -994,29 +1008,61 @@ namespace J2N.Numerics
             //assertFalse(fixture.Equals("Not a Integer"));
         }
 
+        // J2N: Centralizes ToString()/TryFormat() logic to allow testing all overloads
+
+        private void Test_toString(int ii, string answer)
+        {
+            // Test for method java.lang.String java.lang.Double.toString(double)
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int32.ToString(ii, null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int32.ToString(ii, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+            Int32 i = new Int32(ii);
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int32.ToString(i.ToInt32(), null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int32.ToString(i.ToInt32(), null, J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    answer));
+            assertTrue("Incorrect String representation want " + answer + ", got (" + i.ToString(J2N.Text.StringFormatter.InvariantCulture)
+                    + ")", i.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(i.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+
+            assertTrue(Int32.TryFormat(ii, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+#endif
+        }
+
         /**
          * @tests java.lang.Integer#toString()
          */
         [Test]
         public void Test_toString() // J2N TODO: Culture tests
         {
-            assertEquals("-1", new Int32(-1).ToString());
-            assertEquals("0", new Int32(0).ToString());
-            assertEquals("1", new Int32(1).ToString());
-            assertEquals("-1", new Int32(unchecked((int)0xFFFFFFFF)).ToString());
+            //assertEquals("-1", new Int32(-1).ToString());
+            //assertEquals("0", new Int32(0).ToString());
+            //assertEquals("1", new Int32(1).ToString());
+            //assertEquals("-1", new Int32(unchecked((int)0xFFFFFFFF)).ToString());
+
+            Test_toString((int)-1, "-1");
+            Test_toString((int)0, "0");
+            Test_toString((int)1, "1");
+            Test_toString(unchecked((int)0xFFFFFFFF), "-1");
         }
 
-        /**
-         * @tests java.lang.Integer#toString
-         */
-        [Test]
-        public void Test_toStringI() // J2N TODO: Culture tests
-        {
-            assertEquals("-1", Int32.ToString(-1));
-            assertEquals("0", Int32.ToString(0));
-            assertEquals("1", Int32.ToString(1));
-            assertEquals("-1", Int32.ToString(unchecked((int)0xFFFFFFFF)));
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Integer#toString
+        // */
+        //[Test]
+        //public void Test_toStringI() // J2N TODO: Culture tests
+        //{
+        //    assertEquals("-1", Int32.ToString(-1));
+        //    assertEquals("0", Int32.ToString(0));
+        //    assertEquals("1", Int32.ToString(1));
+        //    assertEquals("-1", Int32.ToString(unchecked((int)0xFFFFFFFF)));
+        //}
 
         /**
          * @tests java.lang.Integer#valueOf(String)

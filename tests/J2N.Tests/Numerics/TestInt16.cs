@@ -360,28 +360,34 @@ namespace J2N.Numerics
             // Test for method java.lang.String java.lang.Short.toString()
             assertTrue("Invalid string returned", sp.ToString().Equals("18000")
                     && (sn.ToString().Equals("-19000")));
-            assertEquals("Returned incorrect string", "32767", new Int16((short)32767)
-                    .ToString());
-            assertEquals("Returned incorrect string", "-32767", new Int16((short)-32767)
-                    .ToString());
-            assertEquals("Returned incorrect string", "-32768", new Int16((short)-32768)
-                    .ToString());
+
+            //assertEquals("Returned incorrect string", "32767", new Int16((short)32767)
+            //        .ToString());
+            //assertEquals("Returned incorrect string", "-32767", new Int16((short)-32767)
+            //        .ToString());
+            //assertEquals("Returned incorrect string", "-32768", new Int16((short)-32768)
+            //        .ToString());
+
+            Test_toString((short)32767, "32767");
+            Test_toString((short)-32767, "-32767");
+            Test_toString((short)-32768, "-32768");
         }
 
-        /**
-         * @tests java.lang.Short#toString(short)
-         */
-        [Test]
-        public void Test_toStringS2()
-        {
-            // Test for method java.lang.String java.lang.Short.toString(short)
-            assertEquals("Returned incorrect string", "32767", Int16.ToString((short)32767)
-                    );
-            assertEquals("Returned incorrect string", "-32767", Int16.ToString((short)-32767)
-                    );
-            assertEquals("Returned incorrect string", "-32768", Int16.ToString((short)-32768)
-                    );
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Short#toString(short)
+        // */
+        //[Test]
+        //public void Test_toStringS2()
+        //{
+        //    // Test for method java.lang.String java.lang.Short.toString(short)
+        //    assertEquals("Returned incorrect string", "32767", Int16.ToString((short)32767)
+        //            );
+        //    assertEquals("Returned incorrect string", "-32767", Int16.ToString((short)-32767)
+        //            );
+        //    assertEquals("Returned incorrect string", "-32768", Int16.ToString((short)-32768)
+        //            );
+        //}
 
         /**
          * @tests java.lang.Short#valueOf(java.lang.String)
@@ -591,29 +597,61 @@ namespace J2N.Numerics
             //assertFalse(fixture.Equals("Not a Short"));
         }
 
+        // J2N: Centralizes ToString()/TryFormat() logic to allow testing all overloads
+
+        private void Test_toString(short ss, string answer)
+        {
+            // Test for method java.lang.String java.lang.Double.toString(double)
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int16.ToString(ss, null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int16.ToString(ss, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+            Int16 s = new Int16(ss);
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int16.ToString(s.ToInt16(), null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int16.ToString(s.ToInt16(), null, J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    answer));
+            assertTrue("Incorrect String representation want " + answer + ", got (" + s.ToString(J2N.Text.StringFormatter.InvariantCulture)
+                    + ")", s.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(s.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+
+            assertTrue(Int16.TryFormat(ss, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+#endif
+        }
+
         /**
          * @tests java.lang.Short#toString()
          */
         [Test]
         public void Test_toString()
         {
-            assertEquals("-1", new Int16((short)-1).ToString());
-            assertEquals("0", new Int16((short)0).ToString());
-            assertEquals("1", new Int16((short)1).ToString());
-            assertEquals("-1", new Int16(unchecked((short)0xFFFF)).ToString());
+            //assertEquals("-1", new Int16((short)-1).ToString());
+            //assertEquals("0", new Int16((short)0).ToString());
+            //assertEquals("1", new Int16((short)1).ToString());
+            //assertEquals("-1", new Int16(unchecked((short)0xFFFF)).ToString());
+
+            Test_toString((short)-1, "-1");
+            Test_toString((short)0, "0");
+            Test_toString((short)1, "1");
+            Test_toString(unchecked((short)0xFFFF), "-1");
         }
 
-        /**
-         * @tests java.lang.Short#toString(short)
-         */
-        [Test]
-        public void Test_toStringS()
-        {
-            assertEquals("-1", Int16.ToString((short)-1));
-            assertEquals("0", Int16.ToString((short)0));
-            assertEquals("1", Int16.ToString((short)1));
-            assertEquals("-1", Int16.ToString(unchecked((short)0xFFFF)));
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Short#toString(short)
+        // */
+        //[Test]
+        //public void Test_toStringS()
+        //{
+        //    assertEquals("-1", Int16.ToString((short)-1));
+        //    assertEquals("0", Int16.ToString((short)0));
+        //    assertEquals("1", Int16.ToString((short)1));
+        //    assertEquals("-1", Int16.ToString(unchecked((short)0xFFFF)));
+        //}
 
         /**
          * @tests java.lang.Short#valueOf(String)

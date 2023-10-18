@@ -453,31 +453,36 @@ namespace J2N.Numerics
         [Test]
         public void Test_toString2()
         {
-            // Test for method java.lang.String java.lang.Long.toString()
-            Int64 l = new Int64(89000000005L);
-            assertEquals("Returned incorrect String",
-                    "89000000005", l.ToString());
-            assertEquals("Returned incorrect String", "-9223372036854775808", new Int64(long.MinValue)
-                    .ToString());
-            assertEquals("Returned incorrect String", "9223372036854775807", new Int64(long.MaxValue)
-                    .ToString());
+            //// Test for method java.lang.String java.lang.Long.toString()
+            //Int64 l = new Int64(89000000005L);
+            //assertEquals("Returned incorrect String",
+            //        "89000000005", l.ToString());
+            //assertEquals("Returned incorrect String", "-9223372036854775808", new Int64(long.MinValue)
+            //        .ToString());
+            //assertEquals("Returned incorrect String", "9223372036854775807", new Int64(long.MaxValue)
+            //        .ToString());
+
+            Test_toString(89000000005L, "89000000005");
+            Test_toString(long.MinValue, "-9223372036854775808");
+            Test_toString(long.MaxValue, "9223372036854775807");
         }
 
-        /**
-         * @tests java.lang.Long#toString(long)
-         */
-        [Test]
-        public void Test_toStringJ2()
-        {
-            // Test for method java.lang.String java.lang.Long.toString(long)
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Long#toString(long)
+        // */
+        //[Test]
+        //public void Test_toStringJ2()
+        //{
+        //    // Test for method java.lang.String java.lang.Long.toString(long)
 
-            assertEquals("Returned incorrect String", "89000000005", Int64.ToString(89000000005L)
-                    );
-            assertEquals("Returned incorrect String", "-9223372036854775808", Int64.ToString(long.MinValue)
-                    );
-            assertEquals("Returned incorrect String", "9223372036854775807", Int64.ToString(long.MaxValue)
-                    );
-        }
+        //    assertEquals("Returned incorrect String", "89000000005", Int64.ToString(89000000005L)
+        //            );
+        //    assertEquals("Returned incorrect String", "-9223372036854775808", Int64.ToString(long.MinValue)
+        //            );
+        //    assertEquals("Returned incorrect String", "9223372036854775807", Int64.ToString(long.MaxValue)
+        //            );
+        //}
 
         // J2N: Moved to IntegralNumberExtensions
         ///**
@@ -764,29 +769,61 @@ namespace J2N.Numerics
             //assertFalse(fixture.Equals("Not a Long"));
         }
 
+        // J2N: Centralizes ToString()/TryFormat() logic to allow testing all overloads
+
+        private void Test_toString(long ll, string answer)
+        {
+            // Test for method java.lang.String java.lang.Double.toString(double)
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int64.ToString(ll, null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int64.ToString(ll, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+            Int64 l = new Int64(ll);
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int64.ToString(l.ToInt32(), null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int64.ToString(l.ToInt64(), null, J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    answer));
+            assertTrue("Incorrect String representation want " + answer + ", got (" + l.ToString(J2N.Text.StringFormatter.InvariantCulture)
+                    + ")", l.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(l.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+
+            assertTrue(Int64.TryFormat(ll, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+#endif
+        }
+
         /**
          * @tests java.lang.Long#toString()
          */
         [Test]
         public void Test_toString()
         {
-            assertEquals("-1", new Int64(-1).ToString());
-            assertEquals("0", new Int64(0).ToString());
-            assertEquals("1", new Int64(1).ToString());
-            assertEquals("-1", new Int64(unchecked((int)0xFFFFFFFF)).ToString());
+            //assertEquals("-1", new Int64(-1).ToString());
+            //assertEquals("0", new Int64(0).ToString());
+            //assertEquals("1", new Int64(1).ToString());
+            //assertEquals("-1", new Int64(unchecked((int)0xFFFFFFFF))).ToString());
+
+            Test_toString(-1, "-1");
+            Test_toString(0, "0");
+            Test_toString(1, "1");
+            Test_toString(unchecked((int)0xFFFFFFFF), "-1");
         }
 
-        /**
-         * @tests java.lang.Long#toString
-         */
-        [Test]
-        public void Test_toStringJ()
-        {
-            assertEquals("-1", Int64.ToString(-1));
-            assertEquals("0", Int64.ToString(0));
-            assertEquals("1", Int64.ToString(1));
-            assertEquals("-1", Int64.ToString(unchecked((int)0xFFFFFFFF)));
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Long#toString
+        // */
+        //[Test]
+        //public void Test_toStringJ()
+        //{
+        //    assertEquals("-1", Int64.ToString(-1));
+        //    assertEquals("0", Int64.ToString(0));
+        //    assertEquals("1", Int64.ToString(1));
+        //    assertEquals("-1", Int64.ToString(unchecked((int)0xFFFFFFFF)));
+        //}
 
         /**
          * @tests java.lang.Long#valueOf(String)

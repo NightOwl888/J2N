@@ -160,6 +160,32 @@ namespace J2N.Numerics
             //assertFalse(fixture.Equals("Not a Byte"));
         }
 
+        // J2N: Centralizes ToString()/TryFormat() logic to allow testing all overloads
+
+        private void Test_toString(byte bb, string answer)
+        {
+            // Test for method java.lang.String java.lang.Double.toString(double)
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Byte.ToString(bb, null, J2N.Text.StringFormatter.InvariantCulture) + ")", Byte.ToString(bb, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+            Byte b = new Byte(bb);
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Byte.ToString(b.ToByte(), null, J2N.Text.StringFormatter.InvariantCulture) + ")", Byte.ToString(b.ToByte(), null, J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    answer));
+            assertTrue("Incorrect String representation want " + answer + ", got (" + b.ToString(J2N.Text.StringFormatter.InvariantCulture)
+                    + ")", b.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(b.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+
+            assertTrue(Byte.TryFormat(bb, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+#endif
+        }
+
         /**
          * @tests java.lang.Byte#toString()
          */
@@ -167,24 +193,30 @@ namespace J2N.Numerics
         public void Test_toString()
         {
             // J2N: We get a byte value converted to a string, so the result is always positive
-            assertEquals("255", new Byte(unchecked((byte)-1)).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", new Byte(unchecked((byte)-1)).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("0", new Byte((byte)0).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("1", new Byte((byte)1).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("255", new Byte((byte)0xFF).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", new Byte((byte)0xFF).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("255", new Byte(unchecked((byte)-1)).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", new Byte(unchecked((byte)-1)).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("0", new Byte((byte)0).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("1", new Byte((byte)1).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("255", new Byte((byte)0xFF).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", new Byte((byte)0xFF).ToString(J2N.Text.StringFormatter.InvariantCulture));
+
+            Test_toString(unchecked((byte)-1), "255");
+            Test_toString((byte)0, "0");
+            Test_toString((byte)1, "1");
+            Test_toString((byte)0xFF, "255");
         }
 
-        /**
-         * @tests java.lang.Byte#toString(byte)
-         */
-        [Test]
-        public void Test_toStringB()
-        {
-            // J2N: We get a byte value converted to a string, so the result is always positive
-            assertEquals("255", Byte.ToString(unchecked((byte)-1), J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", Byte.ToString(unchecked((byte)-1), J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("0", Byte.ToString((byte)0, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("1", Byte.ToString((byte)1, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("255", Byte.ToString((byte)0xFF, J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", Byte.ToString((byte)0xFF, J2N.Text.StringFormatter.InvariantCulture));
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Byte#toString(byte)
+        // */
+        //[Test]
+        //public void Test_toStringB()
+        //{
+        //    // J2N: We get a byte value converted to a string, so the result is always positive
+        //    //assertEquals("255", Byte.ToString(unchecked((byte)-1), J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", Byte.ToString(unchecked((byte)-1), J2N.Text.StringFormatter.InvariantCulture));
+        //    //assertEquals("0", Byte.ToString((byte)0, J2N.Text.StringFormatter.InvariantCulture));
+        //    //assertEquals("1", Byte.ToString((byte)1, J2N.Text.StringFormatter.InvariantCulture));
+        //    //assertEquals("255", Byte.ToString((byte)0xFF, J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("-1", Byte.ToString((byte)0xFF, J2N.Text.StringFormatter.InvariantCulture));
+        //}
 
         /**
          * @tests java.lang.Byte#valueOf(String)
@@ -960,22 +992,27 @@ namespace J2N.Numerics
         public void Test_toString2()
         {
             // J2N: We get a byte value converted to a string, so the result is always positive
-            assertEquals("Returned incorrect String", "127", new Byte((byte)127).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "129", new Byte(unchecked((byte)-127)).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-127", new Byte(unchecked((byte)-127)).ToString(J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "128", new Byte(unchecked((byte)-128)).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-128", new Byte(unchecked((byte)-128)).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("Returned incorrect String", "127", new Byte((byte)127).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("Returned incorrect String", "129", new Byte(unchecked((byte)-127)).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-127", new Byte(unchecked((byte)-127)).ToString(J2N.Text.StringFormatter.InvariantCulture));
+            //assertEquals("Returned incorrect String", "128", new Byte(unchecked((byte)-128)).ToString(J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-128", new Byte(unchecked((byte)-128)).ToString(J2N.Text.StringFormatter.InvariantCulture));
+
+            Test_toString((byte)127, "127");
+            Test_toString(unchecked((byte)-127), "129");
+            Test_toString(unchecked((byte)-128), "128");
         }
 
-        /**
-         * @tests java.lang.Byte#toString(byte)
-         */
-        [Test]
-        public void Test_toStringB2()
-        {
-            // J2N: We get a byte value converted to a string, so the result is always positive
-            assertEquals("Returned incorrect String", "127", Byte.ToString((byte)127, J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "129", Byte.ToString(unchecked((byte)-127), J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-127", Byte.ToString(unchecked((byte)-127), J2N.Text.StringFormatter.InvariantCulture));
-            assertEquals("Returned incorrect String", "128", Byte.ToString(unchecked((byte)-128), J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-128", Byte.ToString(unchecked((byte)-128), J2N.Text.StringFormatter.InvariantCulture));
-        }
+        // J2N: Same values as above, no need to run again
+        ///**
+        // * @tests java.lang.Byte#toString(byte)
+        // */
+        //[Test]
+        //public void Test_toStringB2()
+        //{
+        //    // J2N: We get a byte value converted to a string, so the result is always positive
+        //    assertEquals("Returned incorrect String", "127", Byte.ToString((byte)127, J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals("Returned incorrect String", "129", Byte.ToString(unchecked((byte)-127), J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-127", Byte.ToString(unchecked((byte)-127), J2N.Text.StringFormatter.InvariantCulture));
+        //    assertEquals("Returned incorrect String", "128", Byte.ToString(unchecked((byte)-128), J2N.Text.StringFormatter.InvariantCulture)); // assertEquals("Returned incorrect String", "-128", Byte.ToString(unchecked((byte)-128), J2N.Text.StringFormatter.InvariantCulture));
+        //}
 
         /**
          * @tests java.lang.Byte#valueOf(java.lang.String)
