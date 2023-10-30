@@ -795,6 +795,12 @@ namespace J2N.Numerics
 #endif
         }
 
+        [Test]
+        public void Test_ToString_AllowTypeSpecifier()
+        {
+            assertEquals(100L, Int64.Parse("100L", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, CultureInfo.InvariantCulture));
+        }
+
         /**
          * @tests java.lang.Long#toString()
          */
@@ -1753,6 +1759,43 @@ namespace J2N.Numerics
                         yield return new TestCaseData(-1L, "-1", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
 
                         //yield return new TestCaseData(0L, null, NumberStyle.Integer, NumberFormatInfo.InvariantInfo); // J2N: Match .NET behavior where null will result in 0
+
+                        // Custom
+
+                        yield return new TestCaseData(0x007bL, "0x007b", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // J2N: Allow 0x to be specified in the string
+                        yield return new TestCaseData(0x007bL, "0x007bL", NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo); // J2N: Allow 0x to be specified in the string
+                        yield return new TestCaseData(100L, "64L", NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x007bL, "0x007bL  ", NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo); // J2N: Allow trailing whitespace
+
+                        // Tests for AllowTypeSpecifier
+                        yield return new TestCaseData(100L, "100L", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100U", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100l", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100u", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100L, "100UL", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100ul", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100Ul", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100uL", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100L, "100LU", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100lu", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100Lu", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100lU", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100L, "100D", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100d", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100F", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100f", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100M", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100m", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100L, "100.0D", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100.0d", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100.0F", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100.0f", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100.0M", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100L, "100.0m", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
@@ -1806,6 +1849,49 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(FormatException), "9.2", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(typeof(FormatException), "", NumberStyle.Integer, NumberFormatInfo.InvariantInfo); // J2N: .NET throws ArgumentOutOfRangeException rather than FormatException in this case, but since it is inconsistent with long.Parse() we are going with FormatException.
                         yield return new TestCaseData(typeof(ArgumentNullException), null, NumberStyle.Integer, NumberFormatInfo.InvariantInfo); // J2N: Match .NET behavior where null will result in 0
+
+                        // Custom
+
+                        // Tests for AllowTypeSpecifier
+
+                        yield return new TestCaseData(typeof(FormatException), "100L", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100U", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100l", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100u", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100UL", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100ul", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100Ul", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100uL", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100LU", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100lu", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100Lu", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100lU", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // These are not valid ways of specifying long or unsigned types (they do not compile with a decimal point)
+                        yield return new TestCaseData(typeof(FormatException), "100.0L", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0U", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0l", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0u", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100.0UL", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0ul", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0Ul", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0uL", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100.0LU", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0lu", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0Lu", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0lU", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        // We need to use AllowDecimalPoint for these to work.
+                        yield return new TestCaseData(typeof(FormatException), "100.0D", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0d", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0F", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0f", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0M", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0m", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
