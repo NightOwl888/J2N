@@ -1609,11 +1609,15 @@ namespace J2N.Numerics
 
             public abstract class Parse_CharSequence_Int32_TestCase : ParseTestCase
             {
+                protected virtual bool IsNullableType => true;
+
                 protected abstract byte GetResult(string value, int radix);
 
                 [TestCaseSource("TestParse_CharSequence_Int32_Data")]
                 public virtual void TestParse_CharSequence_Int32(byte expected, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     var actual = GetResult(value, radix);
                     assertEquals($"Byte.Parse(string, out byte) failed. String: \"{value}\" Result: {actual}", expected, actual);
                 }
@@ -1621,6 +1625,8 @@ namespace J2N.Numerics
                 [TestCaseSource("TestParse_CharSequence_Int32_ForException_Data")]
                 public virtual void TestParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     Assert.Throws(expectedExceptionType, () => GetResult(value, radix));
                 }
             }
@@ -1633,16 +1639,17 @@ namespace J2N.Numerics
                 }
             }
 
-            // J2N: ReadOnlySpan<char> not supported at this time on this overload (not supported in .NET anyway)
-            //#if FEATURE_SPAN
-            //            public class Parse_ReadOnlySpan_Int32 : Parse_CharSequence_Int32_TestCase
-            //            {
-            //                protected override short GetResult(string s, int radix)
-            //                {
-            //                    return Int16.Parse(s.AsSpan(), radix);
-            //                }
-            //            }
-            //#endif
+#if FEATURE_SPAN
+            public class Parse_ReadOnlySpan_Int32 : Parse_CharSequence_Int32_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override byte GetResult(string s, int radix)
+                {
+                    return Byte.Parse(s.AsSpan(), radix);
+                }
+            }
+#endif
 
             #endregion Parse_CharSequence_Int32
 
@@ -1726,11 +1733,15 @@ namespace J2N.Numerics
 
             public abstract class TryParse_CharSequence_Int32_TestCase : ParseTestCase
             {
+                protected virtual bool IsNullableType => true;
+
                 protected abstract bool GetResult(string value, int radix, out byte result);
 
                 [TestCaseSource("TestParse_CharSequence_Int32_Data")]
                 public virtual void TestTryParse_CharSequence_Int32(byte expected, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     assertTrue(GetResult(value, radix, out byte actual));
                     assertEquals($"Byte.TryParse(string, out byte) failed. String: \"{value}\" Result: {actual}", expected, actual);
                 }
@@ -1738,6 +1749,8 @@ namespace J2N.Numerics
                 [TestCaseSource("TestParse_CharSequence_Int32_ForException_Data")]
                 public virtual void TestTryParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     byte actual = 0;
                     if (expectedExceptionType != typeof(ArgumentOutOfRangeException))
                     {
@@ -1759,16 +1772,17 @@ namespace J2N.Numerics
                 }
             }
 
-            // J2N: ReadOnlySpan<char> not supported at this time on this overload (not supported in .NET anyway)
-            //#if FEATURE_SPAN
-            //            public class TryParse_ReadOnlySpan_Int32 : TryParse_CharSequence_Int32_TestCase
-            //            {
-            //                protected override bool GetResult(string s, int radix, out byte result)
-            //                {
-            //                    return Byte.TryParse(s.AsSpan(), radix, out result);
-            //                }
-            //            }
-            //#endif
+#if FEATURE_SPAN
+            public class TryParse_ReadOnlySpan_Int32 : TryParse_CharSequence_Int32_TestCase
+            {
+                protected override bool IsNullableType => false;
+
+                protected override bool GetResult(string s, int radix, out byte result)
+                {
+                    return Byte.TryParse(s.AsSpan(), radix, out result);
+                }
+            }
+#endif
 
             #endregion Parse_CharSequence_Int32
 

@@ -1332,6 +1332,63 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32
 
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>. 
+        /// <para/>
+        /// Usage Note: This method is similar to the <see cref="Convert.ToInt16(string?, int)"/> method. It differs in that
+        /// it allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/>.
+        /// <para/>
+        /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
+        /// </summary>
+        /// <param name="s">The <see cref="ReadOnlySpan{T}"/> containing the <see cref="short"/> representation to be parsed.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <returns>A 16-bit signed integer that is equivalent to the number in <paramref name="s"/>, or 0 (zero) if
+        /// <paramref name="s"/> is <c>null</c>.</returns>
+        /// <remarks>
+        /// If <paramref name="radix"/> is 16, you can prefix the number specified by the <paramref name="s"/> parameter with "0x" or "0X".
+        /// <para/>
+        /// To specify a negative value for base (radix) 10 numeric representations, use the ASCII character \u002d ('-').
+        /// <para/>
+        /// For any other <paramref name="radix"/>,  negative values may either be specified with ASCII character \u002d ('-')
+        /// (as in Java) or by specifying the two's complement representation (as in .NET), but not both.
+        /// In the latter case, the highest-order binary bit of a long integer (bit 15) is interpreted as the sign bit.
+        /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="short"/>
+        /// data type is converted to a <see cref="short"/> value without the method throwing an exception.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="s"/> contains a character that is not a valid digit in the base specified by <paramref name="radix"/>.
+        /// The exception message indicates that there are no digits to convert if the first character in <paramref name="s"/> is invalid;
+        /// otherwise, the message indicates that <paramref name="s"/> contains invalid trailing characters.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="s"/> contains only a the ASCII character \u002d ('-') or \u002B ('+') sign and/or hexadecimal
+        /// prefix 0X or 0x with no digits.
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number that is less than <see cref="short.MinValue"/> or greater than <see cref="short.MaxValue"/>.
+        /// </exception>
+        /// <seealso cref="TryParse(ReadOnlySpan{char}, int, out short)"/>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, int)"/>
+        public static short Parse(ReadOnlySpan<char> s, int radix) // J2N: Renamed from ParseShort()
+        {
+            int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
+            if (radix != 10 && r <= ushort.MaxValue)
+                return (short)r;
+
+            if (r < short.MinValue || r > short.MaxValue)
+                throw new OverflowException(SR.Overflow_Int16);
+            return (short)r;
+        }
+
+#endif
+
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>. 
         /// <para/>
@@ -1393,6 +1450,71 @@ namespace J2N.Numerics
         #endregion Parse_CharSequence_Int32
 
         #region TryParse_CharSequence_Int32_Int16
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>.
+        /// <para/>
+        /// Usage Note: This method is similar to the <see cref="Convert.ToInt16(string?, int)"/> method. It differs in that it
+        /// allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/> and allows any 
+        /// <paramref name="radix"/> value from <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
+        /// <para/>
+        /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
+        /// <para/>
+        /// Since <see cref="Parse(ReadOnlySpan{char}, int)"/> throws many different exception types and in Java they are all normalized to
+        /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
+        /// when this method returns <c>false</c>.
+        /// </summary>
+        /// <param name="s">The <see cref="ReadOnlySpan{T}"/> containing the <see cref="short"/> representation to be parsed.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <param name="result">The signed <see cref="short"/> represented by the subsequence in the specified <paramref name="radix"/>.</param>
+        /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <remarks>
+        /// If <paramref name="radix"/> is 16, you can prefix the number specified by the <paramref name="s"/> parameter with "0x" or "0X".
+        /// <para/>
+        /// To specify a negative value for base (radix) 10 numeric representations, use the ASCII character \u002d ('-').
+        /// <para/>
+        /// For any other <paramref name="radix"/>,  negative values may either be specified with ASCII character \u002d ('-')
+        /// (as in Java) or by specifying the two's complement representation (as in .NET), but not both.
+        /// In the latter case, the highest-order binary bit of an integer (bit 15) is interpreted as the sign bit.
+        /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="short"/>
+        /// data type is converted to a <see cref="short"/> value without the method throwing an exception.
+        /// </remarks>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, int, int, int)"/>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, int)"/>
+        public static bool TryParse(ReadOnlySpan<char> s, int radix, out short result) // J2N: Renamed from ParseShort()
+        {
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+
+            if (!ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out int r))
+            {
+                result = default;
+                return false;
+            }
+
+            if (radix != 10 && r <= ushort.MaxValue)
+            {
+                result = (short)r;
+                return true;
+            }
+
+            if (r < short.MinValue || r > short.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = (short)r;
+            return true;
+        }
+
+#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>.
