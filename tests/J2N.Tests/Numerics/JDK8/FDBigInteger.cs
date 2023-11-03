@@ -1667,7 +1667,7 @@ namespace J2N.Numerics
             //    magnitude[magnitude.Length - 4 * i - 3] = (byte)(w >> 8);
             //    magnitude[magnitude.Length - 4 * i - 4] = (byte)w;
             //}
-#if FEATURE_READONLYSPAN
+#if FEATURE_BIGINTEGER_CTOR_READONLYSPAN
             for (int i = 0; i < nWords; i++)
             {
                 int w = data[i];

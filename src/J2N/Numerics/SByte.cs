@@ -464,7 +464,7 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>, beginning at the
@@ -906,7 +906,7 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32_Int32_SByte
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>, beginning at the
@@ -1341,6 +1341,64 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32
 
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>. 
+        /// <para/>
+        /// Usage Note: This method is similar to the <see cref="Convert.ToSByte(string?, int)"/> method. It differs in that
+        /// it allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/>.
+        /// <para/>
+        /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
+        /// </summary>
+        /// <param name="s">The <see cref="ReadOnlySpan{T}"/> containing the <see cref="sbyte"/> representation to be parsed.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <returns>An 8-bit signed integer that is equivalent to the number in <paramref name="s"/>, or 0 (zero) if
+        /// <paramref name="s"/> is <c>null</c>.</returns>
+        /// <remarks>
+        /// If <paramref name="radix"/> is 16, you can prefix the number specified by the <paramref name="s"/> parameter with "0x" or "0X".
+        /// <para/>
+        /// To specify a negative value for base (radix) 10 numeric representations, use the ASCII character \u002d ('-').
+        /// <para/>
+        /// For any other <paramref name="radix"/>,  negative values may either be specified with ASCII character \u002d ('-')
+        /// (as in Java) or by specifying the two's complement representation (as in .NET), but not both.
+        /// In the latter case, the highest-order binary bit of a long integer (bit 7) is interpreted as the sign bit.
+        /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="sbyte"/>
+        /// data type is converted to a <see cref="sbyte"/> value without the method throwing an exception.
+        /// </remarks>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="s"/> contains a character that is not a valid digit in the base specified by <paramref name="radix"/>.
+        /// The exception message indicates that there are no digits to convert if the first character in <paramref name="s"/> is invalid;
+        /// otherwise, the message indicates that <paramref name="s"/> contains invalid trailing characters.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="s"/> contains only a the ASCII character \u002d ('-') or \u002B ('+') sign and/or hexadecimal
+        /// prefix 0X or 0x with no digits.
+        /// </exception>
+        /// <exception cref="OverflowException">
+        /// <paramref name="s"/> represents a number that is less than <see cref="sbyte.MinValue"/> or greater than <see cref="sbyte.MaxValue"/>.
+        /// </exception>
+        /// <seealso cref="TryParse(ReadOnlySpan{char}, int, out sbyte)"/>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, int)"/>
+        public static sbyte Parse(ReadOnlySpan<char> s, int radix) // J2N: Renamed from ParseByte()
+        {
+            int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI1);
+
+            if (radix != 10 && r <= byte.MaxValue)
+                return (sbyte)r;
+
+            if (r < sbyte.MinValue || r > sbyte.MaxValue) // J2N: Allow negative sbyte values for compatibility, even though we return sbyte rather than sbyte
+                throw new OverflowException(SR.Overflow_SByte);
+            return (sbyte)r;
+        }
+
+#endif
+
         /// <summary>
         /// Parses the <see cref="string"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>. 
         /// <para/>
@@ -1403,6 +1461,71 @@ namespace J2N.Numerics
         #endregion Parse_CharSequence_Int32
 
         #region TryParse_CharSequence_Int32_SByte
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>.
+        /// <para/>
+        /// Usage Note: This method is similar to the <see cref="Convert.ToSByte(string?, int)"/> method. It differs in that it
+        /// allows the use of the ASCII character \u002d ('-') or \u002B ('+') in any <paramref name="radix"/> and allows any 
+        /// <paramref name="radix"/> value from <see cref="Character.MinRadix"/> to <see cref="Character.MaxRadix"/> inclusive.
+        /// <para/>
+        /// Supports any BMP (Basic Multilingual Plane) or SMP (Supplementary Mulitlingual Plane) digit as defined by Unicode 10.0.
+        /// <para/>
+        /// Since <see cref="Parse(ReadOnlySpan{char}, int)"/> throws many different exception types and in Java they are all normalized to
+        /// <c>NumberFormatException</c>, this method can be used to mimic the same behavior by throwing <see cref="FormatException"/>
+        /// when this method returns <c>false</c>.
+        /// </summary>
+        /// <param name="s">The <see cref="string"/> containing the <see cref="sbyte"/> representation to be parsed.</param>
+        /// <param name="radix">The radix (or base) to use when parsing <paramref name="s"/>. The value must be in the range
+        /// <see cref="Character.MinRadix"/> - <see cref="Character.MaxRadix"/> inclusive.</param>
+        /// <param name="result">The <see cref="sbyte"/> represented by the subsequence in the specified <paramref name="radix"/>.</param>
+        /// <returns><c>true</c> if <paramref name="s"/> was converted successfully; otherwise, <c>false</c>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="radix"/> is less than <see cref="Character.MinRadix"/> or greater than <see cref="Character.MaxRadix"/>.
+        /// </exception>
+        /// <remarks>
+        /// If <paramref name="radix"/> is 16, you can prefix the number specified by the <paramref name="s"/> parameter with "0x" or "0X".
+        /// <para/>
+        /// To specify a negative value for base (radix) 10 numeric representations, use the ASCII character \u002d ('-').
+        /// <para/>
+        /// For any other <paramref name="radix"/>,  negative values may either be specified with ASCII character \u002d ('-')
+        /// (as in Java) or by specifying the two's complement representation (as in .NET), but not both.
+        /// In the latter case, the highest-order binary bit of an integer (bit 7) is interpreted as the sign bit.
+        /// As a result, it is possible to write code in which a non-base 10 number that is out of the range of the <see cref="sbyte"/>
+        /// data type is converted to a <see cref="sbyte"/> value without the method throwing an exception.
+        /// </remarks>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, int, int, int)"/>
+        /// <seealso cref="Parse(ReadOnlySpan{char}, int)"/>
+        public static bool TryParse(ReadOnlySpan<char> s, int radix, out sbyte result) // J2N: Renamed from ParseByte()
+        {
+            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+
+            if (!ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI1, out int r))
+            {
+                result = default;
+                return false;
+            }
+
+            if (radix != 10 && r <= byte.MaxValue)
+            {
+                result = (sbyte)r;
+                return true;
+            }
+
+            if (r < sbyte.MinValue || r > sbyte.MaxValue)
+            {
+                result = default;
+                return false;
+            }
+
+            result = (sbyte)r;
+            return true;
+        }
+
+#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>.
@@ -1626,7 +1749,7 @@ namespace J2N.Numerics
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1735,11 +1858,11 @@ namespace J2N.Numerics
         /// <paramref name="s"/> parameter for the parse operation to succeed. It must be a combination of bit flags from the <see cref="NumberStyle"/>
         /// enumeration. Depending on the value of <paramref name="style"/>, the <paramref name="s"/> parameter may include the following elements:
         /// <para/>
-        /// [ws][$][sign]digits[.fractional-digits][e[sign]exponential-digits][ws]
+        /// [ws][$][sign]digits[.fractional-digits][e[sign]exponential-digits][type][ws]
         /// <para/>
         /// Or, if the <paramref name="style"/> parameter includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <para/>
-        /// [ws]hexdigits[ws]
+        /// [ws][0x]hexdigits[hextype][ws]
         /// <para/>
         /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
         /// <para/>
@@ -1793,9 +1916,29 @@ namespace J2N.Numerics
         ///         <term>A sequence of decimal digits from 0 through 9 that specify an exponent.</term>
         ///     </item>
         ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
+        ///     </item>
+        ///     <item>
         ///         <term><i>hexdigits</i></term>
         ///         <term>A sequence of hexadecimal digits from 0 through f, or 0 through F. Hexadecimal digits can appear in <paramref name="s"/>
         ///         if <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>type</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>hextype</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. Real type suffixes are not supported.</term>
         ///     </item>
         /// </list>
         /// <para/>
@@ -1854,6 +1997,11 @@ namespace J2N.Numerics
         ///         <term><see cref="NumberStyle.AllowCurrencySymbol"/></term>
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
+        ///     </item>
         /// </list>
         /// <para/>
         /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
@@ -1861,10 +2009,12 @@ namespace J2N.Numerics
         /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
         /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
         /// <para/>
-        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
-        /// For example, "F3" parses successfully, but "0xF3" does not. The only other flags that can be present in <paramref name="style"/> are
-        /// <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/> enumeration
-        /// has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value with or without a <c>0x</c> prefix.
+        /// For example, "F3" and "0xF3" both parse successfully. The only other flags that can be present in <paramref name="style"/> are
+        /// <see cref="NumberStyle.AllowLeadingWhite"/>, <see cref="NumberStyle.AllowTrailingWhite"/> and <see cref="NumberStyle.AllowTypeSpecifier"/>.
+        /// (The <see cref="NumberStyle"/> enumeration has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space
+        /// flags.)
+        /// The <see cref="NumberStyle.AllowTypeSpecifier"/> only allows 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu' for hexadecimal numbers.
         /// <para/>
         /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
         /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
@@ -1892,8 +2042,8 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s is null)
                 throw new ArgumentNullException(nameof(s));
-#if FEATURE_READONLYSPAN
-            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i);
+#if FEATURE_SPAN
+            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i);
 #else
             DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i);
 #endif
@@ -1914,7 +2064,7 @@ namespace J2N.Numerics
             return (sbyte)i;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its <see cref="sbyte"/> equivalent.
         /// </summary>
@@ -1944,11 +2094,11 @@ namespace J2N.Numerics
         /// <paramref name="s"/> parameter for the parse operation to succeed. It must be a combination of bit flags from the <see cref="NumberStyle"/>
         /// enumeration. Depending on the value of <paramref name="style"/>, the <paramref name="s"/> parameter may include the following elements:
         /// <para/>
-        /// [ws][$][sign]digits[.fractional-digits][e[sign]exponential-digits][ws]
+        /// [ws][$][sign]digits[.fractional-digits][e[sign]exponential-digits][type][ws]
         /// <para/>
         /// Or, if the <paramref name="style"/> parameter includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <para/>
-        /// [ws]hexdigits[ws]
+        /// [ws][0x]hexdigits[hextype][ws]
         /// <para/>
         /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
         /// <para/>
@@ -2002,9 +2152,29 @@ namespace J2N.Numerics
         ///         <term>A sequence of decimal digits from 0 through 9 that specify an exponent.</term>
         ///     </item>
         ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
+        ///     </item>
+        ///     <item>
         ///         <term><i>hexdigits</i></term>
         ///         <term>A sequence of hexadecimal digits from 0 through f, or 0 through F. Hexadecimal digits can appear in <paramref name="s"/>
         ///         if <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>type</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>hextype</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. Real type suffixes are not supported.</term>
         ///     </item>
         /// </list>
         /// <para/>
@@ -2063,6 +2233,11 @@ namespace J2N.Numerics
         ///         <term><see cref="NumberStyle.AllowCurrencySymbol"/></term>
         ///         <term>The <i>$</i> element.</term>
         ///     </item>
+        ///     <item>
+        ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
+        ///     </item>
         /// </list>
         /// <para/>
         /// The <see cref="NumberStyle"/> enum can be converted to the .NET <see cref="NumberStyles"/> enum by using the
@@ -2070,10 +2245,12 @@ namespace J2N.Numerics
         /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
         /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
         /// <para/>
-        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
-        /// For example, "F3" parses successfully, but "0xF3" does not. The only other flags that can be present in style are
-        /// <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/> enumeration
-        /// has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value with or without a <c>0x</c> prefix.
+        /// For example, "F3" and "0xF3" both parse successfully. The only other flags that can be present in <paramref name="style"/> are
+        /// <see cref="NumberStyle.AllowLeadingWhite"/>, <see cref="NumberStyle.AllowTrailingWhite"/> and <see cref="NumberStyle.AllowTypeSpecifier"/>.
+        /// (The <see cref="NumberStyle"/> enumeration has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space
+        /// flags.)
+        /// The <see cref="NumberStyle.AllowTypeSpecifier"/> only allows 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu' for hexadecimal numbers.
         /// <para/>
         /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
         /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
@@ -2160,11 +2337,11 @@ namespace J2N.Numerics
         /// bit flags from the <see cref="NumberStyle"/> enumeration. Depending on the value of <paramref name="style"/>, the <paramref name="s"/>
         /// parameter may include the following elements:
         /// <code>
-        /// [ws][$][sign][digits,]digits[.fractional-digits][e[sign]exponential-digits][ws]
+        /// [ws][$][sign][digits,]digits[.fractional-digits][e[sign]exponential-digits][type][ws]
         /// </code>
         /// Or, if the <paramref name="style"/> parameter includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <code>
-        /// [ws]hexdigits[ws]
+        /// [ws][0x]hexdigits[hextype][ws]
         /// </code>
         /// Items in square brackets ([ and ]) are optional. The following table describes each element.
         /// <list type="table">
@@ -2216,8 +2393,28 @@ namespace J2N.Numerics
         ///         <term>A sequence of decimal digits from 0 through 9 that specify an exponent.</term>
         ///     </item>
         ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
+        ///     </item>
+        ///     <item>
         ///         <term><i>hexdigits</i></term>
         ///         <term>A sequence of hexadecimal digits from 0 through f, or 0 through F.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>type</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>hextype</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. Real type suffixes are not supported.</term>
         ///     </item>
         /// </list>
         /// <para/>
@@ -2278,7 +2475,8 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
-        ///         <term>The type suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -2304,10 +2502,12 @@ namespace J2N.Numerics
         /// The <see cref="NumberStyle"/> enum is a match in both symbol and value for the .NET <see cref="NumberStyles"/> enum.
         /// Therefore, simply casting the value will convert it properly between the two in both directions.
         /// <para/>
-        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, s must be a hexadecimal value without a prefix.
-        /// For example, "C9AF3" parses successfully, but "0xC9AF3" does not. The only other flags that can be present in style
-        /// are <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/>
-        /// enumeration has a composite style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value with or without a <c>0x</c> prefix.
+        /// For example, "F3" and "0xF3" both parse successfully. The only other flags that can be present in <paramref name="style"/> are
+        /// <see cref="NumberStyle.AllowLeadingWhite"/>, <see cref="NumberStyle.AllowTrailingWhite"/> and <see cref="NumberStyle.AllowTypeSpecifier"/>.
+        /// (The <see cref="NumberStyle"/> enumeration has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space
+        /// flags.)
+        /// The <see cref="NumberStyle.AllowTypeSpecifier"/> only allows 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu' for hexadecimal numbers.
         /// <para/>
         /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
         /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
@@ -2327,10 +2527,10 @@ namespace J2N.Numerics
                 result = 0;
                 return false;
             }
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
             // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
-            if (DotNetNumber.TryParseInt32((ReadOnlySpan<char>)s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
+            if (DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
                 || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
 #else
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
@@ -2346,7 +2546,7 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
@@ -2385,11 +2585,11 @@ namespace J2N.Numerics
         /// bit flags from the <see cref="NumberStyle"/> enumeration. Depending on the value of <paramref name="style"/>, the <paramref name="s"/>
         /// parameter may include the following elements:
         /// <code>
-        /// [ws][$][sign][digits,]digits[.fractional-digits][e[sign]exponential-digits][ws]
+        /// [ws][$][sign][digits,]digits[.fractional-digits][e[sign]exponential-digits][type][ws]
         /// </code>
         /// Or, if the <paramref name="style"/> parameter includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <code>
-        /// [ws]hexdigits[ws]
+        /// [ws][0x]hexdigits[hextype][ws]
         /// </code>
         /// Items in square brackets ([ and ]) are optional. The following table describes each element.
         /// <list type="table">
@@ -2441,8 +2641,28 @@ namespace J2N.Numerics
         ///         <term>A sequence of decimal digits from 0 through 9 that specify an exponent.</term>
         ///     </item>
         ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
+        ///     </item>
+        ///     <item>
         ///         <term><i>hexdigits</i></term>
         ///         <term>A sequence of hexadecimal digits from 0 through f, or 0 through F.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>type</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>hextype</i></term>
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
+        ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. Real type suffixes are not supported.</term>
         ///     </item>
         /// </list>
         /// <para/>
@@ -2503,7 +2723,8 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
-        ///         <term>The <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -2531,10 +2752,12 @@ namespace J2N.Numerics
         /// Similarly, <see cref="NumberStyles"/> enum can be converted to the J2N <see cref="NumberStyle"/> enum by using
         /// the <see cref="NumberStyleExtensions.ToNumberStyle(NumberStyles)"/> extension method.
         /// <para/>
-        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value without a prefix.
-        /// For example, "C9AF3" parses successfully, but "0xC9AF3" does not. The only other flags that can be present in <paramref name="style"/>
-        /// are <see cref="NumberStyle.AllowLeadingWhite"/> and <see cref="NumberStyle.AllowTrailingWhite"/>. (The <see cref="NumberStyle"/>
-        /// enumeration has a composite style, <see cref="NumberStyle.HexNumber"/>, that includes both white space flags.)
+        /// If the <see cref="NumberStyle.AllowHexSpecifier"/> flag is used, <paramref name="s"/> must be a hexadecimal value with or without a <c>0x</c> prefix.
+        /// For example, "F3" and "0xF3" both parse successfully. The only other flags that can be present in <paramref name="style"/> are
+        /// <see cref="NumberStyle.AllowLeadingWhite"/>, <see cref="NumberStyle.AllowTrailingWhite"/> and <see cref="NumberStyle.AllowTypeSpecifier"/>.
+        /// (The <see cref="NumberStyle"/> enumeration has a composite number style, <see cref="NumberStyle.HexNumber"/>, that includes both white space
+        /// flags.)
+        /// The <see cref="NumberStyle.AllowTypeSpecifier"/> only allows 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu' for hexadecimal numbers.
         /// <para/>
         /// The <paramref name="provider"/> parameter is an <see cref="IFormatProvider"/> implementation, such as a <see cref="CultureInfo"/> object,
         /// a <see cref="NumberFormatInfo"/> object or a <see cref="J2N.Text.StringFormatter"/> object, whose <see cref="IFormatProvider.GetFormat(Type?)"/>
@@ -3071,6 +3294,47 @@ namespace J2N.Numerics
         }
 
         #endregion ToString
+
+        #region TryFormat
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Tries to format the value of the current 8-bit signed integer number instance into the provided span of characters.
+        /// </summary>
+        /// <param name="destination">The span in which to write this instance's value formatted as a span of characters.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters that were written in
+        /// <paramref name="destination"/>.</param>
+        /// <param name="format">A span containing the characters that represent a standard or custom format string that
+        /// defines the acceptable format for <paramref name="destination"/>.</param>
+        /// <param name="provider">An optional object that supplies culture-specific formatting information for
+        /// <paramref name="destination"/>.</param>
+        /// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+        public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatInt32(value, 0x000000FF, format, provider, destination, out charsWritten);
+        }
+
+        /// <summary>
+        /// Tries to format the value of the <paramref name="value"/> into the provided span of characters.
+        /// </summary>
+        /// <param name="value">The 8-bit signed integer number to format.</param>
+        /// <param name="destination">The span in which to write this instance's value formatted as a span of characters.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters that were written in
+        /// <paramref name="destination"/>.</param>
+        /// <param name="format">A span containing the characters that represent a standard or custom format string that
+        /// defines the acceptable format for <paramref name="destination"/>.</param>
+        /// <param name="provider">An optional object that supplies culture-specific formatting information for
+        /// <paramref name="destination"/>.</param>
+        /// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+        public static bool TryFormat(sbyte value, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatInt32(value, 0x000000FF, format, provider, destination, out charsWritten);
+        }
+
+#endif
+
+        #endregion TryFormat
 
         #region GetInstance (ValueOf)
 

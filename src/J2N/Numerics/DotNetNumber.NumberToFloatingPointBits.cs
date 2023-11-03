@@ -148,8 +148,11 @@ namespace J2N.Numerics
         {
             BigInteger.SetZero(out result);
 
-            //byte* src = number.GetDigitsPointer() + firstIndex;
+#if FEATURE_SPAN
+            byte* src = number.GetDigitsPointer() + firstIndex;
+#else
             fixed (byte* src = &number.Digits[firstIndex])
+#endif
             {
                 uint remaining = lastIndex - firstIndex;
                 uint offset = 0;
@@ -435,8 +438,9 @@ namespace J2N.Numerics
             // computed to the infinitely precise result and then rounded, which means that
             // we can rely on it to produce the correct result when both inputs are exact.
 
-            //byte* src = number.GetDigitsPointer();
-            //byte[] src = number.Digits;
+#if FEATURE_SPAN
+            byte* src = number.GetDigitsPointer();
+#endif
 
             if ((info.DenormalMantissaBits <= 23) && (totalDigits <= 7) && (fastExponent <= 10))
             {
@@ -445,8 +449,12 @@ namespace J2N.Numerics
                 // wrong value when upcasting to double.
 
                 float result;
+#if !FEATURE_SPAN
                 fixed (byte* src = &number.Digits[0])
+#endif
+                {
                     result = DigitsToUInt32(src, (int)(totalDigits));
+                }
                 float scale = s_Pow10SingleTable[fastExponent];
 
                 if (fractionalDigitsPresent != 0)
@@ -468,8 +476,12 @@ namespace J2N.Numerics
             if ((totalDigits <= 15) && (fastExponent <= 22))
             {
                 double result;
+#if !FEATURE_SPAN
                 fixed (byte* src = &number.Digits[0])
+#endif
+                {
                     result = DigitsToUInt64(src, (int)(totalDigits));
+                }
                 double scale = s_Pow10DoubleTable[fastExponent];
 
                 if (fractionalDigitsPresent != 0)

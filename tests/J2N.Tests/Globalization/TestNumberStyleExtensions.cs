@@ -58,10 +58,12 @@ namespace J2N.Globalization
             Assert.DoesNotThrow(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.Float));
             Assert.DoesNotThrow(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.Number));
             Assert.DoesNotThrow(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.HexNumber));
+            Assert.DoesNotThrow(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.Integer | NumberStyle.AllowTypeSpecifier));
+            Assert.DoesNotThrow(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.Float | NumberStyle.AllowTypeSpecifier));
+            Assert.DoesNotThrow(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier));
 
-            var ex1 = Assert.Throws<ArgumentException>(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.Integer | NumberStyle.AllowTypeSpecifier));
-            var ex2 = Assert.Throws<ArgumentException>(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.HexFloat));
-            var ex3 = Assert.Throws<ArgumentException>(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.HexNumber | NumberStyle.Currency));
+            var ex1 = Assert.Throws<ArgumentException>(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.HexFloat));
+            var ex2 = Assert.Throws<ArgumentException>(() => NumberStyleExtensions.ValidateParseStyleInteger(NumberStyle.HexNumber | NumberStyle.Currency));
         }
 
         [Test]

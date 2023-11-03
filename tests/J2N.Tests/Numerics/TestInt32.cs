@@ -637,7 +637,7 @@ namespace J2N.Numerics
 
             Int32 i = new Int32(-80001);
 
-            assertEquals("Returned incorrect String", "-80001", i.ToString());
+            assertEquals("Returned incorrect String", "-80001", i.ToString(CultureInfo.InvariantCulture));
         }
 
         /**
@@ -648,23 +648,37 @@ namespace J2N.Numerics
         {
             // Test for method java.lang.String java.lang.Integer.toString(int)
 
-            assertEquals("Returned incorrect String", "-80765", Int32.ToString(-80765)
-                    );
-            assertEquals("Returned incorrect octal string", "2147483647", Int32.ToString(
-                    int.MaxValue));
-            assertEquals("Returned incorrect octal string", "-2147483647", Int32.ToString(
-                    -int.MaxValue));
-            assertEquals("Returned incorrect octal string", "-2147483648", Int32.ToString(
-                    int.MinValue));
+            //assertEquals("Returned incorrect String", "-80765", Int32.ToString(-80765)
+            //        );
+            //assertEquals("Returned incorrect octal string", "2147483647", Int32.ToString(
+            //        int.MaxValue));
+            //assertEquals("Returned incorrect octal string", "-2147483647", Int32.ToString(
+            //        -int.MaxValue));
+            //assertEquals("Returned incorrect octal string", "-2147483648", Int32.ToString(
+            //        int.MinValue));
+
+            //// Test for HARMONY-6068
+            //assertEquals("Returned incorrect octal String", "-1000", Int32.ToString(-1000));
+            //assertEquals("Returned incorrect octal String", "1000", Int32.ToString(1000));
+            //assertEquals("Returned incorrect octal String", "0", Int32.ToString(0));
+            //assertEquals("Returned incorrect octal String", "708", Int32.ToString(708));
+            //assertEquals("Returned incorrect octal String", "-100", Int32.ToString(-100));
+            //assertEquals("Returned incorrect octal String", "-1000000008", Int32.ToString(-1000000008));
+            //assertEquals("Returned incorrect octal String", "2000000008", Int32.ToString(2000000008));
+
+            Test_toString(-80765, "-80765");
+            Test_toString(int.MaxValue, "2147483647");
+            Test_toString(-int.MaxValue, "-2147483647");
+            Test_toString(int.MinValue, "-2147483648");
 
             // Test for HARMONY-6068
-            assertEquals("Returned incorrect octal String", "-1000", Int32.ToString(-1000));
-            assertEquals("Returned incorrect octal String", "1000", Int32.ToString(1000));
-            assertEquals("Returned incorrect octal String", "0", Int32.ToString(0));
-            assertEquals("Returned incorrect octal String", "708", Int32.ToString(708));
-            assertEquals("Returned incorrect octal String", "-100", Int32.ToString(-100));
-            assertEquals("Returned incorrect octal String", "-1000000008", Int32.ToString(-1000000008));
-            assertEquals("Returned incorrect octal String", "2000000008", Int32.ToString(2000000008));
+            Test_toString(-1000, "-1000");
+            Test_toString(1000, "1000");
+            Test_toString(0, "0");
+            Test_toString(708, "708");
+            Test_toString(-100, "-100");
+            Test_toString(-1000000008, "-1000000008");
+            Test_toString(2000000008, "2000000008");
         }
 
         // J2N: Moved to IntegralNumberExtensions
@@ -994,29 +1008,61 @@ namespace J2N.Numerics
             //assertFalse(fixture.Equals("Not a Integer"));
         }
 
+        // J2N: Centralizes ToString()/TryFormat() logic to allow testing all overloads
+
+        private void Test_toString(int ii, string answer)
+        {
+            // Test for method java.lang.String java.lang.Double.toString(double)
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int32.ToString(ii, null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int32.ToString(ii, null, J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+            Int32 i = new Int32(ii);
+            assertTrue("Incorrect String representation want " + answer + ", got ("
+                    + Int32.ToString(i.ToInt32(), null, J2N.Text.StringFormatter.InvariantCulture) + ")", Int32.ToString(i.ToInt32(), null, J2N.Text.StringFormatter.InvariantCulture).Equals(
+                    answer));
+            assertTrue("Incorrect String representation want " + answer + ", got (" + i.ToString(J2N.Text.StringFormatter.InvariantCulture)
+                    + ")", i.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
+
+#if FEATURE_SPAN
+            Span<char> buffer = stackalloc char[64];
+            assertTrue(i.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+            string actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+
+            assertTrue(Int32.TryFormat(ii, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
+            actual = buffer.Slice(0, charsWritten).ToString();
+            assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
+#endif
+        }
+
         /**
          * @tests java.lang.Integer#toString()
          */
         [Test]
         public void Test_toString() // J2N TODO: Culture tests
         {
-            assertEquals("-1", new Int32(-1).ToString());
-            assertEquals("0", new Int32(0).ToString());
-            assertEquals("1", new Int32(1).ToString());
-            assertEquals("-1", new Int32(unchecked((int)0xFFFFFFFF)).ToString());
+            //assertEquals("-1", new Int32(-1).ToString());
+            //assertEquals("0", new Int32(0).ToString());
+            //assertEquals("1", new Int32(1).ToString());
+            //assertEquals("-1", new Int32(unchecked((int)0xFFFFFFFF)).ToString());
+
+            Test_toString((int)-1, "-1");
+            Test_toString((int)0, "0");
+            Test_toString((int)1, "1");
+            Test_toString(unchecked((int)0xFFFFFFFF), "-1");
         }
 
-        /**
-         * @tests java.lang.Integer#toString
-         */
-        [Test]
-        public void Test_toStringI() // J2N TODO: Culture tests
-        {
-            assertEquals("-1", Int32.ToString(-1));
-            assertEquals("0", Int32.ToString(0));
-            assertEquals("1", Int32.ToString(1));
-            assertEquals("-1", Int32.ToString(unchecked((int)0xFFFFFFFF)));
-        }
+        // J2N: Same values as above. No need to run again.
+        ///**
+        // * @tests java.lang.Integer#toString
+        // */
+        //[Test]
+        //public void Test_toStringI() // J2N TODO: Culture tests
+        //{
+        //    assertEquals("-1", Int32.ToString(-1));
+        //    assertEquals("0", Int32.ToString(0));
+        //    assertEquals("1", Int32.ToString(1));
+        //    assertEquals("-1", Int32.ToString(unchecked((int)0xFFFFFFFF)));
+        //}
 
         /**
          * @tests java.lang.Integer#valueOf(String)
@@ -1938,6 +1984,43 @@ namespace J2N.Numerics
                         yield return new TestCaseData(0, "0", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(unchecked((int)0x80000000), "-2147483648", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(0x7fffffff, "2147483647", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Custom
+
+                        yield return new TestCaseData(0x007b, "0x007b", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // J2N: Allow 0x to be specified in the string
+                        yield return new TestCaseData(0x007b, "0x007bL", NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo); // J2N: Allow 0x to be specified in the string
+                        yield return new TestCaseData(100, "64L", NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(0x007b, "0x007bL  ", NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo); // J2N: Allow trailing whitespace
+
+                        // Tests for AllowTypeSpecifier
+                        yield return new TestCaseData(100, "100L", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100U", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100l", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100u", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100, "100UL", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100ul", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100Ul", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100uL", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100, "100LU", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100lu", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100Lu", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100lU", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100, "100D", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100d", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100F", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100f", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100M", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100m", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(100, "100.0D", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100.0d", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100.0F", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100.0f", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100.0M", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(100, "100.0m", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
@@ -1993,6 +2076,49 @@ namespace J2N.Numerics
                         yield return new TestCaseData(typeof(OverflowException), "-2147483649", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
                         yield return new TestCaseData(typeof(OverflowException), /*"-80000001"*/ "100000000", NumberStyle.HexNumber, NumberFormatInfo.InvariantInfo); // J2N:  2's complement required
                         yield return new TestCaseData(typeof(OverflowException), "9999999999", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // Custom
+
+                        // Tests for AllowTypeSpecifier
+
+                        yield return new TestCaseData(typeof(FormatException), "100L", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100U", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100l", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100u", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100UL", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100ul", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100Ul", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100uL", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100LU", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100lu", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100Lu", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100lU", NumberStyle.Integer, NumberFormatInfo.InvariantInfo);
+
+                        // These are not valid ways of specifying long or unsigned types (they do not compile with a decimal point)
+                        yield return new TestCaseData(typeof(FormatException), "100.0L", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0U", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0l", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0u", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100.0UL", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0ul", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0Ul", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0uL", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        yield return new TestCaseData(typeof(FormatException), "100.0LU", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0lu", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0Lu", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0lU", NumberStyle.Integer | NumberStyle.AllowDecimalPoint | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+
+                        // We need to use AllowDecimalPoint for these to work.
+                        yield return new TestCaseData(typeof(FormatException), "100.0D", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0d", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0F", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0f", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0M", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
+                        yield return new TestCaseData(typeof(FormatException), "100.0m", NumberStyle.Integer | NumberStyle.AllowTypeSpecifier, NumberFormatInfo.InvariantInfo);
                     }
                 }
 
@@ -2007,12 +2133,15 @@ namespace J2N.Numerics
 
             public abstract class Parse_CharSequence_Int32_TestCase : ParseTestCase
             {
+                protected virtual bool IsNullableType => true;
                 protected abstract int GetResult(string value, int radix);
 
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Data")]
                 public virtual void TestParse_CharSequence_Int32(int expected, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     var actual = GetResult(value, radix);
                     assertEquals($"Int32.Parse(string, IFormatProvider) failed. String: \"{value}\" Result: {actual}", expected, actual);
                 }
@@ -2021,6 +2150,8 @@ namespace J2N.Numerics
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_ForException_Data")]
                 public virtual void TestParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     Assert.Throws(expectedExceptionType, () => GetResult(value, radix));
                 }
             }
@@ -2033,16 +2164,16 @@ namespace J2N.Numerics
                 }
             }
 
-            // J2N: ReadOnlySpan<char> not supported at this time on this overload (not supported in .NET anyway)
-            //#if FEATURE_READONLYSPAN
-            //            public class Parse_ReadOnlySpan_Int32 : Parse_CharSequence_Int32_TestCase
-            //            {
-            //                protected override int GetResult(string s, int radix)
-            //                {
-            //                    return Int32.Parse(s.AsSpan(), radix);
-            //                }
-            //            }
-            //#endif
+#if FEATURE_SPAN
+            public class Parse_ReadOnlySpan_Int32 : Parse_CharSequence_Int32_TestCase
+            {
+                protected override bool IsNullableType => false;
+                protected override int GetResult(string s, int radix)
+                {
+                    return Int32.Parse(s.AsSpan(), radix);
+                }
+            }
+#endif
 
             #endregion Parse_CharSequence_Int32
 
@@ -2109,7 +2240,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_Int32_Int32_Int32_Int32 : Parse_CharSequence_Int32_Int32_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2193,7 +2324,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_Int32_Int32_Int32_Int32 : TryParse_CharSequence_Int32_Int32_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2211,12 +2342,15 @@ namespace J2N.Numerics
 
             public abstract class TryParse_CharSequence_Int32_TestCase : ParseTestCase
             {
+                protected virtual bool IsNullableType => true;
                 protected abstract bool GetResult(string value, int radix, out int result);
 
 
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_Data")]
                 public virtual void TestTryParse_CharSequence_Int32(int expected, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     assertTrue(GetResult(value, radix, out int actual));
                     assertEquals($"Int32.TryParse(string, out int) failed. String: \"{value}\" Result: {actual}", expected, actual);
                 }
@@ -2225,6 +2359,8 @@ namespace J2N.Numerics
                 [TestCaseSource(typeof(ParseTestCase), "TestParse_CharSequence_Int32_ForException_Data")]
                 public virtual void TestTryParse_CharSequence_Int32_ForException(Type expectedExceptionType, string value, int radix)
                 {
+                    Assume.That(IsNullableType || (!IsNullableType && value != null), "null is not supported by this character sequence type.");
+
                     int actual = 0;
                     if (expectedExceptionType != typeof(ArgumentOutOfRangeException))
                     {
@@ -2246,16 +2382,16 @@ namespace J2N.Numerics
                 }
             }
 
-            // J2N: ReadOnlySpan<char> not supported at this time on this overload (not supported in .NET anyway)
-            //#if FEATURE_READONLYSPAN
-            //            public class TryParse_ReadOnlySpan_Int32 : TryParse_CharSequence_Int32_TestCase
-            //            {
-            //                protected override bool GetResult(string s, int radix, out int result)
-            //                {
-            //                    return Int32.TryParse(s.AsSpan(), radix, out result);
-            //                }
-            //            }
-            //#endif
+#if FEATURE_SPAN
+            public class TryParse_ReadOnlySpan_Int32 : TryParse_CharSequence_Int32_TestCase
+            {
+                protected override bool IsNullableType => false;
+                protected override bool GetResult(string s, int radix, out int result)
+                {
+                    return Int32.TryParse(s.AsSpan(), radix, out result);
+                }
+            }
+#endif
 
             #endregion Parse_CharSequence_Int32
 
@@ -2335,7 +2471,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2393,7 +2529,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : TryParse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2453,7 +2589,7 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_TestCase : TryParse_CharSequence_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2999,7 +3135,7 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload
-            //#if FEATURE_READONLYSPAN
+            //#if FEATURE_SPAN
             //            public class Decode_ReadOnlySpan : Decode_CharSequence_TestCase
             //            {
             //                protected override Int32 GetResult(string s)
@@ -3041,7 +3177,7 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload
-            //#if FEATURE_READONLYSPAN
+            //#if FEATURE_SPAN
             //            public class TryDecode_ReadOnlySpan : TryDecode_CharSequence_TestCase
             //            {
             //                protected override bool GetResult(string s, out Int32 result)

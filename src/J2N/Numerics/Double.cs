@@ -935,7 +935,7 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseDouble(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
 
         /// <summary>
         /// Converts the string representation of a number in a character span to its double-precision floating-point number equivalent.
@@ -1105,7 +1105,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Or, if <paramref name="style"/> includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <para/>
-        /// [ws] [$] [sign][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
+        /// [ws] [$] [sign][0x][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
         /// <para/>
         /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
         /// <para/>
@@ -1138,6 +1138,10 @@ namespace J2N.Numerics
         ///         <term><i>integral-digits</i></term>
         ///         <term>A series of digits ranging from 0 to 9 that specify the integral part of the number. The <i>integral-digits</i> element can be absent
         ///             if the string contains the <i>fractional-digits</i> element.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -1185,8 +1189,10 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><i>type</i></term>
-        ///         <term>The 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
-        ///         [real type suffix](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#real-literals)
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
         ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
         ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. If <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/>
         ///         flag, specifying the <see cref="NumberStyle.AllowExponent"/> is required. Including an exponent in the string (prefixed with 'p' or 'P') is
@@ -1251,7 +1257,8 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
-        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -1331,7 +1338,7 @@ namespace J2N.Numerics
             return DotNetNumber.ParseDouble(s, style, NumberFormatInfo.GetInstance(provider));
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         /// <summary>
         /// Converts a character span that contains the string representation of a number in a specified style and culture-specific format to
         /// its double-precision floating-point number equivalent.
@@ -1385,7 +1392,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Or, if <paramref name="style"/> includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <para/>
-        /// [ws] [$] [sign][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
+        /// [ws] [$] [sign][0x][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
         /// <para/>
         /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
         /// <para/>
@@ -1418,6 +1425,10 @@ namespace J2N.Numerics
         ///         <term><i>integral-digits</i></term>
         ///         <term>A series of digits ranging from 0 to 9 that specify the integral part of the number. The <i>integral-digits</i> element can be absent
         ///             if the string contains the <i>fractional-digits</i> element.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -1465,8 +1476,10 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><i>type</i></term>
-        ///         <term>The 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
-        ///         [real type suffix](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#real-literals)
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
         ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
         ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. If <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/>
         ///         flag, specifying the <see cref="NumberStyle.AllowExponent"/> is required. Including an exponent in the string (prefixed with 'p' or 'P') is
@@ -1531,7 +1544,8 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
-        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -1676,7 +1690,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Or, if <paramref name="style"/> includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <para/>
-        /// [ws] [$] [sign][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
+        /// [ws] [$] [sign][0x][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
         /// <para/>
         /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
         /// <para/>
@@ -1709,6 +1723,10 @@ namespace J2N.Numerics
         ///         <term><i>integral-digits</i></term>
         ///         <term>A series of digits ranging from 0 to 9 that specify the integral part of the number. The <i>integral-digits</i> element can be absent
         ///             if the string contains the <i>fractional-digits</i> element.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -1756,8 +1774,10 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><i>type</i></term>
-        ///         <term>The 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
-        ///         [real type suffix](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#real-literals)
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
         ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
         ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. If <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/>
         ///         flag, specifying the <see cref="NumberStyle.AllowExponent"/> is required. Including an exponent in the string (prefixed with 'p' or 'P') is
@@ -1822,7 +1842,8 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
-        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -1904,7 +1925,7 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseDouble(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to
         /// its double-precision floating-point number equivalent. A return value indicates whether the
@@ -1968,7 +1989,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Or, if <paramref name="style"/> includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <para/>
-        /// [ws] [$] [sign][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
+        /// [ws] [$] [sign][0x][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
         /// <para/>
         /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
         /// <para/>
@@ -2001,6 +2022,10 @@ namespace J2N.Numerics
         ///         <term><i>integral-digits</i></term>
         ///         <term>A series of digits ranging from 0 to 9 that specify the integral part of the number. The <i>integral-digits</i> element can be absent
         ///             if the string contains the <i>fractional-digits</i> element.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -2048,8 +2073,10 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><i>type</i></term>
-        ///         <term>The 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
-        ///         [real type suffix](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#real-literals)
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
         ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
         ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. If <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/>
         ///         flag, specifying the <see cref="NumberStyle.AllowExponent"/> is required. Including an exponent in the string (prefixed with 'p' or 'P') is
@@ -2114,7 +2141,8 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.AllowTypeSpecifier"/></term>
-        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# or Java.</term>
+        ///         <term>The literal <i>type</i> suffix used in the literal identifier syntax of C# (suffixed with one of
+        ///         'D', 'd', 'F', 'f', 'M', 'm', 'L', 'l', 'U', 'u', 'UL', 'ul', 'LU', or 'lu').</term>
         ///     </item>
         ///     <item>
         ///         <term><see cref="NumberStyle.Currency"/></term>
@@ -3019,6 +3047,47 @@ namespace J2N.Numerics
 
         #endregion ToString
 
+        #region TryFormat
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Tries to format the value of the current double instance into the provided span of characters.
+        /// </summary>
+        /// <param name="destination">The span in which to write this instance's value formatted as a span of characters.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters that were written in
+        /// <paramref name="destination"/>.</param>
+        /// <param name="format">A span containing the characters that represent a standard or custom format string that
+        /// defines the acceptable format for <paramref name="destination"/>.</param>
+        /// <param name="provider">An optional object that supplies culture-specific formatting information for
+        /// <paramref name="destination"/>.</param>
+        /// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+        public override bool TryFormat(Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatDouble(value, format, provider, destination, out charsWritten);
+        }
+
+        /// <summary>
+        /// Tries to format the value of the <paramref name="value"/> into the provided span of characters.
+        /// </summary>
+        /// <param name="value">The double number to format.</param>
+        /// <param name="destination">The span in which to write this instance's value formatted as a span of characters.</param>
+        /// <param name="charsWritten">When this method returns, contains the number of characters that were written in
+        /// <paramref name="destination"/>.</param>
+        /// <param name="format">A span containing the characters that represent a standard or custom format string that
+        /// defines the acceptable format for <paramref name="destination"/>.</param>
+        /// <param name="provider">An optional object that supplies culture-specific formatting information for
+        /// <paramref name="destination"/>.</param>
+        /// <returns><c>true</c> if the formatting was successful; otherwise, <c>false</c>.</returns>
+        public static bool TryFormat(double value, Span<char> destination, out int charsWritten, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+        {
+            return DotNetNumber.TryFormatDouble(value, format, provider, destination, out charsWritten);
+        }
+
+#endif
+
+        #endregion TryFormat
+
         #region Compare
 
         /// <summary>
@@ -3230,7 +3299,7 @@ namespace J2N.Numerics
         /// <para/>
         /// Or, if <paramref name="style"/> includes <see cref="NumberStyle.AllowHexSpecifier"/>:
         /// <para/>
-        /// [ws] [$] [sign][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
+        /// [ws] [$] [sign][0x][hexdigits,]hexdigits[.[fractional-hexdigits]][P[sign]exponential-digits][type][ws]
         /// <para/>
         /// Elements framed in square brackets ([ and ]) are optional. The following table describes each element.
         /// <para/>
@@ -3263,6 +3332,10 @@ namespace J2N.Numerics
         ///         <term><i>integral-digits</i></term>
         ///         <term>A series of digits ranging from 0 to 9 that specify the integral part of the number. The <i>integral-digits</i> element can be absent
         ///             if the string contains the <i>fractional-digits</i> element.</term>
+        ///     </item>
+        ///     <item>
+        ///         <term><i>0x</i>/></term>
+        ///         <term>The '0x' or '0X' characters, which indicate a hexadecimal number is to immediately follow.</term>
         ///     </item>
         ///     <item>
         ///         <term><i>hexdigits</i></term>
@@ -3310,8 +3383,10 @@ namespace J2N.Numerics
         ///     </item>
         ///     <item>
         ///         <term><i>type</i></term>
-        ///         <term>The 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
-        ///         [real type suffix](https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#real-literals)
+        ///         <term>The 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu', which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6453-integer-literals">integral type suffix</a>
+        ///         or 'f', 'F', 'd', 'D', 'm' or 'M' character, which is the
+        ///         <a href="https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/lexical-structure#6454-real-literals">real type suffix</a>
         ///         of the number as specified in the C# language specification. The type suffix can appear in <paramref name="s"/> if <paramref name="style"/>
         ///         includes the <see cref="NumberStyle.AllowTypeSpecifier"/> flag. If <paramref name="style"/> includes the <see cref="NumberStyle.AllowHexSpecifier"/>
         ///         flag, specifying the <see cref="NumberStyle.AllowExponent"/> is required. Including an exponent in the string (prefixed with 'p' or 'P') is

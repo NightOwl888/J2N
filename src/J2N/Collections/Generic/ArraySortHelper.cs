@@ -31,7 +31,7 @@ namespace J2N.Collections.Generic
             // Add a try block here to detect bogus comparisons
             try
             {
-                IntrospectiveSort(keys, comparer);
+                IntrospectiveSort(keys, comparer!);
             }
             catch (IndexOutOfRangeException)
             {
@@ -71,7 +71,7 @@ namespace J2N.Collections.Generic
 
             if (keys.Length > 1)
             {
-                IntroSort(keys, 2 * (BitOperation.Log2((uint)keys.Length) + 1), comparer);
+                IntroSort(keys, 2 * (BitOperation.Log2((uint)keys.Length) + 1), comparer!);
             }
         }
 
@@ -89,33 +89,33 @@ namespace J2N.Collections.Generic
 
                     if (partitionSize == 2)
                     {
-                        SwapIfGreater(keys, comparer, 0, 1);
+                        SwapIfGreater(keys, comparer!, 0, 1);
                         return;
                     }
 
                     if (partitionSize == 3)
                     {
-                        SwapIfGreater(keys, comparer, 0, 1);
-                        SwapIfGreater(keys, comparer, 0, 2);
-                        SwapIfGreater(keys, comparer, 1, 2);
+                        SwapIfGreater(keys, comparer!, 0, 1);
+                        SwapIfGreater(keys, comparer!, 0, 2);
+                        SwapIfGreater(keys, comparer!, 1, 2);
                         return;
                     }
 
-                    InsertionSort(keys.Slice(0, partitionSize), comparer);
+                    InsertionSort(keys.Slice(0, partitionSize), comparer!);
                     return;
                 }
 
                 if (depthLimit == 0)
                 {
-                    HeapSort(keys.Slice(0, partitionSize), comparer);
+                    HeapSort(keys.Slice(0, partitionSize), comparer!);
                     return;
                 }
                 depthLimit--;
 
-                int p = PickPivotAndPartition(keys.Slice(0, partitionSize), comparer);
+                int p = PickPivotAndPartition(keys.Slice(0, partitionSize), comparer!);
 
                 // Note we've already partitioned around the pivot and do not have to move the pivot again.
-                IntroSort(keys[(p + 1)..partitionSize], depthLimit, comparer);
+                IntroSort(keys[(p + 1)..partitionSize], depthLimit, comparer!);
                 partitionSize = p;
             }
         }
@@ -131,9 +131,9 @@ namespace J2N.Collections.Generic
             int middle = hi >> 1;
 
             // Sort lo, mid and hi appropriately, then pick mid as the pivot.
-            SwapIfGreater(keys, comparer, 0, middle);  // swap the low with the mid point
-            SwapIfGreater(keys, comparer, 0, hi);   // swap the low with the high
-            SwapIfGreater(keys, comparer, middle, hi); // swap the middle with the high
+            SwapIfGreater(keys, comparer!, 0, middle);  // swap the low with the mid point
+            SwapIfGreater(keys, comparer!, 0, hi);   // swap the low with the high
+            SwapIfGreater(keys, comparer!, middle, hi); // swap the middle with the high
 
             T pivot = keys[middle];
             Swap(keys, middle, hi - 1);
@@ -141,8 +141,8 @@ namespace J2N.Collections.Generic
 
             while (left < right)
             {
-                while (comparer(keys[++left], pivot) < 0) ;
-                while (comparer(pivot, keys[--right]) < 0) ;
+                while (comparer!(keys[++left], pivot) < 0) ;
+                while (comparer!(pivot, keys[--right]) < 0) ;
 
                 if (left >= right)
                     break;
@@ -166,13 +166,13 @@ namespace J2N.Collections.Generic
             int n = keys.Length;
             for (int i = n >> 1; i >= 1; i--)
             {
-                DownHeap(keys, i, n, 0, comparer);
+                DownHeap(keys, i, n, 0, comparer!);
             }
 
             for (int i = n; i > 1; i--)
             {
                 Swap(keys, 0, i - 1);
-                DownHeap(keys, 1, i - 1, 0, comparer);
+                DownHeap(keys, 1, i - 1, 0, comparer!);
             }
         }
 
@@ -186,12 +186,12 @@ namespace J2N.Collections.Generic
             while (i <= n >> 1)
             {
                 int child = 2 * i;
-                if (child < n && comparer(keys[lo + child - 1], keys[lo + child]) < 0)
+                if (child < n && comparer!(keys[lo + child - 1], keys[lo + child]) < 0)
                 {
                     child++;
                 }
 
-                if (!(comparer(d, keys[lo + child - 1]) < 0))
+                if (!(comparer!(d, keys[lo + child - 1]) < 0))
                     break;
 
                 keys[lo + i - 1] = keys[lo + child - 1];

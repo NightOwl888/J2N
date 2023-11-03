@@ -792,7 +792,7 @@ namespace J2N.Text
             if (startIndex > value.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
-#if FEATURE_SPAN
+#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
             return text.Insert(index, value.AsSpan(startIndex, charCount));
 #else
             return text.Insert(index, value.Substring(startIndex, charCount));

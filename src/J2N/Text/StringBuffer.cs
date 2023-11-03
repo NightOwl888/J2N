@@ -566,7 +566,7 @@ namespace J2N.Text
 
         #region Append
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_STRINGBUILDER_APPEND_READONLYSPAN
 
         /// <summary>
         /// Appends a copy of the specified <see cref="ReadOnlySpan{Char}"/> to this instance.
@@ -1704,7 +1704,7 @@ namespace J2N.Text
 
         #region Equals
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_STRINGBUILDER_EQUALS_READONLYSPAN
 
         /// <summary>
         /// Returns a value indicating whether this instance is equal to a specified object.
@@ -1794,7 +1794,7 @@ namespace J2N.Text
 
         #region Insert
 
-#if FEATURE_READONLYSPAN
+#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
 
         /// <summary>
         /// Inserts the string representation of a <see cref="ReadOnlySpan{Char}"/> value into this instance at the specified character position.

@@ -107,7 +107,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestValueOfPow52()
@@ -145,7 +145,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestValueOfMulPow52()
@@ -175,7 +175,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestLeftShift()
@@ -237,7 +237,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestQuoRemIteration()
@@ -281,7 +281,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestCmp()
@@ -341,7 +341,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestAddAndCmp()
@@ -385,7 +385,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestMultBy10()
@@ -414,7 +414,7 @@ namespace J2N.Numerics
             check(bt * biPow52(p5, p2), r, "multByPow52 returns wrong result");
         }
         [Test]
-#if !FEATURE_READONLYSPAN
+#if !FEATURE_BIGINTEGER_CTOR_READONLYSPAN
         [Ignore("J2N TODO: Little Endian ToBigInteger() is failing to produce the correct results")]
 #endif
         public void TestMultByPow52()

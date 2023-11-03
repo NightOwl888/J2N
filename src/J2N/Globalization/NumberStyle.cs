@@ -132,12 +132,33 @@ namespace J2N.Globalization
 
         /// <summary>
         /// Indicates that the numeric string represents a number expressed as a
-        /// C# or Java literal string, such as <c>3.14159f</c> or <c>4.972135238332232d</c>.
-        /// This option only applies to floating point numbers <see cref="float"/> and <see cref="double"/>, however,
-        /// the real type suffix 'd', 'D', 'f', 'F', 'm' or 'M' are all valid for each floating point type.
-        /// If this option is used with <see cref="AllowHexSpecifier"/>, then 'd', 'D', 'f', or 'F' are all treated as
-        /// hexadecimal values unless an exponent (beginning with 'p') is also supplied (i.e. <c>0x1.8p1f</c>) so it must be
-        /// used in conjunction with <see cref="AllowExponent"/> for hexadecimal values.
+        /// C# or Java literal string, such as <c>3.14159f</c>, <c>145L</c> or <c>4.972135238332232d</c>.
+        /// This option applies to both floating point numbers and integral numbers.
+        /// The
+        /// <para/>
+        /// If this option is used without <see cref="AllowHexSpecifier"/>, the  type suffix
+        /// 'D', 'd', 'F', 'f', 'M', 'm', 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu'
+        /// are all valid for all numeric types.
+        /// <para/>
+        /// If this option is used with <see cref="AllowHexSpecifier"/>, the destination data type
+        /// determines the type specifiers that can be used.
+        /// <list type="table">
+        ///     <item>
+        ///         <term>Integral Types</term>
+        ///         <description>Only 'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu' are allowed.</description>
+        ///     </item>
+        ///     <item>
+        ///         <term>Floating Point Types</term>
+        ///         <description>'d', 'D', 'f', or 'F' are all treated as hexadecimal values unless an
+        ///         exponent (beginning with 'p') is also supplied (i.e. <c>0x1.8p1f</c>). In these cases,
+        ///         <see cref="AllowExponent"/> is also required.
+        ///         <para/>
+        ///         'UL', 'Ul', 'uL', 'ul', 'LU', 'Lu', 'lU', or 'lu' may be used as long as the
+        ///         numeric representation of the number does not contain a decimal point.
+        ///         </description>
+        ///     </item>
+        /// </list>
+        /// <para/>
         /// Note the type is simply ignored during the parse when you specify this option (which is how it works in Java).
         /// </summary>
         AllowTypeSpecifier = 0x00000400, // J2N specific
@@ -252,15 +273,14 @@ namespace J2N.Globalization
         internal static void ValidateParseStyleInteger(NumberStyle style)
         {
             // Check for undefined flags or invalid hex number flags.
-            // Since we are cascading the call to .NET in this case, we must not allow any custom J2N flags here.
-            if ((style & (~ValidNumberStyles | NumberStyle.AllowHexSpecifier)) != 0
-                && (style & ~NumberStyle.HexNumber) != 0)
+            if ((style & (~ValidNumberStyle | NumberStyle.AllowHexSpecifier)) != 0
+                && (style & ~(NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier)) != 0) // J2N: Note that we don't support AllowTypeSpecifier for hexadecimal integer types
             {
                 throwInvalid(style);
 
                 void throwInvalid(NumberStyle value)
                 {
-                    if ((value & ~ValidNumberStyles) != 0)
+                    if ((value & ~ValidNumberStyle) != 0)
                     {
                         throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidNumberStyle, value & ~ValidNumberStyles), nameof(style));
                     }

@@ -5,6 +5,7 @@
   
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup>
