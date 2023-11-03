@@ -783,6 +783,68 @@ namespace J2N
             }
         }
 
+#if FEATURE_SPAN
+
+        [Test]
+        public void Test_toCharsI_Span() // J2N: Added overload to cover Span<char>
+        {
+            char[] dest = new char[2];
+            Span<char> dst = dest;
+            int result = Character.ToChars(0x10000, dst, 0);
+            assertEquals(2, result);
+            assertTrue(dst.SequenceEqual(new char[] { '\uD800', '\uDC00' }));
+
+            result = Character.ToChars(0x10001, dst, 0);
+            assertEquals(2, result);
+            assertTrue(dst.SequenceEqual(new char[] { '\uD800', '\uDC01' }));
+
+            result = Character.ToChars(0x10401, dst, 0);
+            assertEquals(2, result);
+            assertTrue(dst.SequenceEqual(new char[] { '\uD801', '\uDC01' }));
+
+            result = Character.ToChars(0x10FFFF, dst, 0);
+            assertEquals(2, result);
+            assertTrue(dst.SequenceEqual(new char[] { '\uDBFF', '\uDFFF' }));
+
+            try
+            {
+                Character.ToChars(int.MaxValue, new char[2].AsSpan(), 0);
+                fail("No IAE, invalid code point.");
+            }
+            catch (ArgumentException e)
+            {
+            }
+
+            //try
+            //{
+            //    Character.ToChars('a', null, 0);
+            //    fail("No NPE, null char[].");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //}
+
+            try
+            {
+                Character.ToChars('a', new char[1].AsSpan(), -1);
+                fail("No IOOBE, negative index.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.ToChars('a', new char[1].AsSpan(), 1);
+                fail("No IOOBE, index equal to length.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+        }
+
+#endif
+
         [Test]
         public void Test_toCharsI()
         {
@@ -798,6 +860,43 @@ namespace J2N
             try
             {
                 Character.ToChars(int.MaxValue);
+                fail("No IAE, invalid code point.");
+            }
+            catch (ArgumentException e)
+            {
+            }
+        }
+
+        [Test]
+        public void Test_toCharsI_Out() // J2N: Added overload to avoid heap allocation
+        {
+            char high, low;
+            int length;
+
+            length = Character.ToChars(0x10000, out high, out low);
+            assertEquals(2, length);
+            assertEquals('\uD800', high);
+            assertEquals('\uDC00', low);
+
+            length = Character.ToChars(0x10001, out high, out low);
+            assertEquals(2, length);
+            assertEquals('\uD800', high);
+            assertEquals('\uDC01', low);
+
+            length = Character.ToChars(0x10401, out high, out low);
+            assertEquals(2, length);
+            assertEquals('\uD801', high);
+            assertEquals('\uDC01', low);
+
+            length = Character.ToChars(0x10FFFF, out high, out low);
+            assertEquals(2, length);
+            assertEquals('\uDBFF', high);
+            assertEquals('\uDFFF', low);
+
+
+            try
+            {
+                Character.ToChars(int.MaxValue, out high, out low);
                 fail("No IAE, invalid code point.");
             }
             catch (ArgumentException e)

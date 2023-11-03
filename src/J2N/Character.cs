@@ -1019,6 +1019,55 @@ namespace J2N
             return low;
         }
 
+#if FEATURE_SPAN
+        /// <summary>
+        /// Converts the specified Unicode code point into a UTF-16 encoded sequence
+        /// and copies the value(s) into the <see cref="Span{T}"/> <paramref name="destination"/>, starting at
+        /// index <paramref name="destinationIndex"/>.
+        /// </summary>
+        /// <param name="codePoint">The Unicode code point to encode.</param>
+        /// <param name="destination">The destination span to copy the encoded value into.</param>
+        /// <param name="destinationIndex">The index in <paramref name="destination"/> from where to start copying.</param>
+        /// <returns>The number of <see cref="char"/> value units copied into <paramref name="destination"/>.</returns>
+        /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="destinationIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="destinationIndex"/> is greater than or equal to <c><paramref name="destination"/>.Length</c>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="destinationIndex"/> equals <c><paramref name="destination"/>.Length - 1</c> when 
+        /// <paramref name="codePoint"/> is a supplementary code point (<see cref="IsSupplementaryCodePoint(int)"/>).
+        /// </exception>
+        public static int ToChars(int codePoint, Span<char> destination, int destinationIndex)
+        {
+            if (!IsValidCodePoint(codePoint))
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+            if (destinationIndex < 0 || destinationIndex >= destination.Length)
+                throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+
+            if (IsSupplementaryCodePoint(codePoint))
+            {
+                if (destinationIndex == destination.Length - 1)
+                    throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+                // See RFC 2781, Section 2.1
+                // http://www.faqs.org/rfcs/rfc2781.html
+                int cpPrime = codePoint - 0x10000;
+                int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
+                int low = 0xDC00 | (cpPrime & 0x3FF);
+                destination[destinationIndex] = (char)high;
+                destination[destinationIndex + 1] = (char)low;
+                return 2;
+            }
+
+            destination[destinationIndex] = (char)codePoint;
+            return 1;
+        }
+#endif
+
         /// <summary>
         /// Converts the specified Unicode code point into a UTF-16 encoded sequence
         /// and copies the value(s) into the char array <paramref name="destination"/>, starting at
@@ -1120,7 +1169,7 @@ namespace J2N
         /// just one character (the <paramref name="high"/> value).
         /// </returns>
         /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
-        internal static int ToChars(int codePoint, out char high, out char low) // J2N TODO: Make public?
+        public static int ToChars(int codePoint, out char high, out char low)
         {
             if (!IsValidCodePoint(codePoint))
             {
