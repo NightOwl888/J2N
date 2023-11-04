@@ -2859,8 +2859,27 @@ namespace J2N
         // allow us to make the conversion. Character seems like the most logical place to do this being that there is no way to dynamically
         // add a construtor to System.String and this is the place in J2N that deals the most with code points.
 
+#if FEATURE_SPAN
+
         /// <summary>
-        /// Converts an an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// Converts a sequence <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// <para/>
+        /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
+        /// the .NET equivalent of that constructor overload, however this overload is provided for convenience and assumes the
+        /// whole array will be converted. <see cref="ToString(int[], int, int)"/> allows conversion of a partial array of code points to a
+        /// <see cref="string"/>.
+        /// </summary>
+        /// <param name="codePoints">A <see cref="ReadOnlySpan{T}"/> of UTF-32 code points.</param>
+        /// <returns>A string containing the UTF-16 character equivalent of <paramref name="codePoints"/>.</returns>
+        /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
+        /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
+        public static string ToString(ReadOnlySpan<int> codePoints)
+            => ToStringImpl(codePoints, 0, codePoints.Length);
+
+#endif
+
+        /// <summary>
+        /// Converts an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
         /// <para/>
         /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
         /// the .NET equivalent of that constructor overload, however this overload is provided for convenience and assumes the
@@ -2877,11 +2896,37 @@ namespace J2N
             if (codePoints is null)
                 throw new ArgumentNullException(nameof(codePoints));
 
-            return ToString(codePoints, 0, codePoints.Length);
+            return ToStringImpl(codePoints, 0, codePoints.Length);
         }
 
+#if FEATURE_SPAN
+
         /// <summary>
-        /// Converts an an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// Converts a sequence <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// <para/>
+        /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
+        /// the .NET equivalent of that constructor overload.
+        /// </summary>
+        /// <param name="codePoints">A <see cref="ReadOnlySpan{T}"/> of UTF-32 code points.</param>
+        /// <param name="startIndex">The index of the first code point to convert.</param>
+        /// <param name="length">The number of code point elements to to convert to UTF-32 code units and include in the result.</param>
+        /// <returns>A <see cref="string"/> containing the UTF-16 code units that correspond to the specified range of <paramref name="codePoints"/> elements.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within <paramref name="codePoints"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// </exception>
+        /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
+        /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
+        public static string ToString(ReadOnlySpan<int> codePoints, int startIndex, int length)
+            => ToStringImpl(codePoints, startIndex, length);
+
+#endif
+
+        /// <summary>
+        /// Converts an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
         /// <para/>
         /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
         /// the .NET equivalent of that constructor overload.
@@ -2904,6 +2949,21 @@ namespace J2N
         {
             if (codePoints is null)
                 throw new ArgumentNullException(nameof(codePoints));
+
+            return ToStringImpl(codePoints, startIndex, length);
+        }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private static string ToStringImpl(
+#if FEATURE_SPAN
+            ReadOnlySpan<int> codePoints,
+#else
+            int[] codePoints,
+#endif
+            int startIndex, int length)
+        {
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR2.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
@@ -2929,7 +2989,13 @@ namespace J2N
 
             return ToStringSlow(codePoints, startIndex, length);
 
-            static string ToStringSlow(int[] codePoints, int startIndex, int length)
+            static string ToStringSlow(
+#if FEATURE_SPAN
+                ReadOnlySpan<int> codePoints,
+#else
+                int[] codePoints,
+#endif
+                int startIndex, int length)
             {
                 int bufferLength = 0;
                 // If we go over the threshold, count the number of chars we
@@ -2976,7 +3042,13 @@ namespace J2N
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private unsafe static int WriteCodePointsToCharBuffer(char* buffer, int[] codePoints, int startIndex, int length)
+        private unsafe static int WriteCodePointsToCharBuffer(char* buffer,
+#if FEATURE_SPAN
+            ReadOnlySpan<int> codePoints,
+#else
+            int[] codePoints,
+#endif
+            int startIndex, int length)
         {
             int index = 0;
             int end = startIndex + length; // 1 past the end index
