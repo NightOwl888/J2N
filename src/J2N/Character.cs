@@ -2198,25 +2198,13 @@ namespace J2N
         /// <summary>
         /// Gets the general Unicode category of the specified character.
         /// <para/>
-        /// Usage Note: A safe way to get unicode category. The .NET <see cref="char.ConvertFromUtf32(int)"/>
-        /// method is similar. However, if the value falls between
-        /// 0x00d800 and 0x00dfff, that method throws an exception. So this is a wrapper that converts the
-        /// codepoint to a char in those cases.
-        /// <para/>
         /// This mimics the behavior of the Java Character.GetType(int) method, but returns the .NET <see cref="UnicodeCategory"/>
         /// enumeration for easy consumption.
         /// </summary>
         /// <param name="c">The character to get the category of.</param>
         /// <returns>The <see cref="UnicodeCategory"/> of <paramref name="c"/>.</returns>
         public static UnicodeCategory GetType(char c)
-        {
-            if (!IsValidCodePoint(c))
-                return UnicodeCategory.OtherNotAssigned;
-            if (c >= 0x00d800 && c <= 0x00dfff)
-                return CharUnicodeInfo.GetUnicodeCategory(c);
-            else
-                return CharUnicodeInfo.GetUnicodeCategory(char.ConvertFromUtf32(c), 0);
-        }
+            => CharUnicodeInfo.GetUnicodeCategory(c);
 
         /// <summary>
         /// Gets the general Unicode category of the specified code point.
@@ -2235,10 +2223,14 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
                 return UnicodeCategory.OtherNotAssigned;
+#if FEATURE_CHARUNICODEINFO_GETUNICODECATEGORY_CODEPOINT
+            return CharUnicodeInfo.GetUnicodeCategory(codePoint);
+#else
             if (codePoint >= 0x00d800 && codePoint <= 0x00dfff)
                 return CharUnicodeInfo.GetUnicodeCategory((char)codePoint);
             else
                 return CharUnicodeInfo.GetUnicodeCategory(char.ConvertFromUtf32(codePoint), 0);
+#endif
         }
 
         // TODO: GetDirectionality(char)
