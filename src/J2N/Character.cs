@@ -1102,6 +1102,44 @@ namespace J2N
         }
 
         /// <summary>
+        /// Converts the specified Unicode code point into a UTF-16 encoded sequence
+        /// and returns it as <see cref="char"/>.out parameters.
+        /// <para/>
+        /// This correponds to <see cref="char.ConvertFromUtf32(int)"/>, but returns
+        /// out parameters that allocate on the stack rather than a <see cref="string"/>.
+        /// </summary>
+        /// <param name="codePoint">The Unicode code point to encode.</param>
+        /// <param name="high">The high (first) character of the code point, or the only character if
+        /// <paramref name="codePoint"/> is not a supplementary code point.</param>
+        /// <param name="low">The low (second) character of the code point. This is only populated if
+        /// <paramref name="codePoint"/> is a supplementary code point, in which case the return value is 2.</param>
+        /// <returns>
+        /// The length of the UTF-16 encoded char sequence. If <paramref name="codePoint"/> is a
+        /// supplementary code point (<see cref="IsSupplementaryCodePoint(int)"/>),
+        /// then the returned value indicates two characters, otherwise it indicates
+        /// just one character (the <paramref name="high"/> value).
+        /// </returns>
+        /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        internal static int ToChars(int codePoint, out char high, out char low) // J2N TODO: Make public?
+        {
+            if (!IsValidCodePoint(codePoint))
+            {
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+            }
+
+            if (IsSupplementaryCodePoint(codePoint))
+            {
+                int cpPrime = codePoint - 0x10000;
+                high = (char)(0xD800 | ((cpPrime >> 10) & 0x3FF));
+                low = (char)(0xDC00 | (cpPrime & 0x3FF));
+                return 2;
+            }
+            high = (char)codePoint;
+            low = charNull;
+            return 1;
+        }
+
+        /// <summary>
         /// Returns the number of Unicode code points in the text range of the specified char sequence.
         /// The text range begins at the specified <paramref name="startIndex"/> and extends for the number
         /// of characters specified in <paramref name="length"/>. 
