@@ -1019,6 +1019,55 @@ namespace J2N
             return low;
         }
 
+#if FEATURE_SPAN
+        /// <summary>
+        /// Converts the specified Unicode code point into a UTF-16 encoded sequence
+        /// and copies the value(s) into the <see cref="Span{T}"/> <paramref name="destination"/>, starting at
+        /// index <paramref name="destinationIndex"/>.
+        /// </summary>
+        /// <param name="codePoint">The Unicode code point to encode.</param>
+        /// <param name="destination">The destination span to copy the encoded value into.</param>
+        /// <param name="destinationIndex">The index in <paramref name="destination"/> from where to start copying.</param>
+        /// <returns>The number of <see cref="char"/> value units copied into <paramref name="destination"/>.</returns>
+        /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="destinationIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="destinationIndex"/> is greater than or equal to <c><paramref name="destination"/>.Length</c>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="destinationIndex"/> equals <c><paramref name="destination"/>.Length - 1</c> when 
+        /// <paramref name="codePoint"/> is a supplementary code point (<see cref="IsSupplementaryCodePoint(int)"/>).
+        /// </exception>
+        public static int ToChars(int codePoint, Span<char> destination, int destinationIndex)
+        {
+            if (!IsValidCodePoint(codePoint))
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+            if (destinationIndex < 0 || destinationIndex >= destination.Length)
+                throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+
+            if (IsSupplementaryCodePoint(codePoint))
+            {
+                if (destinationIndex == destination.Length - 1)
+                    throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+                // See RFC 2781, Section 2.1
+                // http://www.faqs.org/rfcs/rfc2781.html
+                int cpPrime = codePoint - 0x10000;
+                int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
+                int low = 0xDC00 | (cpPrime & 0x3FF);
+                destination[destinationIndex] = (char)high;
+                destination[destinationIndex + 1] = (char)low;
+                return 2;
+            }
+
+            destination[destinationIndex] = (char)codePoint;
+            return 1;
+        }
+#endif
+
         /// <summary>
         /// Converts the specified Unicode code point into a UTF-16 encoded sequence
         /// and copies the value(s) into the char array <paramref name="destination"/>, starting at
@@ -1099,6 +1148,44 @@ namespace J2N
                 return new char[] { (char)high, (char)low };
             }
             return new char[] { (char)codePoint };
+        }
+
+        /// <summary>
+        /// Converts the specified Unicode code point into a UTF-16 encoded sequence
+        /// and returns it as <see cref="char"/>.out parameters.
+        /// <para/>
+        /// This correponds to <see cref="char.ConvertFromUtf32(int)"/>, but returns
+        /// out parameters that allocate on the stack rather than a <see cref="string"/>.
+        /// </summary>
+        /// <param name="codePoint">The Unicode code point to encode.</param>
+        /// <param name="high">The high (first) character of the code point, or the only character if
+        /// <paramref name="codePoint"/> is not a supplementary code point.</param>
+        /// <param name="low">The low (second) character of the code point. This is only populated if
+        /// <paramref name="codePoint"/> is a supplementary code point, in which case the return value is 2.</param>
+        /// <returns>
+        /// The length of the UTF-16 encoded char sequence. If <paramref name="codePoint"/> is a
+        /// supplementary code point (<see cref="IsSupplementaryCodePoint(int)"/>),
+        /// then the returned value indicates two characters, otherwise it indicates
+        /// just one character (the <paramref name="high"/> value).
+        /// </returns>
+        /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        public static int ToChars(int codePoint, out char high, out char low)
+        {
+            if (!IsValidCodePoint(codePoint))
+            {
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+            }
+
+            if (IsSupplementaryCodePoint(codePoint))
+            {
+                int cpPrime = codePoint - 0x10000;
+                high = (char)(0xD800 | ((cpPrime >> 10) & 0x3FF));
+                low = (char)(0xDC00 | (cpPrime & 0x3FF));
+                return 2;
+            }
+            high = (char)codePoint;
+            low = charNull;
+            return 1;
         }
 
         /// <summary>
@@ -2111,25 +2198,13 @@ namespace J2N
         /// <summary>
         /// Gets the general Unicode category of the specified character.
         /// <para/>
-        /// Usage Note: A safe way to get unicode category. The .NET <see cref="char.ConvertFromUtf32(int)"/>
-        /// method is similar. However, if the value falls between
-        /// 0x00d800 and 0x00dfff, that method throws an exception. So this is a wrapper that converts the
-        /// codepoint to a char in those cases.
-        /// <para/>
         /// This mimics the behavior of the Java Character.GetType(int) method, but returns the .NET <see cref="UnicodeCategory"/>
         /// enumeration for easy consumption.
         /// </summary>
         /// <param name="c">The character to get the category of.</param>
         /// <returns>The <see cref="UnicodeCategory"/> of <paramref name="c"/>.</returns>
         public static UnicodeCategory GetType(char c)
-        {
-            if (!IsValidCodePoint(c))
-                return UnicodeCategory.OtherNotAssigned;
-            if (c >= 0x00d800 && c <= 0x00dfff)
-                return CharUnicodeInfo.GetUnicodeCategory(c);
-            else
-                return CharUnicodeInfo.GetUnicodeCategory(char.ConvertFromUtf32(c), 0);
-        }
+            => CharUnicodeInfo.GetUnicodeCategory(c);
 
         /// <summary>
         /// Gets the general Unicode category of the specified code point.
@@ -2148,10 +2223,14 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
                 return UnicodeCategory.OtherNotAssigned;
+#if FEATURE_CHARUNICODEINFO_GETUNICODECATEGORY_CODEPOINT
+            return CharUnicodeInfo.GetUnicodeCategory(codePoint);
+#else
             if (codePoint >= 0x00d800 && codePoint <= 0x00dfff)
                 return CharUnicodeInfo.GetUnicodeCategory((char)codePoint);
             else
                 return CharUnicodeInfo.GetUnicodeCategory(char.ConvertFromUtf32(codePoint), 0);
+#endif
         }
 
         // TODO: GetDirectionality(char)
@@ -2772,8 +2851,27 @@ namespace J2N
         // allow us to make the conversion. Character seems like the most logical place to do this being that there is no way to dynamically
         // add a construtor to System.String and this is the place in J2N that deals the most with code points.
 
+#if FEATURE_SPAN
+
         /// <summary>
-        /// Converts an an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// Converts a sequence <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// <para/>
+        /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
+        /// the .NET equivalent of that constructor overload, however this overload is provided for convenience and assumes the
+        /// whole array will be converted. <see cref="ToString(int[], int, int)"/> allows conversion of a partial array of code points to a
+        /// <see cref="string"/>.
+        /// </summary>
+        /// <param name="codePoints">A <see cref="ReadOnlySpan{T}"/> of UTF-32 code points.</param>
+        /// <returns>A string containing the UTF-16 character equivalent of <paramref name="codePoints"/>.</returns>
+        /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
+        /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
+        public static string ToString(ReadOnlySpan<int> codePoints)
+            => ToStringImpl(codePoints, 0, codePoints.Length);
+
+#endif
+
+        /// <summary>
+        /// Converts an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
         /// <para/>
         /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
         /// the .NET equivalent of that constructor overload, however this overload is provided for convenience and assumes the
@@ -2790,11 +2888,37 @@ namespace J2N
             if (codePoints is null)
                 throw new ArgumentNullException(nameof(codePoints));
 
-            return ToString(codePoints, 0, codePoints.Length);
+            return ToStringImpl(codePoints, 0, codePoints.Length);
         }
 
+#if FEATURE_SPAN
+
         /// <summary>
-        /// Converts an an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// Converts a sequence <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
+        /// <para/>
+        /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
+        /// the .NET equivalent of that constructor overload.
+        /// </summary>
+        /// <param name="codePoints">A <see cref="ReadOnlySpan{T}"/> of UTF-32 code points.</param>
+        /// <param name="startIndex">The index of the first code point to convert.</param>
+        /// <param name="length">The number of code point elements to to convert to UTF-32 code units and include in the result.</param>
+        /// <returns>A <see cref="string"/> containing the UTF-16 code units that correspond to the specified range of <paramref name="codePoints"/> elements.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within <paramref name="codePoints"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// </exception>
+        /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
+        /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
+        public static string ToString(ReadOnlySpan<int> codePoints, int startIndex, int length)
+            => ToStringImpl(codePoints, startIndex, length);
+
+#endif
+
+        /// <summary>
+        /// Converts an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
         /// <para/>
         /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
         /// the .NET equivalent of that constructor overload.
@@ -2817,6 +2941,21 @@ namespace J2N
         {
             if (codePoints is null)
                 throw new ArgumentNullException(nameof(codePoints));
+
+            return ToStringImpl(codePoints, startIndex, length);
+        }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private static string ToStringImpl(
+#if FEATURE_SPAN
+            ReadOnlySpan<int> codePoints,
+#else
+            int[] codePoints,
+#endif
+            int startIndex, int length)
+        {
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR2.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
@@ -2842,7 +2981,13 @@ namespace J2N
 
             return ToStringSlow(codePoints, startIndex, length);
 
-            static string ToStringSlow(int[] codePoints, int startIndex, int length)
+            static string ToStringSlow(
+#if FEATURE_SPAN
+                ReadOnlySpan<int> codePoints,
+#else
+                int[] codePoints,
+#endif
+                int startIndex, int length)
             {
                 int bufferLength = 0;
                 // If we go over the threshold, count the number of chars we
@@ -2889,7 +3034,13 @@ namespace J2N
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private unsafe static int WriteCodePointsToCharBuffer(char* buffer, int[] codePoints, int startIndex, int length)
+        private unsafe static int WriteCodePointsToCharBuffer(char* buffer,
+#if FEATURE_SPAN
+            ReadOnlySpan<int> codePoints,
+#else
+            int[] codePoints,
+#endif
+            int startIndex, int length)
         {
             int index = 0;
             int end = startIndex + length; // 1 past the end index

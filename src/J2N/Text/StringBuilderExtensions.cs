@@ -208,7 +208,10 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            text.Append(Character.ToChars(codePoint));
+            int length = Character.ToChars(codePoint, out char high, out char low);
+            text.Append(high);
+            if (length == 2)
+                text.Append(low);
             return text;
         }
 

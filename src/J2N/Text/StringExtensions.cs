@@ -577,13 +577,14 @@ namespace J2N.Text
         /// <summary>
         /// Handles (rare) calls of indexOf with a supplementary character.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         private static int IndexOfSupplementary(this string text, int codePoint, int startIndex)
         {
             if (Character.IsValidCodePoint(codePoint))
             {
-                char[] pair = Character.ToChars(codePoint);
-                char hi = pair[0];
-                char lo = pair[1];
+                Character.ToChars(codePoint, out char hi, out char lo); // J2N: Eliminated array allocation
                 int max = text.Length - 1;
                 for (int i = startIndex; i < max; i++)
                 {
@@ -710,13 +711,14 @@ namespace J2N.Text
         /// <summary>
         /// Handles (rare) calls of lastIndexOf with a supplementary character.
         /// </summary>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif 
         private static int LastIndexOfSupplementary(this string text, int codePoint, int startIndex)
         {
             if (Character.IsValidCodePoint(codePoint))
             {
-                char[] pair = Character.ToChars(codePoint);
-                char hi = pair[0];
-                char lo = pair[1];
+                Character.ToChars(codePoint, out char hi, out char lo); // J2N: Eliminated array allocation
                 int i = Math.Min(startIndex, text.Length - 2);
                 for (; i >= 0; i--)
                 {
