@@ -233,6 +233,21 @@ stages:
         maximumAllowedFailures: $(maximumAllowedFailures)
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
+  - job: Test_net48_x64
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    displayName: 'Test net48,x64 on Windows'
+    pool:
+      vmImage: 'windows-latest'
+    steps:
+    - template: '.build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: 'Windows'
+        testTargetFrameworks: 'net48'
+        vsTestPlatform: 'x64'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
+
   - job: Test_net48_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
     displayName: 'Test net48,x86 on Windows'
