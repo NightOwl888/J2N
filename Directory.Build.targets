@@ -130,6 +130,7 @@
   <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
   <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
 
+    <DefineConstants>$(DefineConstants);FEATURE_ARRAYPOOL</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
