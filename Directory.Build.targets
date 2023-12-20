@@ -27,6 +27,8 @@
 
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTINT64</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTSINGLE</DefineConstants>
+    <!-- J2N NOTE: This is technically supported in .NET 5.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
 
   </PropertyGroup>
 
@@ -36,7 +38,6 @@
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_PREDEFINEDONLY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ICU</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
 
   </PropertyGroup>
 
