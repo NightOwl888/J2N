@@ -169,6 +169,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Source string was not long enough. Check sourceIndex and count..
+        /// </summary>
+        internal static string Arg_LongerThanSrcString {
+            get {
+                return ResourceManager.GetString("Arg_LongerThanSrcString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Object must be of type Byte..
         /// </summary>
         internal static string Arg_MustBeByte {
@@ -313,6 +322,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Destination is too short..
+        /// </summary>
+        internal static string Argument_DestinationTooShort {
+            get {
+                return ResourceManager.GetString("Argument_DestinationTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Type of argument is not compatible with the generic comparer..
         /// </summary>
         internal static string Argument_InvalidArgumentForComparison {
@@ -430,6 +448,15 @@ namespace J2N.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} (&apos;{1}&apos;) must be a non-negative value..
+        /// </summary>
+        internal static string ArgumentOutOfRange_Generic_MustBeNonNegative {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_Generic_MustBeNonNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Index was out of range. Must be non-negative and less than the size of the string/array/collection..
         /// </summary>
         internal static string ArgumentOutOfRange_Index {
@@ -453,6 +480,15 @@ namespace J2N.Resources {
         internal static string ArgumentOutOfRange_IndexLength {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_IndexLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Index was out of range. Must be non-negative and less than or equal to the size of the collection..
+        /// </summary>
+        internal static string ArgumentOutOfRange_IndexMustBeLessOrEqual {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_IndexMustBeLessOrEqual", resourceCulture);
             }
         }
         
