@@ -126,6 +126,9 @@
   <data name="ArgumentOutOfRange_Count" xml:space="preserve">
     <value>Count must be positive and count must refer to a location within the string/array/collection.</value>
   </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeNonNegative" xml:space="preserve">
+    <value>{0} ('{1}') must be a non-negative value.</value>
+  </data>
   <data name="ArgumentOutOfRange_Index" xml:space="preserve">
     <value>Index was out of range. Must be non-negative and less than the size of the string/array/collection.</value>
   </data>
@@ -134,6 +137,9 @@
   </data>
   <data name="ArgumentOutOfRange_IndexLength" xml:space="preserve">
     <value>Index and length must refer to a location within the string.</value>
+  </data>
+  <data name="ArgumentOutOfRange_IndexMustBeLessOrEqual" xml:space="preserve">
+    <value>Index was out of range. Must be non-negative and less than or equal to the size of the collection.</value>
   </data>
   <data name="ArgumentOutOfRange_ListInsert" xml:space="preserve">
     <value>Index must be within the bounds of the List.</value>
@@ -164,6 +170,9 @@
   </data>
   <data name="Argument_CollectionMustNotBeThis" xml:space="preserve">
     <value>collection must not be the same instance as this.</value>
+  </data>
+  <data name="Argument_DestinationTooShort" xml:space="preserve">
+    <value>Destination is too short.</value>
   </data>
   <data name="Argument_InvalidArgumentForComparison" xml:space="preserve">
     <value>Type of argument is not compatible with the generic comparer.</value>
@@ -230,6 +239,9 @@
   </data>
   <data name="Arg_KeyNotFoundWithKey" xml:space="preserve">
     <value>The given key '{0}' was not present in the dictionary.</value>
+  </data>
+  <data name="Arg_LongerThanSrcString" xml:space="preserve">
+    <value>Source string was not long enough. Check sourceIndex and count.</value>
   </data>
   <data name="Arg_MustBeByte" xml:space="preserve">
     <value>Object must be of type Byte.</value>

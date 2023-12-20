@@ -17,6 +17,9 @@
 #endregion
 
 using System;
+#if FEATURE_SPAN
+using System.Buffers;
+#endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -371,6 +374,91 @@ namespace J2N.Text
         }
 
         #endregion CompareToOrdinal
+
+        #region CopyTo
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Copies the characters from a specified segment of this instance to a destination <see cref="char"/> span.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="sourceIndex">The starting position in this instance where characters will be copied from. The index is zero-based.</param>
+        /// <param name="destination">The writable span where characters will be copied.</param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="sourceIndex"/> is greater than the length of this instance.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="sourceIndex"/> + <paramref name="count"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is greater than the length of <paramref name="destination"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        // J2N: Added to cover the missing .NET API on older .NET target frameworks.
+        public static void CopyTo(this StringBuilder text, int sourceIndex, Span<char> destination, int count)
+        {
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), J2N.SR.Format(SR.ArgumentOutOfRange_Generic_MustBeNonNegative, nameof(count), count));
+
+            if ((uint)sourceIndex > (uint)text.Length)
+            {
+                throw new ArgumentOutOfRangeException(nameof(sourceIndex), SR.ArgumentOutOfRange_IndexMustBeLessOrEqual);
+            }
+
+            if (sourceIndex > text.Length - count)
+            {
+                throw new ArgumentException(SR.Arg_LongerThanSrcString);
+            }
+
+            if (count > destination.Length)
+            {
+                throw new ArgumentException(SR.Argument_DestinationTooShort);
+            }
+
+            int startIndex = sourceIndex;
+
+            // J2N NOTE: We don't use GetChunks() because it wasn't added until after StringBuilder got its own CopyTo(int, Span<char> int) overload,
+            // so this will never be called when GetChunks() is supported unless called as a static method.
+
+            int destinationIndex = 0;
+            int remainingCount = count;
+
+            const int MaxChunkSize = 1024;
+            char[] buffer = ArrayPool<char>.Shared.Rent(MaxChunkSize);
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(count, MaxChunkSize);
+
+                    // Copy the chunk to the buffer
+                    text.CopyTo(startIndex, buffer, 0, chunkLength);
+
+                    // Copy from the buffer to the destination Span<char>
+                    buffer.AsSpan(0, chunkLength).CopyTo(destination.Slice(destinationIndex, chunkLength));
+
+                    startIndex += chunkLength;
+                    destinationIndex += chunkLength;
+                    remainingCount -= chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+        }
+
+#endif
+
+        #endregion
 
         #region Delete
 
