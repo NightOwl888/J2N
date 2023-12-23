@@ -1,6 +1,7 @@
 ﻿using J2N.Globalization;
 using NUnit.Framework;
 using System;
+using System.Buffers;
 using System.Globalization;
 using System.Text;
 
@@ -537,6 +538,31 @@ namespace J2N.Text
             }
         }
 
+        private class MyCharSequence : ICharSequence
+        {
+            public string Value { get; }
+            public MyCharSequence(string value)
+            {
+                Value = value;
+            }
+
+            public char this[int index] => Value[index];
+
+            public bool HasValue => Value != null;
+
+            public int Length => Value.Length;
+
+            public ICharSequence Subsequence(int startIndex, int length)
+            {
+                return Value.Substring(startIndex, length).AsCharSequence();
+            }
+
+            public override string ToString()
+            {
+                return Value;
+            }
+        }
+
 
         /**
          * @tests java.lang.StringBuilder.append(CharSequence)
@@ -545,15 +571,44 @@ namespace J2N.Text
         public void Test_Append_ICharSequence()
         {
             StringBuilder sb = new StringBuilder();
-            assertSame(sb, sb.Append("ab".AsCharSequence()));
+            assertSame(sb, sb.Append(charSequence: "ab".AsCharSequence())); // J2N: charSequence label is required to get to this overload over object overload. See https://stackoverflow.com/a/26885473
             assertEquals("ab", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append("cd".AsCharSequence()));
+            assertSame(sb, sb.Append(charSequence: "cd".AsCharSequence()));
             assertEquals("cd", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append((ICharSequence)null));
+            assertSame(sb, sb.Append(charSequence: (ICharSequence)null));
             // assertEquals("null", sb.ToString());
             assertEquals("", sb.ToString()); // J2N: Changed the behavior to be a no-op rather than appending the string "null"
+        }
+
+        /**
+         * @tests java.lang.StringBuilder.append(CharSequence)
+         */
+        [Test]
+        public void Test_Append_ICharSequence_Custom()
+        {
+            StringBuilder sb = new StringBuilder();
+            assertSame(sb, sb.Append(charSequence: new MyCharSequence("ab")));
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append(charSequence: new MyCharSequence("cd")));
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append(charSequence: (ICharSequence)null));
+            // assertEquals("null", sb.ToString());
+            assertEquals("", sb.ToString()); // J2N: Changed the behavior to be a no-op rather than appending the string "null"
+
+            // J2N: Check long strings that will be appended in chunks in certain cases
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb.Length = (0);
+            sb.Append(charSequence: new MyCharSequence(longString1));
+            assertEquals(longString1, sb.ToString());
+            sb.Length = (0);
+            sb.Append(charSequence: new MyCharSequence(longString2));
+            assertEquals(longString2, sb.ToString());
         }
 
         /**
@@ -586,11 +641,65 @@ namespace J2N.Text
             }
             //assertEquals("nu", sb.ToString());
             assertEquals("", sb.ToString());
+
+
+            // J2N: Check long strings that will be appended in chunks in certain cases
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb.Length = (0);
+            sb.Append(new MyCharSequence(longString1), 0, longString1.Length);
+            assertEquals(longString1, sb.ToString());
+            sb.Length = (0);
+            sb.Append(new MyCharSequence(longString2), 0, longString2.Length);
+            assertEquals(longString2, sb.ToString());
+        }
+
+        /**
+         * @tests java.lang.StringBuilder.append(CharSequence, int, int)
+         */
+        [Test]
+        public void Test_Append_ICharSequence_Int32_Int32_Custom()
+        {
+            StringBuilder sb = new StringBuilder();
+            assertSame(sb, sb.Append(new MyCharSequence("ab"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append(new MyCharSequence("cd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append(new MyCharSequence("abcd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append(new MyCharSequence("abcd"), 2, 4 - 2)); // J2N: corrected 3rd parameter
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
+            try
+            {
+                assertSame(sb, sb.Append((ICharSequence)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0's Append(StringBuilder,int,int) overload) rather than appending the string "null"
+                fail("no NPE");
+            }
+            catch (ArgumentNullException e)
+            {
+                // Expected
+            }
+            //assertEquals("nu", sb.ToString());
+            assertEquals("", sb.ToString());
+
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb.Length = (0);
+            sb.Append(new MyCharSequence(longString1), 0, longString1.Length);
+            assertEquals(longString1, sb.ToString());
+            sb.Length = (0);
+            sb.Append(new MyCharSequence(longString2), 1000, 550 + 6999);
+            assertEquals(new string('y', 550) + new string('r', 6999), sb.ToString());
         }
 
 
-        // J2N: Excluding this overload because it is effectively the same as Append(object)
-        // that has the same behavior
         /**
          * @tests java.lang.StringBuilder.append(CharSequence)
          */
@@ -607,6 +716,17 @@ namespace J2N.Text
             assertSame(sb, sb.Append((StringBuilder)null));
             // assertEquals("null", sb.ToString());
             assertEquals("", sb.ToString()); // J2N: Changed the behavior to be a no-op rather than appending the string "null"
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb.Length = (0);
+            sb.Append(new StringBuilder(longString1));
+            assertEquals(longString1, sb.ToString());
+            sb.Length = (0);
+            sb.Append(new StringBuilder(longString2), 1000, 550 + 6999);
+            assertEquals(new string('y', 550) + new string('r', 6999), sb.ToString());
         }
 
         /**
@@ -639,8 +759,46 @@ namespace J2N.Text
             }
             //assertEquals("nu", sb.ToString());
             assertEquals("", sb.ToString());
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb.Length = (0);
+            sb.Append(new StringBuilder(longString1), 0, longString1.Length);
+            assertEquals(longString1, sb.ToString());
+            sb.Length = (0);
+            sb.Append(new StringBuilder(longString2), 1000, 550 + 6999);
+            assertEquals(new string('y', 550) + new string('r', 6999), sb.ToString());
         }
 
+#if FEATURE_SPAN
+
+        [Test]
+        public void Test_Append_ReadOnlySpan() // J2N Specific to cover missing overload in older .NET TFMs
+        {
+            StringBuilder sb = new StringBuilder();
+            assertSame(sb, sb.Append("ab".AsSpan()));
+            assertEquals("ab", sb.ToString());
+            sb.Length = (0);
+            assertSame(sb, sb.Append("cd".AsSpan()));
+            assertEquals("cd", sb.ToString());
+            sb.Length = (0);
+            assertEquals("", sb.ToString());
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb.Length = (0);
+            sb.Append(longString1.AsSpan());
+            assertEquals(longString1, sb.ToString());
+            sb.Length = (0);
+            sb.Append(longString2.AsSpan());
+            assertEquals(longString2, sb.ToString());
+        }
+
+#endif
 
         /**
          * @tests java.lang.StringBuilder.indexOf(String)

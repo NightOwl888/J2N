@@ -34,6 +34,9 @@ namespace J2N.Text
     /// </summary>
     public static class StringBuilderExtensions
     {
+        private const int CharStackBufferSize = 64;
+        private const int CharPoolBufferSize = 512;
+
         #region Append
 
         // This doesn't work right. See: https://stackoverflow.com/a/26885473
@@ -52,18 +55,69 @@ namespace J2N.Text
                 throw new ArgumentNullException(nameof(text));
 
             // For null values, this is a no-op
-            if (charSequence != null && charSequence.HasValue)
+            if (charSequence is null || !charSequence.HasValue)
+                return text;
+
+            if (charSequence is StringCharSequence str)
+                return text.Append(str.Value);
+            else if (charSequence is CharArrayCharSequence charArray)
+                return text.Append(charArray.Value);
+            else if (charSequence is StringBuilderCharSequence sb)
+                return text.Append(sb.Value);
+            else if (charSequence is StringBuffer stringBuffer)
+                return text.Append(stringBuffer.builder);
+
+            int length = charSequence.Length;
+            if (length <= CharStackBufferSize)
             {
-                if (charSequence is StringCharSequence str)
-                    text.Append(str.Value);
-                else if (charSequence is CharArrayCharSequence charArray)
-                    text.Append(charArray.Value);
-                else if (charSequence is StringBuilderCharSequence sb)
-                    text.Append(sb.Value);
-                else
-                    text.Append(charSequence.ToString());
+                for (int i = 0; i < length; i++)
+                {
+                    text.Append(charSequence[i]);
+                }
+                return text;
             }
-            return text;
+
+            return AppendSlow(text, charSequence);
+
+            static StringBuilder AppendSlow(StringBuilder text, ICharSequence charSequence)
+            {
+#if FEATURE_ARRAYPOOL
+                int start = 0;
+                int remainingCount = charSequence.Length;
+
+                char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+                try
+                {
+                    while (remainingCount > 0)
+                    {
+                        // Determine the chunk size for the current iteration
+                        int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                        // Copy the chunk to the buffer
+                        int bufferIndex = 0;
+                        int end = start + chunkLength;
+                        for (int i = start; i < end; i++)
+                        {
+                            buffer[bufferIndex++] = charSequence[i];
+                        }
+
+                        text.Append(buffer, 0, chunkLength);
+
+                        start += chunkLength;
+                        remainingCount -= chunkLength;
+                    }
+
+                    
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(buffer);
+                }
+#else
+                text.Append(charSequence.ToString()); // .NET 4.0...don't care to optimize
+#endif
+                return text;
+            }
         }
 
         /// <summary>
@@ -106,37 +160,122 @@ namespace J2N.Text
 
             if (charSequence is CharArrayCharSequence charArrayCharSequence)
                 return text.Append(charArrayCharSequence.Value, startIndex, charCount);
+            if (charSequence is StringBuilderCharSequence stringBuilderCharSequence)
+                return text.Append(stringBuilderCharSequence.Value, startIndex, charCount);
+            if (charSequence is StringCharSequence stringCharSequence)
+                return text.Append(stringCharSequence.Value, startIndex, charCount);
+            else if (charSequence is StringBuffer stringBuffer)
+                return text.Append(stringBuffer.builder, startIndex, charCount);
 
-            int end = startIndex + charCount;
-            for (int i = startIndex; i < end; i++)
-                text.Append(charSequence[i]);
-            return text;
+            int length = charCount;
+            if (length <= CharStackBufferSize)
+            {
+                int end = startIndex + charCount;
+                for (int i = startIndex; i < end; i++)
+                {
+                    text.Append(charSequence[i]);
+                }
+                return text;
+            }
+
+            return AppendSlow(text, charSequence, startIndex, charCount);
+
+            static StringBuilder AppendSlow(StringBuilder text, ICharSequence charSequence, int startIndex, int charCount)
+            {
+#if FEATURE_ARRAYPOOL
+                int start = startIndex;
+                int remainingCount = charCount;
+
+                char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+                try
+                {
+                    while (remainingCount > 0)
+                    {
+                        // Determine the chunk size for the current iteration
+                        int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                        // Copy the chunk to the buffer
+                        int bufferIndex = 0;
+                        int end = start + chunkLength;
+                        for (int i = start; i < end; i++)
+                        {
+                            buffer[bufferIndex++] = charSequence[i];
+                        }
+
+                        text.Append(buffer, 0, chunkLength);
+
+                        start += chunkLength;
+                        remainingCount -= chunkLength;
+                    }
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(buffer);
+                }
+#else
+                // .NET 4.0...don't care to optimize
+                int end = startIndex + charCount;
+                for (int i = startIndex; i < end; i++)
+                    text.Append(charSequence[i]);
+#endif
+                return text;
+            }
         }
 
-        // J2N: Excluding this overload because it is effectively the same as Append(object)
-        // and the compiler chooses that overload by default, anyway.
-        ///// <summary>
-        ///// Appends the given <see cref="StringBuilder"/> to this <see cref="StringBuilder"/>.
-        ///// <para/>
-        ///// The characters of the <paramref name="charSequence"/> argument are appended,
-        ///// in order, to this sequence, increasing the
-        ///// length of this sequence by the length of <paramref name="charSequence"/>.
-        ///// <para/>
-        ///// Usage Note: Unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
-        ///// <c>"null"</c> to the <see cref="StringBuilder"/>. Instead, it is a no-op.
-        ///// </summary>
-        ///// <param name="text">This <see cref="StringBuilder"/>.</param>
-        ///// <param name="charSequence">The <see cref="StringBuilder"/> to append.</param>
-        ///// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        //public static StringBuilder Append(this StringBuilder text, StringBuilder charSequence)
-        //{
-        //    if (text == null)
-        //        throw new ArgumentNullException(nameof(text));
+        /// <summary>
+        /// Appends the given <see cref="StringBuilder"/> to this <see cref="StringBuilder"/>.
+        /// <para/>
+        /// The characters of the <paramref name="charSequence"/> argument are appended,
+        /// in order, to this sequence, increasing the
+        /// length of this sequence by the length of <paramref name="charSequence"/>.
+        /// <para/>
+        /// Usage Note: Unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
+        /// <c>"null"</c> to the <see cref="StringBuilder"/>. Instead, it is a no-op.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="charSequence">The <see cref="StringBuilder"/> to append.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        public static StringBuilder Append(this StringBuilder text, StringBuilder charSequence)
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
 
-        //    if (charSequence != null)
-        //        text.Append(charSequence.ToString());
-        //    return text;
-        //}
+            if (charSequence == null)
+                return text;
+
+            // J2N NOTE: We don't use Span<char> because this Append() overload was added to StringBuilder prior to th CopyTo(int, Span<char> int) overload,
+            // so this will never be called when Span<char> is supported unless called as a static method.
+
+#if FEATURE_ARRAYPOOL
+            int start = 0;
+            int remainingCount = charSequence.Length;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    charSequence.CopyTo(start, buffer, 0, chunkLength);
+
+                    text.Append(buffer, 0, chunkLength);
+
+                    start += chunkLength;
+                    remainingCount -= chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+            return text;
+#else
+            return text.Append(charSequence.ToString()); // .NET 4.0...don't care to optimize
+#endif
+        }
 
         /// <summary>
         /// Appends the given <see cref="StringBuilder"/> to this <see cref="StringBuilder"/>.
@@ -180,8 +319,91 @@ namespace J2N.Text
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
-            return text.Append(charSequence.ToString(startIndex, charCount));
+            // J2N NOTE: We don't use Span<char> because this Append() overload was added to StringBuilder prior to th CopyTo(int, Span<char> int) overload,
+            // so this will never be called when Span<char> is supported unless called as a static method.
+
+#if FEATURE_ARRAYPOOL
+            int start = startIndex;
+            int remainingCount = charCount;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    charSequence.CopyTo(start, buffer, 0, chunkLength);
+
+                    text.Append(buffer, 0, chunkLength);
+
+                    start += chunkLength;
+                    remainingCount -= chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+            return text;
+#else
+            return text.Append(charSequence.ToString(startIndex, charCount)); // .NET 4.0...don't care to optimize
+#endif
         }
+
+#if FEATURE_SPAN
+        /// <summary>
+        /// Appends the given <see cref="ReadOnlySpan{Char}"/> to this <see cref="StringBuilder"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="charSequence">The <see cref="ReadOnlySpan{Char}"/> to append.</param>
+        /// <returns>This <see cref="StringBuilder"/>, for chaining.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        // J2N: Added to cover the missing .NET API on older .NET target frameworks.
+        public static StringBuilder Append(this StringBuilder text, ReadOnlySpan<char> charSequence)
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+
+#if FEATURE_STRINGBUILDER_APPEND_CHARPTR
+            unsafe
+            {
+                fixed (char* seq = charSequence)
+                {
+                    text.Append(seq, charSequence.Length);
+                }
+            }
+#else
+            int startIndex = 0;
+            int remainingCount = charSequence.Length;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    charSequence.Slice(startIndex, chunkLength).CopyTo(buffer);
+
+                    text.Append(buffer, 0, chunkLength);
+
+                    startIndex += chunkLength;
+                    remainingCount -= chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+#endif
+            return text;
+        }
+#endif
 
         #endregion Append
 
@@ -430,14 +652,13 @@ namespace J2N.Text
             int destinationIndex = 0;
             int remainingCount = count;
 
-            const int MaxChunkSize = 1024;
-            char[] buffer = ArrayPool<char>.Shared.Rent(MaxChunkSize);
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
             try
             {
                 while (remainingCount > 0)
                 {
                     // Determine the chunk size for the current iteration
-                    int chunkLength = Math.Min(count, MaxChunkSize);
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
 
                     // Copy the chunk to the buffer
                     text.CopyTo(startIndex, buffer, 0, chunkLength);
@@ -592,7 +813,7 @@ namespace J2N.Text
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         private static int IndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
             int length = value.Length;
@@ -619,7 +840,7 @@ namespace J2N.Text
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
+#endif
         private static int IndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
             int length = value.Length;
