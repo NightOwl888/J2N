@@ -497,15 +497,25 @@ namespace J2N.Text
         /// </returns>
         public static int CompareToOrdinal(this StringBuilder? text, ICharSequence? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (value is StringBuilderCharSequence && object.ReferenceEquals(text, value)) return 0;
             if (text is null) return (value is null || !value.HasValue) ? 0 : -1;
             if (value is null || !value.HasValue) return 1;
+
+            if (value is StringBuilderCharSequence sb)
+                return CompareToOrdinal(text, sb.Value);
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+#else
+            var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
 
             int length = Math.Min(text.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
             {
-                if ((result = text[i] - value[i]) != 0)
+                if ((result = textIndexer[i] - value[i]) != 0)
                     return result;
             }
 
@@ -537,11 +547,19 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+#else
+            var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
+
             int length = Math.Min(text.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
             {
-                if ((result = text[i] - value[i]) != 0)
+                if ((result = textIndexer[i] - value[i]) != 0)
                     return result;
             }
 
@@ -571,12 +589,33 @@ namespace J2N.Text
         public static int CompareToOrdinal(this StringBuilder? text, StringBuilder? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (object.ReferenceEquals(text, value)) return 0;
-            if (text is null) return -1;
+            if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+            var valueIndexer = new ValueStringBuilderChunkIndexer(value);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var valueIndexer = new ValueStringArrayPoolIndexer(value);
+#endif
+#if FEATURE_STRINGBUILDER_GETCHUNKS || FEATURE_ARRAYPOOL
+            int length = Math.Min(text.Length, value.Length);
+            int result;
+            for (int i = 0; i < length; i++)
+            {
+                if ((result = textIndexer[i] - valueIndexer[i]) != 0)
+                    return result;
+            }
+
+            // At this point, we have compared all the characters in at least one string.
+            // The longer string will be larger.
+            return text.Length - value.Length;
+#else
             // Materialize the string. It is faster to loop through
             // a string than a StringBuilder.
-            return text.ToString().CompareToOrdinal(value.ToString());
+            return text.ToString().CompareToOrdinal(value.ToString()); // .NET 4.0 - don't care to optimize
+#endif
         }
 
         /// <summary>
@@ -602,11 +641,19 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+#else
+            var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
+
             int length = Math.Min(text.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
             {
-                if ((result = text[i] - value[i]) != 0)
+                if ((result = textIndexer[i] - value[i]) != 0)
                     return result;
             }
 
