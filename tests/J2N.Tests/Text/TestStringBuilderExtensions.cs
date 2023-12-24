@@ -1227,6 +1227,9 @@ namespace J2N.Text
                 assertEquals(fixture.IndexOf(searchFor, StringComparison.CurrentCulture), sb.IndexOf(searchFor, StringComparison.CurrentCulture));
                 assertEquals(6, sb.IndexOf(searchFor, StringComparison.Ordinal));
                 assertEquals(6, sb.IndexOf(searchFor, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase), sb.IndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, StringComparison.InvariantCulture), sb.IndexOf(searchFor, StringComparison.InvariantCulture));
+                assertEquals(fixture.IndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase), sb.IndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
@@ -1242,6 +1245,9 @@ namespace J2N.Text
                 assertEquals(fixture.IndexOf(searchFor, StringComparison.CurrentCulture), sb.IndexOf(searchFor, StringComparison.CurrentCulture));
                 assertEquals(LargeUnicodeString.Length + 6, sb.IndexOf(searchFor, StringComparison.Ordinal));
                 assertEquals(LargeUnicodeString.Length + 6, sb.IndexOf(searchFor, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase), sb.IndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, StringComparison.InvariantCulture), sb.IndexOf(searchFor, StringComparison.InvariantCulture));
+                assertEquals(fixture.IndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase), sb.IndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
@@ -1257,6 +1263,9 @@ namespace J2N.Text
                 assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.CurrentCulture), sb.IndexOf(searchFor, 4, StringComparison.CurrentCulture));
                 assertEquals(6, sb.IndexOf(searchFor, 4, StringComparison.Ordinal));
                 assertEquals(6, sb.IndexOf(searchFor, 4, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.CurrentCultureIgnoreCase), sb.IndexOf(searchFor, 4, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.InvariantCulture), sb.IndexOf(searchFor, 4, StringComparison.InvariantCulture));
+                assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.InvariantCultureIgnoreCase), sb.IndexOf(searchFor, 4, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
@@ -1272,6 +1281,9 @@ namespace J2N.Text
                 assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.CurrentCulture), sb.IndexOf(searchFor, 4, StringComparison.CurrentCulture));
                 assertEquals(LargeUnicodeString.Length + 6, sb.IndexOf(searchFor, 4, StringComparison.Ordinal));
                 assertEquals(LargeUnicodeString.Length + 6, sb.IndexOf(searchFor, 4, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.CurrentCultureIgnoreCase), sb.IndexOf(searchFor, 4, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.InvariantCulture), sb.IndexOf(searchFor, 4, StringComparison.InvariantCulture));
+                assertEquals(fixture.IndexOf(searchFor, 4, StringComparison.InvariantCultureIgnoreCase), sb.IndexOf(searchFor, 4, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
@@ -1288,6 +1300,9 @@ namespace J2N.Text
                 assertEquals(fixture.LastIndexOf(searchFor, StringComparison.CurrentCulture), sb.LastIndexOf(searchFor, StringComparison.CurrentCulture));
                 assertEquals(6, sb.LastIndexOf(searchFor, StringComparison.Ordinal));
                 assertEquals(6, sb.LastIndexOf(searchFor, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase), sb.LastIndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, StringComparison.InvariantCulture), sb.LastIndexOf(searchFor, StringComparison.InvariantCulture));
+                assertEquals(fixture.LastIndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase), sb.LastIndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
@@ -1303,6 +1318,9 @@ namespace J2N.Text
                 assertEquals(fixture.LastIndexOf(searchFor, StringComparison.CurrentCulture), sb.LastIndexOf(searchFor, StringComparison.CurrentCulture));
                 assertEquals(6, sb.LastIndexOf(searchFor, StringComparison.Ordinal));
                 assertEquals(6, sb.LastIndexOf(searchFor, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase), sb.LastIndexOf(searchFor, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, StringComparison.InvariantCulture), sb.LastIndexOf(searchFor, StringComparison.InvariantCulture));
+                assertEquals(fixture.LastIndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase), sb.LastIndexOf(searchFor, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
@@ -1318,6 +1336,9 @@ namespace J2N.Text
                 assertEquals(fixture.LastIndexOf(searchFor, 20, StringComparison.CurrentCulture), sb.LastIndexOf(searchFor, 20, StringComparison.CurrentCulture));
                 assertEquals(6, sb.LastIndexOf(searchFor, 20, StringComparison.Ordinal));
                 assertEquals(6, sb.LastIndexOf(searchFor, 20, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, 20, StringComparison.CurrentCultureIgnoreCase), sb.LastIndexOf(searchFor, 20, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, 20, StringComparison.InvariantCulture), sb.LastIndexOf(searchFor, 20, StringComparison.InvariantCulture));
+                assertEquals(fixture.LastIndexOf(searchFor, 20, StringComparison.InvariantCultureIgnoreCase), sb.LastIndexOf(searchFor, 20, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 
@@ -1333,6 +1354,9 @@ namespace J2N.Text
                 assertEquals(fixture.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCulture), sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCulture));
                 assertEquals(6, sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.Ordinal));
                 assertEquals(6, sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.OrdinalIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCultureIgnoreCase), sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.CurrentCultureIgnoreCase));
+                assertEquals(fixture.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.InvariantCulture), sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.InvariantCulture));
+                assertEquals(fixture.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.InvariantCultureIgnoreCase), sb.LastIndexOf(searchFor, LargeUnicodeString.Length - 20, StringComparison.InvariantCultureIgnoreCase));
             }
         }
 

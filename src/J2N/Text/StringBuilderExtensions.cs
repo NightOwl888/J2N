@@ -870,11 +870,18 @@ namespace J2N.Text
             if (value.Length == 0)
                 return 0;
 
-            return comparisonType switch
+            switch (comparisonType)
             {
-                StringComparison.Ordinal => IndexOfOrdinal(text, value, startIndex),
-                StringComparison.OrdinalIgnoreCase => IndexOfOrdinalIgnoreCase(text, value, startIndex),
-                _ => text.ToString().IndexOf(value, startIndex, comparisonType),
+                case StringComparison.Ordinal:
+                    return IndexOfOrdinal(text, value, startIndex);
+                case StringComparison.OrdinalIgnoreCase:
+                    return IndexOfOrdinalIgnoreCase(text, value, startIndex);
+                default:
+                    // J2N TODO: Optimize other StringComparison options better
+                    int length = text.Length;
+                    int start = Math.Min(startIndex, length - 1);
+                    int result = text.ToString(start, length - start).IndexOf(value, comparisonType);
+                    return (result == -1) ? -1 : result + start;
             };
         }
 
@@ -883,6 +890,14 @@ namespace J2N.Text
 #endif
         private static int IndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+#else
+            var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
+
             int length = value.Length;
             if (length == 0)
                 return 0;
@@ -892,10 +907,10 @@ namespace J2N.Text
             int index;
             for (int i = startIndex; i < maxSearchLength; ++i)
             {
-                if (text[i] == firstChar)
+                if (textIndexer[i] == firstChar)
                 {
                     index = 1;
-                    while ((index < length) && (text[i + index] == value[index]))
+                    while ((index < length) && (textIndexer[i + index] == value[index]))
                         ++index;
 
                     if (index == length)
@@ -910,6 +925,14 @@ namespace J2N.Text
 #endif
         private static int IndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+#else
+            var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
+
             int length = value.Length;
             if (length == 0)
                 return 0;
@@ -920,11 +943,11 @@ namespace J2N.Text
             int index;
             for (int i = startIndex; i < maxSearchLength; ++i)
             {
-                if (text[i] == firstChar)
+                if (textIndexer[i] == firstChar)
                 {
                     index = 1;
                     while ((index < length) &&
-                        ((c1 = text[i + index]) == (c2 = value[index]) ||
+                        ((c1 = textIndexer[i + index]) == (c2 = value[index]) ||
                         textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
                         // Required for unicode that we test both cases
                         textInfo.ToLower(c1) == textInfo.ToLower(c2)))
@@ -1521,7 +1544,7 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            return LastIndexOf(text, value, text.Length, comparisonType);
+            return LastIndexOf(text, value, text.Length - 1, comparisonType);
         }
 
         /// <summary>
@@ -1548,11 +1571,16 @@ namespace J2N.Text
             if (value.Length == 0)
                 return text.Length;
 
-            return comparisonType switch
+            switch (comparisonType)
             {
-                StringComparison.Ordinal => LastIndexOfOrdinal(text, value, startIndex),
-                StringComparison.OrdinalIgnoreCase => LastIndexOfOrdinalIgnoreCase(text, value, startIndex),
-                _ => text.ToString().LastIndexOf(value, startIndex, comparisonType),
+                case StringComparison.Ordinal:
+                    return LastIndexOfOrdinal(text, value, startIndex);
+                case StringComparison.OrdinalIgnoreCase:
+                    return LastIndexOfOrdinalIgnoreCase(text, value, startIndex);
+                default:
+                    // J2N TODO: Optimize other StringComparison options better
+                    int start = Math.Min(startIndex, text.Length - 1);
+                    return text.ToString(0, start + 1).LastIndexOf(value, comparisonType);
             };
         }
 
@@ -1561,6 +1589,14 @@ namespace J2N.Text
 #endif
         private static int LastIndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+#else
+            var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
+
             int textLength = text.Length;
             int subCount = value.Length;
 
@@ -1572,7 +1608,6 @@ namespace J2N.Text
                     {
                         startIndex = textLength - subCount; // count and subCount are both >= 1
                     }
-                    // TODO optimize charAt to direct array access
                     char firstChar = value[0];
                     while (true)
                     {
@@ -1580,7 +1615,7 @@ namespace J2N.Text
                         bool found = false;
                         for (; i >= 0; --i)
                         {
-                            if (text[i] == firstChar)
+                            if (textIndexer[i] == firstChar)
                             {
                                 found = true;
                                 break;
@@ -1591,7 +1626,7 @@ namespace J2N.Text
                             return -1;
                         }
                         int o1 = i, o2 = 0;
-                        while (++o2 < subCount && text[++o1] == value[o2])
+                        while (++o2 < subCount && textIndexer[++o1] == value[o2])
                         {
                             // Intentionally empty
                         }
@@ -1612,6 +1647,14 @@ namespace J2N.Text
 #endif
         private static int LastIndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#elif FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+#else
+            var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
+
             int textLength = text.Length;
             int subCount = value.Length;
 
@@ -1623,7 +1666,6 @@ namespace J2N.Text
                     {
                         startIndex = textLength - subCount; // count and subCount are both >= 1
                     }
-                    // TODO optimize charAt to direct array access
                     char firstChar = value[0], c1, c2;
                     var textInfo = CultureInfo.InvariantCulture.TextInfo;
                     while (true)
@@ -1632,7 +1674,7 @@ namespace J2N.Text
                         bool found = false;
                         for (; i >= 0; --i)
                         {
-                            if (text[i] == firstChar)
+                            if (textIndexer[i] == firstChar)
                             {
                                 found = true;
                                 break;
@@ -1644,7 +1686,7 @@ namespace J2N.Text
                         }
                         int o1 = i, o2 = 0;
                         while (++o2 < subCount && 
-                            ((c1 = text[++o1]) == (c2 = value[o2]) ||
+                            ((c1 = textIndexer[++o1]) == (c2 = value[o2]) ||
                             textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
                             // Required for unicode that we test both cases
                             textInfo.ToLower(c1) == textInfo.ToLower(c2)))
