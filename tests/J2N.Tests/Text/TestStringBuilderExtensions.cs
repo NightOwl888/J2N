@@ -800,6 +800,238 @@ namespace J2N.Text
 
 #endif
 
+        [Test]
+        public void Test_Insert_ICharSequence()
+        {
+            StringBuilder sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, charSequence: "ab".AsCharSequence())); // J2N: charSequence label is required to get to this overload over object overload. See https://stackoverflow.com/a/26885473
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, charSequence: "cd".AsCharSequence()));
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo"); ;
+            assertSame(sb, sb.Insert(1, charSequence: (ICharSequence)null));
+            // assertEquals("null", sb.ToString());
+            assertEquals("foo", sb.ToString());
+        }
+
+        [Test]
+        public void Test_Insert_ICharSequence_Custom()
+        {
+            StringBuilder sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, charSequence: new MyCharSequence("ab")));
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, charSequence: new MyCharSequence("cd")));
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, charSequence: (ICharSequence)null));
+            // assertEquals("null", sb.ToString());
+            assertEquals("foo", sb.ToString()); // J2N: Changed the behavior to be a no-op rather than appending the string "null"
+
+            // J2N: Check long strings that will be appended in chunks in certain cases
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, charSequence: new MyCharSequence(longString1));
+            assertEquals('f' + longString1 + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, charSequence: new MyCharSequence(longString2));
+            assertEquals("fo" + longString2 + 'o', sb.ToString());
+        }
+
+        [Test]
+        public void Test_Insert_ICharSequence_Int32_Int32()
+        {
+            StringBuilder sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, "ab".AsCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, "cd".AsCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, "abcd".AsCharSequence(), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, "abcd".AsCharSequence(), 2, 4 - 2)); // J2N: corrected 3rd parameter
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            try
+            {
+                assertSame(sb, sb.Insert(1, (ICharSequence)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0's Append(StringBuilder,int,int) overload) rather than appending the string "null"
+                fail("no NPE");
+            }
+            catch (ArgumentNullException e)
+            {
+                // Expected
+            }
+            //assertEquals("nu", sb.ToString());
+            assertEquals("foo", sb.ToString());
+
+
+            // J2N: Check long strings that will be appended in chunks in certain cases
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, new MyCharSequence(longString1), 0, longString1.Length);
+            assertEquals('f' + longString1 + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, new MyCharSequence(longString2), 0, longString2.Length);
+            assertEquals("fo" + longString2 + 'o', sb.ToString());
+        }
+
+        [Test]
+        public void Test_Insert_ICharSequence_Int32_Int32_Custom()
+        {
+            StringBuilder sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new MyCharSequence("ab"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new MyCharSequence("cd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new MyCharSequence("abcd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new MyCharSequence("abcd"), 2, 4 - 2)); // J2N: corrected 3rd parameter
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            try
+            {
+                assertSame(sb, sb.Insert(1, (ICharSequence)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0's Append(StringBuilder,int,int) overload) rather than appending the string "null"
+                fail("no NPE");
+            }
+            catch (ArgumentNullException e)
+            {
+                // Expected
+            }
+            //assertEquals("nu", sb.ToString());
+            assertEquals("foo", sb.ToString());
+
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, new MyCharSequence(longString1), 0, longString1.Length);
+            assertEquals('f' + longString1 + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, new MyCharSequence(longString2), 0, longString2.Length);
+            assertEquals("fo" + longString2 + 'o', sb.ToString());
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, new MyCharSequence(longString2), 0, 1550);
+            assertEquals('f' + new string('z', 1000) + new string('y', 550) + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, new MyCharSequence(longString2), 1000, 550 + 6999);
+            assertEquals("fo" + new string('y', 550) + new string('r', 6999) + 'o', sb.ToString());
+        }
+
+        [Test]
+        public void Test_Insert_StringBuilder()
+        {
+            StringBuilder sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, charSequence: new StringBuilder("ab")));
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new StringBuilder("cd")));
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, (StringBuilder)null));
+            // assertEquals("null", sb.ToString());
+            assertEquals("foo", sb.ToString()); // J2N: Changed the behavior to be a no-op rather than appending the string "null"
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, new StringBuilder(longString1));
+            assertEquals('f' + longString1 + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, new StringBuilder(longString2));
+            assertEquals("fo" + longString2 + "o", sb.ToString());
+        }
+
+        [Test]
+        public void Test_Insert_StringBuilder_Int32_Int32()
+        {
+            StringBuilder sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new StringBuilder("ab"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new StringBuilder("cd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new StringBuilder("abcd"), 0, 2 - 0)); // J2N: corrected 3rd parameter
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, new StringBuilder("abcd"), 2, 4 - 2)); // J2N: corrected 3rd parameter
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            try
+            {
+                assertSame(sb, sb.Insert(1, (StringBuilder)null, 0, 2)); // J2N: Changed the behavior to throw an exception (to match .NET Core 3.0) rather than appending the string "null"
+                fail("no NPE");
+            }
+            catch (ArgumentNullException e)
+            {
+                // Expected
+            }
+            //assertEquals("nu", sb.ToString());
+            assertEquals("foo", sb.ToString());
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, new StringBuilder(longString1), 0, longString1.Length);
+            assertEquals('f' + longString1 + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, new StringBuilder(longString2), 0, longString2.Length);
+            assertEquals("fo" + longString2 + "o", sb.ToString());
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, new StringBuilder(longString2), 0, 1550);
+            assertEquals('f' + new string('z', 1000) + new string('y', 550) + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, new StringBuilder(longString2), 1000, 550 + 6999);
+            assertEquals("fo" + new string('y', 550) + new string('r', 6999) + 'o', sb.ToString());
+        }
+
+#if FEATURE_SPAN
+
+        [Test]
+        public void Test_Insert_ReadOnlySpan() // J2N Specific to cover missing overload in older .NET TFMs
+        {
+            StringBuilder sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, "ab".AsSpan()));
+            assertEquals("faboo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, "cd".AsSpan()));
+            assertEquals("fcdoo", sb.ToString());
+            sb = new StringBuilder("foo");
+            assertSame(sb, sb.Insert(1, "".AsSpan()));
+            assertEquals("foo", sb.ToString());
+
+            // J2N: Check long strings that will be appended in chunks on certain TFMs
+            string longString1 = new string('a', 2000) + new string('b', 200) + new string('c', 699) + new string('d', 3000);
+            string longString2 = new string('z', 1000) + new string('y', 550) + new string('r', 6999) + new string('f', 300);
+
+            sb = new StringBuilder("foo");
+            sb.Insert(1, longString1.AsSpan());
+            assertEquals('f' + longString1 + "oo", sb.ToString());
+            sb = new StringBuilder("foo");
+            sb.Insert(2, longString2.AsSpan());
+            assertEquals("fo" + longString2 + 'o', sb.ToString());
+        }
+
+#endif
+
         /**
          * @tests java.lang.StringBuilder.indexOf(String)
          */

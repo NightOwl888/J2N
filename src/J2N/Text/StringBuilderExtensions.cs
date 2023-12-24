@@ -899,18 +899,54 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             // For null values, this is a no-op
-            if (charSequence != null && charSequence.HasValue)
+            if (charSequence is null || !charSequence.HasValue)
+                return text;
+
+            if (charSequence is StringCharSequence str)
+                return text.Insert(index, str.Value);
+            else if (charSequence is CharArrayCharSequence charArray)
+                return text.Insert(index, charArray.Value);
+            else if (charSequence is StringBuilderCharSequence sb)
+                return text.Insert(index, sb.Value);
+            else if (charSequence is StringBuffer stringBuffer)
+                return text.Insert(index, stringBuffer.builder);
+
+#if FEATURE_ARRAYPOOL
+            int start = 0;
+            int remainingCount = charSequence.Length;
+            int insertIndex = index;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
             {
-                if (charSequence is StringCharSequence str)
-                    text.Insert(index, str.Value);
-                else if (charSequence is CharArrayCharSequence charArray)
-                    text.Insert(index, charArray.Value);
-                else if (charSequence is StringBuilderCharSequence sb)
-                    text.Insert(index, sb.Value);
-                else
-                    text.Insert(index, charSequence.ToString());
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    int bufferIndex = 0;
+                    int end = start + chunkLength;
+                    for (int i = start; i < end; i++)
+                    {
+                        buffer[bufferIndex++] = charSequence[i];
+                    }
+
+                    text.Insert(insertIndex, buffer, 0, chunkLength);
+
+                    start += chunkLength;
+                    remainingCount -= chunkLength;
+                    insertIndex += chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
             }
             return text;
+#else
+            return text.Insert(index, charSequence.ToString()); // .NET 4.0 - don't care to optimize
+#endif
         }
 
         /// <summary>
@@ -964,10 +1000,51 @@ namespace J2N.Text
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
+            if (charSequence is StringCharSequence stringCharSequence)
+                return text.Insert(index, stringCharSequence.Value, startIndex, charCount);
             if (charSequence is CharArrayCharSequence charArrayCharSequence)
                 return text.Insert(index, charArrayCharSequence.Value, startIndex, charCount);
+            if (charSequence is StringBuilderCharSequence sbCharSequence)
+                return text.Insert(index, sbCharSequence.Value, startIndex, charCount);
+            if (charSequence is StringBuffer stringBuffer)
+                return text.Insert(index, stringBuffer.builder, startIndex, charCount);
 
-            return Insert(text, index, charSequence.Subsequence(startIndex, charCount));
+#if FEATURE_ARRAYPOOL
+            int start = startIndex;
+            int remainingCount = charCount;
+            int insertIndex = index;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    int bufferIndex = 0;
+                    int end = start + chunkLength;
+                    for (int i = start; i < end; i++)
+                    {
+                        buffer[bufferIndex++] = charSequence[i];
+                    }
+
+                    text.Insert(insertIndex, buffer, 0, chunkLength);
+
+                    start += chunkLength;
+                    remainingCount -= chunkLength;
+                    insertIndex += chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+            return text;
+#else
+            return Insert(text, index, charSequence.Subsequence(startIndex, charCount)); // .NET 4.0 - don't care to optimize
+#endif
         }
 
         /// <summary>
@@ -993,10 +1070,41 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException(nameof(index));
             if (charSequence is null)
                 return text;
-           
+
             // NOTE: This method will not be used for .NET Standard 2.1+ because
             // the overload already exists on StringBuilder.
-            return text.Insert(index, charSequence.ToString());
+
+#if FEATURE_ARRAYPOOL
+            int start = 0;
+            int remainingCount = charSequence.Length;
+            int insertIndex = index;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    charSequence.CopyTo(start, buffer, 0, chunkLength);
+
+                    text.Insert(insertIndex, buffer, 0, chunkLength);
+
+                    start += chunkLength;
+                    remainingCount -= chunkLength;
+                    insertIndex += chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+            return text;
+#else
+            return text.Insert(index, charSequence.ToString()); // .NET 4.0 - don't care to optimize.
+#endif
         }
 
         /// <summary>
@@ -1050,7 +1158,40 @@ namespace J2N.Text
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
-            return text.Insert(index, charSequence.ToString(startIndex, charCount));
+            // J2N NOTE: We don't use Span<char> because this Insert() overload was added to StringBuilder prior to the CopyTo(int, Span<char> int) overload,
+            // so this will never be called when Span<char> is supported unless called as a static method.
+
+#if FEATURE_ARRAYPOOL
+            int start = startIndex;
+            int remainingCount = charCount;
+            int insertIndex = index;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    charSequence.CopyTo(start, buffer, 0, chunkLength);
+
+                    text.Insert(insertIndex, buffer, 0, chunkLength);
+
+                    start += chunkLength;
+                    remainingCount -= chunkLength;
+                    insertIndex += chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+            return text;
+#else
+            return text.Insert(index, charSequence.ToString(startIndex, charCount)); // .NET 4.0 - don't care to optimize
+#endif
         }
 
         /// <summary>
@@ -1106,10 +1247,90 @@ namespace J2N.Text
 
 #if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
             return text.Insert(index, value.AsSpan(startIndex, charCount));
+#elif FEATURE_ARRAYPOOL
+            int start = startIndex;
+            int remainingCount = charCount;
+            int insertIndex = index;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    value.CopyTo(start, buffer, 0, chunkLength);
+
+                    text.Insert(insertIndex, buffer, 0, chunkLength);
+
+                    start += chunkLength;
+                    remainingCount -= chunkLength;
+                    insertIndex += chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+            return text;
 #else
-            return text.Insert(index, value.Substring(startIndex, charCount));
+            return text.Insert(index, value.Substring(startIndex, charCount)); // .NET 4.0 - don't care to optimize
 #endif
         }
+
+#if FEATURE_SPAN
+        /// <summary>
+        /// Inserts the sequence of characters into this <see cref="StringBuilder"/>
+        /// at the specified character position.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="charSequence">The <see cref="ReadOnlySpan{Char}"/> to insert.</param>
+        /// <returns>This <see cref="StringBuilder"/>, for chaining.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater
+        /// than the length of this instance.</exception>
+        // J2N: Added to cover the missing .NET API on older .NET target frameworks.
+        public static StringBuilder Insert(this StringBuilder text, int index, ReadOnlySpan<char> charSequence)
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+            if (index < 0 || index > text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index));
+            if (charSequence.Length == 0)
+                return text;
+
+            int startIndex = 0;
+            int remainingCount = charSequence.Length;
+            int insertIndex = index;
+
+            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+            try
+            {
+                while (remainingCount > 0)
+                {
+                    // Determine the chunk size for the current iteration
+                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+
+                    // Copy the chunk to the buffer
+                    charSequence.Slice(startIndex, chunkLength).CopyTo(buffer);
+
+                    text.Insert(insertIndex, buffer, 0, chunkLength);
+
+                    startIndex += chunkLength;
+                    remainingCount -= chunkLength;
+                    insertIndex += chunkLength;
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(buffer);
+            }
+            return text;
+        }
+#endif
 
         #endregion
 
