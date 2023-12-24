@@ -1769,10 +1769,15 @@ namespace J2N.Text
                     // replacing with more characters...need some room
                     text.Insert(startIndex, new char[-diff]);
                 }
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                var textIndexer = new ValueStringBuilderChunkIndexer(text);
+#else // J2N: ValueStringBuilderArrayPoolIndexer doesn't provide any write advantage over StringBuilder
+                var textIndexer = text; // .NET 4.0 - don't care to optimize
+#endif
                 // copy the chars based on the new length
                 for (int i = 0; i < stringLength; i++)
                 {
-                    text[i + startIndex] = newValue[i];
+                    textIndexer[i + startIndex] = newValue[i];
                 }
                 return text;
             }
