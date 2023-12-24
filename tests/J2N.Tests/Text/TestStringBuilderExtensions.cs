@@ -85,6 +85,59 @@ namespace J2N.Text
         }
 
         [Test]
+        public virtual void TestInsertCodePointBmp()
+        {
+            var sb = new StringBuilder("foo bar");
+            int codePoint = 97; // a
+
+            sb.InsertCodePoint(2, codePoint);
+
+            Assert.AreEqual("foao bar", sb.ToString());
+        }
+
+        [Test]
+        public virtual void TestInsertCodePointUnicode()
+        {
+            var sb = new StringBuilder("foo bar");
+            int codePoint = 3594; // ช
+
+            sb.InsertCodePoint(2, codePoint);
+
+            Assert.AreEqual("foชo bar", sb.ToString());
+        }
+
+        [Test]
+        public virtual void TestInsertCodePointUTF16Surrogates()
+        {
+            var sb = new StringBuilder("foo bar");
+            int codePoint = 176129; // '\uD86C', '\uDC01' (𫀁)
+
+            sb.InsertCodePoint(2, codePoint);
+
+            Assert.AreEqual("fo𫀁o bar", sb.ToString());
+        }
+
+        [Test]
+        public virtual void TestInsertCodePointTooHigh()
+        {
+            var sb = new StringBuilder("foo bar");
+            int codePoint = Character.MaxCodePoint + 1;
+
+            Assert.Throws<ArgumentException>(() => sb.InsertCodePoint(2, codePoint));
+        }
+
+        [Test]
+        public virtual void TestInsertCodePointTooLow()
+        {
+            var sb = new StringBuilder("foo bar");
+            int codePoint = Character.MinCodePoint - 1;
+
+            Assert.Throws<ArgumentException>(() => sb.InsertCodePoint(2, codePoint));
+        }
+
+
+
+        [Test]
         public void TestCompareToOrdinal()
         {
             StringBuilder target = null;

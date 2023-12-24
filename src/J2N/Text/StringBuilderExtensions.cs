@@ -428,16 +428,36 @@ namespace J2N.Text
         /// <param name="codePoint">A Unicode code point</param>
         /// <returns>This <see cref="StringBuilder"/>, for chaining.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public static StringBuilder AppendCodePoint(this StringBuilder text, int codePoint)
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
+            if (!Character.IsValidCodePoint(codePoint))
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
-            int length = Character.ToChars(codePoint, out char high, out char low);
-            text.Append(high);
-            if (length == 2)
+            if (codePoint < Character.MinSupplementaryCodePoint)
+            {
+                text.Append((char)codePoint);
+                return text;
+            }
+
+            return AppendCodePointSlow(text, codePoint);
+
+            static StringBuilder AppendCodePointSlow(StringBuilder text, int codePoint)
+            {
+                Character.ToChars(codePoint, out char high, out char low);
+#if FEATURE_STRINGBUILDER_APPEND_CHARPTR
+                Span<char> ch = stackalloc char[2];
+                ch[0] = high;
+                ch[1] = low;
+                text.Append(ch);
+#else
+                text.Append(high);
                 text.Append(low);
-            return text;
+#endif
+                return text;
+            }
         }
 
         #endregion AppendCodePoint
@@ -1333,6 +1353,66 @@ namespace J2N.Text
 #endif
 
         #endregion
+
+        #region InsertCodePoint
+
+        /// <summary>
+        /// Insert the string representation of the <paramref name="codePoint"/>
+        /// argument to this sequence at <paramref name="index"/>.
+        /// <para>
+        /// The argument is inserted into to the contents of this sequence.
+        /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
+        /// </para>
+        /// <para>
+        /// The overall effect is exactly as if the argument were
+        /// converted to a <see cref="char"/> array by the method
+        /// <see cref="Character.ToChars(int)"/> and the character in that array
+        /// were then <see cref="StringBuilder.Insert(int, char[])">inserted</see> into this
+        /// <see cref="StringBuilder"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater
+        /// than the length of this instance.</exception>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        public static StringBuilder InsertCodePoint(this StringBuilder text, int index, int codePoint)
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+            if (index < 0)
+                throw new ArgumentOutOfRangeException(nameof(index), string.Format(SR.ArgumentOutOfRange_Generic_MustBeNonNegative, nameof(index), index));
+            if (!Character.IsValidCodePoint(codePoint))
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+
+            if (codePoint < Character.MinSupplementaryCodePoint)
+            {
+                text.Insert(index, (char)codePoint);
+                return text;
+            }
+
+            return InsertCodePointSlow(text, index, codePoint);
+
+            static StringBuilder InsertCodePointSlow(StringBuilder text, int index, int codePoint)
+            {
+                Character.ToChars(codePoint, out char high, out char low);
+#if FEATURE_STRINGBUILDER_APPEND_CHARPTR
+                Span<char> ch = stackalloc char[2];
+                ch[0] = high;
+                ch[1] = low;
+                text.Insert(index, ch);
+#else
+                text.Insert(index, high);
+                text.Insert(index + 1, low);
+#endif
+                return text;
+            }
+        }
+
+        #endregion InsertCodePoint
 
         #region LastIndexOf
 
