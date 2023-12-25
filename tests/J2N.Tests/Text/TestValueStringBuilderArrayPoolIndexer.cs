@@ -131,20 +131,26 @@ namespace J2N.Text
         public void GetBounds_MultipleChunks_ReturnsCorrectBounds()
         {
             StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using (var indexer = new ValueStringArrayPoolIndexer(sb))
+            using (var indexer = new ValueStringArrayPoolIndexer(sb, iterateForward: true))
             {
-                indexer.Reset(iterateForward: true);
-                //indexer.IterateForward = true;
+                int expectedChunkCount = (int)Math.Ceiling((double)sb.Length / ValueStringArrayPoolIndexer.ChunkLength);
+                Assert.AreEqual(expectedChunkCount, indexer.ChunkCount);
 
-                // Multiple chunks scenario
-                indexer.GetBounds(0, out int lowerBound1, out int upperBound1);
-                indexer.GetBounds(1, out int lowerBound2, out int upperBound2);
 
-                Assert.AreEqual(0, lowerBound1);
-                Assert.AreEqual(ValueStringArrayPoolIndexer.ChunkLength - 1, upperBound1);
-
-                Assert.AreEqual(ValueStringArrayPoolIndexer.ChunkLength, lowerBound2);
-                Assert.AreEqual(sb.Length - 1, upperBound2);
+                for (int i = 0; i < expectedChunkCount; i++)
+                {
+                    indexer.GetBounds(i, out int lowerBound, out int upperBound);
+                    if (i < expectedChunkCount - 1)
+                    {
+                        Assert.AreEqual(ValueStringArrayPoolIndexer.ChunkLength * i, lowerBound);
+                        Assert.AreEqual((ValueStringArrayPoolIndexer.ChunkLength * (i + 1)) - 1, upperBound);
+                    }
+                    else // Last chunk
+                    {
+                        Assert.AreEqual(ValueStringArrayPoolIndexer.ChunkLength * i, lowerBound);
+                        Assert.AreEqual(sb.Length - 1, upperBound);
+                    }
+                }
             }
         }
 
@@ -182,13 +188,10 @@ namespace J2N.Text
         public void IsWithinBounds_MultipleChunks_ReturnsTrueForValidIndex()
         {
             StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using (var indexer = new ValueStringArrayPoolIndexer(sb))
+            using (var indexer = new ValueStringArrayPoolIndexer(sb, iterateForward: true))
             {
-                indexer.Reset(iterateForward: true);
-                //indexer.IterateForward = true;
-
                 // Multiple chunks scenario
-                bool result = indexer.IsWithinBounds(1, 1025);
+                bool result = indexer.IsWithinBounds(1, ValueStringArrayPoolIndexer.ChunkLength * 2 - 10);
                 Assert.IsTrue(result);
             }
         }

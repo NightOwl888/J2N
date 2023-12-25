@@ -36,7 +36,7 @@ namespace J2N.Text
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Structs have performance issues with readonly fields.")]
     internal ref struct ValueStringArrayPoolIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
     {
-        public const int ChunkLength = 1024;
+        public const int ChunkLength = 512;
 
         private /*readonly*/ StringBuilder stringBuilder;
         private /*readonly*/ int lastChunkLength;
@@ -56,12 +56,16 @@ namespace J2N.Text
             currentChunkIndex = -1;
             currentLowerBound = 0;
             currentUpperBound = 0;
+            lastChunkLength = 0;
             currentChunk = ArrayPool<char>.Shared.Rent(ChunkLength);
 
             int length = stringBuilder.Length;
             chunkCount = (int)Math.Ceiling((double)length / ChunkLength);
-            int remainder = (chunkCount * ChunkLength) - length;
-            lastChunkLength = ChunkLength - remainder;
+            if (chunkCount > 0)
+            {
+                int remainder = (chunkCount * ChunkLength) - length;
+                lastChunkLength = ChunkLength - remainder;
+            }
 
             Reset();
         }
@@ -76,15 +80,15 @@ namespace J2N.Text
         internal void GetBounds(int chunkIndex, out int lowerBound, out int upperBound) // internal for testing
         {
             Debug.Assert(chunkIndex >= 0);
-            Debug.Assert(chunkIndex < chunkCount);
+            Debug.Assert(chunkIndex < chunkCount || chunkIndex == 0);
 
             lowerBound = chunkIndex * ChunkLength;
             upperBound = ((chunkIndex + 1) * ChunkLength) - 1;
 
             // Fix last chunk upper bound
-            if (chunkIndex == chunkCount - 1)
+            if (chunkIndex == Math.Max(chunkCount - 1, 0))
             {
-                int lastIndex = stringBuilder.Length - 1;
+                int lastIndex = Math.Max(stringBuilder.Length - 1, 0);
                 if (upperBound > lastIndex)
                     upperBound = lastIndex;
             }
@@ -152,7 +156,11 @@ namespace J2N.Text
             currentLowerBound = lowerBound;
             currentUpperBound = upperBound;
             currentChunkIndex = chunkIndex;
-            stringBuilder.CopyTo(lowerBound, currentChunk, 0, chunkIndex == chunkCount - 1 ? lastChunkLength : ChunkLength);
+            int copyLength = chunkIndex == Math.Max(chunkCount - 1, 0) ? lastChunkLength : ChunkLength;
+            if (copyLength > 0)
+            {
+                stringBuilder.CopyTo(lowerBound, currentChunk, 0, copyLength);
+            }
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -160,7 +168,7 @@ namespace J2N.Text
 #endif
         public void Reset()
         {
-            int chunkIndex = iterateForward ? 0 : chunkCount - 1;
+            int chunkIndex = iterateForward ? 0 : Math.Max(chunkCount - 1, 0);
             SetChunk(chunkIndex);
         }
 
