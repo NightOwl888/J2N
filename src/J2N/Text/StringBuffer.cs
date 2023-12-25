@@ -2551,7 +2551,7 @@ namespace J2N.Text
         /// <para/>
         /// Let <c>n</c> be the character length of this character sequence
         /// (not the length in <see cref="char"/> values) just prior to
-        /// execution of the <see cref="Reverse"/> method. Then the
+        /// execution of the <see cref="Reverse()"/> method. Then the
         /// character at index <c>k</c> in the new character sequence is
         /// equal to the character at index <c>n-k-1</c> in the old
         /// character sequence.
