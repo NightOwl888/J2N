@@ -27,14 +27,14 @@ namespace J2N.Text
     /// <para/>
     /// Do not call any operations that mutate the <see cref="StringBuilder"/>, such as <see cref="StringBuilder.Append(string?)"/>,
     /// <see cref="StringBuilder.Insert(int, string?)"/>. If the state of the <see cref="StringBuilder"/> changes, the behavior
-    /// is undefined and you must create a new instance of <see cref="ValueStringArrayPoolIndexer"/> to read the changes.
+    /// is undefined and you must create a new instance of <see cref="ValueStringBuilderArrayPoolIndexer"/> to read the changes.
     /// <para/>
     /// This type is disposable and the user is responsible for calling <see cref="Dispose()"/> after use.
     /// <para/>
-    /// For .NET Core 3.x and higher, the ValueStringBuilderChunkIndexer should be favored over this approach.
+    /// For .NET Core 3.x and higher, the <see cref="ValueStringBuilderChunkIndexer"/> should be favored over this approach.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Structs have performance issues with readonly fields.")]
-    internal ref struct ValueStringArrayPoolIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
+    internal ref struct ValueStringBuilderArrayPoolIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
     {
         public const int ChunkLength = 512;
 
@@ -47,7 +47,7 @@ namespace J2N.Text
         private int currentUpperBound;
         private bool iterateForward;
 
-        public ValueStringArrayPoolIndexer(StringBuilder stringBuilder, bool iterateForward = true)
+        public ValueStringBuilderArrayPoolIndexer(StringBuilder stringBuilder, bool iterateForward = true)
         {
             this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
             this.iterateForward = iterateForward;

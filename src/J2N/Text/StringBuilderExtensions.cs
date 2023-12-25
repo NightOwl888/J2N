@@ -506,7 +506,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
 #else
             var textIndexer = text; // .NET 4.0 - don't care to optimize
 #endif
@@ -550,7 +550,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
 #else
             var textIndexer = text; // .NET 4.0 - don't care to optimize
 #endif
@@ -596,8 +596,8 @@ namespace J2N.Text
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
             var valueIndexer = new ValueStringBuilderChunkIndexer(value);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
-            using var valueIndexer = new ValueStringArrayPoolIndexer(value);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
+            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
 #endif
 #if FEATURE_STRINGBUILDER_GETCHUNKS || FEATURE_ARRAYPOOL
             int length = Math.Min(text.Length, value.Length);
@@ -644,7 +644,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
 #else
             var textIndexer = text; // .NET 4.0 - don't care to optimize
 #endif
@@ -893,7 +893,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
 #else
             var textIndexer = text; // .NET 4.0 - don't care to optimize
 #endif
@@ -928,7 +928,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
 #else
             var textIndexer = text; // .NET 4.0 - don't care to optimize
 #endif
@@ -1592,7 +1592,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
 #else
             var textIndexer = text; // .NET 4.0 - don't care to optimize
 #endif
@@ -1650,7 +1650,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
 #elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringArrayPoolIndexer(text);
+            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
 #else
             var textIndexer = text; // .NET 4.0 - don't care to optimize
 #endif
@@ -1828,8 +1828,8 @@ namespace J2N.Text
             var forwardTextIndexer = new ValueStringBuilderChunkIndexer(text);
             var reverseTextIndexer = new ValueStringBuilderChunkIndexer(text, iterateForward: false);
 #elif FEATURE_ARRAYPOOL
-            var forwardTextIndexer = new ValueStringArrayPoolIndexer(text);
-            var reverseTextIndexer = new ValueStringArrayPoolIndexer(text, iterateForward: false);
+            var forwardTextIndexer = new ValueStringBuilderArrayPoolIndexer(text);
+            var reverseTextIndexer = new ValueStringBuilderArrayPoolIndexer(text, iterateForward: false);
             try
 #else
             var forwardTextIndexer = text; // .NET 4.0 - don't care to optimize
