@@ -1805,7 +1805,7 @@ namespace J2N.Text
         /// <para/>
         /// Let <c>n</c> be the character length of this character sequence
         /// (not the length in <see cref="char"/> values) just prior to
-        /// execution of the <see cref="Reverse"/> method. Then the
+        /// execution of the <see cref="Reverse(StringBuilder)"/> method. Then the
         /// character at index <c>k</c> in the new character sequence is
         /// equal to the character at index <c>n-k-1</c> in the old
         /// character sequence.
@@ -1824,46 +1824,98 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            bool hasSurrogate = false;
-            int n = text.Length - 1;
-            // Tradeoff: materializing the string is generally faster,
-            // but also requires additional RAM. So, if the string is going
-            // to take up more than 16KB, we index into the StringBuilder
-            // rather than a string.
-            bool materializeString = text.Length <= 16384;
-            string? readOnlyText = materializeString ? text.ToString() : null;
-            for (int j = (n - 1) >> 1; j >= 0; --j)
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var forwardTextIndexer = new ValueStringBuilderChunkIndexer(text);
+            var reverseTextIndexer = new ValueStringBuilderChunkIndexer(text, iterateForward: false);
+#elif FEATURE_ARRAYPOOL
+            var forwardTextIndexer = new ValueStringArrayPoolIndexer(text);
+            var reverseTextIndexer = new ValueStringArrayPoolIndexer(text, iterateForward: false);
+            try
+#else
+            var forwardTextIndexer = text; // .NET 4.0 - don't care to optimize
+            var reverseTextIndexer = text;
+#endif
             {
-                char temp = materializeString ? readOnlyText![j] : text[j];
-                char temp2 = materializeString ? readOnlyText![n - j] : text[n - j];
-                if (!hasSurrogate)
+                int count = text.Length;
+                if (count == 0) return text;
+                int start = 0;
+                int end = count - 1;
+                char startHigh = forwardTextIndexer[0];
+                char endLow = reverseTextIndexer[end];
+                bool allowStartSurrogate = true, allowEndSurrogate = true;
+                while (start < end)
                 {
-                    hasSurrogate = (temp >= Character.MinSurrogate && temp <= Character.MaxSurrogate)
-                        || (temp2 >= Character.MinSurrogate && temp2 <= Character.MaxSurrogate);
-                }
-                text[j] = temp2;
-                text[n - j] = temp;
-            }
-            if (hasSurrogate)
-            {
-                readOnlyText = materializeString ? text.ToString() : null;
-                // Reverse back all valid surrogate pairs
-                for (int i = 0; i < text.Length - 1; i++)
-                {
-                    char c2 = materializeString ? readOnlyText![i] : text[i];
-                    if (char.IsLowSurrogate(c2))
+                    char startLow = forwardTextIndexer[start + 1];
+                    char endHigh = reverseTextIndexer[end - 1];
+                    bool surrogateAtStart = allowStartSurrogate && startLow >= 0xdc00
+                            && startLow <= 0xdfff && startHigh >= 0xd800
+                            && startHigh <= 0xdbff;
+                    if (surrogateAtStart && (count < 3))
                     {
-                        char c1 = materializeString ? readOnlyText![i + 1] : text[i];
-                        if (char.IsHighSurrogate(c1))
+                        return text;
+                    }
+                    bool surAtEnd = allowEndSurrogate && endHigh >= 0xd800
+                            && endHigh <= 0xdbff && endLow >= 0xdc00
+                            && endLow <= 0xdfff;
+                    allowStartSurrogate = allowEndSurrogate = true;
+                    if (surrogateAtStart == surAtEnd)
+                    {
+                        if (surrogateAtStart)
                         {
-                            text[i++] = c1;
-                            text[i] = c2;
+                            // both surrogates
+                            reverseTextIndexer[end] = startLow;
+                            reverseTextIndexer[end - 1] = startHigh;
+                            forwardTextIndexer[start] = endHigh;
+                            forwardTextIndexer[start + 1] = endLow;
+                            startHigh = forwardTextIndexer[start + 2];
+                            endLow = reverseTextIndexer[end - 2];
+                            start++;
+                            end--;
+                        }
+                        else
+                        {
+                            // neither surrogates
+                            reverseTextIndexer[end] = startHigh;
+                            forwardTextIndexer[start] = endLow;
+                            startHigh = startLow;
+                            endLow = endHigh;
                         }
                     }
+                    else
+                    {
+                        if (surrogateAtStart)
+                        {
+                            // surrogate only at the front
+                            reverseTextIndexer[end] = startLow;
+                            forwardTextIndexer[start] = endLow;
+                            endLow = endHigh;
+                            allowStartSurrogate = false;
+                        }
+                        else
+                        {
+                            // surrogate only at the end
+                            reverseTextIndexer[end] = startHigh;
+                            forwardTextIndexer[start] = endHigh;
+                            startHigh = startLow;
+                            allowEndSurrogate = false;
+                        }
+                    }
+                    start++;
+                    end--;
                 }
+                if ((count & 1) == 1 && (!allowStartSurrogate || !allowEndSurrogate))
+                {
+                    reverseTextIndexer[end] = allowStartSurrogate ? endLow : startHigh;
+                }
+                return text;
             }
-
-            return text;
+#if !FEATURE_STRINGBUILDER_GETCHUNKS && FEATURE_ARRAYPOOL
+            finally
+            {
+                forwardTextIndexer.Dispose();
+                reverseTextIndexer.Dispose();
+            }
+#endif
         }
 
         #endregion Reverse

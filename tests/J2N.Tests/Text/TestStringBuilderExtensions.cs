@@ -494,6 +494,9 @@ namespace J2N.Text
 
             str = "abcd\ud802\udc02\ud801\udc01\ud800\udc00";
             reverseTest(str, "\ud800\udc00\ud801\udc01\ud802\udc02dcba", str);
+
+            str = new string('z', 1000) + "abcd\ud802\udc02\ud801\udc01\ud800\udc00" + new string('p', 3000) + "abcd\ud802\udc02\ud801\udc01\ud800\udc00";
+            reverseTest(str, "\ud800\udc00\ud801\udc01\ud802\udc02dcba" + new string('p', 3000) + "\ud800\udc00\ud801\udc01\ud802\udc02dcba" + new string('z', 1000), str);
         }
 
         /**
