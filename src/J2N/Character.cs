@@ -18,12 +18,10 @@
 
 using J2N.Text;
 using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using SR2 = J2N.Resources.Strings;
-
 
 namespace J2N
 {
@@ -585,8 +583,13 @@ namespace J2N
         /// </exception>
         public static int CodePointAt(this ICharSequence seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
+            if (seq is StringBuilderCharSequence sb)
+                return CodePointAt(sb, index);
+            if (seq is StringBuffer stringBuffer)
+                return CodePointAt(stringBuffer.builder, index);
+
             int len = seq.Length;
             if (index < 0 || index >= len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
@@ -623,7 +626,7 @@ namespace J2N
         /// </exception>
         public static int CodePointAt(this char[] seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 0 || index >= len)
@@ -661,16 +664,24 @@ namespace J2N
         /// </exception>
         public static int CodePointAt(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 0 || index >= len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
 
-            char high = seq[index++];
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
+#elif FEATURE_ARRAYPOOL
+            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
+#else
+            var seqIndexer = seq; // .NET 4.0 - don't care to optimize
+#endif
+
+            char high = seqIndexer[index++];
             if (index >= len)
                 return high;
-            char low = seq[index];
+            char low = seqIndexer[index];
             if (char.IsSurrogatePair(high, low))
                 return ToCodePoint(high, low);
             return high;
@@ -699,7 +710,7 @@ namespace J2N
         /// </exception>
         public static int CodePointAt(this string seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 0 || index >= len)
@@ -775,7 +786,7 @@ namespace J2N
         /// </exception>
         public static int CodePointAt(this char[] seq, int index, int limit) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             if (index < 0 || index >= limit)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -809,8 +820,13 @@ namespace J2N
         /// the length of <paramref name="seq"/>.</exception>
         public static int CodePointBefore(this ICharSequence seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
+            if (seq is StringBuilderCharSequence sb)
+                return CodePointBefore(sb, index);
+            if (seq is StringBuffer stringBuffer)
+                return CodePointBefore(stringBuffer.builder, index);
+
             int len = seq.Length;
             if (index < 1 || index > len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
@@ -844,7 +860,7 @@ namespace J2N
         /// the length of <paramref name="seq"/>.</exception>
         public static int CodePointBefore(this char[] seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 1 || index > len)
@@ -879,16 +895,24 @@ namespace J2N
         /// the length of <paramref name="seq"/>.</exception>
         public static int CodePointBefore(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 1 || index > len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
 
-            char low = seq[--index];
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
+#elif FEATURE_ARRAYPOOL
+            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
+#else
+            var seqIndexer = seq; // .NET 4.0 - don't care to optimize
+#endif
+
+            char low = seqIndexer[--index];
             if (--index < 0)
                 return low;
-            char high = seq[index];
+            char high = seqIndexer[index];
             if (char.IsSurrogatePair(high, low))
             {
                 return ToCodePoint(high, low);
@@ -914,7 +938,7 @@ namespace J2N
         /// the length of <paramref name="seq"/>.</exception>
         public static int CodePointBefore(this string seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 1 || index > len)
@@ -998,7 +1022,7 @@ namespace J2N
         /// </exception>
         public static int CodePointBefore(this char[] seq, int index, int start)
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (start < 0 || start >= len)
@@ -1095,7 +1119,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
                 throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
-            if (destination == null)
+            if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
             if (destinationIndex < 0 || destinationIndex >= destination.Length)
                 throw new ArgumentOutOfRangeException(nameof(destinationIndex));
@@ -1212,8 +1236,13 @@ namespace J2N
         /// </exception>
         public static int CodePointCount(this ICharSequence seq, int startIndex, int length) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
+            if (seq is StringBuilderCharSequence sb)
+                return CodePointCount(sb, startIndex, length);
+            if (seq is StringBuffer stringBuffer)
+                return CodePointCount(stringBuffer.builder, startIndex, length);
+
             int len = seq.Length;
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR2.ArgumentOutOfRange_NeedNonNegNum);
@@ -1260,7 +1289,7 @@ namespace J2N
         /// </exception>
         public static int CodePointCount(this char[] seq, int startIndex, int length) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (startIndex < 0)
@@ -1308,7 +1337,7 @@ namespace J2N
         /// </exception>
         public static int CodePointCount(this StringBuilder seq, int startIndex, int length) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (startIndex < 0)
@@ -1318,12 +1347,20 @@ namespace J2N
             if (startIndex + length > len)
                 throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
+#elif FEATURE_ARRAYPOOL
+            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
+#else
+            var seqIndexer = seq; // .NET 4.0 - don't care to optimize
+#endif
+
             int endIndex = startIndex + length;
             int n = length;
             for (int i = startIndex; i < endIndex;)
             {
-                if (char.IsHighSurrogate(seq[i++]) && i < endIndex
-                    && char.IsLowSurrogate(seq[i]))
+                if (char.IsHighSurrogate(seqIndexer[i++]) && i < endIndex
+                    && char.IsLowSurrogate(seqIndexer[i]))
                 {
                     n--;
                     i++;
@@ -1356,7 +1393,7 @@ namespace J2N
         /// </exception>
         public static int CodePointCount(this string seq, int startIndex, int length) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (startIndex < 0)
@@ -1431,8 +1468,13 @@ namespace J2N
         /// </exception>
         public static int OffsetByCodePoints(this ICharSequence seq, int index, int codePointOffset) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
+            if (seq is StringBuilderCharSequence sb)
+                return OffsetByCodePoints(sb, index, codePointOffset);
+            if (seq is StringBuffer stringBuffer)
+                return OffsetByCodePoints(stringBuffer.builder, index, codePointOffset);
+
             int length = seq.Length;
             if (index < 0 || index > length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
@@ -1503,7 +1545,7 @@ namespace J2N
         /// </exception>
         public static int OffsetByCodePoints(this char[] seq, int index, int codePointOffset) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int length = seq.Length;
             if (index < 0 || index > length)
@@ -1575,7 +1617,7 @@ namespace J2N
         /// </exception>
         public static int OffsetByCodePoints(this StringBuilder seq, int index, int codePointOffset) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int length = seq.Length;
             if (index < 0 || index > length)
@@ -1584,12 +1626,19 @@ namespace J2N
             int x = index;
             if (codePointOffset >= 0)
             {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: true);
+#elif FEATURE_ARRAYPOOL
+                using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: true);
+#else
+                var seqIndexer = seq; // .NET 4.0 - don't care to optimize
+#endif
                 int i;
                 for (i = 0; x < length && i < codePointOffset; i++)
                 {
-                    if (char.IsHighSurrogate(seq[x++]))
+                    if (char.IsHighSurrogate(seqIndexer[x++]))
                     {
-                        if (x < length && char.IsLowSurrogate(seq[x]))
+                        if (x < length && char.IsLowSurrogate(seqIndexer[x]))
                         {
                             x++;
                         }
@@ -1602,12 +1651,19 @@ namespace J2N
             }
             else
             {
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: false);
+#elif FEATURE_ARRAYPOOL
+                using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: false);
+#else
+                var seqIndexer = seq; // .NET 4.0 - don't care to optimize
+#endif
                 int i;
                 for (i = codePointOffset; x > 0 && i < 0; i++)
                 {
-                    if (char.IsLowSurrogate(seq[--x]))
+                    if (char.IsLowSurrogate(seqIndexer[--x]))
                     {
-                        if (x > 0 && char.IsHighSurrogate(seq[x - 1]))
+                        if (x > 0 && char.IsHighSurrogate(seqIndexer[x - 1]))
                         {
                             x--;
                         }
@@ -1647,7 +1703,7 @@ namespace J2N
         /// </exception>
         public static int OffsetByCodePoints(this string seq, int index, int codePointOffset) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             int length = seq.Length;
             if (index < 0 || index > length)
@@ -1806,7 +1862,7 @@ namespace J2N
         public static int OffsetByCodePoints(this char[] seq, int start, int count,
                                          int index, int codePointOffset)
         {
-            if (seq == null)
+            if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             if (start < 0)
                 throw new ArgumentOutOfRangeException(nameof(start), SR2.ArgumentOutOfRange_NeedNonNegNum);
@@ -2796,7 +2852,7 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
         public static int ToLower(int codePoint, CultureInfo culture)
         {
-            if (culture == null)
+            if (culture is null)
                 throw new ArgumentNullException(nameof(culture));
             if (!IsValidCodePoint(codePoint))
                 throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
@@ -2834,7 +2890,7 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
         public static int ToUpper(int codePoint, CultureInfo culture)
         {
-            if (culture == null)
+            if (culture is null)
                 throw new ArgumentNullException(nameof(culture));
             if (!IsValidCodePoint(codePoint))
                 throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
