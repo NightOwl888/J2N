@@ -502,6 +502,8 @@ namespace J2N.Text
 
             if (value is StringBuilderCharSequence sb)
                 return CompareToOrdinal(text, sb.Value);
+            if (value is StringBuffer stringBuffer)
+                return CompareToOrdinal(text, stringBuffer.builder);
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             var textIndexer = new ValueStringBuilderChunkIndexer(text);
