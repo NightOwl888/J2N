@@ -31,7 +31,7 @@ namespace J2N.Text
     /// <para/>
     /// This type is disposable and the user is responsible for calling <see cref="Dispose()"/> after use.
     /// <para/>
-    /// For .NET Core 3.x and higher, the <see cref="ValueStringBuilderChunkIndexer"/> should be favored over this approach.
+    /// For .NET Core 3.x and higher, the ValueStringBuilderChunkIndexer should be favored over this approach.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Structs have performance issues with readonly fields.")]
     internal ref struct ValueStringBuilderArrayPoolIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
