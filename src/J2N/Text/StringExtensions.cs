@@ -18,10 +18,8 @@
 
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-
 
 namespace J2N.Text
 {
@@ -67,9 +65,14 @@ namespace J2N.Text
         /// </returns>
         public static int CompareToOrdinal(this string? str, ICharSequence? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (value is StringCharSequence && object.ReferenceEquals(str, value)) return 0;
             if (str is null) return (value is null || !value.HasValue) ? 0 : -1;
             if (value is null || !value.HasValue) return 1;
+            if (value is StringCharSequence s && object.ReferenceEquals(str, s.Value)) return 0;
+
+            if (value is StringBuilderCharSequence sb)
+                return CompareToOrdinal(str, sb.Value);
+            if (value is StringBuffer stringBuffer)
+                return CompareToOrdinal(str, stringBuffer.builder);
 
             int length = Math.Min(str.Length, value.Length);
             int result;
@@ -143,21 +146,25 @@ namespace J2N.Text
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            // Materialize the string. It is faster to loop through
-            // a string than a StringBuilder.
-            string temp = value.ToString();
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var valueIndexer = new ValueStringBuilderChunkIndexer(value);
+#elif FEATURE_ARRAYPOOL
+            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
+#else
+            var valueIndexer = value; // .NET 4.0 - don't care to optimize
+#endif
 
-            int length = Math.Min(str.Length, temp.Length);
+            int length = Math.Min(str.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
             {
-                if ((result = str[i] - temp[i]) != 0)
+                if ((result = str[i] - valueIndexer[i]) != 0)
                     return result;
             }
 
             // At this point, we have compared all the characters in at least one string.
             // The longer string will be larger.
-            return str.Length - temp.Length;
+            return str.Length - value.Length;
         }
 
         /// <summary>
@@ -346,6 +353,11 @@ namespace J2N.Text
                 return charSequence is null || !charSequence.HasValue;
             if (charSequence is null || !charSequence.HasValue)
                 return false;
+
+            if (charSequence is StringBuilderCharSequence sb)
+                return ContentEquals(text, sb.Value, comparisonType);
+            if (charSequence is StringBuffer stringBuffer)
+                return ContentEquals(text, stringBuffer.builder, comparisonType);
 
             int len = charSequence.Length;
             if (len != text.Length)
@@ -752,8 +764,13 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (other is null)
+            if (other is null || !other.HasValue)
                 throw new ArgumentNullException(nameof(other));
+
+            if (other is StringBuilderCharSequence sb)
+                return RegionMatches(text, thisStartIndex, sb.Value!, otherStartIndex, length, comparisonType);
+            if (other is StringBuffer stringBuffer)
+                return RegionMatches(text, thisStartIndex, stringBuffer.builder, otherStartIndex, length, comparisonType);
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
                 return false;
@@ -887,32 +904,51 @@ namespace J2N.Text
             switch (comparisonType)
             {
                 case StringComparison.Ordinal:
-                    for (int i = 0; i < length; ++i)
                     {
-                        if (text[thisStartIndex + i] != other[otherStartIndex + i])
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                        var otherIndexer = new ValueStringBuilderChunkIndexer(other);
+#elif FEATURE_ARRAYPOOL
+                        using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
+#else
+                        var otherIndexer = other; // .NET 4.0 - don't care to optimize
+#endif
+                        for (int i = 0; i < length; ++i)
                         {
-                            return false;
+                            if (text[thisStartIndex + i] != otherIndexer[otherStartIndex + i])
+                            {
+                                return false;
+                            }
                         }
+                        return true;
                     }
-                    return true;
 
                 case StringComparison.OrdinalIgnoreCase:
-                    int end = thisStartIndex + length;
-                    char c1, c2;
-                    var textInfo = CultureInfo.InvariantCulture.TextInfo;
-                    while (thisStartIndex < end)
                     {
-                        if ((c1 = text[thisStartIndex++]) != (c2 = other[otherStartIndex++])
-                                && textInfo.ToUpper(c1) != textInfo.ToUpper(c2)
-                                // Required for unicode that we test both cases
-                                && textInfo.ToLower(c1) != textInfo.ToLower(c2))
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                        var otherIndexer = new ValueStringBuilderChunkIndexer(other);
+#elif FEATURE_ARRAYPOOL
+                    using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
+#else
+                    var otherIndexer = other; // .NET 4.0 - don't care to optimize
+#endif
+                        int end = thisStartIndex + length;
+                        char c1, c2;
+                        var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                        while (thisStartIndex < end)
                         {
-                            return false;
+                            if ((c1 = text[thisStartIndex++]) != (c2 = otherIndexer[otherStartIndex++])
+                                    && textInfo.ToUpper(c1) != textInfo.ToUpper(c2)
+                                    // Required for unicode that we test both cases
+                                    && textInfo.ToLower(c1) != textInfo.ToLower(c2))
+                            {
+                                return false;
+                            }
                         }
+                        return true;
                     }
-                    return true;
 
                 default:
+                    // J2N TODO: Optimize other comparison options
                     string sub2 = other.ToString(otherStartIndex, length);
                     return string.Compare(text, thisStartIndex, sub2, 0, length, comparisonType) == 0;
             }
