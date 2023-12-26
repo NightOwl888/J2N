@@ -18,10 +18,8 @@
 
 using System;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-
 
 namespace J2N.Text
 {
@@ -67,9 +65,14 @@ namespace J2N.Text
         /// </returns>
         public static int CompareToOrdinal(this string? str, ICharSequence? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            if (value is StringCharSequence && object.ReferenceEquals(str, value)) return 0;
             if (str is null) return (value is null || !value.HasValue) ? 0 : -1;
             if (value is null || !value.HasValue) return 1;
+            if (value is StringCharSequence s && object.ReferenceEquals(str, s.Value)) return 0;
+
+            if (value is StringBuilderCharSequence sb)
+                return CompareToOrdinal(str, sb.Value);
+            if (value is StringBuffer stringBuffer)
+                return CompareToOrdinal(str, stringBuffer.builder);
 
             int length = Math.Min(str.Length, value.Length);
             int result;
@@ -143,21 +146,25 @@ namespace J2N.Text
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            // Materialize the string. It is faster to loop through
-            // a string than a StringBuilder.
-            string temp = value.ToString();
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            var valueIndexer = new ValueStringBuilderChunkIndexer(value);
+#elif FEATURE_ARRAYPOOL
+            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
+#else
+            var valueIndexer = value; // .NET 4.0 - don't care to optimize
+#endif
 
-            int length = Math.Min(str.Length, temp.Length);
+            int length = Math.Min(str.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
             {
-                if ((result = str[i] - temp[i]) != 0)
+                if ((result = str[i] - valueIndexer[i]) != 0)
                     return result;
             }
 
             // At this point, we have compared all the characters in at least one string.
             // The longer string will be larger.
-            return str.Length - temp.Length;
+            return str.Length - value.Length;
         }
 
         /// <summary>
