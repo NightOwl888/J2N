@@ -1,5 +1,7 @@
-﻿using J2N.Memory;
+﻿#if FEATURE_STRINGBUILDER_GETCHUNKS
+using J2N.Memory;
 using System;
+using System.Buffers;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -8,7 +10,6 @@ namespace J2N.Text
 {
     using SR = J2N.Resources.Strings;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
     /// <summary>
     /// A decorator for <see cref="StringBuilder"/> to track access to the last used chunk so it doesn't have to be looked up
     /// when iterating forward or reverse through the <see cref="StringBuilder"/>. Supports both reads and writes to the underlying
@@ -27,6 +28,8 @@ namespace J2N.Text
     /// Do not call any operations that change the number of chunks in the <see cref="StringBuilder"/>, such as <see cref="StringBuilder.Append(string?)"/>,
     /// <see cref="StringBuilder.Insert(int, string?)"/>, or <see cref="StringBuilder.EnsureCapacity(int)"/>. If the number of chunks changes, the behavior
     /// is undefined and you must create a new instance of <see cref="ValueStringBuilderChunkIndexer"/> to read the changes.
+    /// <para/>
+    /// This type is disposable and the user is responsible for calling <see cref="Dispose()"/> after use.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Structs have performance issues with readonly fields.")]
     internal ref struct ValueStringBuilderChunkIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
@@ -93,6 +96,12 @@ namespace J2N.Text
             Reset();
         }
 
+        public void Dispose()
+        {
+            if (upperBounds != null)
+                ArrayPool<int>.Shared.Return(upperBounds);
+        }
+
         private void SetUpperBound(int chunkIndex, int upperBound)
         {
             if (usePacker)
@@ -101,7 +110,7 @@ namespace J2N.Text
             }
             else
             {
-                upperBounds ??= new int[chunkCount];
+                upperBounds ??= ArrayPool<int>.Shared.Rent(chunkCount);
                 upperBounds[chunkIndex] = upperBound;
             }
         }
@@ -254,5 +263,5 @@ namespace J2N.Text
             }
         }
     }
-#endif
 }
+#endif
