@@ -726,7 +726,7 @@ namespace J2N.Text
         {
             lock (syncRoot)
             {
-                builder.Append(charSequence, startIndex, charCount);
+                builder.Append(charSequence?.builder, startIndex, charCount);
                 return this;
             }
         }
