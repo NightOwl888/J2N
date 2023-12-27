@@ -686,11 +686,10 @@ namespace J2N.Text
 
             lock (syncRoot)
             {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                foreach (ReadOnlyMemory<char> chunk in value.GetChunks())
-                    builder.Append(chunk);
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                builder.Append(value.builder);
 #else
-                builder.Append(value.ToString());
+                builder.Append(charSequence: value.builder);
 #endif
                 return this;
             }
@@ -748,11 +747,10 @@ namespace J2N.Text
 
             lock (syncRoot)
             {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                foreach (ReadOnlyMemory<char> chunk in value.GetChunks())
-                    builder.Append(chunk);
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                builder.Append(value);
 #else
-                builder.Append(value.ToString());
+                builder.Append(charSequence: value);
 #endif
                 return this;
             }

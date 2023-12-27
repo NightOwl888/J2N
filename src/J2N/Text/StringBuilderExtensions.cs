@@ -240,13 +240,12 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            if (charSequence == null)
+            if (charSequence is null)
                 return text;
 
-            // J2N NOTE: We don't use Span<char> because this Append() overload was added to StringBuilder prior to th CopyTo(int, Span<char> int) overload,
-            // so this will never be called when Span<char> is supported unless called as a static method.
-
-#if FEATURE_ARRAYPOOL
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+            return text.Append(charSequence);
+#elif FEATURE_ARRAYPOOL
             int start = 0;
             int remainingCount = charSequence.Length;
 
@@ -314,15 +313,14 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (charCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (charSequence == null)
+            if (charSequence is null)
                 return text;
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
-            // J2N NOTE: We don't use Span<char> because this Append() overload was added to StringBuilder prior to th CopyTo(int, Span<char> int) overload,
-            // so this will never be called when Span<char> is supported unless called as a static method.
-
-#if FEATURE_ARRAYPOOL
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+            return text.Append(charSequence, startIndex, charCount);
+#elif FEATURE_ARRAYPOOL
             int start = startIndex;
             int remainingCount = charCount;
 
