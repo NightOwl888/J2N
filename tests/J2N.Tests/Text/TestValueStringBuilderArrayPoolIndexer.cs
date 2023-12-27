@@ -114,42 +114,38 @@ namespace J2N.Text
         public void GetBounds_SingleChunk_ReturnsCorrectBounds()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            using (var indexer = new ValueStringBuilderArrayPoolIndexer(sb))
-            {
-                indexer.Reset(iterateForward: true);
-                //indexer.IterateForward = true;
+            using var indexer = new ValueStringBuilderArrayPoolIndexer(sb);
+            indexer.Reset(iterateForward: true);
+            //indexer.IterateForward = true;
 
-                // Single chunk scenario
-                indexer.GetBounds(0, out int lowerBound, out int upperBound);
+            // Single chunk scenario
+            indexer.GetBounds(0, out int lowerBound, out int upperBound);
 
-                Assert.AreEqual(0, lowerBound);
-                Assert.AreEqual(sb.Length - 1, upperBound);
-            }
+            Assert.AreEqual(0, lowerBound);
+            Assert.AreEqual(sb.Length - 1, upperBound);
         }
 
         [Test]
         public void GetBounds_MultipleChunks_ReturnsCorrectBounds()
         {
             StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using (var indexer = new ValueStringBuilderArrayPoolIndexer(sb, iterateForward: true))
+            using var indexer = new ValueStringBuilderArrayPoolIndexer(sb, iterateForward: true);
+            int expectedChunkCount = (int)Math.Ceiling((double)sb.Length / ValueStringBuilderArrayPoolIndexer.ChunkLength);
+            Assert.AreEqual(expectedChunkCount, indexer.ChunkCount);
+
+
+            for (int i = 0; i < expectedChunkCount; i++)
             {
-                int expectedChunkCount = (int)Math.Ceiling((double)sb.Length / ValueStringBuilderArrayPoolIndexer.ChunkLength);
-                Assert.AreEqual(expectedChunkCount, indexer.ChunkCount);
-
-
-                for (int i = 0; i < expectedChunkCount; i++)
+                indexer.GetBounds(i, out int lowerBound, out int upperBound);
+                if (i < expectedChunkCount - 1)
                 {
-                    indexer.GetBounds(i, out int lowerBound, out int upperBound);
-                    if (i < expectedChunkCount - 1)
-                    {
-                        Assert.AreEqual(ValueStringBuilderArrayPoolIndexer.ChunkLength * i, lowerBound);
-                        Assert.AreEqual((ValueStringBuilderArrayPoolIndexer.ChunkLength * (i + 1)) - 1, upperBound);
-                    }
-                    else // Last chunk
-                    {
-                        Assert.AreEqual(ValueStringBuilderArrayPoolIndexer.ChunkLength * i, lowerBound);
-                        Assert.AreEqual(sb.Length - 1, upperBound);
-                    }
+                    Assert.AreEqual(ValueStringBuilderArrayPoolIndexer.ChunkLength * i, lowerBound);
+                    Assert.AreEqual((ValueStringBuilderArrayPoolIndexer.ChunkLength * (i + 1)) - 1, upperBound);
+                }
+                else // Last chunk
+                {
+                    Assert.AreEqual(ValueStringBuilderArrayPoolIndexer.ChunkLength * i, lowerBound);
+                    Assert.AreEqual(sb.Length - 1, upperBound);
                 }
             }
         }
@@ -158,57 +154,49 @@ namespace J2N.Text
         public void IsWithinBounds_SingleChunk_ReturnsTrueForValidIndex()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            using (var indexer = new ValueStringBuilderArrayPoolIndexer(sb))
-            {
-                indexer.Reset(iterateForward: true);
-                //indexer.IterateForward = true;
+            using var indexer = new ValueStringBuilderArrayPoolIndexer(sb);
+            indexer.Reset(iterateForward: true);
+            //indexer.IterateForward = true;
 
-                // Single chunk scenario
-                bool result = indexer.IsWithinBounds(0, 5);
-                Assert.IsTrue(result);
-            }
+            // Single chunk scenario
+            bool result = indexer.IsWithinBounds(0, 5);
+            Assert.IsTrue(result);
         }
 
         [Test]
         public void IsWithinBounds_SingleChunk_ReturnsFalseForInvalidIndex()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            using (var indexer = new ValueStringBuilderArrayPoolIndexer(sb))
-            {
-                indexer.Reset(iterateForward: true);
-                //indexer.IterateForward = true;
+            using var indexer = new ValueStringBuilderArrayPoolIndexer(sb);
+            indexer.Reset(iterateForward: true);
+            //indexer.IterateForward = true;
 
-                // Single chunk scenario
-                bool result = indexer.IsWithinBounds(0, sb.Length);
-                Assert.IsFalse(result);
-            }
+            // Single chunk scenario
+            bool result = indexer.IsWithinBounds(0, sb.Length);
+            Assert.IsFalse(result);
         }
 
         [Test]
         public void IsWithinBounds_MultipleChunks_ReturnsTrueForValidIndex()
         {
             StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using (var indexer = new ValueStringBuilderArrayPoolIndexer(sb, iterateForward: true))
-            {
-                // Multiple chunks scenario
-                bool result = indexer.IsWithinBounds(1, ValueStringBuilderArrayPoolIndexer.ChunkLength * 2 - 10);
-                Assert.IsTrue(result);
-            }
+            using var indexer = new ValueStringBuilderArrayPoolIndexer(sb, iterateForward: true);
+            // Multiple chunks scenario
+            bool result = indexer.IsWithinBounds(1, ValueStringBuilderArrayPoolIndexer.ChunkLength * 2 - 10);
+            Assert.IsTrue(result);
         }
 
         [Test]
         public void IsWithinBounds_MultipleChunks_ReturnsFalseForInvalidIndex()
         {
             StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using (var indexer = new ValueStringBuilderArrayPoolIndexer(sb))
-            {
-                indexer.Reset(iterateForward: true);
-                //indexer.IterateForward = true;
+            using var indexer = new ValueStringBuilderArrayPoolIndexer(sb);
+            indexer.Reset(iterateForward: true);
+            //indexer.IterateForward = true;
 
-                // Multiple chunks scenario
-                bool result = indexer.IsWithinBounds(0, sb.Length);
-                Assert.IsFalse(result);
-            }
+            // Multiple chunks scenario
+            bool result = indexer.IsWithinBounds(0, sb.Length);
+            Assert.IsFalse(result);
         }
 
         [Test]
@@ -221,20 +209,26 @@ namespace J2N.Text
             stringBuilder.Append("Amazing, ").Append(new string('a', 1024));
             stringBuilder.Append("World!");
             var indexer = new ValueStringBuilderArrayPoolIndexer(stringBuilder);
+            try
+            {
+                // Act
+                indexer[7 + 1024] = 'X';
+                indexer[14 + 1024] = 'V';
+                indexer[20 + 2048] = 'A';
+                indexer[27 + 3072] = 'Z';
+                indexer[32 + 3072] = '?';
 
-            // Act
-            indexer[7 + 1024] = 'X';
-            indexer[14 + 1024] = 'V';
-            indexer[20 + 2048] = 'A';
-            indexer[27 + 3072] = 'Z';
-            indexer[32 + 3072] = '?';
-
-            // Assert
-            Assert.AreEqual('X', indexer[7 + 1024]);
-            Assert.AreEqual('V', indexer[14 + 1024]);
-            Assert.AreEqual('A', indexer[20 + 2048]);
-            Assert.AreEqual('Z', indexer[27 + 3072]);
-            Assert.AreEqual('?', indexer[32 + 3072]);
+                // Assert
+                Assert.AreEqual('X', indexer[7 + 1024]);
+                Assert.AreEqual('V', indexer[14 + 1024]);
+                Assert.AreEqual('A', indexer[20 + 2048]);
+                Assert.AreEqual('Z', indexer[27 + 3072]);
+                Assert.AreEqual('?', indexer[32 + 3072]);
+            }
+            finally
+            {
+                indexer.Dispose();
+            }
 
             Assert.AreEqual($"Hello, {new string('a', 1024)}XeautifVl, {new string('a', 1024)}AmAzing, {new string('a', 1024)}Zorld?", stringBuilder.ToString());
         }
@@ -245,7 +239,7 @@ namespace J2N.Text
         {
             // Arrange
             var stringBuilder = new StringBuilder("Hello").Append(", ").Append("World!");
-            var indexer = new ValueStringBuilderArrayPoolIndexer(stringBuilder);
+            using var indexer = new ValueStringBuilderArrayPoolIndexer(stringBuilder);
 
             // Act
             indexer.Reset(iterateForward: false);
