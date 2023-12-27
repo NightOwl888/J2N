@@ -1648,6 +1648,35 @@ namespace J2N.Text
                 builder.CopyTo(sourceIndex, destination, destinationIndex, count);
         }
 
+#if FEATURE_SPAN
+        /// <summary>
+        /// Copies the characters from a specified segment of this instance to a destination Char span.
+        /// </summary>
+        /// <param name="sourceIndex">The starting position in this instance where characters will be copied
+        /// from. The index is zero-based.</param>
+        /// <param name="destination">The writable span where characters will be copied.</param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="sourceIndex"/> is greater than the length of this instance.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="sourceIndex"/> + <paramref name="count"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is greater than the length of <paramref name="destination"/>.
+        /// </exception>
+        public void CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            lock (syncRoot)
+                builder.CopyTo(sourceIndex, destination, count);
+        }
+#endif
+
         #endregion
 
         #region Delete
