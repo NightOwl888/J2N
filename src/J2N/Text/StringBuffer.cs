@@ -902,7 +902,7 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_CHARARRAYPOINTERS
+#if FEATURE_STRINGBUILDER_APPEND_CHARPTR
         /// <summary>
         /// Appends an array of Unicode characters starting at a specified address to this instance.
         /// </summary>
