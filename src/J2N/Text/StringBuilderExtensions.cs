@@ -1446,7 +1446,7 @@ namespace J2N.Text
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="index">The position in this instance where insertion begins.</param>
         /// <param name="codePoint">A Unicode code point.</param>
-        /// <returns></returns>
+        /// <returns>This <see cref="StringBuilder"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater
         /// than the length of this instance.</exception>
