@@ -1,4 +1,5 @@
-﻿using System;
+﻿using J2N.Memory;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -31,9 +32,8 @@ namespace J2N.Text
     internal ref struct ValueStringBuilderChunkIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
     {
         private /*readonly*/ StringBuilder stringBuilder;
-        private /*readonly*/ ChunkBoundsPacker boundsPacker;
+        private /*readonly*/ ValueInt32Packer packer;
         private /*readonly*/ bool usePacker;
-        private /*readonly*/ int[]? lowerBounds;
         private /*readonly*/ int[]? upperBounds;
         private ReadOnlyMemory<char> currentChunk;
         private int chunkCount;
@@ -47,8 +47,7 @@ namespace J2N.Text
             this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
             this.iterateForward = iterateForward;
 
-            boundsPacker = new ChunkBoundsPacker();
-            lowerBounds = null;
+            packer = new ValueInt32Packer();
             upperBounds = null;
             bool first = true;
             bool bound0Set = false;
@@ -56,14 +55,14 @@ namespace J2N.Text
             int upperBound = -1;
             chunkCount = 0;
             currentChunkIndex = 0;
-            currentLowerBound = lowerBound;
+            currentLowerBound = 0;
             currentUpperBound = upperBound;
             currentChunk = null;
 
             foreach (var _ in stringBuilder.GetChunks())
                 chunkCount++;
 
-            usePacker = chunkCount <= ChunkBoundsPacker.TotalChunks && stringBuilder.Length < ChunkBoundsPacker.MaxUpperBound;
+            usePacker = chunkCount <= Int32Packer.TotalSlots && stringBuilder.Length < Int32Packer.MaxValue;
 
             int chunkIndex = 0;
             int prevChunkLength = 0;
@@ -75,7 +74,7 @@ namespace J2N.Text
                 if (first)
                 {
                     currentChunkIndex = 0;
-                    currentLowerBound = lowerBound;
+                    currentLowerBound = 0;
                     currentUpperBound = upperBound;
                     currentChunk = chunk;
                     first = false;
@@ -84,27 +83,25 @@ namespace J2N.Text
                 {
                     if (!bound0Set)
                     {
-                        SetBounds(0, currentLowerBound, currentUpperBound);
+                        SetUpperBound(0, currentUpperBound);
                         bound0Set = true;
                     }
-                    SetBounds(chunkIndex, lowerBound, upperBound);
+                    SetUpperBound(chunkIndex, upperBound);
                 }
                 chunkIndex++;
             }
             Reset();
         }
 
-        private void SetBounds(int chunkIndex, int lowerBound, int upperBound)
+        private void SetUpperBound(int chunkIndex, int upperBound)
         {
             if (usePacker)
             {
-                boundsPacker.SetBounds(chunkIndex, lowerBound, upperBound);
+                packer.SetValue(chunkIndex, upperBound);
             }
             else
             {
-                lowerBounds ??= new int[chunkCount];
                 upperBounds ??= new int[chunkCount];
-                lowerBounds[chunkIndex] = lowerBound;
                 upperBounds[chunkIndex] = upperBound;
             }
         }
@@ -113,16 +110,17 @@ namespace J2N.Text
         {
             if (usePacker)
             {
-                boundsPacker.GetBounds(chunkIndex, out lowerBound, out upperBound);
+                lowerBound = chunkIndex == 0 ? 0 : packer.GetValue(chunkIndex - 1) + 1;
+                upperBound = packer.GetValue(chunkIndex);
             }
             else
             {
-                Debug.Assert(lowerBounds != null);
                 Debug.Assert(upperBounds != null);
 
-                lowerBound = lowerBounds![chunkIndex];
-                upperBound = upperBounds![chunkIndex];
+                lowerBound = chunkIndex == 0 ? 0 : upperBounds![chunkIndex - 1] + 1;
+                upperBound = upperBounds[chunkIndex];
             }
+            
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -253,133 +251,6 @@ namespace J2N.Text
                     char* pointer = (char*)handle.Pointer;
                     pointer[index - currentLowerBound] = value;
                 }
-            }
-        }
-
-        internal ref struct ChunkBoundsPacker
-        {
-            public const int BitsPerChunk = 16; // Number of bits allocated for each chunk
-            public const int ChunksPerULong = 64 / BitsPerChunk; // Number of chunks per ulong variable
-            public const int TotalChunks = 16;
-            public const int MaxUpperBound = (1 << BitsPerChunk) - 1; // Maximum value that can be stored with BitsPerChunk bits
-
-            private ulong lowerBound1;
-            private ulong upperBound1;
-            private ulong lowerBound2;
-            private ulong upperBound2;
-            private ulong lowerBound3;
-            private ulong upperBound3;
-            private ulong lowerBound4;
-            private ulong upperBound4;
-
-            public void SetBounds(int chunkIndex, int lowerBound, int upperBound)
-            {
-                if (chunkIndex < 0 || chunkIndex >= TotalChunks)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(chunkIndex));
-                }
-
-                if (lowerBound < 0 || lowerBound > MaxUpperBound)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(lowerBound));
-                }
-
-                if (upperBound < 0 || upperBound > MaxUpperBound)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(upperBound));
-                }
-
-                // Calculate the bit offset for the chunk within the ulong variables
-                int bitOffset = (chunkIndex % ChunksPerULong) * BitsPerChunk;
-
-                // Clear the existing bits for the chunk
-                switch (chunkIndex / ChunksPerULong)
-                {
-                    case 0:
-                        lowerBound1 &= ~((ulong)MaxUpperBound << bitOffset);
-                        upperBound1 &= ~((ulong)MaxUpperBound << bitOffset);
-                        break;
-                    case 1:
-                        lowerBound2 &= ~((ulong)MaxUpperBound << bitOffset);
-                        upperBound2 &= ~((ulong)MaxUpperBound << bitOffset);
-                        break;
-                    case 2:
-                        lowerBound3 &= ~((ulong)MaxUpperBound << bitOffset);
-                        upperBound3 &= ~((ulong)MaxUpperBound << bitOffset);
-                        break;
-                    case 3:
-                        lowerBound4 &= ~((ulong)MaxUpperBound << bitOffset);
-                        upperBound4 &= ~((ulong)MaxUpperBound << bitOffset);
-                        break;
-                }
-
-                // Pack the new bounds into the ulong
-                switch (chunkIndex / ChunksPerULong)
-                {
-                    case 0:
-                        lowerBound1 |= ((ulong)lowerBound & (ulong)MaxUpperBound) << bitOffset;
-                        upperBound1 |= ((ulong)upperBound & (ulong)MaxUpperBound) << bitOffset;
-                        break;
-                    case 1:
-                        lowerBound2 |= ((ulong)lowerBound & (ulong)MaxUpperBound) << bitOffset;
-                        upperBound2 |= ((ulong)upperBound & (ulong)MaxUpperBound) << bitOffset;
-                        break;
-                    case 2:
-                        lowerBound3 |= ((ulong)lowerBound & (ulong)MaxUpperBound) << bitOffset;
-                        upperBound3 |= ((ulong)upperBound & (ulong)MaxUpperBound) << bitOffset;
-                        break;
-                    case 3:
-                        lowerBound4 |= ((ulong)lowerBound & (ulong)MaxUpperBound) << bitOffset;
-                        upperBound4 |= ((ulong)upperBound & (ulong)MaxUpperBound) << bitOffset;
-                        break;
-                }
-            }
-
-            public void GetBounds(int chunkIndex, out int lowerBound, out int upperBound)
-            {
-                if (chunkIndex < 0 || chunkIndex >= TotalChunks)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(chunkIndex));
-                }
-
-                // Calculate the bit offset for the chunk within the ulong variables
-                int bitOffset = (chunkIndex % ChunksPerULong) * BitsPerChunk;
-
-                // Extract the packed bounds for the given chunk
-                switch (chunkIndex / ChunksPerULong)
-                {
-                    case 0:
-                        lowerBound = (int)((lowerBound1 >> bitOffset) & (ulong)MaxUpperBound);
-                        upperBound = (int)((upperBound1 >> bitOffset) & (ulong)MaxUpperBound);
-                        break;
-                    case 1:
-                        lowerBound = (int)((lowerBound2 >> bitOffset) & (ulong)MaxUpperBound);
-                        upperBound = (int)((upperBound2 >> bitOffset) & (ulong)MaxUpperBound);
-                        break;
-                    case 2:
-                        lowerBound = (int)((lowerBound3 >> bitOffset) & (ulong)MaxUpperBound);
-                        upperBound = (int)((upperBound3 >> bitOffset) & (ulong)MaxUpperBound);
-                        break;
-                    case 3:
-                        lowerBound = (int)((lowerBound4 >> bitOffset) & (ulong)MaxUpperBound);
-                        upperBound = (int)((upperBound4 >> bitOffset) & (ulong)MaxUpperBound);
-                        break;
-                    default:
-                        lowerBound = upperBound = 0; // This should not happen
-                        break;
-                }
-            }
-
-            public void PrintPackedBounds()
-            {
-                Console.WriteLine($"Lower Bounds 1: {Convert.ToString((long)lowerBound1, 2).PadLeft(64, '0')}");
-                Console.WriteLine($"Upper Bounds 1: {Convert.ToString((long)upperBound1, 2).PadLeft(64, '0')}");
-                Console.WriteLine($"Lower Bounds 2: {Convert.ToString((long)lowerBound2, 2).PadLeft(64, '0')}");
-                Console.WriteLine($"Upper Bounds 2: {Convert.ToString((long)upperBound2, 2).PadLeft(64, '0')}");
-                Console.WriteLine($"Lower Bounds 3: {Convert.ToString((long)lowerBound3, 2).PadLeft(64, '0')}");
-                Console.WriteLine($"Upper Bounds 3: {Convert.ToString((long)upperBound3, 2).PadLeft(64, '0')}");
-                Console.WriteLine($"Lower Bounds 4: {Convert.ToString((long)lowerBound4, 2).PadLeft(64, '0')}");
-                Console.WriteLine($"Upper Bounds 4: {Convert.ToString((long)upperBound4, 2).PadLeft(64, '0')}");
             }
         }
     }

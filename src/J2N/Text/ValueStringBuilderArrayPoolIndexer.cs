@@ -57,9 +57,11 @@ namespace J2N.Text
             currentLowerBound = 0;
             currentUpperBound = 0;
             lastChunkLength = 0;
-            currentChunk = ArrayPool<char>.Shared.Rent(ChunkLength);
+            
 
             int length = stringBuilder.Length;
+            int chunkSize = length < ChunkLength ? Math.Max(1, length) : ChunkLength;
+            currentChunk = ArrayPool<char>.Shared.Rent(chunkSize);
             chunkCount = (int)Math.Ceiling((double)length / ChunkLength);
             if (chunkCount > 0)
             {
