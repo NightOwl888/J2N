@@ -80,6 +80,8 @@ namespace J2N.Text
                     return Compare(sa, otherStringBuilder);
                 else if (y is char[] otherCharArray)
                     return Compare(sa, otherCharArray);
+                else if (y is StringBuffer otherStringBuffer)
+                    return Compare(sa, otherStringBuffer.builder);
             }
 
             if (x is IComparable comparable)
@@ -120,7 +122,7 @@ namespace J2N.Text
         /// Compares two character sequences and returns an indication of their relative sort order.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">An <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="T:char[]"/> to compare to <paramref name="x"/>.</param>
         /// <returns>
         /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.
         /// <list type="table">
@@ -148,7 +150,7 @@ namespace J2N.Text
         /// Compares two character sequences and returns an indication of their relative sort order.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">An <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="StringBuilder"/> to compare to <paramref name="x"/>.</param>
         /// <returns>
         /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.
         /// <list type="table">
@@ -176,7 +178,7 @@ namespace J2N.Text
         /// Compares two character sequences and returns an indication of their relative sort order.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">An <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="string"/> to compare to <paramref name="x"/>.</param>
         /// <returns>
         /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.
         /// <list type="table">
@@ -204,7 +206,7 @@ namespace J2N.Text
         /// Compares two character sequences and returns an indication of their relative sort order.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">An <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="CharArrayCharSequence"/> to compare to <paramref name="x"/>.</param>
         /// <returns>
         /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.
         /// <list type="table">
@@ -232,7 +234,7 @@ namespace J2N.Text
         /// Compares two character sequences and returns an indication of their relative sort order.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">An <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="StringBuilderCharSequence"/> to compare to <paramref name="x"/>.</param>
         /// <returns>
         /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.
         /// <list type="table">
@@ -260,7 +262,7 @@ namespace J2N.Text
         /// Compares two character sequences and returns an indication of their relative sort order.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">An <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="StringCharSequence"/> to compare to <paramref name="x"/>.</param>
         /// <returns>
         /// A signed integer that indicates the relative values of <paramref name="x"/> and <paramref name="y"/>, as shown in the following table.
         /// <list type="table">
@@ -287,8 +289,8 @@ namespace J2N.Text
         /// <summary>
         /// Indicates whether two objects or character sequences are equal.
         /// </summary>
-        /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">A <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="x">An <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
+        /// <param name="y">An <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
         /// <returns><c>true</c> if <paramref name="x"/> and <paramref name="y"/> refer to the same object,
         /// or <paramref name="x"/> and <paramref name="y"/> both contain the same sequence of characters,
         /// or both <paramref name="x"/> and <paramref name="y"/> are <c>null</c>; otherwise <c>false</c>.</returns>
@@ -307,6 +309,8 @@ namespace J2N.Text
                     return Equals(sa, otherStringBuilder);
                 else if (y is char[] otherCharArray)
                     return Equals(sa, otherCharArray);
+                else if (y is StringBuffer otherStringBuffer)
+                    return Equals(sa, otherStringBuffer.builder);
             }
             return x.Equals(y);
         }
@@ -325,7 +329,7 @@ namespace J2N.Text
         /// Indicates whether two character sequences are equal.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">A <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="T:char[]"/> to compare to <paramref name="x"/>.</param>
         /// <returns><c>true</c> if <paramref name="x"/> and <paramref name="y"/> refer to the same object,
         /// or <paramref name="x"/> and <paramref name="y"/> both contain the same sequence of characters,
         /// or both <paramref name="x"/> and <paramref name="y"/> are <c>null</c>; otherwise <c>false</c>.</returns>
@@ -335,7 +339,7 @@ namespace J2N.Text
         /// Indicates whether two character sequences are equal.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">A <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="StringBuilder"/> to compare to <paramref name="x"/>.</param>
         /// <returns><c>true</c> if <paramref name="x"/> and <paramref name="y"/> refer to the same object,
         /// or <paramref name="x"/> and <paramref name="y"/> both contain the same sequence of characters,
         /// or both <paramref name="x"/> and <paramref name="y"/> are <c>null</c>; otherwise <c>false</c>.</returns>
@@ -345,7 +349,7 @@ namespace J2N.Text
         /// Indicates whether two character sequences are equal.
         /// </summary>
         /// <param name="x">A <see cref="ICharSequence"/> to compare to <paramref name="y"/>.</param>
-        /// <param name="y">A <see cref="ICharSequence"/> to compare to <paramref name="x"/>.</param>
+        /// <param name="y">A <see cref="string"/> to compare to <paramref name="x"/>.</param>
         /// <returns><c>true</c> if <paramref name="x"/> and <paramref name="y"/> refer to the same object,
         /// or <paramref name="x"/> and <paramref name="y"/> both contain the same sequence of characters,
         /// or both <paramref name="x"/> and <paramref name="y"/> are <c>null</c>; otherwise <c>false</c>.</returns>
@@ -374,6 +378,8 @@ namespace J2N.Text
                 return GetHashCode(otherStringBuilderCharSequence);
             else if (obj is CharArrayCharSequence otherCharArrayCharSequence)
                 return GetHashCode(otherCharArrayCharSequence);
+            else if (obj is StringBuffer otherStringBuffer)
+                return GetHashCode(otherStringBuffer.builder);
 
             return obj.GetHashCode();
         }
@@ -418,11 +424,60 @@ namespace J2N.Text
                 if (x is null || !x.HasValue) return (y is null || y.HasValue) ? 0 : -1;
                 if (y is null || !y.HasValue) return 1;
 
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Compare(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Compare(stringBuffer.builder, y);
+
+                if (y is StringCharSequence yString)
+                    return Compare(x, yString.Value);
+                if (y is CharArrayCharSequence yCharArray)
+                    return Compare(x, yCharArray.Value);
+                if (y is StringBuilderCharSequence yStringBuilder)
+                    return Compare(x, yStringBuilder.Value);
+                if (y is StringBuffer yStringBuffer)
+                    return Compare(x, yStringBuffer.builder);
+
                 int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
                 {
                     if ((result = x[i] - y[i]) != 0)
+                        return result;
+                }
+
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return x.Length - y.Length;
+            }
+
+            private int Compare(StringBuilder? x, ICharSequence? y)
+            {
+                if (x is null) return (y is null || y.HasValue) ? 0 : -1;
+                if (y is null || !y.HasValue) return 1;
+
+                if (y is StringCharSequence yString)
+                    return Compare(x, yString.Value);
+                if (y is CharArrayCharSequence yCharArray)
+                    return Compare(x, yCharArray.Value);
+                if (y is StringBuilderCharSequence yStringBuilder)
+                    return Compare(x, yStringBuilder.Value);
+                if (y is StringBuffer yStringBuffer)
+                    return Compare(x, yStringBuffer.builder);
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+#else
+                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int length = Math.Min(x.Length, y.Length);
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = xIndexer[i] - y[i]) != 0)
                         return result;
                 }
 
@@ -436,11 +491,42 @@ namespace J2N.Text
                 if (x is null || !x.HasValue) return (y is null) ? 0 : -1;
                 if (y is null) return 1;
 
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Compare(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Compare(stringBuffer.builder, y);
+
                 int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
                 {
                     if ((result = x[i] - y[i]) != 0)
+                        return result;
+                }
+
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return x.Length - y.Length;
+            }
+
+            private int Compare(StringBuilder? x, char[]? y)
+            {
+                if (x is null) return (y is null) ? 0 : -1;
+                if (y is null) return 1;
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+#else
+                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int length = Math.Min(x.Length, y.Length);
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = xIndexer[i] - y[i]) != 0)
                         return result;
                 }
 
@@ -451,8 +537,13 @@ namespace J2N.Text
 
             public override int Compare(ICharSequence? x, string? y)
             {
-                if (x is null) return (y is null) ? 0 : -1;
+                if (x is null || !x.HasValue) return (y is null) ? 0 : -1;
                 if (y is null) return 1;
+
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Compare(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Compare(stringBuffer.builder, y);
 
                 int length = Math.Min(x.Length, y.Length);
                 int result;
@@ -467,25 +558,90 @@ namespace J2N.Text
                 return x.Length - y.Length;
             }
 
-            public override int Compare(ICharSequence? x, StringBuilder? y)
+            private int Compare(StringBuilder? x, string? y)
             {
-                if (x == null) return -1;
-                if (y == null) return 1;
+                if (x is null) return (y is null) ? 0 : -1;
+                if (y is null) return 1;
 
-                // NOTE: This benchmarked to be faster than looping through the StringBuilder
-                string temp = y.ToString();
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+#else
+                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
+#endif
 
-                int length = Math.Min(x.Length, temp.Length);
+                int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
                 {
-                    if ((result = x[i] - temp[i]) != 0)
+                    if ((result = xIndexer[i] - y[i]) != 0)
                         return result;
                 }
 
                 // At this point, we have compared all the characters in at least one string.
                 // The longer string will be larger.
-                return x.Length - temp.Length;
+                return x.Length - y.Length;
+            }
+
+            public override int Compare(ICharSequence? x, StringBuilder? y)
+            {
+                if (x == null || !x.HasValue) return -1;
+                if (y == null) return 1;
+
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Compare(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Compare(stringBuffer.builder, y);
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
+#elif FEATURE_ARRAYPOOL
+                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+#else
+                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int length = Math.Min(x.Length, y.Length);
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = x[i] - yIndexer[i]) != 0)
+                        return result;
+                }
+
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return x.Length - y.Length;
+            }
+
+            private int Compare(StringBuilder? x, StringBuilder? y)
+            {
+                if (x == null) return -1;
+                if (y == null) return 1;
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+#else
+                var xIndexer = x.ToString();
+                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int length = Math.Min(x.Length, y.Length);
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = xIndexer[i] - yIndexer[i]) != 0)
+                        return result;
+                }
+
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return x.Length - y.Length;
             }
 
             public override bool Equals(ICharSequence? x, ICharSequence? y)
@@ -495,11 +651,59 @@ namespace J2N.Text
                 if (y is null || !y.HasValue)
                     return false;
 
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Equals(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Equals(stringBuffer.builder, y);
+
+                if (y is StringCharSequence yString)
+                    return Equals(x, yString.Value);
+                if (y is CharArrayCharSequence yCharArray)
+                    return Equals(x, yCharArray.Value);
+                if (y is StringBuilderCharSequence yStringBuilder)
+                    return Equals(x, yStringBuilder.Value);
+                if (y is StringBuffer yStringBuffer)
+                    return Equals(x, yStringBuffer.builder);
+
+
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
                 {
                     if (!x[i].Equals(y[i])) return false;
+                }
+                return true;
+            }
+
+            private bool Equals(StringBuilder? x, ICharSequence? y)
+            {
+                if (x is null)
+                    return y is null || !y.HasValue;
+                if (y is null || !y.HasValue)
+                    return false;
+
+                if (y is StringCharSequence yString)
+                    return Equals(x, yString.Value);
+                if (y is CharArrayCharSequence yCharArray)
+                    return Equals(x, yCharArray.Value);
+                if (y is StringBuilderCharSequence yStringBuilder)
+                    return Equals(x, yStringBuilder.Value);
+                if (y is StringBuffer yStringBuffer)
+                    return Equals(x, yStringBuffer.builder);
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+#else
+                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int len = x.Length;
+                if (len != y.Length) return false;
+                for (int i = 0; i < len; i++)
+                {
+                    if (!xIndexer[i].Equals(y[i])) return false;
                 }
                 return true;
             }
@@ -511,11 +715,40 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Equals(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Equals(stringBuffer.builder, y);
+
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
                 {
                     if (!x[i].Equals(y[i])) return false;
+                }
+                return true;
+            }
+
+            private bool Equals(StringBuilder? x, char[]? y)
+            {
+                if (x is null)
+                    return y is null;
+                if (y is null)
+                    return false;
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+#else
+                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int len = x.Length;
+                if (len != y.Length) return false;
+                for (int i = 0; i < len; i++)
+                {
+                    if (!xIndexer[i].Equals(y[i])) return false;
                 }
                 return true;
             }
@@ -527,8 +760,53 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
-                // NOTE: This benchmarked to be faster than looping through the StringBuilder
-                return EqualsImpl(x, y.ToString());
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Equals(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Equals(stringBuffer.builder, y);
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
+#elif FEATURE_ARRAYPOOL
+                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+#else
+                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int len = x.Length;
+                if (len != y.Length) return false;
+                for (int i = 0; i < len; i++)
+                {
+                    if (!x[i].Equals(yIndexer[i])) return false;
+                }
+                return true;
+            }
+
+            private bool Equals(StringBuilder? x, StringBuilder? y)
+            {
+                if (x is null)
+                    return y is null;
+                if (y is null)
+                    return false;
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+#else
+                var xIndexer = x.ToString();
+                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int len = x.Length;
+                if (len != y.Length) return false;
+                for (int i = 0; i < len; i++)
+                {
+                    if (!xIndexer[i].Equals(yIndexer[i])) return false;
+                }
+                return true;
             }
 
             public override bool Equals(ICharSequence? x, string? y)
@@ -538,11 +816,11 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
-                return EqualsImpl(x, y);
-            }
+                if (x is StringBuilderCharSequence stringBuilder)
+                    return Equals(stringBuilder.Value, y);
+                if (x is StringBuffer stringBuffer)
+                    return Equals(stringBuffer.builder, y);
 
-            private static bool EqualsImpl(ICharSequence x, string y)
-            {
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
@@ -552,10 +830,43 @@ namespace J2N.Text
                 return true;
             }
 
+            private bool Equals(StringBuilder? x, string? y)
+            {
+                if (x is null)
+                    return y is null;
+                if (y is null)
+                    return false;
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
+#elif FEATURE_ARRAYPOOL
+                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+#else
+                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+
+                int len = x.Length;
+                if (len != y.Length) return false;
+                for (int i = 0; i < len; i++)
+                {
+                    if (!xIndexer[i].Equals(y[i])) return false;
+                }
+                return true;
+            }
+
             public override int GetHashCode(ICharSequence? obj)
             {
                 if (obj is null ||!obj.HasValue)
                     return int.MaxValue;
+
+                if (obj is StringCharSequence yString)
+                    return GetHashCode(yString.Value);
+                if (obj is CharArrayCharSequence yCharArray)
+                    return GetHashCode(yCharArray.Value);
+                if (obj is StringBuilderCharSequence yStringBuilder)
+                    return GetHashCode(yStringBuilder.Value);
+                if (obj is StringBuffer yStringBuffer)
+                    return GetHashCode(yStringBuffer.builder);
 
                 // From Apache Harmony
                 int length = obj.Length;
@@ -591,8 +902,23 @@ namespace J2N.Text
                 if (obj is null)
                     return int.MaxValue;
 
-                // NOTE: This benchmarked to be faster than looping through the StringBuilder
-                return GetHashCodeImpl(obj.ToString());
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                using var objIndexer = new ValueStringBuilderChunkIndexer(obj);
+#elif FEATURE_ARRAYPOOL
+                using var objIndexer = new ValueStringBuilderArrayPoolIndexer(obj);
+#else
+                var objIndexer = obj.ToString(); // .NET 4.0 - don't care to optimize
+#endif
+                // From Apache Harmony
+                int length = obj.Length;
+                if (length == 0)
+                    return 0;
+                int hash = 0;
+                for (int i = 0; i < length; i++)
+                {
+                    hash = objIndexer[i] + ((hash << 5) - hash);
+                }
+                return hash;
             }
 
             public override int GetHashCode(string? obj)
@@ -600,11 +926,6 @@ namespace J2N.Text
                 if (obj is null)
                     return int.MaxValue;
 
-                return GetHashCodeImpl(obj);
-            }
-
-            private static int GetHashCodeImpl(string obj)
-            {
                 // From Apache Harmony
                 int length = obj.Length;
                 if (length == 0)
