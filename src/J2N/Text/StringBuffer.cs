@@ -2337,6 +2337,38 @@ namespace J2N.Text
 
         #endregion Insert
 
+        #region InsertCodePoint
+
+        /// <summary>
+        /// Insert the string representation of the <paramref name="codePoint"/>
+        /// argument to this instance at <paramref name="index"/>.
+        /// <para/>
+        /// The argument is inserted into to the contents of this sequence.
+        /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
+        /// <para/>
+        /// The overall effect is exactly as if the argument were
+        /// converted to a <see cref="char"/> array by the method
+        /// <see cref="Character.ToChars(int)"/> and the character in that array
+        /// were then <see cref="Insert(int, char[])">inserted</see> into this
+        /// <see cref="StringBuffer"/>.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <returns>This <see cref="StringBuffer"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater
+        /// than the length of this instance.</exception>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        public StringBuffer InsertCodePoint(int index, int codePoint)
+        {
+            lock (syncRoot)
+            {
+                builder.InsertCodePoint(index, codePoint);
+                return this;
+            }
+        }
+
+        #endregion InsertCodePoint
+
         #region IndexOf
 
         /// <summary>
