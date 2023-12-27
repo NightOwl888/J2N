@@ -1821,7 +1821,7 @@ namespace J2N.Text
 
         #region Insert
 
-#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
+#if FEATURE_SPAN
 
         /// <summary>
         /// Inserts the string representation of a <see cref="ReadOnlySpan{Char}"/> value into this instance at the specified character position.
