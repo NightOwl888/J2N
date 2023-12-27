@@ -105,7 +105,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(string? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -116,7 +116,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(ICharSequence? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         // .NET Gaps
@@ -131,7 +131,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(ICharSequence? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
@@ -184,7 +184,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(StringBuilder? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -197,7 +197,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(StringBuilder? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
@@ -250,7 +250,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(char[]? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -263,7 +263,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(char[]? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
@@ -335,7 +335,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(string? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
