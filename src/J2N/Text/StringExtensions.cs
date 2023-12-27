@@ -147,7 +147,7 @@ namespace J2N.Text
             if (value is null) return 1;
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-            var valueIndexer = new ValueStringBuilderChunkIndexer(value);
+            using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
 #elif FEATURE_ARRAYPOOL
             using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
 #else
@@ -906,7 +906,7 @@ namespace J2N.Text
                 case StringComparison.Ordinal:
                     {
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-                        var otherIndexer = new ValueStringBuilderChunkIndexer(other);
+                        using var otherIndexer = new ValueStringBuilderChunkIndexer(other);
 #elif FEATURE_ARRAYPOOL
                         using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
 #else
@@ -925,11 +925,11 @@ namespace J2N.Text
                 case StringComparison.OrdinalIgnoreCase:
                     {
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-                        var otherIndexer = new ValueStringBuilderChunkIndexer(other);
+                        using var otherIndexer = new ValueStringBuilderChunkIndexer(other);
 #elif FEATURE_ARRAYPOOL
-                    using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
+                        using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
 #else
-                    var otherIndexer = other; // .NET 4.0 - don't care to optimize
+                        var otherIndexer = other; // .NET 4.0 - don't care to optimize
 #endif
                         int end = thisStartIndex + length;
                         char c1, c2;
