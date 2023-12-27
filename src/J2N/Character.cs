@@ -671,7 +671,7 @@ namespace J2N
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-            var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
+            using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
 #elif FEATURE_ARRAYPOOL
             using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
 #else
@@ -902,7 +902,7 @@ namespace J2N
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-            var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
+            using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
 #elif FEATURE_ARRAYPOOL
             using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
 #else
@@ -1348,7 +1348,7 @@ namespace J2N
                 throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-            var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
+            using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
 #elif FEATURE_ARRAYPOOL
             using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
 #else
@@ -1627,7 +1627,7 @@ namespace J2N
             if (codePointOffset >= 0)
             {
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-                var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: true);
+                using var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: true);
 #elif FEATURE_ARRAYPOOL
                 using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: true);
 #else
@@ -1652,7 +1652,7 @@ namespace J2N
             else
             {
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-                var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: false);
+                using var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: false);
 #elif FEATURE_ARRAYPOOL
                 using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: false);
 #else

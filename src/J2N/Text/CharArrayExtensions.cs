@@ -142,7 +142,7 @@ namespace J2N.Text
             if (value is null) return 1;
 
 #if FEATURE_STRINGBUILDER_GETCHUNKS
-            var valueIndexer = new ValueStringBuilderChunkIndexer(value);
+            using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
 #elif FEATURE_ARRAYPOOL
             using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
 #else
