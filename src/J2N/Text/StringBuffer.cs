@@ -108,7 +108,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(string? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -119,7 +119,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(ICharSequence? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         // .NET Gaps
@@ -134,7 +134,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(ICharSequence? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(StringBuilder? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -200,7 +200,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(StringBuilder? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
@@ -253,7 +253,7 @@ namespace J2N.Text
         /// If <paramref name="value"/> is <c>null</c>, the new <see cref="StringBuffer"/> will
         /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
         public StringBuffer(char[]? value)
-            : this(value, (value is null ? 0 : value.Length) + DefaultCapacity)
+            : this(value, (value?.Length ?? 0) + DefaultCapacity)
         { }
 
         /// <summary>
@@ -266,7 +266,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(char[]? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
@@ -338,7 +338,7 @@ namespace J2N.Text
         /// <param name="capacity">The suggested starting size of the <see cref="StringBuffer"/>.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
         public StringBuffer(string? value, int capacity)
-            : this(value, 0, (value is null ? 0 : value.Length), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         { }
 
         /// <summary>
@@ -689,11 +689,10 @@ namespace J2N.Text
 
             lock (syncRoot)
             {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                foreach (ReadOnlyMemory<char> chunk in value.GetChunks())
-                    builder.Append(chunk);
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                builder.Append(value.builder);
 #else
-                builder.Append(value.ToString());
+                builder.Append(charSequence: value.builder);
 #endif
                 return this;
             }
@@ -730,7 +729,7 @@ namespace J2N.Text
         {
             lock (syncRoot)
             {
-                builder.Append(charSequence, startIndex, charCount);
+                builder.Append(charSequence?.builder, startIndex, charCount);
                 return this;
             }
         }
@@ -751,11 +750,10 @@ namespace J2N.Text
 
             lock (syncRoot)
             {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                foreach (ReadOnlyMemory<char> chunk in value.GetChunks())
-                    builder.Append(chunk);
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                builder.Append(value);
 #else
-                builder.Append(value.ToString());
+                builder.Append(charSequence: value);
 #endif
                 return this;
             }
@@ -905,7 +903,7 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_CHARARRAYPOINTERS
+#if FEATURE_STRINGBUILDER_APPEND_CHARPTR
         /// <summary>
         /// Appends an array of Unicode characters starting at a specified address to this instance.
         /// </summary>
@@ -1653,6 +1651,35 @@ namespace J2N.Text
                 builder.CopyTo(sourceIndex, destination, destinationIndex, count);
         }
 
+#if FEATURE_SPAN
+        /// <summary>
+        /// Copies the characters from a specified segment of this instance to a destination Char span.
+        /// </summary>
+        /// <param name="sourceIndex">The starting position in this instance where characters will be copied
+        /// from. The index is zero-based.</param>
+        /// <param name="destination">The writable span where characters will be copied.</param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="sourceIndex"/> is greater than the length of this instance.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="sourceIndex"/> + <paramref name="count"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is greater than the length of <paramref name="destination"/>.
+        /// </exception>
+        public void CopyTo(int sourceIndex, Span<char> destination, int count)
+        {
+            lock (syncRoot)
+                builder.CopyTo(sourceIndex, destination, count);
+        }
+#endif
+
         #endregion
 
         #region Delete
@@ -1797,7 +1824,7 @@ namespace J2N.Text
 
         #region Insert
 
-#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
+#if FEATURE_SPAN
 
         /// <summary>
         /// Inserts the string representation of a <see cref="ReadOnlySpan{Char}"/> value into this instance at the specified character position.
@@ -2312,6 +2339,38 @@ namespace J2N.Text
         }
 
         #endregion Insert
+
+        #region InsertCodePoint
+
+        /// <summary>
+        /// Insert the string representation of the <paramref name="codePoint"/>
+        /// argument to this instance at <paramref name="index"/>.
+        /// <para/>
+        /// The argument is inserted into to the contents of this sequence.
+        /// The length of this sequence increases by <see cref="Character.CharCount(int)"/>.
+        /// <para/>
+        /// The overall effect is exactly as if the argument were
+        /// converted to a <see cref="char"/> array by the method
+        /// <see cref="Character.ToChars(int)"/> and the character in that array
+        /// were then <see cref="Insert(int, char[])">inserted</see> into this
+        /// <see cref="StringBuffer"/>.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="codePoint">A Unicode code point.</param>
+        /// <returns>This <see cref="StringBuffer"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero or greater
+        /// than the length of this instance.</exception>
+        /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        public StringBuffer InsertCodePoint(int index, int codePoint)
+        {
+            lock (syncRoot)
+            {
+                builder.InsertCodePoint(index, codePoint);
+                return this;
+            }
+        }
+
+        #endregion InsertCodePoint
 
         #region IndexOf
 

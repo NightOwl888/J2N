@@ -19,7 +19,6 @@
 using System;
 using System.Text;
 
-
 namespace J2N.Text
 {
     using SR = J2N.Resources.Strings;
@@ -608,10 +607,10 @@ namespace J2N.Text
 
             if (value != null)
             {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                Value.Append(value); // J2N: This overload uses GetChunks() to transfer the chars
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                Value.Append(value);
 #else
-                Value.Append(value.ToString());
+                Value.Append(charSequence: value);
 #endif
             }
             return this;
@@ -648,7 +647,7 @@ namespace J2N.Text
                 throw new InvalidOperationException(J2N.SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(StringBuilder)));
 
             if (value != null)
-                Value.Append(value.ToString(startIndex, count));
+                Value.Append(value, startIndex, count);
             return this;
         }
 
