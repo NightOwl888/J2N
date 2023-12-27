@@ -33,6 +33,9 @@ namespace J2N.Text
         IEquatable<ICharSequence>,
         IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
         IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>
+#if FEATURE_SPAN
+        , ISpanAppendable
+#endif
     {
         /// <summary>
         /// Initializes a new instance of <see cref="StringBuilderCharSequence"/> with a new backing <see cref="StringBuilder"/>.
@@ -771,6 +774,23 @@ namespace J2N.Text
             return this;
         }
 
+#if FEATURE_SPAN
+        /// <summary>
+        /// Appends the string representation of a specified <see cref="ReadOnlySpan{T}"/> of Unicode characters to this instance.
+        /// </summary>
+        /// <param name="value">The <see cref="ReadOnlySpan{T}"/> containing the characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="InvalidOperationException"><see cref="Value"/> is <c>null</c>.</exception>
+        public StringBuilderCharSequence Append(ReadOnlySpan<char> value)
+        {
+            if (Value is null)
+                throw new InvalidOperationException(J2N.SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(StringBuilder)));
+
+            Value.Append(value);
+            return this;
+        }
+#endif
+
         IAppendable IAppendable.Append(char value) => this.Append(value);
 
         IAppendable IAppendable.Append(string? value) => this.Append(value);
@@ -788,6 +808,10 @@ namespace J2N.Text
         IAppendable IAppendable.Append(ICharSequence? value) => this.Append(value);
 
         IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count) => this.Append(value, startIndex, count);
+
+#if FEATURE_SPAN
+        ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => this.Append(value);
+#endif
 
         #endregion
     }

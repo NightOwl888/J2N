@@ -67,6 +67,9 @@ namespace J2N.Text
     [Serializable]
 #endif
     public sealed class StringBuffer : IAppendable, ICharSequence
+#if FEATURE_SPAN
+        , ISpanAppendable
+#endif
     {
         private const int DefaultCapacity = 16;
 
@@ -566,7 +569,7 @@ namespace J2N.Text
 
         #region Append
 
-#if FEATURE_STRINGBUILDER_APPEND_READONLYSPAN
+#if FEATURE_SPAN
 
         /// <summary>
         /// Appends a copy of the specified <see cref="ReadOnlySpan{Char}"/> to this instance.
@@ -2652,6 +2655,14 @@ namespace J2N.Text
         IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count) => Append(value, startIndex, count);
 
         #endregion IAppendable Members
+
+        #region ISpanAppendable Members
+
+#if FEATURE_SPAN
+        ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => Append(value);
+#endif
+
+        #endregion ISpanAppendable Members
 
         #region ICharSequence Members
 
