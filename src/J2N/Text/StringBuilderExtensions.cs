@@ -1766,10 +1766,17 @@ namespace J2N.Text
         /// high-surrogates before the operation. For example, reversing
         /// "&#92;uDC00&#92;uD800" produces "&#92;uD800&#92;uDC00" which is
         /// a valid surrogate pair.
+        /// <para/>
+        /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
+        /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
+        /// and <see cref="J2N.Memory.MemoryExtensions.ReverseText(Span{char})"/> which
+        /// don't require a <see cref="StringBuilder"/> instance.
         /// </summary>
         /// <param name="text">this <see cref="StringBuilder"/></param>
         /// <returns>A reference to this <see cref="StringBuilder"/>, for chaining.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
+        /// <seealso cref="J2N.Memory.MemoryExtensions.ReverseText(Span{char})"/>
         public static StringBuilder Reverse(this StringBuilder text)
         {
             if (text is null)

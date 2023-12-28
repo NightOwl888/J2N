@@ -1,7 +1,6 @@
 ﻿using J2N.Globalization;
 using NUnit.Framework;
 using System;
-using System.Globalization;
 using System.Text;
 
 namespace J2N.Text
@@ -740,6 +739,126 @@ namespace J2N.Text
 
             assertNotNull(result);
             assertEquals(typeof(StringCharSequence), result.GetType());
+        }
+
+        private void reverseTest(string org, string rev, string back)
+        {
+            {
+                string reversed = org.ReverseText();
+                assertEquals(rev, reversed);
+
+                reversed = reversed.ReverseText();
+                assertEquals(back, reversed);
+            }
+
+            {
+                var sb = new StringBuilder(org);
+                string copy = sb.ToString();
+                assertEquals(org, copy);
+                string reversed = copy.ReverseText();
+                assertEquals(rev, reversed);
+                sb = new StringBuilder(reversed);
+                copy = sb.ToString();
+                assertEquals(rev, copy);
+                reversed = copy.ReverseText();
+                assertEquals(back, reversed);
+            }
+        }
+
+        [Test]
+        public void TestReverseText()
+        {
+            {
+                string fixture = "0123456789";
+                string actual = fixture.ReverseText();
+                assertEquals("9876543210", actual);
+            }
+
+            {
+                string fixture = "012345678";
+                string actual = fixture.ReverseText();
+                assertEquals("876543210", actual);
+            }
+
+            {
+                string fixture = "8";
+                string actual = fixture.ReverseText();
+                assertEquals("8", actual);
+            }
+
+            {
+                string fixture = "";
+                string actual = fixture.ReverseText();
+                assertEquals("", actual);
+            }
+
+
+            string str;
+            str = "a";
+            reverseTest(str, str, str);
+
+            str = "ab";
+            reverseTest(str, "ba", str);
+
+            str = "abcdef";
+            reverseTest(str, "fedcba", str);
+
+            str = "abcdefg";
+            reverseTest(str, "gfedcba", str);
+
+            str = "\ud800\udc00";
+            reverseTest(str, str, str);
+
+            str = "\udc00\ud800";
+            reverseTest(str, "\ud800\udc00", "\ud800\udc00");
+
+            str = "a\ud800\udc00";
+            reverseTest(str, "\ud800\udc00a", str);
+
+            str = "ab\ud800\udc00";
+            reverseTest(str, "\ud800\udc00ba", str);
+
+            str = "abc\ud800\udc00";
+            reverseTest(str, "\ud800\udc00cba", str);
+
+            str = "\ud800\udc00\udc01\ud801\ud802\udc02";
+            reverseTest(str, "\ud802\udc02\ud801\udc01\ud800\udc00",
+                    "\ud800\udc00\ud801\udc01\ud802\udc02");
+
+            str = "\ud800\udc00\ud801\udc01\ud802\udc02";
+            reverseTest(str, "\ud802\udc02\ud801\udc01\ud800\udc00", str);
+
+            str = "\ud800\udc00\udc01\ud801a";
+            reverseTest(str, "a\ud801\udc01\ud800\udc00",
+                    "\ud800\udc00\ud801\udc01a");
+
+            str = "a\ud800\udc00\ud801\udc01";
+            reverseTest(str, "\ud801\udc01\ud800\udc00a", str);
+
+            str = "\ud800\udc00\udc01\ud801ab";
+            reverseTest(str, "ba\ud801\udc01\ud800\udc00",
+                    "\ud800\udc00\ud801\udc01ab");
+
+            str = "ab\ud800\udc00\ud801\udc01";
+            reverseTest(str, "\ud801\udc01\ud800\udc00ba", str);
+
+            str = "\ud800\udc00\ud801\udc01";
+            reverseTest(str, "\ud801\udc01\ud800\udc00", str);
+
+            str = "a\ud800\udc00z\ud801\udc01";
+            reverseTest(str, "\ud801\udc01z\ud800\udc00a", str);
+
+            str = "a\ud800\udc00bz\ud801\udc01";
+            reverseTest(str, "\ud801\udc01zb\ud800\udc00a", str);
+
+            str = "abc\ud802\udc02\ud801\udc01\ud800\udc00";
+            reverseTest(str, "\ud800\udc00\ud801\udc01\ud802\udc02cba", str);
+
+            str = "abcd\ud802\udc02\ud801\udc01\ud800\udc00";
+            reverseTest(str, "\ud800\udc00\ud801\udc01\ud802\udc02dcba", str);
+
+            str = new string('z', 1000) + "abcd\ud802\udc02\ud801\udc01\ud800\udc00" + new string('p', 3000) + "abcd\ud802\udc02\ud801\udc01\ud800\udc00";
+            reverseTest(str, "\ud800\udc00\ud801\udc01\ud802\udc02dcba" + new string('p', 3000) + "\ud800\udc00\ud801\udc01\ud802\udc02dcba" + new string('z', 1000), str);
         }
     }
 }
