@@ -63,9 +63,17 @@ namespace J2N.Text
             else if (charSequence is CharArrayCharSequence charArray)
                 return text.Append(charArray.Value);
             else if (charSequence is StringBuilderCharSequence sb)
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(sb.Value);
+#else
+                return Append(text, sb.Value);
+#endif
             else if (charSequence is StringBuffer stringBuffer)
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(stringBuffer.builder);
+#else
+                return Append(text, stringBuffer.builder);
+#endif
 
             int length = charSequence.Length;
             if (length <= CharStackBufferSize)
@@ -235,7 +243,7 @@ namespace J2N.Text
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="charSequence">The <see cref="StringBuilder"/> to append.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        public static StringBuilder Append(this StringBuilder text, StringBuilder charSequence)
+        public static StringBuilder Append(this StringBuilder text, StringBuilder? charSequence)
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -773,7 +781,7 @@ namespace J2N.Text
         /// <paramref name="startIndex"/> is greater than <see cref="StringBuilder.Length"/>.
         /// </exception>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        public static StringBuilder Delete(this StringBuilder? text, int startIndex, int count)
+        public static StringBuilder Delete(this StringBuilder text, int startIndex, int count)
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
