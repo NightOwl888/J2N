@@ -468,7 +468,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
 #else
                 var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -517,7 +517,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
 #else
                 var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -566,7 +566,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
 #else
                 var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -597,7 +597,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var yIndexer = new ValueStringBuilderChunkIndexer(y);
 #elif FEATURE_ARRAYPOOL
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+                using var yIndexer = new ValueStringBuilderChunkedArrayIndexer(y);
 #else
                 var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -624,8 +624,8 @@ namespace J2N.Text
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
                 using var yIndexer = new ValueStringBuilderChunkIndexer(y);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
+                using var yIndexer = new ValueStringBuilderChunkedArrayIndexer(y);
 #else
                 var xIndexer = x.ToString();
                 var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
@@ -694,7 +694,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
 #else
                 var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -739,7 +739,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
 #else
                 var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -768,7 +768,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var yIndexer = new ValueStringBuilderChunkIndexer(y);
 #elif FEATURE_ARRAYPOOL
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+                using var yIndexer = new ValueStringBuilderChunkedArrayIndexer(y);
 #else
                 var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -793,8 +793,8 @@ namespace J2N.Text
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
                 using var yIndexer = new ValueStringBuilderChunkIndexer(y);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
+                using var yIndexer = new ValueStringBuilderChunkedArrayIndexer(y);
 #else
                 var xIndexer = x.ToString();
                 var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
@@ -840,7 +840,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var xIndexer = new ValueStringBuilderChunkIndexer(x);
 #elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
+                using var xIndexer = new ValueStringBuilderChunkedArrayIndexer(x);
 #else
                 var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -905,7 +905,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var objIndexer = new ValueStringBuilderChunkIndexer(obj);
 #elif FEATURE_ARRAYPOOL
-                using var objIndexer = new ValueStringBuilderArrayPoolIndexer(obj);
+                using var objIndexer = new ValueStringBuilderChunkedArrayIndexer(obj);
 #else
                 var objIndexer = obj.ToString(); // .NET 4.0 - don't care to optimize
 #endif

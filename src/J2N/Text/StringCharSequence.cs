@@ -336,7 +336,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             using var otherIndexer = new ValueStringBuilderChunkIndexer(other);
 #elif FEATURE_ARRAYPOOL
-            using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
+            using var otherIndexer = new ValueStringBuilderChunkedArrayIndexer(other);
 #else
             var otherIndexer = other.ToString(); // .NET 4.0 - don't care to optimize
 #endif

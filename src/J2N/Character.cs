@@ -673,7 +673,7 @@ namespace J2N
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
 #elif FEATURE_ARRAYPOOL
-            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
+            using var seqIndexer = new ValueStringBuilderChunkedArrayIndexer(seq);
 #else
             var seqIndexer = seq; // .NET 4.0 - don't care to optimize
 #endif
@@ -904,7 +904,7 @@ namespace J2N
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
 #elif FEATURE_ARRAYPOOL
-            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
+            using var seqIndexer = new ValueStringBuilderChunkedArrayIndexer(seq);
 #else
             var seqIndexer = seq; // .NET 4.0 - don't care to optimize
 #endif
@@ -1350,7 +1350,7 @@ namespace J2N
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
 #elif FEATURE_ARRAYPOOL
-            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
+            using var seqIndexer = new ValueStringBuilderChunkedArrayIndexer(seq);
 #else
             var seqIndexer = seq; // .NET 4.0 - don't care to optimize
 #endif
@@ -1629,7 +1629,7 @@ namespace J2N
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: true);
 #elif FEATURE_ARRAYPOOL
-                using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: true);
+                using var seqIndexer = new ValueStringBuilderChunkedArrayIndexer(seq, iterateForward: true);
 #else
                 var seqIndexer = seq; // .NET 4.0 - don't care to optimize
 #endif
@@ -1654,7 +1654,7 @@ namespace J2N
 #if FEATURE_STRINGBUILDER_GETCHUNKS
                 using var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: false);
 #elif FEATURE_ARRAYPOOL
-                using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: false);
+                using var seqIndexer = new ValueStringBuilderChunkedArrayIndexer(seq, iterateForward: false);
 #else
                 var seqIndexer = seq; // .NET 4.0 - don't care to optimize
 #endif

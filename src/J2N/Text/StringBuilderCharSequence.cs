@@ -339,7 +339,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
 #elif FEATURE_ARRAYPOOL
-            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
+            using var valueIndexer = new ValueStringBuilderChunkedArrayIndexer(value);
 #else
             var valueIndexer = value.ToString(); // .NET 4.0 - don't care to optimize
 #endif
@@ -369,8 +369,8 @@ namespace J2N.Text
             using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
             using var otherIndexer = new ValueStringBuilderChunkIndexer(other);
 #elif FEATURE_ARRAYPOOL
-            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
-            using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
+            using var valueIndexer = new ValueStringBuilderChunkedArrayIndexer(value);
+            using var otherIndexer = new ValueStringBuilderChunkedArrayIndexer(other);
 #else
             var valueIndexer = value.ToString(); // .NET 4.0 - don't care to optimize
             var otherIndexer = other.ToString();
@@ -400,7 +400,7 @@ namespace J2N.Text
 #if FEATURE_STRINGBUILDER_GETCHUNKS
             using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
 #elif FEATURE_ARRAYPOOL
-            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
+            using var valueIndexer = new ValueStringBuilderChunkedArrayIndexer(value);
 #else
             var valueIndexer = value.ToString(); // .NET 4.0 - don't care to optimize
 #endif
