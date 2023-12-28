@@ -36,31 +36,37 @@ namespace J2N.Text
                 return appendable;
             }
 
-            int startIndex = 0;
-            int remainingCount = value.Length;
+            return AppendSlow(appendable, value);
 
-            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
-            try
+            static T AppendSlow(T appendable, ReadOnlySpan<char> value)
             {
-                while (remainingCount > 0)
+
+                int startIndex = 0;
+                int remainingCount = value.Length;
+
+                char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+                try
                 {
-                    // Determine the chunk size for the current iteration
-                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+                    while (remainingCount > 0)
+                    {
+                        // Determine the chunk size for the current iteration
+                        int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
 
-                    // Copy the chunk to the buffer
-                    value.Slice(startIndex, chunkLength).CopyTo(buffer);
+                        // Copy the chunk to the buffer
+                        value.Slice(startIndex, chunkLength).CopyTo(buffer);
 
-                    appendable.Append(buffer, 0, chunkLength);
+                        appendable.Append(buffer, 0, chunkLength);
 
-                    startIndex += chunkLength;
-                    remainingCount -= chunkLength;
+                        startIndex += chunkLength;
+                        remainingCount -= chunkLength;
+                    }
                 }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(buffer);
+                }
+                return appendable;
             }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
-            return appendable;
         }
     }
 }
