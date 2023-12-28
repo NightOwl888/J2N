@@ -336,13 +336,7 @@ namespace J2N.Text
 
             int len = Length;
             if (len != other.Length) return false;
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
-#elif FEATURE_ARRAYPOOL
-            using var valueIndexer = new ValueStringBuilderChunkedArrayIndexer(value);
-#else
-            var valueIndexer = value.ToString(); // .NET 4.0 - don't care to optimize
-#endif
+            using var valueIndexer = new ValueStringBuilderIndexer(value);
             for (int i = 0; i < len; i++)
             {
                 if (!valueIndexer[i].Equals(other[i])) return false;
@@ -365,16 +359,8 @@ namespace J2N.Text
 
             int len = Length;
             if (len != other.Length) return false;
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
-            using var otherIndexer = new ValueStringBuilderChunkIndexer(other);
-#elif FEATURE_ARRAYPOOL
-            using var valueIndexer = new ValueStringBuilderChunkedArrayIndexer(value);
-            using var otherIndexer = new ValueStringBuilderChunkedArrayIndexer(other);
-#else
-            var valueIndexer = value.ToString(); // .NET 4.0 - don't care to optimize
-            var otherIndexer = other.ToString();
-#endif
+            using var valueIndexer = new ValueStringBuilderIndexer(value);
+            using var otherIndexer = new ValueStringBuilderIndexer(other);
             for (int i = 0; i < len; i++)
             {
                 if (!valueIndexer[i].Equals(otherIndexer[i])) return false;
@@ -397,13 +383,7 @@ namespace J2N.Text
 
             int len = Length;
             if (len != other.Length) return false;
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
-#elif FEATURE_ARRAYPOOL
-            using var valueIndexer = new ValueStringBuilderChunkedArrayIndexer(value);
-#else
-            var valueIndexer = value.ToString(); // .NET 4.0 - don't care to optimize
-#endif
+            using var valueIndexer = new ValueStringBuilderIndexer(value);
             for (int i = 0; i < len; i++)
             {
                 if (!valueIndexer[i].Equals(other[i])) return false;
