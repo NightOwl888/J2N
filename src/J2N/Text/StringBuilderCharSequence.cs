@@ -717,13 +717,23 @@ namespace J2N.Text
                     throw new InvalidOperationException(J2N.SR.Format(SR.InvalidOperation_CannotEditNullObject, nameof(StringBuilder)));
 
                 if (value is StringCharSequence stringCharSequence)
-                    Value.Append(stringCharSequence.Value); // Already checked for null above, but StringBuilder is fine with null anyway
+                    Value.Append(stringCharSequence.Value); // Already checked for null above
                 else if (value is StringBuilderCharSequence stringBuilderCharSequence)
-                    Value.Append(stringBuilderCharSequence.Value); // Already checked for null above, but StringBuilder is fine with null anyway. This is the object overload prior to .NET Standard 2.1.
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                    Value.Append(stringBuilderCharSequence.Value); // Already checked for null above
+#else
+                    Value.Append(charSequence: stringBuilderCharSequence.Value); // Already checked for null above
+#endif
                 else if (value is CharArrayCharSequence charArrayCharSequence)
-                    Value.Append(charArrayCharSequence.Value); // Already checked for null above, but StringBuilder is fine with null anyway
+                    Value.Append(charArrayCharSequence.Value); // Already checked for null above
+                else if (value is StringBuffer stringBuffer)
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                    Value.Append(stringBuffer.builder);
+#else
+                    Value.Append(charSequence: stringBuffer.builder);
+#endif
                 else
-                    Value.Append(value.ToString());
+                    Value.Append(charSequence: value);
             }
             return this;
         }
@@ -767,8 +777,10 @@ namespace J2N.Text
                     Value.Append(stringBuilderCharSequence.Value, startIndex, count); // Already checked for null above
                 else if (value is CharArrayCharSequence charArrayCharSequence)
                     Value.Append(charArrayCharSequence.Value, startIndex, count); // Already checked for null above
+                else if (value is StringBuffer stringBuffer)
+                    Value.Append(stringBuffer.builder, startIndex, count);
                 else
-                    Value.Append(value.ToString());
+                    Value.Append(value, startIndex, count);
             }
             return this;
         }
