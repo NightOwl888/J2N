@@ -32,7 +32,7 @@ namespace J2N.Text
     /// This type is disposable and the user is responsible for calling <see cref="Dispose()"/> after use.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Structs have performance issues with readonly fields.")]
-    internal ref struct ValueStringBuilderChunkIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
+    internal ref struct ValueStringBuilderChunkIndexer
     {
         private /*readonly*/ StringBuilder stringBuilder;
         private /*readonly*/ ValueInt32Packer packer;
@@ -230,7 +230,7 @@ namespace J2N.Text
             {
                 if ((uint)index >= (uint)stringBuilder.Length)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    throw new IndexOutOfRangeException();
                 }
 
                 if (index < currentLowerBound || index > currentUpperBound)

@@ -333,13 +333,7 @@ namespace J2N.Text
 
             int len = Length;
             if (len != other.Length) return false;
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var otherIndexer = new ValueStringBuilderChunkIndexer(other);
-#elif FEATURE_ARRAYPOOL
-            using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
-#else
-            var otherIndexer = other.ToString(); // .NET 4.0 - don't care to optimize
-#endif
+            using var otherIndexer = new ValueStringBuilderIndexer(other);
             for (int i = 0; i < len; i++)
             {
                 if (!value[i].Equals(otherIndexer[i])) return false;

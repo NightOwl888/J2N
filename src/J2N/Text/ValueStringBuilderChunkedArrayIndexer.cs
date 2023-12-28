@@ -1,6 +1,7 @@
-﻿#if FEATURE_ARRAYPOOL
-using System;
+﻿using System;
+#if FEATURE_ARRAYPOOL
 using System.Buffers;
+#endif
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -12,8 +13,8 @@ namespace J2N.Text
     /// <summary>
     /// A decorator for <see cref="StringBuilder"/> to track access to the last used chunk so it doesn't have to be looked up
     /// when iterating forward or reverse through the <see cref="StringBuilder"/>. Supports both reads and writes.
-    /// The purpose is to chunk the <see cref="char"/>s from the <see cref="StringBuilder"/> into a pooled array. The
-    /// interface is similar to the <see cref="StringBuilder"/> so
+    /// The purpose is to chunk the <see cref="char"/>s from the <see cref="StringBuilder"/> into an array, which is pooled
+    /// if the platform supports array pooling. The interface is similar to the <see cref="StringBuilder"/> so
     /// business logic doesn't have to be rewritten to iterate a <see cref="StringBuilder"/> via index. The performance of
     /// the <see cref="StringBuilder.this[int]"/> indexer is very poor and this is intended as a direct replacement.
     /// <para/>
@@ -27,14 +28,14 @@ namespace J2N.Text
     /// <para/>
     /// Do not call any operations that mutate the <see cref="StringBuilder"/>, such as <see cref="StringBuilder.Append(string?)"/>,
     /// <see cref="StringBuilder.Insert(int, string?)"/>. If the state of the <see cref="StringBuilder"/> changes, the behavior
-    /// is undefined and you must create a new instance of <see cref="ValueStringBuilderArrayPoolIndexer"/> to read the changes.
+    /// is undefined and you must create a new instance of <see cref="ValueStringBuilderChunkedArrayIndexer"/> to read the changes.
     /// <para/>
     /// This type is disposable and the user is responsible for calling <see cref="Dispose()"/> after use.
     /// <para/>
     /// For .NET Core 3.x and higher, the ValueStringBuilderChunkIndexer should be favored over this approach.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Structs have performance issues with readonly fields.")]
-    internal ref struct ValueStringBuilderArrayPoolIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
+    internal ref struct ValueStringBuilderChunkedArrayIndexer
     {
         public const int ChunkLength = 512;
 
@@ -47,7 +48,7 @@ namespace J2N.Text
         private int currentUpperBound;
         private bool iterateForward;
 
-        public ValueStringBuilderArrayPoolIndexer(StringBuilder stringBuilder, bool iterateForward = true)
+        public ValueStringBuilderChunkedArrayIndexer(StringBuilder stringBuilder, bool iterateForward = true)
         {
             this.stringBuilder = stringBuilder ?? throw new ArgumentNullException(nameof(stringBuilder));
             this.iterateForward = iterateForward;
@@ -61,7 +62,11 @@ namespace J2N.Text
 
             int length = stringBuilder.Length;
             int chunkSize = length < ChunkLength ? Math.Max(1, length) : ChunkLength;
+#if FEATURE_ARRAYPOOL
             currentChunk = ArrayPool<char>.Shared.Rent(chunkSize);
+#else
+            currentChunk = new char[chunkSize];
+#endif
             chunkCount = (int)Math.Ceiling((double)length / ChunkLength);
             if (chunkCount > 0)
             {
@@ -76,7 +81,10 @@ namespace J2N.Text
         internal int LastChunkLength => lastChunkLength; // internal for testing
         public void Dispose()
         {
+#if FEATURE_ARRAYPOOL
             ArrayPool<char>.Shared.Return(currentChunk);
+#endif
+            // else no-op
         }
 
         internal void GetBounds(int chunkIndex, out int lowerBound, out int upperBound) // internal for testing
@@ -184,12 +192,14 @@ namespace J2N.Text
 
         public char this[int index]
         {
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
             get
             {
                 if ((uint)index >= (uint)stringBuilder.Length)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    throw new IndexOutOfRangeException();
                 }
 
                 if (index < currentLowerBound || index > currentUpperBound)
@@ -200,7 +210,9 @@ namespace J2N.Text
                 return currentChunk[index - currentLowerBound];
             }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
             set
             {
                 if ((uint)index >= (uint)stringBuilder.Length)
@@ -218,4 +230,3 @@ namespace J2N.Text
         }
     }
 }
-#endif

@@ -141,14 +141,7 @@ namespace J2N.Text
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
-#elif FEATURE_ARRAYPOOL
-            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
-#else
-            var valueIndexer = value; // .NET 4.0 - don't care to optimize
-#endif
-
+            using var valueIndexer = new ValueStringBuilderIndexer(value);
             int length = Math.Min(str.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)

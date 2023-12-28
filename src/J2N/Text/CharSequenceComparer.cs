@@ -465,14 +465,7 @@ namespace J2N.Text
                 if (y is StringBuffer yStringBuffer)
                     return Compare(x, yStringBuffer.builder);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-#else
-                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
                 int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
@@ -514,14 +507,7 @@ namespace J2N.Text
                 if (x is null) return (y is null) ? 0 : -1;
                 if (y is null) return 1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-#else
-                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
                 int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
@@ -563,14 +549,7 @@ namespace J2N.Text
                 if (x is null) return (y is null) ? 0 : -1;
                 if (y is null) return 1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-#else
-                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
                 int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
@@ -594,14 +573,7 @@ namespace J2N.Text
                 if (x is StringBuffer stringBuffer)
                     return Compare(stringBuffer.builder, y);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
-#elif FEATURE_ARRAYPOOL
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
-#else
-                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var yIndexer = new ValueStringBuilderIndexer(y);
                 int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
@@ -620,17 +592,8 @@ namespace J2N.Text
                 if (x == null) return -1;
                 if (y == null) return 1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
-#else
-                var xIndexer = x.ToString();
-                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
+                using var yIndexer = new ValueStringBuilderIndexer(y);
                 int length = Math.Min(x.Length, y.Length);
                 int result;
                 for (int i = 0; i < length; i++)
@@ -691,14 +654,7 @@ namespace J2N.Text
                 if (y is StringBuffer yStringBuffer)
                     return Equals(x, yStringBuffer.builder);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-#else
-                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
@@ -736,14 +692,7 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-#else
-                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
@@ -765,14 +714,7 @@ namespace J2N.Text
                 if (x is StringBuffer stringBuffer)
                     return Equals(stringBuffer.builder, y);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
-#elif FEATURE_ARRAYPOOL
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
-#else
-                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var yIndexer = new ValueStringBuilderIndexer(y);
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
@@ -789,17 +731,8 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-                using var yIndexer = new ValueStringBuilderChunkIndexer(y);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-                using var yIndexer = new ValueStringBuilderArrayPoolIndexer(y);
-#else
-                var xIndexer = x.ToString();
-                var yIndexer = y.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
+                using var yIndexer = new ValueStringBuilderIndexer(y);
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
@@ -837,14 +770,7 @@ namespace J2N.Text
                 if (y is null)
                     return false;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var xIndexer = new ValueStringBuilderChunkIndexer(x);
-#elif FEATURE_ARRAYPOOL
-                using var xIndexer = new ValueStringBuilderArrayPoolIndexer(x);
-#else
-                var xIndexer = x.ToString(); // .NET 4.0 - don't care to optimize
-#endif
-
+                using var xIndexer = new ValueStringBuilderIndexer(x);
                 int len = x.Length;
                 if (len != y.Length) return false;
                 for (int i = 0; i < len; i++)
@@ -902,13 +828,7 @@ namespace J2N.Text
                 if (obj is null)
                     return int.MaxValue;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var objIndexer = new ValueStringBuilderChunkIndexer(obj);
-#elif FEATURE_ARRAYPOOL
-                using var objIndexer = new ValueStringBuilderArrayPoolIndexer(obj);
-#else
-                var objIndexer = obj.ToString(); // .NET 4.0 - don't care to optimize
-#endif
+                using var objIndexer = new ValueStringBuilderIndexer(obj);
                 // From Apache Harmony
                 int length = obj.Length;
                 if (length == 0)

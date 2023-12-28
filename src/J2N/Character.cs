@@ -670,18 +670,11 @@ namespace J2N
             if (index < 0 || index >= len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
-#elif FEATURE_ARRAYPOOL
-            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
-#else
-            var seqIndexer = seq; // .NET 4.0 - don't care to optimize
-#endif
-
-            char high = seqIndexer[index++];
+            // J2N NOTE: Looking up 1 or 2 characters is faster through the StringBuilder than an indexer
+            char high = seq[index++];
             if (index >= len)
                 return high;
-            char low = seqIndexer[index];
+            char low = seq[index];
             if (char.IsSurrogatePair(high, low))
                 return ToCodePoint(high, low);
             return high;
@@ -901,18 +894,11 @@ namespace J2N
             if (index < 1 || index > len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
-#elif FEATURE_ARRAYPOOL
-            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
-#else
-            var seqIndexer = seq; // .NET 4.0 - don't care to optimize
-#endif
-
-            char low = seqIndexer[--index];
+            // J2N NOTE: Looking up 1 or 2 characters is faster through the StringBuilder than an indexer
+            char low = seq[--index];
             if (--index < 0)
                 return low;
-            char high = seqIndexer[index];
+            char high = seq[index];
             if (char.IsSurrogatePair(high, low))
             {
                 return ToCodePoint(high, low);
@@ -1347,14 +1333,7 @@ namespace J2N
             if (startIndex + length > len)
                 throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var seqIndexer = new ValueStringBuilderChunkIndexer(seq);
-#elif FEATURE_ARRAYPOOL
-            using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq);
-#else
-            var seqIndexer = seq; // .NET 4.0 - don't care to optimize
-#endif
-
+            using var seqIndexer = new ValueStringBuilderIndexer(seq);
             int endIndex = startIndex + length;
             int n = length;
             for (int i = startIndex; i < endIndex;)
@@ -1626,13 +1605,7 @@ namespace J2N
             int x = index;
             if (codePointOffset >= 0)
             {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: true);
-#elif FEATURE_ARRAYPOOL
-                using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: true);
-#else
-                var seqIndexer = seq; // .NET 4.0 - don't care to optimize
-#endif
+                using var seqIndexer = new ValueStringBuilderIndexer(seq, iterateForward: true);
                 int i;
                 for (i = 0; x < length && i < codePointOffset; i++)
                 {
@@ -1651,13 +1624,7 @@ namespace J2N
             }
             else
             {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                using var seqIndexer = new ValueStringBuilderChunkIndexer(seq, iterateForward: false);
-#elif FEATURE_ARRAYPOOL
-                using var seqIndexer = new ValueStringBuilderArrayPoolIndexer(seq, iterateForward: false);
-#else
-                var seqIndexer = seq; // .NET 4.0 - don't care to optimize
-#endif
+                using var seqIndexer = new ValueStringBuilderIndexer(seq, iterateForward: false);
                 int i;
                 for (i = codePointOffset; x > 0 && i < 0; i++)
                 {

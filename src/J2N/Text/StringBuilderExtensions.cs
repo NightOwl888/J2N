@@ -511,14 +511,7 @@ namespace J2N.Text
             if (value is StringBuffer stringBuffer)
                 return CompareToOrdinal(text, stringBuffer.builder);
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-#else
-            var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
-
+            using var textIndexer = new ValueStringBuilderIndexer(text);
             int length = Math.Min(text.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
@@ -555,14 +548,7 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-#else
-            var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
-
+            using var textIndexer = new ValueStringBuilderIndexer(text);
             int length = Math.Min(text.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
@@ -600,14 +586,8 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-            using var valueIndexer = new ValueStringBuilderChunkIndexer(value);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-            using var valueIndexer = new ValueStringBuilderArrayPoolIndexer(value);
-#endif
-#if FEATURE_STRINGBUILDER_GETCHUNKS || FEATURE_ARRAYPOOL
+            using var textIndexer = new ValueStringBuilderIndexer(text);
+            using var valueIndexer = new ValueStringBuilderIndexer(value);
             int length = Math.Min(text.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
@@ -619,11 +599,6 @@ namespace J2N.Text
             // At this point, we have compared all the characters in at least one string.
             // The longer string will be larger.
             return text.Length - value.Length;
-#else
-            // Materialize the string. It is faster to loop through
-            // a string than a StringBuilder.
-            return text.ToString().CompareToOrdinal(value.ToString()); // .NET 4.0 - don't care to optimize
-#endif
         }
 
         /// <summary>
@@ -649,14 +624,7 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-#else
-            var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
-
+            using var textIndexer = new ValueStringBuilderIndexer(text);
             int length = Math.Min(text.Length, value.Length);
             int result;
             for (int i = 0; i < length; i++)
@@ -898,14 +866,6 @@ namespace J2N.Text
 #endif
         private static int IndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-#else
-            var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
-
             int length = value.Length;
             if (length == 0)
                 return 0;
@@ -913,6 +873,7 @@ namespace J2N.Text
             int maxSearchLength = (textLength - length) + 1;
             char firstChar = value[0];
             int index;
+            using var textIndexer = new ValueStringBuilderIndexer(text);
             for (int i = startIndex; i < maxSearchLength; ++i)
             {
                 if (textIndexer[i] == firstChar)
@@ -933,14 +894,6 @@ namespace J2N.Text
 #endif
         private static int IndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-#else
-            var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
-
             int length = value.Length;
             if (length == 0)
                 return 0;
@@ -949,6 +902,7 @@ namespace J2N.Text
             char firstChar = value[0], c1, c2;
             var textInfo = CultureInfo.InvariantCulture.TextInfo;
             int index;
+            using var textIndexer = new ValueStringBuilderIndexer(text);
             for (int i = startIndex; i < maxSearchLength; ++i)
             {
                 if (textIndexer[i] == firstChar)
@@ -1597,14 +1551,6 @@ namespace J2N.Text
 #endif
         private static int LastIndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-#else
-            var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
-
             int textLength = text.Length;
             int subCount = value.Length;
 
@@ -1616,6 +1562,7 @@ namespace J2N.Text
                     {
                         startIndex = textLength - subCount; // count and subCount are both >= 1
                     }
+                    using var textIndexer = new ValueStringBuilderIndexer(text);
                     char firstChar = value[0];
                     while (true)
                     {
@@ -1655,14 +1602,6 @@ namespace J2N.Text
 #endif
         private static int LastIndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            using var textIndexer = new ValueStringBuilderChunkIndexer(text);
-#elif FEATURE_ARRAYPOOL
-            using var textIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-#else
-            var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
-
             int textLength = text.Length;
             int subCount = value.Length;
 
@@ -1676,6 +1615,7 @@ namespace J2N.Text
                     }
                     char firstChar = value[0], c1, c2;
                     var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                    using var textIndexer = new ValueStringBuilderIndexer(text);
                     while (true)
                     {
                         int i = startIndex;
@@ -1777,12 +1717,8 @@ namespace J2N.Text
                     // replacing with more characters...need some room
                     text.Insert(startIndex, new char[-diff]);
                 }
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-                var textIndexer = new ValueStringBuilderChunkIndexer(text);
+                var textIndexer = new ValueStringBuilderIndexer(text);
                 try
-#else // J2N: ValueStringBuilderArrayPoolIndexer doesn't provide any write advantage over StringBuilder
-                var textIndexer = text; // .NET 4.0 - don't care to optimize
-#endif
                 {
                     // copy the chars based on the new length
                     for (int i = 0; i < stringLength; i++)
@@ -1790,12 +1726,10 @@ namespace J2N.Text
                         textIndexer[i + startIndex] = newValue[i];
                     }
                 }
-#if FEATURE_STRINGBUILDER_GETCHUNKS
                 finally
                 {
                     textIndexer.Dispose();
                 }
-#endif
                 return text;
             }
             if (startIndex == end)
@@ -1841,18 +1775,9 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-#if FEATURE_STRINGBUILDER_GETCHUNKS
-            var forwardTextIndexer = new ValueStringBuilderChunkIndexer(text);
-            var reverseTextIndexer = new ValueStringBuilderChunkIndexer(text, iterateForward: false);
+            var forwardTextIndexer = new ValueStringBuilderIndexer(text, iterateForward: true);
+            var reverseTextIndexer = new ValueStringBuilderIndexer(text, iterateForward: false);
             try
-#elif FEATURE_ARRAYPOOL
-            var forwardTextIndexer = new ValueStringBuilderArrayPoolIndexer(text);
-            var reverseTextIndexer = new ValueStringBuilderArrayPoolIndexer(text, iterateForward: false);
-            try
-#else
-            var forwardTextIndexer = text; // .NET 4.0 - don't care to optimize
-            var reverseTextIndexer = text;
-#endif
             {
                 int count = text.Length;
                 if (count == 0) return text;
@@ -1927,13 +1852,11 @@ namespace J2N.Text
                 }
                 return text;
             }
-#if FEATURE_STRINGBUILDER_GETCHUNKS || FEATURE_ARRAYPOOL
             finally
             {
                 forwardTextIndexer.Dispose();
                 reverseTextIndexer.Dispose();
             }
-#endif
         }
 
         #endregion Reverse
