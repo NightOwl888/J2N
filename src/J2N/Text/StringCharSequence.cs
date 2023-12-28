@@ -19,7 +19,6 @@
 using System;
 using System.Text;
 
-
 namespace J2N.Text
 {
     using SR = J2N.Resources.Strings;
@@ -244,21 +243,12 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(ICharSequence? other)
         {
-            if (this.Value is null)
+            if (!HasValue)
                 return other is null || !other.HasValue;
             if (other is null || !other.HasValue)
                 return false;
 
-            if (other is StringCharSequence stringCharSequence)
-                return Equals(stringCharSequence.Value);
-
-            int len = other.Length;
-            if (len != this.Value.Length) return false;
-            for (int i = 0; i < len; i++)
-            {
-                if (!this.Value[i].Equals(other[i])) return false;
-            }
-            return true;
+            return CharSequenceComparer.Ordinal.Equals(this, other);
         }
 
         /// <summary>
@@ -268,12 +258,12 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(StringCharSequence? other)
         {
-            if (this.Value is null)
+            if (!HasValue)
                 return other is null || !other.HasValue;
             if (other is null || !other.HasValue)
                 return false;
 
-            return this.Equals(other.Value);
+            return Equals(other.Value);
         }
 
         /// <summary>
@@ -283,12 +273,12 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(CharArrayCharSequence? other)
         {
-            if (this.Value is null)
+            if (!HasValue)
                 return other is null || !other.HasValue;
             if (other is null || !other.HasValue)
                 return false;
 
-            return this.Equals(other.Value);
+            return Equals(other.Value);
         }
 
         /// <summary>
@@ -298,12 +288,12 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(StringBuilderCharSequence? other)
         {
-            if (this.Value is null)
+            if (!HasValue)
                 return other is null || !other.HasValue;
             if (other is null || !other.HasValue)
                 return false;
 
-            return this.Equals(other.Value);
+            return Equals(other.Value);
         }
 
         /// <summary>
@@ -313,12 +303,19 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(string? other)
         {
-            if (this.Value is null)
+            var value = Value;
+            if (value is null)
                 return other is null;
             if (other is null)
                 return false;
 
-            return this.Value.Equals(other, StringComparison.Ordinal);
+            int len = Length;
+            if (len != other.Length) return false;
+            for (int i = 0; i < len; i++)
+            {
+                if (!value[i].Equals(other[i])) return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -328,19 +325,24 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(StringBuilder? other)
         {
-            if (this.Value is null)
+            var value = Value;
+            if (value is null)
                 return other is null;
             if (other is null)
                 return false;
 
-            int len = other.Length;
-            if (len != this.Value.Length) return false;
-
-            // NOTE: This benchmarked to be faster than looping through the StringBuilder
-            string temp = other.ToString();
+            int len = Length;
+            if (len != other.Length) return false;
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+            using var otherIndexer = new ValueStringBuilderChunkIndexer(other);
+#elif FEATURE_ARRAYPOOL
+            using var otherIndexer = new ValueStringBuilderArrayPoolIndexer(other);
+#else
+            var otherIndexer = other.ToString(); // .NET 4.0 - don't care to optimize
+#endif
             for (int i = 0; i < len; i++)
             {
-                if (!this.Value[i].Equals(temp[i])) return false;
+                if (!value[i].Equals(otherIndexer[i])) return false;
             }
             return true;
         }
@@ -352,16 +354,17 @@ namespace J2N.Text
         /// <returns><c>true</c> if <paramref name="other"/> is equal to the current <see cref="StringCharSequence"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(char[]? other)
         {
-            if (this.Value is null)
+            var value = Value;
+            if (value is null)
                 return other is null;
             if (other is null)
                 return false;
 
             int len = other.Length;
-            if (len != this.Value.Length) return false;
+            if (len != value.Length) return false;
             for (int i = 0; i < len; i++)
             {
-                if (!this.Value[i].Equals(other[i])) return false;
+                if (!value[i].Equals(other[i])) return false;
             }
             return true;
         }
@@ -383,15 +386,17 @@ namespace J2N.Text
             else if (other is char[] otherCharArray)
                 return Equals(otherCharArray);
             else if (other is StringCharSequence otherStringCharSequence)
-                return Equals(otherStringCharSequence);
+                return Equals(otherStringCharSequence.Value);
             else if (other is CharArrayCharSequence otherCharArrayCharSequence)
-                return Equals(otherCharArrayCharSequence);
+                return Equals(otherCharArrayCharSequence.Value);
             else if (other is StringBuilderCharSequence otherStringBuilderCharSequence)
-                return Equals(otherStringBuilderCharSequence);
+                return Equals(otherStringBuilderCharSequence.Value);
+            else if (other is StringBuffer stringBuffer)
+                return Equals(stringBuffer.builder);
             else if (other is ICharSequence otherCharSequence)
                 return Equals(otherCharSequence);
 
-            return false;
+            return Equals(other.ToString());
         }
 
         /// <summary>
@@ -500,17 +505,27 @@ namespace J2N.Text
         /// </returns>
         public int CompareTo(object? other)
         {
-            bool otherIsNull = other is null;
-            if (!otherIsNull && other is ICharSequence csq)
-            {
-                if (this.Value is null) return !csq.HasValue ? 0 : -1;
-                if (!csq.HasValue) return 1;
-            }
+            if (this.Value is null) return (other is null) ? 0 : -1;
+            if (other is null) return 1;
 
-            if (this.Value is null) return otherIsNull ? 0 : -1;
-            if (otherIsNull) return 1;
+            if (other is string otherString)
+                return CompareTo(otherString);
+            else if (other is StringBuilder otherStringBuilder)
+                return CompareTo(otherStringBuilder);
+            else if (other is char[] otherCharArray)
+                return CompareTo(otherCharArray);
+            else if (other is StringCharSequence otherStringCharSequence)
+                return CompareTo(otherStringCharSequence.Value);
+            else if (other is CharArrayCharSequence otherCharArrayCharSequence)
+                return CompareTo(otherCharArrayCharSequence.Value);
+            else if (other is StringBuilderCharSequence otherStringBuilderCharSequence)
+                return CompareTo(otherStringBuilderCharSequence.Value);
+            else if (other is StringBuffer stringBuffer)
+                return CompareTo(stringBuffer.builder);
+            else if (other is ICharSequence otherCharSequence)
+                return CompareTo(otherCharSequence);
 
-            return this.Value.CompareToOrdinal(other!.ToString());
+            return this.Value.CompareToOrdinal(other.ToString());
         }
 
         #endregion
