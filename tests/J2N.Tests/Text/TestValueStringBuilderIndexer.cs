@@ -4,13 +4,13 @@ using System.Text;
 
 namespace J2N.Text
 {
-    public class TestValueStringBuilderChunkedArrayIndexer
+    public class TestValueStringBuilderIndexer
     {
         [Test]
         public void SequentialAccess_ReadsCorrectly()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
+            using var indexer = new ValueStringBuilderIndexer(sb);
             for (int i = 0; i < sb.Length; i++)
             {
                 char expected = sb[i];
@@ -23,7 +23,7 @@ namespace J2N.Text
         public void SequentialAccess_WritesCorrectly()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
+            var indexer = new ValueStringBuilderIndexer(sb);
             try
             {
                 for (int i = 0; i < sb.Length; i++)
@@ -43,7 +43,7 @@ namespace J2N.Text
         public void RandomAccess_ReadsCorrectly()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
+            using var indexer = new ValueStringBuilderIndexer(sb);
             Assert.AreEqual('4', indexer[3]);
             Assert.AreEqual('8', indexer[7]);
         }
@@ -52,7 +52,7 @@ namespace J2N.Text
         public void RandomAccess_WritesCorrectly()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
+            var indexer = new ValueStringBuilderIndexer(sb);
             try
             {
                 indexer[3] = 'X';
@@ -68,26 +68,10 @@ namespace J2N.Text
         }
 
         [Test]
-        public void ResettingIterators_SwitchingDirections_Successful()
-        {
-            StringBuilder sb = new StringBuilder("1234567890");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
-            Assert.AreEqual(true, indexer.IterateForward);
-
-            // Switching direction from forward to backward
-            indexer.Reset(false);
-            Assert.AreEqual(false, indexer.IterateForward);
-
-            // Switching direction from backward to forward
-            indexer.Reset(true);
-            Assert.AreEqual(true, indexer.IterateForward);
-        }
-
-        [Test]
         public void InvalidIndex_ThrowsException()
         {
             StringBuilder sb = new StringBuilder("1234567890");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
+            using var indexer = new ValueStringBuilderIndexer(sb);
 
             try
             {
@@ -110,95 +94,6 @@ namespace J2N.Text
         }
 
         [Test]
-        public void GetBounds_SingleChunk_ReturnsCorrectBounds()
-        {
-            StringBuilder sb = new StringBuilder("1234567890");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
-            indexer.Reset(iterateForward: true);
-            //indexer.IterateForward = true;
-
-            // Single chunk scenario
-            indexer.GetBounds(0, out int lowerBound, out int upperBound);
-
-            Assert.AreEqual(0, lowerBound);
-            Assert.AreEqual(sb.Length - 1, upperBound);
-        }
-
-        [Test]
-        public void GetBounds_MultipleChunks_ReturnsCorrectBounds()
-        {
-            StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb, iterateForward: true);
-            int expectedChunkCount = (int)Math.Ceiling((double)sb.Length / ValueStringBuilderChunkedArrayIndexer.ChunkLength);
-            Assert.AreEqual(expectedChunkCount, indexer.ChunkCount);
-
-
-            for (int i = 0; i < expectedChunkCount; i++)
-            {
-                indexer.GetBounds(i, out int lowerBound, out int upperBound);
-                if (i < expectedChunkCount - 1)
-                {
-                    Assert.AreEqual(ValueStringBuilderChunkedArrayIndexer.ChunkLength * i, lowerBound);
-                    Assert.AreEqual((ValueStringBuilderChunkedArrayIndexer.ChunkLength * (i + 1)) - 1, upperBound);
-                }
-                else // Last chunk
-                {
-                    Assert.AreEqual(ValueStringBuilderChunkedArrayIndexer.ChunkLength * i, lowerBound);
-                    Assert.AreEqual(sb.Length - 1, upperBound);
-                }
-            }
-        }
-
-        [Test]
-        public void IsWithinBounds_SingleChunk_ReturnsTrueForValidIndex()
-        {
-            StringBuilder sb = new StringBuilder("1234567890");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
-            indexer.Reset(iterateForward: true);
-            //indexer.IterateForward = true;
-
-            // Single chunk scenario
-            bool result = indexer.IsWithinBounds(0, 5);
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public void IsWithinBounds_SingleChunk_ReturnsFalseForInvalidIndex()
-        {
-            StringBuilder sb = new StringBuilder("1234567890");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
-            indexer.Reset(iterateForward: true);
-            //indexer.IterateForward = true;
-
-            // Single chunk scenario
-            bool result = indexer.IsWithinBounds(0, sb.Length);
-            Assert.IsFalse(result);
-        }
-
-        [Test]
-        public void IsWithinBounds_MultipleChunks_ReturnsTrueForValidIndex()
-        {
-            StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb, iterateForward: true);
-            // Multiple chunks scenario
-            bool result = indexer.IsWithinBounds(1, ValueStringBuilderChunkedArrayIndexer.ChunkLength * 2 - 10);
-            Assert.IsTrue(result);
-        }
-
-        [Test]
-        public void IsWithinBounds_MultipleChunks_ReturnsFalseForInvalidIndex()
-        {
-            StringBuilder sb = new StringBuilder("12345678901234567890").Append(new string('a', 1024));
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(sb);
-            indexer.Reset(iterateForward: true);
-            //indexer.IterateForward = true;
-
-            // Multiple chunks scenario
-            bool result = indexer.IsWithinBounds(0, sb.Length);
-            Assert.IsFalse(result);
-        }
-
-        [Test]
         public void ModifyingValuesInMultipleChunks_ChangesValues()
         {
             // Arrange
@@ -207,7 +102,7 @@ namespace J2N.Text
             stringBuilder.Append("Beautiful, ").Append(new string('a', 1024));
             stringBuilder.Append("Amazing, ").Append(new string('a', 1024));
             stringBuilder.Append("World!");
-            var indexer = new ValueStringBuilderChunkedArrayIndexer(stringBuilder);
+            var indexer = new ValueStringBuilderIndexer(stringBuilder);
             try
             {
                 // Act
@@ -238,13 +133,12 @@ namespace J2N.Text
             Assert.AreEqual($"Hello, {new string('a', 1024)}XeautifVl, {new string('a', 1024)}AmAzing, {new string('a', 1024)}Zorld?", stringBuilder.ToString());
         }
 
-
         [Test]
         public void SwitchingToRandomAccessAndBackToSequentialAccess_ReturnsCorrectValues()
         {
             // Arrange
             var stringBuilder = new StringBuilder("Hello").Append(", ").Append("World!");
-            using var indexer = new ValueStringBuilderChunkedArrayIndexer(stringBuilder);
+            using var indexer = new ValueStringBuilderIndexer(stringBuilder);
 
             // Act
             // Assert random access

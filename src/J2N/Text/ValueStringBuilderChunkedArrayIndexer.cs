@@ -35,7 +35,7 @@ namespace J2N.Text
     /// For .NET Core 3.x and higher, the ValueStringBuilderChunkIndexer should be favored over this approach.
     /// </summary>
     [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Structs have performance issues with readonly fields.")]
-    internal ref struct ValueStringBuilderChunkedArrayIndexer // J2N TODO: Make public? This may be useful in ICU4N and Lucene.NET
+    internal ref struct ValueStringBuilderChunkedArrayIndexer
     {
         public const int ChunkLength = 512;
 
@@ -199,7 +199,7 @@ namespace J2N.Text
             {
                 if ((uint)index >= (uint)stringBuilder.Length)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    throw new IndexOutOfRangeException();
                 }
 
                 if (index < currentLowerBound || index > currentUpperBound)

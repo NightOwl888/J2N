@@ -22,7 +22,7 @@ namespace J2N.Text
             }
             catch (Exception ex)
             {
-                Assert.IsInstanceOf<ArgumentOutOfRangeException>(ex);
+                Assert.IsInstanceOf<IndexOutOfRangeException>(ex);
             }
 
             try
@@ -32,7 +32,7 @@ namespace J2N.Text
             }
             catch (Exception ex)
             {
-                Assert.IsInstanceOf<ArgumentOutOfRangeException>(ex);
+                Assert.IsInstanceOf<IndexOutOfRangeException>(ex);
             }
         }
 
