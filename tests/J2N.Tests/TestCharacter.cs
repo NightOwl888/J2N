@@ -256,6 +256,51 @@ namespace J2N
         }
 
         [Test]
+        public void Test_codePointAt_ValueStringBuilderIndexerI()
+        {
+            var i1 = new ValueStringBuilderIndexer(new StringBuilder("abc"));
+            assertEquals('a', Character.CodePointAt(ref i1, 0));
+            assertEquals('a', i1.CodePointAt(0));
+            assertEquals('b', Character.CodePointAt(ref i1, 1));
+            assertEquals('b', i1.CodePointAt(1));
+            assertEquals('c', Character.CodePointAt(ref i1, 2));
+            assertEquals('c', i1.CodePointAt(2));
+
+            var i2 = new ValueStringBuilderIndexer(new StringBuilder("\uD800\uDC00"));
+            assertEquals(0x10000, Character.CodePointAt(ref i2, 0));
+            assertEquals(0x10000, i2.CodePointAt(0));
+            assertEquals('\uDC00', Character.CodePointAt(ref i2, 1));
+            assertEquals('\uDC00', i2.CodePointAt(1));
+
+            //try
+            //{
+            //    Character.CodePointAt((StringBuilder)null, 0);
+            //    fail("No NPE.");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //}
+
+            try
+            {
+                Character.CodePointAt(ref i1, -1);
+                fail("No IOOBE, negative index.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.CodePointAt(ref i1, 4);
+                fail("No IOOBE, index too large.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+        }
+
+        [Test]
         public void Test_codePointAt_StringI()
         {
 
@@ -543,6 +588,52 @@ namespace J2N
             try
             {
                 Character.CodePointBefore((StringBuilder)new StringBuilder("abc"), 4);
+                fail("No IOOBE, index too large.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+        }
+
+        [Test]
+        public void Test_codePointBefore_ValueStringBuilderIndexerI()
+        {
+            var i1 = new ValueStringBuilderIndexer(new StringBuilder("abc"));
+            assertEquals('a', Character.CodePointBefore(ref i1, 1));
+            assertEquals('a', i1.CodePointBefore(1));
+            assertEquals('b', Character.CodePointBefore(ref i1, 2));
+            assertEquals('b', i1.CodePointBefore(2));
+            assertEquals('c', Character.CodePointBefore(ref i1, 3));
+            assertEquals('c', i1.CodePointBefore(3));
+
+            var i2 = new ValueStringBuilderIndexer(new StringBuilder("\uD800\uDC00"));
+            assertEquals(0x10000, Character.CodePointBefore(ref i2, 2));
+            assertEquals(0x10000, i2.CodePointBefore(2));
+            assertEquals('\uD800', Character.CodePointBefore(ref i2, 1));
+            assertEquals('\uD800', i2.CodePointBefore(1));
+
+
+            //try
+            //{
+            //    Character.CodePointBefore((StringBuilder)null, 0);
+            //    fail("No NPE.");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //}
+
+            try
+            {
+                Character.CodePointBefore(ref i1, 0);
+                fail("No IOOBE, index below one.");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+            }
+
+            try
+            {
+                Character.CodePointBefore(ref i1, 4);
                 fail("No IOOBE, index too large.");
             }
             catch (ArgumentOutOfRangeException e)

@@ -223,6 +223,8 @@ namespace J2N.Text
 
         public bool IterateForward => iterateForward;
 
+        public int Length => stringBuilder.Length;
+
         public char this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

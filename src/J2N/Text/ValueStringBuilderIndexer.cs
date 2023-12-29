@@ -82,6 +82,11 @@ namespace J2N.Text
         public bool IterateForward => indexer.IterateForward;
 
         /// <summary>
+        /// Gets the length of the <see cref="StringBuilder"/>.
+        /// </summary>
+        public int Length => indexer.Length;
+
+        /// <summary>
         /// Gets or sets the character at the specified character position in the <see cref="StringBuilder"/>
         /// that is passed into the constructor.
         /// </summary>
