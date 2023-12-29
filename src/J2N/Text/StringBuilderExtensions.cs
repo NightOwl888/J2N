@@ -1744,6 +1744,7 @@ namespace J2N.Text
 
         #region Reverse
 
+#if FEATURE_SPAN
         /// <summary>
         /// Causes this character sequence to be replaced by the reverse of
         /// the sequence. If there are any surrogate pairs included in the
@@ -1777,6 +1778,39 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// <seealso cref="J2N.Memory.MemoryExtensions.ReverseText(Span{char})"/>
+#else
+        /// <summary>
+        /// Causes this character sequence to be replaced by the reverse of
+        /// the sequence. If there are any surrogate pairs included in the
+        /// sequence, these are treated as single characters for the
+        /// reverse operation. Thus, the order of the high-low surrogates
+        /// is never reversed.
+        /// <para/>
+        /// IMPORTANT: This operation is done in-place. Although a <see cref="StringBuilder"/>
+        /// is returned, it is the SAME instance as the one that is passed in.
+        /// <para/>
+        /// Let <c>n</c> be the character length of this character sequence
+        /// (not the length in <see cref="char"/> values) just prior to
+        /// execution of the <see cref="Reverse(StringBuilder)"/> method. Then the
+        /// character at index <c>k</c> in the new character sequence is
+        /// equal to the character at index <c>n-k-1</c> in the old
+        /// character sequence.
+        /// <para/>
+        /// Note that the reverse operation may result in producing
+        /// surrogate pairs that were unpaired low-surrogates and
+        /// high-surrogates before the operation. For example, reversing
+        /// "&#92;uDC00&#92;uD800" produces "&#92;uD800&#92;uDC00" which is
+        /// a valid surrogate pair.
+        /// <para/>
+        /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
+        /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
+        /// which doesn't require a <see cref="StringBuilder"/> instance.
+        /// </summary>
+        /// <param name="text">this <see cref="StringBuilder"/></param>
+        /// <returns>A reference to this <see cref="StringBuilder"/>, for chaining.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
+        /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
+#endif
         public static StringBuilder Reverse(this StringBuilder text)
         {
             if (text is null)
@@ -1866,7 +1900,7 @@ namespace J2N.Text
             }
         }
 
-        #endregion Reverse
+#endregion Reverse
 
         #region Subsequence
 
