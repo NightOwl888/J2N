@@ -65,7 +65,7 @@ namespace J2N.Text
             foreach (var _ in stringBuilder.GetChunks())
                 chunkCount++;
 
-            usePacker = chunkCount <= Int32Packer.TotalSlots && stringBuilder.Length < Int32Packer.MaxValue;
+            usePacker = chunkCount <= ValueInt32Packer.TotalSlots && stringBuilder.Length < ValueInt32Packer.MaxValue;
 
             int chunkIndex = 0;
             int prevChunkLength = 0;
