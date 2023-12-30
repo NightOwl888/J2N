@@ -19,7 +19,8 @@
       Test Client       | Target Under Test
       net6.0            | net6.0
       net5.0            | netstandard2.1
-      net48             | net45
+      net48             | net462
+      net472            | net45
       net461            | netstandard2.0
       net452            | net40
       MonoAndroid100    | netstandard2.1
@@ -28,7 +29,7 @@
       // The compilations for netstandard2.1 and netstandard2.0 are for loading
       // as dependencies in Xamarin tests to test those exact targets
     -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net6.0;net5.0;net48;net461;net452;netstandard2.1;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net6.0;net5.0;net48;net472;net461;net452;netstandard2.1;netstandard2.0</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>
 
@@ -36,6 +37,7 @@
     <SetTargetFramework></SetTargetFramework>
     <SetTargetFramework Condition=" '$(TargetFramework)' == 'net452' ">TargetFramework=net40</SetTargetFramework>
     <SetTargetFramework Condition=" '$(TargetFramework)' == 'net461' ">TargetFramework=netstandard2.0</SetTargetFramework>
+    <SetTargetFramework Condition=" '$(TargetFramework)' == 'net472' ">TargetFramework=net45</SetTargetFramework>
   </PropertyGroup>
   
 </Project>
