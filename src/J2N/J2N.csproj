@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net6.0;netstandard2.1;netstandard2.0;net45;net40</TargetFrameworks>
+    <TargetFrameworks>net6.0;netstandard2.1;netstandard2.0;net462;net45;net40</TargetFrameworks>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
@@ -28,11 +28,11 @@
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'net45' ">
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net40' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'net45' Or '$(TargetFramework)' == 'net40' ">
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
