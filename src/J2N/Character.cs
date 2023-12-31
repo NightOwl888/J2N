@@ -18,6 +18,9 @@
 
 using J2N.Text;
 using System;
+#if FEATURE_ARRAYPOOL
+using System.Buffers;
+#endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -53,6 +56,8 @@ namespace J2N
     /// </summary>
     public static class Character
     {
+        private const int CodePointStackBufferSize = 256;
+
         private const char charNull = '\0';
         private const char charZero = '0';
         private const char charA = 'a';
@@ -2967,7 +2972,7 @@ namespace J2N
         /// <para/>
         /// Usage Note: In the JDK, there is a constructor overload that accept code points and turn them into a string. This is
         /// the .NET equivalent of that constructor overload, however this overload is provided for convenience and assumes the
-        /// whole array will be converted. <see cref="ToString(int[], int, int)"/> allows conversion of a partial array of code points to a
+        /// whole array will be converted. <see cref="ToString(ReadOnlySpan{int}, int, int)"/> allows conversion of a partial array of code points to a
         /// <see cref="string"/>.
         /// </summary>
         /// <param name="codePoints">A <see cref="ReadOnlySpan{T}"/> of UTF-32 code points.</param>
@@ -2975,7 +2980,27 @@ namespace J2N
         /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
         /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
         public static string ToString(ReadOnlySpan<int> codePoints)
-            => ToStringImpl(codePoints, 0, codePoints.Length);
+        {
+            int length = codePoints.Length;
+            // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
+            if (length <= CodePointStackBufferSize)
+            {
+                unsafe
+                {
+                    // Initialize our array on the stack with enough space
+                    // assuming the entire string consists of surrogate pairs
+                    // (worst case scenario).
+                    char* buffer = stackalloc char[length * 2];
+                    fixed (int* codePointsPtr = codePoints)
+                    {
+                        int stringLength = WriteCodePointsToCharBuffer(buffer, codePointsPtr, startIndex: 0, length);
+                        return new string(buffer, 0, stringLength);
+                    }
+                }
+            }
+
+            return ToStringSlow(codePoints, startIndex: 0, length);
+        }
 
 #endif
 
@@ -2997,7 +3022,25 @@ namespace J2N
             if (codePoints is null)
                 throw new ArgumentNullException(nameof(codePoints));
 
-            return ToStringImpl(codePoints, 0, codePoints.Length);
+            int length = codePoints.Length;
+            // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
+            if (length <= CodePointStackBufferSize)
+            {
+                unsafe
+                {
+                    // Initialize our array on the stack with enough space
+                    // assuming the entire string consists of surrogate pairs
+                    // (worst case scenario).
+                    char* buffer = stackalloc char[length * 2];
+                    fixed (int* codePointsPtr = codePoints)
+                    {
+                        int stringLength = WriteCodePointsToCharBuffer(buffer, codePointsPtr, startIndex: 0, length);
+                        return new string(buffer, 0, stringLength);
+                    }
+                }
+            }
+
+            return ToStringSlow(codePoints, startIndex: 0, length);
         }
 
 #if FEATURE_SPAN
@@ -3022,8 +3065,33 @@ namespace J2N
         /// <exception cref="ArgumentException">One of the <paramref name="codePoints"/> is not a valid Unicode
         /// code point (see <see cref="IsValidCodePoint(int)"/>).</exception>
         public static string ToString(ReadOnlySpan<int> codePoints, int startIndex, int length)
-            => ToStringImpl(codePoints, startIndex, length);
+        {
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR2.ArgumentOutOfRange_NeedNonNegNum);
+            if (length < 0)
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR2.ArgumentOutOfRange_NeedNonNegNum);
+            if (startIndex > codePoints.Length - length) // Checks for int overflow
+                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
+            // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
+            if (length <= CodePointStackBufferSize)
+            {
+                unsafe
+                {
+                    // Initialize our array on the stack with enough space
+                    // assuming the entire string consists of surrogate pairs
+                    // (worst case scenario).
+                    char* buffer = stackalloc char[length * 2];
+                    fixed (int* codePointsPtr = codePoints)
+                    {
+                        int stringLength = WriteCodePointsToCharBuffer(buffer, codePointsPtr, startIndex, length);
+                        return new string(buffer, 0, stringLength);
+                    }
+                }
+            }
+
+            return ToStringSlow(codePoints, startIndex, length);
+        }
 #endif
 
         /// <summary>
@@ -3050,21 +3118,6 @@ namespace J2N
         {
             if (codePoints is null)
                 throw new ArgumentNullException(nameof(codePoints));
-
-            return ToStringImpl(codePoints, startIndex, length);
-        }
-
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        private static string ToStringImpl(
-#if FEATURE_SPAN
-            ReadOnlySpan<int> codePoints,
-#else
-            int[] codePoints,
-#endif
-            int startIndex, int length)
-        {
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR2.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
@@ -3072,10 +3125,8 @@ namespace J2N
             if (startIndex > codePoints.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
-            const int CountThreshold = 1024; // If the number of code points exceeds this, we count them instead of allocating count * 2.
-            const int StackThreshold = 256; // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
-
-            if (length <= StackThreshold)
+            // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
+            if (length <= CodePointStackBufferSize)
             {
                 unsafe
                 {
@@ -3083,52 +3134,102 @@ namespace J2N
                     // assuming the entire string consists of surrogate pairs
                     // (worst case scenario).
                     char* buffer = stackalloc char[length * 2];
-                    int stringLength = WriteCodePointsToCharBuffer(buffer, codePoints, startIndex, length);
-                    return new string(buffer, 0, stringLength);
-                }
-            }
-
-            return ToStringSlow(codePoints, startIndex, length);
-
-            static string ToStringSlow(
-#if FEATURE_SPAN
-                ReadOnlySpan<int> codePoints,
-#else
-                int[] codePoints,
-#endif
-                int startIndex, int length)
-            {
-                int bufferLength = 0;
-                // If we go over the threshold, count the number of chars we
-                // will need so we can allocate the precise amount of memory
-                if (length > CountThreshold)
-                {
-                    int end = startIndex + length; // 1 past the end index
-                    for (int j = startIndex; j < end; ++j)
+                    fixed (int* codePointsPtr = codePoints)
                     {
-                        bufferLength += CharCount(codePoints[j]);
-                    }
-                }
-                // If we don't have any characters at this point,
-                // as a last resort, assume each codepoint
-                // is 2 characters (worst case scenario).
-                if (bufferLength < 1)
-                {
-                    bufferLength = length * 2;
-                }
-
-                unsafe
-                {
-                    // Initialize our array on the heap to our exact or oversized length.
-                    // It is now safe to assume we have enough space for all of the characters.
-                    fixed (char* buffer = new char[bufferLength])
-                    {
-                        int stringLength = WriteCodePointsToCharBuffer(buffer, codePoints, startIndex, length);
+                        int stringLength = WriteCodePointsToCharBuffer(buffer, codePointsPtr, startIndex, length);
                         return new string(buffer, 0, stringLength);
                     }
                 }
             }
+
+            return ToStringSlow(codePoints, startIndex, length);
         }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private static int GetStringLength(
+#if FEATURE_SPAN
+            ReadOnlySpan<int> codePoints,
+#else
+            int[] codePoints,
+#endif
+            int startIndex, int length)
+        {
+            int result = 0;
+            int end = startIndex + length; // 1 past the end index
+            for (int j = startIndex; j < end; ++j)
+            {
+                result += CharCount(codePoints[j]);
+            }
+            return result;
+        }
+
+#if FEATURE_STRING_CREATE
+
+        private static string ToStringSlow(int[] codePoints, int startIndex, int length)
+        {
+            int stringLength = GetStringLength(codePoints, startIndex, length);
+            return string.Create(stringLength, (codePoints, startIndex, length), WriteString);
+        }
+
+        private static string ToStringSlow(ReadOnlySpan<int> codePoints, int startIndex, int length)
+        {
+            int stringLength = GetStringLength(codePoints, startIndex, length);
+            int[] buffer = ArrayPool<int>.Shared.Rent(length);
+            try
+            {
+                codePoints.Slice(startIndex, length).CopyTo(buffer);
+                return string.Create(stringLength, (buffer, 0, length), WriteString);
+            }
+            finally
+            {
+                ArrayPool<int>.Shared.Return(buffer);
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private unsafe static void WriteString(Span<char> chars, ValueTuple<int[], int, int> state)
+        {
+            fixed (char* charsPtr = chars)
+            fixed (int* codePointsPtr = state.Item1)
+            {
+                WriteCodePointsToCharBuffer(charsPtr, codePointsPtr, startIndex: state.Item2, length: state.Item3);
+            }
+        }
+
+#elif FEATURE_SPAN
+        private unsafe static string ToStringSlow(ReadOnlySpan<int> codePoints, int startIndex, int length)
+        {
+            int stringLength = GetStringLength(codePoints, startIndex, length);
+            char[] chars = ArrayPool<char>.Shared.Rent(stringLength);
+            try
+            {
+                fixed (char* charsPtr = chars)
+                fixed (int* codePointsPtr = codePoints)
+                {
+                    WriteCodePointsToCharBuffer(charsPtr, codePointsPtr, startIndex, length);
+                    return new string(charsPtr, 0, stringLength);
+                }
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.Return(chars);
+            }
+        }
+#else
+        private unsafe static string ToStringSlow(int[] codePoints, int startIndex, int length)
+        {
+            int stringLength = GetStringLength(codePoints, startIndex, length);
+            char[] chars = new char[stringLength];
+            fixed (char* charsPtr = chars)
+            fixed (int* codePointsPtr = codePoints)
+            {
+                WriteCodePointsToCharBuffer(charsPtr, codePointsPtr, startIndex, length);
+                return new string(charsPtr, 0, stringLength);
+            }
+        }
+#endif
 
         /// <summary>
         /// Converts an an array <paramref name="codePoints"/> to a buffer of UTF-16 code units.
@@ -3143,13 +3244,7 @@ namespace J2N
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private unsafe static int WriteCodePointsToCharBuffer(char* buffer,
-#if FEATURE_SPAN
-            ReadOnlySpan<int> codePoints,
-#else
-            int[] codePoints,
-#endif
-            int startIndex, int length)
+        private unsafe static int WriteCodePointsToCharBuffer(char* buffer, int* codePoints, int startIndex, int length)
         {
             int index = 0;
             int end = startIndex + length; // 1 past the end index
