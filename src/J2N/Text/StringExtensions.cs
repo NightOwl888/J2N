@@ -1030,6 +1030,8 @@ namespace J2N.Text
         /// </summary>
         /// <param name="text">This <see cref="string"/>.</param>
         /// <returns>The reversed string with non-reversed surrogate pairs.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is
+        /// <c>null</c>.</exception>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
         /// <seealso cref="J2N.Memory.MemoryExtensions.ReverseText(Span{char})"/>
 #else
@@ -1061,10 +1063,39 @@ namespace J2N.Text
         /// </summary>
         /// <param name="text">This <see cref="string"/>.</param>
         /// <returns>The reversed string with non-reversed surrogate pairs.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="text"/> is
+        /// <c>null</c>.</exception>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
 #endif
         public static string ReverseText(this string text)
         {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+            if (text.Length < 2) return text;
+
+#if FEATURE_STRING_CREATE
+            return string.Create(text.Length, text, (Span<char> chars, string str) =>
+            {
+                int length = str.Length;
+                int index = 0;
+                for (int i = length - 1; i >= 0; i--)
+                {
+                    char ch = str[i];
+                    if (char.IsLowSurrogate(ch) && i > 0)
+                    {
+                        char ch2 = str[i - 1];
+                        if (char.IsHighSurrogate(ch2))
+                        {
+                            chars[index++] = ch2;
+                            chars[index++] = ch;
+                            i--;
+                            continue;
+                        }
+                    }
+                    chars[index++] = ch;
+                }
+            });
+#else
             int length = text.Length;
 #if FEATURE_SPAN
             var result = length <= CharStackBufferSize
@@ -1090,9 +1121,10 @@ namespace J2N.Text
                 result.Append(ch);
             }
             return result.ToString();
+#endif
         }
 
-#endregion ReverseText
+        #endregion ReverseText
 
         #region StartsWith
 
