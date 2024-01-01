@@ -2050,91 +2050,52 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            var forwardTextIndexer = new ValueStringBuilderIndexer(text, iterateForward: true);
-            var reverseTextIndexer = new ValueStringBuilderIndexer(text, iterateForward: false);
+            int length = text.Length;
+            if (length <= 1) return text;
+
+#if FEATURE_ARRAYPOOL
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
             try
+#else
+            char[] textChars = new char[length];
+#endif
             {
-                int count = text.Length;
-                if (count == 0) return text;
-                int start = 0;
-                int end = count - 1;
-                char startHigh = forwardTextIndexer[0];
-                char endLow = reverseTextIndexer[end];
-                bool allowStartSurrogate = true, allowEndSurrogate = true;
-                while (start < end)
+#if FEATURE_ARRAYPOOL
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                text.CopyTo(0, textChars, length);
+#else
+                text.CopyTo(0, textChars, 0, length);
+#endif
+                text.Length = 0;
+                for (int i = length - 1; i >= 0; i--)
                 {
-                    char startLow = forwardTextIndexer[start + 1];
-                    char endHigh = reverseTextIndexer[end - 1];
-                    bool surrogateAtStart = allowStartSurrogate && startLow >= 0xdc00
-                            && startLow <= 0xdfff && startHigh >= 0xd800
-                            && startHigh <= 0xdbff;
-                    if (surrogateAtStart && (count < 3))
+                    char ch = textChars[i];
+                    if (char.IsLowSurrogate(ch) && i > 0)
                     {
-                        return text;
-                    }
-                    bool surAtEnd = allowEndSurrogate && endHigh >= 0xd800
-                            && endHigh <= 0xdbff && endLow >= 0xdc00
-                            && endLow <= 0xdfff;
-                    allowStartSurrogate = allowEndSurrogate = true;
-                    if (surrogateAtStart == surAtEnd)
-                    {
-                        if (surrogateAtStart)
+                        char ch2 = textChars[i - 1];
+                        if (char.IsHighSurrogate(ch2))
                         {
-                            // both surrogates
-                            reverseTextIndexer[end] = startLow;
-                            reverseTextIndexer[end - 1] = startHigh;
-                            forwardTextIndexer[start] = endHigh;
-                            forwardTextIndexer[start + 1] = endLow;
-                            startHigh = forwardTextIndexer[start + 2];
-                            endLow = reverseTextIndexer[end - 2];
-                            start++;
-                            end--;
-                        }
-                        else
-                        {
-                            // neither surrogates
-                            reverseTextIndexer[end] = startHigh;
-                            forwardTextIndexer[start] = endLow;
-                            startHigh = startLow;
-                            endLow = endHigh;
+                            text.Append(ch2);
+                            text.Append(ch);
+                            i--;
+                            continue;
                         }
                     }
-                    else
-                    {
-                        if (surrogateAtStart)
-                        {
-                            // surrogate only at the front
-                            reverseTextIndexer[end] = startLow;
-                            forwardTextIndexer[start] = endLow;
-                            endLow = endHigh;
-                            allowStartSurrogate = false;
-                        }
-                        else
-                        {
-                            // surrogate only at the end
-                            reverseTextIndexer[end] = startHigh;
-                            forwardTextIndexer[start] = endHigh;
-                            startHigh = startLow;
-                            allowEndSurrogate = false;
-                        }
-                    }
-                    start++;
-                    end--;
-                }
-                if ((count & 1) == 1 && (!allowStartSurrogate || !allowEndSurrogate))
-                {
-                    reverseTextIndexer[end] = allowStartSurrogate ? endLow : startHigh;
+                    text.Append(ch);
                 }
                 return text;
             }
+#if FEATURE_ARRAYPOOL
             finally
             {
-                forwardTextIndexer.Dispose();
-                reverseTextIndexer.Dispose();
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
             }
+#endif
         }
 
-#endregion Reverse
+        #endregion Reverse
 
         #region Subsequence
 
