@@ -993,24 +993,54 @@ namespace J2N.Text
             int length = value.Length;
             if (length == 0)
                 return 0;
-            int textLength = text.Length;
-            int maxSearchLength = (textLength - length) + 1;
-            char firstChar = value[0];
-            int index;
-            using var textIndexer = new ValueStringBuilderIndexer(text);
-            for (int i = startIndex; i < maxSearchLength; ++i)
-            {
-                if (textIndexer[i] == firstChar)
-                {
-                    index = 1;
-                    while ((index < length) && (textIndexer[i + index] == value[index]))
-                        ++index;
 
-                    if (index == length)
-                        return i;
+            int textLength = text.Length;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
+            {
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int maxSearchLength = (textLength - length) + 1;
+                char firstChar = value[0];
+                int index;
+                for (int i = startIndex; i < maxSearchLength; ++i)
+                {
+                    if (textChars[i] == firstChar)
+                    {
+                        index = 1;
+                        while ((index < length) && (textChars[i + index] == value[index]))
+                            ++index;
+
+                        if (index == length)
+                            return i;
+                    }
                 }
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -1021,31 +1051,61 @@ namespace J2N.Text
             int length = value.Length;
             if (length == 0)
                 return 0;
-            int textLength = text.Length;
-            int maxSearchLength = (textLength - length) + 1;
-            char firstChar = value[0], c1, c2;
-            var textInfo = CultureInfo.InvariantCulture.TextInfo;
-            int index;
-            using var textIndexer = new ValueStringBuilderIndexer(text);
-            for (int i = startIndex; i < maxSearchLength; ++i)
-            {
-                if (textIndexer[i] == firstChar)
-                {
-                    index = 1;
-                    while ((index < length) &&
-                        ((c1 = textIndexer[i + index]) == (c2 = value[index]) ||
-                        textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
-                        // Required for unicode that we test both cases
-                        textInfo.ToLower(c1) == textInfo.ToLower(c2)))
-                    {
-                        ++index;
-                    }
 
-                    if (index == length)
-                        return i;
+            int textLength = text.Length;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
+            {
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int maxSearchLength = (textLength - length) + 1;
+                char firstChar = value[0], c1, c2;
+                var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                int index;
+                for (int i = startIndex; i < maxSearchLength; ++i)
+                {
+                    if (textChars[i] == firstChar)
+                    {
+                        index = 1;
+                        while ((index < length) &&
+                            ((c1 = textChars[i + index]) == (c2 = value[index]) ||
+                            textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
+                            // Required for unicode that we test both cases
+                            textInfo.ToLower(c1) == textInfo.ToLower(c2)))
+                        {
+                            ++index;
+                        }
+
+                        if (index == length)
+                            return i;
+                    }
                 }
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
         #endregion IndexOf
@@ -1676,49 +1736,78 @@ namespace J2N.Text
         private static int LastIndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;
-            int subCount = value.Length;
-
-            if (subCount <= textLength && startIndex >= 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
             {
-                if (subCount > 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int subCount = value.Length;
+
+                if (subCount <= textLength && startIndex >= 0)
                 {
-                    if (startIndex > textLength - subCount)
+                    if (subCount > 0)
                     {
-                        startIndex = textLength - subCount; // count and subCount are both >= 1
-                    }
-                    using var textIndexer = new ValueStringBuilderIndexer(text);
-                    char firstChar = value[0];
-                    while (true)
-                    {
-                        int i = startIndex;
-                        bool found = false;
-                        for (; i >= 0; --i)
+                        if (startIndex > textLength - subCount)
                         {
-                            if (textIndexer[i] == firstChar)
+                            startIndex = textLength - subCount; // count and subCount are both >= 1
+                        }
+                        char firstChar = value[0];
+                        while (true)
+                        {
+                            int i = startIndex;
+                            bool found = false;
+                            for (; i >= 0; --i)
                             {
-                                found = true;
-                                break;
+                                if (textChars[i] == firstChar)
+                                {
+                                    found = true;
+                                    break;
+                                }
                             }
+                            if (!found)
+                            {
+                                return -1;
+                            }
+                            int o1 = i, o2 = 0;
+                            while (++o2 < subCount && textChars[++o1] == value[o2])
+                            {
+                                // Intentionally empty
+                            }
+                            if (o2 == subCount)
+                            {
+                                return i;
+                            }
+                            startIndex = i - 1;
                         }
-                        if (!found)
-                        {
-                            return -1;
-                        }
-                        int o1 = i, o2 = 0;
-                        while (++o2 < subCount && textIndexer[++o1] == value[o2])
-                        {
-                            // Intentionally empty
-                        }
-                        if (o2 == subCount)
-                        {
-                            return i;
-                        }
-                        startIndex = i - 1;
                     }
+                    return startIndex < textLength ? startIndex : textLength;
                 }
-                return startIndex < textLength ? startIndex : textLength;
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -1727,54 +1816,83 @@ namespace J2N.Text
         private static int LastIndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;
-            int subCount = value.Length;
-
-            if (subCount <= textLength && startIndex >= 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
             {
-                if (subCount > 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int subCount = value.Length;
+
+                if (subCount <= textLength && startIndex >= 0)
                 {
-                    if (startIndex > textLength - subCount)
+                    if (subCount > 0)
                     {
-                        startIndex = textLength - subCount; // count and subCount are both >= 1
-                    }
-                    char firstChar = value[0], c1, c2;
-                    var textInfo = CultureInfo.InvariantCulture.TextInfo;
-                    using var textIndexer = new ValueStringBuilderIndexer(text);
-                    while (true)
-                    {
-                        int i = startIndex;
-                        bool found = false;
-                        for (; i >= 0; --i)
+                        if (startIndex > textLength - subCount)
                         {
-                            if (textIndexer[i] == firstChar)
+                            startIndex = textLength - subCount; // count and subCount are both >= 1
+                        }
+                        char firstChar = value[0], c1, c2;
+                        var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                        while (true)
+                        {
+                            int i = startIndex;
+                            bool found = false;
+                            for (; i >= 0; --i)
                             {
-                                found = true;
-                                break;
+                                if (textChars[i] == firstChar)
+                                {
+                                    found = true;
+                                    break;
+                                }
                             }
+                            if (!found)
+                            {
+                                return -1;
+                            }
+                            int o1 = i, o2 = 0;
+                            while (++o2 < subCount && 
+                                ((c1 = textChars[++o1]) == (c2 = value[o2]) ||
+                                textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
+                                // Required for unicode that we test both cases
+                                textInfo.ToLower(c1) == textInfo.ToLower(c2)))
+                            {
+                                // Intentionally empty
+                            }
+                            if (o2 == subCount)
+                            {
+                                return i;
+                            }
+                            startIndex = i - 1;
                         }
-                        if (!found)
-                        {
-                            return -1;
-                        }
-                        int o1 = i, o2 = 0;
-                        while (++o2 < subCount && 
-                            ((c1 = textIndexer[++o1]) == (c2 = value[o2]) ||
-                            textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
-                            // Required for unicode that we test both cases
-                            textInfo.ToLower(c1) == textInfo.ToLower(c2)))
-                        {
-                            // Intentionally empty
-                        }
-                        if (o2 == subCount)
-                        {
-                            return i;
-                        }
-                        startIndex = i - 1;
                     }
+                    return startIndex < textLength ? startIndex : textLength;
                 }
-                return startIndex < textLength ? startIndex : textLength;
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
         #endregion LastIndexOf
