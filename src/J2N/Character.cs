@@ -587,7 +587,7 @@ namespace J2N
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
-        public static int CodePointAt(this ICharSequence seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointAt(this ICharSequence seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
@@ -630,7 +630,7 @@ namespace J2N
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
-        public static int CodePointAt(this char[] seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointAt(this char[] seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
@@ -647,6 +647,7 @@ namespace J2N
             return high;
         }
 
+#if FEATURE_SPAN
         /// <summary>
         /// Returns the code point at <paramref name="index"/> in the specified sequence of
         /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
@@ -655,10 +656,11 @@ namespace J2N
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <paramref name="index"/> is returned.
         /// <para/>
-        /// <strong>Usage Note:</strong> Using this overload for getting a single code point is fine. However,
-        /// if you are calling this method in a loop, it is highly recommended to use the
-        /// <see cref="CodePointAt(ref ValueStringBuilderIndexer, int)"/> overload
-        /// after wrapping the <see cref="StringBuilder"/> in a <see cref="ValueStringBuilderIndexer"/>.
+        /// <strong>Usage Note:</strong> This method is slow because it relies on the indexer of
+        /// <see cref="StringBuilder"/> and it is designed to be used inside of a loop. Avoid.
+        /// It is recommended to convert the contents of the
+        /// <see cref="StringBuilder"/> to <see cref="ReadOnlySpan{T}"/>, <see cref="T:char[]"/>,
+        /// or <see cref="string"/> and to call the appropriate overload, instead.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
         /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
@@ -673,7 +675,35 @@ namespace J2N
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
-        public static int CodePointAt(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+#else
+        /// <summary>
+        /// Returns the code point at <paramref name="index"/> in the specified sequence of
+        /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
+        /// <c><paramref name="index"/> + 1</c> is less than the length of the sequence and the unit at
+        /// <c><paramref name="index"/> + 1</c> is a low-surrogate unit, then the supplementary code
+        /// point represented by the pair is returned; otherwise the <see cref="char"/>
+        /// value at <paramref name="index"/> is returned.
+        /// <para/>
+        /// <strong>Usage Note:</strong> This method is slow because it relies on the indexer of
+        /// <see cref="StringBuilder"/> and it is designed to be used inside of a loop. Avoid.
+        /// It is recommended to convert the contents of the <see cref="StringBuilder"/> to
+        /// <see cref="T:char[]"/> or <see cref="string"/> and to call the appropriate overload, instead.
+        /// </summary>
+        /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
+        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// point.</param>
+        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <paramref name="seq"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is greater than or equal to the length of <paramref name="seq"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is less than zero.
+        /// </exception>
+#endif
+        public static int CodePointAt(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
@@ -698,45 +728,6 @@ namespace J2N
         /// <c><paramref name="index"/> + 1</c> is a low-surrogate unit, then the supplementary code
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <paramref name="index"/> is returned.
-        /// <para/>
-        /// <strong>Usage Note:</strong> Prefer this overload instead of <see cref="CodePointAt(StringBuilder, int)"/>
-        /// for optimal performance. Simply wrap the <see cref="StringBuilder"/> in a <see cref="ValueStringBuilderIndexer"/>
-        /// to make repeated calls to this method.
-        /// </summary>
-        /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
-        /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
-        /// <paramref name="seq"/>.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is greater than or equal to the length of <paramref name="seq"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is less than zero.
-        /// </exception>
-        public static int CodePointAt(this ref ValueStringBuilderIndexer seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
-        {
-            int len = seq.Length;
-            if (index < 0 || index >= len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
-
-            char high = seq[index++];
-            if (index >= len)
-                return high;
-            char low = seq[index];
-            if (char.IsSurrogatePair(high, low))
-                return ToCodePoint(high, low);
-            return high;
-        }
-
-        /// <summary>
-        /// Returns the code point at <paramref name="index"/> in the specified sequence of
-        /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
-        /// <c><paramref name="index"/> + 1</c> is less than the length of the sequence and the unit at
-        /// <c><paramref name="index"/> + 1</c> is a low-surrogate unit, then the supplementary code
-        /// point represented by the pair is returned; otherwise the <see cref="char"/>
-        /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
         /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
@@ -751,7 +742,7 @@ namespace J2N
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
-        public static int CodePointAt(this string seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointAt(this string seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
@@ -789,7 +780,7 @@ namespace J2N
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
-        public static int CodePointAt(this ReadOnlySpan<char> seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointAt(this ReadOnlySpan<char> seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             int len = seq.Length;
             if (index < 0 || index >= len)
@@ -827,7 +818,7 @@ namespace J2N
         /// <para/>
         /// <paramref name="limit"/> is less than zero or greater than the length of <paramref name="seq"/>.
         /// </exception>
-        public static int CodePointAt(this char[] seq, int index, int limit) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointAt(this char[] seq, int index, int limit) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
@@ -861,7 +852,7 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
         /// the length of <paramref name="seq"/>.</exception>
-        public static int CodePointBefore(this ICharSequence seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointBefore(this ICharSequence seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
@@ -901,7 +892,7 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
         /// the length of <paramref name="seq"/>.</exception>
-        public static int CodePointBefore(this char[] seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointBefore(this char[] seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
@@ -920,6 +911,7 @@ namespace J2N
             return low;
         }
 
+#if FEATURE_SPAN
         /// <summary>
         /// Returns the code point that precedes <paramref name="index"/> in the specified
         /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
@@ -928,10 +920,11 @@ namespace J2N
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <c><paramref name="index"/> - 1</c> is returned.
         /// <para/>
-        /// <strong>Usage Note:</strong> Using this overload for getting a single code point is fine. However,
-        /// if you are calling this method in a loop, it is highly recommended to use the
-        /// <see cref="CodePointBefore(ref ValueStringBuilderIndexer, int)"/> overload
-        /// after wrapping the <see cref="StringBuilder"/> in a <see cref="ValueStringBuilderIndexer"/>.
+        /// <strong>Usage Note:</strong> This method is slow because it relies on the indexer of
+        /// <see cref="StringBuilder"/> and it is designed to be used inside of a loop. Avoid.
+        /// It is recommended to convert the contents of the
+        /// <see cref="StringBuilder"/> to <see cref="ReadOnlySpan{T}"/>, <see cref="T:char[]"/>,
+        /// or <see cref="string"/> and to call the appropriate overload, instead.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
         /// <param name="index">The position in <paramref name="seq"/> following the code
@@ -941,7 +934,30 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
         /// the length of <paramref name="seq"/>.</exception>
-        public static int CodePointBefore(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+#else
+        /// <summary>
+        /// Returns the code point that precedes <paramref name="index"/> in the specified
+        /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
+        /// low-surrogate unit, <c><paramref name="index"/> - 2</c> is not negative and the unit at
+        /// <c><paramref name="index"/> - 2</c> is a high-surrogate unit, then the supplementary code
+        /// point represented by the pair is returned; otherwise the <see cref="char"/>
+        /// value at <c><paramref name="index"/> - 1</c> is returned.
+        /// <para/>
+        /// <strong>Usage Note:</strong> This method is slow because it relies on the indexer of
+        /// <see cref="StringBuilder"/> and it is designed to be used inside of a loop. Avoid.
+        /// It is recommended to convert the contents of the <see cref="StringBuilder"/> to
+        /// <see cref="T:char[]"/> or <see cref="string"/> and to call the appropriate overload, instead.
+        /// </summary>
+        /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
+        /// <param name="index">The position in <paramref name="seq"/> following the code
+        /// point that should be returned.</param>
+        /// <returns>The Unicode code point or <see cref="char"/> value before <paramref name="index"/>
+        /// in <paramref name="seq"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
+        /// the length of <paramref name="seq"/>.</exception>
+#endif
+        public static int CodePointBefore(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
@@ -968,43 +984,6 @@ namespace J2N
         /// <c><paramref name="index"/> - 2</c> is a high-surrogate unit, then the supplementary code
         /// point represented by the pair is returned; otherwise the <see cref="char"/>
         /// value at <c><paramref name="index"/> - 1</c> is returned.
-        /// <para/>
-        /// <strong>Usage Note:</strong> Prefer this overload instead of <see cref="CodePointBefore(StringBuilder, int)"/>
-        /// for optimal performance. Simply wrap the <see cref="StringBuilder"/> in a <see cref="ValueStringBuilderIndexer"/>
-        /// to make repeated calls to this method. Generally, you should instantiate <see cref="ValueStringBuilderIndexer"/>
-        /// with <c>iterateForward: false</c> when using this method.
-        /// </summary>
-        /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">The position in <paramref name="seq"/> following the code
-        /// point that should be returned.</param>
-        /// <returns>The Unicode code point or <see cref="char"/> value before <paramref name="index"/>
-        /// in <paramref name="seq"/>.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
-        /// the length of <paramref name="seq"/>.</exception>
-        public static int CodePointBefore(this ref ValueStringBuilderIndexer seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
-        {
-            int len = seq.Length;
-            if (index < 1 || index > len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
-
-            char low = seq[--index];
-            if (--index < 0)
-                return low;
-            char high = seq[index];
-            if (char.IsSurrogatePair(high, low))
-            {
-                return ToCodePoint(high, low);
-            }
-            return low;
-        }
-
-        /// <summary>
-        /// Returns the code point that precedes <paramref name="index"/> in the specified
-        /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
-        /// low-surrogate unit, <c><paramref name="index"/> - 2</c> is not negative and the unit at
-        /// <c><paramref name="index"/> - 2</c> is a high-surrogate unit, then the supplementary code
-        /// point represented by the pair is returned; otherwise the <see cref="char"/>
-        /// value at <c><paramref name="index"/> - 1</c> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
         /// <param name="index">The position in <paramref name="seq"/> following the code
@@ -1014,7 +993,7 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
         /// the length of <paramref name="seq"/>.</exception>
-        public static int CodePointBefore(this string seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointBefore(this string seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
@@ -1049,7 +1028,7 @@ namespace J2N
         /// in <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
         /// the length of <paramref name="seq"/>.</exception>
-        public static int CodePointBefore(this ReadOnlySpan<char> seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, ValueStringBuilderIndexer, and string IN SYNC
+        public static int CodePointBefore(this ReadOnlySpan<char> seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             int len = seq.Length;
             if (index < 1 || index > len)
