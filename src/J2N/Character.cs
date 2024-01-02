@@ -56,6 +56,7 @@ namespace J2N
     /// </summary>
     public static class Character
     {
+        private const int CharStackBufferSize = 64;
         private const int CodePointStackBufferSize = 256;
 
         private const char charNull = '\0';
@@ -1694,44 +1695,72 @@ namespace J2N
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
 
             int x = index;
-            if (codePointOffset >= 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] chars = ArrayPool<char>.Shared.Rent(length);
+            try
+#else
+            char[] chars = new char[length];
+#endif
             {
-                using var seqIndexer = new ValueStringBuilderIndexer(seq, iterateForward: true);
-                int i;
-                for (i = 0; x < length && i < codePointOffset; i++)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> chars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                seq.CopyTo(0, chars, length);
+#else
+                seq.CopyTo(0, chars, 0, length);
+#endif
+                if (codePointOffset >= 0)
                 {
-                    if (char.IsHighSurrogate(seqIndexer[x++]))
+                    int i;
+                    for (i = 0; x < length && i < codePointOffset; i++)
                     {
-                        if (x < length && char.IsLowSurrogate(seqIndexer[x]))
+                        if (char.IsHighSurrogate(chars[x++]))
                         {
-                            x++;
+                            if (x < length && char.IsLowSurrogate(chars[x]))
+                            {
+                                x++;
+                            }
                         }
                     }
-                }
-                if (i < codePointOffset)
-                {
-                    throw new ArgumentOutOfRangeException(nameof(codePointOffset));
-                }
-            }
-            else
-            {
-                using var seqIndexer = new ValueStringBuilderIndexer(seq, iterateForward: false);
-                int i;
-                for (i = codePointOffset; x > 0 && i < 0; i++)
-                {
-                    if (char.IsLowSurrogate(seqIndexer[--x]))
+                    if (i < codePointOffset)
                     {
-                        if (x > 0 && char.IsHighSurrogate(seqIndexer[x - 1]))
-                        {
-                            x--;
-                        }
+                        throw new ArgumentOutOfRangeException(nameof(codePointOffset));
                     }
                 }
-                if (i < 0)
+                else
                 {
-                    throw new ArgumentOutOfRangeException(nameof(codePointOffset));
+                    int i;
+                    for (i = codePointOffset; x > 0 && i < 0; i++)
+                    {
+                        if (char.IsLowSurrogate(chars[--x]))
+                        {
+                            if (x > 0 && char.IsHighSurrogate(chars[x - 1]))
+                            {
+                                x--;
+                            }
+                        }
+                    }
+                    if (i < 0)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(codePointOffset));
+                    }
                 }
             }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(chars);
+            }
+#endif
             return x;
         }
 
