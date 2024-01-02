@@ -1425,19 +1425,49 @@ namespace J2N
             if (startIndex + length > len)
                 throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
-            using var seqIndexer = new ValueStringBuilderIndexer(seq);
-            int endIndex = startIndex + length;
-            int n = length;
-            for (int i = startIndex; i < endIndex;)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] chars = ArrayPool<char>.Shared.Rent(length);
+            try
+#else
+            char[] chars = new char[length];
+#endif
             {
-                if (char.IsHighSurrogate(seqIndexer[i++]) && i < endIndex
-                    && char.IsLowSurrogate(seqIndexer[i]))
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> chars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                seq.CopyTo(0, chars, length);
+#else
+                seq.CopyTo(0, chars, 0, length);
+#endif
+
+                int endIndex = startIndex + length;
+                int n = length;
+                for (int i = startIndex; i < endIndex;)
                 {
-                    n--;
-                    i++;
+                    if (char.IsHighSurrogate(chars[i++]) && i < endIndex
+                        && char.IsLowSurrogate(chars[i]))
+                    {
+                        n--;
+                        i++;
+                    }
                 }
+                return n;
             }
-            return n;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(chars);
+            }
+#endif
         }
 
         /// <summary>
