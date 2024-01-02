@@ -80,8 +80,7 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             char[] result = new char[length];
-            for (int i = 0, j = startIndex; i < length; i++, j++)
-                result[i] = text[j];
+            Array.Copy(text, startIndex, result, 0, length);
 
             return new CharArrayCharSequence(result);
         }
