@@ -1959,18 +1959,10 @@ namespace J2N.Text
                     // replacing with more characters...need some room
                     text.Insert(startIndex, new char[-diff]);
                 }
-                var textIndexer = new ValueStringBuilderIndexer(text);
-                try
+                // copy the chars based on the new length
+                for (int i = 0; i < stringLength; i++)
                 {
-                    // copy the chars based on the new length
-                    for (int i = 0; i < stringLength; i++)
-                    {
-                        textIndexer[i + startIndex] = newValue[i];
-                    }
-                }
-                finally
-                {
-                    textIndexer.Dispose();
+                    text[i + startIndex] = newValue[i];
                 }
                 return text;
             }
