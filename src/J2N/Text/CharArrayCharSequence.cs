@@ -17,6 +17,9 @@
 #endregion
 
 using System;
+#if FEATURE_ARRAYPOOL
+using System.Buffers;
+#endif
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -34,6 +37,8 @@ namespace J2N.Text
         IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
         IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>
     {
+        private const int CharStackBufferSize = 64;
+
         /// <summary>
         /// Initializes a new instance of <see cref="CharArrayCharSequence"/> with the provided <paramref name="value"/>.
         /// </summary>
@@ -338,13 +343,44 @@ namespace J2N.Text
                 return false;
 
             int len = Length;
-            if (len != other.Length) return false;
-            using var otherIndexer = new ValueStringBuilderIndexer(other);
-            for (int i = 0; i < len; i++)
+            int otherLength = other.Length;
+            if (len != otherLength) return false;
+
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = otherLength > CharStackBufferSize;
+            char[]? otherArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(otherLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] otherChars = ArrayPool<char>.Shared.Rent(otherLength);
+            try
+#else
+            char[] otherChars = new char[otherLength];
+#endif
             {
-                if (!value[i].Equals(otherIndexer[i])) return false;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> otherChars = usePool ? otherArrayToReturnToPool : stackalloc char[otherLength];
+                other.CopyTo(0, otherChars, otherLength);
+#else
+                other.CopyTo(0, otherChars, 0, otherLength);
+#endif
+                for (int i = 0; i < len; i++)
+                {
+                    if (!value[i].Equals(otherChars[i])) return false;
+                }
+                return true;
             }
-            return true;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (otherArrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(otherArrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(otherChars);
+            }
+#endif
         }
 
         /// <summary>
