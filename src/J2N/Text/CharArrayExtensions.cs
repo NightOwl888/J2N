@@ -17,6 +17,9 @@
 #endregion
 
 using System;
+#if FEATURE_ARRAYPOOL
+using System.Buffers;
+#endif
 using System.Text;
 
 
@@ -29,6 +32,8 @@ namespace J2N.Text
     /// </summary>
     public static class CharArrayExtensions
     {
+        private const int CharStackBufferSize = 64;
+
         /// <summary>
         /// Convenience method to wrap a string in a <see cref="CharArrayCharSequence"/>
         /// so a <see cref="T:char[]"/> can be used as <see cref="ICharSequence"/> in .NET.
@@ -141,18 +146,47 @@ namespace J2N.Text
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            using var valueIndexer = new ValueStringBuilderIndexer(value);
             int length = Math.Min(str.Length, value.Length);
-            int result;
-            for (int i = 0; i < length; i++)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] valueChars = ArrayPool<char>.Shared.Rent(length);
+            try
+#else
+            char[] valueChars = new char[length];
+#endif
             {
-                if ((result = str[i] - valueIndexer[i]) != 0)
-                    return result;
-            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> valueChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                value.CopyTo(0, valueChars, length);
+#else
+                value.CopyTo(0, valueChars, 0, length);
+#endif
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = str[i] - valueChars[i]) != 0)
+                        return result;
+                }
 
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return str.Length - value.Length;
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return str.Length - value.Length;
+            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(valueChars);
+            }
+#endif
         }
 
         /// <summary>
