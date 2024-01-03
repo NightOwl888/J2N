@@ -2882,8 +2882,29 @@ namespace J2N
             return (char)((c << 8) | (c >> 8));
         }
 
-        // J2N NOTE: Harmony didn't implement ToUpper or ToLower, but they
-        // are required by Lucene.Net
+
+        /// <summary>
+        /// Converts the character argument to
+        /// lowercase using the current culture.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int ToLower(char c) => char.ToLower(c);
+
+        /// <summary>
+        /// Converts the character argument to
+        /// lowercase using the specified <paramref name="culture"/>.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <param name="culture">An object that specifies culture-specific casing rules.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
+        public static int ToLower(char c, CultureInfo culture) => char.ToLower(c, culture);
 
         /// <summary>
         /// Converts the character (Unicode code point) argument to
@@ -2934,6 +2955,32 @@ namespace J2N
                 return ToCodePoint(result[0], result[1]);
             }
         }
+
+        /// <summary>
+        /// Converts the character argument to
+        /// uppercase using the current culture.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int ToUpper(char c) => char.ToUpper(c);
+
+        /// <summary>
+        /// Converts the character argument to
+        /// uppercase using the specified <paramref name="culture"/>.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <param name="culture">An object that specifies culture-specific casing rules.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int ToUpper(char c, CultureInfo culture) => char.ToUpper(c, culture);
 
         /// <summary>
         /// Converts the character (Unicode code point) argument to
