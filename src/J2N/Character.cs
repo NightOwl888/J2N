@@ -2916,11 +2916,23 @@ namespace J2N
                 throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
-            if (CharCount(codePoint) == 1)
-                return culture.TextInfo.ToLower((char)codePoint);
-                
-            var str = culture.TextInfo.ToLower(char.ConvertFromUtf32(codePoint));
-            return CodePointAt(str, 0);
+            if (codePoint < MinSupplementaryCodePoint)
+                return char.ToLower((char)codePoint, culture);
+
+            return ToLower_Supplementary(codePoint, culture);
+
+            static int ToLower_Supplementary(int codePoint, CultureInfo culture)
+            {
+#if FEATURE_SPAN
+                Span<char> buffer = stackalloc char[2];
+                ToChars(codePoint, buffer, 0);
+                Span<char> result = stackalloc char[2];
+                System.MemoryExtensions.ToLower(buffer, result, culture);
+#else
+                string result = char.ConvertFromUtf32(codePoint).ToLower(culture);
+#endif
+                return ToCodePoint(result[0], result[1]);
+            }
         }
 
         /// <summary>
@@ -2954,11 +2966,23 @@ namespace J2N
                 throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
-            if (CharCount(codePoint) == 1)
-                return culture.TextInfo.ToUpper((char)codePoint);
+            if (codePoint < MinSupplementaryCodePoint)
+                return char.ToUpper((char)codePoint, culture);
 
-            var str = culture.TextInfo.ToUpper(char.ConvertFromUtf32(codePoint));
-            return CodePointAt(str, 0);
+            return ToUpper_Supplementary(codePoint, culture);
+
+            static int ToUpper_Supplementary(int codePoint, CultureInfo culture)
+            {
+#if FEATURE_SPAN
+                Span<char> buffer = stackalloc char[2];
+                ToChars(codePoint, buffer, 0);
+                Span<char> result = stackalloc char[2];
+                System.MemoryExtensions.ToUpper(buffer, result, culture);
+#else
+                string result = char.ConvertFromUtf32(codePoint).ToUpper(culture);
+#endif
+                return ToCodePoint(result[0], result[1]);
+            }
         }
 
         // J2N: Since .NET's string class has no constructor that accepts an array of code points, we have extra helper methods that
