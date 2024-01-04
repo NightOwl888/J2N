@@ -3026,7 +3026,7 @@ namespace J2N
          * @tests java.lang.Character#toLowerCase(char)
          */
         [Test]
-        public void Test_toLowerCaseC()
+        public void Test_ToLower_C()
         {
             assertEquals("Failed to change case", 't', Character.ToLower('T', CultureInfo.InvariantCulture));
         }
@@ -3035,7 +3035,7 @@ namespace J2N
          * @tests java.lang.Character#toLowerCase(int)
          */
         [Test]
-        public void Test_toLowerCase_I()
+        public void Test_ToLower_I()
         {
             Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Xamarin fails to correctly case surrogate pairs");
 
@@ -3051,6 +3051,42 @@ namespace J2N
             try
             {
                 Character.ToLower(0x110000, CultureInfo.InvariantCulture);
+                fail("No IOOBE, negative offset");
+            }
+            catch (ArgumentException e)
+            {
+            }
+        }
+
+        /**
+         * @tests java.lang.Character#toLowerCase(char)
+         */
+        [Test]
+        public void Test_ToLowerInvariant_C()
+        {
+            assertEquals("Failed to change case", 't', Character.ToLowerInvariant('T'));
+        }
+
+        /**
+         * @tests java.lang.Character#toLowerCase(int)
+         */
+        [Test]
+        public void Test_ToLowerInvariant_I()
+        {
+            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Xamarin fails to correctly case surrogate pairs");
+
+            assertEquals('t', Character.ToLowerInvariant((int)'T'));
+
+            assertEquals(0x10428, Character.ToLowerInvariant(0x10400));
+            assertEquals(0x10428, Character.ToLowerInvariant(0x10428));
+
+            assertEquals(0x1D504, Character.ToLowerInvariant(0x1D504));
+            assertEquals(0x10FFFD, Character.ToLowerInvariant(0x10FFFD));
+            //assertEquals(0x110000, Character.ToLowerInvariant(0x110000)); // J2N: To match the behavior of CharUnicodeInfo.GetUnicodeCategory(int), we are throwing an exception rather than passing through invalid codepoints.
+
+            try
+            {
+                Character.ToLowerInvariant(0x110000);
                 fail("No IOOBE, negative offset");
             }
             catch (ArgumentException e)
@@ -3102,7 +3138,7 @@ namespace J2N
          * @tests java.lang.Character#toUpperCase(char)
          */
         [Test]
-        public void Test_toUpperCaseC()
+        public void Test_ToUpper_C()
         {
             // Test for method char java.lang.Character.toUpperCase(char)
             assertEquals("Incorrect upper case for a",
@@ -3117,7 +3153,7 @@ namespace J2N
          * @tests java.lang.Character#toUpperCase(int)
          */
         [Test]
-        public void Test_toUpperCase_I()
+        public void Test_ToUpper_I()
         {
             Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Xamarin fails to correctly case surrogate pairs");
 
@@ -3134,6 +3170,49 @@ namespace J2N
             try
             {
                 Character.ToUpper(0x110000, CultureInfo.InvariantCulture);
+                fail("No IOOBE, negative offset");
+            }
+            catch (ArgumentException e)
+            {
+            }
+        }
+
+        /**
+         * @tests java.lang.Character#toUpperCase(char)
+         */
+        [Test]
+        public void Test_ToUpperInvariant_C()
+        {
+            // Test for method char java.lang.Character.toUpperCase(char)
+            assertEquals("Incorrect upper case for a",
+                    'A', Character.ToUpperInvariant('a'));
+            assertEquals("Incorrect upper case for A",
+                    'A', Character.ToUpperInvariant('A'));
+            assertEquals("Incorrect upper case for 1",
+                    '1', Character.ToUpperInvariant('1'));
+        }
+
+        /**
+         * @tests java.lang.Character#toUpperCase(int)
+         */
+        [Test]
+        public void Test_ToUpperInvariant_I()
+        {
+            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Xamarin fails to correctly case surrogate pairs");
+
+            assertEquals('A', Character.ToUpperInvariant((int)'a'));
+            assertEquals('A', Character.ToUpperInvariant((int)'A'));
+            assertEquals('1', Character.ToUpperInvariant((int)'1'));
+
+            assertEquals(0x10400, Character.ToUpperInvariant(0x10428));
+            assertEquals(0x10400, Character.ToUpperInvariant(0x10400));
+
+            assertEquals(0x10FFFF, Character.ToUpperInvariant(0x10FFFF));
+            //assertEquals(0x110000, Character.ToUpperInvariant(0x110000)); // J2N: To match the behavior of CharUnicodeInfo.GetUnicodeCategory(int), we are throwing an exception rather than passing through invalid codepoints.
+
+            try
+            {
+                Character.ToUpperInvariant(0x110000);
                 fail("No IOOBE, negative offset");
             }
             catch (ArgumentException e)
