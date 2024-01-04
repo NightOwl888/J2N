@@ -1960,10 +1960,32 @@ namespace J2N.Text
                     text.Insert(startIndex, new char[-diff]);
                 }
                 // copy the chars based on the new length
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                var textEnumerator = text.GetChunks();
+                ReadOnlyMemory<char> textChunk = default;
+                int lowerBound = 0, upperBound = -1;
+                for (int i = 0; i < stringLength; i++)
+                {
+                    while (i + startIndex > upperBound)
+                    {
+                        lowerBound += textChunk.Length;
+                        textEnumerator.MoveNext();
+                        textChunk = textEnumerator.Current;
+                        upperBound += textChunk.Length;
+                    }
+                    unsafe
+                    {
+                        using var handle = textChunk.Pin();
+                        char* pointer = (char*)handle.Pointer;
+                        pointer[i + startIndex - lowerBound] = newValue[i];
+                    }
+                }
+#else
                 for (int i = 0; i < stringLength; i++)
                 {
                     text[i + startIndex] = newValue[i];
                 }
+#endif
                 return text;
             }
             if (startIndex == end)

@@ -380,6 +380,14 @@ namespace J2N.Text
             assertEquals("12XXX7", buffer.ToString());
         }
 
+        [Test]
+        public void Test_Replace_Across_Chunks()
+        {
+            StringBuilder sb = new StringBuilder(2).Append("foodie").Append("guru");
+            sb.Replace(startIndex: 1, count: 7, "1234567");
+            assertEquals("f1234567ru", sb.ToString());
+        }
+
         private void reverseTest(String org, String rev, String back)
         {
             // create non-shared StringBuilder
