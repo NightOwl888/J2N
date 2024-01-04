@@ -2882,8 +2882,29 @@ namespace J2N
             return (char)((c << 8) | (c >> 8));
         }
 
-        // J2N NOTE: Harmony didn't implement ToUpper or ToLower, but they
-        // are required by Lucene.Net
+
+        /// <summary>
+        /// Converts the character argument to
+        /// lowercase using the current culture.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int ToLower(char c) => char.ToLower(c);
+
+        /// <summary>
+        /// Converts the character argument to
+        /// lowercase using the specified <paramref name="culture"/>.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <param name="culture">An object that specifies culture-specific casing rules.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
+        public static int ToLower(char c, CultureInfo culture) => char.ToLower(c, culture);
 
         /// <summary>
         /// Converts the character (Unicode code point) argument to
@@ -2912,16 +2933,97 @@ namespace J2N
         {
             if (culture is null)
                 throw new ArgumentNullException(nameof(culture));
-            if (!IsValidCodePoint(codePoint))
+            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
                 throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
-            if (CharCount(codePoint) == 1)
-                return culture.TextInfo.ToLower((char)codePoint);
-                
-            var str = culture.TextInfo.ToLower(char.ConvertFromUtf32(codePoint));
-            return CodePointAt(str, 0);
+            if (codePoint < MinSupplementaryCodePoint)
+                return char.ToLower((char)codePoint, culture);
+
+            return ToLower_Supplementary(codePoint, culture);
+
+            static int ToLower_Supplementary(int codePoint, CultureInfo culture)
+            {
+#if FEATURE_SPAN
+                Span<char> buffer = stackalloc char[2];
+                ToChars(codePoint, buffer, 0);
+                Span<char> result = stackalloc char[2];
+                System.MemoryExtensions.ToLower(buffer, result, culture);
+#else
+                string result = char.ConvertFromUtf32(codePoint).ToLower(culture);
+#endif
+                return ToCodePoint(result[0], result[1]);
+            }
         }
+
+
+        /// <summary>
+        /// Converts the character argument to
+        /// lowercase using the invariant culture.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        public static int ToLowerInvariant(char c) => char.ToLowerInvariant(c);
+
+        /// <summary>
+        /// Converts the character (Unicode code point) argument to
+        /// lowercase using the invariant culture.
+        /// </summary>
+        /// <param name="codePoint">The character (Unicode code point) to be converted.</param>
+        /// <returns>The lowercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+        public static int ToLowerInvariant(int codePoint)
+        {
+            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+
+            // Fast path - convert using char if not a surrogate pair
+            if (codePoint < MinSupplementaryCodePoint)
+                return char.ToLowerInvariant((char)codePoint);
+
+            return ToLowerInvariant_Supplementary(codePoint);
+
+            static int ToLowerInvariant_Supplementary(int codePoint)
+            {
+#if FEATURE_SPAN
+                Span<char> buffer = stackalloc char[2];
+                ToChars(codePoint, buffer, 0);
+                Span<char> result = stackalloc char[2];
+                System.MemoryExtensions.ToLowerInvariant(buffer, result);
+#else
+                string result = char.ConvertFromUtf32(codePoint).ToLowerInvariant();
+#endif
+                return ToCodePoint(result[0], result[1]);
+            }
+        }
+
+        /// <summary>
+        /// Converts the character argument to
+        /// uppercase using the current culture.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int ToUpper(char c) => char.ToUpper(c);
+
+        /// <summary>
+        /// Converts the character argument to
+        /// uppercase using the specified <paramref name="culture"/>.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <param name="culture">An object that specifies culture-specific casing rules.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="culture"/> is <c>null</c>.</exception>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int ToUpper(char c, CultureInfo culture) => char.ToUpper(c, culture);
 
         /// <summary>
         /// Converts the character (Unicode code point) argument to
@@ -2950,15 +3052,72 @@ namespace J2N
         {
             if (culture is null)
                 throw new ArgumentNullException(nameof(culture));
-            if (!IsValidCodePoint(codePoint))
+            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
                 throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
-            if (CharCount(codePoint) == 1)
-                return culture.TextInfo.ToUpper((char)codePoint);
+            if (codePoint < MinSupplementaryCodePoint)
+                return char.ToUpper((char)codePoint, culture);
 
-            var str = culture.TextInfo.ToUpper(char.ConvertFromUtf32(codePoint));
-            return CodePointAt(str, 0);
+            return ToUpper_Supplementary(codePoint, culture);
+
+            static int ToUpper_Supplementary(int codePoint, CultureInfo culture)
+            {
+#if FEATURE_SPAN
+                Span<char> buffer = stackalloc char[2];
+                ToChars(codePoint, buffer, 0);
+                Span<char> result = stackalloc char[2];
+                System.MemoryExtensions.ToUpper(buffer, result, culture);
+#else
+                string result = char.ConvertFromUtf32(codePoint).ToUpper(culture);
+#endif
+                return ToCodePoint(result[0], result[1]);
+            }
+        }
+
+        /// <summary>
+        /// Converts the character argument to
+        /// uppercase using the invariant culture.
+        /// </summary>
+        /// <param name="c">The character to be converted.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static int ToUpperInvariant(char c) => char.ToUpperInvariant(c);
+
+        /// <summary>
+        /// Converts the character (Unicode code point) argument to
+        /// uppercase using the invariant culture.
+        /// </summary>
+        /// <param name="codePoint">The character (Unicode code point) to be converted.</param>
+        /// <returns>The uppercase equivalent of the character, if any;
+        /// otherwise, the character itself.</returns>
+        /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
+        public static int ToUpperInvariant(int codePoint) 
+        {
+            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+
+            // Fast path - convert using char if not a surrogate pair
+            if (codePoint < MinSupplementaryCodePoint)
+                return char.ToUpperInvariant((char)codePoint);
+
+            return ToUpperInvariant_Supplementary(codePoint);
+
+            static int ToUpperInvariant_Supplementary(int codePoint)
+            {
+#if FEATURE_SPAN
+                Span<char> buffer = stackalloc char[2];
+                ToChars(codePoint, buffer, 0);
+                Span<char> result = stackalloc char[2];
+                System.MemoryExtensions.ToUpperInvariant(buffer, result);
+#else
+                string result = char.ConvertFromUtf32(codePoint).ToUpperInvariant();
+#endif
+                return ToCodePoint(result[0], result[1]);
+            }
         }
 
         // J2N: Since .NET's string class has no constructor that accepts an array of code points, we have extra helper methods that
