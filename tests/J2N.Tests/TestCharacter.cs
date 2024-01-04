@@ -3037,6 +3037,8 @@ namespace J2N
         [Test]
         public void Test_toLowerCase_I()
         {
+            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Xamarin fails to correctly case surrogate pairs");
+
             assertEquals('t', Character.ToLower((int)'T', CultureInfo.InvariantCulture));
 
             assertEquals(0x10428, Character.ToLower(0x10400, CultureInfo.InvariantCulture));
@@ -3117,6 +3119,8 @@ namespace J2N
         [Test]
         public void Test_toUpperCase_I()
         {
+            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Xamarin fails to correctly case surrogate pairs");
+
             assertEquals('A', Character.ToUpper((int)'a', CultureInfo.InvariantCulture));
             assertEquals('A', Character.ToUpper((int)'A', CultureInfo.InvariantCulture));
             assertEquals('1', Character.ToUpper((int)'1', CultureInfo.InvariantCulture));
