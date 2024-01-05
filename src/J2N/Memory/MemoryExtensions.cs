@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace J2N.Memory
 {
@@ -45,7 +46,7 @@ namespace J2N.Memory
         {
             int count = text.Length;
             if (count == 0) return;
-            fixed (char* textPtr = text)
+            fixed (char* textPtr = &MemoryMarshal.GetReference(text))
             {
                 ReverseText(textPtr, count);
             }
