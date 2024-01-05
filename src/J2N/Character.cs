@@ -23,6 +23,7 @@ using System.Buffers;
 #endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 using SR2 = J2N.Resources.Strings;
 
@@ -3188,7 +3189,7 @@ namespace J2N
                     // assuming the entire string consists of surrogate pairs
                     // (worst case scenario).
                     char* buffer = stackalloc char[length * 2];
-                    fixed (int* codePointsPtr = codePoints)
+                    fixed (int* codePointsPtr = &MemoryMarshal.GetReference(codePoints))
                     {
                         int stringLength = WriteCodePointsToCharBuffer(buffer, codePointsPtr, startIndex: 0, length);
                         return new string(buffer, 0, stringLength);
@@ -3279,7 +3280,7 @@ namespace J2N
                     // assuming the entire string consists of surrogate pairs
                     // (worst case scenario).
                     char* buffer = stackalloc char[length * 2];
-                    fixed (int* codePointsPtr = codePoints)
+                    fixed (int* codePointsPtr = &MemoryMarshal.GetReference(codePoints))
                     {
                         int stringLength = WriteCodePointsToCharBuffer(buffer, codePointsPtr, startIndex, length);
                         return new string(buffer, 0, stringLength);
@@ -3388,7 +3389,7 @@ namespace J2N
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe static void WriteString(Span<char> chars, ValueTuple<int[], int, int> state)
         {
-            fixed (char* charsPtr = chars)
+            fixed (char* charsPtr = &MemoryMarshal.GetReference(chars))
             fixed (int* codePointsPtr = state.Item1)
             {
                 WriteCodePointsToCharBuffer(charsPtr, codePointsPtr, startIndex: state.Item2, length: state.Item3);
@@ -3403,7 +3404,7 @@ namespace J2N
             try
             {
                 fixed (char* charsPtr = chars)
-                fixed (int* codePointsPtr = codePoints)
+                fixed (int* codePointsPtr = &MemoryMarshal.GetReference(codePoints))
                 {
                     WriteCodePointsToCharBuffer(charsPtr, codePointsPtr, startIndex, length);
                     return new string(charsPtr, 0, stringLength);
