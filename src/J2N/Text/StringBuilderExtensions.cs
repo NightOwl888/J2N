@@ -22,6 +22,7 @@ using System.Buffers;
 #endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 
@@ -39,11 +40,19 @@ namespace J2N.Text
 
         #region Append
 
-        // This doesn't work right. See: https://stackoverflow.com/a/26885473
-        // However, we can fallback on the Append(object) overload and it will call ToString().
-        // To work around, call the charSequenceLabel explicitly : sb.IndexOf(charSequence: theCharSequence);
         /// <summary>
         /// Appends the given <see cref="ICharSequence"/> to this <see cref="StringBuilder"/>.
+        /// <para/>
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Append(object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Append(stringBuilder, charSequenceToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Append(charSequence: charSequenceToInsert);
+        /// </code>
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="charSequence">The <see cref="ICharSequence"/> to append.</param>
@@ -55,20 +64,20 @@ namespace J2N.Text
                 throw new ArgumentNullException(nameof(text));
 
             // For null values, this is a no-op
-            if (charSequence is null || !charSequence.HasValue)
+            if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
                 return text;
 
             if (charSequence is StringCharSequence str)
                 return text.Append(str.Value);
-            else if (charSequence is CharArrayCharSequence charArray)
+            if (charSequence is CharArrayCharSequence charArray)
                 return text.Append(charArray.Value);
-            else if (charSequence is StringBuilderCharSequence sb)
+            if (charSequence is StringBuilderCharSequence sb)
 #if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(sb.Value);
 #else
                 return Append(text, sb.Value);
 #endif
-            else if (charSequence is StringBuffer stringBuffer)
+            if (charSequence is StringBuffer stringBuffer)
 #if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(stringBuffer.builder);
 #else
@@ -114,8 +123,6 @@ namespace J2N.Text
                         start += chunkLength;
                         remainingCount -= chunkLength;
                     }
-
-                    
                 }
                 finally
                 {
@@ -168,12 +175,20 @@ namespace J2N.Text
 
             if (charSequence is CharArrayCharSequence charArrayCharSequence)
                 return text.Append(charArrayCharSequence.Value, startIndex, charCount);
-            if (charSequence is StringBuilderCharSequence stringBuilderCharSequence)
-                return text.Append(stringBuilderCharSequence.Value, startIndex, charCount);
             if (charSequence is StringCharSequence stringCharSequence)
                 return text.Append(stringCharSequence.Value, startIndex, charCount);
-            else if (charSequence is StringBuffer stringBuffer)
+            if (charSequence is StringBuilderCharSequence stringBuilderCharSequence)
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                return text.Append(stringBuilderCharSequence.Value, startIndex, charCount);
+#else
+                return Append(text, stringBuilderCharSequence.Value, startIndex, charCount);
+#endif
+            if (charSequence is StringBuffer stringBuffer)
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(stringBuffer.builder, startIndex, charCount);
+#else
+                return Append(text, stringBuffer.builder, startIndex, charCount);
+#endif
 
             int length = charCount;
             if (length <= CharStackBufferSize)
@@ -237,7 +252,18 @@ namespace J2N.Text
         /// in order, to this sequence, increasing the
         /// length of this sequence by the length of <paramref name="charSequence"/>.
         /// <para/>
-        /// Usage Note: Unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Append(object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Append(stringBuilder, stringBuilderToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Append(charSequence: stringBuilderToInsert);
+        /// </code>
+        /// <para/>
+        /// Also, unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
         /// <c>"null"</c> to the <see cref="StringBuilder"/>. Instead, it is a no-op.
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
@@ -247,8 +273,7 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-
-            if (charSequence is null)
+            if (charSequence is null || charSequence.Length == 0)
                 return text;
 
 #if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
@@ -315,6 +340,9 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+            return text.Append(charSequence, startIndex, charCount);
+#else
             if (charSequence is null && (startIndex != 0 || charCount != 0))
                 throw new ArgumentNullException(nameof(charSequence)); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (startIndex < 0)
@@ -326,9 +354,7 @@ namespace J2N.Text
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
-#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
-            return text.Append(charSequence, startIndex, charCount);
-#elif FEATURE_ARRAYPOOL
+#if FEATURE_ARRAYPOOL
             int start = startIndex;
             int remainingCount = charCount;
 
@@ -357,6 +383,7 @@ namespace J2N.Text
 #else
             return text.Append(charSequence.ToString(startIndex, charCount)); // .NET 4.0...don't care to optimize
 #endif
+#endif
         }
 
 #if FEATURE_SPAN
@@ -372,11 +399,13 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
+            if (charSequence.Length == 0)
+                return text;
 
 #if FEATURE_STRINGBUILDER_APPEND_CHARPTR
             unsafe
             {
-                fixed (char* seq = charSequence)
+                fixed (char* seq = &MemoryMarshal.GetReference(charSequence))
                 {
                     text.Append(seq, charSequence.Length);
                 }
@@ -1114,6 +1143,17 @@ namespace J2N.Text
 
         /// <summary>
         /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Insert(int, object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Insert(stringBuilder, 2, charSequenceToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Insert(2, charSequence: charSequenceToInsert);
+        /// </code>
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="index">The position in this instance where insertion begins.</param>
@@ -1131,21 +1171,21 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             // For null values, this is a no-op
-            if (charSequence is null || !charSequence.HasValue)
+            if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
                 return text;
 
             if (charSequence is StringCharSequence str)
                 return text.Insert(index, str.Value);
-            else if (charSequence is CharArrayCharSequence charArray)
+            if (charSequence is CharArrayCharSequence charArray)
                 return text.Insert(index, charArray.Value);
-            else if (charSequence is StringBuilderCharSequence sb)
-                return text.Insert(index, sb.Value);
-            else if (charSequence is StringBuffer stringBuffer)
-                return text.Insert(index, stringBuffer.builder);
+            if (charSequence is StringBuilderCharSequence sb)
+                return Insert(text, index, sb.Value);
+            if (charSequence is StringBuffer stringBuffer)
+                return Insert(text, index, stringBuffer.builder);
 
 #if FEATURE_ARRAYPOOL
             int start = 0;
@@ -1219,12 +1259,12 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
         /// </exception>
-        public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence? charSequence, int startIndex, int charCount) // J2N TODO: API - extension method for StringBuilder
+        public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence? charSequence, int startIndex, int charCount)
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (charCount < 0)
@@ -1285,6 +1325,17 @@ namespace J2N.Text
 
         /// <summary>
         /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Insert(int, object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Insert(stringBuilder, 2, stringBuilderToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Insert(2, charSequence: stringBuilderToInsert);
+        /// </code>
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="index">The position in this instance where insertion begins.</param>
@@ -1302,9 +1353,9 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            if (charSequence is null)
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
+            if (charSequence is null || charSequence.Length == 0)
                 return text;
 
             // NOTE: This method will not be used for .NET Standard 2.1+ because
@@ -1381,8 +1432,8 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (charCount < 0)
@@ -1468,8 +1519,8 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (charCount < 0)
@@ -1533,38 +1584,43 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            if (charSequence.Length == 0)
-                return text;
+#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
+            return text.Insert(index, charSequence);
+#else
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
-            int startIndex = 0;
-            int remainingCount = charSequence.Length;
-            int insertIndex = index;
-
-            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
-            try
+            if (charSequence.Length > 0)
             {
-                while (remainingCount > 0)
+                int startIndex = 0;
+                int remainingCount = charSequence.Length;
+                int insertIndex = index;
+
+                char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+                try
                 {
-                    // Determine the chunk size for the current iteration
-                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+                    while (remainingCount > 0)
+                    {
+                        // Determine the chunk size for the current iteration
+                        int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
 
-                    // Copy the chunk to the buffer
-                    charSequence.Slice(startIndex, chunkLength).CopyTo(buffer);
+                        // Copy the chunk to the buffer
+                        charSequence.Slice(startIndex, chunkLength).CopyTo(buffer);
 
-                    text.Insert(insertIndex, buffer, 0, chunkLength);
+                        text.Insert(insertIndex, buffer, 0, chunkLength);
 
-                    startIndex += chunkLength;
-                    remainingCount -= chunkLength;
-                    insertIndex += chunkLength;
+                        startIndex += chunkLength;
+                        remainingCount -= chunkLength;
+                        insertIndex += chunkLength;
+                    }
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(buffer);
                 }
             }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
             return text;
+#endif
         }
 #endif
 
