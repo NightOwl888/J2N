@@ -22,6 +22,7 @@ using System.Buffers;
 #endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 
 
@@ -39,11 +40,19 @@ namespace J2N.Text
 
         #region Append
 
-        // This doesn't work right. See: https://stackoverflow.com/a/26885473
-        // However, we can fallback on the Append(object) overload and it will call ToString().
-        // To work around, call the charSequenceLabel explicitly : sb.IndexOf(charSequence: theCharSequence);
         /// <summary>
         /// Appends the given <see cref="ICharSequence"/> to this <see cref="StringBuilder"/>.
+        /// <para/>
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Append(object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Append(stringBuilder, charSequenceToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Append(charSequence: charSequenceToInsert);
+        /// </code>
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="charSequence">The <see cref="ICharSequence"/> to append.</param>
@@ -55,20 +64,20 @@ namespace J2N.Text
                 throw new ArgumentNullException(nameof(text));
 
             // For null values, this is a no-op
-            if (charSequence is null || !charSequence.HasValue)
+            if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
                 return text;
 
             if (charSequence is StringCharSequence str)
                 return text.Append(str.Value);
-            else if (charSequence is CharArrayCharSequence charArray)
+            if (charSequence is CharArrayCharSequence charArray)
                 return text.Append(charArray.Value);
-            else if (charSequence is StringBuilderCharSequence sb)
+            if (charSequence is StringBuilderCharSequence sb)
 #if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(sb.Value);
 #else
                 return Append(text, sb.Value);
 #endif
-            else if (charSequence is StringBuffer stringBuffer)
+            if (charSequence is StringBuffer stringBuffer)
 #if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(stringBuffer.builder);
 #else
@@ -114,8 +123,6 @@ namespace J2N.Text
                         start += chunkLength;
                         remainingCount -= chunkLength;
                     }
-
-                    
                 }
                 finally
                 {
@@ -168,12 +175,20 @@ namespace J2N.Text
 
             if (charSequence is CharArrayCharSequence charArrayCharSequence)
                 return text.Append(charArrayCharSequence.Value, startIndex, charCount);
-            if (charSequence is StringBuilderCharSequence stringBuilderCharSequence)
-                return text.Append(stringBuilderCharSequence.Value, startIndex, charCount);
             if (charSequence is StringCharSequence stringCharSequence)
                 return text.Append(stringCharSequence.Value, startIndex, charCount);
-            else if (charSequence is StringBuffer stringBuffer)
+            if (charSequence is StringBuilderCharSequence stringBuilderCharSequence)
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+                return text.Append(stringBuilderCharSequence.Value, startIndex, charCount);
+#else
+                return Append(text, stringBuilderCharSequence.Value, startIndex, charCount);
+#endif
+            if (charSequence is StringBuffer stringBuffer)
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
                 return text.Append(stringBuffer.builder, startIndex, charCount);
+#else
+                return Append(text, stringBuffer.builder, startIndex, charCount);
+#endif
 
             int length = charCount;
             if (length <= CharStackBufferSize)
@@ -237,7 +252,18 @@ namespace J2N.Text
         /// in order, to this sequence, increasing the
         /// length of this sequence by the length of <paramref name="charSequence"/>.
         /// <para/>
-        /// Usage Note: Unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Append(object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Append(stringBuilder, stringBuilderToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Append(charSequence: stringBuilderToInsert);
+        /// </code>
+        /// <para/>
+        /// Also, unlike in Java, a <c>null</c> <paramref name="charSequence"/> won't append the string
         /// <c>"null"</c> to the <see cref="StringBuilder"/>. Instead, it is a no-op.
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
@@ -247,8 +273,7 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-
-            if (charSequence is null)
+            if (charSequence is null || charSequence.Length == 0)
                 return text;
 
 #if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
@@ -315,6 +340,9 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
+#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
+            return text.Append(charSequence, startIndex, charCount);
+#else
             if (charSequence is null && (startIndex != 0 || charCount != 0))
                 throw new ArgumentNullException(nameof(charSequence)); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (startIndex < 0)
@@ -326,9 +354,7 @@ namespace J2N.Text
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
 
-#if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
-            return text.Append(charSequence, startIndex, charCount);
-#elif FEATURE_ARRAYPOOL
+#if FEATURE_ARRAYPOOL
             int start = startIndex;
             int remainingCount = charCount;
 
@@ -357,6 +383,7 @@ namespace J2N.Text
 #else
             return text.Append(charSequence.ToString(startIndex, charCount)); // .NET 4.0...don't care to optimize
 #endif
+#endif
         }
 
 #if FEATURE_SPAN
@@ -372,11 +399,13 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
+            if (charSequence.Length == 0)
+                return text;
 
 #if FEATURE_STRINGBUILDER_APPEND_CHARPTR
             unsafe
             {
-                fixed (char* seq = charSequence)
+                fixed (char* seq = &MemoryMarshal.GetReference(charSequence))
                 {
                     text.Append(seq, charSequence.Length);
                 }
@@ -511,18 +540,47 @@ namespace J2N.Text
             if (value is StringBuffer stringBuffer)
                 return CompareToOrdinal(text, stringBuffer.builder);
 
-            using var textIndexer = new ValueStringBuilderIndexer(text);
             int length = Math.Min(text.Length, value.Length);
-            int result;
-            for (int i = 0; i < length; i++)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(length);
+            try
+#else
+            char[] textChars = new char[length];
+#endif
             {
-                if ((result = textIndexer[i] - value[i]) != 0)
-                    return result;
-            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                text.CopyTo(0, textChars, length);
+#else
+                text.CopyTo(0, textChars, 0, length);
+#endif
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = textChars[i] - value[i]) != 0)
+                        return result;
+                }
 
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return text.Length - value.Length;
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return text.Length - value.Length;
+            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
         /// <summary>
@@ -548,18 +606,47 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            using var textIndexer = new ValueStringBuilderIndexer(text);
             int length = Math.Min(text.Length, value.Length);
-            int result;
-            for (int i = 0; i < length; i++)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(length);
+            try
+#else
+            char[] textChars = new char[length];
+#endif
             {
-                if ((result = textIndexer[i] - value[i]) != 0)
-                    return result;
-            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                text.CopyTo(0, textChars, length);
+#else
+                text.CopyTo(0, textChars, 0, length);
+#endif
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = textChars[i] - value[i]) != 0)
+                        return result;
+                }
 
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return text.Length - value.Length;
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return text.Length - value.Length;
+            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
         /// <summary>
@@ -586,19 +673,56 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            using var textIndexer = new ValueStringBuilderIndexer(text);
-            using var valueIndexer = new ValueStringBuilderIndexer(value);
             int length = Math.Min(text.Length, value.Length);
-            int result;
-            for (int i = 0; i < length; i++)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = length > CharStackBufferSize;
+            char[]? textArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            char[]? valueArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(length);
+            char[] valueChars = ArrayPool<char>.Shared.Rent(length);
+            try
+#else
+            char[] textChars = new char[length];
+            char[] valueChars = new char[length];
+#endif
             {
-                if ((result = textIndexer[i] - valueIndexer[i]) != 0)
-                    return result;
-            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? textArrayToReturnToPool : stackalloc char[length];
+                Span<char> valueChars = usePool ? valueArrayToReturnToPool : stackalloc char[length];
+                text.CopyTo(0, textChars, length);
+                value.CopyTo(0, valueChars, length);
+#else
+                text.CopyTo(0, textChars, 0, length);
+                value.CopyTo(0, valueChars, 0, length);
+#endif
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = textChars[i] - valueChars[i]) != 0)
+                        return result;
+                }
 
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return text.Length - value.Length;
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return text.Length - value.Length;
+            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (textArrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(textArrayToReturnToPool);
+                if (valueArrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(valueArrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+                ArrayPool<char>.Shared.Return(valueChars);
+            }
+#endif
         }
 
         /// <summary>
@@ -624,18 +748,47 @@ namespace J2N.Text
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            using var textIndexer = new ValueStringBuilderIndexer(text);
             int length = Math.Min(text.Length, value.Length);
-            int result;
-            for (int i = 0; i < length; i++)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(length);
+            try
+#else
+            char[] textChars = new char[length];
+#endif
             {
-                if ((result = textIndexer[i] - value[i]) != 0)
-                    return result;
-            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                text.CopyTo(0, textChars, length);
+#else
+                text.CopyTo(0, textChars, 0, length);
+#endif
+                int result;
+                for (int i = 0; i < length; i++)
+                {
+                    if ((result = textChars[i] - value[i]) != 0)
+                        return result;
+                }
 
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return text.Length - value.Length;
+                // At this point, we have compared all the characters in at least one string.
+                // The longer string will be larger.
+                return text.Length - value.Length;
+            }
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
         #endregion CompareToOrdinal
@@ -869,24 +1022,54 @@ namespace J2N.Text
             int length = value.Length;
             if (length == 0)
                 return 0;
-            int textLength = text.Length;
-            int maxSearchLength = (textLength - length) + 1;
-            char firstChar = value[0];
-            int index;
-            using var textIndexer = new ValueStringBuilderIndexer(text);
-            for (int i = startIndex; i < maxSearchLength; ++i)
-            {
-                if (textIndexer[i] == firstChar)
-                {
-                    index = 1;
-                    while ((index < length) && (textIndexer[i + index] == value[index]))
-                        ++index;
 
-                    if (index == length)
-                        return i;
+            int textLength = text.Length;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
+            {
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int maxSearchLength = (textLength - length) + 1;
+                char firstChar = value[0];
+                int index;
+                for (int i = startIndex; i < maxSearchLength; ++i)
+                {
+                    if (textChars[i] == firstChar)
+                    {
+                        index = 1;
+                        while ((index < length) && (textChars[i + index] == value[index]))
+                            ++index;
+
+                        if (index == length)
+                            return i;
+                    }
                 }
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -897,31 +1080,61 @@ namespace J2N.Text
             int length = value.Length;
             if (length == 0)
                 return 0;
-            int textLength = text.Length;
-            int maxSearchLength = (textLength - length) + 1;
-            char firstChar = value[0], c1, c2;
-            var textInfo = CultureInfo.InvariantCulture.TextInfo;
-            int index;
-            using var textIndexer = new ValueStringBuilderIndexer(text);
-            for (int i = startIndex; i < maxSearchLength; ++i)
-            {
-                if (textIndexer[i] == firstChar)
-                {
-                    index = 1;
-                    while ((index < length) &&
-                        ((c1 = textIndexer[i + index]) == (c2 = value[index]) ||
-                        textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
-                        // Required for unicode that we test both cases
-                        textInfo.ToLower(c1) == textInfo.ToLower(c2)))
-                    {
-                        ++index;
-                    }
 
-                    if (index == length)
-                        return i;
+            int textLength = text.Length;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
+            {
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int maxSearchLength = (textLength - length) + 1;
+                char firstChar = value[0], c1, c2;
+                var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                int index;
+                for (int i = startIndex; i < maxSearchLength; ++i)
+                {
+                    if (textChars[i] == firstChar)
+                    {
+                        index = 1;
+                        while ((index < length) &&
+                            ((c1 = textChars[i + index]) == (c2 = value[index]) ||
+                            textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
+                            // Required for unicode that we test both cases
+                            textInfo.ToLower(c1) == textInfo.ToLower(c2)))
+                        {
+                            ++index;
+                        }
+
+                        if (index == length)
+                            return i;
+                    }
                 }
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
         #endregion IndexOf
@@ -930,6 +1143,17 @@ namespace J2N.Text
 
         /// <summary>
         /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Insert(int, object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Insert(stringBuilder, 2, charSequenceToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Insert(2, charSequence: charSequenceToInsert);
+        /// </code>
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="index">The position in this instance where insertion begins.</param>
@@ -947,21 +1171,21 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             // For null values, this is a no-op
-            if (charSequence is null || !charSequence.HasValue)
+            if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
                 return text;
 
             if (charSequence is StringCharSequence str)
                 return text.Insert(index, str.Value);
-            else if (charSequence is CharArrayCharSequence charArray)
+            if (charSequence is CharArrayCharSequence charArray)
                 return text.Insert(index, charArray.Value);
-            else if (charSequence is StringBuilderCharSequence sb)
-                return text.Insert(index, sb.Value);
-            else if (charSequence is StringBuffer stringBuffer)
-                return text.Insert(index, stringBuffer.builder);
+            if (charSequence is StringBuilderCharSequence sb)
+                return Insert(text, index, sb.Value);
+            if (charSequence is StringBuffer stringBuffer)
+                return Insert(text, index, stringBuffer.builder);
 
 #if FEATURE_ARRAYPOOL
             int start = 0;
@@ -1035,12 +1259,12 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
         /// </exception>
-        public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence? charSequence, int startIndex, int charCount) // J2N TODO: API - extension method for StringBuilder
+        public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence? charSequence, int startIndex, int charCount)
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (charCount < 0)
@@ -1101,6 +1325,17 @@ namespace J2N.Text
 
         /// <summary>
         /// Inserts the string representation of a specified sequence of Unicode characters into this instance at the specified character position.
+        /// <para/>
+        /// <strong>Usage Note:</strong> The compiler will not automatically call this extension method because
+        /// <see cref="StringBuilder.Insert(int, object?)"/> will take precedence over the call. This can be
+        /// overcome only by calling this static method explicitly:
+        /// <code>
+        /// J2N.Text.StringBuilderExtensions.Insert(stringBuilder, 2, stringBuilderToInsert);
+        /// </code>
+        /// or by explicitly using the <paramref name="charSequence"/> label:
+        /// <code>
+        /// stringBuilder.Insert(2, charSequence: stringBuilderToInsert);
+        /// </code>
         /// </summary>
         /// <param name="text">This <see cref="StringBuilder"/>.</param>
         /// <param name="index">The position in this instance where insertion begins.</param>
@@ -1118,13 +1353,10 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            if (charSequence is null)
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
+            if (charSequence is null || charSequence.Length == 0)
                 return text;
-
-            // NOTE: This method will not be used for .NET Standard 2.1+ because
-            // the overload already exists on StringBuilder.
 
 #if FEATURE_ARRAYPOOL
             int start = 0;
@@ -1197,8 +1429,8 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (charCount < 0)
@@ -1209,9 +1441,6 @@ namespace J2N.Text
                 return text;
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
-
-            // J2N NOTE: We don't use Span<char> because this Insert() overload was added to StringBuilder prior to the CopyTo(int, Span<char> int) overload,
-            // so this will never be called when Span<char> is supported unless called as a static method.
 
 #if FEATURE_ARRAYPOOL
             int start = startIndex;
@@ -1284,8 +1513,8 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (charCount < 0)
@@ -1349,38 +1578,43 @@ namespace J2N.Text
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
-            if (index < 0 || index > text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index));
-            if (charSequence.Length == 0)
-                return text;
+#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
+            return text.Insert(index, charSequence);
+#else
+            if ((uint)index > (uint)text.Length)
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
-            int startIndex = 0;
-            int remainingCount = charSequence.Length;
-            int insertIndex = index;
-
-            char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
-            try
+            if (charSequence.Length > 0)
             {
-                while (remainingCount > 0)
+                int startIndex = 0;
+                int remainingCount = charSequence.Length;
+                int insertIndex = index;
+
+                char[] buffer = ArrayPool<char>.Shared.Rent(Math.Min(remainingCount, CharPoolBufferSize));
+                try
                 {
-                    // Determine the chunk size for the current iteration
-                    int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
+                    while (remainingCount > 0)
+                    {
+                        // Determine the chunk size for the current iteration
+                        int chunkLength = Math.Min(remainingCount, CharPoolBufferSize);
 
-                    // Copy the chunk to the buffer
-                    charSequence.Slice(startIndex, chunkLength).CopyTo(buffer);
+                        // Copy the chunk to the buffer
+                        charSequence.Slice(startIndex, chunkLength).CopyTo(buffer);
 
-                    text.Insert(insertIndex, buffer, 0, chunkLength);
+                        text.Insert(insertIndex, buffer, 0, chunkLength);
 
-                    startIndex += chunkLength;
-                    remainingCount -= chunkLength;
-                    insertIndex += chunkLength;
+                        startIndex += chunkLength;
+                        remainingCount -= chunkLength;
+                        insertIndex += chunkLength;
+                    }
+                }
+                finally
+                {
+                    ArrayPool<char>.Shared.Return(buffer);
                 }
             }
-            finally
-            {
-                ArrayPool<char>.Shared.Return(buffer);
-            }
             return text;
+#endif
         }
 #endif
 
@@ -1552,49 +1786,78 @@ namespace J2N.Text
         private static int LastIndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;
-            int subCount = value.Length;
-
-            if (subCount <= textLength && startIndex >= 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
             {
-                if (subCount > 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int subCount = value.Length;
+
+                if (subCount <= textLength && startIndex >= 0)
                 {
-                    if (startIndex > textLength - subCount)
+                    if (subCount > 0)
                     {
-                        startIndex = textLength - subCount; // count and subCount are both >= 1
-                    }
-                    using var textIndexer = new ValueStringBuilderIndexer(text);
-                    char firstChar = value[0];
-                    while (true)
-                    {
-                        int i = startIndex;
-                        bool found = false;
-                        for (; i >= 0; --i)
+                        if (startIndex > textLength - subCount)
                         {
-                            if (textIndexer[i] == firstChar)
+                            startIndex = textLength - subCount; // count and subCount are both >= 1
+                        }
+                        char firstChar = value[0];
+                        while (true)
+                        {
+                            int i = startIndex;
+                            bool found = false;
+                            for (; i >= 0; --i)
                             {
-                                found = true;
-                                break;
+                                if (textChars[i] == firstChar)
+                                {
+                                    found = true;
+                                    break;
+                                }
                             }
+                            if (!found)
+                            {
+                                return -1;
+                            }
+                            int o1 = i, o2 = 0;
+                            while (++o2 < subCount && textChars[++o1] == value[o2])
+                            {
+                                // Intentionally empty
+                            }
+                            if (o2 == subCount)
+                            {
+                                return i;
+                            }
+                            startIndex = i - 1;
                         }
-                        if (!found)
-                        {
-                            return -1;
-                        }
-                        int o1 = i, o2 = 0;
-                        while (++o2 < subCount && textIndexer[++o1] == value[o2])
-                        {
-                            // Intentionally empty
-                        }
-                        if (o2 == subCount)
-                        {
-                            return i;
-                        }
-                        startIndex = i - 1;
                     }
+                    return startIndex < textLength ? startIndex : textLength;
                 }
-                return startIndex < textLength ? startIndex : textLength;
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
@@ -1603,54 +1866,83 @@ namespace J2N.Text
         private static int LastIndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;
-            int subCount = value.Length;
-
-            if (subCount <= textLength && startIndex >= 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+            bool usePool = textLength > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(textLength) : null;
+            try
+#elif FEATURE_ARRAYPOOL
+            char[] textChars = ArrayPool<char>.Shared.Rent(textLength);
+            try
+#else
+            char[] textChars = new char[textLength];
+#endif
             {
-                if (subCount > 0)
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[textLength];
+                text.CopyTo(0, textChars, textLength);
+#else
+                text.CopyTo(0, textChars, 0, textLength);
+#endif
+                int subCount = value.Length;
+
+                if (subCount <= textLength && startIndex >= 0)
                 {
-                    if (startIndex > textLength - subCount)
+                    if (subCount > 0)
                     {
-                        startIndex = textLength - subCount; // count and subCount are both >= 1
-                    }
-                    char firstChar = value[0], c1, c2;
-                    var textInfo = CultureInfo.InvariantCulture.TextInfo;
-                    using var textIndexer = new ValueStringBuilderIndexer(text);
-                    while (true)
-                    {
-                        int i = startIndex;
-                        bool found = false;
-                        for (; i >= 0; --i)
+                        if (startIndex > textLength - subCount)
                         {
-                            if (textIndexer[i] == firstChar)
+                            startIndex = textLength - subCount; // count and subCount are both >= 1
+                        }
+                        char firstChar = value[0], c1, c2;
+                        var textInfo = CultureInfo.InvariantCulture.TextInfo;
+                        while (true)
+                        {
+                            int i = startIndex;
+                            bool found = false;
+                            for (; i >= 0; --i)
                             {
-                                found = true;
-                                break;
+                                if (textChars[i] == firstChar)
+                                {
+                                    found = true;
+                                    break;
+                                }
                             }
+                            if (!found)
+                            {
+                                return -1;
+                            }
+                            int o1 = i, o2 = 0;
+                            while (++o2 < subCount && 
+                                ((c1 = textChars[++o1]) == (c2 = value[o2]) ||
+                                textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
+                                // Required for unicode that we test both cases
+                                textInfo.ToLower(c1) == textInfo.ToLower(c2)))
+                            {
+                                // Intentionally empty
+                            }
+                            if (o2 == subCount)
+                            {
+                                return i;
+                            }
+                            startIndex = i - 1;
                         }
-                        if (!found)
-                        {
-                            return -1;
-                        }
-                        int o1 = i, o2 = 0;
-                        while (++o2 < subCount && 
-                            ((c1 = textIndexer[++o1]) == (c2 = value[o2]) ||
-                            textInfo.ToUpper(c1) == textInfo.ToUpper(c2) ||
-                            // Required for unicode that we test both cases
-                            textInfo.ToLower(c1) == textInfo.ToLower(c2)))
-                        {
-                            // Intentionally empty
-                        }
-                        if (o2 == subCount)
-                        {
-                            return i;
-                        }
-                        startIndex = i - 1;
                     }
+                    return startIndex < textLength ? startIndex : textLength;
                 }
-                return startIndex < textLength ? startIndex : textLength;
+                return -1;
             }
-            return -1;
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+#elif FEATURE_ARRAYPOOL
+            finally
+            {
+                ArrayPool<char>.Shared.Return(textChars);
+            }
+#endif
         }
 
         #endregion LastIndexOf
@@ -1717,19 +2009,33 @@ namespace J2N.Text
                     // replacing with more characters...need some room
                     text.Insert(startIndex, new char[-diff]);
                 }
-                var textIndexer = new ValueStringBuilderIndexer(text);
-                try
+                // copy the chars based on the new length
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                var textEnumerator = text.GetChunks();
+                ReadOnlyMemory<char> textChunk = default;
+                int lowerBound = 0, upperBound = -1;
+                for (int i = 0; i < stringLength; i++)
                 {
-                    // copy the chars based on the new length
-                    for (int i = 0; i < stringLength; i++)
+                    while (i + startIndex > upperBound)
                     {
-                        textIndexer[i + startIndex] = newValue[i];
+                        lowerBound += textChunk.Length;
+                        textEnumerator.MoveNext();
+                        textChunk = textEnumerator.Current;
+                        upperBound += textChunk.Length;
+                    }
+                    unsafe
+                    {
+                        using var handle = textChunk.Pin();
+                        char* pointer = (char*)handle.Pointer;
+                        pointer[i + startIndex - lowerBound] = newValue[i];
                     }
                 }
-                finally
+#else
+                for (int i = 0; i < stringLength; i++)
                 {
-                    textIndexer.Dispose();
+                    text[i + startIndex] = newValue[i];
                 }
+#endif
                 return text;
             }
             if (startIndex == end)
@@ -1816,91 +2122,52 @@ namespace J2N.Text
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
 
-            var forwardTextIndexer = new ValueStringBuilderIndexer(text, iterateForward: true);
-            var reverseTextIndexer = new ValueStringBuilderIndexer(text, iterateForward: false);
+            int length = text.Length;
+            if (length <= 1) return text;
+
+#if FEATURE_ARRAYPOOL
+            bool usePool = length > CharStackBufferSize;
+            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
             try
+#else
+            char[] textChars = new char[length];
+#endif
             {
-                int count = text.Length;
-                if (count == 0) return text;
-                int start = 0;
-                int end = count - 1;
-                char startHigh = forwardTextIndexer[0];
-                char endLow = reverseTextIndexer[end];
-                bool allowStartSurrogate = true, allowEndSurrogate = true;
-                while (start < end)
+#if FEATURE_ARRAYPOOL
+                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+                text.CopyTo(0, textChars, length);
+#else
+                text.CopyTo(0, textChars, 0, length);
+#endif
+                text.Length = 0;
+                for (int i = length - 1; i >= 0; i--)
                 {
-                    char startLow = forwardTextIndexer[start + 1];
-                    char endHigh = reverseTextIndexer[end - 1];
-                    bool surrogateAtStart = allowStartSurrogate && startLow >= 0xdc00
-                            && startLow <= 0xdfff && startHigh >= 0xd800
-                            && startHigh <= 0xdbff;
-                    if (surrogateAtStart && (count < 3))
+                    char ch = textChars[i];
+                    if (char.IsLowSurrogate(ch) && i > 0)
                     {
-                        return text;
-                    }
-                    bool surAtEnd = allowEndSurrogate && endHigh >= 0xd800
-                            && endHigh <= 0xdbff && endLow >= 0xdc00
-                            && endLow <= 0xdfff;
-                    allowStartSurrogate = allowEndSurrogate = true;
-                    if (surrogateAtStart == surAtEnd)
-                    {
-                        if (surrogateAtStart)
+                        char ch2 = textChars[i - 1];
+                        if (char.IsHighSurrogate(ch2))
                         {
-                            // both surrogates
-                            reverseTextIndexer[end] = startLow;
-                            reverseTextIndexer[end - 1] = startHigh;
-                            forwardTextIndexer[start] = endHigh;
-                            forwardTextIndexer[start + 1] = endLow;
-                            startHigh = forwardTextIndexer[start + 2];
-                            endLow = reverseTextIndexer[end - 2];
-                            start++;
-                            end--;
-                        }
-                        else
-                        {
-                            // neither surrogates
-                            reverseTextIndexer[end] = startHigh;
-                            forwardTextIndexer[start] = endLow;
-                            startHigh = startLow;
-                            endLow = endHigh;
+                            text.Append(ch2);
+                            text.Append(ch);
+                            i--;
+                            continue;
                         }
                     }
-                    else
-                    {
-                        if (surrogateAtStart)
-                        {
-                            // surrogate only at the front
-                            reverseTextIndexer[end] = startLow;
-                            forwardTextIndexer[start] = endLow;
-                            endLow = endHigh;
-                            allowStartSurrogate = false;
-                        }
-                        else
-                        {
-                            // surrogate only at the end
-                            reverseTextIndexer[end] = startHigh;
-                            forwardTextIndexer[start] = endHigh;
-                            startHigh = startLow;
-                            allowEndSurrogate = false;
-                        }
-                    }
-                    start++;
-                    end--;
-                }
-                if ((count & 1) == 1 && (!allowStartSurrogate || !allowEndSurrogate))
-                {
-                    reverseTextIndexer[end] = allowStartSurrogate ? endLow : startHigh;
+                    text.Append(ch);
                 }
                 return text;
             }
+#if FEATURE_ARRAYPOOL
             finally
             {
-                forwardTextIndexer.Dispose();
-                reverseTextIndexer.Dispose();
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
             }
+#endif
         }
 
-#endregion Reverse
+        #endregion Reverse
 
         #region Subsequence
 
