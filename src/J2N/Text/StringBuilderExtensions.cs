@@ -1358,9 +1358,6 @@ namespace J2N.Text
             if (charSequence is null || charSequence.Length == 0)
                 return text;
 
-            // NOTE: This method will not be used for .NET Standard 2.1+ because
-            // the overload already exists on StringBuilder.
-
 #if FEATURE_ARRAYPOOL
             int start = 0;
             int remainingCount = charSequence.Length;
@@ -1444,9 +1441,6 @@ namespace J2N.Text
                 return text;
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
-
-            // J2N NOTE: We don't use Span<char> because this Insert() overload was added to StringBuilder prior to the CopyTo(int, Span<char> int) overload,
-            // so this will never be called when Span<char> is supported unless called as a static method.
 
 #if FEATURE_ARRAYPOOL
             int start = startIndex;
