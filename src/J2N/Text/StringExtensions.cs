@@ -537,7 +537,7 @@ namespace J2N.Text
         /// <c>-1</c> if the character does not occur.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        public static int IndexOf(this string text, int codePoint)
+        public static int IndexOf(this string text, int codePoint) // KEEP IN SYNC WITH MemoryExtensions.IndexOf()
         {
             return IndexOf(text, codePoint, 0);
         }
@@ -583,7 +583,7 @@ namespace J2N.Text
         /// if the character does not occur.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        public static int IndexOf(this string text, int codePoint, int startIndex)
+        public static int IndexOf(this string text, int codePoint, int startIndex) // KEEP IN SYNC WITH MemoryExtensions.IndexOf()
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -616,10 +616,7 @@ namespace J2N.Text
         /// <summary>
         /// Handles (rare) calls of indexOf with a supplementary character.
         /// </summary>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
-        private static int IndexOfSupplementary(this string text, int codePoint, int startIndex)
+        private static int IndexOfSupplementary(this string text, int codePoint, int startIndex) // KEEP IN SYNC WITH MemoryExtensions.IndexOfSupplementary()
         {
             if (Character.IsValidCodePoint(codePoint))
             {
@@ -686,7 +683,7 @@ namespace J2N.Text
         /// <c>-1</c> if the character does not occur.
         /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        public static int LastIndexOf(this string text, int codePoint)
+        public static int LastIndexOf(this string text, int codePoint) // KEEP IN SYNC WITH MemoryExtensions.LastIndexOf()
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -725,9 +722,13 @@ namespace J2N.Text
         /// length of this string: this entire string may be searched.
         /// If it is negative, it has the same effect as if it were <c>-1</c>:
         /// </param>
-        /// <returns></returns>
+        /// <returns>
+        /// The index of the last occurrence of the character in the
+        /// character sequence represented by this object, or
+        /// <c>-1</c> if the character does not occur.
+        /// </returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
-        public static int LastIndexOf(this string text, int codePoint, int startIndex)
+        public static int LastIndexOf(this string text, int codePoint, int startIndex) // KEEP IN SYNC WITH MemoryExtensions.LastIndexOf()
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -750,10 +751,7 @@ namespace J2N.Text
         /// <summary>
         /// Handles (rare) calls of lastIndexOf with a supplementary character.
         /// </summary>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
-        private static int LastIndexOfSupplementary(this string text, int codePoint, int startIndex)
+        private static int LastIndexOfSupplementary(this string text, int codePoint, int startIndex) // KEEP IN SYNC WITH MemoryExtensions.LastIndexOfSupplementary()
         {
             if (Character.IsValidCodePoint(codePoint))
             {

@@ -5,7 +5,119 @@ namespace J2N.Memory
 {
     public class TestMemoryExtensions : TestCase
     {
+        private const string hw1 = "HelloWorld";
+        private const string TestStringSupplementary = "李红：不，那不是杂志。那是字典。𠳕";
+
 #if FEATURE_SPAN
+
+        /**
+         * @tests java.lang.String#indexOf(int)
+         */
+        [Test]
+        public void Test_IndexOf_ReadOnlySpan_Int32()
+        {
+            // Test for method int java.lang.String.indexOf(int)
+            assertEquals("Invalid index returned", 1, hw1.AsSpan().IndexOf((int)'e'));
+            assertEquals("Invalid index returned", 1, "a\ud800\udc00".AsSpan().IndexOf(0x10000));
+
+            MemoryExtensions.IndexOf(TestStringSupplementary.AsSpan(), "𠳕".CodePointAt(0));
+        }
+
+        /**
+         * @tests java.lang.String#indexOf(int, int)
+         */
+        [Test]
+        public void Test_IndexOf_ReadOnlySpan_Int32_Int32()
+        {
+            // Test for method int java.lang.String.indexOf(int, int)
+            assertEquals("Invalid character index returned", 5, hw1.AsSpan().IndexOf((int)'W', 2));
+            assertEquals("Invalid index returned", 2, "ab\ud800\udc00".AsSpan().IndexOf(0x10000, 1));
+        }
+
+        /**
+         * @tests java.lang.String#lastIndexOf(int)
+         */
+        [Test]
+        public void Test_LastIndexOf_ReadOnlySpan_Int32()
+        {
+            // Test for method int java.lang.String.lastIndexOf(int)
+            assertEquals("Failed to return correct index", 5, hw1.AsSpan().LastIndexOf((int)'W'));
+            assertEquals("Returned index for non-existent char", -1, hw1.AsSpan()
+                    .LastIndexOf((int)'Z'));
+            assertEquals("Failed to return correct index", 1, "a\ud800\udc00".AsSpan()
+                    .LastIndexOf(0x10000));
+        }
+
+        /**
+         * @tests java.lang.String#lastIndexOf(int, int)
+         */
+        [Test]
+        public void Test_LastIndexOf_ReadOnlySpan_Int32_Int32()
+        {
+            // Test for method int java.lang.String.lastIndexOf(int, int)
+            assertEquals("Failed to return correct index", 5, hw1.AsSpan().LastIndexOf((int)'W',
+                    6));
+            assertEquals("Returned index for char out of specified range", -1, hw1.AsSpan()
+                    .LastIndexOf((int)'W', 4));
+            assertEquals("Returned index for non-existent char", -1, hw1.AsSpan()
+                    .LastIndexOf((int)'Z', 9));
+        }
+
+
+        /**
+         * @tests java.lang.String#indexOf(int)
+         */
+        [Test]
+        public void Test_IndexOf_Span_Int32()
+        {
+            // Test for method int java.lang.String.indexOf(int)
+            assertEquals("Invalid index returned", 1, hw1.ToCharArray().AsSpan().IndexOf((int)'e'));
+            assertEquals("Invalid index returned", 1, "a\ud800\udc00".ToCharArray().AsSpan().IndexOf(0x10000));
+
+            MemoryExtensions.IndexOf(TestStringSupplementary.ToCharArray().AsSpan(), "𠳕".CodePointAt(0));
+        }
+
+        /**
+         * @tests java.lang.String#indexOf(int, int)
+         */
+        [Test]
+        public void Test_IndexOf_Span_Int32_Int32()
+        {
+            // Test for method int java.lang.String.indexOf(int, int)
+            assertEquals("Invalid character index returned", 5, hw1.ToCharArray().AsSpan().IndexOf((int)'W', 2));
+            assertEquals("Invalid index returned", 2, "ab\ud800\udc00".ToCharArray().AsSpan().IndexOf(0x10000, 1));
+        }
+
+        /**
+         * @tests java.lang.String#lastIndexOf(int)
+         */
+        [Test]
+        public void Test_LastIndexOf_Span_Int32()
+        {
+            // Test for method int java.lang.String.lastIndexOf(int)
+            assertEquals("Failed to return correct index", 5, hw1.ToCharArray().AsSpan().LastIndexOf((int)'W'));
+            assertEquals("Returned index for non-existent char", -1, hw1.ToCharArray().AsSpan()
+                    .LastIndexOf((int)'Z'));
+            assertEquals("Failed to return correct index", 1, "a\ud800\udc00".ToCharArray().AsSpan()
+                    .LastIndexOf(0x10000));
+        }
+
+        /**
+         * @tests java.lang.String#lastIndexOf(int, int)
+         */
+        [Test]
+        public void Test_LastIndexOf_Span_Int32_Int32()
+        {
+            // Test for method int java.lang.String.lastIndexOf(int, int)
+            assertEquals("Failed to return correct index", 5, hw1.ToCharArray().AsSpan().LastIndexOf((int)'W',
+                    6));
+            assertEquals("Returned index for char out of specified range", -1, hw1.ToCharArray().AsSpan()
+                    .LastIndexOf((int)'W', 4));
+            assertEquals("Returned index for non-existent char", -1, hw1.ToCharArray().AsSpan()
+                    .LastIndexOf((int)'Z', 9));
+        }
+
+
         private void reverseTest(string org, string rev, string back)
         {
             {
