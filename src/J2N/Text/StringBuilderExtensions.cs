@@ -530,7 +530,7 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, ICharSequence? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this StringBuilder? text, ICharSequence? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null) return (value is null || !value.HasValue) ? 0 : -1;
             if (value is null || !value.HasValue) return 1;
@@ -601,52 +601,18 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, char[]? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this StringBuilder? text, char[]? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            int length = Math.Min(text.Length, value.Length);
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-            bool usePool = length > CharStackBufferSize;
-            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
-            try
-#elif FEATURE_ARRAYPOOL
-            char[] textChars = ArrayPool<char>.Shared.Rent(length);
-            try
-#else
-            char[] textChars = new char[length];
-#endif
+            unsafe
             {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                Span<char> textChars = usePool ? arrayToReturnToPool : stackalloc char[length];
-                text.CopyTo(0, textChars, length);
-#else
-                text.CopyTo(0, textChars, 0, length);
-#endif
-                int result;
-                for (int i = 0; i < length; i++)
+                fixed (char* valuePtr = value)
                 {
-                    if ((result = textChars[i] - value[i]) != 0)
-                        return result;
+                    return CompareToOrdinalCore(text, valuePtr, value.Length);
                 }
-
-                // At this point, we have compared all the characters in at least one string.
-                // The longer string will be larger.
-                return text.Length - value.Length;
             }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-            finally
-            {
-                if (arrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
-            }
-#elif FEATURE_ARRAYPOOL
-            finally
-            {
-                ArrayPool<char>.Shared.Return(textChars);
-            }
-#endif
         }
 
         /// <summary>
@@ -667,7 +633,7 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, StringBuilder? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this StringBuilder? text, StringBuilder? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (object.ReferenceEquals(text, value)) return 0;
             if (text is null) return (value is null) ? 0 : -1;
@@ -743,12 +709,59 @@ namespace J2N.Text
         /// Zero indicates the strings are equal.
         /// Greater than zero indicates the comparison value is less than the current string.
         /// </returns>
-        public static int CompareToOrdinal(this StringBuilder? text, string? value) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static int CompareToOrdinal(this StringBuilder? text, string? value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            int length = Math.Min(text.Length, value.Length);
+            unsafe
+            {
+                fixed (char* valuePtr = value)
+                {
+                    return CompareToOrdinalCore(text, valuePtr, value.Length);
+                }
+            }
+        }
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// This method mimics the Java String.compareTo(CharSequence) method in that it
+        /// <list type="number">
+        ///     <item><description>Compares the strings using lexographic sorting rules</description></item>
+        ///     <item><description>Performs a culture-insensitive comparison</description></item>
+        /// </list>
+        /// This method is a convenience to replace the .NET CompareTo method 
+        /// on all strings, provided the logic does not expect specific values
+        /// but is simply comparing them with <c>&gt;</c> or <c>&lt;</c>.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="value">The string to compare with.</param>
+        /// <returns>
+        /// An integer that indicates the lexical relationship between the two comparands.
+        /// Less than zero indicates the comparison value is greater than the current string.
+        /// Zero indicates the strings are equal.
+        /// Greater than zero indicates the comparison value is less than the current string.
+        /// </returns>
+        public static int CompareToOrdinal(this StringBuilder? text, ReadOnlySpan<char> value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
+        {
+            if (text is null) return (value == default) ? 0 : -1;
+            if (value == default) return 1;
+
+            unsafe
+            {
+                fixed (char* valuePtr = &MemoryMarshal.GetReference(value))
+                {
+                    return CompareToOrdinalCore(text, valuePtr, value.Length);
+                }
+            }
+        }
+
+#endif
+
+        private unsafe static int CompareToOrdinalCore(StringBuilder text, char* value, int valueLength)
+        {
+            int length = Math.Min(text.Length, valueLength);
 #if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
             bool usePool = length > CharStackBufferSize;
             char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
@@ -775,7 +788,7 @@ namespace J2N.Text
 
                 // At this point, we have compared all the characters in at least one string.
                 // The longer string will be larger.
-                return text.Length - value.Length;
+                return text.Length - valueLength;
             }
 #if FEATURE_STRINGBUILDER_COPYTO_SPAN
             finally

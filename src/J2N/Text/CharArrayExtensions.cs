@@ -19,6 +19,7 @@
 using System;
 #if FEATURE_ARRAYPOOL
 using System.Buffers;
+using System.Runtime.InteropServices;
 #endif
 using System.Text;
 
@@ -106,20 +107,16 @@ namespace J2N.Text
         public static int CompareToOrdinal(this char[]? str, char[]? value)
         {
             if (object.ReferenceEquals(str, value)) return 0;
-            if (str is null) return -1;
+            if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            int length = Math.Min(str.Length, value.Length);
-            int result;
-            for (int i = 0; i < length; i++)
+            unsafe
             {
-                if ((result = str[i] - value[i]) != 0)
-                    return result;
+                fixed (char* valuePtr = value)
+                {
+                    return CompareToOrdinalCore(str, valuePtr, value.Length);
+                }
             }
-
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return str.Length - value.Length;
         }
 
         /// <summary>
@@ -211,17 +208,13 @@ namespace J2N.Text
             if (str is null) return (value is null) ? 0 : -1;
             if (value is null) return 1;
 
-            int length = Math.Min(str.Length, value.Length);
-            int result;
-            for (int i = 0; i < length; i++)
+            unsafe
             {
-                if ((result = str[i] - value[i]) != 0)
-                    return result;
+                fixed (char* valuePtr = value)
+                {
+                    return CompareToOrdinalCore(str, valuePtr, value.Length);
+                }
             }
-
-            // At this point, we have compared all the characters in at least one string.
-            // The longer string will be larger.
-            return str.Length - value.Length;
         }
 
         /// <summary>
@@ -264,6 +257,57 @@ namespace J2N.Text
             // At this point, we have compared all the characters in at least one string.
             // The longer string will be larger.
             return str.Length - value.Length;
+        }
+
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// This method mimics the Java String.compareTo(CharSequence) method in that it
+        /// <list type="number">
+        ///     <item><description>Compares the strings using lexographic sorting rules</description></item>
+        ///     <item><description>Performs a culture-insensitive comparison</description></item>
+        /// </list>
+        /// This method is a convenience to replace the .NET CompareTo method 
+        /// on all strings, provided the logic does not expect specific values
+        /// but is simply comparing them with <c>&gt;</c> or <c>&lt;</c>.
+        /// </summary>
+        /// <param name="str">This string.</param>
+        /// <param name="value">The string to compare with.</param>
+        /// <returns>
+        /// An integer that indicates the lexical relationship between the two comparands.
+        /// Less than zero indicates the comparison value is greater than the current string.
+        /// Zero indicates the strings are equal.
+        /// Greater than zero indicates the comparison value is less than the current string.
+        /// </returns>
+        public static int CompareToOrdinal(this char[]? str, ReadOnlySpan<char> value)
+        {
+            if (str is null) return (value == default) ? 0 : -1;
+            if (value == default) return 1;
+
+            unsafe
+            {
+                fixed (char* valuePtr = &MemoryMarshal.GetReference(value))
+                {
+                    return CompareToOrdinalCore(str, valuePtr, value.Length);
+                }
+            }
+        }
+
+#endif
+
+        private unsafe static int CompareToOrdinalCore(char[] str, char* value, int valueLength)
+        {
+            int length = Math.Min(str.Length, valueLength);
+            int result;
+            for (int i = 0; i < length; i++)
+            {
+                if ((result = str[i] - value[i]) != 0)
+                    return result;
+            }
+
+            // At this point, we have compared all the characters in at least one string.
+            // The longer string will be larger.
+            return str.Length - valueLength;
         }
     }
 }
