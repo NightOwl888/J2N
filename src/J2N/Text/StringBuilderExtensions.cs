@@ -2059,6 +2059,105 @@ namespace J2N.Text
             return text;
         }
 
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Replaces the specified subsequence in this builder with the specified
+        /// string, <paramref name="newValue"/>. The substring begins at the specified
+        /// <paramref name="startIndex"/> and ends to the character at 
+        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// to the end of the sequence if no such character exists. First the
+        /// characters in the substring ar removed and then the specified 
+        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        /// This <see cref="StringBuilder"/> will be lengthened to accommodate the
+        /// specified <paramref name="newValue"/> if necessary.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count
+        /// rather than an exclusive end index. To translate from Java, use <c>end - start</c>
+        /// to resolve the <paramref name="count"/> parameter.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="startIndex">The inclusive begin index in <paramref name="text"/>.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>This <see cref="StringBuilder"/> builder.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="StringBuilder.MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
+        public static StringBuilder Replace(this StringBuilder text, int startIndex, int count, ReadOnlySpan<char> newValue)
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+            if (startIndex < 0)
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (count < 0)
+                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (text.MaxCapacity > 0 && startIndex > text.MaxCapacity - count)
+                throw new ArgumentOutOfRangeException(nameof(count),
+                    $"{nameof(startIndex)}: {startIndex} + {nameof(count)}: {count} > {nameof(text.MaxCapacity)}: {text.MaxCapacity}");
+
+            int end = startIndex + count;
+            if (end > text.Length)
+            {
+                end = text.Length;
+            }
+            if (end > startIndex)
+            {
+                int stringLength = newValue.Length;
+                int diff = end - startIndex - stringLength;
+                if (diff > 0)
+                { // replacing with fewer characters
+                    text.Remove(startIndex, diff);
+                }
+                else if (diff < 0)
+                {
+                    // replacing with more characters...need some room
+                    text.Insert(startIndex, new char[-diff]);
+                }
+                // copy the chars based on the new length
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+                var textEnumerator = text.GetChunks();
+                ReadOnlyMemory<char> textChunk = default;
+                int lowerBound = 0, upperBound = -1;
+                for (int i = 0; i < stringLength; i++)
+                {
+                    while (i + startIndex > upperBound)
+                    {
+                        lowerBound += textChunk.Length;
+                        textEnumerator.MoveNext();
+                        textChunk = textEnumerator.Current;
+                        upperBound += textChunk.Length;
+                    }
+                    unsafe
+                    {
+                        using var handle = textChunk.Pin();
+                        char* pointer = (char*)handle.Pointer;
+                        pointer[i + startIndex - lowerBound] = newValue[i];
+                    }
+                }
+#else
+                for (int i = 0; i < stringLength; i++)
+                {
+                    text[i + startIndex] = newValue[i];
+                }
+#endif
+                return text;
+            }
+            if (startIndex == end)
+            {
+                text.Insert(startIndex, newValue);
+                return text;
+            }
+            return text;
+        }
+
+#endif
+
         #endregion Replace
 
         #region Reverse

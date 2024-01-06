@@ -325,7 +325,7 @@ namespace J2N.Text
          * @tests java.lang.StringBuilder.replace(int, int, String)'
          */
         [Test]
-        public void Test_ReplaceIILjava_lang_String()
+        public void Test_Replace_String()
         {
             string fixture = "0000";
             StringBuilder sb = new StringBuilder(fixture);
@@ -351,7 +351,7 @@ namespace J2N.Text
             // FIXME Undocumented NPE in Sun's JRE 5.0_5
             try
             {
-                sb.Replace(1, 2 - 1, null); // J2N; Corrected 2nd parameter
+                sb.Replace(1, 2 - 1, (string)null); // J2N; Corrected 2nd parameter
                 fail("No NPE");
             }
             catch (ArgumentNullException e)
@@ -399,12 +399,101 @@ namespace J2N.Text
         }
 
         [Test]
-        public void Test_Replace_Across_Chunks()
+        public void Test_Replace_String_Across_Chunks()
         {
             StringBuilder sb = new StringBuilder(2).Append("foodie").Append("guru");
             sb.Replace(startIndex: 1, count: 7, "1234567");
             assertEquals("f1234567ru", sb.ToString());
         }
+
+#if FEATURE_SPAN
+
+        /**
+         * @tests java.lang.StringBuilder.replace(int, int, String)'
+         */
+        [Test]
+        public void Test_Replace_ReadOnlySpan()
+        {
+            string fixture = "0000";
+            StringBuilder sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(1, 3 - 1, "11".AsSpan())); // J2N; Corrected 2nd parameter
+            assertEquals("0110", sb.ToString());
+            assertEquals(4, sb.Length);
+
+            sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(1, 2 - 1, "11".AsSpan())); // J2N; Corrected 2nd parameter
+            assertEquals("01100", sb.ToString());
+            assertEquals(5, sb.Length);
+
+            sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(4, 5 - 4, "11".AsSpan())); // J2N; Corrected 2nd parameter
+            assertEquals("000011", sb.ToString());
+            assertEquals(6, sb.Length);
+
+            sb = new StringBuilder(fixture);
+            assertSame(sb, sb.Replace(4, 6 - 4, "11".AsSpan())); // J2N; Corrected 2nd parameter
+            assertEquals("000011", sb.ToString());
+            assertEquals(6, sb.Length);
+
+            //// FIXME Undocumented NPE in Sun's JRE 5.0_5
+            //try
+            //{
+            //    sb.Replace(1, 2 - 1, null); // J2N; Corrected 2nd parameter
+            //    fail("No NPE");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // Expected
+            //}
+
+            try
+            {
+                sb = new StringBuilder(fixture);
+                sb.Replace(-1, 2 - -1, "11".AsSpan()); // J2N; Corrected 2nd parameter
+                fail("No SIOOBE, negative start");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            try
+            {
+                sb = new StringBuilder(fixture);
+                sb.Replace(5, 2 - 5, "11".AsSpan()); // J2N; Corrected 2nd parameter
+                fail("No SIOOBE, start > length");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            try
+            {
+                sb = new StringBuilder(fixture);
+                sb.Replace(3, 2 - 3, "11".AsSpan()); // J2N; Corrected 2nd parameter
+                fail("No SIOOBE, start > end");
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                // Expected
+            }
+
+            // Regression for HARMONY-348
+            StringBuilder buffer = new StringBuilder("1234567");
+            buffer.Replace(2, 6 - 2, "XXX".AsSpan()); // J2N; Corrected 2nd parameter
+            assertEquals("12XXX7", buffer.ToString());
+        }
+
+        [Test]
+        public void Test_Replace_ReadOnlySpan_Across_Chunks()
+        {
+            StringBuilder sb = new StringBuilder(2).Append("foodie").Append("guru");
+            sb.Replace(startIndex: 1, count: 7, "1234567".AsSpan());
+            assertEquals("f1234567ru", sb.ToString());
+        }
+
+#endif
 
         private void reverseTest(String org, String rev, String back)
         {
