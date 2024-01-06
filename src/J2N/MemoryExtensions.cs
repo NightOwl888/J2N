@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace J2N
 {
     /// <summary>
-    /// Extensions to System.Memory types.
+    /// Extensions to <see cref="Span{T}"/> and <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
     public static class MemoryExtensions
     {
