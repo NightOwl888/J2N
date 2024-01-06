@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 
-namespace J2N.Memory
+namespace J2N
 {
     public class TestMemoryExtensions : TestCase
     {

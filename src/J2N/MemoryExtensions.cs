@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace J2N.Memory
+namespace J2N
 {
     /// <summary>
     /// Extensions to System.Memory types.
