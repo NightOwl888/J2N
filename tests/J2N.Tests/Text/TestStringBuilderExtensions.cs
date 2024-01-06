@@ -143,6 +143,9 @@ namespace J2N.Text
             StringBuilder target = null;
             string compareTo = "Alpine";
 
+#if FEATURE_SPAN
+            Assert.Greater(0, target.CompareToOrdinal(compareTo.AsSpan()));
+#endif
             Assert.Greater(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.Greater(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.Greater(0, target.CompareToOrdinal(compareTo));
@@ -152,6 +155,9 @@ namespace J2N.Text
 
             target = new StringBuilder("Alpha");
 
+#if FEATURE_SPAN
+            Assert.Greater(0, target.CompareToOrdinal(compareTo.AsSpan()));
+#endif
             Assert.Greater(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.Greater(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.Greater(0, target.CompareToOrdinal(compareTo));
@@ -161,6 +167,9 @@ namespace J2N.Text
 
             compareTo = "Alpha";
 
+#if FEATURE_SPAN
+            Assert.AreEqual(0, target.CompareToOrdinal(compareTo.AsSpan()));
+#endif
             Assert.AreEqual(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.AreEqual(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.AreEqual(0, target.CompareToOrdinal(compareTo));
@@ -170,6 +179,9 @@ namespace J2N.Text
 
             compareTo = "Alp";
 
+#if FEATURE_SPAN
+            Assert.Less(0, target.CompareToOrdinal(compareTo.AsSpan()));
+#endif
             Assert.Less(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.Less(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.Less(0, target.CompareToOrdinal(compareTo));
@@ -178,6 +190,9 @@ namespace J2N.Text
             Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(compareTo)));
 
 
+#if FEATURE_SPAN
+            Assert.Less(0, target.CompareToOrdinal((ReadOnlySpan<char>)null));
+#endif
             Assert.Less(0, target.CompareToOrdinal((char[])null));
             Assert.Less(0, target.CompareToOrdinal((StringBuilder)null));
             Assert.Less(0, target.CompareToOrdinal((string)null));
@@ -187,6 +202,9 @@ namespace J2N.Text
 
             target = null;
 
+#if FEATURE_SPAN
+            Assert.AreEqual(0, target.CompareToOrdinal((ReadOnlySpan<char>)null));
+#endif
             Assert.AreEqual(0, target.CompareToOrdinal((char[])null));
             Assert.AreEqual(0, target.CompareToOrdinal((StringBuilder)null));
             Assert.AreEqual(0, target.CompareToOrdinal((string)null));
