@@ -593,7 +593,7 @@ namespace J2N
             if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
             if (seq is StringBuilderCharSequence sb)
-                return CodePointAt(sb, index);
+                return CodePointAt(sb.Value!, index);
             if (seq is StringBuffer stringBuffer)
                 return CodePointAt(stringBuffer.builder, index);
 
@@ -858,7 +858,7 @@ namespace J2N
             if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
             if (seq is StringBuilderCharSequence sb)
-                return CodePointBefore(sb, index);
+                return CodePointBefore(sb.Value!, index);
             if (seq is StringBuffer stringBuffer)
                 return CodePointBefore(stringBuffer.builder, index);
 
@@ -1297,7 +1297,7 @@ namespace J2N
             if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
             if (seq is StringBuilderCharSequence sb)
-                return CodePointCount(sb, startIndex, length);
+                return CodePointCount(sb.Value!, startIndex, length);
             if (seq is StringBuffer stringBuffer)
                 return CodePointCount(stringBuffer.builder, startIndex, length);
 
@@ -1552,7 +1552,7 @@ namespace J2N
             if (seq is null || !seq.HasValue)
                 throw new ArgumentNullException(nameof(seq));
             if (seq is StringBuilderCharSequence sb)
-                return OffsetByCodePoints(sb, index, codePointOffset);
+                return OffsetByCodePoints(sb.Value!, index, codePointOffset);
             if (seq is StringBuffer stringBuffer)
                 return OffsetByCodePoints(stringBuffer.builder, index, codePointOffset);
 
