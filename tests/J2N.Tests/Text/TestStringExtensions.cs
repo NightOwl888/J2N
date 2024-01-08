@@ -282,6 +282,55 @@ namespace J2N.Text
             assertTrue("".ContentEquals((string)""));
         }
 
+#if FEATURE_SPAN
+
+        /**
+         * @tests java.lang.String#contentEquals(CharSequence cs)
+         */
+        [Test]
+        public void Test_ContentEquals_ReadonlySpan()
+        {
+            // Test for method java.lang.String
+            // java.lang.String.contentEquals(CharSequence cs)
+            assertFalse("Incorrect result of compare", "qwerty".ContentEquals("".AsSpan()));
+        }
+
+        /**
+         * @tests java.lang.String#contentEquals(CharSequence)
+         */
+        [Test]
+        public void Test_ContentEquals_ReadOnlySpan2()
+        {
+            String s = "abc";
+            assertTrue(s.ContentEquals("abc".AsSpan()));
+            assertFalse(s.ContentEquals("def".AsSpan()));
+            assertFalse(s.ContentEquals("ghij".AsSpan()));
+
+            s = new string("_abc_".ToCharArray(), 1, 3);
+            assertTrue(s.ContentEquals("abc".AsSpan()));
+            assertFalse(s.ContentEquals("def".AsSpan()));
+            assertFalse(s.ContentEquals("ghij".AsSpan()));
+
+            //try
+            //{
+            //    s.ContentEquals((ICharSequence)null);
+            //    fail("No NPE");
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //}
+
+            // J2N: This differs from Java in that ContentEquals never throws an exception.
+            // It returns true it both the string and the target are null, otherwise false
+            // if the target is null and string is not.
+            assertFalse(s.ContentEquals((ReadOnlySpan<char>)null));
+            assertTrue(((string)null).ContentEquals((ReadOnlySpan<char>)null));
+            assertFalse(((string)null).ContentEquals("".AsSpan()));
+            assertTrue("".ContentEquals("".AsSpan()));
+        }
+
+#endif
+
         /**
          * @tests java.lang.String#getBytes()
          */
