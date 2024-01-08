@@ -1168,7 +1168,39 @@ namespace J2N.Text
             }
         }
 
-        #endregion
+#if FEATURE_SPAN
+
+        /// <summary>
+        /// Compares the specified <see cref="ReadOnlySpan{Char}"/> to this string and compares the specified
+        /// range of characters to determine if they are the same.
+        /// </summary>
+        /// <param name="text">This string.</param>
+        /// <param name="thisStartIndex">The starting offset in this string.</param>
+        /// <param name="other">The <see cref="ReadOnlySpan{Char}"/> to compare.</param>
+        /// <param name="otherStartIndex">The starting offset in the specified string.</param>
+        /// <param name="length">The number of characters to compare.</param>
+        /// <param name="comparisonType">One of the enumeration values that specifies the rules for the search.</param>
+        /// <returns><c>true</c> if the ranges of characters are equal, <c>false</c> otherwise.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
+        public static bool RegionMatches(this string text, int thisStartIndex, ReadOnlySpan<char> other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        {
+            if (text is null)
+                throw new ArgumentNullException(nameof(text));
+
+            if (other.Length - otherStartIndex < length || otherStartIndex < 0)
+                return false;
+            if (thisStartIndex < 0 || text.Length - thisStartIndex < length)
+                return false;
+            if (length <= 0)
+                return true;
+
+            return text.AsSpan(thisStartIndex, length).Equals(other.Slice(otherStartIndex, length), comparisonType);
+        }
+
+#endif
+
+        #endregion RegionMatches
 
         #region ReverseText
 
@@ -1204,7 +1236,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is
         /// <c>null</c>.</exception>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
-        /// <seealso cref="J2N.Memory.MemoryExtensions.ReverseText(Span{char})"/>
+        /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
 #else
         /// <summary>
         /// Reverses the character sequence and returns a new string.
