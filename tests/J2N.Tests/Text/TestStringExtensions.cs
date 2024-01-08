@@ -544,13 +544,10 @@ namespace J2N.Text
             }
             using (var context = new CultureContext("en"))
             {
-                if (!input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
-                    input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
-                    assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
-                        input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
-                }
+                assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
+                input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
+                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
+                    input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
             }
         }
 
@@ -605,13 +602,10 @@ namespace J2N.Text
             }
             using (var context = new CultureContext("en"))
             {
-                if (!input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
-                    input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
-                    assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
-                        input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
-                }
+                assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
+                input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
+                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
+                    input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
             }
         }
 
@@ -666,13 +660,10 @@ namespace J2N.Text
             }
             using (var context = new CultureContext("en"))
             {
-                if (!input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
-                    input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
-                    assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
-                        input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
-                }
+                assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
+                input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
+                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
+                    input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
             }
         }
 
@@ -727,13 +718,10 @@ namespace J2N.Text
             }
             using (var context = new CultureContext("en"))
             {
-                if (!input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
-                    input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
-                    assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
-                        input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
-                }
+                assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
+                input.RegionMatches(10, test, 0, 3, StringComparison.CurrentCultureIgnoreCase));
+                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
+                    input.RegionMatches(10, test, 0, 3, StringComparison.Ordinal));
             }
         }
 
@@ -758,6 +746,70 @@ namespace J2N.Text
             assertTrue("identical regions failed comparison with different cases",
                     hw1.RegionMatches(2, hw2, 2, 5, StringComparison.Ordinal));
         }
+
+#if FEATURE_SPAN
+
+        /**
+         * @tests java.lang.String#regionMatches(int, java.lang.String, int, int)
+         */
+        [Test]
+        public void Test_RegionMatches_String_Int32_ReadOnlySpan_Int32_Int32_StringComparison()
+        {
+            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5425");
+
+            // Test for method boolean java.lang.String.regionMatches(int,
+            // java.lang.String, int, int)
+            String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
+
+            assertTrue("identical regions failed comparison", hw1.RegionMatches(2,
+                    hw2.AsSpan(), 2, 5, StringComparison.Ordinal));
+            assertTrue("Different regions returned true", !hw1.RegionMatches(2,
+                    bogusString.AsSpan(), 2, 5, StringComparison.Ordinal));
+
+            var input = "iiiiiiiiiiiıIiii";
+            var test = "İII"; // Turkish capital dotted I test.
+
+            using (var context = new CultureContext("tr"))
+            {
+                assertTrue("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in tr culture",
+                    input.RegionMatches(10, test.AsSpan(), 0, 3, StringComparison.CurrentCultureIgnoreCase));
+                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in tr culture",
+                    input.RegionMatches(10, test.AsSpan(), 0, 3, StringComparison.Ordinal));
+            }
+            using (var context = new CultureContext("en"))
+            {
+                assertFalse("Turkish captial I test failed using StringComparison.CurrentCultureIgnoreCase in en culture",
+                input.RegionMatches(10, test.AsSpan(), 0, 3, StringComparison.CurrentCultureIgnoreCase));
+                assertFalse("Turkish captial I test failed using StringComparison.Ordinal in en culture",
+                    input.RegionMatches(10, test.AsSpan(), 0, 3, StringComparison.Ordinal));
+            }
+        }
+
+        /**
+         * @tests java.lang.String#regionMatches(boolean, int, java.lang.String,
+         *        int, int)
+         */
+        [Test]
+        public void Test_RegionMatches_String_Int32_ReadOnlySpan_Int32_Int32_StringComparison_OrdinalIgnoreCase()
+        {
+            // Test for method boolean java.lang.String.regionMatches(boolean, int,
+            // java.lang.String, int, int)
+
+            String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
+
+            assertTrue("identical regions failed comparison", hw1.RegionMatches(
+                    2, hw2.AsSpan(), 2, 5, StringComparison.Ordinal));
+            assertTrue("identical regions failed comparison with different cases",
+                    hw1.RegionMatches(2, hw2.AsSpan(), 2, 5, StringComparison.OrdinalIgnoreCase));
+            assertTrue("Different regions returned true", !hw1.RegionMatches(
+                    2, bogusString.AsSpan(), 2, 5, StringComparison.OrdinalIgnoreCase));
+            assertTrue("identical regions failed comparison with different cases",
+                    hw1.RegionMatches(2, hw2.AsSpan(), 2, 5, StringComparison.Ordinal));
+        }
+
+#endif
+
+
 
         /**
         * @tests java.lang.String#startsWith(java.lang.String, int)
