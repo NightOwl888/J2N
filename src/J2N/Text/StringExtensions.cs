@@ -337,7 +337,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string? text, ICharSequence? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, ICharSequence? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -359,7 +359,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string? text, char[]? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, char[]? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -381,7 +381,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string? text, StringBuilder? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, StringBuilder? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -403,7 +403,7 @@ namespace J2N.Text
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif 
-        public static bool ContentEquals(this string? text, string? charSequence) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, string? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
@@ -424,7 +424,7 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
-        public static bool ContentEquals(this string? text, ReadOnlySpan<char> charSequence)
+        public static bool ContentEquals(this string? text, ReadOnlySpan<char> charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 return charSequence == default;
@@ -454,7 +454,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string? text, ICharSequence? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, ICharSequence? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 return charSequence is null || !charSequence.HasValue;
@@ -489,7 +489,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string? text, char[]? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, char[]? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 return charSequence is null;
@@ -519,7 +519,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string? text, StringBuilder? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, StringBuilder? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 return charSequence is null;
@@ -549,7 +549,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string? text, string? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool ContentEquals(this string? text, string? charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 return charSequence is null;
@@ -581,7 +581,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool ContentEquals(this string? text, ReadOnlySpan<char> charSequence, StringComparison comparisonType)
+        public static bool ContentEquals(this string? text, ReadOnlySpan<char> charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 return charSequence == default;
@@ -897,7 +897,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if the ranges of characters are equal, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="other"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool RegionMatches(this string text, int thisStartIndex, ICharSequence other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool RegionMatches(this string text, int thisStartIndex, ICharSequence other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -963,7 +963,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if the ranges of characters are equal, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="other"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool RegionMatches(this string text, int thisStartIndex, char[] other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool RegionMatches(this string text, int thisStartIndex, char[] other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -1024,7 +1024,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if the ranges of characters are equal, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="other"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool RegionMatches(this string text, int thisStartIndex, StringBuilder other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool RegionMatches(this string text, int thisStartIndex, StringBuilder other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -1121,7 +1121,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if the ranges of characters are equal, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="other"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool RegionMatches(this string text, int thisStartIndex, string other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool RegionMatches(this string text, int thisStartIndex, string other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
@@ -1183,7 +1183,7 @@ namespace J2N.Text
         /// <returns><c>true</c> if the ranges of characters are equal, <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c></exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
-        public static bool RegionMatches(this string text, int thisStartIndex, ReadOnlySpan<char> other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ICharSequence, char[], StringBuilder, and string IN SYNC
+        public static bool RegionMatches(this string text, int thisStartIndex, ReadOnlySpan<char> other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (text is null)
                 throw new ArgumentNullException(nameof(text));
