@@ -4,15 +4,14 @@ using System.Runtime.InteropServices;
 
 namespace J2N
 {
+#if FEATURE_SPAN
+
     /// <summary>
     /// Extensions to <see cref="Span{T}"/> and <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
-    public static class MemoryExtensions
+    public static partial class MemoryExtensions
     {
-
         #region IndexOf
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Searches for the specified sequence and returns the index of its first occurrence.
@@ -162,45 +161,41 @@ namespace J2N
             return -1;
         }
 
-#endif
-
         #endregion IndexOf
 
         #region LastIndexOf
 
-#if FEATURE_SPAN
+        /// <summary>
+        /// Searches for the specified value and returns the index of its last occurrence.
+        /// <para/>
+        /// This method simply cascades the call to <see cref="System.MemoryExtensions.LastIndexOf{T}(ReadOnlySpan{T}, T)"/>.
+        /// Its purpose is to avoid the overhead of casting to an <see cref="int"/> and back to <see cref="char"/> when
+        /// calling <see cref="LastIndexOf(ReadOnlySpan{char}, int)"/> with a <see cref="char"/>. If this method did not exist,
+        /// the compiler would always choose <see cref="LastIndexOf(ReadOnlySpan{char}, int)"/> instead of
+        /// <see cref="System.MemoryExtensions.LastIndexOf{T}(ReadOnlySpan{T}, T)"/> when the type of <c>T</c> is <see cref="char"/>.
+        /// </summary>
+        /// <param name="text">The span to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <returns>The index of the last occurrence of the value in the span. If not found, returns -1.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int LastIndexOf(this ReadOnlySpan<char> text, char value)
+            => System.MemoryExtensions.LastIndexOf(text, value);
 
-        ///// <summary>
-        ///// Searches for the specified value and returns the index of its last occurrence.
-        ///// <para/>
-        ///// This method simply cascades the call to <see cref="System.MemoryExtensions.LastIndexOf{T}(ReadOnlySpan{T}, T)"/>.
-        ///// Its purpose is to avoid the overhead of casting to an <see cref="int"/> and back to <see cref="char"/> when
-        ///// calling <see cref="LastIndexOf(ReadOnlySpan{char}, int)"/> with a <see cref="char"/>. If this method did not exist,
-        ///// the compiler would always choose <see cref="LastIndexOf(ReadOnlySpan{char}, int)"/> instead of
-        ///// <see cref="System.MemoryExtensions.LastIndexOf{T}(ReadOnlySpan{T}, T)"/> when the type of <c>T</c> is <see cref="char"/>.
-        ///// </summary>
-        ///// <param name="text">The span to search.</param>
-        ///// <param name="value">The value to search for.</param>
-        ///// <returns>The index of the last occurrence of the value in the span. If not found, returns -1.</returns>
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //public static int LastIndexOf(this ReadOnlySpan<char> text, char value)
-        //    => System.MemoryExtensions.LastIndexOf(text, value);
-
-        ///// <summary>
-        ///// Searches for the specified value and returns the index of its last occurrence.
-        ///// <para/>
-        ///// This method simply cascades the call to <see cref="System.MemoryExtensions.LastIndexOf{T}(Span{T}, T)"/>.
-        ///// Its purpose is to avoid the overhead of casting to an <see cref="int"/> and back to <see cref="char"/> when
-        ///// calling <see cref="LastIndexOf(Span{char}, int)"/> with a <see cref="char"/>. If this method did not exist,
-        ///// the compiler would always choose <see cref="LastIndexOf(Span{char}, int)"/> instead of
-        ///// <see cref="System.MemoryExtensions.LastIndexOf{T}(Span{T}, T)"/> when the type of <c>T</c> is <see cref="char"/>.
-        ///// </summary>
-        ///// <param name="text">The span to search.</param>
-        ///// <param name="value">The value to search for.</param>
-        ///// <returns>The index of the last occurrence of the value in the span. If not found, returns -1.</returns>
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //public static int LastIndexOf(this Span<char> text, char value)
-        //    => System.MemoryExtensions.LastIndexOf(text, value);
+        /// <summary>
+        /// Searches for the specified value and returns the index of its last occurrence.
+        /// <para/>
+        /// This method simply cascades the call to <see cref="System.MemoryExtensions.LastIndexOf{T}(Span{T}, T)"/>.
+        /// Its purpose is to avoid the overhead of casting to an <see cref="int"/> and back to <see cref="char"/> when
+        /// calling <see cref="LastIndexOf(Span{char}, int)"/> with a <see cref="char"/>. If this method did not exist,
+        /// the compiler would always choose <see cref="LastIndexOf(Span{char}, int)"/> instead of
+        /// <see cref="System.MemoryExtensions.LastIndexOf{T}(Span{T}, T)"/> when the type of <c>T</c> is <see cref="char"/>.
+        /// </summary>
+        /// <param name="text">The span to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <returns>The index of the last occurrence of the value in the span. If not found, returns -1.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static int LastIndexOf(this Span<char> text, char value)
+            => System.MemoryExtensions.LastIndexOf(text, value);
 
         /// <summary>
         /// Returns the index within this string of the last occurrence of
@@ -315,13 +310,10 @@ namespace J2N
             return -1;
         }
 
-#endif
-
         #endregion LastIndexOf
 
-        #region Reverse
+        #region ReverseText
 
-#if FEATURE_SPAN
         /// <summary>
         /// Causes this character sequence to be replaced by the reverse of
         /// the sequence. If there are any surrogate pairs included in the
@@ -362,8 +354,6 @@ namespace J2N
                 ReverseText(textPtr, count);
             }
         }
-
-#endif
 
         internal unsafe static void ReverseText(char* text, int count)
         {
@@ -439,6 +429,8 @@ namespace J2N
             }
         }
 
-        #endregion
+        #endregion ReverseText
     }
+
+#endif
 }
