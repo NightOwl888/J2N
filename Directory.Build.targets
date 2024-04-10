@@ -135,15 +135,19 @@
   <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
   <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
 
-    <DefineConstants>$(DefineConstants);FEATURE_ARRAYPOOL</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_ISENTERED</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
 
+  </PropertyGroup>
+
+  <!-- Features that apply everywhere (to be removed) -->
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);FEATURE_ARRAYPOOL</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -179,7 +183,7 @@
 
   <!-- Global PackageReferences -->
 
-  <ItemGroup>
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
     <!-- This is to allow the .NET Framework references to be machine-indepenedent so builds can happen without installing prerequisites -->
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="$(MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion)" PrivateAssets="All" />
   </ItemGroup>
@@ -193,8 +197,7 @@
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="$(MicrosoftSourceLinkGitHubPackageReferenceVersion)" PrivateAssets="All"/>
   </ItemGroup>
 
-  <!-- J2N will always use semantic versioning, there is no need for a 4 component version number so we don't always have to skip this on Azure DevOps -->
-  <ItemGroup Condition=" '$(SkipGitVersioning.ToLower())' != 'true' ">
+  <ItemGroup Condition=" '$(SkipGitVersioning.ToLower())' != 'true' And '$(TF_BUILD.ToLower())' != 'true' ">
     <PackageReference Include="Nerdbank.GitVersioning" Version="$(NerdBankGitVersioningPackageReferenceVersion)" PrivateAssets="All" />
   </ItemGroup>
 
