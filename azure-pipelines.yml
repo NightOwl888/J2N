@@ -51,6 +51,8 @@ stages:
       vmImage: 'windows-latest'
 
     steps:
+    - template: '.build/azure-templates/show-all-files.yml' # for debugging
+
     - pwsh: |
         $configuration = if ($env:BUILDCONFIGURATION) { $env:BUILDCONFIGURATION } else { "Release" }
         Write-Host "##vso[task.setvariable variable=BuildConfiguration;]$configuration"
