@@ -3211,7 +3211,9 @@ namespace J2N.Numerics
     {
 #if FEATURE_SPAN
         // From MemoryExtensions class in .NET Runtime
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         internal static bool EqualsOrdinalIgnoreCase(this ReadOnlySpan<char> span, ReadOnlySpan<char> value)
         {
             if (span.Length != value.Length)
