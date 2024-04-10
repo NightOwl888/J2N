@@ -16,7 +16,7 @@ namespace J2N
         public void Test_getResourceLjava_lang_String()
         {
             string name = "test_resource.txt";
-            string res = GetType().GetTypeInfo().Assembly.FindResource(GetType(), name);
+            string res = GetType().Assembly.FindResource(GetType(), name);
             assertNotNull(res);
         }
 
@@ -27,11 +27,11 @@ namespace J2N
         public void Test_getResourceAsStreamLjava_lang_String()
         {
             string name = "test_resource.txt";
-            using (Stream stream = GetType().GetTypeInfo().Assembly.FindAndGetManifestResourceStream(GetType(), name))
+            using (Stream stream = GetType().Assembly.FindAndGetManifestResourceStream(GetType(), name))
                 assertNotNull("the file " + name + " can not be found in this directory", stream);
 
             String nameBadURI = "org/apache/harmony/luni/tests/test_resource.txt";
-            using (Stream stream2 = GetType().GetTypeInfo().Assembly.FindAndGetManifestResourceStream(GetType(), nameBadURI))
+            using (Stream stream2 = GetType().Assembly.FindAndGetManifestResourceStream(GetType(), nameBadURI))
                 assertNull("the file " + nameBadURI + " should not be found in this directory", stream2);
 
             //Stream str = Object.class.getResourceAsStream("Class.class");
@@ -41,7 +41,7 @@ namespace J2N
             //assertEquals("Cannot read multiple bytes", 5, str.read(new byte[5]));
             //str.close();
 
-            using (Stream str2 = GetType().GetTypeInfo().Assembly.FindAndGetManifestResourceStream(GetType(), "test_resource.txt"))
+            using (Stream str2 = GetType().Assembly.FindAndGetManifestResourceStream(GetType(), "test_resource.txt"))
             {
                 assertNotNull("Can't find resource", str2);
                 assertTrue("Cannot read single byte", str2.ReadByte() != -1);

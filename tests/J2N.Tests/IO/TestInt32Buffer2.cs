@@ -162,7 +162,7 @@ namespace J2N.IO
             }
             catch (Exception x)
             {
-                if (ex.GetTypeInfo().IsAssignableFrom(x.GetType()))
+                if (ex.IsAssignableFrom(x.GetType()))
                 {
                     caught = true;
                 }
