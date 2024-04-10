@@ -48,10 +48,11 @@ stages:
 
   - job: Build
     pool:
-      vmImage: 'windows-latest'
+      vmImage: 'windows-2019'
 
     steps:
-    - template: '.build/azure-templates/show-all-files.yml' # for debugging
+    #- template: '.build/azure-templates/show-all-files.yml' # for debugging
+    - pwsh: C:;cd $env:ANDROID_HOME;dir -r  | Where-Object {$_.PsIsContainer -eq $false} | % { $_.FullName }
 
     - pwsh: |
         $configuration = if ($env:BUILDCONFIGURATION) { $env:BUILDCONFIGURATION } else { "Release" }
@@ -96,13 +97,13 @@ stages:
         nugetArtifactName: '$(NuGetArtifactName)'
         binaryArtifactName: '$(BinaryArtifactName)'
 
-    - template: '.build/azure-templates/install-android-sdk.yml'
-      parameters:
-        sdkVersion: '28'
+    #- template: '.build/azure-templates/install-android-sdk.yml'
+    #  parameters:
+    #    sdkVersion: '28'
 
-    - template: '.build/azure-templates/install-android-sdk.yml'
-      parameters:
-        sdkVersion: '29'
+    #- template: '.build/azure-templates/install-android-sdk.yml'
+    #  parameters:
+    #    sdkVersion: '29'
 
     - task: NuGetToolInstaller@1
       displayName: 'Install NuGet'
