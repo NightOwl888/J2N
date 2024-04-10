@@ -1286,7 +1286,9 @@ namespace J2N.Threading
         {
             // Test for method void java.lang.Thread.sleep(long, int)
 
+#if FEATURE_RUNTIMEINFORMATION
             Assume.That(!RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !PlatformDetection.IsXamarinAndroid, "J2N TODO: This test currently fails on macOS and Xamarin.Android.");
+#endif
 
             // TODO : Test needs revisiting.
             long stime = 0, ftime = 0;
@@ -1311,7 +1313,9 @@ namespace J2N.Threading
         [Test]
         public void Test_start()
         {
+#if FEATURE_RUNTIMEINFORMATION
             Assume.That(!RuntimeInformation.IsOSPlatform(OSPlatform.OSX) && !PlatformDetection.IsXamarinAndroid, "J2N TODO: This test currently fails on macOS and hangs on Xamarin.Android.");
+#endif
 
             // Test for method void java.lang.Thread.start()
             try
