@@ -37,6 +37,6 @@ steps:
     $platformDir = "$sdkPath/platforms/android-$sdkVersion"
     if (-not (Test-Path $platformDir)) {
         Write-Host "Android SDK platform $sdkVersion not found. Installing..."
-        & "$sdkPath/tools/bin/sdkmanager" "platforms;android-$sdkVersion" > $null
+        & "$sdkPath/tools/bin/sdkmanager.bat" "platforms;android-$sdkVersion" > $null
     }
   displayName: 'Install Android SDK Platform ${{ parameters.sdkVersion }}'
