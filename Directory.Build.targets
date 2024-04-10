@@ -135,21 +135,15 @@
   <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
   <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
 
+    <DefineConstants>$(DefineConstants);FEATURE_ARRAYPOOL</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
-    <!-- Due to dependency conflicts we are disabling ICU4N comparison tests, for now -->
-    <!--<DefineConstants>$(DefineConstants);FEATURE_ICU4N</DefineConstants>-->
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_ISENTERED</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
 
-  </PropertyGroup>
-
-  <!-- Features that apply everywhere (to be removed) -->
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);FEATURE_ARRAYPOOL</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -185,7 +179,7 @@
 
   <!-- Global PackageReferences -->
 
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('net4')) ">
+  <ItemGroup>
     <!-- This is to allow the .NET Framework references to be machine-indepenedent so builds can happen without installing prerequisites -->
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="$(MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion)" PrivateAssets="All" />
   </ItemGroup>

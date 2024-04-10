@@ -1,8 +1,6 @@
-﻿#if FEATURE_ICU4N
-using ICU4N;
+﻿using ICU4N;
 using ICU4N.Globalization;
 using ICU4N.Text;
-#endif
 using J2N.Collections;
 using J2N.Text;
 using NUnit.Framework;
@@ -1721,7 +1719,6 @@ namespace J2N
             assertEquals("Returned incorrect digit", 1, Character.Digit('๑', 10));
         }
 
-#if FEATURE_ICU4N
         [Test]
         public void Test_DigitCI_Against_ICU4N()
         {
@@ -1739,7 +1736,6 @@ namespace J2N
                 }
             }
         }
-#endif
 
         /**
          * @tests java.lang.Character#digit(int, int)
@@ -1759,7 +1755,6 @@ namespace J2N
             assertEquals(-1, Character.Digit(0x110000, 20));
         }
 
-#if FEATURE_ICU4N
         [Test]
         //[Ignore("Run Manually - ICU4N's Digit method is slow with surrogates")]
         public void Test_Digit_II_Against_ICU4N()
@@ -1788,7 +1783,6 @@ namespace J2N
 
             assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match for radix {radix}.", expected, actual);
         }
-#endif
 
         /////**
         //// * @tests java.lang.Character#equals(java.lang.Object)
@@ -1848,7 +1842,6 @@ namespace J2N
                     .GetNumericValue('\uff12'));
         }
 
-#if FEATURE_ICU4N
         [Test]
         public void Test_GetNumericValueC_Against_ICU4N()
         {
@@ -1875,7 +1868,6 @@ namespace J2N
 
             assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
         }
-#endif
 
         /**
          * @tests java.lang.Character#getNumericValue(int)
@@ -1913,7 +1905,6 @@ namespace J2N
             assertEquals(35, Character.GetNumericValue(0xFF5A));
         }
 
-#if FEATURE_ICU4N
         [Test]
         public void Test_GetNumericValue_I_Against_ICU4N()
         {
@@ -1937,7 +1928,6 @@ namespace J2N
 
             assertEquals($"{c} (Hex 0x{c.ToHexString()}) failed to match.", expected, actual);
         }
-#endif
 
         /**
          * @tests java.lang.Character#getType(char)
@@ -2813,12 +2803,10 @@ namespace J2N
                 assertFalse($"0x{c:X4}", Character.IsWhiteSpace(c));
             }
 
-#if FEATURE_ICU4N
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
                 assertEquals($"0x{c:X4}", UChar.IsWhiteSpace((char)c), Character.IsWhiteSpace((char)c));
             }
-#endif
 
             //assertTrue("space returned false", Character.IsWhiteSpace('\n'));
             //assertTrue("non-space returned true", !Character.IsWhiteSpace('T'));
@@ -2886,12 +2874,10 @@ namespace J2N
                 assertFalse($"0x{c:X4}", Character.IsWhiteSpace(c));
             }
 
-#if FEATURE_ICU4N
             for (int c = Character.MinCodePoint; c <= Character.MaxCodePoint; c++)
             {
                 assertEquals($"0x{c:X4}", UChar.IsWhiteSpace(c), Character.IsWhiteSpace(c));
             }
-#endif
 
             //assertTrue(Character.IsWhiteSpace((int)'\n'));
             //assertFalse(Character.IsWhiteSpace((int)'T'));

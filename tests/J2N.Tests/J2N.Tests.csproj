@@ -1,11 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="$(SolutionDir)/.build/TestTargetFramework.props" />
-
-  <PropertyGroup>
-    <TargetFramework Condition=" '$(TargetFramework)' == 'net452' ">net40</TargetFramework>
-  </PropertyGroup>
-  
   <Import Project="$(SolutionDir)/.build/TestReferences.Common.targets" />
   
   <PropertyGroup>
@@ -22,33 +17,12 @@
     <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
   </PropertyGroup>
 
-  <!-- We cannot test this on net452 (target net40) because this will load System.Memory, which conflicts with NetFx.System.Memory. -->
-  <!-- Due to dependency conflicts we are disabling ICU4N comparison tests, for now -->
-  <!--<ItemGroup Condition=" '$(TargetFramework)' != 'net452' ">
+  <ItemGroup>
     <PackageReference Include="ICU4N" Version="$(ICU4NPackageReferenceVersion)" />
-  </ItemGroup>-->
-  <ItemGroup Condition=" '$(TargetFramework)' != 'net452' And '$(TargetFramework)' != 'net40' And '$(TargetFramework)' != '' ">
-    <PackageReference Include="RandomizedTesting.Generators"
-                      Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' Or '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="RandomizedTesting.Generators"
-                      Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)" />
-    <!--<PackageReference Include="RandomizedTesting.Generators"
-                      Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)"
-                      ExcludeAssets="Compile"/>
-    <Reference Include="RandomizedTesting.Generators">
-      <HintPath>F:\Users\shad\.nuget\packages\randomizedtesting.generators\$(RandomizedTestingGeneratorsPackageReferenceVersion)\lib\net40\RandomizedTesting.Generators.dll</HintPath>
-    </Reference>-->
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
     <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' Or '$(TargetFramework)' == 'net40' ">
-    <PackageReference Include="NetFx.System.Memory" Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
@@ -78,25 +52,11 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\J2N.TestFramework\J2N.TestFramework.csproj">
-      <SetTargetFramework>TargetFramework=net40</SetTargetFramework>
-      <!--<ReferenceOutputAssembly>false</ReferenceOutputAssembly>-->
+      <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
     <ProjectReference Include="..\..\src\J2N\J2N.csproj">
-      <SetTargetFramework>TargetFramework=net40</SetTargetFramework>
-      <!--<ReferenceOutputAssembly>false</ReferenceOutputAssembly>-->
+      <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
   </ItemGroup>
-
-  <!--<ItemGroup>
-    <Reference Include="RandomizedTesting.Generators">
-      <HintPath>F:\Users\shad\.nuget\packages\randomizedtesting.generators\$(RandomizedTestingGeneratorsPackageReferenceVersion)\lib\net45\RandomizedTesting.Generators.dll</HintPath>
-    </Reference>
-    <Reference Include="J2N">
-      <HintPath>..\..\src\J2N\bin\Debug\net40\J2N.dll</HintPath>
-    </Reference>
-    <Reference Include="J2N.TestFramework">
-      <HintPath>..\..\src\J2N.TestFramework\bin\Debug\net40\J2N.TestFramework.dll</HintPath>
-    </Reference>
-  </ItemGroup>-->
 
 </Project>

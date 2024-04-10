@@ -12,5 +12,6 @@
 
   <ItemGroup Label="Test Project Common References">
     <PackageReference Include="NUnit" Version="$(NUnitPackageReferenceVersion)" />
+    <PackageReference Include="RandomizedTesting.Generators" Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)" />
   </ItemGroup>
 </Project>

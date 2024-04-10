@@ -7,14 +7,12 @@
     <MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>1.1.1</MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>
     <MicrosoftSourceLinkGitHubPackageReferenceVersion>$(MicrosoftSourceLinkAzureReposGitPackageReferenceVersion)</MicrosoftSourceLinkGitHubPackageReferenceVersion>
     <NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>
-    <NetFxSystemMemoryPackageReferenceVersion>4.0.0-alpha-0016</NetFxSystemMemoryPackageReferenceVersion>
-    <NetFxSystemRuntimeCompilerServicesUnsafePackageReferenceVersion>$(NetFxSystemMemoryPackageReferenceVersion)</NetFxSystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>
-    <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8.1-alpha-0009-gfd548c1e41</RandomizedTestingGeneratorsPackageReferenceVersion>
+    <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8-beta-0001</RandomizedTestingGeneratorsPackageReferenceVersion>
     <SystemMemoryPackageReferenceVersion>4.5.4</SystemMemoryPackageReferenceVersion>
-    <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>4.7.1</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
+    <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>4.5.0</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
     <XunitPackageReferenceVersion>2.4.1</XunitPackageReferenceVersion>
     <XunitRunnerVisualStudioPackageReferenceVersion>$(XunitPackageReferenceVersion)</XunitRunnerVisualStudioPackageReferenceVersion>
