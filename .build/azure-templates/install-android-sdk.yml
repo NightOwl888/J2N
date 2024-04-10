@@ -32,11 +32,11 @@ steps:
   displayName: 'Validate Template Parameters'
 
 - pwsh: |
-    $sdkPath = 'C:\Program Files (x86)\Android\android-sdk'
+    $sdkPath = "$env:ANDROID_HOME"
     $sdkVersion = '${{ parameters.sdkVersion }}'
-    $platformDir = "$sdkPath\platforms\android-$sdkVersion"
+    $platformDir = "$sdkPath/platforms/android-$sdkVersion"
     if (-not (Test-Path $platformDir)) {
         Write-Host "Android SDK platform $sdkVersion not found. Installing..."
-        & "$sdkPath\tools\bin\sdkmanager" "platforms;android-$sdkVersion" > $null
+        & "$sdkPath/tools/bin/sdkmanager" "platforms;android-$sdkVersion" > $null
     }
   displayName: 'Install Android SDK Platform ${{ parameters.sdkVersion }}'
