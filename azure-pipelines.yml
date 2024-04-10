@@ -94,6 +94,18 @@ stages:
         nugetArtifactName: '$(NuGetArtifactName)'
         binaryArtifactName: '$(BinaryArtifactName)'
 
+    - task: AndroidSdkInstaller@0
+      inputs:
+        sdkPath: 'C:\Program Files (x86)\Android\android-sdk'
+        sdkVersion: '28'
+      displayName: 'Install Android SDK Platform 28'
+
+    - task: AndroidSdkInstaller@0
+      inputs:
+        sdkPath: 'C:\Program Files (x86)\Android\android-sdk'
+        sdkVersion: '29'
+      displayName: 'Install Android SDK Platform 29'
+
     - task: NuGetToolInstaller@1
       displayName: 'Install NuGet'
 
