@@ -6,6 +6,7 @@
     this setting only affects the test projects. -->
     <!--<TargetFramework>net452</TargetFramework>-->
     <!--<TargetFramework>net461</TargetFramework>-->
+    <!--<TargetFramework>net472</TargetFramework>-->
     <!--<TargetFramework>net48</TargetFramework>-->
     <!--<TargetFramework>net5.0</TargetFramework>-->
     <!--<TargetFramework>net6.0</TargetFramework>-->

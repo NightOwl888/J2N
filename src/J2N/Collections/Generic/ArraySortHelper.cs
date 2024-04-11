@@ -55,7 +55,9 @@ namespace J2N.Collections.Generic
             }
         }
 
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static void Swap(Span<T> a, int i, int j)
         {
             Debug.Assert(i != j);
@@ -115,7 +117,8 @@ namespace J2N.Collections.Generic
                 int p = PickPivotAndPartition(keys.Slice(0, partitionSize), comparer!);
 
                 // Note we've already partitioned around the pivot and do not have to move the pivot again.
-                IntroSort(keys[(p + 1)..partitionSize], depthLimit, comparer!);
+                //IntroSort(keys[(p + 1)..partitionSize], depthLimit, comparer!);
+                IntroSort(keys.Slice(p + 1, partitionSize - (p + 1)), depthLimit, comparer!); // J2N: Removed index/range so we can compile on .NET Framework
                 partitionSize = p;
             }
         }

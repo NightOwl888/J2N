@@ -75,7 +75,7 @@ steps:
     testResultsFileName: '${{ parameters.testResultsFileName }}'
 
 # Special Case: Using lowest supported version of .NET Framework (4.5.2) in xUnit to test .NET Framework 4.0.
-# This only works because we are using the AdditionalProperties attribute to set the target framework of the project reference.
+# This only works because we are using the SetTargetFramework attribute to set the target framework of the project reference.
 - template: publish-test-results.yml
   parameters:
     framework: 'net452'

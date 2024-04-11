@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29215.179
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34525.116
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9F28FE5B-BE86-4A38-8534-A6555C7C53A4}"
 	ProjectSection(SolutionItems) = preProject
@@ -35,6 +35,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-templates", "azure-te
 	ProjectSection(SolutionItems) = preProject
 		.build\azure-templates\build-pack-and-publish-libraries.yml = .build\azure-templates\build-pack-and-publish-libraries.yml
 		.build\azure-templates\gitversioning-increment-and-persist-versions.yml = .build\azure-templates\gitversioning-increment-and-persist-versions.yml
+		.build\azure-templates\install-android-sdk.yml = .build\azure-templates\install-android-sdk.yml
+		.build\azure-templates\install-dotnet-sdk.yml = .build\azure-templates\install-dotnet-sdk.yml
 		.build\azure-templates\publish-nuget-packages.yml = .build\azure-templates\publish-nuget-packages.yml
 		.build\azure-templates\publish-test-results-for-target-frameworks.yml = .build\azure-templates\publish-test-results-for-target-frameworks.yml
 		.build\azure-templates\publish-test-results-for-test-projects.yml = .build\azure-templates\publish-test-results-for-test-projects.yml

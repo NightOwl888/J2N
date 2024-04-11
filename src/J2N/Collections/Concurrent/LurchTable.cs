@@ -957,7 +957,7 @@ namespace J2N.Collections.Concurrent
         public bool ContainsKey(TKey key)
         {
             if (_entries == null) throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
-            return TryGetValue(key, out TValue _);
+            return TryGetValue(key, out _);
         }
 
         /// <summary>

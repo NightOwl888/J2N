@@ -107,6 +107,7 @@ namespace J2N.Text
             Assert.AreEqual(sb.ToString(), vsb.ToString());
         }
 
+#if FEATURE_STRINGBUILDER_APPEND_CHARPTR
         [Test]
         public unsafe void Append_PtrInt_MatchesStringBuilder()
         {
@@ -125,6 +126,7 @@ namespace J2N.Text
             Assert.AreEqual(sb.Length, vsb.Length);
             Assert.AreEqual(sb.ToString(), vsb.ToString());
         }
+#endif
 
         [Test]
         public void AppendSpan_DataAppendedCorrectly()
