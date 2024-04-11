@@ -21,12 +21,6 @@
     <PackageReference Include="ICU4N" Version="$(ICU4NPackageReferenceVersion)" />
     <PackageReference Include="RandomizedTesting.Generators" Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)" />
   </ItemGroup>
-
-  <!-- Override the asset target fallback for net452, since we are testing net40 here and need those specific dependencies.
-      We favor net40 and fallback to net451 or net45, if available. -->
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'net452' And ('$(PackageReference)' == 'ICU4N' Or '$(PackageReference)' == 'RandomizedTesting.Generators') ">
-    <AssetTargetFallback>net40;net451;net45</AssetTargetFallback>
-  </PropertyGroup>
   
   <!-- See the following post to understand this approach: https://duanenewman.net/blog/post/a-better-way-to-override-references-with-packagereference/ -->
   <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
