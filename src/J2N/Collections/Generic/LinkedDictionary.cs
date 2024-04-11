@@ -828,7 +828,7 @@ namespace J2N.Collections.Generic
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
         {
-            return TryGetNode(item.Key, item.Value, out LinkedListNode<KeyValuePair<TKey, TValue>> _);
+            return TryGetNode(item.Key, item.Value, out _);
         }
 
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
