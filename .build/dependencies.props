@@ -12,7 +12,8 @@
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>
-    <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8.1-alpha-0009-gfd548c1e41</RandomizedTestingGeneratorsPackageReferenceVersion>
+    <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8</RandomizedTestingGeneratorsPackageReferenceVersion>
+    <SystemBuffersPackageReferenceVersion>4.5.1</SystemBuffersPackageReferenceVersion>
     <SystemMemoryPackageReferenceVersion>4.5.5</SystemMemoryPackageReferenceVersion>
     <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>6.0.0</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion Condition=" '$(TargetFramework)' == 'net45' ">4.7.1</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
