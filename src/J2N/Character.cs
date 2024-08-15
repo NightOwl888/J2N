@@ -16,11 +16,10 @@
  */
 #endregion
 
+using J2N.Buffers;
 using J2N.Text;
 using System;
-#if FEATURE_ARRAYPOOL
 using System.Buffers;
-#endif
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -1405,24 +1404,18 @@ namespace J2N
             if (startIndex + length > len)
                 throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-            bool usePool = length > CharStackBufferSize;
-            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            char[]? arrayToReturnToPool = null;
             try
-#elif FEATURE_ARRAYPOOL
-            char[] chars = ArrayPool<char>.Shared.Rent(length);
-            try
-#else
-            char[] chars = new char[length];
-#endif
             {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                Span<char> chars = usePool ? arrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                Span<char> chars = length > CharStackBufferSize
+                    ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                    : stackalloc char[length];
                 seq.CopyTo(0, chars, length);
 #else
-                seq.CopyTo(0, chars, 0, length);
+                Span<char> chars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                seq.CopyTo(0, arrayToReturnToPool, 0, length);
 #endif
-
                 int endIndex = startIndex + length;
                 int n = length;
                 for (int i = startIndex; i < endIndex;)
@@ -1436,18 +1429,10 @@ namespace J2N
                 }
                 return n;
             }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
             finally
             {
-                if (arrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
             }
-#elif FEATURE_ARRAYPOOL
-            finally
-            {
-                ArrayPool<char>.Shared.Return(chars);
-            }
-#endif
         }
 
         /// <summary>
@@ -1705,22 +1690,17 @@ namespace J2N
                 throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
 
             int x = index;
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-            bool usePool = length > CharStackBufferSize;
-            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            char[]? arrayToReturnToPool = null;
             try
-#elif FEATURE_ARRAYPOOL
-            char[] chars = ArrayPool<char>.Shared.Rent(length);
-            try
-#else
-            char[] chars = new char[length];
-#endif
             {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                Span<char> chars = usePool ? arrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                Span<char> chars = length > CharStackBufferSize
+                    ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                    : stackalloc char[length];
                 seq.CopyTo(0, chars, length);
 #else
-                seq.CopyTo(0, chars, 0, length);
+                Span<char> chars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                seq.CopyTo(0, arrayToReturnToPool, 0, length);
 #endif
                 if (codePointOffset >= 0)
                 {
@@ -1759,18 +1739,10 @@ namespace J2N
                     }
                 }
             }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
             finally
             {
-                if (arrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
             }
-#elif FEATURE_ARRAYPOOL
-            finally
-            {
-                ArrayPool<char>.Shared.Return(chars);
-            }
-#endif
             return x;
         }
 

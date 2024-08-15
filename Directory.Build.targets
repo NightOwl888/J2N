@@ -136,7 +136,6 @@
 
   <!-- Features that apply everywhere (to be removed) -->
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);FEATURE_ARRAYPOOL</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
   </PropertyGroup>

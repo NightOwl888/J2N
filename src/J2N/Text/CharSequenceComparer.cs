@@ -16,10 +16,9 @@
  */
 #endregion
 
+using J2N.Buffers;
 using System;
-#if FEATURE_ARRAYPOOL
 using System.Buffers;
-#endif
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
@@ -471,22 +470,17 @@ namespace J2N.Text
                     return Compare(x, yStringBuffer.builder);
 
                 int length = Math.Min(x.Length, y.Length);
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = length > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+                char[]? xArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(length);
-                try
-#else
-                char[] xChars = new char[length];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = length > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                        : stackalloc char[length];
                     x.CopyTo(0, xChars, length);
 #else
-                    x.CopyTo(0, xChars, 0, length);
+                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
 #endif
                     int result;
                     for (int i = 0; i < length; i++)
@@ -499,18 +493,10 @@ namespace J2N.Text
                     // The longer string will be larger.
                     return x.Length - y.Length;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                }
-#endif
             }
 
             public override int Compare(ICharSequence? x, char[]? y)
@@ -542,22 +528,17 @@ namespace J2N.Text
                 if (y is null) return 1;
 
                 int length = Math.Min(x.Length, y.Length);
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = length > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+                char[]? xArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(length);
-                try
-#else
-                char[] xChars = new char[length];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = length > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                        : stackalloc char[length];
                     x.CopyTo(0, xChars, length);
 #else
-                    x.CopyTo(0, xChars, 0, length);
+                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
 #endif
                     int result;
                     for (int i = 0; i < length; i++)
@@ -570,18 +551,10 @@ namespace J2N.Text
                     // The longer string will be larger.
                     return x.Length - y.Length;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                }
-#endif
             }
 
             public override int Compare(ICharSequence? x, string? y)
@@ -613,22 +586,17 @@ namespace J2N.Text
                 if (y is null) return 1;
 
                 int length = Math.Min(x.Length, y.Length);
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = length > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+                char[]? xArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(length);
-                try
-#else
-                char[] xChars = new char[length];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = length > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                        : stackalloc char[length];
                     x.CopyTo(0, xChars, length);
 #else
-                    x.CopyTo(0, xChars, 0, length);
+                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
 #endif
                     int result;
                     for (int i = 0; i < length; i++)
@@ -641,18 +609,10 @@ namespace J2N.Text
                     // The longer string will be larger.
                     return x.Length - y.Length;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                }
-#endif
             }
 
             public override int Compare(ICharSequence? x, StringBuilder? y)
@@ -666,22 +626,17 @@ namespace J2N.Text
                     return Compare(stringBuffer.builder, y);
 
                 int length = Math.Min(x.Length, y.Length);
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = length > CharStackBufferSize;
-                char[]? yArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+                char[]? yArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] yChars = ArrayPool<char>.Shared.Rent(length);
-                try
-#else
-                char[] yChars = new char[length];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> yChars = usePool ? yArrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> yChars = length > CharStackBufferSize
+                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                        : stackalloc char[length];
                     y.CopyTo(0, yChars, length);
 #else
-                    y.CopyTo(0, yChars, 0, length);
+                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                    y.CopyTo(0, yArrayToReturnToPool, 0, length);
 #endif
                     int result;
                     for (int i = 0; i < length; i++)
@@ -694,18 +649,10 @@ namespace J2N.Text
                     // The longer string will be larger.
                     return x.Length - y.Length;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (yArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(yArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(yChars);
-                }
-#endif
             }
 
             private int Compare(StringBuilder? x, StringBuilder? y)
@@ -714,28 +661,24 @@ namespace J2N.Text
                 if (y == null) return 1;
 
                 int length = Math.Min(x.Length, y.Length);
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = length > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
-                char[]? yArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+                char[]? xArrayToReturnToPool = null;
+                char[]? yArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(length);
-                char[] yChars = ArrayPool<char>.Shared.Rent(length);
-                try
-#else
-                char[] xChars = new char[length];
-                char[] yChars = new char[length];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[length];
-                    Span<char> yChars = usePool ? yArrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = length > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                        : stackalloc char[length];
+                    Span<char> yChars = length > CharStackBufferSize
+                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                        : stackalloc char[length];
                     x.CopyTo(0, xChars, length);
                     y.CopyTo(0, yChars, length);
 #else
-                    x.CopyTo(0, xChars, 0, length);
-                    y.CopyTo(0, yChars, 0, length);
+                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                    x.CopyTo(0, xArrayToReturnToPool, 0, length);
+                    y.CopyTo(0, yArrayToReturnToPool, 0, length);
 #endif
                     int result;
                     for (int i = 0; i < length; i++)
@@ -748,21 +691,11 @@ namespace J2N.Text
                     // The longer string will be larger.
                     return x.Length - y.Length;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
-                    if (yArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(yArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                    ArrayPool<char>.Shared.Return(yChars);
-                }
-#endif
             }
 
             public override bool Equals(ICharSequence? x, ICharSequence? y)
@@ -815,21 +748,16 @@ namespace J2N.Text
                 int len = x.Length;
                 if (len != y.Length) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = len > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
+                char[]? xArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(len);
-                try
-#else
-                char[] xChars = new char[len];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[len];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = len > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                        : stackalloc char[len];
                     x.CopyTo(0, xChars, len);
 #else
+                    char[] xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
                     x.CopyTo(0, xChars, 0, len);
 #endif
                     for (int i = 0; i < len; i++)
@@ -838,18 +766,10 @@ namespace J2N.Text
                     }
                     return true;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                }
-#endif
             }
 
             public override bool Equals(ICharSequence? x, char[]? y)
@@ -883,22 +803,17 @@ namespace J2N.Text
                 int len = x.Length;
                 if (len != y.Length) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = len > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
+                char[]? xArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(len);
-                try
-#else
-                char[] xChars = new char[len];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[len];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = len > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                        : stackalloc char[len];
                     x.CopyTo(0, xChars, len);
 #else
-                    x.CopyTo(0, xChars, 0, len);
+                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                    x.CopyTo(0, xArrayToReturnToPool, 0, len);
 #endif
                     for (int i = 0; i < len; i++)
                     {
@@ -906,18 +821,10 @@ namespace J2N.Text
                     }
                     return true;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                }
-#endif
             }
 
             public override bool Equals(ICharSequence? x, StringBuilder? y)
@@ -935,22 +842,17 @@ namespace J2N.Text
                 int len = x.Length;
                 if (len != y.Length) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = len > CharStackBufferSize;
-                char[]? yArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
+                char[]? yArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] yChars = ArrayPool<char>.Shared.Rent(len);
-                try
-#else
-                char[] yChars = new char[len];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> yChars = usePool ? yArrayToReturnToPool : stackalloc char[len];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> yChars = len > CharStackBufferSize
+                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                        : stackalloc char[len];
                     y.CopyTo(0, yChars, len);
 #else
-                    y.CopyTo(0, yChars, 0, len);
+                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                    y.CopyTo(0, yArrayToReturnToPool, 0, len);
 #endif
                     for (int i = 0; i < len; i++)
                     {
@@ -958,18 +860,10 @@ namespace J2N.Text
                     }
                     return true;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (yArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(yArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(yChars);
-                }
-#endif
             }
 
             private bool Equals(StringBuilder? x, StringBuilder? y)
@@ -982,28 +876,24 @@ namespace J2N.Text
                 int len = x.Length;
                 if (len != y.Length) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = len > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
-                char[]? yArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
+                char[]? xArrayToReturnToPool = null;
+                char[]? yArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(len);
-                char[] yChars = ArrayPool<char>.Shared.Rent(len);
-                try
-#else
-                char[] xChars = new char[len];
-                char[] yChars = new char[len];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[len];
-                    Span<char> yChars = usePool ? yArrayToReturnToPool : stackalloc char[len];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = len > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                        : stackalloc char[len];
+                    Span<char> yChars = len > CharStackBufferSize
+                        ? (yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                        : stackalloc char[len];
                     x.CopyTo(0, xChars, len);
                     y.CopyTo(0, yChars, len);
 #else
-                    x.CopyTo(0, xChars, 0, len);
-                    y.CopyTo(0, yChars, 0, len);
+                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                    Span<char> yChars = yArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                    x.CopyTo(0, xArrayToReturnToPool, 0, len);
+                    y.CopyTo(0, yArrayToReturnToPool, 0, len);
 #endif
                     for (int i = 0; i < len; i++)
                     {
@@ -1011,21 +901,11 @@ namespace J2N.Text
                     }
                     return true;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
-                    if (yArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(yArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(yArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                    ArrayPool<char>.Shared.Return(yChars);
-                }
-#endif
             }
 
             public override bool Equals(ICharSequence? x, string? y)
@@ -1059,22 +939,17 @@ namespace J2N.Text
                 int len = x.Length;
                 if (len != y.Length) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = len > CharStackBufferSize;
-                char[]? xArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
+                char[]? xArrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] xChars = ArrayPool<char>.Shared.Rent(len);
-                try
-#else
-                char[] xChars = new char[len];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> xChars = usePool ? xArrayToReturnToPool : stackalloc char[len];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> xChars = len > CharStackBufferSize
+                        ? (xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                        : stackalloc char[len];
                     x.CopyTo(0, xChars, len);
 #else
-                    x.CopyTo(0, xChars, 0, len);
+                    Span<char> xChars = xArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                    x.CopyTo(0, xArrayToReturnToPool, 0, len);
 #endif
                     for (int i = 0; i < len; i++)
                     {
@@ -1082,18 +957,10 @@ namespace J2N.Text
                     }
                     return true;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (xArrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(xArrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(xArrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(xChars);
-                }
-#endif
             }
 
             public override int GetHashCode(ICharSequence? obj)
@@ -1148,22 +1015,17 @@ namespace J2N.Text
                 if (length == 0)
                     return 0;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-                bool usePool = length > CharStackBufferSize;
-                char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+                char[]? arrayToReturnToPool = null;
                 try
-#elif FEATURE_ARRAYPOOL
-                char[] objChars = ArrayPool<char>.Shared.Rent(length);
-                try
-#else
-                char[] objChars = new char[length];
-#endif
                 {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                    Span<char> objChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                    Span<char> objChars = length > CharStackBufferSize
+                        ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                        : stackalloc char[length];
                     obj.CopyTo(0, objChars, length);
 #else
-                    obj.CopyTo(0, objChars, 0, length);
+                    Span<char> objChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                    obj.CopyTo(0, arrayToReturnToPool, 0, length);
 #endif
                     // From Apache Harmony
                     int hash = 0;
@@ -1173,18 +1035,10 @@ namespace J2N.Text
                     }
                     return hash;
                 }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
                 finally
                 {
-                    if (arrayToReturnToPool != null)
-                        ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+                    ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
                 }
-#elif FEATURE_ARRAYPOOL
-                finally
-                {
-                    ArrayPool<char>.Shared.Return(objChars);
-                }
-#endif
             }
 
             public override int GetHashCode(string? obj)

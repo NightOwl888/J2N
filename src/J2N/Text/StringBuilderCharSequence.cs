@@ -16,10 +16,9 @@
  */
 #endregion
 
+using J2N.Buffers;
 using System;
-#if FEATURE_ARRAYPOOL
 using System.Buffers;
-#endif
 using System.Text;
 
 namespace J2N.Text
@@ -343,22 +342,17 @@ namespace J2N.Text
             int otherLength = other.Length;
             if (len != otherLength) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-            bool usePool = len > CharStackBufferSize;
-            char[]? thisArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
+            char[]? thisArrayToReturnToPool = null;
             try
-#elif FEATURE_ARRAYPOOL
-            char[] chars = ArrayPool<char>.Shared.Rent(len);
-            try
-#else
-            char[] chars = new char[len];
-#endif
             {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                Span<char> chars = usePool ? thisArrayToReturnToPool : stackalloc char[len];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                Span<char> chars = len > CharStackBufferSize
+                    ? (thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                    : stackalloc char[len];
                 value.CopyTo(0, chars, len);
 #else
-                value.CopyTo(0, chars, 0, len);
+                Span<char> chars = thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                value.CopyTo(0, thisArrayToReturnToPool, 0, len);
 #endif
                 for (int i = 0; i < len; i++)
                 {
@@ -366,18 +360,10 @@ namespace J2N.Text
                 }
                 return true;
             }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
             finally
             {
-                if (thisArrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(thisArrayToReturnToPool);
+                ArrayPool<char>.Shared.ReturnIfNotNull(thisArrayToReturnToPool);
             }
-#elif FEATURE_ARRAYPOOL
-            finally
-            {
-                ArrayPool<char>.Shared.Return(chars);
-            }
-#endif
         }
 
         /// <summary>
@@ -397,28 +383,24 @@ namespace J2N.Text
             int otherLength = other.Length;
             if (len != otherLength) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-            bool usePool = otherLength > CharStackBufferSize || len > CharStackBufferSize;
-            char[]? thisArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
-            char[]? otherArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(otherLength) : null;
+            char[]? thisArrayToReturnToPool = null;
+            char[]? otherArrayToReturnToPool = null;
             try
-#elif FEATURE_ARRAYPOOL
-            char[] chars = ArrayPool<char>.Shared.Rent(len);
-            char[] otherChars = ArrayPool<char>.Shared.Rent(otherLength);
-            try
-#else
-            char[] chars = new char[len];
-            char[] otherChars = new char[otherLength];
-#endif
             {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                Span<char> chars = usePool ? thisArrayToReturnToPool : stackalloc char[len];
-                Span<char> otherChars = usePool ? otherArrayToReturnToPool : stackalloc char[otherLength];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                Span<char> chars = len > CharStackBufferSize
+                    ? (thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                    : stackalloc char[len];
+                Span<char> otherChars = otherLength > CharStackBufferSize
+                    ? (otherArrayToReturnToPool = ArrayPool<char>.Shared.Rent(otherLength))
+                    : stackalloc char[otherLength];
                 value.CopyTo(0, chars, len);
                 other.CopyTo(0, otherChars, otherLength);
 #else
-                value.CopyTo(0, chars, 0, len);
-                other.CopyTo(0, otherChars, 0, otherLength);
+                Span<char> chars = thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                Span<char> otherChars = otherArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                value.CopyTo(0, thisArrayToReturnToPool, 0, len);
+                other.CopyTo(0, otherArrayToReturnToPool, 0, otherLength);
 #endif
                 for (int i = 0; i < len; i++)
                 {
@@ -426,21 +408,11 @@ namespace J2N.Text
                 }
                 return true;
             }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
             finally
             {
-                if (thisArrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(thisArrayToReturnToPool);
-                if (otherArrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(otherArrayToReturnToPool);
+                ArrayPool<char>.Shared.ReturnIfNotNull(thisArrayToReturnToPool);
+                ArrayPool<char>.Shared.ReturnIfNotNull(otherArrayToReturnToPool);
             }
-#elif FEATURE_ARRAYPOOL
-            finally
-            {
-                ArrayPool<char>.Shared.Return(chars);
-                ArrayPool<char>.Shared.Return(otherChars);
-            }
-#endif
         }
 
         /// <summary>
@@ -460,22 +432,17 @@ namespace J2N.Text
             int otherLength = other.Length;
             if (len != otherLength) return false;
 
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-            bool usePool = len > CharStackBufferSize;
-            char[]? thisArrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(len) : null;
+            char[]? thisArrayToReturnToPool = null;
             try
-#elif FEATURE_ARRAYPOOL
-            char[] chars = ArrayPool<char>.Shared.Rent(len);
-            try
-#else
-            char[] chars = new char[len];
-#endif
             {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                Span<char> chars = usePool ? thisArrayToReturnToPool : stackalloc char[len];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                Span<char> chars = len > CharStackBufferSize
+                    ? (thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len))
+                    : stackalloc char[len];
                 value.CopyTo(0, chars, len);
 #else
-                value.CopyTo(0, chars, 0, len);
+                Span<char> chars = thisArrayToReturnToPool = ArrayPool<char>.Shared.Rent(len);
+                value.CopyTo(0, thisArrayToReturnToPool, 0, len);
 #endif
                 for (int i = 0; i < len; i++)
                 {
@@ -483,18 +450,10 @@ namespace J2N.Text
                 }
                 return true;
             }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
             finally
             {
-                if (thisArrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(thisArrayToReturnToPool);
+                ArrayPool<char>.Shared.ReturnIfNotNull(thisArrayToReturnToPool);
             }
-#elif FEATURE_ARRAYPOOL
-            finally
-            {
-                ArrayPool<char>.Shared.Return(chars);
-            }
-#endif
         }
 
         /// <summary>

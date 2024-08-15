@@ -16,11 +16,10 @@
  */
 #endregion
 
+using J2N.Buffers;
 using System;
-#if FEATURE_ARRAYPOOL
 using System.Buffers;
 using System.Runtime.InteropServices;
-#endif
 using System.Text;
 
 
@@ -143,22 +142,17 @@ namespace J2N.Text
             if (value is null) return 1;
 
             int length = Math.Min(str.Length, value.Length);
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
-            bool usePool = length > CharStackBufferSize;
-            char[]? arrayToReturnToPool = usePool ? ArrayPool<char>.Shared.Rent(length) : null;
+            char[]? arrayToReturnToPool = null;
             try
-#elif FEATURE_ARRAYPOOL
-            char[] valueChars = ArrayPool<char>.Shared.Rent(length);
-            try
-#else
-            char[] valueChars = new char[length];
-#endif
             {
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
-                Span<char> valueChars = usePool ? arrayToReturnToPool : stackalloc char[length];
+#if FEATURE_STRINGBUILDER_COPYTO_SPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
+                Span<char> valueChars = length > CharStackBufferSize
+                    ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length))
+                    : stackalloc char[length];
                 value.CopyTo(0, valueChars, length);
 #else
-                value.CopyTo(0, valueChars, 0, length);
+                Span<char> valueChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
+                value.CopyTo(0, arrayToReturnToPool, 0, length);
 #endif
                 int result;
                 for (int i = 0; i < length; i++)
@@ -171,18 +165,10 @@ namespace J2N.Text
                 // The longer string will be larger.
                 return str.Length - value.Length;
             }
-#if FEATURE_STRINGBUILDER_COPYTO_SPAN
             finally
             {
-                if (arrayToReturnToPool != null)
-                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
             }
-#elif FEATURE_ARRAYPOOL
-            finally
-            {
-                ArrayPool<char>.Shared.Return(valueChars);
-            }
-#endif
         }
 
         /// <summary>
