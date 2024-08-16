@@ -66,10 +66,7 @@ namespace J2N.Text
 #if FEATURE_SERIALIZABLE_STRINGS
     [Serializable]
 #endif
-    public sealed class StringBuffer : IAppendable, ICharSequence
-#if FEATURE_SPAN
-        , ISpanAppendable
-#endif
+    public sealed class StringBuffer : IAppendable, ICharSequence, ISpanAppendable
     {
         private const int DefaultCapacity = 16;
 
@@ -569,8 +566,6 @@ namespace J2N.Text
 
         #region Append
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Appends a copy of the specified <see cref="ReadOnlySpan{Char}"/> to this instance.
         /// </summary>
@@ -585,8 +580,6 @@ namespace J2N.Text
                 return this;
             }
         }
-#endif
-#if FEATURE_READONLYMEMORY
 
         /// <summary>
         /// Appends a copy of the specified <see cref="ReadOnlyMemory{Char}"/> to this instance.
@@ -602,7 +595,6 @@ namespace J2N.Text
                 return this;
             }
         }
-#endif
 
         /// <summary>
         /// Appends the string representation of a specified object to this instance.
@@ -1651,7 +1643,6 @@ namespace J2N.Text
                 builder.CopyTo(sourceIndex, destination, destinationIndex, count);
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Copies the characters from a specified segment of this instance to a destination Char span.
         /// </summary>
@@ -1678,7 +1669,6 @@ namespace J2N.Text
             lock (syncRoot)
                 builder.CopyTo(sourceIndex, destination, count);
         }
-#endif
 
         #endregion
 
@@ -1824,8 +1814,6 @@ namespace J2N.Text
 
         #region Insert
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Inserts the string representation of a <see cref="ReadOnlySpan{Char}"/> value into this instance at the specified character position.
         /// </summary>
@@ -1842,8 +1830,6 @@ namespace J2N.Text
                 return this;
             }
         }
-
-#endif
 
         /// <summary>
         /// Inserts the string representation of a Boolean value into this instance at the specified character position.
@@ -2717,9 +2703,7 @@ namespace J2N.Text
 
         #region ISpanAppendable Members
 
-#if FEATURE_SPAN
         ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => Append(value);
-#endif
 
         #endregion ISpanAppendable Members
 

@@ -932,8 +932,6 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseSingle(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Converts the string representation of a number in a character span to its single-precision floating-point number equivalent.
         /// A return value indicates whether the conversion succeeded or failed.
@@ -1041,8 +1039,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryParseSingle(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
-
-#endif
 
         #endregion TryParse_CharSequence_Single
 
@@ -1344,7 +1340,6 @@ namespace J2N.Numerics
             return DotNetNumber.ParseSingle(s, style, NumberFormatInfo.GetInstance(provider));
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts a character span that contains the string representation of a number in a specified style and culture-specific format to
         /// its single-precision floating-point number equivalent.
@@ -1625,7 +1620,6 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
             return DotNetNumber.ParseSingle(s, style, NumberFormatInfo.GetInstance(provider));
         }
-#endif
 
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
@@ -1927,7 +1921,6 @@ namespace J2N.Numerics
             return DotNetNumber.TryParseSingle(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to
         /// its single-precision floating-point number equivalent. A return value indicates whether the
@@ -2217,7 +2210,6 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
             return DotNetNumber.TryParseSingle(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
-#endif
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Single
 
@@ -3050,8 +3042,6 @@ namespace J2N.Numerics
 
         #region TryFormat
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Tries to format the value of the current single instance into the provided span of characters.
         /// </summary>
@@ -3084,8 +3074,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryFormatSingle(value, format, provider, destination, out charsWritten);
         }
-
-#endif
 
         #endregion TryFormat
 

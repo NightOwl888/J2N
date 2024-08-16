@@ -23,7 +23,6 @@ namespace J2N.Collections.Generic
 
         // From ArraySortHelper<T> class
 
-#if FEATURE_SPAN
         internal static void Sort(Span<T> keys, Comparison<T> comparer)
         {
             Debug.Assert(comparer != null, "Check the arguments in the caller!");
@@ -220,7 +219,6 @@ namespace J2N.Collections.Generic
                 keys[j + 1] = t;
             }
         }
-#endif
 
         internal unsafe static void Sort(T[]? array, int startIndex, int length, Comparison<T> comparer)
         {

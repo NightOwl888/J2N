@@ -486,8 +486,6 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -564,8 +562,6 @@ namespace J2N.Numerics
 
             return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>, beginning at the
@@ -896,8 +892,6 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32_Int32_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -963,8 +957,6 @@ namespace J2N.Numerics
 
             return ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>, beginning at the
@@ -1247,8 +1239,6 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>. 
         /// <para/>
@@ -1293,8 +1283,6 @@ namespace J2N.Numerics
         {
             return ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>. 
@@ -1347,8 +1335,6 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>.
         /// <para/>
@@ -1388,8 +1374,6 @@ namespace J2N.Numerics
 
             return ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight, out result);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="int"/> in the specified <paramref name="radix"/>.
@@ -1519,11 +1503,7 @@ namespace J2N.Numerics
         public static int Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return DotNetNumber.ParseInt32(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
+            return DotNetNumber.ParseInt32(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
         }
 
         #endregion
@@ -1606,14 +1586,9 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return DotNetNumber.TryParseInt32IntegerStyle(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
+            return DotNetNumber.TryParseInt32IntegerStyle(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 32-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1686,7 +1661,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryParseInt32IntegerStyle(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
         }
-#endif
 
         #endregion TryParse_CharSequence_Int32
 
@@ -1906,14 +1880,9 @@ namespace J2N.Numerics
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return DotNetNumber.ParseInt32(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider));
+            return DotNetNumber.ParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to its
         /// 32-bit signed integer equivalent.
@@ -2128,7 +2097,7 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             return DotNetNumber.ParseInt32(s, style, NumberFormatInfo.GetInstance(provider));
         }
-#endif
+
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
         #region TryParse_CharSequence_NumberStyle_IFormatProvider_Int32
@@ -2367,15 +2336,9 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return DotNetNumber.TryParseInt32(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
+            return DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
         }
 
-
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 32-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
@@ -2606,7 +2569,6 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             return DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
         }
-#endif
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int32
 
@@ -3171,8 +3133,6 @@ namespace J2N.Numerics
 
         #region TryFormat
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Tries to format the value of the current integer number instance into the provided span of characters.
         /// </summary>
@@ -3205,8 +3165,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryFormatInt32(value, ~0, format, provider, destination, out charsWritten);
         }
-
-#endif
 
         #endregion TryFormat
 

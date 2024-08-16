@@ -1,5 +1,4 @@
-﻿#if FEATURE_SPAN
-using NUnit.Framework;
+﻿using NUnit.Framework;
 using System;
 using System.Text;
 #nullable enable
@@ -198,4 +197,3 @@ namespace J2N.Text
         }
     }
 }
-#endif

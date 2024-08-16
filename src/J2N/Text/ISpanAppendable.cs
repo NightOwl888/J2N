@@ -1,5 +1,4 @@
-﻿#if FEATURE_SPAN
-using System;
+﻿using System;
 
 namespace J2N.Text
 {
@@ -25,4 +24,3 @@ namespace J2N.Text
         ISpanAppendable Append(ReadOnlySpan<char> value);
     }
 }
-#endif

@@ -1089,7 +1089,7 @@ namespace J2N
                 {
                     if (last != current)
                     {
-#if FEATURE_SPAN && FEATURE_TEXTWRITER_WRITE_READONLYSPAN
+#if FEATURE_TEXTWRITER_WRITE_READONLYSPAN
                         bw.Write(comments.AsSpan(last, current - last)); // end - start
 #else
                         bw.Write(comments.Substring(last, current - last)); // end - start
@@ -1123,7 +1123,7 @@ namespace J2N
             }
             if (last != current)
             {
-#if FEATURE_SPAN && FEATURE_TEXTWRITER_WRITE_READONLYSPAN
+#if FEATURE_TEXTWRITER_WRITE_READONLYSPAN
                 bw.Write(comments.AsSpan(last, current - last)); // end - start
 #else
                 bw.Write(comments.Substring(last, current - last)); // end - start

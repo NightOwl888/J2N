@@ -134,12 +134,6 @@
 
   </PropertyGroup>
 
-  <!-- Features that apply everywhere (to be removed) -->
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);FEATURE_READONLYMEMORY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_SPAN</DefineConstants>
-  </PropertyGroup>
-
   <PropertyGroup>
     <!-- NuGet.org only supports portable debug symbol format: 
          https://docs.microsoft.com/en-us/nuget/create-packages/symbol-packages-snupkg#nugetorg-symbol-package-constraints -->

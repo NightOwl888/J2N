@@ -647,7 +647,6 @@ namespace J2N
             return high;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Returns the code point at <paramref name="index"/> in the specified sequence of
         /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
@@ -675,34 +674,6 @@ namespace J2N
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
-#else
-        /// <summary>
-        /// Returns the code point at <paramref name="index"/> in the specified sequence of
-        /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
-        /// <c><paramref name="index"/> + 1</c> is less than the length of the sequence and the unit at
-        /// <c><paramref name="index"/> + 1</c> is a low-surrogate unit, then the supplementary code
-        /// point represented by the pair is returned; otherwise the <see cref="char"/>
-        /// value at <paramref name="index"/> is returned.
-        /// <para/>
-        /// <strong>Usage Note:</strong> This method is slow because it relies on the indexer of
-        /// <see cref="StringBuilder"/> and it is designed to be used inside of a loop. Avoid.
-        /// It is recommended to convert the contents of the <see cref="StringBuilder"/> to
-        /// <see cref="T:char[]"/> or <see cref="string"/> and to call the appropriate overload, instead.
-        /// </summary>
-        /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
-        /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
-        /// <paramref name="seq"/>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="index"/> is greater than or equal to the length of <paramref name="seq"/>.
-        /// <para/>
-        /// -or-
-        /// <para/>
-        /// <paramref name="index"/> is less than zero.
-        /// </exception>
-#endif
         public static int CodePointAt(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
@@ -759,7 +730,6 @@ namespace J2N
             return high;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Returns the code point at <paramref name="index"/> in the specified sequence of
         /// character units. If the unit at <paramref name="index"/> is a high-surrogate unit,
@@ -794,7 +764,6 @@ namespace J2N
                 return ToCodePoint(high, low);
             return high;
         }
-#endif
 
         /// <summary>
         /// Returns the code point at <paramref name="index"/> in the specified array of
@@ -911,7 +880,6 @@ namespace J2N
             return low;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Returns the code point that precedes <paramref name="index"/> in the specified
         /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
@@ -934,29 +902,6 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
         /// the length of <paramref name="seq"/>.</exception>
-#else
-        /// <summary>
-        /// Returns the code point that precedes <paramref name="index"/> in the specified
-        /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
-        /// low-surrogate unit, <c><paramref name="index"/> - 2</c> is not negative and the unit at
-        /// <c><paramref name="index"/> - 2</c> is a high-surrogate unit, then the supplementary code
-        /// point represented by the pair is returned; otherwise the <see cref="char"/>
-        /// value at <c><paramref name="index"/> - 1</c> is returned.
-        /// <para/>
-        /// <strong>Usage Note:</strong> This method is slow because it relies on the indexer of
-        /// <see cref="StringBuilder"/> and it is designed to be used inside of a loop. Avoid.
-        /// It is recommended to convert the contents of the <see cref="StringBuilder"/> to
-        /// <see cref="T:char[]"/> or <see cref="string"/> and to call the appropriate overload, instead.
-        /// </summary>
-        /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">The position in <paramref name="seq"/> following the code
-        /// point that should be returned.</param>
-        /// <returns>The Unicode code point or <see cref="char"/> value before <paramref name="index"/>
-        /// in <paramref name="seq"/>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than 1 or greater than
-        /// the length of <paramref name="seq"/>.</exception>
-#endif
         public static int CodePointBefore(this StringBuilder seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             if (seq is null)
@@ -1012,7 +957,6 @@ namespace J2N
             return low;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Returns the code point that precedes <paramref name="index"/> in the specified
         /// sequence of character units. If the unit at <c><paramref name="index"/> - 1</c> is a
@@ -1044,7 +988,6 @@ namespace J2N
             }
             return low;
         }
-#endif
 
         /// <summary>
         /// Returns the code point that preceds the <paramref name="index"/> in the specified
@@ -1100,7 +1043,6 @@ namespace J2N
             return low;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the specified Unicode code point into a UTF-16 encoded sequence
         /// and copies the value(s) into the <see cref="Span{T}"/> <paramref name="destination"/>, starting at
@@ -1147,7 +1089,6 @@ namespace J2N
             destination[destinationIndex] = (char)codePoint;
             return 1;
         }
-#endif
 
         /// <summary>
         /// Converts the specified Unicode code point into a UTF-16 encoded sequence
@@ -1483,7 +1424,6 @@ namespace J2N
             return n;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Returns the number of Unicode code points in the text range of the specified char sequence.
         /// The text range begins at 0 and extends for the number
@@ -1506,7 +1446,6 @@ namespace J2N
             }
             return n;
         }
-#endif
 
         /// <summary>
         /// Returns the index within the given char sequence that is offset from the given <paramref name="index"/> by
@@ -1818,7 +1757,6 @@ namespace J2N
             return x;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Returns the index within the given char sequence that is offset from the given <paramref name="index"/> by
         /// <paramref name="codePointOffset"/> code points. Unpaired surrogates within the text range given by 
@@ -1887,7 +1825,6 @@ namespace J2N
             }
             return x;
         }
-#endif
 
         /// <summary>
         /// Returns the index within the given <see cref="char"/> subarray <paramref name="seq"/> that is offset from the given <paramref name="index"/>
@@ -2955,14 +2892,10 @@ namespace J2N
 
             static int ToLower_Supplementary(int codePoint, CultureInfo culture)
             {
-#if FEATURE_SPAN
                 Span<char> buffer = stackalloc char[2];
                 ToChars(codePoint, buffer, 0);
                 Span<char> result = stackalloc char[2];
                 System.MemoryExtensions.ToLower(buffer, result, culture);
-#else
-                string result = char.ConvertFromUtf32(codePoint).ToLower(culture);
-#endif
                 return ToCodePoint(result[0], result[1]);
             }
         }
@@ -2998,14 +2931,10 @@ namespace J2N
 
             static int ToLowerInvariant_Supplementary(int codePoint)
             {
-#if FEATURE_SPAN
                 Span<char> buffer = stackalloc char[2];
                 ToChars(codePoint, buffer, 0);
                 Span<char> result = stackalloc char[2];
                 System.MemoryExtensions.ToLowerInvariant(buffer, result);
-#else
-                string result = char.ConvertFromUtf32(codePoint).ToLowerInvariant();
-#endif
                 return ToCodePoint(result[0], result[1]);
             }
         }
@@ -3074,14 +3003,10 @@ namespace J2N
 
             static int ToUpper_Supplementary(int codePoint, CultureInfo culture)
             {
-#if FEATURE_SPAN
                 Span<char> buffer = stackalloc char[2];
                 ToChars(codePoint, buffer, 0);
                 Span<char> result = stackalloc char[2];
                 System.MemoryExtensions.ToUpper(buffer, result, culture);
-#else
-                string result = char.ConvertFromUtf32(codePoint).ToUpper(culture);
-#endif
                 return ToCodePoint(result[0], result[1]);
             }
         }
@@ -3119,14 +3044,10 @@ namespace J2N
 
             static int ToUpperInvariant_Supplementary(int codePoint)
             {
-#if FEATURE_SPAN
                 Span<char> buffer = stackalloc char[2];
                 ToChars(codePoint, buffer, 0);
                 Span<char> result = stackalloc char[2];
                 System.MemoryExtensions.ToUpperInvariant(buffer, result);
-#else
-                string result = char.ConvertFromUtf32(codePoint).ToUpperInvariant();
-#endif
                 return ToCodePoint(result[0], result[1]);
             }
         }
@@ -3134,8 +3055,6 @@ namespace J2N
         // J2N: Since .NET's string class has no constructor that accepts an array of code points, we have extra helper methods that
         // allow us to make the conversion. Character seems like the most logical place to do this being that there is no way to dynamically
         // add a construtor to System.String and this is the place in J2N that deals the most with code points.
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Converts a sequence <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
@@ -3171,8 +3090,6 @@ namespace J2N
 
             return ToStringSlow(codePoints, startIndex: 0, length);
         }
-
-#endif
 
         /// <summary>
         /// Converts an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
@@ -3212,8 +3129,6 @@ namespace J2N
 
             return ToStringSlow(codePoints, startIndex: 0, length);
         }
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Converts a sequence <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
@@ -3262,7 +3177,6 @@ namespace J2N
 
             return ToStringSlow(codePoints, startIndex, length);
         }
-#endif
 
         /// <summary>
         /// Converts an array <paramref name="codePoints"/> to a <see cref="string"/> of UTF-16 code units.
@@ -3318,13 +3232,7 @@ namespace J2N
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private static int GetStringLength(
-#if FEATURE_SPAN
-            ReadOnlySpan<int> codePoints,
-#else
-            int[] codePoints,
-#endif
-            int startIndex, int length)
+        private static int GetStringLength(ReadOnlySpan<int> codePoints, int startIndex, int length)
         {
             int result = 0;
             int end = startIndex + length; // 1 past the end index
@@ -3368,7 +3276,7 @@ namespace J2N
             }
         }
 
-#elif FEATURE_SPAN
+#else
         private unsafe static string ToStringSlow(ReadOnlySpan<int> codePoints, int startIndex, int length)
         {
             int stringLength = GetStringLength(codePoints, startIndex, length);
@@ -3385,18 +3293,6 @@ namespace J2N
             finally
             {
                 ArrayPool<char>.Shared.Return(chars);
-            }
-        }
-#else
-        private unsafe static string ToStringSlow(int[] codePoints, int startIndex, int length)
-        {
-            int stringLength = GetStringLength(codePoints, startIndex, length);
-            char[] chars = new char[stringLength];
-            fixed (char* charsPtr = chars)
-            fixed (int* codePointsPtr = codePoints)
-            {
-                WriteCodePointsToCharBuffer(charsPtr, codePointsPtr, startIndex, length);
-                return new string(charsPtr, 0, stringLength);
             }
         }
 #endif

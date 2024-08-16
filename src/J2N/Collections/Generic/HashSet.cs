@@ -1833,14 +1833,10 @@ namespace J2N.Collections.Generic
             int originalLastIndex = _lastIndex;
             int intArrayLength = BitHelper.ToIntArrayLength(originalLastIndex);
 
-#if FEATURE_SPAN
             Span<int> span = stackalloc int[StackAllocThreshold];
             BitHelper bitHelper = intArrayLength <= StackAllocThreshold ?
                 new BitHelper(span.Slice(0, intArrayLength), clear: true) :
                 new BitHelper(new int[intArrayLength], clear: false);
-#else
-            BitHelper bitHelper = new BitHelper(new int[intArrayLength], clear: false);
-#endif
 
             // mark if contains: find index of in slots array and mark corresponding element in bit array
             foreach (T item in other)
@@ -1989,7 +1985,6 @@ namespace J2N.Collections.Generic
             int originalLastIndex = _lastIndex;
             int intArrayLength = BitHelper.ToIntArrayLength(originalLastIndex);
 
-#if FEATURE_SPAN
             Span<int> itemsToRemoveSpan = stackalloc int[StackAllocThreshold / 2];
             BitHelper itemsToRemove = intArrayLength <= StackAllocThreshold / 2 ?
                 new BitHelper(itemsToRemoveSpan.Slice(0, intArrayLength), clear: true) :
@@ -1999,10 +1994,6 @@ namespace J2N.Collections.Generic
             BitHelper itemsAddedFromOther = intArrayLength <= StackAllocThreshold / 2 ?
                 new BitHelper(itemsAddedFromOtherSpan.Slice(0, intArrayLength), clear: true) :
                 new BitHelper(new int[intArrayLength], clear: false);
-#else
-            BitHelper itemsToRemove = new BitHelper(new int[intArrayLength], clear: false);
-            BitHelper itemsAddedFromOther = new BitHelper(new int[intArrayLength], clear: false);
-#endif
 
             foreach (T item in other)
             {
@@ -2150,14 +2141,10 @@ namespace J2N.Collections.Generic
             int originalLastIndex = _lastIndex;
             int intArrayLength = BitHelper.ToIntArrayLength(originalLastIndex);
 
-#if FEATURE_SPAN
             Span<int> span = stackalloc int[StackAllocThreshold];
             BitHelper bitHelper = intArrayLength <= StackAllocThreshold ?
                 new BitHelper(span.Slice(0, intArrayLength), clear: true) :
                 new BitHelper(new int[intArrayLength], clear: false);
-#else
-            BitHelper bitHelper = new BitHelper(new int[intArrayLength], clear: false);
-#endif
 
             // count of items in other not found in this
             int unfoundCount = 0;

@@ -295,7 +295,6 @@ namespace J2N
             }
         }
 
-#if FEATURE_SPAN
         [Test]
         public void Test_codePointAt_ReadOnlySpanI()
         {
@@ -328,7 +327,6 @@ namespace J2N
             {
             }
         }
-#endif
 
         [Test]
         public void Test_codePointAt_CI()
@@ -590,7 +588,6 @@ namespace J2N
             }
         }
 
-#if FEATURE_SPAN
         [Test]
         public void Test_codePointBefore_ReadOnlySpanI()
         {
@@ -623,7 +620,6 @@ namespace J2N
             {
             }
         }
-#endif
 
 
         [Test]
@@ -783,8 +779,6 @@ namespace J2N
             }
         }
 
-#if FEATURE_SPAN
-
         [Test]
         public void Test_toCharsI_Span() // J2N: Added overload to cover Span<char>
         {
@@ -842,8 +836,6 @@ namespace J2N
             {
             }
         }
-
-#endif
 
         [Test]
         public void Test_toCharsI()
@@ -1096,7 +1088,6 @@ namespace J2N
             }
         }
 
-#if FEATURE_SPAN
         [Test]
         public void Test_codePointCount_ReadOnlySpanII()
         {
@@ -1108,7 +1099,6 @@ namespace J2N
             assertEquals(3, Character.CodePointCount("a\uD800\uDC00b".AsSpan(0, 4 - 0))); // end - start
             assertEquals(4, Character.CodePointCount("a\uD800\uDC00b\uD800".AsSpan(0, 5 - 0))); // end - start
         }
-#endif
 
         [Test]
         public void Test_offsetByCodePoints_ICharSequenceII()
@@ -1402,7 +1392,6 @@ namespace J2N
             }
         }
 
-#if FEATURE_SPAN
         [Test]
         public void Test_offsetByCodePoints_ReadOnlySpanII()
         {
@@ -1468,7 +1457,6 @@ namespace J2N
             {
             }
         }
-#endif
 
 
         [Test]
@@ -3226,8 +3214,6 @@ namespace J2N
         ////}
 
 
-#if FEATURE_SPAN
-
         // J2N: Tess the static Character.ToString() method to ensure it does the same thing as the Java constructor overload of String.
         // Basically, just replaced "new String(" with "Character.ToString(".
         /**
@@ -3294,8 +3280,6 @@ namespace J2N
             {
             }
         }
-
-#endif
 
         // J2N: Tess the static Character.ToString() method to ensure it does the same thing as the Java constructor overload of String.
         // Basically, just replaced "new String(" with "Character.ToString(".
@@ -3364,8 +3348,6 @@ namespace J2N
             }
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Ensures that arrays with lengths below and above thresholds will successfully convert
         /// </summary>
@@ -3414,8 +3396,6 @@ namespace J2N
             assertEquals(expected.Length, CountThresholdPlusOne.Length);
             assertEquals(expected, actual);
         }
-
-#endif
 
         /// <summary>
         /// Ensures that arrays with lengths below and above thresholds will successfully convert
@@ -3466,8 +3446,6 @@ namespace J2N
             assertEquals(expected, actual);
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Ensures that arrays with lengths below and above thresholds will successfully convert
         /// </summary>
@@ -3515,8 +3493,6 @@ namespace J2N
             assertEquals(expected.Length, CountThresholdPlusOne.Length * 2);
             assertEquals(expected, actual);
         }
-
-#endif
 
         /// <summary>
         /// Ensures that arrays with lengths below and above thresholds will successfully convert

@@ -30,8 +30,6 @@ namespace J2N.Numerics
 
         #region StringToLong
 
-#if FEATURE_SPAN
-
         public static unsafe long StringToLong(ReadOnlySpan<char> s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
             int pos = 0;
@@ -116,8 +114,6 @@ namespace J2N.Numerics
             result *= sign;
             return result;
         }
-
-#endif
 
         public static unsafe long StringToLong(string s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
@@ -378,8 +374,6 @@ namespace J2N.Numerics
 
         #region TryStringToLong
 
-#if FEATURE_SPAN
-
         public static unsafe bool TryStringToLong(ReadOnlySpan<char> s, int radix, int flags, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
             int pos = 0;
@@ -475,8 +469,6 @@ namespace J2N.Numerics
             result *= sign;
             return true;
         }
-
-#endif
 
         public static unsafe bool TryStringToLong(string s, int radix, int flags, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
@@ -770,8 +762,6 @@ namespace J2N.Numerics
 
         #region StringToInt
 
-#if FEATURE_SPAN
-
         public static int StringToInt(ReadOnlySpan<char> s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
             int pos = 0;
@@ -857,8 +847,6 @@ namespace J2N.Numerics
             result *= sign;
             return result;
         }
-
-#endif
 
         public static int StringToInt(string s, int radix, int flags) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
@@ -1122,8 +1110,6 @@ namespace J2N.Numerics
 
         #region TryStringToInt
 
-#if FEATURE_SPAN
-
         public static bool TryStringToInt(ReadOnlySpan<char> s, int radix, int flags, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
             int pos = 0;
@@ -1221,8 +1207,6 @@ namespace J2N.Numerics
             result *= sign;
             return true;
         }
-
-#endif
 
         public static bool TryStringToInt(string s, int radix, int flags, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC, KEEP Try... versions IN SYNC
         {
@@ -1818,14 +1802,12 @@ namespace J2N.Numerics
 
         #region EatWhiteSpace
 
-#if FEATURE_SPAN
         private static void EatWhiteSpace(ReadOnlySpan<char> s, ref int i) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
             int localIndex = i;
             for (; localIndex < s.Length && char.IsWhiteSpace(s[localIndex]); localIndex++) ;
             i = localIndex;
         }
-#endif
 
         private static void EatWhiteSpace(string s, ref int i) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
@@ -1851,8 +1833,6 @@ namespace J2N.Numerics
         #endregion EatWhiteSpace
 
         #region TryGrabLongs
-
-#if FEATURE_SPAN
 
         private static bool TryGrabLongs(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
@@ -1915,8 +1895,6 @@ namespace J2N.Numerics
             result = (long)unsignedResult;
             return true;
         }
-
-#endif
 
         private static bool TryGrabLongs(int radix, string s, ref int i, int end, bool isUnsigned, out long result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
@@ -2108,8 +2086,6 @@ namespace J2N.Numerics
 
         #region TryGrabInts
 
-#if FEATURE_SPAN
-
         private static bool TryGrabInts(int radix, ReadOnlySpan<char> s, ref int i, int end, bool isUnsigned, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
             uint unsignedResult = 0;
@@ -2169,8 +2145,6 @@ namespace J2N.Numerics
             result = (int)unsignedResult;
             return true;
         }
-
-#endif
 
         private static bool TryGrabInts(int radix, string s, ref int i, int end, bool isUnsigned, out int result) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, and string IN SYNC
         {
@@ -2458,9 +2432,7 @@ namespace J2N.Numerics
 
         #endregion
 
-        #region EatDigit
-
-#if FEATURE_SPAN
+        #region IsDigit
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -2477,8 +2449,6 @@ namespace J2N.Numerics
             charCount = result == -1 ? 0 : 1;
             return result != -1;
         }
-
-#endif
 
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

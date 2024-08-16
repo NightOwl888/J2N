@@ -113,13 +113,8 @@ namespace J2N.Numerics
         //  "Printing Floating-Point Numbers Quickly and Accurately"
         //    Burger and Dybvig
         //    http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.72.4656&rep=rep1&type=pdf
-        private static unsafe uint Dragon4(ulong mantissa, int exponent, uint mantissaHighBitIdx, bool hasUnequalMargins, int cutoffNumber, bool isSignificantDigits,
-#if FEATURE_SPAN
-            Span<byte> buffer,
-#else
-            byte[] buffer,
-#endif
-            out int decimalExponent)
+        private static unsafe uint Dragon4(ulong mantissa, int exponent, uint mantissaHighBitIdx, bool hasUnequalMargins,
+            int cutoffNumber, bool isSignificantDigits, Span<byte> buffer, out int decimalExponent)
         {
             int curDigit = 0;
 

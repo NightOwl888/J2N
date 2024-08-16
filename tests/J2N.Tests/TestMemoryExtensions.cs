@@ -8,8 +8,6 @@ namespace J2N
         private const string hw1 = "HelloWorld";
         private const string TestStringSupplementary = "李红：不，那不是杂志。那是字典。𠳕";
 
-#if FEATURE_SPAN
-
         /**
          * @tests java.lang.String#indexOf(int)
          */
@@ -236,6 +234,5 @@ namespace J2N
             str = new string('z', 1000) + "abcd\ud802\udc02\ud801\udc01\ud800\udc00" + new string('p', 3000) + "abcd\ud802\udc02\ud801\udc01\ud800\udc00";
             reverseTest(str, "\ud800\udc00\ud801\udc01\ud802\udc02dcba" + new string('p', 3000) + "\ud800\udc00\ud801\udc01\ud802\udc02dcba" + new string('z', 1000), str);
         }
-#endif
     }
 }

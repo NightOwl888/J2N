@@ -464,8 +464,6 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -548,8 +546,6 @@ namespace J2N.Numerics
                 throw new OverflowException(SR.Overflow_SByte);
             return (sbyte)r;
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>, beginning at the
@@ -906,8 +902,6 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32_Int32_SByte
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -990,8 +984,6 @@ namespace J2N.Numerics
 
             return false;
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>, beginning at the
@@ -1341,8 +1333,6 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>. 
         /// <para/>
@@ -1396,8 +1386,6 @@ namespace J2N.Numerics
                 throw new OverflowException(SR.Overflow_SByte);
             return (sbyte)r;
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>. 
@@ -1462,8 +1450,6 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_SByte
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>.
         /// <para/>
@@ -1524,8 +1510,6 @@ namespace J2N.Numerics
             result = (sbyte)r;
             return true;
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a <see cref="sbyte"/> in the specified <paramref name="radix"/>.
@@ -1749,7 +1733,6 @@ namespace J2N.Numerics
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1822,7 +1805,6 @@ namespace J2N.Numerics
         {
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
         }
-#endif
 
         #endregion TryParse_CharSequence_SByte
 
@@ -2042,11 +2024,7 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s is null)
                 throw new ArgumentNullException(nameof(s));
-#if FEATURE_SPAN
             DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i);
-#else
-            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i);
-#endif
             if (status != DotNetNumber.ParsingStatus.OK)
             {
                 if (status == DotNetNumber.ParsingStatus.Overflow)
@@ -2064,7 +2042,6 @@ namespace J2N.Numerics
             return (sbyte)i;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its <see cref="sbyte"/> equivalent.
         /// </summary>
@@ -2293,7 +2270,6 @@ namespace J2N.Numerics
             }
             return (sbyte)i;
         }
-#endif
 
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
@@ -2527,17 +2503,10 @@ namespace J2N.Numerics
                 result = 0;
                 return false;
             }
-#if FEATURE_SPAN
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
             // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
             if (DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
                 || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
-#else
-            // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
-            // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
-            if (DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
-                || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
-#endif
             {
                 result = 0;
                 return false;
@@ -2546,7 +2515,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 8-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
@@ -2784,7 +2752,6 @@ namespace J2N.Numerics
             result = (sbyte)i;
             return true;
         }
-#endif
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_SByte
 
@@ -3297,8 +3264,6 @@ namespace J2N.Numerics
 
         #region TryFormat
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Tries to format the value of the current 8-bit signed integer number instance into the provided span of characters.
         /// </summary>
@@ -3331,8 +3296,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryFormatInt32(value, 0x000000FF, format, provider, destination, out charsWritten);
         }
-
-#endif
 
         #endregion TryFormat
 

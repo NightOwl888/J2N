@@ -27,11 +27,7 @@ namespace J2N.Numerics
             public bool IsNegative;
             public bool HasNonZeroTail;
             public NumberBufferKind Kind;
-#if FEATURE_SPAN
             public Span<byte> Digits;
-#else
-            public byte[] Digits;
-#endif
 
             public NumberBuffer(NumberBufferKind kind, byte* digits, int digitsLength)
             {
@@ -43,21 +39,9 @@ namespace J2N.Numerics
                 IsNegative = false;
                 HasNonZeroTail = false;
                 Kind = kind;
-#if FEATURE_SPAN
                 Digits = new Span<byte>(digits, digitsLength);
-#else
-                Digits = new byte[digitsLength];
-                for (int i = 0; i < digitsLength; i++)
-                {
-                    Digits[i] = digits[i];
-                }
-#endif
 #if DEBUG
-#if FEATURE_SPAN
                 Digits.Fill(0xCC);
-#else
-                Digits.Fill<byte>(0xCC);
-#endif
 #endif
 
                 Digits[0] = (byte)('\0');
@@ -89,13 +73,11 @@ namespace J2N.Numerics
 #endif // DEBUG
             }
 
-#if FEATURE_SPAN
             public byte* GetDigitsPointer()
             {
                 // This is safe to do since we are a ref struct
                 return (byte*)(Unsafe.AsPointer(ref Digits[0]));
             }
-#endif
 
             //
             // Code coverage note: This only exists so that Number displays nicely in the VS watch window. So yes, I know it works.

@@ -488,8 +488,6 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32_Int32_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -565,8 +563,6 @@ namespace J2N.Numerics
 
             return ParseNumbers.StringToLong(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
@@ -893,8 +889,6 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int32_Int32_Int64
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -960,8 +954,6 @@ namespace J2N.Numerics
 
             return ParseNumbers.TryStringToLong(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>, beginning at the
@@ -1244,8 +1236,6 @@ namespace J2N.Numerics
 
         #region Parse_CharSequence_Int32
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>. 
         /// <para/>
@@ -1292,8 +1282,6 @@ namespace J2N.Numerics
         {
             return ParseNumbers.StringToLong(s, radix, ParseNumbers.IsTight);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>. 
@@ -1348,8 +1336,6 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_Int32_Int64
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>.
         /// <para/>
@@ -1391,8 +1377,6 @@ namespace J2N.Numerics
 
             return ParseNumbers.TryStringToLong(s, radix, ParseNumbers.IsTight, out result);
         }
-
-#endif
 
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="long"/> in the specified <paramref name="radix"/>.
@@ -1524,11 +1508,7 @@ namespace J2N.Numerics
         public static long Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return DotNetNumber.ParseInt64(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
+            return DotNetNumber.ParseInt64(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
         }
 
         #endregion Parse_CharSequence_IFormatProvider
@@ -1608,7 +1588,6 @@ namespace J2N.Numerics
             return long.TryParse(s, out result);
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 64-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1681,7 +1660,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryParseInt64IntegerStyle(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
         }
-#endif
 
         #endregion TryParse_CharSequence_Int64
 
@@ -1901,15 +1879,10 @@ namespace J2N.Numerics
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s == null) throw new ArgumentNullException(nameof(s));
-            return DotNetNumber.ParseInt64(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider));
+            return DotNetNumber.ParseInt64(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
 
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to its
         /// 64-bit signed integer equivalent.
@@ -2125,7 +2098,7 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             return DotNetNumber.ParseInt64(s, style, NumberFormatInfo.GetInstance(provider));
         }
-#endif
+
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
         #region TryParse_CharSequence_NumberStyle_IFormatProvider_Int64
@@ -2364,15 +2337,9 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return DotNetNumber.TryParseInt64(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
+            return DotNetNumber.TryParseInt64(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
         }
 
-
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 64-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
@@ -2603,7 +2570,7 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             return DotNetNumber.TryParseInt64(s, style, NumberFormatInfo.GetInstance(provider), out result) == DotNetNumber.ParsingStatus.OK;
         }
-#endif
+
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int64
 
         #region ToBinaryString
@@ -3167,8 +3134,6 @@ namespace J2N.Numerics
 
         #region TryFormat
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Tries to format the value of the current long number instance into the provided span of characters.
         /// </summary>
@@ -3201,8 +3166,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryFormatInt64(value, format, provider, destination, out charsWritten);
         }
-
-#endif
 
         #endregion TryFormat
 

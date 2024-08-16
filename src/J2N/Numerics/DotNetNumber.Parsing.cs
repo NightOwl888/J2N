@@ -57,14 +57,8 @@ namespace J2N.Numerics
                 return false;
             }
             int n = 0;
-#if FEATURE_SPAN
             byte* p = number.GetDigitsPointer();
             {
-#else
-            fixed (byte* dp = &number.Digits[0])
-            {
-                byte* p = dp;
-#endif
                 Debug.Assert(p != null);
                 while (--i >= 0)
                 {
@@ -108,14 +102,8 @@ namespace J2N.Numerics
                 return false;
             }
             long n = 0;
-#if FEATURE_SPAN
             byte* p = number.GetDigitsPointer();
             {
-#else
-            fixed (byte* dp = &number.Digits[0])
-            {
-                byte* p = dp;
-#endif
                 Debug.Assert(p != null);
                 while (--i >= 0)
                 {
@@ -217,13 +205,7 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-        internal static int ParseInt32(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info)
+        internal static int ParseInt32(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         {
             ParsingStatus status = TryParseInt32(value, styles, info, out int result);
             if (status != ParsingStatus.OK)
@@ -237,13 +219,7 @@ namespace J2N.Numerics
             return result;
         }
 
-        internal static long ParseInt64(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info)
+        internal static long ParseInt64(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         {
             ParsingStatus status = TryParseInt64(value, styles, info, out long result);
             if (status != ParsingStatus.OK)
@@ -813,13 +789,7 @@ namespace J2N.Numerics
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        internal static ParsingStatus TryParseInt32(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info, out int result)
+        internal static ParsingStatus TryParseInt32(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         {
             if ((styles & ~NumberStyle.Integer) == 0)
             {
@@ -843,13 +813,7 @@ namespace J2N.Numerics
             return TryParseInt32Number(value, styles, info, out result);
         }
 
-        private static unsafe ParsingStatus TryParseInt32Number(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info, out int result)
+        private static unsafe ParsingStatus TryParseInt32Number(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         {
             result = 0;
             byte* pDigits = stackalloc byte[Int32NumberBufferLength];
@@ -869,17 +833,8 @@ namespace J2N.Numerics
         }
 
         /// <summary>Parses int limited to styles that make up NumberStyle.Integer.</summary>
-        internal static ParsingStatus TryParseInt32IntegerStyle(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info, out int result)
+        internal static ParsingStatus TryParseInt32IntegerStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         {
-#if !FEATURE_SPAN
-            Debug.Assert(value != null);
-#endif
             Debug.Assert((styles & ~NumberStyle.Integer) == 0, "Only handles subsets of Integer format");
 
             if (value!.Length == 0)
@@ -926,29 +881,17 @@ namespace J2N.Numerics
                 }
                 else
                 {
-#if FEATURE_SPAN
                     value = value.Slice(index);
-#else
-                    value = value.Substring(index);
-#endif
                     index = 0;
                     string positiveSign = info.PositiveSign, negativeSign = info.NegativeSign;
-                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign
-#if FEATURE_SPAN
-                        .AsSpan()
-#endif
-                        ))
+                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign.AsSpan(), StringComparison.Ordinal))
                     {
                         index += positiveSign.Length;
                         if ((uint)index >= (uint)value.Length)
                             goto FalseExit;
                         num = value[index];
                     }
-                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign
-#if FEATURE_SPAN
-                        .AsSpan()
-#endif
-                        ))
+                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign.AsSpan(), StringComparison.Ordinal))
                     {
                         sign = -1;
                         index += negativeSign.Length;
@@ -1062,17 +1005,8 @@ namespace J2N.Numerics
         }
 
         /// <summary>Parses long inputs limited to styles that make up NumberStyle.Integer.</summary>
-        internal static ParsingStatus TryParseInt64IntegerStyle(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info, out long result)
+        internal static ParsingStatus TryParseInt64IntegerStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out long result)
         {
-#if !FEATURE_SPAN
-            Debug.Assert(value != null);
-#endif
             Debug.Assert((styles & ~NumberStyle.Integer) == 0, "Only handles subsets of Integer format");
 
             if (value!.Length == 0)
@@ -1119,29 +1053,17 @@ namespace J2N.Numerics
                 }
                 else
                 {
-#if FEATURE_SPAN
                     value = value.Slice(index);
-#else
-                    value = value.Substring(index);
-#endif
                     index = 0;
                     string positiveSign = info.PositiveSign, negativeSign = info.NegativeSign;
-                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign
-#if FEATURE_SPAN
-                            .AsSpan()
-#endif
-                        ))
+                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign.AsSpan(), StringComparison.Ordinal))
                     {
                         index += positiveSign.Length;
                         if ((uint)index >= (uint)value.Length)
                             goto FalseExit;
                         num = value[index];
                     }
-                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign
-#if FEATURE_SPAN
-                            .AsSpan()
-#endif
-                        ))
+                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign.AsSpan(), StringComparison.Ordinal))
                     {
                         sign = -1;
                         index += negativeSign.Length;
@@ -1257,13 +1179,7 @@ namespace J2N.Numerics
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        internal static ParsingStatus TryParseInt64(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info, out long result)
+        internal static ParsingStatus TryParseInt64(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out long result)
         {
             if ((styles & ~NumberStyle.Integer) == 0)
             {
@@ -1287,13 +1203,7 @@ namespace J2N.Numerics
             return TryParseInt64Number(value, styles, info, out result);
         }
 
-        private static unsafe ParsingStatus TryParseInt64Number(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, NumberFormatInfo info, out long result)
+        private static unsafe ParsingStatus TryParseInt64Number(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out long result)
         {
             result = 0;
             byte* pDigits = stackalloc byte[Int64NumberBufferLength];
@@ -1520,17 +1430,8 @@ namespace J2N.Numerics
         //}
 
         /// <summary>Parses uint limited to styles that make up NumberStyle.HexNumber.</summary>
-        private static ParsingStatus TryParseUInt32HexNumberStyle(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, out uint result)
+        private static ParsingStatus TryParseUInt32HexNumberStyle(ReadOnlySpan<char> value, NumberStyle styles, out uint result)
         {
-#if !FEATURE_SPAN
-            Debug.Assert(value != null);
-#endif
             Debug.Assert((styles & ~(NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier)) == 0, "Only handles subsets of HexNumber format and trailing type");
 
             if (value!.Length == 0)
@@ -1869,17 +1770,8 @@ namespace J2N.Numerics
 
 
         /// <summary>Parses ulong limited to styles that make up NumberStyle.HexNumber.</summary>
-        private static ParsingStatus TryParseUInt64HexNumberStyle(
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            NumberStyle styles, out ulong result)
+        private static ParsingStatus TryParseUInt64HexNumberStyle(ReadOnlySpan<char> value, NumberStyle styles, out ulong result)
         {
-#if !FEATURE_SPAN
-            Debug.Assert(value != null);
-#endif
             Debug.Assert((styles & ~(NumberStyle.HexNumber | NumberStyle.AllowTypeSpecifier)) == 0, "Only handles subsets of HexNumber format and trailing type");
 
             if (value!.Length == 0)
@@ -2140,7 +2032,6 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-#if FEATURE_SPAN
         internal static double ParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         {
             if (!TryParseDouble(value, styles, info, out double result))
@@ -2150,7 +2041,6 @@ namespace J2N.Numerics
 
             return result;
         }
-#endif
 
         internal static double ParseDouble(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
         {
@@ -2162,7 +2052,6 @@ namespace J2N.Numerics
             return result;
         }
 
-#if FEATURE_SPAN
         internal static float ParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         {
             if (!TryParseSingle(value, styles, info, out float result))
@@ -2172,7 +2061,6 @@ namespace J2N.Numerics
 
             return result;
         }
-#endif
 
         internal static float ParseSingle(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
         {
@@ -2214,7 +2102,6 @@ namespace J2N.Numerics
         //    return ParsingStatus.OK;
         //}
 
-#if FEATURE_SPAN
         internal static unsafe bool TryParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
@@ -2224,7 +2111,6 @@ namespace J2N.Numerics
 
             return TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
-#endif
 
         internal static unsafe bool TryParseDouble(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
@@ -2236,7 +2122,6 @@ namespace J2N.Numerics
             return TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
 
-#if FEATURE_SPAN
         internal static unsafe bool TryParseDoubleFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             byte* pDigits = stackalloc byte[DoubleNumberBufferLength];
@@ -2298,7 +2183,6 @@ namespace J2N.Numerics
 
             return true;
         }
-#endif
 
         internal static unsafe bool TryParseDoubleFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
@@ -2361,8 +2245,6 @@ namespace J2N.Numerics
 
             return true;
         }
-
-#if FEATURE_SPAN
 
         internal static unsafe bool TryParseDoubleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
@@ -2427,7 +2309,6 @@ namespace J2N.Numerics
 
             return true;
         }
-#endif
 
         internal static unsafe bool TryParseDoubleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
@@ -2560,7 +2441,6 @@ namespace J2N.Numerics
         //    return true;
         //}
 
-#if FEATURE_SPAN
         internal static unsafe bool TryParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
@@ -2570,7 +2450,6 @@ namespace J2N.Numerics
 
             return TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
-#endif
 
         internal static unsafe bool TryParseSingle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
@@ -2583,7 +2462,6 @@ namespace J2N.Numerics
         }
 
 
-#if FEATURE_SPAN
         internal static unsafe bool TryParseSingleFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             byte* pDigits = stackalloc byte[SingleNumberBufferLength];
@@ -2650,7 +2528,6 @@ namespace J2N.Numerics
 
             return true;
         }
-#endif
 
         internal static unsafe bool TryParseSingleFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
@@ -2718,8 +2595,6 @@ namespace J2N.Numerics
 
             return true;
         }
-
-#if FEATURE_SPAN
 
         internal static unsafe bool TryParseSingleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
@@ -2789,7 +2664,6 @@ namespace J2N.Numerics
 
             return true;
         }
-#endif
 
         internal static unsafe bool TryParseSingleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
@@ -2860,7 +2734,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_SPAN
         internal static unsafe bool TryStringToNumber(ReadOnlySpan<char> value, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
@@ -2878,7 +2751,6 @@ namespace J2N.Numerics
             number.CheckConsistency();
             return true;
         }
-#endif
         internal static unsafe bool TryStringToNumber(string value, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
@@ -2897,7 +2769,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_SPAN
         internal static unsafe bool TryStringToFloatingPointHexNumber(ReadOnlySpan<char> value, NumberStyle styles, FloatingPointHexNumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
@@ -2915,7 +2786,7 @@ namespace J2N.Numerics
             //number.CheckConsistency();
             return true;
         }
-#endif
+
         internal static unsafe bool TryStringToFloatingPointHexNumber(string value, NumberStyle styles, FloatingPointHexNumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
@@ -2934,7 +2805,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#if FEATURE_SPAN
         private static bool TrailingZeros(ReadOnlySpan<char> value, int index)
         {
             // For compatibility, we need to allow trailing zeros at the end of a number string
@@ -2948,7 +2818,7 @@ namespace J2N.Numerics
 
             return true;
         }
-#endif
+
         private static bool TrailingZeros(string value, int index)
         {
             // For compatibility, we need to allow trailing zeros at the end of a number string
@@ -2967,15 +2837,7 @@ namespace J2N.Numerics
         /// <summary>
         /// Returns <c>true</c> if the pattern matches, otherwise returns <c>false</c>.
         /// </summary>
-        private static bool TrailingCharsHex(
-            int num,
-            NumberStyle styles,
-#if FEATURE_SPAN
-            ReadOnlySpan<char> value,
-#else
-            string value,
-#endif
-            int index)
+        private static bool TrailingCharsHex(int num, NumberStyle styles, ReadOnlySpan<char> value, int index)
         {
             bool hasTypeSuffix = false;
             // Skip past integral type suffix, then past trailing whitespace, and if anything else remains, fail.
@@ -3209,7 +3071,6 @@ namespace J2N.Numerics
 
     internal static class MemoryExtensions
     {
-#if FEATURE_SPAN
         // From MemoryExtensions class in .NET Runtime
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3222,11 +3083,9 @@ namespace J2N.Numerics
                 return true;
             return EqualsIgnoreCase(ref MemoryMarshal.GetReference(span), span, ref MemoryMarshal.GetReference(value), value, span.Length);
         }
-#endif
 
         // J2N: For now, we are just calling this on .NET Standard 2.1+
 
-#if FEATURE_SPAN
         // From Ordinal class in .NET Runtime
         internal static unsafe bool EqualsIgnoreCase(ref char charA, ReadOnlySpan<char> spanA, ref char charB, ReadOnlySpan<char> spanB, int length)
         {
@@ -3339,7 +3198,6 @@ namespace J2N.Numerics
             int startIndex = byteOffset.ToInt32() / 2; // Convert number of bytes to number of chars
             return StringComparer.OrdinalIgnoreCase.Equals(spanA.Slice(startIndex, length).ToString(), spanB.Slice(startIndex, length).ToString());
         }
-#endif
 
         // From Utf16Utility in System.Text.Unicode
         /// <summary>
