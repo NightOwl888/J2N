@@ -521,8 +521,6 @@ namespace J2N.Text
         [Test]
         public void Test_RegionMatches_String_Int32_ICharSequence_Int32_Int32_StringComparison()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5425");
-
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
             String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
@@ -579,8 +577,6 @@ namespace J2N.Text
         [Test]
         public void Test_RegionMatches_String_Int32_CharArray_Int32_Int32_StringComparison()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5425");
-
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
             String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
@@ -637,8 +633,6 @@ namespace J2N.Text
         [Test]
         public void Test_RegionMatches_String_Int32_StringBuilder_Int32_Int32_StringComparison()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5425");
-
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
             String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
@@ -695,8 +689,6 @@ namespace J2N.Text
         [Test]
         public void Test_RegionMatches_String_Int32_String_Int32_Int32_StringComparison()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5425");
-
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
             String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";
@@ -755,8 +747,6 @@ namespace J2N.Text
         [Test]
         public void Test_RegionMatches_String_Int32_ReadOnlySpan_Int32_Int32_StringComparison()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5425");
-
             // Test for method boolean java.lang.String.regionMatches(int,
             // java.lang.String, int, int)
             String bogusString = "xxcedkedkleiorem lvvwr e''' 3r3r 23r";

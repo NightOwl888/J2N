@@ -242,7 +242,7 @@ namespace J2N.Numerics
         }
 
         [Test]
-        [Ignore(".NET Framework, .NET Core 2.x and Xamarin.Android are off by 1 bit when round tripping using the .NET parser in certain cases, likely due to the documented issue that we need at least 17 decimal digits to be round-trippable")]
+        [Ignore("J2N TODO: .NET Framework is off by 1 bit when round tripping using the .NET parser in certain cases, likely due to the documented issue that we need at least 17 decimal digits to be round-trippable")]
         public void TestToJavaFormatStringDoubleRandom()
         {
             Console.WriteLine("    testToJavaFormatStringDoubleRandom");
