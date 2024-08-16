@@ -97,42 +97,6 @@ stages:
         nugetArtifactName: '$(NuGetArtifactName)'
         binaryArtifactName: '$(BinaryArtifactName)'
 
-    - template: '.build/azure-templates/install-android-sdk.yml'
-      parameters:
-        sdkVersion: '28'
-
-    - template: '.build/azure-templates/install-android-sdk.yml'
-      parameters:
-        sdkVersion: '29'
-
-    - task: NuGetToolInstaller@1
-      displayName: 'Install NuGet'
-
-    - task: NuGetCommand@2
-      inputs:
-        restoreSolution: '$(Build.SourcesDirectory)/J2N.sln'
-        feedsToUse: config
-        nugetConfigPath: '$(Build.SourcesDirectory)/NuGet.config'
-      displayName: 'Restore NuGet packages'
-
-    - task: XamarinAndroid@1
-      inputs:
-        projectFile: '$(Build.SourcesDirectory)/tests/Xamarin/Android/**/*.Tests.MonoAndroid90*.csproj'
-        outputDirectory: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)/MonoAndroid90'
-        configuration: '$(BuildConfiguration)'
-        target: 'SignAndroidPackage'
-        msbuildVersionOption: '16.0'
-      displayName: 'Build XamarinAndroid90'
-
-    - task: XamarinAndroid@1
-      inputs:
-        projectFile: '$(Build.SourcesDirectory)/tests/Xamarin/Android/**/*.Tests.MonoAndroid100*.csproj'
-        outputDirectory: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)/MonoAndroid100'
-        configuration: '$(BuildConfiguration)'
-        target: 'SignAndroidPackage'
-        msbuildVersionOption: '16.0'
-      displayName: 'Build XamarinAndroid100'
-
     - task: PublishBuildArtifacts@1
       displayName: 'Publish Artifact: $(BinaryArtifactName)'
       inputs:
@@ -360,66 +324,6 @@ stages:
         osName: 'Windows'
         testTargetFrameworks: 'net452'
         vsTestPlatform: 'x86'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        dotNetSdkVersion: '$(DotNetSDKVersion)'
-
-  - job: Test_MonoAndroid90_x86_64
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    displayName: 'Test MonoAndroid90,x86_64 on macOS'
-    pool:
-      vmImage: 'macOS-latest'
-    steps:
-    - template: '.build/azure-templates/run-tests-on-android.yml'
-      parameters:
-        osName: 'Android'
-        testTargetFrameworks: 'MonoAndroid90'
-        androidAbi: 'x86_64'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        dotNetSdkVersion: '$(DotNetSDKVersion)'
-
-  - job: Test_MonoAndroid90_x86 # Only run if explicitly enabled with RunX86Tests
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
-    displayName: 'Test MonoAndroid90,x86 on macOS'
-    pool:
-      vmImage: 'macOS-latest'
-    steps:
-    - template: '.build/azure-templates/run-tests-on-android.yml'
-      parameters:
-        osName: 'Android'
-        testTargetFrameworks: 'MonoAndroid90'
-        androidAbi: 'x86'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        dotNetSdkVersion: '$(DotNetSDKVersion)'
-
-  - job: Test_MonoAndroid100_x86_64
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    displayName: 'Test MonoAndroid100,x86_64 on macOS'
-    pool:
-      vmImage: 'macOS-latest'
-    steps:
-    - template: '.build/azure-templates/run-tests-on-android.yml'
-      parameters:
-        osName: 'Android'
-        testTargetFrameworks: 'MonoAndroid100'
-        androidAbi: 'x86_64'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        dotNetSdkVersion: '$(DotNetSDKVersion)'
-
-  - job: Test_MonoAndroid100_x86 # Only run if explicitly enabled with RunX86Tests
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
-    displayName: 'Test MonoAndroid100,x86 on macOS'
-    pool:
-      vmImage: 'macOS-latest'
-    steps:
-    - template: '.build/azure-templates/run-tests-on-android.yml'
-      parameters:
-        osName: 'Android'
-        testTargetFrameworks: 'MonoAndroid100'
-        androidAbi: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'

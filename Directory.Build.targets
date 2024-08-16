@@ -49,15 +49,6 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Standard 2.1 only -->
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
-
-    <!-- Bug in Xamarin.Android - EnsureCapacity and TrimExcess should break enumerator, but do not -->
-    <DefineConstants>$(DefineConstants);BUG_DICTIONARY_ENSURECAPACITY_INVALIDATES_ENUMERATION</DefineConstants>
-    <DefineConstants>$(DefineConstants);BUG_DICTIONARY_TRIMEXCESS_INVALIDATES_ENUMERATION</DefineConstants>
-
-  </PropertyGroup>
-
   <!-- Features in .NET Standard 2.1, .NET Core 3.x, .NET 5.x, and .NET 6.x only -->
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
 

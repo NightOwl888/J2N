@@ -56,8 +56,6 @@ namespace J2N.IO.MemoryMappedFiles
         [Test]
         public void TestReadOnly()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423");
-
             using (var fis = new FileStream(tmpFile.FullName, FileMode.Open, FileAccess.Read))
             using (var fc = MemoryMappedFile.CreateFromFile(fis, null, 0, MemoryMappedFileAccess.Read,
 #if FEATURE_MEMORYMAPPEDFILESECURITY
@@ -124,8 +122,6 @@ namespace J2N.IO.MemoryMappedFiles
         [Test]
         public void TestEmptyBuffer()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423");
-
             // Map empty file
             //    FileInputStream fis = new FileInputStream(emptyFile);
             //FileChannel fc = fis.getChannel();
@@ -327,8 +323,6 @@ namespace J2N.IO.MemoryMappedFiles
         [Test]
         public void Test_Position()
         {
-            Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423");
-
             var tmp = new FileInfo(Path.GetTempFileName());
 
             //File tmp = File.createTempFile("hmy", "tmp");
@@ -445,8 +439,6 @@ namespace J2N.IO.MemoryMappedFiles
             [Test]
             public void TestFlush() // Force.java
             {
-                Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423");
-
                 long fileSize = Random.Next(3 * 1024 * 1024);
                 int cut = Random.Next((int)fileSize);
                 var file = new FileInfo(Path.GetTempFileName());
@@ -480,8 +472,6 @@ namespace J2N.IO.MemoryMappedFiles
             [Test]
             public void TestZeroMap()
             {
-                Assume.That(!PlatformDetection.IsXamarinAndroid, "J2N TODO: Awaits fix: https://github.com/xamarin/xamarin-android/issues/5423");
-
                 long fileSize = Random.Next(1024 * 1024);
                 int cut = Random.Next((int)fileSize);
                 var file = new FileInfo(Path.GetTempFileName());
