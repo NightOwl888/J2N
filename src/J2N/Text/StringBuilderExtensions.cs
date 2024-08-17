@@ -19,6 +19,7 @@
 using J2N.Buffers;
 using System;
 using System.Buffers;
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -2139,5 +2140,79 @@ namespace J2N.Text
         }
 
         #endregion Subsequence
+
+        #region TryAsSpan
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+
+        /// <summary>
+        /// Gets a <see cref="ReadOnlySpan{Char}"/> from a <see cref="StringBuilder"/> if it
+        /// contains a contiguous block memory corresponding with the location specified by
+        /// <paramref name="startIndex"/> and <paramref name="length"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="startIndex">The inclusive first index in the range.</param>
+        /// <param name="length">The number of characters to retrieve.</param>
+        /// <param name="span">Upon successful return of this method, contains a
+        /// <see cref="ReadOnlySpan{Char}"/> corresponding to the specified
+        /// <paramref name="startIndex"/> and <paramref name="length"/>.</param>
+        /// <returns><c>true</c> if the <see cref="StringBuilder"/> contains a chunk of memory
+        /// of <paramref name="length"/> starting at the index <paramref name="startIndex"/>; othewise, <c>false</c>.
+        /// Note that the <c>false</c> case may occur frequently in practice and it is recommended to have a fallback 
+        /// approach using <see cref="StringBuilder.CopyTo(int, char[], int, int)"/>,
+        /// <see cref="StringBuilder.CopyTo(int, Span{char}, int)"/>, or <see cref="StringBuilder.ToString(int, int)"/>.</returns>
+        internal static bool TryAsSpan(this StringBuilder text, int startIndex, int length, out ReadOnlySpan<char> span)
+        {
+            Debug.Assert(text != null);
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(length >= 0);
+
+            span = default;
+
+            if (length == 0)
+            {
+                return true;
+            }
+
+            int offset = 0;
+
+            foreach (var chunk in text.GetChunks())
+            {
+                int chunkLength = chunk.Length;
+
+                // If the startIndex is before this chunk, we can return false immediately
+                if (startIndex - offset < 0)
+                {
+                    return false;
+                }
+
+                // If the startIndex is within this chunk
+                if (startIndex - offset < chunkLength)
+                {
+                    int relativeStartIndex = startIndex - offset;
+
+                    // Check if the entire requested range is within this chunk
+                    if (chunkLength - relativeStartIndex >= length)
+                    {
+                        span = chunk.Span.Slice(relativeStartIndex, length);
+                        return true;
+                    }
+                    else
+                    {
+                        // If the range exceeds the current chunk, return false
+                        return false;
+                    }
+                }
+
+                offset += chunkLength;
+            }
+
+            // If the loop ends and no valid span was found, return false
+            return false;
+        }
+
+#endif
+
+        #endregion TryAsSpan
     }
 }

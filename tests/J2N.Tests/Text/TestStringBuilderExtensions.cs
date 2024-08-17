@@ -1490,5 +1490,67 @@ namespace J2N.Text
 
             Assert.Throws<ArgumentException>(() => builder.CopyTo(0, new Span<char>(new char[10]), 11)); // count > destinationArray.Length
         }
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+
+        [Test]
+        public void Test_TryAsSpan_EmptyStringBuilder_NonZeroLength_ReturnsFalse()
+        {
+            var sb = new StringBuilder();
+            Assert.False(sb.TryAsSpan(0, 1, out var span));
+            Assert.False(sb.TryAsSpan(5, 1, out span));
+        }
+
+        [Test]
+        public void Test_TryAsSpan_StartIndexOutOfBounds_ReturnsFalse()
+        {
+            var sb = new StringBuilder("Hello");
+            Assert.False(sb.TryAsSpan(sb.Length, 1, out var span));
+            Assert.False(sb.TryAsSpan(sb.Length + 1, 1, out span));
+        }
+
+        [Test]
+        public void Test_TryAsSpan_RangeSplitBetweenChunks_ReturnsFalse()
+        {
+            var sb = new StringBuilder("Hello");
+            sb.Append(new string('x', 1024));
+            Assert.False(sb.TryAsSpan(4, 1025, out var span));
+        }
+
+        [Test]
+        public void Test_TryAsSpan_EntireRangeInFirstChunk_ReturnsTrueWithCorrectSlice()
+        {
+            var sb = new StringBuilder("HelloWorld");
+            Assert.True(sb.TryAsSpan(0, 5, out var span));
+            Assert.AreEqual("Hello", span.ToString());
+
+            Assert.True(sb.TryAsSpan(5, 5, out span));
+            Assert.AreEqual("World", span.ToString());
+        }
+
+        [Test]
+        public void Test_TryAsSpan_EntireRangeInNonFirstChunk_ReturnsTrueWithCorrectSlice()
+        {
+            var sb = new StringBuilder("Hello");
+            sb.Append(new string('x', 1024));
+            sb.Append("World");
+
+            int startIndex = "Hello".Length + 1024;
+            Assert.True(sb.TryAsSpan(startIndex, 5, out var span));
+            Assert.AreEqual("World", span.ToString());
+        }
+
+        [Test]
+        public void Test_TryAsSpan_EntireRangeInNonFirstChunk_SliceOfChunk_ReturnsTrueWithCorrectSlice()
+        {
+            var sb = new StringBuilder("Hello");
+            sb.Append(new string('x', 1024));
+            sb.Append("HelloWorldOfMine");
+
+            int startIndex = "Hello".Length + 1024 + "Hello".Length;
+            Assert.True(sb.TryAsSpan(startIndex, 5, out var span));
+            Assert.AreEqual("World", span.ToString());
+        }
+#endif
     }
 }
