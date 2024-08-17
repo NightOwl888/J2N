@@ -799,15 +799,8 @@ namespace J2N.Numerics
 
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
             {
-                //result = 0;
-                //return TryParseUInt32HexNumberStyle(value, styles, out Unsafe.As<int, uint>(ref result));
-                ParsingStatus status = TryParseUInt32HexNumberStyle(value, styles, out uint uResult);
-                if (status == ParsingStatus.OK)
-                    result = (int)uResult;
-                else
-                    result = 0;
-
-                return status;
+                result = 0;
+                return TryParseUInt32HexNumberStyle(value, styles, out Unsafe.As<int, uint>(ref result));
             }
 
             return TryParseInt32Number(value, styles, info, out result);
@@ -1189,15 +1182,8 @@ namespace J2N.Numerics
 
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
             {
-                //result = 0;
-                //return TryParseUInt64HexNumberStyle(value, styles, out Unsafe.As<long, ulong>(ref result));
-                ParsingStatus status = TryParseUInt64HexNumberStyle(value, styles, out ulong uResult);
-                if (status == ParsingStatus.OK)
-                    result = (long)uResult;
-                else
-                    result = 0;
-
-                return status;
+                result = 0;
+                return TryParseUInt64HexNumberStyle(value, styles, out Unsafe.As<long, ulong>(ref result));
             }
 
             return TryParseInt64Number(value, styles, info, out result);
@@ -2042,31 +2028,11 @@ namespace J2N.Numerics
             return result;
         }
 
-        internal static double ParseDouble(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
-        {
-            if (!TryParseDouble(value, styles, info, out double result))
-            {
-                ThrowFormatException(value);
-            }
-
-            return result;
-        }
-
         internal static float ParseSingle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info)
         {
             if (!TryParseSingle(value, styles, info, out float result))
             {
                 ThrowFormatException(value.ToString());
-            }
-
-            return result;
-        }
-
-        internal static float ParseSingle(string value, NumberStyle styles, NumberFormatInfo info) // J2N TODO: ICharSequence?
-        {
-            if (!TryParseSingle(value, styles, info, out float result))
-            {
-                ThrowFormatException(value);
             }
 
             return result;
@@ -2103,16 +2069,6 @@ namespace J2N.Numerics
         //}
 
         internal static unsafe bool TryParseDouble(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
-        {
-            if ((styles & NumberStyle.AllowHexSpecifier) != 0)
-            {
-                return TryParseDoubleHexFloatStyle(value, styles, info, out result);
-            }
-
-            return TryParseDoubleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
-        }
-
-        internal static unsafe bool TryParseDouble(string value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             if ((styles & NumberStyle.AllowHexSpecifier) != 0)
             {
@@ -2184,68 +2140,6 @@ namespace J2N.Numerics
             return true;
         }
 
-        internal static unsafe bool TryParseDoubleFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
-        {
-            byte* pDigits = stackalloc byte[DoubleNumberBufferLength];
-            NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, DoubleNumberBufferLength);
-
-            if (!TryStringToNumber(value, styles, ref number, info))
-            {
-                string valueTrim = value.Trim();
-
-                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
-                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
-                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
-
-                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
-                {
-                    result = double.PositiveInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NegativeInfinitySymbol))
-                {
-                    result = double.NegativeInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                {
-                    result = double.NaN;
-                }
-                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
-                {
-                    valueTrim = valueTrim.Substring(info.PositiveSign.Length);
-
-                    if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
-                    {
-                        result = double.PositiveInfinity;
-                    }
-                    else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                    {
-                        result = double.NaN;
-                    }
-                    else
-                    {
-                        result = 0;
-                        return false;
-                    }
-                }
-                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                        StringComparer.OrdinalIgnoreCase.Equals(valueTrim.Substring(info.NegativeSign.Length), info.NaNSymbol))
-                {
-                    result = double.NaN;
-                }
-                else
-                {
-                    result = 0;
-                    return false; // We really failed
-                }
-            }
-            else
-            {
-                result = NumberToDouble(ref number);
-            }
-
-            return true;
-        }
-
         internal static unsafe bool TryParseDoubleHexFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out double result)
         {
             Debug.Assert(info != null);
@@ -2293,70 +2187,6 @@ namespace J2N.Numerics
                 }
                 else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
                         valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
-                {
-                    result = double.NaN;
-                }
-                else
-                {
-                    result = 0;
-                    return false; // We really failed
-                }
-            }
-            else if (!number.TryGetValue(out result))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        internal static unsafe bool TryParseDoubleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out double result)
-        {
-            Debug.Assert(info != null);
-            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
-
-            var number = new DoubleNumberBuffer(value.Length);
-
-            if (!TryStringToFloatingPointHexNumber(value, styles, number, info!))
-            {
-                string valueTrim = value.Trim();
-
-                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
-                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
-                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
-
-                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info!.PositiveInfinitySymbol))
-                {
-                    result = double.PositiveInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NegativeInfinitySymbol))
-                {
-                    result = double.NegativeInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                {
-                    result = double.NaN;
-                }
-                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
-                {
-                    valueTrim = valueTrim.Substring(info.PositiveSign.Length);
-
-                    if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
-                    {
-                        result = double.PositiveInfinity;
-                    }
-                    else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                    {
-                        result = double.NaN;
-                    }
-                    else
-                    {
-                        result = 0;
-                        return false;
-                    }
-                }
-                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                        StringComparer.OrdinalIgnoreCase.Equals(valueTrim.Substring(info.NegativeSign.Length), info.NaNSymbol))
                 {
                     result = double.NaN;
                 }
@@ -2451,17 +2281,6 @@ namespace J2N.Numerics
             return TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
         }
 
-        internal static unsafe bool TryParseSingle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
-        {
-            if ((styles & NumberStyle.AllowHexSpecifier) != 0)
-            {
-                return TryParseSingleHexFloatStyle(value, styles, info, out result);
-            }
-
-            return TryParseSingleFloatStyle(value, styles & ~NumberStyle.AllowHexSpecifier, info, out result);
-        }
-
-
         internal static unsafe bool TryParseSingleFloatStyle(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out float result)
         {
             byte* pDigits = stackalloc byte[SingleNumberBufferLength];
@@ -2512,73 +2331,6 @@ namespace J2N.Numerics
                 else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
                          !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
                          valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
-                {
-                    result = float.NaN;
-                }
-                else
-                {
-                    result = 0;
-                    return false; // We really failed
-                }
-            }
-            else
-            {
-                result = NumberToSingle(ref number);
-            }
-
-            return true;
-        }
-
-        internal static unsafe bool TryParseSingleFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
-        {
-            byte* pDigits = stackalloc byte[SingleNumberBufferLength];
-            NumberBuffer number = new NumberBuffer(NumberBufferKind.FloatingPoint, pDigits, SingleNumberBufferLength);
-
-            if (!TryStringToNumber(value, styles, ref number, info))
-            {
-                string valueTrim = value.Trim();
-
-                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
-                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
-                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
-                //
-                // Additionally, since some cultures ("wo") actually define `PositiveInfinitySymbol`
-                // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
-                // that case so that we don't start parsing things like `++infini`.
-
-                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
-                {
-                    result = float.PositiveInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NegativeInfinitySymbol))
-                {
-                    result = float.NegativeInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                {
-                    result = float.NaN;
-                }
-                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
-                {
-                    valueTrim = valueTrim.Substring(info.PositiveSign.Length);
-
-                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
-                    {
-                        result = float.PositiveInfinity;
-                    }
-                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                    {
-                        result = float.NaN;
-                    }
-                    else
-                    {
-                        result = 0;
-                        return false;
-                    }
-                }
-                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         StringComparer.OrdinalIgnoreCase.Equals(valueTrim.Substring(info.NegativeSign.Length), info.NaNSymbol))
                 {
                     result = float.NaN;
                 }
@@ -2665,96 +2417,10 @@ namespace J2N.Numerics
             return true;
         }
 
-        internal static unsafe bool TryParseSingleHexFloatStyle(string value, NumberStyle styles, NumberFormatInfo info, out float result)
-        {
-            Debug.Assert(info != null);
-            Debug.Assert((styles & ~(NumberStyle.HexFloat | NumberStyle.AllowTypeSpecifier | NumberStyle.AllowTrailingSign | NumberStyle.AllowParentheses)) == 0, "Only handles subsets of HexFloat format, trailing type, and alternate sign positions");
-
-            var number = new SingleHexNumberBuffer(value.Length);
-
-            if (!TryStringToFloatingPointHexNumber(value, styles, number, info!))
-            {
-                string valueTrim = value.Trim();
-
-                // This code would be simpler if we only had the concept of `InfinitySymbol`, but
-                // we don't so we'll check the existing cases first and then handle `PositiveSign` +
-                // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
-                //
-                // Additionally, since some cultures ("wo") actually define `PositiveInfinitySymbol`
-                // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
-                // that case so that we don't start parsing things like `++infini`.
-
-                if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info!.PositiveInfinitySymbol))
-                {
-                    result = float.PositiveInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NegativeInfinitySymbol))
-                {
-                    result = float.NegativeInfinity;
-                }
-                else if (StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                {
-                    result = float.NaN;
-                }
-                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
-                {
-                    valueTrim = valueTrim.Substring(info.PositiveSign.Length);
-
-                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.PositiveInfinitySymbol))
-                    {
-                        result = float.PositiveInfinity;
-                    }
-                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && StringComparer.OrdinalIgnoreCase.Equals(valueTrim, info.NaNSymbol))
-                    {
-                        result = float.NaN;
-                    }
-                    else
-                    {
-                        result = 0;
-                        return false;
-                    }
-                }
-                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         StringComparer.OrdinalIgnoreCase.Equals(valueTrim.Substring(info.NegativeSign.Length), info.NaNSymbol))
-                {
-                    result = float.NaN;
-                }
-                else
-                {
-                    result = 0;
-                    return false; // We really failed
-                }
-            }
-            else if (!number.TryGetValue(out result))
-            {
-                return false;
-            }
-
-            return true;
-        }
-
         internal static unsafe bool TryStringToNumber(ReadOnlySpan<char> value, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
         {
             Debug.Assert(info != null);
             fixed (char* stringPointer = &MemoryMarshal.GetReference(value))
-            {
-                char* p = stringPointer;
-                if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info!)
-                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
-                {
-                    number.CheckConsistency();
-                    return false;
-                }
-            }
-
-            number.CheckConsistency();
-            return true;
-        }
-        internal static unsafe bool TryStringToNumber(string value, NumberStyle styles, ref NumberBuffer number, NumberFormatInfo info)
-        {
-            Debug.Assert(info != null);
-            fixed (char* stringPointer = value)
             {
                 char* p = stringPointer;
                 if (!TryParseNumber(ref p, p + value.Length, styles, ref number, info!)
@@ -2787,24 +2453,6 @@ namespace J2N.Numerics
             return true;
         }
 
-        internal static unsafe bool TryStringToFloatingPointHexNumber(string value, NumberStyle styles, FloatingPointHexNumberBuffer number, NumberFormatInfo info)
-        {
-            Debug.Assert(info != null);
-            fixed (char* stringPointer = value)
-            {
-                char* p = stringPointer;
-                if (!TryParseFloatingPointHexNumber(ref p, p + value.Length, styles, number, info!)
-                    || ((int)(p - stringPointer) < value.Length && !TrailingZeros(value, (int)(p - stringPointer))))
-                {
-                    //number.CheckConsistency();
-                    return false;
-                }
-            }
-
-            //number.CheckConsistency();
-            return true;
-        }
-
         private static bool TrailingZeros(ReadOnlySpan<char> value, int index)
         {
             // For compatibility, we need to allow trailing zeros at the end of a number string
@@ -2818,21 +2466,6 @@ namespace J2N.Numerics
 
             return true;
         }
-
-        private static bool TrailingZeros(string value, int index)
-        {
-            // For compatibility, we need to allow trailing zeros at the end of a number string
-            for (int i = index; (uint)i < (uint)value.Length; i++)
-            {
-                if (value[i] != '\0')
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
 
         /// <summary>
         /// Returns <c>true</c> if the pattern matches, otherwise returns <c>false</c>.
