@@ -2091,15 +2091,15 @@ namespace J2N.Numerics
                 // we don't so we'll check the existing cases first and then handle `PositiveSign` +
                 // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
 
-                if (valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol.AsSpan()))
+                if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.PositiveInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NegativeInfinitySymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NegativeInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
@@ -2107,11 +2107,11 @@ namespace J2N.Numerics
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol.AsSpan()))
+                    if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.PositiveInfinity;
                     }
-                    else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                    else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.NaN;
                     }
@@ -2122,7 +2122,7 @@ namespace J2N.Numerics
                     }
                 }
                 else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
-                        valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                        valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
@@ -2155,15 +2155,15 @@ namespace J2N.Numerics
                 // we don't so we'll check the existing cases first and then handle `PositiveSign` +
                 // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
 
-                if (valueTrim.EqualsOrdinalIgnoreCase(info!.PositiveInfinitySymbol.AsSpan()))
+                if (valueTrim.Equals(info!.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.PositiveInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NegativeInfinitySymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NegativeInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
@@ -2171,11 +2171,11 @@ namespace J2N.Numerics
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol.AsSpan()))
+                    if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.PositiveInfinity;
                     }
-                    else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                    else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.NaN;
                     }
@@ -2186,7 +2186,7 @@ namespace J2N.Numerics
                     }
                 }
                 else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
-                        valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                        valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
@@ -2298,15 +2298,15 @@ namespace J2N.Numerics
                 // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
                 // that case so that we don't start parsing things like `++infini`.
 
-                if (valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol.AsSpan()))
+                if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.PositiveInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NegativeInfinitySymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NegativeInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }
@@ -2314,11 +2314,11 @@ namespace J2N.Numerics
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol.AsSpan()))
+                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.PositiveInfinity;
                     }
-                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.NaN;
                     }
@@ -2330,7 +2330,7 @@ namespace J2N.Numerics
                 }
                 else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
                          !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                         valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }
@@ -2367,15 +2367,15 @@ namespace J2N.Numerics
                 // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
                 // that case so that we don't start parsing things like `++infini`.
 
-                if (valueTrim.EqualsOrdinalIgnoreCase(info!.PositiveInfinitySymbol.AsSpan()))
+                if (valueTrim.Equals(info!.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.PositiveInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NegativeInfinitySymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NegativeInfinity;
                 }
-                else if (valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }
@@ -2383,11 +2383,11 @@ namespace J2N.Numerics
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.EqualsOrdinalIgnoreCase(info.PositiveInfinitySymbol.AsSpan()))
+                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.PositiveInfinity;
                     }
-                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.NaN;
                     }
@@ -2399,7 +2399,7 @@ namespace J2N.Numerics
                 }
                 else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
                          !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         valueTrim.Slice(info.NegativeSign.Length).EqualsOrdinalIgnoreCase(info.NaNSymbol.AsSpan()))
+                         valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }
@@ -2699,209 +2699,6 @@ namespace J2N.Numerics
             }
 
             return number.IsNegative ? -result : result;
-        }
-    }
-
-    internal static class MemoryExtensions
-    {
-        // From MemoryExtensions class in .NET Runtime
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        internal static bool EqualsOrdinalIgnoreCase(this ReadOnlySpan<char> span, ReadOnlySpan<char> value)
-        {
-            if (span.Length != value.Length)
-                return false;
-            if (value.Length == 0)  // span.Length == value.Length == 0
-                return true;
-            return EqualsIgnoreCase(ref MemoryMarshal.GetReference(span), span, ref MemoryMarshal.GetReference(value), value, span.Length);
-        }
-
-        // J2N: For now, we are just calling this on .NET Standard 2.1+
-
-        // From Ordinal class in .NET Runtime
-        internal static unsafe bool EqualsIgnoreCase(ref char charA, ReadOnlySpan<char> spanA, ref char charB, ReadOnlySpan<char> spanB, int length)
-        {
-            IntPtr byteOffset = IntPtr.Zero;
-
-#if TARGET_64BIT // J2N: We don't have a separate 32 bit compilation, but if it is ever added, we can enable this
-            // Read 4 chars (64 bits) at a time from each string
-            while ((uint)length >= 4)
-            {
-                ulong valueA = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<char, byte>(ref Unsafe.AddByteOffset(ref charA, byteOffset)));
-                ulong valueB = Unsafe.ReadUnaligned<ulong>(ref Unsafe.As<char, byte>(ref Unsafe.AddByteOffset(ref charB, byteOffset)));
-
-                // A 32-bit test - even with the bit-twiddling here - is more efficient than a 64-bit test.
-                ulong temp = valueA | valueB;
-                if (!/*Utf16Utility.*/AllCharsInUInt32AreAscii((uint)temp | (uint)(temp >> 32)))
-                {
-                    goto NonAscii; // one of the inputs contains non-ASCII data
-                }
-
-                // Generally, the caller has likely performed a first-pass check that the input strings
-                // are likely equal. Consider a dictionary which computes the hash code of its key before
-                // performing a proper deep equality check of the string contents. We want to optimize for
-                // the case where the equality check is likely to succeed, which means that we want to avoid
-                // branching within this loop unless we're about to exit the loop, either due to failure or
-                // due to us running out of input data.
-
-                if (!/*Utf16Utility.*/UInt64OrdinalIgnoreCaseAscii(valueA, valueB))
-                {
-                    return false;
-                }
-
-                byteOffset += 8;
-                length -= 4;
-            }
-#endif
-
-            // Read 2 chars (32 bits) at a time from each string
-#if TARGET_64BIT // J2N: We don't have a separate 32 bit compilation, but if it is ever added, we can enable this
-            if ((uint)length >= 2)
-#else
-            while ((uint)length >= 2)
-#endif
-            {
-                uint valueA = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<char, byte>(ref Unsafe.AddByteOffset(ref charA, byteOffset)));
-                uint valueB = Unsafe.ReadUnaligned<uint>(ref Unsafe.As<char, byte>(ref Unsafe.AddByteOffset(ref charB, byteOffset)));
-
-                if (!/*Utf16Utility.*/AllCharsInUInt32AreAscii(valueA | valueB))
-                {
-                    goto NonAscii; // one of the inputs contains non-ASCII data
-                }
-
-                // Generally, the caller has likely performed a first-pass check that the input strings
-                // are likely equal. Consider a dictionary which computes the hash code of its key before
-                // performing a proper deep equality check of the string contents. We want to optimize for
-                // the case where the equality check is likely to succeed, which means that we want to avoid
-                // branching within this loop unless we're about to exit the loop, either due to failure or
-                // due to us running out of input data.
-
-                if (!/*Utf16Utility.*/UInt32OrdinalIgnoreCaseAscii(valueA, valueB))
-                {
-                    return false;
-                }
-
-                byteOffset += 4;
-                length -= 2;
-            }
-
-            if (length != 0)
-            {
-                Debug.Assert(length == 1);
-
-                uint valueA = Unsafe.AddByteOffset(ref charA, byteOffset);
-                uint valueB = Unsafe.AddByteOffset(ref charB, byteOffset);
-
-                if ((valueA | valueB) > 0x7Fu)
-                {
-                    goto NonAscii; // one of the inputs contains non-ASCII data
-                }
-
-                if (valueA == valueB)
-                {
-                    return true; // exact match
-                }
-
-                valueA |= 0x20u;
-                if ((uint)(valueA - 'a') > (uint)('z' - 'a'))
-                {
-                    return false; // not exact match, and first input isn't in [A-Za-z]
-                }
-
-                // The ternary operator below seems redundant but helps RyuJIT generate more optimal code.
-                // See https://github.com/dotnet/runtime/issues/4207.
-#pragma warning disable IDE0075 // Simplify conditional expression
-                return (valueA == (valueB | 0x20u)) ? true : false;
-#pragma warning restore IDE0075 // Simplify conditional expression
-            }
-
-            Debug.Assert(length == 0);
-            return true;
-
-        NonAscii:
-            // The non-ASCII case is factored out into its own helper method so that the JIT
-            // doesn't need to emit a complex prolog for its caller (this method).
-            //return CompareStringIgnoreCase(ref Unsafe.AddByteOffset(ref charA, byteOffset), length, ref Unsafe.AddByteOffset(ref charB, byteOffset), length) == 0;
-
-            // J2N TODO: There is probably a way to get the substring from knowing the ref of the char, the byteOffset, and its length, which
-            // would both be more optimal and eliminate the need to pass the ReadOnlySpan<char> values into this method. But it would be better
-            // if we could stay at a low level and make the comparison without converting to string. In CompareStringIgnoreCase there are calls directly into
-            // NLS or ICU resources, but need to investigate how to deal with this further.
-            int startIndex = byteOffset.ToInt32() / 2; // Convert number of bytes to number of chars
-            return StringComparer.OrdinalIgnoreCase.Equals(spanA.Slice(startIndex, length).ToString(), spanB.Slice(startIndex, length).ToString());
-        }
-
-        // From Utf16Utility in System.Text.Unicode
-        /// <summary>
-        /// Returns true iff the UInt32 represents two ASCII UTF-16 characters in machine endianness.
-        /// </summary>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        internal static bool AllCharsInUInt32AreAscii(uint value)
-        {
-            return (value & ~0x007F_007Fu) == 0;
-        }
-
-        // From Utf16Utility in System.Text.Unicode
-        /// <summary>
-        /// Given two UInt32s that represent two ASCII UTF-16 characters each, returns true iff
-        /// the two inputs are equal using an ordinal case-insensitive comparison.
-        /// </summary>
-        /// <remarks>
-        /// This is a branchless implementation.
-        /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        internal static bool UInt32OrdinalIgnoreCaseAscii(uint valueA, uint valueB)
-        {
-            // Intrinsified in mono interpreter
-            // ASSUMPTION: Caller has validated that input values are ASCII.
-            Debug.Assert(AllCharsInUInt32AreAscii(valueA));
-            Debug.Assert(AllCharsInUInt32AreAscii(valueB));
-
-            // Generate a mask of all bits which are different between A and B. Since [A-Z]
-            // and [a-z] differ by the 0x20 bit, we'll left-shift this by 2 now so that
-            // this is moved over to the 0x80 bit, which nicely aligns with the calculation
-            // we're going to do on the indicator flag later.
-            //
-            // n.b. All of the logic below assumes we have at least 2 "known zero" bits leading
-            // each of the 7-bit ASCII values. This assumption won't hold if this method is
-            // ever adapted to deal with packed bytes instead of packed chars.
-
-            uint differentBits = (valueA ^ valueB) << 2;
-
-            // Now, we want to generate a mask where for each word in the input, the mask contains
-            // 0xFF7F if the word is [A-Za-z], 0xFFFF if the word is not [A-Za-z]. We know each
-            // input word is ASCII (only low 7 bit set), so we can use a combination of addition
-            // and logical operators as follows.
-            //
-            // original input   +05         |A0         +1A
-            // ====================================================
-            //         00 .. 3F -> 05 .. 44 -> A5 .. E4 -> BF .. FE
-            //               40 ->       45 ->       E5 ->       FF
-            // ([A-Z]) 41 .. 5A -> 46 .. 5F -> E6 .. FF -> 00 .. 19
-            //         5B .. 5F -> 60 .. 64 -> E0 .. E4 -> FA .. FE
-            //               60 ->       65 ->       E5 ->       FF
-            // ([a-z]) 61 .. 7A -> 66 .. 7F -> E6 .. FF -> 00 .. 19
-            //         7B .. 7F -> 80 .. 84 -> A0 .. A4 -> BA .. BE
-            //
-            // This combination of operations results in the 0x80 bit of each word being set
-            // iff the original word value was *not* [A-Za-z].
-
-            uint indicator = valueA + 0x0005_0005u;
-            indicator |= 0x00A0_00A0u;
-            indicator += 0x001A_001Au;
-            indicator |= 0xFF7F_FF7Fu; // normalize each word to 0xFF7F or 0xFFFF
-
-            // At this point, 'indicator' contains the mask of bits which are *not* allowed to
-            // differ between the inputs, and 'differentBits' contains the mask of bits which
-            // actually differ between the inputs. If these masks have any bits in common, then
-            // the two values are *not* equal under an OrdinalIgnoreCase comparer.
-
-            return (differentBits & indicator) == 0;
         }
     }
 }
