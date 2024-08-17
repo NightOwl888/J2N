@@ -290,7 +290,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
 
-            int r = ParseNumbers.StringToInt(s, @base, flags: ParseNumbers.IsTight, sign, ref i, s.Length - i);
+            int r = ParseNumbers.StringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight, sign, ref i, s.Length - i);
 
             // Only allow negative if it was passed as a sign in the string
             if (r < 0 && sign > 0)
@@ -398,7 +398,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 return false;
 
-            if (!ParseNumbers.TryStringToInt(s, @base, flags: ParseNumbers.IsTight, sign, ref i, s.Length - i, out int r) ||
+            if (!ParseNumbers.TryStringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight, sign, ref i, s.Length - i, out int r) ||
                 // Only allow negative if it was passed as a sign in the string
                 (r < 0 && sign > 0))
             {
@@ -470,13 +470,13 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned, sign: 1, ref startIndex, length);
+            return ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned, sign: 1, ref startIndex, length);
         }
 
         internal static int ParseUnsigned(string? s, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
         {
             return s != null ?
-                ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned) :
+                ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned) :
                 0;
         }
 
@@ -640,7 +640,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
+            return ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
 
         /// <summary>
@@ -800,7 +800,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            return ParseNumbers.StringToInt(s.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight);
+            return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
 
         /// <summary>
@@ -881,9 +881,16 @@ namespace J2N.Numerics
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (s is StringBuilderCharSequence stringBuilderCharSequence)
-                return ParseNumbers.StringToInt(stringBuilderCharSequence.Value!.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight);
+            {
+                return ParseNumbers.StringToInt(stringBuilderCharSequence.Value!, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
+            }
             if (s is StringBuffer stringBuffer)
-                return ParseNumbers.StringToInt(stringBuffer.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight);
+            {
+                lock (stringBuffer.SyncRoot)
+                {
+                    return ParseNumbers.StringToInt(stringBuffer.builder, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
+                }
+            }
 
             return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
@@ -1023,7 +1030,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            return ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
+            return ParseNumbers.TryStringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
 
         /// <summary>
@@ -1159,7 +1166,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            return ParseNumbers.TryStringToInt(s.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight, out result);
+            return ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
 
         /// <summary>
@@ -1228,9 +1235,16 @@ namespace J2N.Numerics
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             if (s is StringBuilderCharSequence stringBuilderCharSequence)
-                return ParseNumbers.TryStringToInt(stringBuilderCharSequence.Value!.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight, out result);
+            {
+                return ParseNumbers.TryStringToInt(stringBuilderCharSequence.Value!, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
+            }
             if (s is StringBuffer stringBuffer)
-                return ParseNumbers.TryStringToInt(stringBuffer.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight, out result);
+            {
+                lock (stringBuffer.SyncRoot)
+                {
+                    return ParseNumbers.TryStringToInt(stringBuffer.builder, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
+                }
+            }
 
             return ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
@@ -1327,7 +1341,7 @@ namespace J2N.Numerics
         public static int Parse(string? s, int radix) // J2N: Renamed from ParseInt()
         {
             return s != null ?
-                ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight) :
+                ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight) :
                 0;
         }
 
@@ -1418,7 +1432,7 @@ namespace J2N.Numerics
                 return true;
             }
 
-            return ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight, out result);
+            return ParseNumbers.TryStringToInt(s.AsSpan(), radix, ParseNumbers.IsTight, out result);
         }
 
         #endregion TryParse_CharSequence_Int32_Int32
