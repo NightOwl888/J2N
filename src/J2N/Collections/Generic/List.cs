@@ -57,7 +57,7 @@ namespace J2N.Collections.Generic
         private const int DefaultCapacity = 4;
 
 #if !FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-        private static readonly bool TIsNullableType = typeof(T).IsNullableType();
+        internal static readonly bool TIsNullableType = typeof(T).IsNullableType();
 #endif
 
 #if FEATURE_SERIALIZABLE
@@ -901,21 +901,46 @@ namespace J2N.Collections.Generic
             Array.Copy(_items, Offset, array, arrayIndex, Size);
         }
 
-        // Ensures that the capacity of this list is at least the given minimum
-        // value. If the currect capacity of the list is less than min, the
-        // capacity is increased to twice the current capacity or to min,
-        // whichever is larger.
-        internal void EnsureCapacity(int min) // J2N: Internal for testing
+        /// <summary>
+        /// Ensures that the capacity of this list is at least the specified <paramref name="capacity"/>.
+        /// If the current capacity of the list is less than specified <paramref name="capacity"/>,
+        /// the capacity is increased by continuously twice current capacity until it is at least the specified <paramref name="capacity"/>.
+        /// </summary>
+        /// <param name="capacity">The minimum capacity to ensure.</param>
+        /// <returns>The new capacity of this list.</returns>
+        public int EnsureCapacity(int capacity)
         {
-            if (_items.Length < min)
+            if (capacity < 0)
             {
-                int newCapacity = _items.Length == 0 ? DefaultCapacity : _items.Length * 2;
-                // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
-                // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
-                if ((uint)newCapacity > MaxArrayLength) newCapacity = MaxArrayLength;
-                if (newCapacity < min) newCapacity = min;
-                Capacity = newCapacity;
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
             }
+            if (_items.Length < capacity)
+            {
+                Grow(capacity);
+            }
+
+            return _items.Length;
+        }
+
+        /// <summary>
+        /// Increase the capacity of this list to at least the specified <paramref name="capacity"/>.
+        /// </summary>
+        /// <param name="capacity">The minimum capacity to ensure.</param>
+        internal void Grow(int capacity)
+        {
+            Debug.Assert(_items.Length < capacity);
+
+            int newCapacity = _items.Length == 0 ? DefaultCapacity : 2 * _items.Length;
+
+            // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
+            // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
+            if ((uint)newCapacity > MaxArrayLength) newCapacity = MaxArrayLength;
+
+            // If the computed capacity is still less than specified, set to the original argument.
+            // Capacities exceeding Array.MaxLength will be surfaced as OutOfMemoryException by Array.Resize.
+            if (newCapacity < capacity) newCapacity = capacity;
+
+            Capacity = newCapacity;
         }
 
         /// <summary>

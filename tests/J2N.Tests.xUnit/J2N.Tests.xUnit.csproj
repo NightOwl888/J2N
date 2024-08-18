@@ -4,6 +4,7 @@
 
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
     <NoWarn Label="Use Length/Count property instead of Enumerable.Count method">$(NoWarn);CA1829</NoWarn>
     <NoWarn Label="Do not use equality check to check for collection size.">$(NoWarn);xUnit2013</NoWarn>
@@ -14,6 +15,23 @@
 
   <ItemGroup>
     <PackageReference Include="xunit" Version="$(XunitPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <!-- See the following post to understand this approach: https://duanenewman.net/blog/post/a-better-way-to-override-references-with-packagereference/ -->
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
+    <!-- On net452, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
+        ExcludeAssets=compile removes the dependency from being referenced. ExcludeAssets=runtime removes the dependency from the build output. -->
+    <PackageReference Include="System.Buffers"
+                      Version="$(SystemBuffersPackageReferenceVersion)"
+                      ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.Memory"
+                      Version="$(SystemMemoryPackageReferenceVersion)"
+                      ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe"
+                      Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)"
+                      ExcludeAssets="compile;runtime" />
+    <PackageReference Include="NetFx.System.Memory"
+                      Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup Label="Test Project Common References" Condition=" !$(TargetFramework.StartsWith('netstandard')) ">

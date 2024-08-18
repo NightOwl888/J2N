@@ -389,6 +389,119 @@ namespace J2N
             }
         }
 
+        /// <summary>
+        /// Validates that the actual collection contains same items as expected collection. If the test fails, this will display:
+        /// 1. Count if two collection count are different;
+        /// 2. Missed expected collection item when found
+        /// </summary>
+        /// <param name="expected">The collection that <paramref name="actual"/> should contain same items as</param>
+        /// <param name="actual"></param>
+        /// <param name="comparer">The comparer used to compare the items in two collections</param>
+        public static void CollectionEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, IEqualityComparer<T> comparer)
+        {
+            var actualItemCountMapping = new Dictionary<T, ItemCount>(comparer);
+            int actualCount = 0;
+            foreach (T actualItem in actual)
+            {
+                if (actualItemCountMapping.TryGetValue(actualItem, out ItemCount countInfo))
+                {
+                    countInfo.Original++;
+                    countInfo.Remain++;
+                }
+                else
+                {
+                    actualItemCountMapping[actualItem] = new ItemCount(1, 1);
+                }
+
+                actualCount++;
+            }
+
+            T[] expectedArray = expected.ToArray();
+            int expectedCount = expectedArray.Length;
+
+            if (expectedCount != actualCount)
+            {
+                throw new XunitException($"Expected count: {expectedCount}{Environment.NewLine}Actual count: {actualCount}");
+            }
+
+            for (int i = 0; i < expectedCount; i++)
+            {
+                T currentExpectedItem = expectedArray[i];
+                if (!actualItemCountMapping.TryGetValue(currentExpectedItem, out ItemCount countInfo))
+                {
+                    throw new XunitException($"Expected: {currentExpectedItem} but not found");
+                }
+
+                if (countInfo.Remain == 0)
+                {
+                    throw new XunitException($"Collections are not equal.{Environment.NewLine}Totally {countInfo.Original} {currentExpectedItem} in actual collection but expect more {currentExpectedItem}");
+                }
+
+                countInfo.Remain--;
+            }
+        }
+
+        /// <summary>
+        /// Validates that the actual span is equal to the expected span.
+        /// If this fails, determine where the differences are and create an exception with that information.
+        /// </summary>
+        /// <param name="expected">The array that <paramref name="actual"/> should be equal to.</param>
+        /// <param name="actual"></param>
+        public static void SequenceEqual<T>(ReadOnlySpan<T> expected, ReadOnlySpan<T> actual) where T : IEquatable<T>
+        {
+            // Use the SequenceEqual to compare the arrays for better performance. The default Assert.Equal method compares
+            // the arrays by boxing each element that is very slow for large arrays.
+            if (!expected.SequenceEqual(actual))
+            {
+                if (expected.Length != actual.Length)
+                {
+                    throw new XunitException($"Expected: Span of length {expected.Length}{Environment.NewLine}Actual: Span of length {actual.Length}");
+                }
+                else
+                {
+                    const int MaxDiffsToShow = 10;      // arbitrary; enough to be useful, hopefully, but still manageable
+
+                    int diffCount = 0;
+                    string message = $"Showing first {MaxDiffsToShow} differences{Environment.NewLine}";
+                    for (int i = 0; i < expected.Length; i++)
+                    {
+                        if (!expected[i].Equals(actual[i]))
+                        {
+                            diffCount++;
+
+                            // Add up to 10 differences to the exception message
+                            if (diffCount <= MaxDiffsToShow)
+                            {
+                                message += $"  Position {i}: Expected: {expected[i]}, Actual: {actual[i]}{Environment.NewLine}";
+                            }
+                        }
+                    }
+
+                    message += $"Total number of differences: {diffCount} out of {expected.Length}";
+
+                    throw new XunitException(message);
+                }
+            }
+        }
+
+        public static void FilledWith<T>(T expected, ReadOnlySpan<T> actual)
+        {
+            EqualityComparer<T> comparer = EqualityComparer<T>.Default; // J2N TODO: Do we need to use JCG EqualityComparer here?
+
+            for (int i = 0; i < actual.Length; i++)
+            {
+                if (!comparer.Equals(expected, actual[i]))
+                {
+                    throw new XunitException($"Expected {expected?.ToString() ?? "null"} at position {i}; actual {actual[i]?.ToString() ?? "null"}");
+                }
+            }
+        }
+
+        public static void SequenceEqual<T>(Span<T> expected, Span<T> actual) where T : IEquatable<T> => SequenceEqual((ReadOnlySpan<T>)expected, (ReadOnlySpan<T>)actual);
+
+        public static void SequenceEqual<T>(T[] expected, T[] actual) where T : IEquatable<T> => SequenceEqual(expected.AsSpan(), actual.AsSpan());
+
+
         public static void AtLeastOneEquals<T>(T expected1, T expected2, T value)
         {
             EqualityComparer<T> comparer = EqualityComparer<T>.Default;
@@ -448,6 +561,18 @@ namespace J2N
             if (exception.GetType() != typeof(E))
             {
                 throw new ThrowsException(typeof(E), exception);
+            }
+        }
+
+        private class ItemCount
+        {
+            public int Original { get; set; }
+            public int Remain { get; set; }
+
+            public ItemCount(int original, int remain)
+            {
+                Original = original;
+                Remain = remain;
             }
         }
     }
