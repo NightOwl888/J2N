@@ -1438,7 +1438,6 @@ namespace J2N.Numerics
             assertTrue("Incorrect String representation want " + answer + ", got (" + f.ToString(J2N.Text.StringFormatter.InvariantCulture)
                     + ")", f.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
 
-#if FEATURE_SPAN
             Span<char> buffer = stackalloc char[64];
             assertTrue(f.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
             string actual = buffer.Slice(0, charsWritten).ToString();
@@ -1447,7 +1446,6 @@ namespace J2N.Numerics
             assertTrue(Single.TryFormat(ff, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
             actual = buffer.Slice(0, charsWritten).ToString();
             assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
-#endif
         }
 
         /**
@@ -2951,7 +2949,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider
             {
                 protected override bool IsNullableType => false;
@@ -2969,7 +2966,7 @@ namespace J2N.Numerics
                     assertEquals(float.NaN, GetResult("NANe\u0661234", NumberStyle.Float, new NumberFormatInfo { NaNSymbol = "NaNe\u0661234" }));
                 }
             }
-#endif
+
             #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
             #region Parse_CharSequence_IFormatProvider
@@ -3117,7 +3114,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_Single : TryParse_CharSequence_NumberStyle_IFormatProvider_Single_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -3127,7 +3123,6 @@ namespace J2N.Numerics
                     return Single.TryParse(value.AsSpan(), style, provider, out result);
                 }
             }
-#endif
 
             #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Single
 
@@ -3205,7 +3200,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_Single : TryParse_CharSequence_Single_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -3215,7 +3209,6 @@ namespace J2N.Numerics
                     return Single.TryParse(value.AsSpan(), out result);
                 }
             }
-#endif
 
             #endregion TryParse_CharSequence_Single
         }

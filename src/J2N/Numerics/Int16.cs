@@ -284,7 +284,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
 
-            int r = ParseNumbers.StringToInt(s, @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i);
+            int r = ParseNumbers.StringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i);
 
             if (r < short.MinValue || r > short.MaxValue)
                 throw new OverflowException(SR.Overflow_Int16);
@@ -393,7 +393,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 return false;
 
-            if (!ParseNumbers.TryStringToInt(s, @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i, out int r) ||
+            if (!ParseNumbers.TryStringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i, out int r) ||
                 // Only allow negative if it was passed as a sign in the string
                 (r < 0 && sign > 0) ||
                 (r < short.MinValue || r > short.MaxValue))
@@ -454,8 +454,6 @@ namespace J2N.Numerics
         // Radix-based parsing (default in Java)
 
         #region Parse_CharSequence_Int32_Int32_Int32
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>, beginning at the
@@ -540,8 +538,6 @@ namespace J2N.Numerics
             return (short)r;
         }
 
-#endif
-
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -619,7 +615,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            int r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
+            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
             if (radix != 10 && r <= ushort.MaxValue)
                 return (short)r;
 
@@ -791,7 +787,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            int r = ParseNumbers.StringToInt(s.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
+            int r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
             if (radix != 10 && r <= ushort.MaxValue)
                 return (short)r;
 
@@ -879,11 +875,20 @@ namespace J2N.Numerics
 
             int r;
             if (s is StringBuilderCharSequence stringBuilderCharSequence)
-                r = ParseNumbers.StringToInt(stringBuilderCharSequence.Value!.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
+            {
+                r = ParseNumbers.StringToInt(stringBuilderCharSequence.Value!, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
+            }
             else if (s is StringBuffer stringBuffer)
-                r = ParseNumbers.StringToInt(stringBuffer.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
+            {
+                lock (stringBuffer.SyncRoot)
+                {
+                    r = ParseNumbers.StringToInt(stringBuffer.builder, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
+                }
+            }
             else
+            {
                 r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
+            }
 
             if (radix != 10 && r <= ushort.MaxValue)
                 return (short)r;
@@ -896,8 +901,6 @@ namespace J2N.Numerics
         #endregion Parse_CharSequence_Int32_Int32_Int32
 
         #region TryParse_CharSequence_Int32_Int32_Int32_Int16
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{Char}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>, beginning at the
@@ -982,8 +985,6 @@ namespace J2N.Numerics
             return false;
         }
 
-#endif
-
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>, beginning at the
         /// specified <paramref name="startIndex"/> with the specified number of characters in <paramref name="length"/>.
@@ -1049,7 +1050,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            if (ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out int r))
+            if (ParseNumbers.TryStringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out int r))
             {
                 if (radix != 10 && r <= ushort.MaxValue)
                 {
@@ -1219,7 +1220,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
-            if (ParseNumbers.TryStringToInt(s.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out int r))
+            if (ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out int r))
             {
                 if (radix != 10 && r <= ushort.MaxValue)
                 {
@@ -1306,33 +1307,50 @@ namespace J2N.Numerics
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             int r;
-            if ((s is StringBuilderCharSequence stringBuilderCharSequence && ParseNumbers.TryStringToInt(stringBuilderCharSequence.Value!.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out r)) ||
-                (s is StringBuffer stringBuffer && ParseNumbers.TryStringToInt(stringBuffer.ToString(startIndex, length), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out r)) ||
-                ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out r))
+            if (s is StringBuilderCharSequence stringBuilderCharSequence && ParseNumbers.TryStringToInt(stringBuilderCharSequence.Value!, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out r))
             {
-                if (radix != 10 && r <= ushort.MaxValue)
-                {
-                    result = (short)r;
-                    return true;
-                }
+                goto ReturnResult;
+            }
 
-                if (r < short.MinValue || r > short.MaxValue)
+            if (s is StringBuffer stringBuffer)
+            {
+                lock (stringBuffer.SyncRoot)
                 {
-                    return false;
+                    if (ParseNumbers.TryStringToInt(stringBuffer.builder, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out r))
+                    {
+                        goto ReturnResult;
+                    }
                 }
+                return false;
+            }
 
+            if (ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out r))
+            {
+                goto ReturnResult;
+            }
+
+            return false;
+
+        ReturnResult:
+
+            if (radix != 10 && r <= ushort.MaxValue)
+            {
                 result = (short)r;
                 return true;
             }
 
-            return false;
+            if (r < short.MinValue || r > short.MaxValue)
+            {
+                return false;
+            }
+
+            result = (short)r;
+            return true;
         }
 
         #endregion TryParse_CharSequence_Int32_Int32_Int32_Int16
 
         #region Parse_CharSequence_Int32
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>. 
@@ -1387,8 +1405,6 @@ namespace J2N.Numerics
             return (short)r;
         }
 
-#endif
-
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>. 
         /// <para/>
@@ -1438,7 +1454,7 @@ namespace J2N.Numerics
                 return 0;
             }
 
-            int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
+            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
             if (radix != 10 && r <= ushort.MaxValue)
                 return (short)r;
 
@@ -1450,8 +1466,6 @@ namespace J2N.Numerics
         #endregion Parse_CharSequence_Int32
 
         #region TryParse_CharSequence_Int32_Int16
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Parses the <see cref="ReadOnlySpan{T}"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>.
@@ -1514,8 +1528,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#endif
-
         /// <summary>
         /// Parses the <see cref="string"/> argument as a signed <see cref="short"/> in the specified <paramref name="radix"/>.
         /// <para/>
@@ -1561,7 +1573,7 @@ namespace J2N.Numerics
                 return true;
             }
 
-            if (!ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out int r))
+            if (!ParseNumbers.TryStringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out int r))
             {
                 result = default;
                 return false;
@@ -1665,11 +1677,7 @@ namespace J2N.Numerics
         public static short Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             if (s is null) throw new ArgumentNullException(nameof(s));
-            return Parse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
+            return Parse(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
         }
 
         #endregion Parse_CharSequence_IFormatProvider
@@ -1751,14 +1759,9 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return TryParse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
+            return TryParse(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 16-bit signed
         /// integer equivalent. A return value indicates whether the conversion succeeded.
@@ -1831,7 +1834,6 @@ namespace J2N.Numerics
         {
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
         }
-#endif
 
         #endregion TryParse_CharSequence_Int16
 
@@ -2051,14 +2053,9 @@ namespace J2N.Numerics
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s is null) throw new ArgumentNullException(nameof(s));
-            return Parse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider));
+            return Parse(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the string representation of a number in a specified style and culture-specific format to its
         /// 16-bit signed integer equivalent.
@@ -2274,16 +2271,11 @@ namespace J2N.Numerics
             return Parse(s, style, NumberFormatInfo.GetInstance(provider));
         }
 
-#endif
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
         #region Parse_CharSequence_NumberStyle_NumberFormatInfo
 
-#if FEATURE_SPAN
         private static short Parse(ReadOnlySpan<char> s, NumberStyle style, NumberFormatInfo info)
-#else
-        private static short Parse(string s, NumberStyle style, NumberFormatInfo info)
-#endif
         {
             DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, info, out int i);
             if (status != DotNetNumber.ParsingStatus.OK)
@@ -2310,11 +2302,7 @@ namespace J2N.Numerics
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-#if FEATURE_SPAN
         private static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, NumberFormatInfo info, out short result)
-#else
-        private static bool TryParse(string s, NumberStyle style, NumberFormatInfo info, out short result)
-#endif
         {
             // For hex number styles AllowHexSpecifier << 6 == 0x8000 and cancels out MinValue so the check is effectively: (uint)i > ushort.MaxValue
             // For integer styles it's zero and the effective check is (uint)(i - MinValue) > ushort.MaxValue
@@ -2566,14 +2554,9 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return TryParse(s
-#if FEATURE_SPAN
-                .AsSpan()
-#endif
-                , style, NumberFormatInfo.GetInstance(provider), out result);
+            return TryParse(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out result);
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to its 16-bit signed integer equivalent.
         /// A return value indicates whether the conversion succeeded.
@@ -2804,7 +2787,6 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             return TryParse(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
-#endif
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Int16
 
@@ -3317,8 +3299,6 @@ namespace J2N.Numerics
 
         #region TryFormat
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Tries to format the value of the current short number instance into the provided span of characters.
         /// </summary>
@@ -3351,8 +3331,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryFormatInt32(value, 0x0000FFFF, format, provider, destination, out charsWritten);
         }
-
-#endif
 
         #endregion TryFormat
 

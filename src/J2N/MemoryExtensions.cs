@@ -4,8 +4,6 @@ using System.Runtime.InteropServices;
 
 namespace J2N
 {
-#if FEATURE_SPAN
-
     /// <summary>
     /// Extensions to <see cref="Span{T}"/> and <see cref="ReadOnlySpan{T}"/>.
     /// </summary>
@@ -439,6 +437,4 @@ namespace J2N
 
         #endregion ReverseText
     }
-
-#endif
 }

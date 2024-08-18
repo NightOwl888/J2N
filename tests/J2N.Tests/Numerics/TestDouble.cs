@@ -197,7 +197,6 @@ namespace J2N.Numerics
             assertEquals(answer, Double.ToString(d.ToDouble(), null, J2N.Text.StringFormatter.InvariantCulture));
             assertEquals(answer, d.ToString(J2N.Text.StringFormatter.InvariantCulture));
 
-#if FEATURE_SPAN
             Span<char> buffer = stackalloc char[64];
             assertTrue(d.TryFormat(buffer, out int charsWritten, provider: CultureInfo.InvariantCulture));
             string actual = buffer.Slice(0, charsWritten).ToString();
@@ -206,7 +205,6 @@ namespace J2N.Numerics
             assertTrue(Double.TryFormat(dd, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
             actual = buffer.Slice(0, charsWritten).ToString();
             assertEquals(answer, actual);
-#endif
         }
 
         /**
@@ -4309,7 +4307,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -4327,7 +4324,6 @@ namespace J2N.Numerics
                     assertEquals(double.NaN, GetResult("NANe\u0661234", NumberStyle.Float, new NumberFormatInfo { NaNSymbol = "NaNe\u0661234" }));
                 }
             }
-#endif
 
             #endregion
 
@@ -4484,7 +4480,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_Double : TryParse_CharSequence_NumberStyle_IFormatProvider_Double_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -4494,7 +4489,6 @@ namespace J2N.Numerics
                     return Double.TryParse(value.AsSpan(), style, provider, out result);
                 }
             }
-#endif
 
             #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
@@ -4576,7 +4570,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_Double : TryParse_CharSequence_Double_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -4586,7 +4579,6 @@ namespace J2N.Numerics
                     return Double.TryParse(value.AsSpan(), out result);
                 }
             }
-#endif
 
             #endregion TryParse_CharSequence_Double
 

@@ -34,10 +34,7 @@ namespace J2N.Numerics
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public abstract class Number : IFormattable
-#if FEATURE_SPAN
-        , ISpanFormattable
-#endif
+    public abstract class Number : IFormattable, ISpanFormattable
     {
         // From System.Convert
 
@@ -387,8 +384,6 @@ namespace J2N.Numerics
 
         #region TryFormat
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Tries to format the value of the current number instance into the provided span of characters.
         /// <para/>
@@ -428,8 +423,6 @@ namespace J2N.Numerics
 #endif
 
         }
-
-#endif
 
 #endregion
 

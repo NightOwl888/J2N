@@ -1,5 +1,4 @@
-﻿#if FEATURE_SPAN
-using System;
+﻿using System;
 using System.Buffers;
 
 namespace J2N.Text
@@ -70,4 +69,3 @@ namespace J2N.Text
         }
     }
 }
-#endif

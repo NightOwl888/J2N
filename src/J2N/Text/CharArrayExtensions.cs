@@ -245,8 +245,6 @@ namespace J2N.Text
             return str.Length - value.Length;
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// This method mimics the Java String.compareTo(CharSequence) method in that it
         /// <list type="number">
@@ -278,8 +276,6 @@ namespace J2N.Text
                 }
             }
         }
-
-#endif
 
         private unsafe static int CompareToOrdinalCore(char[] str, char* value, int valueLength)
         {

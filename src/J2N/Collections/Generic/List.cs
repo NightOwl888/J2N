@@ -2286,11 +2286,7 @@ namespace J2N.Collections.Generic
 
             if (size > 1)
             {
-#if FEATURE_SPAN
                 ArraySortHelper<T>.Sort(new Span<T>(_items, index, count), comparison);
-#else
-                ArraySortHelper<T>.Sort(_items, index, count, comparison);
-#endif
             }
             _version++;
         }

@@ -200,8 +200,6 @@ namespace J2N.Text
             return string.CompareOrdinal(str, value);
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// This method mimics the Java String.compareTo(CharSequence) method in that it
         /// <list type="number">
@@ -233,8 +231,6 @@ namespace J2N.Text
                 }
             }
         }
-
-#endif
 
         private unsafe static int CompareToOrdinalCore(string str, char* value, int valueLength)
         {
@@ -394,8 +390,6 @@ namespace J2N.Text
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Compares a <see cref="ReadOnlySpan{Char}"/> to this <see cref="string"/> to determine if
         /// their contents are equal.
@@ -423,8 +417,6 @@ namespace J2N.Text
 
             return charSequence.Equals(text.AsSpan(), StringComparison.Ordinal);
         }
-
-#endif
 
         /// <summary>
         /// Compares a <see cref="ICharSequence"/> to this <see cref="string"/> to determine if
@@ -551,8 +543,6 @@ namespace J2N.Text
             return RegionMatches(text, 0, charSequence, 0, len, comparisonType);
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Compares a <see cref="ReadOnlySpan{Char}"/> to this <see cref="string"/> to determine if
         /// their contents are equal.
@@ -580,8 +570,6 @@ namespace J2N.Text
 
             return charSequence.Equals(text.AsSpan(), comparisonType);
         }
-
-#endif
 
         #endregion ContentEquals
 
@@ -1142,8 +1130,6 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Compares the specified <see cref="ReadOnlySpan{Char}"/> to this string and compares the specified
         /// range of characters to determine if they are the same.
@@ -1172,13 +1158,10 @@ namespace J2N.Text
             return text.AsSpan(thisStartIndex, length).Equals(other.Slice(otherStartIndex, length), comparisonType);
         }
 
-#endif
-
         #endregion RegionMatches
 
         #region ReverseText
 
-#if FEATURE_SPAN
         /// <summary>
         /// Reverses the character sequence and returns a new string.
         /// If there are any surrogate pairs included in the
@@ -1211,39 +1194,6 @@ namespace J2N.Text
         /// <c>null</c>.</exception>
         /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
         /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
-#else
-        /// <summary>
-        /// Reverses the character sequence and returns a new string.
-        /// If there are any surrogate pairs included in the
-        /// sequence, these are treated as single characters for the
-        /// reverse operation. Thus, the order of the high-low surrogates
-        /// is never reversed.
-        /// <para/>
-        /// Let <c>n</c> be the character length of this character sequence
-        /// (not the length in <see cref="char"/> values) just prior to
-        /// execution of the <see cref="ReverseText(string)"/> method. Then the
-        /// character at index <c>k</c> in the new character sequence is
-        /// equal to the character at index <c>n-k-1</c> in the old
-        /// character sequence.
-        /// <para/>
-        /// Note that the reverse operation may result in producing
-        /// surrogate pairs that were unpaired low-surrogates and
-        /// high-surrogates before the operation. For example, reversing
-        /// "&#92;uDC00&#92;uD800" produces "&#92;uD800&#92;uDC00" which is
-        /// a valid surrogate pair.
-        /// <para/>
-        /// Usage Note: This is the same operation as
-        /// <see cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
-        /// (derived from Java's StringBuilder.reverse() method) but is more
-        /// efficient because it doesn't allocate a new <see cref="StringBuilder"/>
-        /// instance and will use the stack for strings 64 characters and less.
-        /// </summary>
-        /// <param name="text">This <see cref="string"/>.</param>
-        /// <returns>The reversed string with non-reversed surrogate pairs.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is
-        /// <c>null</c>.</exception>
-        /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
-#endif
         public static string ReverseText(this string text)
         {
             if (text is null)
@@ -1274,13 +1224,9 @@ namespace J2N.Text
             });
 #else
             int length = text.Length;
-#if FEATURE_SPAN
             var result = length <= CharStackBufferSize
                 ? new ValueStringBuilder(stackalloc char[length])
                 : new ValueStringBuilder(length);
-#else
-            var result = new StringBuilder(length);
-#endif
             for (int i = length - 1; i >= 0; i--)
             {
                 char ch = text[i];

@@ -189,19 +189,11 @@ namespace J2N.Numerics
 
         public static string ToString(float value, NumberFormatInfo info, RoundingMode roundingMode, bool upperCase)
         {
-#if FEATURE_SPAN
             var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
             return FormatSingle(ref sb, value, info, roundingMode, upperCase) ?? sb.ToString();
-#else
-            return FormatSingle(value, info, roundingMode, upperCase)!;
-#endif
         }
 
-        public static string? FormatSingle(
-#if FEATURE_SPAN
-            ref ValueStringBuilder sb,
-#endif
-            float value, NumberFormatInfo info, RoundingMode roundingMode, bool upperCase)
+        public static string? FormatSingle(ref ValueStringBuilder sb, float value, NumberFormatInfo info, RoundingMode roundingMode, bool upperCase)
         {
             // Step 1: Decode the floating point number, and unify normalized and subnormal cases.
             // First, handle all the trivial cases.
@@ -450,7 +442,6 @@ namespace J2N.Numerics
 
             unsafe
             {
-#if FEATURE_SPAN
                 fixed (char* ptr = &MemoryMarshal.GetReference(sb.AppendSpan(bufferLength)))
                 {
                     char* result = ptr;
@@ -459,28 +450,6 @@ namespace J2N.Numerics
                 int excess = bufferLength - index;
                 sb.Length -= excess;
                 return null;
-#else
-                const int MaximumStackSize = 64;
-                if (bufferLength <= MaximumStackSize)
-                {
-                    char* result = stackalloc char[bufferLength];
-                    WriteBuffer(result, ref index, output, olength, upperCase, sign, exp, scientificNotation, negSign, negSignLength, decimalSeparator, decimalSeparatorLength);
-                    return new string(result, 0, index);
-                }
-                else
-                {
-                    // Since negSignLength and decimalSeparatorLength are based on user input,
-                    // this is a fallback to prevent a stack overflow if these are abused.
-                    // This should not ever happen under normal usage.
-                    fixed (char* resultPtr = new char[bufferLength])
-                    {
-                        char* result = resultPtr;
-                        WriteBuffer(result, ref index, output, olength, upperCase, sign, exp, scientificNotation, negSign, negSignLength, decimalSeparator, decimalSeparatorLength);
-                        return new string(result, 0, index);
-                    }
-                }
-
-#endif
             }
         }
 

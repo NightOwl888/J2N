@@ -932,10 +932,8 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return DotNetNumber.TryParseDouble(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
+            return DotNetNumber.TryParseDouble(s.AsSpan(), NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Converts the string representation of a number in a character span to its double-precision floating-point number equivalent.
@@ -1044,8 +1042,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryParseDouble(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
-
-#endif
 
         #endregion TryParse_CharSequence_Double
 
@@ -1335,10 +1331,9 @@ namespace J2N.Numerics
                 throw new ArgumentNullException(nameof(s));
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
 
-            return DotNetNumber.ParseDouble(s, style, NumberFormatInfo.GetInstance(provider));
+            return DotNetNumber.ParseDouble(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts a character span that contains the string representation of a number in a specified style and culture-specific format to
         /// its double-precision floating-point number equivalent.
@@ -1622,7 +1617,6 @@ namespace J2N.Numerics
 
             return DotNetNumber.ParseDouble(s, style, NumberFormatInfo.GetInstance(provider));
         }
-#endif
 
         #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
@@ -1922,10 +1916,9 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return DotNetNumber.TryParseDouble(s, style, NumberFormatInfo.GetInstance(provider), out result);
+            return DotNetNumber.TryParseDouble(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out result);
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Converts the span representation of a number in a specified style and culture-specific format to
         /// its double-precision floating-point number equivalent. A return value indicates whether the
@@ -2216,7 +2209,6 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
             return DotNetNumber.TryParseDouble(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
-#endif
 
         #endregion TryParse_CharSequence_NumberStyle_IFormatProvider_Double
 
@@ -3049,8 +3041,6 @@ namespace J2N.Numerics
 
         #region TryFormat
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Tries to format the value of the current double instance into the provided span of characters.
         /// </summary>
@@ -3083,8 +3073,6 @@ namespace J2N.Numerics
         {
             return DotNetNumber.TryFormatDouble(value, format, provider, destination, out charsWritten);
         }
-
-#endif
 
         #endregion TryFormat
 

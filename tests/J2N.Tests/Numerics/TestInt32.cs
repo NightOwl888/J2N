@@ -1022,7 +1022,6 @@ namespace J2N.Numerics
             assertTrue("Incorrect String representation want " + answer + ", got (" + i.ToString(J2N.Text.StringFormatter.InvariantCulture)
                     + ")", i.ToString(J2N.Text.StringFormatter.InvariantCulture).Equals(answer));
 
-#if FEATURE_SPAN
             Span<char> buffer = stackalloc char[64];
             assertTrue(i.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
             string actual = buffer.Slice(0, charsWritten).ToString();
@@ -1031,7 +1030,6 @@ namespace J2N.Numerics
             assertTrue(Int32.TryFormat(ii, buffer, out charsWritten, provider: CultureInfo.InvariantCulture));
             actual = buffer.Slice(0, charsWritten).ToString();
             assertEquals("Incorrect String representation want " + answer + ", got (" + actual + ")", answer, actual);
-#endif
         }
 
         /**
@@ -2164,7 +2162,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_Int32 : Parse_CharSequence_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2173,7 +2170,6 @@ namespace J2N.Numerics
                     return Int32.Parse(s.AsSpan(), radix);
                 }
             }
-#endif
 
             #endregion Parse_CharSequence_Int32
 
@@ -2240,7 +2236,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_Int32_Int32_Int32_Int32 : Parse_CharSequence_Int32_Int32_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2250,7 +2245,6 @@ namespace J2N.Numerics
                     return Int32.Parse(value.AsSpan(), startIndex, length, radix);
                 }
             }
-#endif
 
 
             #endregion Parse_CharSequence_Int32_Int32_Int32
@@ -2324,7 +2318,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_Int32_Int32_Int32_Int32 : TryParse_CharSequence_Int32_Int32_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2334,7 +2327,6 @@ namespace J2N.Numerics
                     return Int32.TryParse(value.AsSpan(), startIndex, length, radix, out result);
                 }
             }
-#endif
 
             #endregion TryParse_CharSequence_Int32_Int32_Int32
 
@@ -2382,7 +2374,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_Int32 : TryParse_CharSequence_Int32_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2391,7 +2382,6 @@ namespace J2N.Numerics
                     return Int32.TryParse(s.AsSpan(), radix, out result);
                 }
             }
-#endif
 
             #endregion Parse_CharSequence_Int32
 
@@ -2471,7 +2461,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class Parse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : Parse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2481,7 +2470,6 @@ namespace J2N.Numerics
                     return Int32.Parse(s.AsSpan(), style, provider);
                 }
             }
-#endif
 
             #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
@@ -2529,7 +2517,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_NumberStyle_IFormatProvider_TestCase : TryParse_CharSequence_NumberStyle_IFormatProvider_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2539,7 +2526,6 @@ namespace J2N.Numerics
                     return Int32.TryParse(s.AsSpan(), style, provider, out result);
                 }
             }
-#endif
 
             #endregion Parse_CharSequence_NumberStyle_IFormatProvider
 
@@ -2589,7 +2575,6 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             public class TryParse_ReadOnlySpan_TestCase : TryParse_CharSequence_TestCase
             {
                 protected override bool IsNullableType => false;
@@ -2599,7 +2584,6 @@ namespace J2N.Numerics
                     return Int32.TryParse(s.AsSpan(), out result);
                 }
             }
-#endif
 
             #endregion TryParse_CharSequence
 
@@ -3135,7 +3119,6 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload
-            //#if FEATURE_SPAN
             //            public class Decode_ReadOnlySpan : Decode_CharSequence_TestCase
             //            {
             //                protected override Int32 GetResult(string s)
@@ -3143,7 +3126,6 @@ namespace J2N.Numerics
             //                    return Int32.Decode(s.AsSpan());
             //                }
             //            }
-            //#endif
 
             #endregion Decode_CharSequence
 
@@ -3177,7 +3159,6 @@ namespace J2N.Numerics
             }
 
             // J2N: ReadOnlySpan<char> not supported at this time on this overload
-            //#if FEATURE_SPAN
             //            public class TryDecode_ReadOnlySpan : TryDecode_CharSequence_TestCase
             //            {
             //                protected override bool GetResult(string s, out Int32 result)
@@ -3185,7 +3166,6 @@ namespace J2N.Numerics
             //                    return Int32.TryDecode(s.AsSpan(), out result);
             //                }
             //            }
-            //#endif
 
             #endregion TryDecode_CharSequence
         }

@@ -143,9 +143,7 @@ namespace J2N.Text
             StringBuilder target = null;
             string compareTo = "Alpine";
 
-#if FEATURE_SPAN
             Assert.Greater(0, target.CompareToOrdinal(compareTo.AsSpan()));
-#endif
             Assert.Greater(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.Greater(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.Greater(0, target.CompareToOrdinal(compareTo));
@@ -155,9 +153,7 @@ namespace J2N.Text
 
             target = new StringBuilder("Alpha");
 
-#if FEATURE_SPAN
             Assert.Greater(0, target.CompareToOrdinal(compareTo.AsSpan()));
-#endif
             Assert.Greater(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.Greater(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.Greater(0, target.CompareToOrdinal(compareTo));
@@ -167,9 +163,7 @@ namespace J2N.Text
 
             compareTo = "Alpha";
 
-#if FEATURE_SPAN
             Assert.AreEqual(0, target.CompareToOrdinal(compareTo.AsSpan()));
-#endif
             Assert.AreEqual(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.AreEqual(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.AreEqual(0, target.CompareToOrdinal(compareTo));
@@ -179,9 +173,7 @@ namespace J2N.Text
 
             compareTo = "Alp";
 
-#if FEATURE_SPAN
             Assert.Less(0, target.CompareToOrdinal(compareTo.AsSpan()));
-#endif
             Assert.Less(0, target.CompareToOrdinal(compareTo.ToCharArray()));
             Assert.Less(0, target.CompareToOrdinal(new StringBuilder(compareTo)));
             Assert.Less(0, target.CompareToOrdinal(compareTo));
@@ -190,9 +182,7 @@ namespace J2N.Text
             Assert.Less(0, target.CompareToOrdinal(new StringCharSequence(compareTo)));
 
 
-#if FEATURE_SPAN
             Assert.Less(0, target.CompareToOrdinal((ReadOnlySpan<char>)null));
-#endif
             Assert.Less(0, target.CompareToOrdinal((char[])null));
             Assert.Less(0, target.CompareToOrdinal((StringBuilder)null));
             Assert.Less(0, target.CompareToOrdinal((string)null));
@@ -202,9 +192,7 @@ namespace J2N.Text
 
             target = null;
 
-#if FEATURE_SPAN
             Assert.AreEqual(0, target.CompareToOrdinal((ReadOnlySpan<char>)null));
-#endif
             Assert.AreEqual(0, target.CompareToOrdinal((char[])null));
             Assert.AreEqual(0, target.CompareToOrdinal((StringBuilder)null));
             Assert.AreEqual(0, target.CompareToOrdinal((string)null));
@@ -406,8 +394,6 @@ namespace J2N.Text
             assertEquals("f1234567ru", sb.ToString());
         }
 
-#if FEATURE_SPAN
-
         /**
          * @tests java.lang.StringBuilder.replace(int, int, String)'
          */
@@ -493,7 +479,6 @@ namespace J2N.Text
             assertEquals("f1234567ru", sb.ToString());
         }
 
-#endif
 
         private void reverseTest(String org, String rev, String back)
         {
@@ -943,8 +928,6 @@ namespace J2N.Text
             assertEquals(new string('y', 550) + new string('r', 6999), sb.ToString());
         }
 
-#if FEATURE_SPAN
-
         [Test]
         public void Test_Append_ReadOnlySpan() // J2N Specific to cover missing overload in older .NET TFMs
         {
@@ -968,8 +951,6 @@ namespace J2N.Text
             sb.Append(longString2.AsSpan());
             assertEquals(longString2, sb.ToString());
         }
-
-#endif
 
         [Test]
         public void Test_Insert_ICharSequence()
@@ -1174,8 +1155,6 @@ namespace J2N.Text
             assertEquals("fo" + new string('y', 550) + new string('r', 6999) + 'o', sb.ToString());
         }
 
-#if FEATURE_SPAN
-
         [Test]
         public void Test_Insert_ReadOnlySpan() // J2N Specific to cover missing overload in older .NET TFMs
         {
@@ -1200,8 +1179,6 @@ namespace J2N.Text
             sb.Insert(2, longString2.AsSpan());
             assertEquals("fo" + longString2 + 'o', sb.ToString());
         }
-
-#endif
 
         /**
          * @tests java.lang.StringBuilder.indexOf(String)
@@ -1478,8 +1455,6 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_SPAN
-
         [Test]
         [TestCase("Hello", 0, new char[] { '\0', '\0', '\0', '\0', '\0' }, 5, new char[] { 'H', 'e', 'l', 'l', 'o' })]
         [TestCase("Hello", 0, new char[] { '\0', '\0', '\0', '\0' }, 4, new char[] { 'H', 'e', 'l', 'l' })]
@@ -1514,6 +1489,67 @@ namespace J2N.Text
             Assert.Throws<ArgumentException>(() => builder.CopyTo(4, new Span<char>(new char[10]), 2)); // Source index + count > builder.Length
 
             Assert.Throws<ArgumentException>(() => builder.CopyTo(0, new Span<char>(new char[10]), 11)); // count > destinationArray.Length
+        }
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+
+        [Test]
+        public void Test_TryAsSpan_EmptyStringBuilder_NonZeroLength_ReturnsFalse()
+        {
+            var sb = new StringBuilder();
+            Assert.False(sb.TryAsSpan(0, 1, out var span));
+            Assert.False(sb.TryAsSpan(5, 1, out span));
+        }
+
+        [Test]
+        public void Test_TryAsSpan_StartIndexOutOfBounds_ReturnsFalse()
+        {
+            var sb = new StringBuilder("Hello");
+            Assert.False(sb.TryAsSpan(sb.Length, 1, out var span));
+            Assert.False(sb.TryAsSpan(sb.Length + 1, 1, out span));
+        }
+
+        [Test]
+        public void Test_TryAsSpan_RangeSplitBetweenChunks_ReturnsFalse()
+        {
+            var sb = new StringBuilder("Hello");
+            sb.Append(new string('x', 1024));
+            Assert.False(sb.TryAsSpan(4, 1025, out var span));
+        }
+
+        [Test]
+        public void Test_TryAsSpan_EntireRangeInFirstChunk_ReturnsTrueWithCorrectSlice()
+        {
+            var sb = new StringBuilder("HelloWorld");
+            Assert.True(sb.TryAsSpan(0, 5, out var span));
+            Assert.AreEqual("Hello", span.ToString());
+
+            Assert.True(sb.TryAsSpan(5, 5, out span));
+            Assert.AreEqual("World", span.ToString());
+        }
+
+        [Test]
+        public void Test_TryAsSpan_EntireRangeInNonFirstChunk_ReturnsTrueWithCorrectSlice()
+        {
+            var sb = new StringBuilder("Hello");
+            sb.Append(new string('x', 1024));
+            sb.Append("World");
+
+            int startIndex = "Hello".Length + 1024;
+            Assert.True(sb.TryAsSpan(startIndex, 5, out var span));
+            Assert.AreEqual("World", span.ToString());
+        }
+
+        [Test]
+        public void Test_TryAsSpan_EntireRangeInNonFirstChunk_SliceOfChunk_ReturnsTrueWithCorrectSlice()
+        {
+            var sb = new StringBuilder("Hello");
+            sb.Append(new string('x', 1024));
+            sb.Append("HelloWorldOfMine");
+
+            int startIndex = "Hello".Length + 1024 + "Hello".Length;
+            Assert.True(sb.TryAsSpan(startIndex, 5, out var span));
+            Assert.AreEqual("World", span.ToString());
         }
 #endif
     }

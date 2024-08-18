@@ -12,7 +12,6 @@ namespace J2N.Collections.Generic
     internal ref struct BitHelper
     {
         private const int IntSize = sizeof(int) * 8;
-#if FEATURE_SPAN
         private readonly Span<int> _span;
 
         internal BitHelper(Span<int> span, bool clear)
@@ -23,18 +22,6 @@ namespace J2N.Collections.Generic
             }
             _span = span;
         }
-#else
-        private readonly int[] _span;
-
-        internal BitHelper(int[] span, bool clear)
-        {
-            if (clear)
-            {
-                span.Fill(0);
-            }
-            _span = span;
-        }
-#endif
 
         internal void MarkBit(int bitPosition)
         {

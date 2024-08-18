@@ -1859,14 +1859,10 @@ namespace J2N.Collections.Generic
             int originalLastIndex = Count;
             int intArrayLength = BitHelper.ToIntArrayLength(originalLastIndex);
 
-#if FEATURE_SPAN
             Span<int> span = stackalloc int[StackAllocThreshold];
-#endif
             BitHelper bitHelper =
-#if FEATURE_SPAN
                 intArrayLength <= StackAllocThreshold ?
                 new BitHelper(span.Slice(0, intArrayLength), clear: true) :
-#endif
                 new BitHelper(new int[intArrayLength], clear: false);
 
             // count of items in other not found in this

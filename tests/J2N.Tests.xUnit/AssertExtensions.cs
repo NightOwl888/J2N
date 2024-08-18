@@ -372,11 +372,7 @@ namespace J2N
         {
             // Use the SequenceEqual to compare the arrays for better performance. The default Assert.Equal method compares
             // the arrays by boxing each element that is very slow for large arrays.
-#if FEATURE_SPAN
             if (!expected.AsSpan().SequenceEqual(actual.AsSpan()))
-#else
-            if (!J2N.Collections.ArrayEqualityComparer<T>.OneDimensional.Equals(expected, actual))
-#endif
             {
                 string expectedString = string.Join(", ", expected);
                 string actualString = string.Join(", ", actual);
@@ -400,7 +396,6 @@ namespace J2N
                 throw new XunitException($"Expected: {expected1} || {expected2}{Environment.NewLine}Actual: {value}");
         }
 
-#if FEATURE_SPAN
         public delegate void AssertThrowsActionReadOnly<T>(ReadOnlySpan<T> span);
 
         public delegate void AssertThrowsAction<T>(Span<T> span);
@@ -455,6 +450,5 @@ namespace J2N
                 throw new ThrowsException(typeof(E), exception);
             }
         }
-#endif
     }
 }

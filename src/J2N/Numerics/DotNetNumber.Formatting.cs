@@ -10,11 +10,6 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-#if !FEATURE_SPAN
-// J2N NOTE: We are passing by reference in this case only to prevent having to conditionally
-// compile around "ref" everywhere only to support net40
-using ValueStringBuilder = System.Text.StringBuilder;
-#endif
 
 namespace J2N.Numerics
 {
@@ -416,13 +411,8 @@ namespace J2N.Numerics
                 // Slow path for special cases
                 if (fmtUpper == 'R' || value.IsNegativeZero())
                 {
-#if FEATURE_SPAN
                     var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
                     return FormatDouble(ref sb, value, format.AsSpan(), NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
-#else
-                    var sb = new StringBuilder(CharStackBufferSize);
-                    return FormatDouble(ref sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
-#endif
                 }
 #endif
 
@@ -430,7 +420,6 @@ namespace J2N.Numerics
             }
         }
 
-#if FEATURE_SPAN
         public static bool TryFormatDouble(double value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
         {
             // Fast path for default format
@@ -494,15 +483,10 @@ namespace J2N.Numerics
 
             return success;
         }
-#endif
 
         internal static string DoubleToHexStr(double value, NumberFormatInfo info, bool upperCase)
         {
-#if FEATURE_SPAN
             ValueStringBuilder sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
-#else
-            StringBuilder sb = new StringBuilder(10);
-#endif
             return FormatDoubleHex(ref sb, value, info, upperCase) ?? sb.ToString();
         }
 
@@ -733,13 +717,7 @@ namespace J2N.Numerics
         /// Non-null if an existing string can be returned, in which case the builder will be unmodified.
         /// Null if no existing string was returned, in which case the formatted output is in the builder.
         /// </returns>
-        private static unsafe string? FormatDouble(ref ValueStringBuilder sb, double value,
-#if FEATURE_SPAN
-            ReadOnlySpan<char> format,
-#else
-            string format,
-#endif
-            NumberFormatInfo info)
+        private static unsafe string? FormatDouble(ref ValueStringBuilder sb, double value, ReadOnlySpan<char> format, NumberFormatInfo info)
         {
             if (!value.IsFinite())
             {
@@ -833,21 +811,14 @@ namespace J2N.Numerics
                 // Slow path for special cases
                 if (fmtUpper == 'R' || value.IsNegativeZero())
                 {
-#if FEATURE_SPAN
                     var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
                     return FormatSingle(ref sb, value, format.AsSpan(), NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
-#else
-                    var sb = new StringBuilder(CharStackBufferSize);
-                    return FormatSingle(ref sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
-#endif
                 }
 #endif
 
                 return value.ToString(format, provider);
             }
         }
-
-#if FEATURE_SPAN
 
         public static bool TryFormatSingle(float value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
         {
@@ -912,15 +883,10 @@ namespace J2N.Numerics
 
             return success;
         }
-#endif
 
         internal static string SingleToHexStr(float value, NumberFormatInfo info, bool upperCase)
         {
-#if FEATURE_SPAN
             ValueStringBuilder sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
-#else
-            StringBuilder sb = new StringBuilder(10);
-#endif
             return SingleToHexStr(ref sb, value, info, upperCase) ?? sb.ToString();
         }
 
@@ -1032,13 +998,7 @@ namespace J2N.Numerics
         /// Non-null if an existing string can be returned, in which case the builder will be unmodified.
         /// Null if no existing string was returned, in which case the formatted output is in the builder.
         /// </returns>
-        private static unsafe string? FormatSingle(ref ValueStringBuilder sb, float value,
-#if FEATURE_SPAN
-            ReadOnlySpan<char> format,
-#else
-            string format,
-#endif
-            NumberFormatInfo info)
+        private static unsafe string? FormatSingle(ref ValueStringBuilder sb, float value, ReadOnlySpan<char> format, NumberFormatInfo info)
         {
             if (!value.IsFinite())
             {
@@ -1188,7 +1148,6 @@ namespace J2N.Numerics
         //        sb.TryCopyTo(destination, out charsWritten);
         //}
 
-#if FEATURE_SPAN
         internal static bool TryCopyTo(string source, Span<char> destination, out int charsWritten)
         {
             Debug.Assert(source != null);
@@ -1202,7 +1161,6 @@ namespace J2N.Numerics
             charsWritten = 0;
             return false;
         }
-#endif
 
         private static char GetHexBase(char fmt)
         {
@@ -1263,7 +1221,6 @@ namespace J2N.Numerics
         //    }
         //}
 
-#if FEATURE_SPAN
         public static bool TryFormatInt32(int value, int hexMask, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
         {
             // Fast path for default format
@@ -1315,8 +1272,6 @@ namespace J2N.Numerics
             }
         }
 
-#endif
-
         //public static string FormatUInt32(uint value, string? format, IFormatProvider? provider)
         //{
         //    // Fast path for default format
@@ -1365,8 +1320,6 @@ namespace J2N.Numerics
         //    }
         //}
 
-
-#if FEATURE_SPAN
         public static bool TryFormatUInt32(uint value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
         {
             // Fast path for default format
@@ -1413,8 +1366,6 @@ namespace J2N.Numerics
                 }
             }
         }
-
-#endif
 
         //public static string FormatInt64(long value, string? format, IFormatProvider? provider)
         //{
@@ -1468,8 +1419,6 @@ namespace J2N.Numerics
         //    }
         //}
 
-#if FEATURE_SPAN
-
         public static bool TryFormatInt64(long value, ReadOnlySpan<char> format, IFormatProvider? provider, Span<char> destination, out int charsWritten)
         {
             // Fast path for default format
@@ -1520,8 +1469,6 @@ namespace J2N.Numerics
                 }
             }
         }
-
-#endif
 
         //public static string FormatUInt64(ulong value, string? format, IFormatProvider? provider)
         //{
@@ -1618,8 +1565,6 @@ namespace J2N.Numerics
         //    }
         //}
 
-#if FEATURE_SPAN // J2N: GetDigitsPointer() would need to be reworked to support net40, but this overload is only called by TryFormat for now
-
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // called from only one location
 #endif
@@ -1653,8 +1598,6 @@ namespace J2N.Numerics
             number.CheckConsistency();
         }
 
-#endif
-
         //public static string Int32ToDecStr(int value)
         //{
         //    return value >= 0 ?
@@ -1685,8 +1628,6 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-#if FEATURE_SPAN
-
         private static unsafe bool TryNegativeInt32ToDecStr(int value, int digits, string sNegative, Span<char> destination, out int charsWritten)
         {
             Debug.Assert(value < 0);
@@ -1716,8 +1657,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#endif
-
         //private static unsafe string Int32ToHexStr(int value, char hexBase, int digits)
         //{
         //    if (digits < 1)
@@ -1732,8 +1671,6 @@ namespace J2N.Numerics
         //    }
         //    return result;
         //}
-
-#if FEATURE_SPAN
 
         private static unsafe bool TryInt32ToHexStr(int value, char hexBase, int digits, Span<char> destination, out int charsWritten)
         {
@@ -1755,7 +1692,6 @@ namespace J2N.Numerics
             }
             return true;
         }
-#endif
 
         private static unsafe char* Int32ToHexChars(char* buffer, uint value, int hexBase, int digits)
         {
@@ -1768,7 +1704,6 @@ namespace J2N.Numerics
             return buffer;
         }
 
-#if FEATURE_SPAN // J2N: GetDigitsPointer() would need to be reworked for older platforms, but this method is only called by TryFormat for now
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // called from only one location
 #endif
@@ -1792,7 +1727,6 @@ namespace J2N.Numerics
 
             number.CheckConsistency();
         }
-#endif
 
         internal static unsafe byte* UInt32ToDecChars(byte* bufferEnd, uint value, int digits)
         {
@@ -1856,8 +1790,6 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-#if FEATURE_SPAN
-
         private static unsafe bool TryUInt32ToDecStr(uint value, int digits, Span<char> destination, out int charsWritten)
         {
             int bufferLength = Math.Max(digits, FormattingHelpers.CountDigits(value));
@@ -1889,9 +1821,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#endif
-
-#if FEATURE_SPAN // J2N: GetDigitsPointer() would need to be reworked to support net40, but this overload is only called by TryFormat for now
         private static unsafe void Int64ToNumber(long input, ref NumberBuffer number)
         {
             ulong value = (ulong)input;
@@ -1920,7 +1849,6 @@ namespace J2N.Numerics
 
             number.CheckConsistency();
         }
-#endif
 
         //public static string Int64ToDecStr(long value)
         //{
@@ -1962,8 +1890,6 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-#if FEATURE_SPAN
-
         private static unsafe bool TryNegativeInt64ToDecStr(long input, int digits, string sNegative, Span<char> destination, out int charsWritten)
         {
             Debug.Assert(input < 0);
@@ -2003,8 +1929,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#endif
-
         //private static unsafe string Int64ToHexStr(long value, char hexBase, int digits)
         //{
         //    int bufferLength = Math.Max(digits, FormattingHelpers.CountHexDigits((ulong)value));
@@ -2026,7 +1950,6 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-#if FEATURE_SPAN
         private static unsafe bool TryInt64ToHexStr(long value, char hexBase, int digits, Span<char> destination, out int charsWritten)
         {
             int bufferLength = Math.Max(digits, FormattingHelpers.CountHexDigits((ulong)value));
@@ -2053,8 +1976,6 @@ namespace J2N.Numerics
             }
             return true;
         }
-
-#endif
 
         //private static unsafe void UInt64ToNumber(ulong value, ref NumberBuffer number)
         //{
@@ -2109,7 +2030,6 @@ namespace J2N.Numerics
         //    return result;
         //}
 
-#if FEATURE_SPAN
         private static unsafe bool TryUInt64ToDecStr(ulong value, int digits, Span<char> destination, out int charsWritten)
         {
             if (digits < 1)
@@ -2137,9 +2057,6 @@ namespace J2N.Numerics
             return true;
         }
 
-#endif
-
-#if FEATURE_SPAN
         internal static unsafe char ParseFormatSpecifier(ReadOnlySpan<char> format, out int digits)
         {
             char c = default;
@@ -2205,7 +2122,7 @@ namespace J2N.Numerics
                 'G' :
                 '\0';
         }
-#endif
+
         internal static unsafe char ParseFormatSpecifier(string format, out int digits)
         {
             char c = default;
@@ -2407,13 +2324,7 @@ namespace J2N.Numerics
             }
         }
 
-        internal static unsafe void NumberToStringFormat(ref ValueStringBuilder sb, ref NumberBuffer number,
-#if FEATURE_SPAN
-            ReadOnlySpan<char> format,
-#else
-            string format,
-#endif
-            NumberFormatInfo info)
+        internal static unsafe void NumberToStringFormat(ref ValueStringBuilder sb, ref NumberBuffer number, ReadOnlySpan<char> format, NumberFormatInfo info)
         {
             number.CheckConsistency();
 
@@ -2433,14 +2344,8 @@ namespace J2N.Numerics
             int src;
             char ch;
 
-#if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
             {
-#else
-            fixed (byte* digPtr = &number.Digits[0])
-            {
-                byte* dig = digPtr;
-#endif
 
                 section = FindSection(format, dig[0] == 0 ? 2 : number.IsNegative ? 1 : 0);
 
@@ -2456,11 +2361,7 @@ namespace J2N.Numerics
                     scaleAdjust = 0;
                     src = section;
 
-#if FEATURE_SPAN
                     fixed (char* pFormat = &MemoryMarshal.GetReference(format))
-#else
-                    fixed (char* pFormat = format)
-#endif
                     {
                         while (src < format.Length && (ch = pFormat[src++]) != 0 && ch != ';')
                         {
@@ -2635,11 +2536,7 @@ namespace J2N.Numerics
 
                 bool decimalWritten = false;
 
-#if FEATURE_SPAN
                 fixed (char* pFormat = &MemoryMarshal.GetReference(format))
-#else
-                fixed (char* pFormat = format)
-#endif
                 {
                     byte* cur = dig;
 
@@ -2828,15 +2725,8 @@ namespace J2N.Numerics
         {
             int digPos = number.Scale;
 
-#if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
             {
-#else
-            fixed (byte* digPtr = &number.Digits[0])
-            {
-                byte* dig = digPtr;
-#endif
-
                 if (digPos > 0)
                 {
                     if (groupDigits != null)
@@ -2876,12 +2766,7 @@ namespace J2N.Numerics
                         int digLength = number.DigitsCount;
                         int digStart = (digPos < digLength) ? digPos : digLength;
 
-#if FEATURE_SPAN
                         fixed (char* spanPtr = &MemoryMarshal.GetReference(sb.AppendSpan(bufferSize)))
-#else
-                        char[] buffer = new char[bufferSize];
-                        fixed (char* spanPtr = &buffer[0])
-#endif
                         {
                             char* p = spanPtr + bufferSize - 1;
                             for (int i = digPos - 1; i >= 0; i--)
@@ -2909,10 +2794,6 @@ namespace J2N.Numerics
                             Debug.Assert(p >= spanPtr - 1, "Underflow");
                             dig += digStart;
                         }
-#if !FEATURE_SPAN
-                        // J2N: Append buffer to StringBuilder last
-                        sb.Append(buffer);
-#endif
                     }
                     else
                     {
@@ -2974,15 +2855,8 @@ namespace J2N.Numerics
 
         private static unsafe void FormatScientific(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar)
         {
-#if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
             {
-#else
-            fixed (byte* digPtr = &number.Digits[0])
-            {
-                byte* dig = digPtr;
-#endif
-
                 sb.Append((*dig != 0) ? (char)(*dig++) : '0');
 
                 if (nMaxDigits != 1) // For E0 we would like to suppress the decimal point
@@ -3013,21 +2887,7 @@ namespace J2N.Numerics
 
             char* digits = stackalloc char[MaxUInt32DecDigits];
             char* p = UInt32ToDecChars(digits + MaxUInt32DecDigits, (uint)value, minDigits);
-#if FEATURE_SPAN
             sb.Append(p, (int)(digits + MaxUInt32DecDigits - p));
-#else
-            sb.Append(Create<char>(p, (int)(digits + MaxUInt32DecDigits - p)));
-#endif
-        }
-
-        // Converts a pointer of a given length into an array (hack for older platforms)
-        // J2N TODO: Move to more appropriate location
-        private unsafe static T[] Create<T>(T* ptr, int length) where T : unmanaged
-        {
-            T[] array = new T[length];
-            for (int i = 0; i < length; i++)
-                array[i] = ptr[i];
-            return array;
         }
 
         private static unsafe void FormatGeneral(ref ValueStringBuilder sb, ref NumberBuffer number, int nMaxDigits, NumberFormatInfo info, char expChar, bool bSuppressScientific)
@@ -3045,15 +2905,8 @@ namespace J2N.Numerics
                 }
             }
 
-#if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
             {
-#else
-            fixed (byte* digPtr = &number.Digits[0])
-            {
-                byte* dig = digPtr;
-#endif
-
                 if (digPos > 0)
                 {
                     do
@@ -3113,15 +2966,8 @@ namespace J2N.Numerics
 
         internal static unsafe void RoundNumber(ref NumberBuffer number, int pos, bool isCorrectlyRounded)
         {
-#if FEATURE_SPAN
             byte* dig = number.GetDigitsPointer();
             {
-#else
-            fixed (byte* digPtr = &number.Digits[0])
-            {
-                byte* dig = digPtr;
-#endif
-
                 int i = 0;
                 while (i < pos && dig[i] != '\0')
                     i++;
@@ -3196,7 +3042,6 @@ namespace J2N.Numerics
             }
         }
 
-#if FEATURE_SPAN
         private static unsafe int FindSection(ReadOnlySpan<char> format, int section)
         {
             int src;
@@ -3237,7 +3082,6 @@ namespace J2N.Numerics
                 }
             }
         }
-#endif
 
         private static unsafe int FindSection(string format, int section)
         {

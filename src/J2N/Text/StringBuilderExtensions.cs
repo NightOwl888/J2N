@@ -18,9 +18,8 @@
 
 using J2N.Buffers;
 using System;
-#if FEATURE_SPAN
 using System.Buffers;
-#endif
+using System.Diagnostics;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -370,7 +369,6 @@ namespace J2N.Text
 #endif
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Appends the given <see cref="ReadOnlySpan{Char}"/> to this <see cref="StringBuilder"/>.
         /// </summary>
@@ -422,7 +420,6 @@ namespace J2N.Text
 #endif
             return text;
         }
-#endif
 
         #endregion Append
 
@@ -680,8 +677,6 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// This method mimics the Java String.compareTo(CharSequence) method in that it
         /// <list type="number">
@@ -713,8 +708,6 @@ namespace J2N.Text
                 }
             }
         }
-
-#endif
 
         private unsafe static int CompareToOrdinalCore(StringBuilder text, char* value, int valueLength)
         {
@@ -751,8 +744,6 @@ namespace J2N.Text
         #endregion CompareToOrdinal
 
         #region CopyTo
-
-#if FEATURE_SPAN
 
         /// <summary>
         /// Copies the characters from a specified segment of this instance to a destination <see cref="char"/> span.
@@ -829,8 +820,6 @@ namespace J2N.Text
                 ArrayPool<char>.Shared.Return(buffer);
             }
         }
-
-#endif
 
         #endregion
 
@@ -1474,7 +1463,6 @@ namespace J2N.Text
 #endif
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Inserts the sequence of characters into this <see cref="StringBuilder"/>
         /// at the specified character position.
@@ -1529,7 +1517,6 @@ namespace J2N.Text
             return text;
 #endif
         }
-#endif
 
         #endregion
 
@@ -1933,8 +1920,6 @@ namespace J2N.Text
             return text;
         }
 
-#if FEATURE_SPAN
-
         /// <summary>
         /// Replaces the specified subsequence in this builder with the specified
         /// string, <paramref name="newValue"/>. The substring begins at the specified
@@ -2030,13 +2015,10 @@ namespace J2N.Text
             return text;
         }
 
-#endif
-
         #endregion Replace
 
         #region Reverse
 
-#if FEATURE_SPAN
         /// <summary>
         /// Causes this character sequence to be replaced by the reverse of
         /// the sequence. If there are any surrogate pairs included in the
@@ -2070,39 +2052,6 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
         /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
-#else
-        /// <summary>
-        /// Causes this character sequence to be replaced by the reverse of
-        /// the sequence. If there are any surrogate pairs included in the
-        /// sequence, these are treated as single characters for the
-        /// reverse operation. Thus, the order of the high-low surrogates
-        /// is never reversed.
-        /// <para/>
-        /// IMPORTANT: This operation is done in-place. Although a <see cref="StringBuilder"/>
-        /// is returned, it is the SAME instance as the one that is passed in.
-        /// <para/>
-        /// Let <c>n</c> be the character length of this character sequence
-        /// (not the length in <see cref="char"/> values) just prior to
-        /// execution of the <see cref="Reverse(StringBuilder)"/> method. Then the
-        /// character at index <c>k</c> in the new character sequence is
-        /// equal to the character at index <c>n-k-1</c> in the old
-        /// character sequence.
-        /// <para/>
-        /// Note that the reverse operation may result in producing
-        /// surrogate pairs that were unpaired low-surrogates and
-        /// high-surrogates before the operation. For example, reversing
-        /// "&#92;uDC00&#92;uD800" produces "&#92;uD800&#92;uDC00" which is
-        /// a valid surrogate pair.
-        /// <para/>
-        /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
-        /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
-        /// which doesn't require a <see cref="StringBuilder"/> instance.
-        /// </summary>
-        /// <param name="text">this <see cref="StringBuilder"/></param>
-        /// <returns>A reference to this <see cref="StringBuilder"/>, for chaining.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="text"/> is <c>null</c>.</exception>
-        /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
-#endif
         public static StringBuilder Reverse(this StringBuilder text)
         {
             if (text is null)
@@ -2191,5 +2140,79 @@ namespace J2N.Text
         }
 
         #endregion Subsequence
+
+        #region TryAsSpan
+
+#if FEATURE_STRINGBUILDER_GETCHUNKS
+
+        /// <summary>
+        /// Gets a <see cref="ReadOnlySpan{Char}"/> from a <see cref="StringBuilder"/> if it
+        /// contains a contiguous block memory corresponding with the location specified by
+        /// <paramref name="startIndex"/> and <paramref name="length"/>.
+        /// </summary>
+        /// <param name="text">This <see cref="StringBuilder"/>.</param>
+        /// <param name="startIndex">The inclusive first index in the range.</param>
+        /// <param name="length">The number of characters to retrieve.</param>
+        /// <param name="span">Upon successful return of this method, contains a
+        /// <see cref="ReadOnlySpan{Char}"/> corresponding to the specified
+        /// <paramref name="startIndex"/> and <paramref name="length"/>.</param>
+        /// <returns><c>true</c> if the <see cref="StringBuilder"/> contains a chunk of memory
+        /// of <paramref name="length"/> starting at the index <paramref name="startIndex"/>; othewise, <c>false</c>.
+        /// Note that the <c>false</c> case may occur frequently in practice and it is recommended to have a fallback 
+        /// approach using <see cref="StringBuilder.CopyTo(int, char[], int, int)"/>,
+        /// <see cref="StringBuilder.CopyTo(int, Span{char}, int)"/>, or <see cref="StringBuilder.ToString(int, int)"/>.</returns>
+        internal static bool TryAsSpan(this StringBuilder text, int startIndex, int length, out ReadOnlySpan<char> span)
+        {
+            Debug.Assert(text != null);
+            Debug.Assert(startIndex >= 0);
+            Debug.Assert(length >= 0);
+
+            span = default;
+
+            if (length == 0)
+            {
+                return true;
+            }
+
+            int offset = 0;
+
+            foreach (var chunk in text.GetChunks())
+            {
+                int chunkLength = chunk.Length;
+
+                // If the startIndex is before this chunk, we can return false immediately
+                if (startIndex - offset < 0)
+                {
+                    return false;
+                }
+
+                // If the startIndex is within this chunk
+                if (startIndex - offset < chunkLength)
+                {
+                    int relativeStartIndex = startIndex - offset;
+
+                    // Check if the entire requested range is within this chunk
+                    if (chunkLength - relativeStartIndex >= length)
+                    {
+                        span = chunk.Span.Slice(relativeStartIndex, length);
+                        return true;
+                    }
+                    else
+                    {
+                        // If the range exceeds the current chunk, return false
+                        return false;
+                    }
+                }
+
+                offset += chunkLength;
+            }
+
+            // If the loop ends and no valid span was found, return false
+            return false;
+        }
+
+#endif
+
+        #endregion TryAsSpan
     }
 }

@@ -263,7 +263,6 @@ namespace J2N.Text
             assertEquals(string.Empty, sb.ToString()); // J2N: To match .NET, appending null is a no-op
         }
 
-#if FEATURE_SPAN
         /**
          * @tests java.lang.StringBuffer.Append(CharSequence)
          */
@@ -281,7 +280,6 @@ namespace J2N.Text
             //assertEquals("null", sb.ToString());
             assertEquals(string.Empty, sb.ToString()); // J2N: To match .NET, appending null is a no-op
         }
-#endif
 
         /**
          * @tests java.lang.StringBuffer.Append(CharSequence, int, int)

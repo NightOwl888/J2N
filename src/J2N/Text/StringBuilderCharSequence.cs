@@ -33,10 +33,7 @@ namespace J2N.Text
         IComparable<string>, IComparable<StringBuilder>, IComparable<char[]>,
         IEquatable<ICharSequence>,
         IEquatable<CharArrayCharSequence>, IEquatable<StringBuilderCharSequence>, IEquatable<StringCharSequence>,
-        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>
-#if FEATURE_SPAN
-        , ISpanAppendable
-#endif
+        IEquatable<string>, IEquatable<StringBuilder>, IEquatable<char[]>, ISpanAppendable
     {
         private const int CharStackBufferSize = 64;
 
@@ -877,7 +874,6 @@ namespace J2N.Text
             return this;
         }
 
-#if FEATURE_SPAN
         /// <summary>
         /// Appends the string representation of a specified <see cref="ReadOnlySpan{T}"/> of Unicode characters to this instance.
         /// </summary>
@@ -892,7 +888,6 @@ namespace J2N.Text
             Value.Append(value);
             return this;
         }
-#endif
 
         IAppendable IAppendable.Append(char value) => this.Append(value);
 
@@ -912,9 +907,7 @@ namespace J2N.Text
 
         IAppendable IAppendable.Append(ICharSequence? value, int startIndex, int count) => this.Append(value, startIndex, count);
 
-#if FEATURE_SPAN
         ISpanAppendable ISpanAppendable.Append(ReadOnlySpan<char> value) => this.Append(value);
-#endif
 
         #endregion
     }
