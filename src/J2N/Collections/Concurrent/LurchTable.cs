@@ -12,7 +12,9 @@
  * limitations under the License.
  */
 #endregion
+
 using J2N.Collections.Generic;
+using J2N.Collections.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -762,6 +764,24 @@ namespace J2N.Collections.Concurrent
                 });
             }
         }
+
+        #region AsReadOnly
+
+        /// <summary>
+        /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
+        /// </summary>
+        /// <returns>An object that acts as a read-only wrapper around the current <see cref="LurchTable{TKey, TValue}"/>.</returns>
+        /// <remarks>
+        /// To prevent any modifications to the <see cref="LurchTable{TKey, TValue}"/> object, expose it only through this wrapper.
+        /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> object does not expose methods that modify the collection. However,
+        /// if changes are made to the underlying <see cref="LurchTable{TKey, TValue}"/> object, the read-only collection reflects those changes.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
+        public ReadOnlyDictionary<TKey, TValue> AsReadOnly()
+            => new ReadOnlyDictionary<TKey, TValue>(this);
+
+        #endregion AsReadOnly
 
         #region IDictionary Members
 
