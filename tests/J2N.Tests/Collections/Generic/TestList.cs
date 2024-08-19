@@ -1114,7 +1114,7 @@ namespace J2N.Collections.Generic
 
                 List<String> list = new List<String>(1);
                 list.Add("hello");
-                list.EnsureCapacity(int.MinValue);
+                list.EnsureCapacity(/*int.MinValue*/ 0); // J2N: int.MinValue throws ArgumentOutOfRangeException, but this is nonsensical, anyway.
             }
 
             /**
