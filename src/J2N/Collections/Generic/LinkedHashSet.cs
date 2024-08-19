@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.Collections.ObjectModel;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -180,6 +181,24 @@ namespace J2N.Collections.Generic
 #endif
 
         #endregion
+
+        #region AsReadOnly
+
+        /// <summary>
+        /// Returns a read-only <see cref="ReadOnlySet{T}"/> wrapper for the current collection.
+        /// </summary>
+        /// <returns>An object that acts as a read-only wrapper around the current <see cref="LinkedHashSet{T}"/>.</returns>
+        /// <remarks>
+        /// To prevent any modifications to the <see cref="LinkedHashSet{T}"/> object, expose it only through this wrapper.
+        /// A <see cref="ReadOnlySet{T}"/> object does not expose methods that modify the collection. However,
+        /// if changes are made to the underlying <see cref="LinkedHashSet{T}"/> object, the read-only collection reflects those changes.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
+        public ReadOnlySet<T> AsReadOnly()
+            => new ReadOnlySet<T>(this);
+
+        #endregion AsReadOnly
 
         #region Nested Class: HashSetWrapper
 
