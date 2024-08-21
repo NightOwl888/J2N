@@ -1146,10 +1146,14 @@ namespace J2N
         /// <para/>
         /// This correponds to <see cref="char.ConvertFromUtf32(int)"/>, but returns
         /// a <see cref="T:char[]"/> rather than a <see cref="string"/>.
+        /// <para/>
+        /// Usage Note: This overload is discouraged because it produces a heap allocation
+        /// every time it is called. The <see cref="ToChars(int, Span{char})"/> is a direct
+        /// replacement that allows passing in a reusable buffer.
         /// </summary>
         /// <param name="codePoint">The Unicode code point to encode.</param>
         /// <returns>
-        /// the UTF-16 encoded char sequence. If <paramref name="codePoint"/> is a
+        /// The UTF-16 encoded char sequence. If <paramref name="codePoint"/> is a
         /// supplementary code point (<see cref="IsSupplementaryCodePoint(int)"/>),
         /// then the returned array contains two characters, otherwise it contains
         /// just one character.
@@ -1170,6 +1174,47 @@ namespace J2N
                 return new char[] { (char)high, (char)low };
             }
             return new char[] { (char)codePoint };
+        }
+
+        /// <summary>
+        /// Converts the specified Unicode code point into a UTF-16 encoded sequence
+        /// and returns it as a <see cref="ReadOnlySpan{Char}"/>.
+        /// <para/>
+        /// This correponds to <see cref="char.ConvertFromUtf32(int)"/>, but returns
+        /// a <see cref="ReadOnlySpan{Char}"/> rather than a <see cref="string"/>.
+        /// </summary>
+        /// <param name="codePoint">The Unicode code point to encode.</param>
+        /// <param name="buffer">The memory location to store the chars. Typically,
+        /// it should be <c>stackalloc char[2]</c> since it will never be longer than 2 chars.
+        /// Note that this <paramref name="buffer"/> is not intended for use by callers,
+        /// it is just a memory location to use when returning the result. The caller is
+        /// responsible for ensuring the memory location has a sufficient scope that is
+        /// at least as long as the scope of the return value.</param>
+        /// <returns>
+        /// The UTF-16 encoded char sequence sliced to the proper length. If
+        /// <paramref name="codePoint"/> is a supplementary code point
+        /// (<see cref="IsSupplementaryCodePoint(int)"/>), then the returned
+        /// span contains two characters, otherwise it contains just one character.
+        /// </returns>
+        /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
+        public static ReadOnlySpan<char> ToChars(int codePoint, Span<char> buffer)
+        {
+            if (!IsValidCodePoint(codePoint))
+            {
+                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+            }
+
+            if (IsSupplementaryCodePoint(codePoint))
+            {
+                int cpPrime = codePoint - 0x10000;
+                int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
+                int low = 0xDC00 | (cpPrime & 0x3FF);
+                buffer[0] = (char)high;
+                buffer[1] = (char)low;
+                return buffer.Slice(0, 2);
+            }
+            buffer[0] = (char)codePoint;
+            return buffer.Slice(0, 1);
         }
 
         /// <summary>

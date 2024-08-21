@@ -780,7 +780,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_toCharsI_Span() // J2N: Added overload to cover Span<char>
+        public void Test_toCharsI_Span_I() // J2N: Added overload to cover Span<char>
         {
             char[] dest = new char[2];
             Span<char> dst = dest;
@@ -852,6 +852,29 @@ namespace J2N
             try
             {
                 Character.ToChars(int.MaxValue);
+                fail("No IAE, invalid code point.");
+            }
+            catch (ArgumentException e)
+            {
+            }
+        }
+
+        [Test]
+        public void Test_toCharsI_Span() // J2N: Added overload to return ReadOnlySpan<char> while passing in a buffer on the stack.
+        {
+            Span<char> buffer = stackalloc char[2];
+            assertTrue(System.MemoryExtensions.SequenceEqual(new char[] { '\uD800', '\uDC00' }, Character
+                    .ToChars(0x10000, buffer)));
+            assertTrue(System.MemoryExtensions.SequenceEqual(new char[] { '\uD800', '\uDC01' }, Character
+                    .ToChars(0x10001, buffer)));
+            assertTrue(System.MemoryExtensions.SequenceEqual(new char[] { '\uD801', '\uDC01' }, Character
+                    .ToChars(0x10401, buffer)));
+            assertTrue(System.MemoryExtensions.SequenceEqual(new char[] { '\uDBFF', '\uDFFF' }, Character
+                    .ToChars(0x10FFFF, buffer)));
+
+            try
+            {
+                Character.ToChars(int.MaxValue, buffer);
                 fail("No IAE, invalid code point.");
             }
             catch (ArgumentException e)
