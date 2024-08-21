@@ -58,7 +58,7 @@ namespace J2N.Runtime.InteropServices
         /// <param name="list">The list to set the count of.</param>
         /// <param name="count">The value to set the list's count to.</param>
         /// <typeparam name="T">The type of the elements in the list.</typeparam>
-        /// <exception cref="NullReferenceException">
+        /// <exception cref="ArgumentNullException">
         /// <paramref name="list"/> is <see langword="null"/>.
         /// </exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -69,6 +69,9 @@ namespace J2N.Runtime.InteropServices
         /// </remarks>
         public static void SetCount<T>(List<T> list, int count)
         {
+            if (list is null)
+                throw new ArgumentNullException(nameof(list));
+
             if (count < 0)
             {
                 throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);

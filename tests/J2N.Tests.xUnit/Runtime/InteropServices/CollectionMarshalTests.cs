@@ -513,9 +513,11 @@ namespace J2N.Runtime.InteropServices.Tests
         public void ListSetCount()
         {
             List<int> list = null;
-            Assert.Throws<NullReferenceException>(() => CollectionMarshal.SetCount(list, 3));
+            // J2N: Changed API to throw ArgumentNullException instead of NullReferenceException.
+            // To match other APIs, the null check is done first.
+            Assert.Throws<ArgumentNullException>(() => CollectionMarshal.SetCount(list, 3));
 
-            Assert.Throws<ArgumentOutOfRangeException>(() => CollectionMarshal.SetCount(list, -1));
+            //Assert.Throws<ArgumentOutOfRangeException>(() => CollectionMarshal.SetCount(list, -1));
 
             list = new List<int>();
             Assert.Throws<ArgumentOutOfRangeException>(() => CollectionMarshal.SetCount(list, -1));
