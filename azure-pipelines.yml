@@ -51,6 +51,10 @@ stages:
       vmImage: 'windows-2019'
 
     steps:
+    # Nerdbank.GitVersioning requires a deep clone. See: https://github.com/dotnet/Nerdbank.GitVersioning/blob/main/doc/cloudbuild.md#azure-pipelines
+    - checkout: self
+      fetchDepth: 0
+
     #- template: '.build/azure-templates/show-all-files.yml' # for debugging
     #- pwsh: C:;cd $env:ANDROID_HOME;dir -r  | Where-Object {$_.PsIsContainer -eq $false} | % { $_.FullName }
 
