@@ -2,14 +2,14 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Sdk;
-using System.Linq;
-using System;
-using System.Reflection;
 
 namespace J2N
 {
@@ -449,9 +449,13 @@ namespace J2N
         /// <param name="actual"></param>
         public static void SequenceEqual<T>(ReadOnlySpan<T> expected, ReadOnlySpan<T> actual) where T : IEquatable<T>
         {
+#if NET5_0_OR_GREATER
             // Use the SequenceEqual to compare the arrays for better performance. The default Assert.Equal method compares
             // the arrays by boxing each element that is very slow for large arrays.
             if (!expected.SequenceEqual(actual))
+#else
+            if (!SequenceEqualHack(expected, actual))
+#endif
             {
                 if (expected.Length != actual.Length)
                 {
@@ -483,6 +487,40 @@ namespace J2N
                 }
             }
         }
+
+#if !NET5_0_OR_GREATER
+        private static bool SequenceEqualHack<T>(ReadOnlySpan<T> span, ReadOnlySpan<T> other) where T : IEquatable<T>
+        {
+            int length = span.Length;
+            // Check if T is a reference type or if it's a nullable value type
+            // System.MemoryExtensions.SequenceEqual() has a bug in the NuGet package where comparing
+            // against null elements throws a NullReferenceException, so we fix that here.
+            // In .NET Core, this bug no longer exists.
+            if (default(T) == null || Nullable.GetUnderlyingType(typeof(T)) != null)
+            {
+                if (length == other.Length)
+                {
+                    T e1, e2;
+                    for (int i = 0; i < span.Length; i++)
+                    {
+                        e1 = span[i];
+                        e2 = other[i];
+                        if (!(e1 == null ? e2 == null : J2N.Collections.Generic.EqualityComparer<T>.Default.Equals(e1, e2)))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            }
+            if (length == other.Length)
+            {
+                return System.MemoryExtensions.SequenceEqual(span, other);
+            }
+            return false;
+        }
+#endif
 
         public static void FilledWith<T>(T expected, ReadOnlySpan<T> actual)
         {
