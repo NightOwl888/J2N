@@ -1880,8 +1880,28 @@ namespace J2N.Text
                 }
                 else if (diff < 0)
                 {
+#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
+                    // We just need to add some blank space which will be written to later.
+                    // We reuse the allocation by either putting it on the stack or using the array pool.
+                    char[]? arrayToReturnToPool = null;
+                    try
+                    {
+                        int diffLength = -diff;
+                        Span<char> diffChars = diffLength > CharStackBufferSize
+                            ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(diffLength)).AsSpan(0, diffLength)
+                            : stackalloc char[diffLength];
+
+                        // replacing with more characters...need some room
+                        text.Insert(startIndex, diffChars);
+                    }
+                    finally
+                    {
+                        ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
+                    }
+#else
                     // replacing with more characters...need some room
                     text.Insert(startIndex, new char[-diff]);
+#endif
                 }
                 // copy the chars based on the new length
 #if FEATURE_STRINGBUILDER_GETCHUNKS
@@ -1975,8 +1995,28 @@ namespace J2N.Text
                 }
                 else if (diff < 0)
                 {
+#if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
+                    // We just need to add some blank space which will be written to later.
+                    // We reuse the allocation by either putting it on the stack or using the array pool.
+                    char[]? arrayToReturnToPool = null;
+                    try
+                    {
+                        int diffLength = -diff;
+                        Span<char> diffChars = diffLength > CharStackBufferSize
+                            ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(diffLength)).AsSpan(0, diffLength)
+                            : stackalloc char[diffLength];
+
+                        // replacing with more characters...need some room
+                        text.Insert(startIndex, diffChars);
+                    }
+                    finally
+                    {
+                        ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
+                    }
+#else
                     // replacing with more characters...need some room
                     text.Insert(startIndex, new char[-diff]);
+#endif
                 }
                 // copy the chars based on the new length
 #if FEATURE_STRINGBUILDER_GETCHUNKS
