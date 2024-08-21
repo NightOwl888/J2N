@@ -26,7 +26,7 @@
       net452            | net40
       
     -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net6.0;net5.0;net48;net472;net461;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net8.0;net6.0;net5.0;net48;net472;net461;net452</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>
 
