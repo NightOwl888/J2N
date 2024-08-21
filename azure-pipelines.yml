@@ -101,11 +101,12 @@ stages:
         nugetArtifactName: '$(NuGetArtifactName)'
         binaryArtifactName: '$(BinaryArtifactName)'
 
-    - task: PublishBuildArtifacts@1
+    - task: PublishPipelineArtifact@1
       displayName: 'Publish Artifact: $(BinaryArtifactName)'
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)'
-        ArtifactName: '$(BinaryArtifactName)'
+        targetPath: '$(Build.ArtifactStagingDirectory)/$(BinaryArtifactName)'
+        artifact: '$(BinaryArtifactName)'
+        publishLocation: 'pipeline'
       condition: succeededOrFailed()
 
 - stage: Test_Stage
