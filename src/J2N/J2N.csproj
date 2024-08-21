@@ -8,7 +8,7 @@
     <WarningsAsErrors Label="Force all public members to have XML doc comments.">NU1605;1591</WarningsAsErrors>
 
     <Nullable>enable</Nullable>
-    <LangVersion>8.0</LangVersion>
+    <LangVersion>9.0</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet Package Settings">
