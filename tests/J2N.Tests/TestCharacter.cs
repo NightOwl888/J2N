@@ -1989,8 +1989,12 @@ namespace J2N
             assertTrue(Character.GetType((int)'$') == UnicodeCategory.CurrencySymbol);
             assertTrue(Character.GetType((int)'\u2029') == UnicodeCategory.ParagraphSeparator);
 
+#if FEATURE_UNICODE_DEFINED_0x9FFF
+            assertTrue(Character.GetType(0x9FFF) == UnicodeCategory.OtherLetter);
+#else
             assertTrue(Character.GetType(0x9FFF) == UnicodeCategory.OtherNotAssigned);
-#if FEATURE_ICU
+#endif
+#if FEATURE_UNICODE_DEFINED_0x30000
             assertTrue(Character.GetType(0x30000) == UnicodeCategory.OtherLetter); // This character is now defined in .NET 5
 #else
             assertTrue(Character.GetType(0x30000) == UnicodeCategory.OtherNotAssigned);
@@ -2114,7 +2118,7 @@ namespace J2N
             assertTrue(Character.IsDefined((int)'\u6039'));
             assertTrue(Character.IsDefined(0x10300));
 
-#if FEATURE_ICU
+#if FEATURE_UNICODE_DEFINED_0x30000
             assertTrue(Character.IsDefined(0x30000)); // This character is now defined in .NET 5
 #else
             assertFalse(Character.IsDefined(0x30000));
