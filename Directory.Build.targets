@@ -146,6 +146,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_ISENTERED</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_VOLATILE</DefineConstants>
 
   </PropertyGroup>
 
