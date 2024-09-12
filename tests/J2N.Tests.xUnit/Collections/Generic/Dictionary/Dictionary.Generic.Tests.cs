@@ -1,11 +1,11 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
-//using Common.System;
 using J2N.Collections.Generic;
 using System;
+using System.Globalization;
 using System.Linq;
+using System.Runtime.Serialization;
 using Xunit;
 using SCG = System.Collections.Generic;
 
@@ -16,20 +16,19 @@ namespace J2N.Collections.Tests
     /// </summary>
     public abstract class Dictionary_Generic_Tests<TKey, TValue> : IDictionary_Generic_Tests<TKey, TValue>
     {
-#if FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
 
         protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert;
 
-        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Remove | ModifyOperation.Clear;
-
-#endif
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Overwrite | ModifyOperation.Remove | ModifyOperation.Clear;
 
         #region IDictionary<TKey, TValue Helper Methods
 
-        protected override SCG.IDictionary<TKey, TValue> GenericIDictionaryFactory()
-        {
-            return new J2N.Collections.Generic.Dictionary<TKey, TValue>();
-        }
+        protected override SCG.IDictionary<TKey, TValue> GenericIDictionaryFactory() => new Dictionary<TKey, TValue>();
+
+        protected override SCG.IDictionary<TKey, TValue> GenericIDictionaryFactory(SCG.IEqualityComparer<TKey> comparer) => new Dictionary<TKey, TValue>(comparer);
 
         protected override Type ICollection_Generic_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
 
@@ -228,6 +227,7 @@ namespace J2N.Collections.Tests
                 Dictionary<TKey, TValue> dictionary = (Dictionary<TKey, TValue>)(GenericIDictionaryFactory(count));
                 TKey missingKey = default(TKey);
                 TValue value;
+
                 dictionary.TryAdd(missingKey, default(TValue));
                 Assert.True(dictionary.Remove(missingKey, out value));
             }
@@ -236,67 +236,56 @@ namespace J2N.Collections.Tests
         [Fact]
         public void Dictionary_Generic_Remove_RemoveFirstEnumerationContinues()
         {
-            if (ModifyEnumeratorAllowed.HasFlag(ModifyOperation.Remove))
+            Dictionary<TKey,TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
+            using (var enumerator = dict.GetEnumerator())
             {
-                Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
-                using (var enumerator = dict.GetEnumerator())
-                {
-                    enumerator.MoveNext();
-                    TKey key = enumerator.Current.Key;
-                    enumerator.MoveNext();
-                    dict.Remove(key);
-                    Assert.True(enumerator.MoveNext());
-                    Assert.False(enumerator.MoveNext());
-                }
+                enumerator.MoveNext();
+                TKey key = enumerator.Current.Key;
+                enumerator.MoveNext();
+                dict.Remove(key);
+                Assert.True(enumerator.MoveNext());
+                Assert.False(enumerator.MoveNext());
             }
         }
 
         [Fact]
         public void Dictionary_Generic_Remove_RemoveCurrentEnumerationContinues()
         {
-            if (ModifyEnumeratorAllowed.HasFlag(ModifyOperation.Remove))
+            Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
+            using (var enumerator = dict.GetEnumerator())
             {
-                Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
-                using (var enumerator = dict.GetEnumerator())
-                {
-                    enumerator.MoveNext();
-                    enumerator.MoveNext();
-                    dict.Remove(enumerator.Current.Key);
-                    Assert.True(enumerator.MoveNext());
-                    Assert.False(enumerator.MoveNext());
-                }
+                enumerator.MoveNext();
+                enumerator.MoveNext();
+                dict.Remove(enumerator.Current.Key);
+                Assert.True(enumerator.MoveNext());
+                Assert.False(enumerator.MoveNext());
             }
         }
 
         [Fact]
         public void Dictionary_Generic_Remove_RemoveLastEnumerationFinishes()
         {
-            if (ModifyEnumeratorAllowed.HasFlag(ModifyOperation.Remove))
+            Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
+            TKey key = default;
+            using (var enumerator = dict.GetEnumerator())
             {
-                Dictionary<TKey, TValue> dict = (Dictionary<TKey, TValue>)GenericIDictionaryFactory(3);
-                TKey key = default;
-                using (var enumerator = dict.GetEnumerator())
+                while (enumerator.MoveNext())
                 {
-                    while (enumerator.MoveNext())
-                    {
-                        key = enumerator.Current.Key;
-                    }
+                    key = enumerator.Current.Key;
                 }
-                using (var enumerator = dict.GetEnumerator())
-                {
-                    enumerator.MoveNext();
-                    enumerator.MoveNext();
-                    dict.Remove(key);
-                    Assert.False(enumerator.MoveNext());
-                }
+            }
+            using (var enumerator = dict.GetEnumerator())
+            {
+                enumerator.MoveNext();
+                enumerator.MoveNext();
+                dict.Remove(key);
+                Assert.False(enumerator.MoveNext());
             }
         }
 
         #endregion
 
         #region EnsureCapacity
-
-#if FEATURE_DICTIONARY_ENSURECAPACITY
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -421,13 +410,9 @@ namespace J2N.Collections.Tests
             Assert.Equal(17, dictionary.EnsureCapacity(13));
         }
 
-#endif
-
-#endregion
+        #endregion
 
         #region TrimExcess
-
-#if FEATURE_DICTIONARY_TRIMEXCESS
 
         [Fact]
         public void TrimExcess_Generic_NegativeCapacity_Throw()
@@ -632,8 +617,38 @@ namespace J2N.Collections.Tests
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
         }
 
-#endif
+        #endregion
 
-#endregion
+        #region Non-randomized comparers
+        [Fact]
+        public void Dictionary_Comparer_NonRandomizedStringComparers()
+        {
+            RunTest(null);
+            RunTest(EqualityComparer<string>.Default);
+            RunTest(StringComparer.Ordinal);
+            RunTest(StringComparer.OrdinalIgnoreCase);
+            RunTest(StringComparer.InvariantCulture);
+            RunTest(StringComparer.InvariantCultureIgnoreCase);
+            RunTest(StringComparer.Create(CultureInfo.InvariantCulture, ignoreCase: false));
+            RunTest(StringComparer.Create(CultureInfo.InvariantCulture, ignoreCase: true));
+
+            void RunTest(SCG.IEqualityComparer<string> comparer)
+            {
+                // First, instantiate the dictionary and check its Comparer property
+
+                Dictionary<string, object> dict = new Dictionary<string, object>(comparer);
+                object expected = comparer ?? EqualityComparer<string>.Default;
+
+                Assert.Same(expected, dict.EqualityComparer);
+
+                // Then pretend to serialize the dictionary and check the stored Comparer instance
+
+                SerializationInfo si = new SerializationInfo(typeof(Dictionary<string, object>), new FormatterConverter());
+                dict.GetObjectData(si, new StreamingContext(StreamingContextStates.All));
+
+                Assert.Same(expected, si.GetValue("EqualityComparer", typeof(SCG.IEqualityComparer<string>)));
+            }
+        }
+        #endregion
     }
 }

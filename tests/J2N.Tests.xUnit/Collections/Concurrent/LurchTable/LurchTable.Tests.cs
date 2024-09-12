@@ -29,6 +29,8 @@ namespace J2N.Collections.Concurrent.Tests
 
         protected override bool IDictionary_NonGeneric_Keys_Values_ParentDictionaryModifiedInvalidates => false;
 
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
+
 
         /// <summary>
         /// Creates an object that is dependent on the seed given. The object may be either

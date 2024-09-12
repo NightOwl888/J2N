@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System;
 using System.Collections.Generic;
@@ -43,8 +42,9 @@ namespace J2N.Collections.Tests
             None = 0,
             Add = 1,
             Insert = 2,
-            Remove = 4,
-            Clear = 8
+            Overwrite = 4,
+            Remove = 8,
+            Clear = 16
         }
 
         #endregion

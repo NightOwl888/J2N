@@ -1,12 +1,12 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -15,16 +15,19 @@ namespace J2N.Collections.Tests
         protected override bool DefaultValueAllowed => true;
         protected override bool DuplicateValuesAllowed => true;
         protected override bool IsReadOnly => true;
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
 
         protected override ICollection<string> GenericICollectionFactory()
         {
-            return new Dictionary<string, string>().Values;
+            return new JCG.Dictionary<string, string>().Values;
         }
 
         protected override ICollection<string> GenericICollectionFactory(int count)
         {
-            Dictionary<string, string> list = new Dictionary<string, string>();
+            JCG.Dictionary<string, string> list = new JCG.Dictionary<string, string>();
             int seed = 13453;
             for (int i = 0; i < count; i++)
                 list.Add(CreateT(seed++), CreateT(seed++));
@@ -45,14 +48,14 @@ namespace J2N.Collections.Tests
         [Fact]
         public void Dictionary_Generic_ValueCollection_Constructor_NullDictionary()
         {
-            Assert.Throws<ArgumentNullException>(() => new Dictionary<string, string>.ValueCollection(null));
+            Assert.Throws<ArgumentNullException>(() => new JCG.Dictionary<string, string>.ValueCollection(null));
         }
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void Dictionary_Generic_ValueCollection_GetEnumerator(int count)
         {
-            Dictionary<string, string> dictionary = new Dictionary<string, string>();
+            JCG.Dictionary<string, string> dictionary = new JCG.Dictionary<string, string>();
             int seed = 13453;
             while (dictionary.Count < count)
                 dictionary.Add(CreateT(seed++), CreateT(seed++));
@@ -65,21 +68,23 @@ namespace J2N.Collections.Tests
         protected override bool NullAllowed => true;
         protected override bool DuplicateValuesAllowed => true;
         protected override bool IsReadOnly => true;
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
         protected override Type ICollection_NonGeneric_CopyTo_ArrayOfEnumType_ThrowType => typeof(ArgumentException);
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new JCG.List<ModifyEnumerable>();
         protected override bool SupportsSerialization => false;
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
 
         protected override Type ICollection_NonGeneric_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
 
         protected override ICollection NonGenericICollectionFactory()
         {
-            return new Dictionary<string, string>().Values;
+            return new JCG.Dictionary<string, string>().Values;
         }
 
         protected override ICollection NonGenericICollectionFactory(int count)
         {
-            Dictionary<string, string> list = new Dictionary<string, string>();
+            JCG.Dictionary<string, string> list = new JCG.Dictionary<string, string>();
             int seed = 13453;
             for (int i = 0; i < count; i++)
                 list.Add(CreateT(seed++), CreateT(seed++));

@@ -1,28 +1,18 @@
-﻿#region Copyright 2019-2021 by Shad Storhaug, Licensed under the Apache License, Version 2.0
-/*  Licensed to the Apache Software Foundation (ASF) under one or more
- *  contributor license agreements.  See the NOTICE file distributed with
- *  this work for additional information regarding copyright ownership.
- *  The ASF licenses this file to You under the Apache License, Version 2.0
- *  (the "License"); you may not use this file except in compliance with
- *  the License.  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
- */
-#endregion
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
+using J2N.Runtime.InteropServices;
 using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
 using SCG = System.Collections.Generic;
 
 
@@ -81,42 +71,26 @@ namespace J2N.Collections.Generic
         , System.Runtime.Serialization.ISerializable, System.Runtime.Serialization.IDeserializationCallback
 #endif
     {
-        private static readonly bool TKeyIsNullable = typeof(TKey).IsNullableType();
-
 #if FEATURE_SERIALIZABLE
-        [NonSerialized]
-#endif
-        private readonly IConcreteDictionary<TKey, TValue> dictionary;
-
-#if FEATURE_SERIALIZABLE
-        [NonSerialized]
-#endif
-        private bool hasNullKey;
-        private KeyValuePair<TKey, TValue> nullEntry;
-#if FEATURE_SERIALIZABLE
-        [NonSerialized]
-#endif
-        private int version;
-
-#if FEATURE_SERIALIZABLE
-        [NonSerialized]
-#endif
-        private KeyCollection? keys;
-#if FEATURE_SERIALIZABLE
-        [NonSerialized]
-#endif
-        private ValueCollection? values;
-
-#if FEATURE_SERIALIZABLE
-
-        private System.Runtime.Serialization.SerializationInfo? siInfo; //A temporary variable which we need during deserialization.
-
-        // names for serialization
+        // constants for serialization
         private const string EqualityComparerName = "EqualityComparer"; // Do not rename (binary serialization)
-        private const string CountName = "Count"; // Do not rename (binary serialization) - used to allocate during deserialzation, not actually a field
+        private const string HashSizeName = "HashSize"; // Do not rename (binary serialization). Must save buckets.Length
+        private const string CountName = "Count"; // Do not rename (binary serialization) - used to allocate during deserialzation, not actually a field. This only exists for backward compatibility with J2N 2.0.0.
         private const string KeyValuePairsName = "KeyValuePairs"; // Do not rename (binary serialization)
         private const string VersionName = "Version"; // Do not rename (binary serialization)
 #endif
+
+        private int[]? _buckets;
+        private Entry[]? _entries;
+        private ulong _fastModMultiplier;
+        private int _count;
+        private int _freeList;
+        private int _freeCount;
+        private int _version;
+        private IEqualityComparer<TKey>? _comparer;
+        private KeyCollection? _keys;
+        private ValueCollection? _values;
+        private const int StartOfFreeList = -3;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty,
@@ -136,7 +110,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        public Dictionary() : this(0, null) { }
+        public Dictionary() : this(0, null) { /* Intentionally blank */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty, has the specified initial
@@ -162,7 +136,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        public Dictionary(int capacity) : this(capacity, null) { }
+        public Dictionary(int capacity) : this(capacity, null) { /* Intentionally blank */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty, has the default
@@ -186,7 +160,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        public Dictionary(IEqualityComparer<TKey>? comparer) : this(0, comparer) { }
+        public Dictionary(IEqualityComparer<TKey>? comparer) : this(0, comparer) { /* Intentionally blank */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that is empty, has the specified
@@ -222,7 +196,35 @@ namespace J2N.Collections.Generic
             if (capacity < 0)
                 throw new ArgumentOutOfRangeException(nameof(capacity));
 
-            dictionary = new ConcreteDictionary(capacity, comparer ?? EqualityComparer<TKey>.Default);
+            if (capacity > 0)
+            {
+                Initialize(capacity);
+            }
+
+            // For reference types, we always want to store a comparer instance, either
+            // the one provided, or if one wasn't provided, the default (accessing
+            // EqualityComparer<TKey>.Default with shared generics on every dictionary
+            // access can add measurable overhead).  For value types, if no comparer is
+            // provided, or if the default is provided, we'd prefer to use
+            // EqualityComparer<TKey>.Default.Equals on every use, enabling the JIT to
+            // devirtualize and possibly inline the operation.
+            if (!typeof(TKey).IsValueType)
+            {
+                _comparer = comparer ?? EqualityComparer<TKey>.Default;
+
+                // Special-case EqualityComparer<string>.Default, StringComparer.Ordinal, and StringComparer.OrdinalIgnoreCase.
+                // We use a non-randomized comparer for improved perf, falling back to a randomized comparer if the
+                // hash buckets become unbalanced.
+                if (typeof(TKey) == typeof(string) && NonRandomizedStringEqualityComparer.GetStringComparer(_comparer!) is IEqualityComparer<string> stringComparer)
+                {
+                    _comparer = (IEqualityComparer<TKey>)stringComparer;
+                }
+            }
+            else if (comparer is not null && // first check for null to avoid forcing default comparer instantiation unnecessarily
+                     comparer != EqualityComparer<TKey>.Default)
+            {
+                _comparer = comparer;
+            }
         }
 
         /// <summary>
@@ -252,7 +254,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-        public Dictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
+        public Dictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { /* Intentionally blank */ }
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 #pragma warning restore IDE0079 // Remove unnecessary suppression
 
@@ -292,13 +294,12 @@ namespace J2N.Collections.Generic
         public Dictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer)
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 #pragma warning restore IDE0079 // Remove unnecessary suppression
-            : this(dictionary != null ? dictionary.Count : 0, comparer)
+            : this(dictionary?.Count ?? 0, comparer)
         {
             if (dictionary == null)
                 throw new ArgumentNullException(nameof(dictionary));
 
-            foreach (var pair in dictionary)
-                Add(pair.Key, pair.Value);
+            AddRange(dictionary);
         }
 
         /// <summary>
@@ -326,9 +327,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="collection"/>.
         /// </remarks>
-        public Dictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection)
-            : this(collection, null)
-        { }
+        public Dictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection) : this(collection, null) { /* Intentionally blank */ }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}"/> class that contains elements copied
@@ -362,13 +361,90 @@ namespace J2N.Collections.Generic
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="collection"/>.
         /// </remarks>
         public Dictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer)
-            : this(collection is ICollection<KeyValuePair<TKey, TValue>> col ? col.Count : 0, comparer)
+            : this((collection as ICollection<KeyValuePair<TKey, TValue>>)?.Count ?? 0, comparer)
         {
             if (collection == null)
                 throw new ArgumentNullException(nameof(collection));
 
-            foreach (var pair in collection)
+            AddRange(collection);
+        }
+
+        private void AddRange(IEnumerable<KeyValuePair<TKey, TValue>> enumerable)
+        {
+            // It is likely that the passed-in enumerable is Dictionary<TKey,TValue>. When this is the case,
+            // avoid the enumerator allocation and overhead by looping through the entries array directly.
+            // We only do this when dictionary is Dictionary<TKey,TValue> and not a subclass, to maintain
+            // back-compat with subclasses that may have overridden the enumerator behavior.
+            if (enumerable.GetType() == typeof(Dictionary<TKey, TValue>))
+            {
+                Dictionary<TKey, TValue> source = (Dictionary<TKey, TValue>)enumerable;
+
+                if (source.Count == 0)
+                {
+                    // Nothing to copy, all done
+                    return;
+                }
+
+                // This is not currently a true .AddRange as it needs to be an initialized dictionary
+                // of the correct size, and also an empty dictionary with no current entities (and no argument checks).
+                Debug.Assert(source._entries is not null);
+                Debug.Assert(_entries is not null);
+                Debug.Assert(_entries!.Length >= source.Count);
+                Debug.Assert(_count == 0);
+
+                Entry[] oldEntries = source._entries!;
+                if (source._comparer == _comparer)
+                {
+                    // If comparers are the same, we can copy _entries without rehashing.
+                    CopyEntries(oldEntries, source._count);
+                    return;
+                }
+
+                // Comparers differ need to rehash all the entries via Add
+                int count = source._count;
+                for (int i = 0; i < count; i++)
+                {
+                    // Only copy if an entry
+                    if (oldEntries[i].next >= -1)
+                    {
+                        Add(oldEntries[i].key, oldEntries[i].value);
+                    }
+                }
+                return;
+            }
+
+            // We similarly special-case KVP<>[] and List<KVP<>>, as they're commonly used to seed dictionaries, and
+            // we want to avoid the enumerator costs (e.g. allocation) for them as well. Extract a span if possible.
+            ReadOnlySpan<KeyValuePair<TKey, TValue>> span;
+            if (enumerable is KeyValuePair<TKey, TValue>[] array)
+            {
+                span = array;
+            }
+            else if (enumerable.GetType() == typeof(List<KeyValuePair<TKey, TValue>>))
+            {
+                span = CollectionMarshal.AsSpan((List<KeyValuePair<TKey, TValue>>)enumerable);
+            }
+#if FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST
+            else if (enumerable.GetType() == typeof(SCG.List<KeyValuePair<TKey, TValue>>))
+            {
+                span = CollectionsMarshal.AsSpan((SCG.List<KeyValuePair<TKey, TValue>>)enumerable);
+            }
+#endif
+            else
+            {
+                // Fallback path for all other enumerables
+                foreach (KeyValuePair<TKey, TValue> pair in enumerable)
+                {
+                    Add(pair.Key, pair.Value);
+                }
+                return;
+            }
+
+            // We got a span. Add the elements to the dictionary.
+            foreach (KeyValuePair<TKey, TValue> pair in span)
+            {
                 Add(pair.Key, pair.Value);
+            }
         }
 
 #if FEATURE_SERIALIZABLE
@@ -387,10 +463,10 @@ namespace J2N.Collections.Generic
         /// </remarks>
         protected Dictionary(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            siInfo = info;
-            int capacity = info.GetInt32(CountName);
-            var comparer = (IEqualityComparer<TKey>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<TKey>))!;
-            this.dictionary = new ConcreteDictionary(capacity, comparer);
+            // We can't do anything with the keys and values until the entire graph has been deserialized
+            // and we have a resonable estimate that GetHashCode is not going to fail.  For the time being,
+            // we'll just cache this.  The graph is not valid until OnDeserialization has been called.
+            HashHelpers.SerializationInfoTable.Add(this, info);
         }
 
 #endif
@@ -427,7 +503,21 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public IEqualityComparer<TKey> EqualityComparer => dictionary.Comparer;
+        public IEqualityComparer<TKey> EqualityComparer
+        {
+            get
+            {
+                if (typeof(TKey) == typeof(string))
+                {
+                    Debug.Assert(_comparer is not null, "The comparer should never be null for a reference type.");
+                    return (IEqualityComparer<TKey>)InternalStringEqualityComparer.GetUnderlyingEqualityComparer((IEqualityComparer<string?>)_comparer!);
+                }
+                else
+                {
+                    return _comparer ?? EqualityComparer<TKey>.Default;
+                }
+            }
+        }
 
         /// <summary>
         /// Determines whether the <see cref="Dictionary{TKey, TValue}"/> contains a specific value.
@@ -445,11 +535,46 @@ namespace J2N.Collections.Generic
         /// is proportional to <see cref="Count"/>. That is, this method is an O(<c>n</c>) operation,
         /// where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public bool ContainsValue(TValue value)
+        public bool ContainsValue([AllowNull] TValue value)
         {
-            // NOTE: We do this check here to override the .NET default equality comparer
-            // with J2N's version
-            return ContainsValue(value, EqualityComparer<TValue>.Default);
+            Entry[]? entries = _entries;
+            if (value == null)
+            {
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries![i].next >= -1 && entries[i].value == null)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else if (typeof(TValue).IsValueType)
+            {
+                // ValueType: Devirtualize with EqualityComparer<TValue>.Default intrinsic
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries![i].next >= -1 && EqualityComparer<TValue>.Default.Equals(entries[i].value!, value))
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize
+                // https://github.com/dotnet/runtime/issues/10050
+                // So cache in a local rather than get EqualityComparer per loop iteration
+                IEqualityComparer<TValue> defaultComparer = EqualityComparer<TValue>.Default;
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries![i].next >= -1 && defaultComparer.Equals(entries[i].value!, value))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -467,20 +592,34 @@ namespace J2N.Collections.Generic
         /// is proportional to <see cref="Count"/>. That is, this method is an O(<c>n</c>) operation,
         /// where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public bool ContainsValue(TValue value, IEqualityComparer<TValue> valueComparer) // Overload added so end user can override J2N's equality comparer
+        public bool ContainsValue([AllowNull] TValue value, IEqualityComparer<TValue>? valueComparer) // Overload added so end user can override J2N's equality comparer
         {
-            if (TKeyIsNullable && hasNullKey && valueComparer.Equals(nullEntry.Value, value))
-                return true;
+            valueComparer ??= EqualityComparer<TValue>.Default;
 
-            foreach (var val in dictionary.Values)
+            Entry[]? entries = _entries;
+            if (value is null)
             {
-                if (valueComparer.Equals(val, value))
-                    return true;
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries![i].next >= -1 && entries[i].value is null)
+                    {
+                        return true;
+                    }
+                }
             }
+            else
+            {
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries![i].next >= -1 && valueComparer.Equals(entries[i].value!, value))
+                    {
+                        return true;
+                    }
+                }
+            }
+
             return false;
         }
-
-#if FEATURE_DICTIONARY_ENSURECAPACITY
 
         /// <summary>
         /// Ensures that the dictionary can hold up to a specified number of entries without any
@@ -491,11 +630,29 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than 0.</exception>
         public int EnsureCapacity(int capacity)
         {
-            int result = dictionary.EnsureCapacity(capacity);
-            version++;
-            return result;
+            if (capacity < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
+            }
+
+            int currentCapacity = _entries == null ? 0 : _entries.Length;
+            if (currentCapacity >= capacity)
+            {
+                return currentCapacity;
+            }
+
+            _version++;
+
+            if (_buckets == null)
+            {
+                return Initialize(capacity);
+            }
+
+            int newSize = HashHelpers.GetPrime(capacity);
+            Resize(newSize, forceNewHashCodes: false);
+            return newSize;
         }
-#endif
+
 #if FEATURE_SERIALIZABLE
 
         /// <summary>
@@ -511,22 +668,21 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            // Customized serialization for LinkedList.
+            // Customized serialization for Dictionary.
             // We need to do this because it will give us flexibility to change the design
             // without changing the serialized info.
             if (info == null)
                 throw new ArgumentNullException(nameof(info));
 
-            int count = Count;
-            info.AddValue(CountName, count);
+            info.AddValue(VersionName, _version);
             info.AddValue(EqualityComparerName, EqualityComparer, typeof(IEqualityComparer<TKey>));
-            info.AddValue(VersionName, version);
+            info.AddValue(HashSizeName, _buckets == null ? 0 : _buckets.Length); // This is the length of the bucket array
 
-            if (count > 0)
+            if (_buckets != null)
             {
-                KeyValuePair<TKey, TValue>[] array = new KeyValuePair<TKey, TValue>[count];
+                var array = new KeyValuePair<TKey, TValue>[Count];
                 CopyTo(array, 0);
-                info.AddValue(KeyValuePairsName, array, typeof(KeyValuePair<TKey, TValue>));
+                info.AddValue(KeyValuePairsName, array, typeof(KeyValuePair<TKey, TValue>[]));
             }
         }
 
@@ -541,14 +697,37 @@ namespace J2N.Collections.Generic
         /// <remarks>This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         public virtual void OnDeserialization(object? sender)
         {
+            HashHelpers.SerializationInfoTable.TryGetValue(this, out SerializationInfo? siInfo);
+
             if (siInfo == null)
             {
-                return; //Somebody had a dependency on this Dictionary and fixed us up before the ObjectManager got to it.
+                // We can return immediately if this function is called twice.
+                // Note we remove the serialization info from the table at the end of this method.
+                return;
             }
 
-            int count = siInfo.GetInt32(CountName);
-            if (count > 0)
+            int realVersion = siInfo.GetInt32(VersionName);
+            int hashsize = 0;
+
+            // Try to get HashSizeName, and if it fails, use CountName as fallback.
+            // CountName was used to serialize Dictionary<TKey, TValue> in J2N 2.0.0 and earlier,
+            // so this is just for backward compatibility. It was used incorrectly, though.
+            // It was tracking the count instead of the capacity.
+            try
             {
+                hashsize = siInfo.GetInt32(HashSizeName);
+            }
+            catch (SerializationException)
+            {
+                // Fallback to CountName if HashSizeName is not present.
+                hashsize = siInfo.GetInt32(CountName);
+            }
+            _comparer = (IEqualityComparer<TKey>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<TKey>))!; // When serialized if comparer is null, we use the default.
+
+            if (hashsize != 0)
+            {
+                Initialize(hashsize);
+
                 KeyValuePair<TKey, TValue>[]? array = (KeyValuePair<TKey, TValue>[]?)
                     siInfo.GetValue(KeyValuePairsName, typeof(KeyValuePair<TKey, TValue>[]));
 
@@ -559,19 +738,20 @@ namespace J2N.Collections.Generic
 
                 for (int i = 0; i < array.Length; i++)
                 {
-                    Add(array[i]);
+                    // J2N allows null keys
+
+                    Add(array[i].Key, array[i].Value);
                 }
             }
-            // Overwrite the version with the original after all of the items were added
-            version = siInfo.GetInt32(VersionName);
-            if (Count != count)
-                throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MismatchedCount);
+            else
+            {
+                _buckets = null;
+            }
 
-            siInfo = null;
+            _version = realVersion;
+            HashHelpers.SerializationInfoTable.Remove(this);
         }
 #endif
-
-#if FEATURE_DICTIONARY_TRIMEXCESS
 
         /// <summary>
         /// Sets the capacity of this dictionary to hold up a specified number of entries
@@ -586,8 +766,27 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void TrimExcess(int capacity)
         {
-            dictionary.TrimExcess(capacity);
-            version++;
+            if (capacity < Count)
+            {
+                //ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity);
+                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_SmallCapacity);
+            }
+
+            int newSize = HashHelpers.GetPrime(capacity);
+            Entry[]? oldEntries = _entries;
+            int currentCapacity = oldEntries == null ? 0 : oldEntries.Length;
+            if (newSize >= currentCapacity)
+            {
+                return;
+            }
+
+            int oldCount = _count;
+            _version++;
+            Initialize(newSize);
+
+            Debug.Assert(oldEntries is not null);
+
+            CopyEntries(oldEntries!, oldCount);
         }
 
         /// <summary>
@@ -603,13 +802,7 @@ namespace J2N.Collections.Generic
         /// dictionary.TrimExcess();
         /// </code>
         /// </remarks>
-        public void TrimExcess()
-        {
-            dictionary.TrimExcess();
-            version++;
-        }
-
-#endif
+        public void TrimExcess() => TrimExcess(Count);
 
         /// <summary>
         /// Attempts to add the specified key and value to the dictionary.
@@ -623,16 +816,8 @@ namespace J2N.Collections.Generic
         /// <see cref="TryAdd(TKey, TValue)"/> does nothing and returns <c>false</c>.</remarks>
         // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
         // It is redefined here to ensure we have it in prior platforms.
-        public bool TryAdd([AllowNull] TKey key, [AllowNull] TValue value)
-        {
-            if (!ContainsKey(key))
-            {
-                Add(key, value);
-                return true;
-            }
-
-            return false;
-        }
+        public bool TryAdd([AllowNull] TKey key, [AllowNull] TValue value) =>
+            TryInsert(key, value, InsertionBehavior.None);
 
         #endregion SCG.Dictionary<TKey, TValue> Members
 
@@ -652,14 +837,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public ICollection<TKey> Keys
-        {
-            get
-            {
-                if (keys == null) keys = new KeyCollection(this, dictionary.Keys);
-                return keys;
-            }
-        }
+        public KeyCollection Keys => _keys ??= new KeyCollection(this);
+
+        ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
         /// <summary>
         /// Gets a collection containing the values in the <see cref="Dictionary{TKey, TValue}"/>.
@@ -676,14 +856,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public ICollection<TValue> Values
-        {
-            get
-            {
-                if (values == null) values = new ValueCollection(this, dictionary.Values);
-                return values;
-            }
-        }
+        public ValueCollection Values => _values ??= new ValueCollection(this);
+
+        ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
         /// <summary>
         /// Gets the number of key/value pairs contained in the <see cref="Dictionary{TKey, TValue}"/>.
@@ -691,7 +866,7 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public int Count => dictionary.Count + (TKeyIsNullable && hasNullKey ? 1 : 0);
+        public int Count => _count - _freeCount;
 
         bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => false;
 
@@ -726,28 +901,26 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public TValue this[[AllowNull] TKey key]
         {
+            [return: MaybeNull]
             get
             {
-                if (TKeyIsNullable && key is null)
+                ref TValue value = ref FindValue(key);
+                if (!UnsafeHelpers.IsNullRef(ref value))
                 {
-                    if (!hasNullKey)
-                        throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, "null"));
-                    return nullEntry.Value;
+                    return value;
                 }
-                return dictionary[key];
+
+                if (key is null)
+                {
+                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, "null"));
+                }
+
+                throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
             }
             set
             {
-                if (TKeyIsNullable && key is null)
-                {
-                    hasNullKey = true;
-                    nullEntry = new KeyValuePair<TKey, TValue>(default!, value);
-                }
-                else
-                {
-                    dictionary[key] = value;
-                }
-                version++;
+                bool modified = TryInsert(key, value, InsertionBehavior.OverwriteExisting);
+                Debug.Assert(modified);
             }
         }
 
@@ -773,19 +946,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
-            if (TKeyIsNullable && key is null)
-            {
-                if (hasNullKey)
-                    throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, "null"));
-
-                hasNullKey = true;
-                nullEntry = new KeyValuePair<TKey, TValue>(key!, value!);
-            }
-            else
-            {
-                dictionary.Add(key!, value!);
-            }
-            version++;
+            bool modified = TryInsert(key, value, InsertionBehavior.ThrowOnExisting);
+            Debug.Assert(modified); // If there was an existing key and the Add failed, an exception will already have been thrown.
         }
 
         /// <summary>
@@ -798,9 +960,7 @@ namespace J2N.Collections.Generic
         /// <remarks>This method is an O(log <c>n</c>) operation.</remarks>
         public bool ContainsKey([AllowNull] TKey key)
         {
-            if (TKeyIsNullable && key is null)
-                return hasNullKey;
-            return dictionary.ContainsKey(key!);
+            return !UnsafeHelpers.IsNullRef(ref FindValue(key));
         }
 
         /// <summary>
@@ -817,20 +977,120 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool Remove([AllowNull] TKey key)
         {
-            if (TKeyIsNullable && key is null)
-            {
-                if (!hasNullKey)
-                    return false;
+            // The overload Remove(TKey key, out TValue value) is a copy of this method with one additional
+            // statement to copy the value for entry being removed into the output parameter.
+            // Code has been intentionally duplicated for performance reasons.
 
-                hasNullKey = false;
-                nullEntry = default;
-                version++;
-                return true;
-            }
-            else if (dictionary.Remove(key!))
+            // J2N allows null keys
+
+            if (_buckets != null)
             {
-                version++;
-                return true;
+                Debug.Assert(_entries != null, "entries should be non-null");
+                uint collisionCount = 0;
+
+                IEqualityComparer<TKey>? comparer = _comparer;
+                Debug.Assert(typeof(TKey).IsValueType || comparer is not null);
+                uint hashCode = (uint)(typeof(TKey).IsValueType && comparer == null ? key?.GetHashCode() ?? 0 : key is not null ? comparer!.GetHashCode(key!) : 0);
+
+                ref int bucket = ref GetBucket(hashCode);
+                Entry[]? entries = _entries;
+                int last = -1;
+                int i = bucket - 1; // Value in buckets is 1-based
+                if (key is not null)
+                {
+                    while (i >= 0)
+                    {
+                        ref Entry entry = ref entries![i];
+
+                        if (entry.hashCode == hashCode &&
+                            (typeof(TKey).IsValueType && comparer == null ? EqualityComparer<TKey>.Default.Equals(entry.key, key) : comparer!.Equals(entry.key, key)))
+                        {
+                            if (last < 0)
+                            {
+                                bucket = entry.next + 1; // Value in buckets is 1-based
+                            }
+                            else
+                            {
+                                entries[last].next = entry.next;
+                            }
+
+                            Debug.Assert((StartOfFreeList - _freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
+                            entry.next = StartOfFreeList - _freeList;
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                            {
+                                entry.key = default!;
+                            }
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                            {
+                                entry.value = default!;
+                            }
+
+                            _freeList = i;
+                            _freeCount++;
+                            return true;
+                        }
+
+                        last = i;
+                        i = entry.next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
+                }
+                else
+                {
+                    while (i >= 0)
+                    {
+                        ref Entry entry = ref entries![i];
+
+                        if (entry.hashCode == hashCode && entry.key is null)
+                        {
+                            if (last < 0)
+                            {
+                                bucket = entry.next + 1; // Value in buckets is 1-based
+                            }
+                            else
+                            {
+                                entries[last].next = entry.next;
+                            }
+
+                            Debug.Assert((StartOfFreeList - _freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
+                            entry.next = StartOfFreeList - _freeList;
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                            {
+                                entry.key = default!;
+                            }
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                            {
+                                entry.value = default!;
+                            }
+
+                            _freeList = i;
+                            _freeCount++;
+                            return true;
+                        }
+
+                        last = i;
+                        i = entry.next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
+                }
             }
             return false;
         }
@@ -864,39 +1124,18 @@ namespace J2N.Collections.Generic
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         {
-            if (TKeyIsNullable && key is null)
+            ref TValue valRef = ref FindValue(key);
+            if (!UnsafeHelpers.IsNullRef(ref valRef))
             {
-                if (hasNullKey)
-                {
-                    value = nullEntry.Value;
-                    return true;
-                }
-
-                value = default!;
-                return false;
+                value = valRef;
+                return true;
             }
-            return dictionary.TryGetValue(key!, out value);
+
+            value = default;
+            return false;
         }
 
-        void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item) => Add(item);
-        
-        // declared locally so we can use during deserialization
-        private void Add(KeyValuePair<TKey, TValue> item)
-        {
-            if (TKeyIsNullable && item.Key is null)
-            {
-                if (hasNullKey)
-                    throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, "null"));
-
-                hasNullKey = true;
-                nullEntry = item;
-            }
-            else
-            {
-                dictionary.Add(item);
-            }
-            version++;
-        }
+        void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> item) => Add(item.Key, item.Value);
 
         /// <summary>
         /// Removes all elements from the <see cref="Dictionary{TKey, TValue}"/>.
@@ -910,15 +1149,34 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void Clear()
         {
-            dictionary.Clear();
-            version++;
+            int count = _count;
+            if (count > 0)
+            {
+                Debug.Assert(_buckets != null, "_buckets should be non-null");
+                Debug.Assert(_entries != null, "_entries should be non-null");
+
+#if FEATURE_ARRAY_CLEAR_ARRAY
+                Array.Clear(_buckets);
+#else
+                Array.Clear(_buckets, 0, _buckets!.Length);
+#endif
+
+                _count = 0;
+                _freeList = -1;
+                _freeCount = 0;
+                Array.Clear(_entries, 0, count);
+            }
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
         {
-            if (item.Key is null)
-                return hasNullKey && EqualityComparer<TValue>.Default.Equals(item.Value, nullEntry.Value);
-            return dictionary.Contains(item);
+            ref TValue value = ref FindValue(item.Key);
+            if (!UnsafeHelpers.IsNullRef(ref value) && EqualityComparer<TValue>.Default.Equals(value, item.Value))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -933,29 +1191,32 @@ namespace J2N.Collections.Generic
         {
             if (array == null)
                 throw new ArgumentNullException(nameof(array));
-            if (index < 0 || index > array.Length)
+            if ((uint)index > (uint)array.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (array.Length - index < Count)
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
-            if (TKeyIsNullable && hasNullKey)
-                array[index++] = nullEntry;
-            foreach (var item in dictionary)
-                array[index++] = item;
+            int count = _count;
+            Entry[]? entries = _entries;
+            for (int i = 0; i < count; i++)
+            {
+                if (entries![i].next >= -1)
+                {
+                    array[index++] = new KeyValuePair<TKey, TValue>(entries[i].key!, entries[i].value!);
+                }
+            }
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
         {
-            if (TKeyIsNullable && item.Key is null)
+            ref TValue value = ref FindValue(item.Key);
+            if (!UnsafeHelpers.IsNullRef(ref value) && EqualityComparer<TValue>.Default.Equals(value, item.Value))
             {
-                if (!hasNullKey || !EqualityComparer<TValue>.Default.Equals(item.Value, nullEntry.Value))
-                    return false;
-
-                hasNullKey = false;
-                nullEntry = default;
+                Remove(item.Key);
                 return true;
             }
-            return dictionary.Remove(item);
+
+            return false;
         }
 
         /// <summary>
@@ -974,25 +1235,127 @@ namespace J2N.Collections.Generic
         // It is redefined here to ensure we have it in prior platforms.
         public bool Remove([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
-            if (TKeyIsNullable && key is null)
+            // This overload is a copy of the overload Remove(TKey key) with one additional
+            // statement to copy the value for entry being removed into the output parameter.
+            // Code has been intentionally duplicated for performance reasons.
+
+            // J2N supports null keys
+
+            if (_buckets != null)
             {
-                if (!hasNullKey)
+                Debug.Assert(_entries != null, "entries should be non-null");
+                uint collisionCount = 0;
+
+                IEqualityComparer<TKey>? comparer = _comparer;
+                Debug.Assert(typeof(TKey).IsValueType || comparer is not null);
+                uint hashCode = (uint)(typeof(TKey).IsValueType && comparer == null ? key?.GetHashCode() ?? 0 : key is not null ? comparer!.GetHashCode(key) : 0);
+
+                ref int bucket = ref GetBucket(hashCode);
+                Entry[]? entries = _entries;
+                int last = -1;
+                int i = bucket - 1; // Value in buckets is 1-based
+                if (key is not null)
                 {
-                    value = default;
-                    return false;
+                    while (i >= 0)
+                    {
+                        ref Entry entry = ref entries![i];
+
+                        if (entry.hashCode == hashCode &&
+                            (typeof(TKey).IsValueType && comparer == null ? EqualityComparer<TKey>.Default.Equals(entry.key, key) : comparer!.Equals(entry.key, key)))
+                        {
+                            if (last < 0)
+                            {
+                                bucket = entry.next + 1; // Value in buckets is 1-based
+                            }
+                            else
+                            {
+                                entries[last].next = entry.next;
+                            }
+
+                            value = entry.value;
+
+                            Debug.Assert((StartOfFreeList - _freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
+                            entry.next = StartOfFreeList - _freeList;
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                            {
+                                entry.key = default!;
+                            }
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                            {
+                                entry.value = default!;
+                            }
+
+                            _freeList = i;
+                            _freeCount++;
+                            return true;
+                        }
+
+                        last = i;
+                        i = entry.next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
                 }
+                else
+                {
+                    while (i >= 0)
+                    {
+                        ref Entry entry = ref entries![i];
 
-                value = nullEntry.Value;
-                return true;
+                        if (entry.hashCode == hashCode && entry.key is null)
+                        {
+                            if (last < 0)
+                            {
+                                bucket = entry.next + 1; // Value in buckets is 1-based
+                            }
+                            else
+                            {
+                                entries[last].next = entry.next;
+                            }
+
+                            value = entry.value;
+
+                            Debug.Assert((StartOfFreeList - _freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
+                            entry.next = StartOfFreeList - _freeList;
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                            {
+                                entry.key = default!;
+                            }
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                            {
+                                entry.value = default!;
+                            }
+
+                            _freeList = i;
+                            _freeCount++;
+                            return true;
+                        }
+
+                        last = i;
+                        i = entry.next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
+                }
             }
 
-            if (dictionary.TryGetValue(key!, out value))
-            {
-                dictionary.Remove(key!);
-                return true;
-            }
-
-            value = default!;
+            value = default;
             return false;
         }
 
@@ -1043,32 +1406,29 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator()
-        {
-            // Only use our enumerator if we have a null value, otherwise, use the original
-            if (TKeyIsNullable && hasNullKey)
-                return new Enumerator(this, Enumerator.KeyValuePair);
-            return dictionary.GetEnumerator();
-        }
+        public Enumerator GetEnumerator() => new Enumerator(this, Enumerator.KeyValuePair);
 
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() =>
+            Count == 0 ? GenericEmptyEnumerator<KeyValuePair<TKey, TValue>>.Instance :
+            GetEnumerator();
 
-        #endregion IDictionary<TKey, TValue> Members
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<KeyValuePair<TKey, TValue>>)this).GetEnumerator();
+
+#endregion IDictionary<TKey, TValue> Members
 
         #region IDictionary Members
 
-        bool IDictionary.IsFixedSize => ((IDictionary)dictionary).IsFixedSize;
+        bool IDictionary.IsFixedSize => false;
 
-        ICollection IDictionary.Keys => (ICollection)Keys;
+        ICollection IDictionary.Keys => Keys;
 
-        ICollection IDictionary.Values => (ICollection)Values;
+        ICollection IDictionary.Values => Values;
 
         bool IDictionary.IsReadOnly => false;
 
-        bool ICollection.IsSynchronized => ((ICollection)dictionary).IsSynchronized;
+        bool ICollection.IsSynchronized => false;
 
-        object ICollection.SyncRoot => ((ICollection)dictionary).SyncRoot;
+        object ICollection.SyncRoot => this;
 
         object? IDictionary.this[object? key]
         {
@@ -1076,12 +1436,8 @@ namespace J2N.Collections.Generic
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TKeyIsNullable && key is null)
-                    {
-                        if (hasNullKey)
-                            return nullEntry.Value;
-                    }
-                    else if (TryGetValue((TKey)key, out TValue value))
+                    ref TValue value = ref FindValue((TKey)key!);
+                    if (!UnsafeHelpers.IsNullRef(ref value))
                     {
                         return value;
                     }
@@ -1091,14 +1447,14 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: Only throw if the generic closing type is not nullable
-                if (!TKeyIsNullable && key is null)
+                if (!(default(TKey) == null) && key is null)
                     throw new ArgumentNullException(nameof(key));
-                if (value is null && !typeof(TValue).IsNullableType())
+                if (!(default(TValue) == null) && value is null)
                     throw new ArgumentNullException(nameof(value));
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
 
                     try
                     {
@@ -1119,18 +1475,18 @@ namespace J2N.Collections.Generic
         void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
-            if (!TKeyIsNullable && key is null)
+            if (!(default(TKey) == null) && key is null)
                 throw new ArgumentNullException(nameof(key));
-            if (value is null && !typeof(TValue).IsNullableType())
+            if (!(default(TValue) == null) && value is null)
                 throw new ArgumentNullException(nameof(value));
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
-                    Add(tempKey, (TValue)value);
+                    Add(tempKey, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -1147,24 +1503,18 @@ namespace J2N.Collections.Generic
         {
             if (IsCompatibleKey(key))
             {
-                return ContainsKey((TKey)key);
+                return ContainsKey((TKey)key!);
             }
             return false;
         }
 
-        IDictionaryEnumerator IDictionary.GetEnumerator()
-        {
-            // Only use our enumerator if we have a null value, otherwise, use the original
-            if (hasNullKey)
-                return new Enumerator(this, Enumerator.DictEntry);
-            return ((IDictionary)dictionary).GetEnumerator();
-        }
+        IDictionaryEnumerator IDictionary.GetEnumerator() => new Enumerator(this, Enumerator.DictEntry);
 
         void IDictionary.Remove(object? key)
         {
             if (IsCompatibleKey(key))
             {
-                Remove((TKey)key);
+                Remove((TKey)key!);
             }
         }
 
@@ -1187,22 +1537,34 @@ namespace J2N.Collections.Generic
             }
             else if (array is DictionaryEntry[] dictEntryArray)
             {
-                // Null check not needed because we are enumerating this
-                foreach (var entry in this)
-                    dictEntryArray[index++] = new DictionaryEntry(entry.Key!, entry.Value);
+                Entry[]? entries = _entries;
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries![i].next >= -1)
+                    {
+                        dictEntryArray[index++] = new DictionaryEntry(entries[i].key!, entries[i].value);
+                    }
+                }
             }
             else
             {
-                if (!(array is object[] objects))
+                object[]? objects = array as object[];
+                if (objects == null)
                 {
                     throw new ArgumentException(SR.Argument_InvalidArrayType);
                 }
 
                 try
                 {
-                    // Null check not needed because we are enumerating this
-                    foreach (var entry in this)
-                        objects[index++] = entry;
+                    int count = _count;
+                    Entry[]? entries = _entries;
+                    for (int i = 0; i < count; i++)
+                    {
+                        if (entries![i].next >= -1)
+                        {
+                            objects[index++] = new KeyValuePair<TKey, TValue>(entries[i].key!, entries[i].value!);
+                        }
+                    }
                 }
                 catch (ArrayTypeMismatchException)
                 {
@@ -1214,7 +1576,7 @@ namespace J2N.Collections.Generic
         private static bool IsCompatibleKey(object? key)
         {
             if (key is null)
-                return TKeyIsNullable;
+                return default(TKey) == null;
 
             return (key is TKey);
         }
@@ -1226,14 +1588,496 @@ namespace J2N.Collections.Generic
 
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => ((IReadOnlyDictionary<TKey, TValue>)dictionary).Keys;
+        IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
-        IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => ((IReadOnlyDictionary<TKey, TValue>)dictionary).Values;
+        IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 #pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 #pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion IReadOnlyDictionary<TKey, TValue> Members
 #endif
+
+        #region Hash Table
+
+        internal ref TValue FindValue([AllowNull] TKey key)
+        {
+            ref Entry entry = ref UnsafeHelpers.NullRef<Entry>();
+            if (_buckets != null)
+            {
+                Debug.Assert(_entries != null, "expected entries to be != null");
+                IEqualityComparer<TKey>? comparer = _comparer;
+                if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                    comparer == null)
+                {
+                    uint hashCode = (uint)(key?.GetHashCode() ?? 0);
+                    int i = GetBucket(hashCode);
+                    Entry[]? entries = _entries;
+                    uint collisionCount = 0;
+
+                    // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
+                    i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                    if (key is not null)
+                    {
+                        do
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
+
+                            entry = ref entries[i];
+                            if (entry.hashCode == hashCode && EqualityComparer<TKey>.Default.Equals(entry.key, key))
+                            {
+                                goto ReturnFound;
+                            }
+
+                            i = entry.next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
+                    else
+                    {
+                        do
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
+
+                            entry = ref entries[i];
+                            if (entry.hashCode == hashCode && entry.key is null)
+                            {
+                                goto ReturnFound;
+                            }
+
+                            i = entry.next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+                else
+                {
+                    Debug.Assert(comparer is not null);
+                    if (key is not null)
+                    {
+                        uint hashCode = (uint)comparer!.GetHashCode(key);
+                        int i = GetBucket(hashCode);
+                        Entry[]? entries = _entries;
+                        uint collisionCount = 0;
+                        i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                        do
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
+
+                            entry = ref entries[i];
+                            if (entry.hashCode == hashCode && comparer.Equals(entry.key, key))
+                            {
+                                goto ReturnFound;
+                            }
+
+                            i = entry.next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
+                    else
+                    {
+                        uint hashCode = 0;
+                        int i = GetBucket(hashCode);
+                        Entry[]? entries = _entries;
+                        uint collisionCount = 0;
+                        i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                        do
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
+
+                            entry = ref entries[i];
+                            if (entry.hashCode == hashCode && key is null)
+                            {
+                                goto ReturnFound;
+                            }
+
+                            i = entry.next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+            }
+
+            goto ReturnNotFound;
+
+        ConcurrentOperation:
+            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+        ReturnFound:
+            ref TValue value = ref entry.value;
+        Return:
+            return ref value;
+        ReturnNotFound:
+            value = ref UnsafeHelpers.NullRef<TValue>();
+            goto Return;
+        }
+
+        private int Initialize(int capacity)
+        {
+            int size = HashHelpers.GetPrime(capacity);
+            int[] buckets = new int[size];
+            Entry[] entries = new Entry[size];
+
+            // Assign member variables after both arrays allocated to guard against corruption from OOM if second fails
+            _freeList = -1;
+            if (Unsafe.SizeOf<IntPtr>() == sizeof(long)) // 64 bit
+            {
+                _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)size);
+            }
+            _buckets = buckets;
+            _entries = entries;
+
+            return size;
+        }
+
+        private bool TryInsert([AllowNull] TKey key, [AllowNull] TValue value, InsertionBehavior behavior)
+        {
+            // NOTE: this method is mirrored in CollectionsMarshal.GetValueRefOrAddDefault below.
+            // If you make any changes here, make sure to keep that version in sync as well.
+
+            // J2N supports null keys
+
+            if (_buckets == null)
+            {
+                Initialize(0);
+            }
+            Debug.Assert(_buckets != null);
+
+            Entry[]? entries = _entries;
+            Debug.Assert(entries != null, "expected entries to be non-null");
+
+            IEqualityComparer<TKey>? comparer = _comparer;
+            Debug.Assert(comparer is not null || typeof(TKey).IsValueType);
+            uint hashCode = (uint)((typeof(TKey).IsValueType && comparer == null) ? key?.GetHashCode() ?? 0 : key is not null ? comparer!.GetHashCode(key) : 0);
+
+            uint collisionCount = 0;
+            ref int bucket = ref GetBucket(hashCode);
+            int i = bucket - 1; // Value in _buckets is 1-based
+
+            if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                comparer == null)
+            {
+                // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
+                if (key is not null)
+                {
+                    while (true)
+                    {
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test uint in if rather than loop condition to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length)
+                        {
+                            break;
+                        }
+
+                        if (entries[i].hashCode == hashCode && EqualityComparer<TKey>.Default.Equals(entries[i].key!, key))
+                        {
+                            if (behavior == InsertionBehavior.OverwriteExisting)
+                            {
+                                entries[i].value = value;
+                                return true;
+                            }
+
+                            if (behavior == InsertionBehavior.ThrowOnExisting)
+                            {
+                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
+                            }
+
+                            return false;
+                        }
+
+                        i = entries[i].next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
+                }
+                else
+                {
+                    while (true)
+                    {
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test uint in if rather than loop condition to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length)
+                        {
+                            break;
+                        }
+
+                        if (entries[i].hashCode == hashCode && entries[i].key is null)
+                        {
+                            if (behavior == InsertionBehavior.OverwriteExisting)
+                            {
+                                entries[i].value = value;
+                                return true;
+                            }
+
+                            if (behavior == InsertionBehavior.ThrowOnExisting)
+                            {
+                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, "null"));
+                            }
+
+                            return false;
+                        }
+
+                        i = entries[i].next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (key is not null)
+                {
+                    Debug.Assert(comparer is not null);
+                    while (true)
+                    {
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test uint in if rather than loop condition to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length)
+                        {
+                            break;
+                        }
+
+                        if (entries[i].hashCode == hashCode && comparer!.Equals(entries[i].key!, key))
+                        {
+                            if (behavior == InsertionBehavior.OverwriteExisting)
+                            {
+                                entries[i].value = value;
+                                return true;
+                            }
+
+                            if (behavior == InsertionBehavior.ThrowOnExisting)
+                            {
+                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
+                            }
+
+                            return false;
+                        }
+
+                        i = entries[i].next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
+                }
+                else
+                {
+                    while (true)
+                    {
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test uint in if rather than loop condition to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length)
+                        {
+                            break;
+                        }
+
+                        if (entries[i].hashCode == hashCode && entries[i].key is null)
+                        {
+                            if (behavior == InsertionBehavior.OverwriteExisting)
+                            {
+                                entries[i].value = value;
+                                return true;
+                            }
+
+                            if (behavior == InsertionBehavior.ThrowOnExisting)
+                            {
+                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, "null"));
+                            }
+
+                            return false;
+                        }
+
+                        i = entries[i].next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        }
+                    }
+                }
+            }
+
+            int index;
+            if (_freeCount > 0)
+            {
+                index = _freeList;
+                Debug.Assert((StartOfFreeList - entries[_freeList].next) >= -1, "shouldn't overflow because `next` cannot underflow");
+                _freeList = StartOfFreeList - entries[_freeList].next;
+                _freeCount--;
+            }
+            else
+            {
+                int count = _count;
+                if (count == entries.Length)
+                {
+                    Resize();
+                    bucket = ref GetBucket(hashCode);
+                }
+                index = count;
+                _count = count + 1;
+                entries = _entries;
+            }
+
+            ref Entry entry = ref entries![index];
+            entry.hashCode = hashCode;
+            entry.next = bucket - 1; // Value in _buckets is 1-based
+            entry.key = key;
+            entry.value = value;
+            bucket = index + 1; // Value in _buckets is 1-based
+            _version++;
+
+            // Value types never rehash
+
+            if (!typeof(TKey).IsValueType && collisionCount > HashHelpers.HashCollisionThreshold && comparer is NonRandomizedStringEqualityComparer)
+            {
+                // If we hit the collision threshold we'll need to switch to the comparer which is using randomized string hashing
+                // i.e. EqualityComparer<string>.Default.
+                Resize(entries.Length, true);
+            }
+
+            return true;
+        }
+
+        private void Resize() => Resize(HashHelpers.ExpandPrime(_count), false);
+
+        private void Resize(int newSize, bool forceNewHashCodes)
+        {
+            // Value types never rehash
+            Debug.Assert(!forceNewHashCodes || !typeof(TKey).IsValueType);
+            Debug.Assert(_entries != null, "_entries should be non-null");
+            Debug.Assert(newSize >= _entries!.Length);
+
+            Entry[] entries = new Entry[newSize];
+
+            int count = _count;
+            Array.Copy(_entries, entries, count);
+
+            if (!typeof(TKey).IsValueType && forceNewHashCodes)
+            {
+                Debug.Assert(_comparer is NonRandomizedStringEqualityComparer);
+                IEqualityComparer<TKey> comparer = _comparer = (IEqualityComparer<TKey>)((NonRandomizedStringEqualityComparer)_comparer!).GetRandomizedEqualityComparer();
+
+                for (int i = 0; i < count; i++)
+                {
+                    if (entries[i].next >= -1)
+                    {
+                        TKey? key = entries[i].key;
+                        entries[i].hashCode = key is not null ? (uint)comparer.GetHashCode(key) : 0;
+                    }
+                }
+            }
+
+            // Assign member variables after both arrays allocated to guard against corruption from OOM if second fails
+            _buckets = new int[newSize];
+            if (Unsafe.SizeOf<IntPtr>() == sizeof(long)) // 64 bit
+            {
+                _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)newSize);
+            }
+            for (int i = 0; i < count; i++)
+            {
+                if (entries[i].next >= -1)
+                {
+                    ref int bucket = ref GetBucket(entries[i].hashCode);
+                    entries[i].next = bucket - 1; // Value in _buckets is 1-based
+                    bucket = i + 1;
+                }
+            }
+
+            _entries = entries;
+        }
+
+        private void CopyEntries(Entry[] entries, int count)
+        {
+            Debug.Assert(_entries is not null);
+
+            Entry[] newEntries = _entries!;
+            int newCount = 0;
+            for (int i = 0; i < count; i++)
+            {
+                uint hashCode = entries[i].hashCode;
+                if (entries[i].next >= -1)
+                {
+                    ref Entry entry = ref newEntries[newCount];
+                    entry = entries[i];
+                    ref int bucket = ref GetBucket(hashCode);
+                    entry.next = bucket - 1; // Value in _buckets is 1-based
+                    bucket = newCount + 1;
+                    newCount++;
+                }
+            }
+
+            _count = newCount;
+            _freeCount = 0;
+        }
+
+#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private ref int GetBucket(uint hashCode)
+        {
+            int[] buckets = _buckets!;
+
+            if (Unsafe.SizeOf<IntPtr>() == sizeof(long)) // 64 bit
+            {
+                return ref buckets[HashHelpers.FastMod(hashCode, (uint)buckets.Length, _fastModMultiplier)];
+            }
+            else
+            {
+                return ref buckets[(uint)hashCode % buckets.Length];
+            }
+        }
+
+        #endregion Hash Table
+
 
         #region Structural Equality
 
@@ -1350,31 +2194,54 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Represents the collection of keys in a <see cref="Dictionary{TKey, TValue}"/>. This class cannot be inherited.
         /// </summary>
+        /// <remarks>
+        /// The <see cref="Dictionary{TKey, TValue}.Keys"/> property returns an instance of this type, containing all
+        /// the keys in that <see cref="Dictionary{TKey, TValue}"/>. The order of the keys in the
+        /// <see cref="Dictionary{TKey, TValue}.KeyCollection"/> is unspecified, but it is the same order as the
+        /// associated values in the <see cref="Dictionary{TKey, TValue}.ValueCollection"/> returned by the
+        /// <see cref="Dictionary{TKey, TValue}.Values"/> property.
+        /// <para/>
+        /// The <see cref="Dictionary{TKey, TValue}.KeyCollection"/> is not a static copy; instead, the
+        /// <see cref="Dictionary{TKey, TValue}.KeyCollection"/> refers back to the keys in the original
+        /// <see cref="Dictionary{TKey, TValue}"/>. Therefore, changes to the <see cref="Dictionary{TKey, TValue}"/>
+        /// continue to be reflected in the <see cref="Dictionary{TKey, TValue}.KeyCollection"/>.
+        /// </remarks>
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
         [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
-        private sealed class KeyCollection : ICollection<TKey>, ICollection
+        public sealed class KeyCollection : ICollection<TKey>, ICollection
         {
-            private readonly Dictionary<TKey, TValue> nullableKeyDictionary;
-            private readonly ICollection<TKey> collection;
-            public KeyCollection(Dictionary<TKey, TValue> nullableKeyDictionary, ICollection<TKey> collection)
+            private readonly Dictionary<TKey, TValue> dictionary;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Dictionary{TKey,TValue}.KeyCollection"/>
+            /// class that reflects the keys in the specified <see cref="Dictionary{TKey,TValue}"/>.
+            /// </summary>
+            /// <param name="dictionary">The <see cref="Dictionary{TKey,TValue}"/> whose keys are
+            /// reflected in the new <see cref="Dictionary{TKey,TValue}.KeyCollection"/>.</param>
+            /// <exception cref="ArgumentNullException"></exception>
+            public KeyCollection(Dictionary<TKey, TValue> dictionary)
             {
-                this.nullableKeyDictionary = nullableKeyDictionary ?? throw new ArgumentNullException(nameof(nullableKeyDictionary));
-                this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
+                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
             }
 
             /// <summary>
             ///  Gets the number of elements contained in the <see cref="KeyCollection"/>.
             /// </summary>
-            public int Count => nullableKeyDictionary.Count;
+            /// <value>
+            /// The number of elements contained in the <see cref="Dictionary{TKey,TValue}.KeyCollection"/>.
+            /// <para/>
+            /// Retrieving the value of this property is an O(1) operation.
+            /// </value>
+            public int Count => dictionary.Count;
 
             bool ICollection<TKey>.IsReadOnly => true;
 
-            public bool IsSynchronized => false;
+            bool ICollection.IsSynchronized => false;
 
-            public object SyncRoot => ((ICollection)nullableKeyDictionary).SyncRoot;
+            object ICollection.SyncRoot => ((ICollection)dictionary).SyncRoot;
 
             void ICollection<TKey>.Add(TKey item)
                 => throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
@@ -1382,14 +2249,30 @@ namespace J2N.Collections.Generic
             void ICollection<TKey>.Clear()
                 => throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
 
-            bool ICollection<TKey>.Contains(TKey item)
+            bool ICollection<TKey>.Contains([AllowNull] TKey item)
             {
-                if (TKeyIsNullable && item is null)
-                    return nullableKeyDictionary.hasNullKey;
-                return collection.Contains(item);
+                return dictionary.ContainsKey(item);
             }
 
-            public void CopyTo(TKey[] array, int index)
+            /// <summary>
+            /// Copies the <see cref="Dictionary{TKey, TValue}.KeyCollection"/> elements to an
+            /// existing one-dimensional <see cref="Array"/>, starting at the specified array index.
+            /// </summary>
+            /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination
+            /// of the elements copied from <see cref="Dictionary{TKey, TValue}.KeyCollection"/>.
+            /// The <see cref="Array"/> must have zero-based indexing.</param>
+            /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+            /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero.</exception>
+            /// <exception cref="ArgumentException">The number of elements in the source <see cref="Dictionary{TKey, TValue}.KeyCollection"/>
+            /// is greater than the available space from <paramref name="index"/> to the end of the destination <paramref name="array"/>.</exception>
+            /// <remarks>
+            /// The elements are copied to the <see cref="Array"/> in the same order in which the enumerator iterates through
+            /// the <see cref="Dictionary{TKey, TValue}.KeyCollection"/>.
+            /// <para/>
+            /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+            /// </remarks>
+            public void CopyTo([MaybeNull] TKey[] array, int index)
             {
                 if (array == null)
                     throw new ArgumentNullException(nameof(array));
@@ -1398,20 +2281,64 @@ namespace J2N.Collections.Generic
                 if (array.Length - index < Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
-                // Null check not needed because we are enumerating this
-                foreach (var item in this)
-                    array[index++] = item;
+                int count = dictionary._count;
+                Entry[]? entries = dictionary._entries;
+                for (int i = 0; i < count; i++)
+                {
+                    if (entries![i].next >= -1) array[index++] = entries[i].key!;
+                }
             }
 
-            public IEnumerator<TKey> GetEnumerator()
-            {
-                // Only use our enumerator if we have a null value, otherwise, use the original
-                if (TKeyIsNullable && nullableKeyDictionary.hasNullKey)
-                    return new Enumerator(nullableKeyDictionary, collection);
-                return collection.GetEnumerator();
-            }
+            /// <summary>
+            /// Returns an enumerator that iterates through the <see cref="Dictionary{TKey, TValue}.KeyCollection"/>.
+            /// </summary>
+            /// <returns>A <see cref="Dictionary{TKey, TValue}.KeyCollection.Enumerator"/> for the <see cref="Dictionary{TKey, TValue}.KeyCollection"/>.</returns>
+            /// <remarks>
+            /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+            /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
+            /// <para/>
+            /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+            /// <para/>
+            /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
+            /// <see cref="Enumerator.Current"/> property is undefined. Therefore, you must call the
+            /// <see cref="Enumerator.MoveNext()"/> method to advance the enumerator to the first element
+            /// of the collection before reading the value of <see cref="Enumerator.Current"/>.
+            /// <para/>
+            /// The <see cref="Enumerator.Current"/> property returns the same object until
+            /// <see cref="Enumerator.MoveNext()"/> is called. <see cref="Enumerator.MoveNext()"/>
+            /// sets <see cref="Enumerator.Current"/> to the next element.
+            /// <para/>
+            /// If <see cref="Enumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+            /// positioned after the last element in the collection and <see cref="Enumerator.MoveNext()"/>
+            /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="Enumerator.MoveNext()"/>
+            /// also return <c>false</c>. If the last call to <see cref="Enumerator.MoveNext()"/> returned <c>false</c>,
+            /// <see cref="Enumerator.Current"/> is undefined. You cannot set <see cref="Enumerator.Current"/>
+            /// to the first element of the collection again; you must create a new enumerator object instead.
+            /// <para/>
+            /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+            /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
+            /// to <see cref="Enumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+            /// <see cref="InvalidOperationException"/>.
+            /// <para/>
+            /// The only mutating methods which do not invalidate enumerators are <see cref="Remove(TKey)"/>,
+            /// <see cref="Remove(TKey, out TValue)"/> and <see cref="Clear"/>.
+            /// <para/>
+            /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+            /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+            /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+            /// reading and writing, you must implement your own synchronization.
+            /// <para/>
+            /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+            /// <para/>
+            /// This method is an O(1) operation.
+            /// </remarks>
+            public Enumerator GetEnumerator() => new Enumerator(dictionary);
 
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            IEnumerator<TKey> IEnumerable<TKey>.GetEnumerator() =>
+               Count == 0 ? SZGenericArrayEnumerator<TKey>.Empty :
+               GetEnumerator();
+
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TKey>)this).GetEnumerator();
 
             bool ICollection<TKey>.Remove(TKey item)
                 => throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
@@ -1424,9 +2351,9 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-                if (index < 0 || index > array.Length)
+                if ((uint)index > (uint)array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                if (array.Length - index < Count)
+                if (array.Length - index < dictionary.Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
                 if (array is TKey[] keys)
@@ -1435,16 +2362,20 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
-                    if (!(array is object?[]))
+                    object[]? objects = array as object[];
+                    if (objects == null)
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
+
+                    int count = dictionary._count;
+                    Entry[]? entries = dictionary._entries;
                     try
                     {
-                        object?[] objects = (object?[])array;
-                        // Null check not needed because we are enumerating this
-                        foreach (var item in this)
-                            objects[index++] = item;
+                        for (int i = 0; i < count; i++)
+                        {
+                            if (entries![i].next >= -1) objects[index++] = entries[i].key!;
+                        }
                     }
                     catch (ArrayTypeMismatchException)
                     {
@@ -1456,62 +2387,155 @@ namespace J2N.Collections.Generic
             #region Nested Structure: Enumerator
 
             /// <summary>
-            /// An enumerator that contains a null key to swap in when there is one.
+            /// Enumerates the elements of a <see cref="Dictionary{TKey,TValue}.KeyCollection"/>.
             /// </summary>
+            /// <remarks>
+            /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+            /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
+            /// <para/>
+            /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+            /// <para/>
+            /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
+            /// <see cref="Enumerator.Current"/> property is undefined. Therefore, you must call the
+            /// <see cref="Enumerator.MoveNext()"/> method to advance the enumerator to the first element
+            /// of the collection before reading the value of <see cref="Enumerator.Current"/>.
+            /// <para/>
+            /// The <see cref="Enumerator.Current"/> property returns the same object until
+            /// <see cref="Enumerator.MoveNext()"/> is called. <see cref="Enumerator.MoveNext()"/>
+            /// sets <see cref="Enumerator.Current"/> to the next element.
+            /// <para/>
+            /// If <see cref="Enumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+            /// positioned after the last element in the collection and <see cref="Enumerator.MoveNext()"/>
+            /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="Enumerator.MoveNext()"/>
+            /// also return <c>false</c>. If the last call to <see cref="Enumerator.MoveNext()"/> returned <c>false</c>,
+            /// <see cref="Enumerator.Current"/> is undefined. You cannot set <see cref="Enumerator.Current"/>
+            /// to the first element of the collection again; you must create a new enumerator object instead.
+            /// <para/>
+            /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+            /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
+            /// to <see cref="Enumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+            /// <see cref="InvalidOperationException"/>.
+            /// <para/>
+            /// The only mutating methods which do not invalidate enumerators are <see cref="Remove(TKey)"/>,
+            /// <see cref="Remove(TKey, out TValue)"/> and <see cref="Clear"/>.
+            /// <para/>
+            /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+            /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+            /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+            /// reading and writing, you must implement your own synchronization.
+            /// <para/>
+            /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+            /// </remarks>
 #if FEATURE_SERIALIZABLE
             [Serializable]
 #endif
-            internal struct Enumerator : IEnumerator<TKey>, IEnumerator
+            public struct Enumerator : IEnumerator<TKey>, IEnumerator
             {
                 private readonly Dictionary<TKey, TValue> dictionary;
-                private readonly IEnumerator<TKey> enumerator;
+                private int index;
                 private readonly int version;
-                [AllowNull, MaybeNull] private TKey current;
-                private bool nullKeySeen;
-                public Enumerator(Dictionary<TKey, TValue> dictionary, ICollection<TKey> keyCollection)
+                private TKey? currentKey;
+                internal Enumerator(Dictionary<TKey, TValue> dictionary)
                 {
-                    this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
-                    this.enumerator = keyCollection.GetEnumerator();
-                    this.version = dictionary.version;
-                    current = default;
-                    nullKeySeen = false;
+                    this.dictionary = dictionary;
+                    version = dictionary._version;
+                    index = 0;
+                    currentKey = default;
                 }
 
-                public TKey Current => current!;
+                /// <summary>
+                /// Gets the element at the current position of the enumerator.
+                /// </summary>
+                /// <value>
+                /// The element in the <see cref="Dictionary{TKey,TValue}.KeyCollection"/> at
+                /// the current position of the enumerator.</value>
+                /// <remarks>
+                /// <see cref="Current"/> is undefined under any of the following conditions:
+                /// <list type="bullet">
+                ///     <item><description>The enumerator is positioned before the first element of the collection. That happens
+                ///         after an enumerator is created or after the <see cref="IEnumerator.Reset"/> method is called.
+                ///         The <see cref="MoveNext"/> method must be called to advance the enumerator to the first element
+                ///         of the collection before reading the value of the <see cref="Current"/> property.</description></item>
+                ///     <item><description>The last call to <see cref="MoveNext"/> returned <c>false</c>, which indicates the
+                ///         end of the collection and that the enumerator is positioned after the last element of the
+                ///         collection.</description></item>
+                ///     <item><description>The enumerator is invalidated due to changes made in the collection, such as adding,
+                ///         modifying, or deleting elements.</description></item>
+                /// </list>
+                /// <para/>
+                /// <see cref="Current"/> does not move the position of the enumerator, and consecutive calls to
+                /// <see cref="Current"/> return the same object until either <see cref="MoveNext"/> or <see cref="IEnumerator.Reset"/>
+                /// is called.
+                /// </remarks>
+                public TKey Current => currentKey!;
 
-                object? IEnumerator.Current => Current;
+                object? IEnumerator.Current
+                {
+                    get
+                    {
+                        if (index == 0 || (index == dictionary._count + 1))
+                        {
+                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        }
 
-                public void Dispose()
-                    => enumerator.Dispose();
+                        return currentKey;
+                    }
+                }
 
+                /// <summary>
+                /// Releases all resources used by the <see cref="Dictionary{TKey, TValue}.KeyCollection.Enumerator"/>.
+                /// </summary>
+                public void Dispose() { /* Intentionally blank */ }
+
+                /// <summary>
+                /// Advances the enumerator to the next element of the <see cref="Dictionary{TKey, TValue}.KeyCollection"/>.
+                /// </summary>
+                /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
+                /// <c>false</c> if the enumerator has passed the end of the collection.</returns>
+                /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+                /// <remarks>
+                /// After an enumerator is created, the enumerator is positioned before the first element in the collection,
+                /// and the first call to <see cref="MoveNext"/> advances the enumerator to the first element of the collection.
+                /// <para/>
+                /// If <see cref="MoveNext"/> passes the end of the collection, the enumerator is positioned after the last element
+                /// in the collection and <see cref="MoveNext"/> returns <c>false</c>. When the enumerator is at this position,
+                /// subsequent calls to <see cref="MoveNext"/> also return <c>false</c>.
+                /// <para/>
+                /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+                /// such as adding elements or changing the capacity, the enumerator is irrecoverably invalidated and the next
+                /// call to <see cref="MoveNext"/> or <see cref="IEnumerator.Reset"/> throws an <see cref="InvalidOperationException"/>.
+                /// <para/>
+                /// The only mutating methods which do not invalidate enumerators are <see cref="Remove(TKey)"/>,
+                /// <see cref="Remove(TKey, out TValue)"/> and <see cref="Clear"/>.
+                /// </remarks>
                 public bool MoveNext()
                 {
-                    if (version != dictionary.version)
+                    if (version != dictionary._version)
                         throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
 
-                    if (!nullKeySeen)
+                    while ((uint)index < (uint)dictionary._count)
                     {
-                        nullKeySeen = true;
-                        current = default;
-                        return true;
+                        ref Entry entry = ref dictionary._entries![index++];
+
+                        if (entry.next >= -1)
+                        {
+                            currentKey = entry.key;
+                            return true;
+                        }
                     }
 
-                    if (enumerator.MoveNext())
-                    {
-                        current = enumerator.Current;
-                        return true;
-                    }
-                    current = default;
+                    index = dictionary._count + 1;
+                    currentKey = default;
                     return false;
                 }
 
                 void IEnumerator.Reset()
                 {
-                    if (version != dictionary.version)
+                    if (version != dictionary._version)
                         throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
 
-                    nullKeySeen = false;
-                    enumerator.Reset();
+                    index = 0;
+                    currentKey = default;
                 }
             }
 
@@ -1525,27 +2549,61 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Represents the collection of values in a <see cref="Dictionary{TKey, TValue}"/>. This class cannot be inherited.
         /// </summary>
+        /// <remarks>
+        /// The <see cref="Dictionary{TKey, TValue}.Values"/> property returns an instance of this type, containing
+        /// all the values in that <see cref="Dictionary{TKey, TValue}"/>. The order of the values in the
+        /// <see cref="Dictionary{TKey, TValue}.ValueCollection"/> is unspecified, but it is the same order as
+        /// the associated keys in the <see cref="Dictionary{TKey, TValue}.KeyCollection"/> returned by the
+        /// <see cref="Dictionary{TKey, TValue}.Keys"/> property.
+        /// <para/>
+        /// The <see cref="Dictionary{TKey, TValue}.ValueCollection"/> is not a static copy; instead, the
+        /// <see cref="Dictionary{TKey, TValue}.ValueCollection"/> refers back to the values in the original
+        /// <see cref="Dictionary{TKey, TValue}"/>. Therefore, changes to the <see cref="Dictionary{TKey, TValue}"/>
+        /// continue to be reflected in the <see cref="Dictionary{TKey, TValue}.ValueCollection"/>.
+        /// </remarks>
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
         [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
-        internal sealed class ValueCollection : ICollection<TValue>, ICollection
+        public sealed class ValueCollection : ICollection<TValue>, ICollection
         {
-            private readonly Dictionary<TKey, TValue> nullableKeyDictionary;
-            private readonly ICollection<TValue> collection;
+            private readonly Dictionary<TKey, TValue> dictionary;
 
-            public ValueCollection(Dictionary<TKey, TValue> nullableKeyDictionary, ICollection<TValue> collection)
+            /// <summary>
+            /// Initializes a new instance of the <see cref="Dictionary{TKey, TValue}.ValueCollection"/> class
+            /// that reflects the values in the specified <see cref="Dictionary{TKey, TValue}"/>.
+            /// </summary>
+            /// <param name="dictionary">The <see cref="Dictionary{TKey, TValue}"/> whose values are reflected
+            /// in the new <see cref="Dictionary{TKey, TValue}.ValueCollection"/>.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
+            /// <remarks>
+            /// The <see cref="Dictionary{TKey, TValue}.ValueCollection"/> is not a static copy; instead,
+            /// the <see cref="Dictionary{TKey, TValue}.ValueCollection"/> refers back to the values in the
+            /// original <see cref="Dictionary{TKey, TValue}"/>. Therefore, changes to the <see cref="Dictionary{TKey, TValue}"/>
+            /// continue to be reflected in the <see cref="Dictionary{TKey, TValue}.ValueCollection"/>.
+            /// <para/>
+            /// This constructor is an O(1) operation.
+            /// </remarks>
+            public ValueCollection(Dictionary<TKey, TValue> dictionary)
             {
-                this.nullableKeyDictionary = nullableKeyDictionary ?? throw new ArgumentNullException(nameof(nullableKeyDictionary));
-                this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
+                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
             }
 
-            public int Count => nullableKeyDictionary.Count;
+            /// <summary>
+            /// Gets the number of elements contained in the <see cref="Dictionary{TKey, TValue}.ValueCollection"/>.
+            /// </summary>
+            /// <value>
+            /// The number of elements contained in the <see cref="Dictionary{TKey, TValue}.ValueCollection"/>.
+            /// </value>
+            /// <remarks>
+            /// Retrieving the value of this property is an O(1) operation.
+            /// </remarks>
+            public int Count => dictionary.Count;
 
             bool ICollection.IsSynchronized => false;
 
-            object ICollection.SyncRoot => ((ICollection)nullableKeyDictionary).SyncRoot;
+            object ICollection.SyncRoot => ((ICollection)dictionary).SyncRoot;
 
             bool ICollection<TValue>.IsReadOnly => true;
 
@@ -1555,20 +2613,7 @@ namespace J2N.Collections.Generic
             void ICollection<TValue>.Clear()
                 => throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
 
-            bool ICollection<TValue>.Contains(TValue item)
-            {
-                if (TKeyIsNullable && nullableKeyDictionary.hasNullKey)
-                {
-                    if (EqualityComparer<TValue>.Default.Equals(nullableKeyDictionary.nullEntry.Value, item))
-                        return true;
-                }
-                foreach (var value in collection)
-                {
-                    if (EqualityComparer<TValue>.Default.Equals(value, item))
-                        return true;
-                }
-                return false;
-            }
+            bool ICollection<TValue>.Contains([AllowNull] TValue item) => dictionary.ContainsValue(item);
 
             void ICollection.CopyTo(Array array, int index)
             {
@@ -1578,9 +2623,9 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-                if (index < 0 || index > array.Length)
+                if ((uint)index > (uint)array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                if (array.Length - index < Count)
+                if (array.Length - index < dictionary.Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
                 if (array is TValue[] values)
@@ -1589,17 +2634,20 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
-                    if (!(array is object?[]))
+                    object[]? objects = array as object[];
+                    if (objects == null)
                     {
                         throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
                     }
 
+                    int count = dictionary._count;
+                    Entry[]? entries = dictionary._entries;
                     try
                     {
-                        object?[] objects = (object?[])array;
-                        // Null check not needed because we are enumerating this
-                        foreach (var entry in this)
-                            objects[index++] = entry;
+                        for (int i = 0; i < count; i++)
+                        {
+                            if (entries![i].next >= -1) objects[index++] = entries[i].value!;
+                        }
                     }
                     catch (ArrayTypeMismatchException)
                     {
@@ -1608,96 +2656,248 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            public void CopyTo(TValue[] array, int index)
+            /// <summary>
+            /// Copies the <see cref="Dictionary{TKey,TValue}.ValueCollection"/> elements to an
+            /// existing one-dimensional <see cref="Array"/>, starting at the specified array index.
+            /// </summary>
+            /// <param name="array">The one-dimensional <see cref="Array"/> that is the destination of the elements
+            /// copied from <see cref="Dictionary{TKey,TValue}.ValueCollection"/>. The <see cref="Array"/> must have
+            /// zero-based indexing.</param>
+            /// <param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+            /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than zero.</exception>
+            /// <exception cref="ArgumentException">The number of elements in the source <see cref="Dictionary{TKey,TValue}.ValueCollection"/>
+            /// is greater than the available space from <paramref name="index"/> to the end of the destination <paramref name="array"/>.</exception>
+            /// <remarks>
+            /// The elements are copied to the <see cref="Array"/> in the same order in which the enumerator iterates through
+            /// the <see cref="Dictionary{TKey,TValue}.ValueCollection"/>.
+            /// <para/>
+            /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+            /// </remarks>
+            public void CopyTo([MaybeNull] TValue[] array, int index)
             {
                 if (array == null)
                     throw new ArgumentNullException(nameof(array));
-                if (index < 0 || index > array.Length)
+                if ((uint)index > array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
-                if (array.Length - index < Count)
+                if (array.Length - index < dictionary.Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
-                // Null check not needed because we are enumerating this
-                foreach (var value in this)
-                    array[index++] = value;
+                int count = dictionary._count;
+                Entry[]? entries = dictionary._entries;
+                for (int i = 0; i < count; i++)
+                {
+                    if (entries![i].next >= -1) array[index++] = entries[i].value!;
+                }
             }
 
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TValue>)this).GetEnumerator();
 
             bool ICollection<TValue>.Remove(TValue item)
                 => throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
 
-            public IEnumerator<TValue> GetEnumerator()
-            {
-                // Only use our enumerator if we have a null value, otherwise, use the original
-                if (TKeyIsNullable && nullableKeyDictionary.hasNullKey)
-                    return new Enumerator(nullableKeyDictionary, collection);
-                return collection.GetEnumerator();
-            }
+            /// <summary>
+            /// Returns an enumerator that iterates through the <see cref="Dictionary{TKey,TValue}.ValueCollection"/>.
+            /// </summary>
+            /// <returns>A <see cref="Dictionary{TKey,TValue}.ValueCollection.Enumerator"/> for the
+            /// <see cref="Dictionary{TKey,TValue}.ValueCollection"/>.</returns>
+            /// <remarks>
+            /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+            /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
+            /// <para/>
+            /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+            /// <para/>
+            /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
+            /// <see cref="Enumerator.Current"/> property is undefined. Therefore, you must call the
+            /// <see cref="Enumerator.MoveNext()"/> method to advance the enumerator to the first element
+            /// of the collection before reading the value of <see cref="Enumerator.Current"/>.
+            /// <para/>
+            /// The <see cref="Enumerator.Current"/> property returns the same object until
+            /// <see cref="Enumerator.MoveNext()"/> is called. <see cref="Enumerator.MoveNext()"/>
+            /// sets <see cref="Enumerator.Current"/> to the next element.
+            /// <para/>
+            /// If <see cref="Enumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+            /// positioned after the last element in the collection and <see cref="Enumerator.MoveNext()"/>
+            /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="Enumerator.MoveNext()"/>
+            /// also return <c>false</c>. If the last call to <see cref="Enumerator.MoveNext()"/> returned <c>false</c>,
+            /// <see cref="Enumerator.Current"/> is undefined. You cannot set <see cref="Enumerator.Current"/>
+            /// to the first element of the collection again; you must create a new enumerator object instead.
+            /// <para/>
+            /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+            /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
+            /// to <see cref="Enumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+            /// <see cref="InvalidOperationException"/>.
+            /// <para/>
+            /// The only mutating methods which do not invalidate enumerators are <see cref="Remove(TKey)"/>,
+            /// <see cref="Remove(TKey, out TValue)"/> and <see cref="Clear"/>.
+            /// <para/>
+            /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+            /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+            /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+            /// reading and writing, you must implement your own synchronization.
+            /// <para/>
+            /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+            /// <para/>
+            /// This method is an O(1) operation.
+            /// </remarks>
+            public Enumerator GetEnumerator() => new Enumerator(dictionary);
+
+            IEnumerator<TValue> IEnumerable<TValue>.GetEnumerator() =>
+                Count == 0 ? SZGenericArrayEnumerator<TValue>.Empty :
+                GetEnumerator();
 
             #region Nested Structure: Enumerator
 
             /// <summary>
-            /// An enumerator that contains a null key to swap in when there is one.
+            /// Enumerates the elements of a <see cref="Dictionary{TKey,TValue}.ValueCollection"/>.
             /// </summary>
-            // NOTE: Xamarin.iOS only has partial generics support. One issue it has
-            // is that it cannot cope with nested structs that implement generic interfaces
-            // unless the struct is also made generic. This is why we have named the
-            // type ref TValue1 instead of simply using TValue of the parent class.
+            /// <remarks>
+            /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+            /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
+            /// <para/>
+            /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+            /// <para/>
+            /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
+            /// <see cref="Enumerator.Current"/> property is undefined. Therefore, you must call the
+            /// <see cref="Enumerator.MoveNext()"/> method to advance the enumerator to the first element
+            /// of the collection before reading the value of <see cref="Enumerator.Current"/>.
+            /// <para/>
+            /// The <see cref="Enumerator.Current"/> property returns the same object until
+            /// <see cref="Enumerator.MoveNext()"/> is called. <see cref="Enumerator.MoveNext()"/>
+            /// sets <see cref="Enumerator.Current"/> to the next element.
+            /// <para/>
+            /// If <see cref="Enumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+            /// positioned after the last element in the collection and <see cref="Enumerator.MoveNext()"/>
+            /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="Enumerator.MoveNext()"/>
+            /// also return <c>false</c>. If the last call to <see cref="Enumerator.MoveNext()"/> returned <c>false</c>,
+            /// <see cref="Enumerator.Current"/> is undefined. You cannot set <see cref="Enumerator.Current"/>
+            /// to the first element of the collection again; you must create a new enumerator object instead.
+            /// <para/>
+            /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+            /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
+            /// to <see cref="Enumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+            /// <see cref="InvalidOperationException"/>.
+            /// <para/>
+            /// The only mutating methods which do not invalidate enumerators are <see cref="Remove(TKey)"/>,
+            /// <see cref="Remove(TKey, out TValue)"/> and <see cref="Clear"/>.
+            /// <para/>
+            /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+            /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+            /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+            /// reading and writing, you must implement your own synchronization.
+            /// <para/>
+            /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+            /// </remarks>
 #if FEATURE_SERIALIZABLE
             [Serializable]
 #endif
-            private struct Enumerator : IEnumerator<TValue>, IEnumerator
+            public struct Enumerator : IEnumerator<TValue>, IEnumerator
             {
                 private readonly Dictionary<TKey, TValue> dictionary;
-                private readonly IEnumerator<TValue> enumerator;
+                private int index;
                 private readonly int version;
-                [AllowNull, MaybeNull] private TValue current;
-                private bool nullValueSeen;
-                public Enumerator(Dictionary<TKey, TValue> dictionary, ICollection<TValue> valueCollection)
+                private TValue? currentValue;
+                internal Enumerator(Dictionary<TKey, TValue> dictionary)
                 {
-                    this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
-                    this.enumerator = valueCollection.GetEnumerator();
-                    this.version = dictionary.version;
-                    current = default;
-                    nullValueSeen = false;
+                    this.dictionary = dictionary;
+                    version = dictionary._version;
+                    index = 0;
+                    currentValue = default;
                 }
 
-                public TValue Current => current!;
+                /// <summary>
+                /// Gets the element at the current position of the enumerator.
+                /// </summary>
+                /// <value>
+                /// The element in the <see cref="Dictionary{TKey,TValue}.ValueCollection"/> at the current position
+                /// of the enumerator.
+                /// </value>
+                /// <remarks>
+                /// <see cref="Current"/> is undefined under any of the following conditions:
+                /// <list type="bullet">
+                ///     <item><description>The enumerator is positioned before the first element of the collection. That happens
+                ///         after an enumerator is created or after the <see cref="IEnumerator.Reset"/> method is called.
+                ///         The <see cref="MoveNext"/> method must be called to advance the enumerator to the first element
+                ///         of the collection before reading the value of the <see cref="Current"/> property.</description></item>
+                ///     <item><description>The last call to <see cref="MoveNext"/> returned <c>false</c>, which indicates the
+                ///         end of the collection and that the enumerator is positioned after the last element of the
+                ///         collection.</description></item>
+                ///     <item><description>The enumerator is invalidated due to changes made in the collection, such as adding,
+                ///         modifying, or deleting elements.</description></item>
+                /// </list>
+                /// <para/>
+                /// <see cref="Current"/> does not move the position of the enumerator, and consecutive calls to
+                /// <see cref="Current"/> return the same object until either <see cref="MoveNext"/> or <see cref="IEnumerator.Reset"/>
+                /// is called.
+                /// </remarks>
+                public TValue Current => currentValue!;
 
-                object? IEnumerator.Current => current;
+                object? IEnumerator.Current
+                {
+                    get
+                    {
+                        if (index == 0 || (index == dictionary._count + 1))
+                        {
+                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        }
 
-                public void Dispose()
-                    => enumerator.Dispose();
+                        return currentValue;
+                    }
+                }
 
+                /// <summary>
+                /// Releases all resources used by the <see cref="Dictionary{TKey, TValue}.ValueCollection.Enumerator"/>.
+                /// </summary>
+                public void Dispose() { /* Intentionally blank */ }
+
+                /// <summary>
+                /// Advances the enumerator to the next element of the <see cref="Dictionary{TKey, TValue}.ValueCollection"/>.
+                /// </summary>
+                /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
+                /// <c>false</c> if the enumerator has passed the end of the collection.</returns>
+                /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+                /// <remarks>
+                /// After an enumerator is created, the enumerator is positioned before the first element in the collection,
+                /// and the first call to <see cref="MoveNext"/> advances the enumerator to the first element of the collection.
+                /// <para/>
+                /// If <see cref="MoveNext"/> passes the end of the collection, the enumerator is positioned after the last element
+                /// in the collection and <see cref="MoveNext"/> returns <c>false</c>. When the enumerator is at this position,
+                /// subsequent calls to <see cref="MoveNext"/> also return <c>false</c>.
+                /// <para/>
+                /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+                /// such as adding elements or changing the capacity, the enumerator is irrecoverably invalidated and the next
+                /// call to <see cref="MoveNext"/> or <see cref="IEnumerator.Reset"/> throws an <see cref="InvalidOperationException"/>.
+                /// <para/>
+                /// The only mutating methods which do not invalidate enumerators are <see cref="Remove(TKey)"/>,
+                /// <see cref="Remove(TKey, out TValue)"/> and <see cref="Clear"/>.
+                /// </remarks>
                 public bool MoveNext()
                 {
-                    if (version != dictionary.version)
+                    if (version != dictionary._version)
                         throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
 
-                    if (!nullValueSeen)
+                    while ((uint)index < (uint)dictionary._count)
                     {
-                        nullValueSeen = true;
-                        current = dictionary.nullEntry.Value;
-                        return true;
-                    }
+                        ref Entry entry = ref dictionary._entries![index++];
 
-                    if (enumerator.MoveNext())
-                    {
-                        current = enumerator.Current;
-                        return true;
+                        if (entry.next >= -1)
+                        {
+                            currentValue = entry.value;
+                            return true;
+                        }
                     }
-                    current = default;
+                    index = dictionary._count + 1;
+                    currentValue = default;
                     return false;
                 }
 
                 void IEnumerator.Reset()
                 {
-                    if (version != dictionary.version)
+                    if (version != dictionary._version)
                         throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
 
-                    nullValueSeen = false;
-                    enumerator.Reset();
+                    index = 0;
+                    currentValue = default;
                 }
             }
 
@@ -1711,79 +2911,139 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Enumerates the elemensts of a <see cref="Dictionary{TKey, TValue}"/>.
         /// </summary>
-        internal struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
+        /// <remarks>
+        /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+        /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
+        /// <para/>
+        /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+        /// <para/>
+        /// Initially, the enumerator is positioned before the first element in the collection. At this position, the
+        /// <see cref="Enumerator.Current"/> property is undefined. Therefore, you must call the
+        /// <see cref="Enumerator.MoveNext()"/> method to advance the enumerator to the first element
+        /// of the collection before reading the value of <see cref="Enumerator.Current"/>.
+        /// <para/>
+        /// The <see cref="Enumerator.Current"/> property returns the same object until
+        /// <see cref="Enumerator.MoveNext()"/> is called. <see cref="Enumerator.MoveNext()"/>
+        /// sets <see cref="Enumerator.Current"/> to the next element.
+        /// <para/>
+        /// If <see cref="Enumerator.MoveNext()"/> passes the end of the collection, the enumerator is
+        /// positioned after the last element in the collection and <see cref="Enumerator.MoveNext()"/>
+        /// returns <c>false</c>. When the enumerator is at this position, subsequent calls to <see cref="Enumerator.MoveNext()"/>
+        /// also return <c>false</c>. If the last call to <see cref="Enumerator.MoveNext()"/> returned <c>false</c>,
+        /// <see cref="Enumerator.Current"/> is undefined. You cannot set <see cref="Enumerator.Current"/>
+        /// to the first element of the collection again; you must create a new enumerator object instead.
+        /// <para/>
+        /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+        /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and the next call
+        /// to <see cref="Enumerator.MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+        /// <see cref="InvalidOperationException"/>.
+        /// <para/>
+        /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+        /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+        /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+        /// reading and writing, you must implement your own synchronization.
+        /// <para/>
+        /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+        /// </remarks>
+        public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
         {
             private readonly Dictionary<TKey, TValue> dictionary;
-            private readonly IEnumerator<KeyValuePair<TKey, TValue>> enumerator;
             private readonly int version;
             private int index;
-            private bool nullKeySeen;
             private KeyValuePair<TKey, TValue> current;
             private readonly int getEnumeratorRetType;  // What should Enumerator.Current return?
 
             internal const int DictEntry = 1;
             internal const int KeyValuePair = 2;
 
-            public Enumerator(Dictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
+            internal Enumerator(Dictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
             {
-                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
-                this.enumerator = dictionary.dictionary.GetEnumerator();
+                this.dictionary = dictionary;
                 this.getEnumeratorRetType = getEnumeratorRetType;
-                version = dictionary.version;
+                version = dictionary._version;
                 index = 0;
-                nullKeySeen = false;
                 current = default;
             }
 
+            /// <summary>
+            /// Gets the element at the current position of the enumerator.
+            /// </summary>
+            /// <value>The element in the <see cref="Dictionary{TKey, TValue}"/> at the current position of the enumerator.</value>
             public KeyValuePair<TKey, TValue> Current => current;
 
-            object IEnumerator.Current
+            object? IEnumerator.Current
             {
                 get
                 {
-                    if (index == 0 || (index == dictionary.Count + 1))
+                    if (index == 0 || (index == dictionary._count + 1))
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
 
                     if (getEnumeratorRetType == DictEntry)
+                    {
                         return new DictionaryEntry(current.Key!, current.Value);
-                    else
-                        return new KeyValuePair<TKey, TValue>(current.Key, current.Value);
+                    }
+
+                    return new KeyValuePair<TKey, TValue>(current.Key, current.Value);
                 }
             }
 
-            public void Dispose() => enumerator.Dispose();
+            /// <summary>
+            /// Releases all resources used by the <see cref="Enumerator"/>.
+            /// </summary>
+            public void Dispose() { /* Intentionally blank */ }
 
+            /// <summary>
+            /// Advances the enumerator to the next element of the <see cref="Dictionary{TKey, TValue}"/>.
+            /// </summary>
+            /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
+            /// <c>false</c> if the enumerator has passed the end of the collection.</returns>
+            /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+            /// <remarks>
+            /// After an enumerator is created, the enumerator is positioned before the first element in the collection, and the
+            /// first call to <see cref="MoveNext"/> advances the enumerator to the first element of the collection.
+            /// <para/>
+            /// If <see cref="MoveNext"/> passes the end of the collection, the enumerator is positioned after the last element
+            /// in the collection and <see cref="MoveNext"/> returns <c>false</c>. When the enumerator is at this position,
+            /// subsequent calls to <see cref="MoveNext"/> also return <c>false</c>.
+            /// <para/>
+            /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+            /// such as adding elements or changing the capacity, the enumerator is irrecoverably invalidated and the next
+            /// call to <see cref="MoveNext"/> or <see cref="IEnumerator.Reset()"/> throws an <see cref="InvalidOperationException"/>.
+            /// <para/>
+            /// The only mutating methods which do not invalidate enumerators are <see cref="Remove(TKey)"/>,
+            /// <see cref="Remove(TKey, out TValue)"/> and <see cref="Clear()"/>.
+            /// </remarks>
+            /// <seealso cref="Current"/>
             public bool MoveNext()
             {
-                if (version != dictionary.version)
+                if (version != dictionary._version)
                     throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
 
-                if (!nullKeySeen)
+                // Use unsigned comparison since we set index to dictionary.count+1 when the enumeration ends.
+                // dictionary.count+1 could be negative if dictionary.count is int.MaxValue
+                while ((uint)index < (uint)dictionary._count)
                 {
-                    index++;
-                    nullKeySeen = true;
-                    current = dictionary.nullEntry;
-                    return true;
+                    ref Entry entry = ref dictionary._entries![index++];
+
+                    if (entry.next >= -1)
+                    {
+                        current = new KeyValuePair<TKey, TValue>(entry.key, entry.value);
+                        return true;
+                    }
                 }
-                if (enumerator.MoveNext())
-                {
-                    index++;
-                    current = enumerator.Current;
-                    return true;
-                }
-                index = dictionary.Count + 1;
+
+                index = dictionary._count + 1;
                 current = default;
                 return false;
             }
 
-            public void Reset()
+            void IEnumerator.Reset()
             {
-                if (version != dictionary.version)
+                if (version != dictionary._version)
                     throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
 
                 index = 0;
-                nullKeySeen = false;
-                enumerator.Reset();
+                current = default;
             }
 
             #region IDictionaryEnumerator Members
@@ -1792,7 +3052,7 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    if (index == 0 || (index == dictionary.Count + 1))
+                    if (index == 0 || (index == dictionary._count + 1))
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
 
                     return new DictionaryEntry(current.Key!, current.Value);
@@ -1807,7 +3067,7 @@ namespace J2N.Collections.Generic
 #pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
 #pragma warning restore IDE0079 // Remove unnecessary suppression
                 {
-                    if (index == 0 || (index == dictionary.Count + 1))
+                    if (index == 0 || (index == dictionary._count + 1))
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
 
                     return current.Key;
@@ -1818,7 +3078,7 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    if (index == 0 || (index == dictionary.Count + 1))
+                    if (index == 0 || (index == dictionary._count + 1))
                         throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
 
                     return current.Value;
@@ -1830,55 +3090,241 @@ namespace J2N.Collections.Generic
 
         #endregion
 
-        #region Nested Type: ConcreteDictionary<TKey, TValue>
+        #region Nested Class: CollectionsMarshalHelper
 
         /// <summary>
-        /// An adapter class for <see cref="SCG.Dictionary{TKey, TValue}"/> to implement <see cref="IConcreteDictionary{TKey, TValue}"/>,
-        /// which is an interface that is used to expose all of the members of <see cref="SCG.Dictionary{TKey, TValue}"/>
-        /// and <see cref="SCG.IDictionary{TKey, TValue}"/>.
+        /// A helper class containing APIs exposed through <see cref="CollectionMarshal"/>.
+        /// These methods are relatively niche and only used in specific scenarios, so adding them in a separate type avoids
+        /// the additional overhead on each <see cref="Dictionary{TKey, TValue}"/> instantiation, especially in AOT scenarios.
         /// </summary>
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-        internal class ConcreteDictionary : SCG.Dictionary<TKey, TValue>, IConcreteDictionary<TKey, TValue>
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
+        internal static class CollectionsMarshalHelper
         {
-            public ConcreteDictionary(int capacity, IEqualityComparer<TKey> comparer) : base(capacity, comparer ?? EqualityComparer<TKey>.Default) { }
+            ///// <inheritdoc cref="CollectionsMarshal.GetValueRefOrAddDefault{TKey, TValue}(Dictionary{TKey, TValue}, TKey, out bool)"/>
+            public static ref TValue? GetValueRefOrAddDefault(Dictionary<TKey, TValue> dictionary, [AllowNull] TKey key, out bool exists)
+            {
+                // NOTE: this method is mirrored by Dictionary<TKey, TValue>.TryInsert above.
+                // If you make any changes here, make sure to keep that version in sync as well.
+
+                // J2N supports null keys
+
+                if (dictionary._buckets == null)
+                {
+                    dictionary.Initialize(0);
+                }
+                Debug.Assert(dictionary._buckets != null);
+
+                Entry[]? entries = dictionary._entries;
+                Debug.Assert(entries != null, "expected entries to be non-null");
+
+                IEqualityComparer<TKey>? comparer = dictionary._comparer;
+                Debug.Assert(comparer is not null || typeof(TKey).IsValueType);
+                uint hashCode = (uint)((typeof(TKey).IsValueType && comparer == null) ? key?.GetHashCode() ?? 0 : key is not null ? comparer!.GetHashCode(key) : 0);
+
+                uint collisionCount = 0;
+                ref int bucket = ref dictionary.GetBucket(hashCode);
+                int i = bucket - 1; // Value in _buckets is 1-based
+
+                if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                    comparer == null)
+                {
+                    // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
+                    if (key is not null)
+                    {
+                        while (true)
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test uint in if rather than loop condition to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                break;
+                            }
+
+                            if (entries[i].hashCode == hashCode && EqualityComparer<TKey>.Default.Equals(entries[i].key!, key))
+                            {
+                                exists = true;
+
+                                return ref entries[i].value!;
+                            }
+
+                            i = entries[i].next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
+                            {
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                // Break out of the loop and throw, rather than looping forever.
+                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        while (true)
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test uint in if rather than loop condition to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                break;
+                            }
+
+                            if (entries[i].hashCode == hashCode && entries[i].key is null)
+                            {
+                                exists = true;
+
+                                return ref entries[i].value!;
+                            }
+
+                            i = entries[i].next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
+                            {
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                // Break out of the loop and throw, rather than looping forever.
+                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (key is not null)
+                    {
+                        Debug.Assert(comparer is not null);
+                        while (true)
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test uint in if rather than loop condition to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                break;
+                            }
+
+                            if (entries[i].hashCode == hashCode && comparer!.Equals(entries[i].key!, key))
+                            {
+                                exists = true;
+
+                                return ref entries[i].value!;
+                            }
+
+                            i = entries[i].next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
+                            {
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                // Break out of the loop and throw, rather than looping forever.
+                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        
+                        while (true)
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test uint in if rather than loop condition to drop range check for following array access
+                            if ((uint)i >= (uint)entries!.Length)
+                            {
+                                break;
+                            }
+
+                            if (entries[i].hashCode == hashCode && entries[i].key is null)
+                            {
+                                exists = true;
+
+                                return ref entries[i].value!;
+                            }
+
+                            i = entries[i].next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
+                            {
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                // Break out of the loop and throw, rather than looping forever.
+                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            }
+                        }
+                    }
+                }
+
+                int index;
+                if (dictionary._freeCount > 0)
+                {
+                    index = dictionary._freeList;
+                    Debug.Assert((StartOfFreeList - entries[dictionary._freeList].next) >= -1, "shouldn't overflow because `next` cannot underflow");
+                    dictionary._freeList = StartOfFreeList - entries[dictionary._freeList].next;
+                    dictionary._freeCount--;
+                }
+                else
+                {
+                    int count = dictionary._count;
+                    if (count == entries.Length)
+                    {
+                        dictionary.Resize();
+                        bucket = ref dictionary.GetBucket(hashCode);
+                    }
+                    index = count;
+                    dictionary._count = count + 1;
+                    entries = dictionary._entries;
+                }
+
+                ref Entry entry = ref entries![index];
+                entry.hashCode = hashCode;
+                entry.next = bucket - 1; // Value in _buckets is 1-based
+                entry.key = key;
+                entry.value = default!;
+                bucket = index + 1; // Value in _buckets is 1-based
+                dictionary._version++;
+
+                // Value types never rehash
+
+                if (!typeof(TKey).IsValueType && collisionCount > HashHelpers.HashCollisionThreshold && comparer is NonRandomizedStringEqualityComparer)
+                {
+                    // If we hit the collision threshold we'll need to switch to the comparer which is using randomized string hashing
+                    // i.e. EqualityComparer<string>.Default.
+                    dictionary.Resize(entries.Length, true);
+
+                    exists = false;
+
+                    // At this point the entries array has been resized, so the current reference we have is no longer valid.
+                    // We're forced to do a new lookup and return an updated reference to the new entry instance. This new
+                    // lookup is guaranteed to always find a value though and it will never return a null reference here.
+                    ref TValue? value = ref dictionary.FindValue(key)!;
+
+                    Debug.Assert(!UnsafeHelpers.IsNullRef(ref value), "the lookup result cannot be a null ref here");
+
+                    return ref value;
+                }
+
+                exists = false;
+
+                return ref entry.value!;
+            }
         }
 
-        #endregion
+        #endregion Nested Class: CollectionsMarshalHelper
 
+        #region Nested Structure: Entry
+
+        private struct Entry
+        {
+            public uint hashCode;
+            /// <summary>
+            /// 0-based index of next entry in chain: -1 means end of chain
+            /// also encodes whether this entry _itself_ is part of the free list by changing sign and subtracting 3,
+            /// so -2 means end of free list, -3 means index 0 but on free list, -4 means index 1 but on free list, etc.
+            /// </summary>
+            public int next;
+            [AllowNull, MaybeNull]
+            public TKey key;     // Key of entry
+            [AllowNull, MaybeNull]
+            public TValue value; // Value of entry
+        }
+
+        #endregion Nested Structure: Entry
     }
-
-    #region Interface: IConcreteDictionary<TKey, TValue>
-
-    /// <summary>
-    /// Interface to expose all of the members of the concrete <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/> type,
-    /// so we can duplicate them in other types without having to cast.
-    /// </summary>
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-    internal interface IConcreteDictionary<TKey, TValue> : IDictionary<TKey, TValue>
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
-    {
-        IEqualityComparer<TKey> Comparer { get; }
-
-        //bool ContainsValue(TValue value); // NOTE: We don't want to utilize the built-in method because
-        // it uses the .NET default equality comparer, and we want to swap that.
-
-
-#if FEATURE_DICTIONARY_ENSURECAPACITY
-        int EnsureCapacity(int capacity);
-#endif
-#if FEATURE_DICTIONARY_TRIMEXCESS
-        void TrimExcess(int capacity);
-
-        void TrimExcess();
-#endif
-
-    }
-
-    #endregion
-
 }

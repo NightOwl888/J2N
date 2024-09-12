@@ -485,6 +485,9 @@ namespace J2N.Numerics
 #endif
         }
 
+        internal static uint RotateLeft(this uint value, int distance) // J2N TODO: API - Make public once we have implementations for all methods accepting uint and ulong
+            => (value << distance) | (value >> (32 - distance));
+
         /// <summary>
         /// Returns the value obtained by rotating the two's complement binary
         /// representation of the specified <paramref name="value"/> left by the

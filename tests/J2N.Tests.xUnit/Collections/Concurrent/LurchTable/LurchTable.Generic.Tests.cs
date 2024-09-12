@@ -18,9 +18,11 @@ namespace J2N.Collections.Concurrent.Tests
     {
         protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.None;
 
-        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Add | ModifyOperation.Insert | ModifyOperation.Remove | ModifyOperation.Clear;
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Add | ModifyOperation.Insert | ModifyOperation.Overwrite | ModifyOperation.Remove | ModifyOperation.Clear;
 
         //protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
+
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
 
         /// <summary>
         /// Used in IDictionary_Generic_Values_Enumeration_ParentDictionaryModifiedInvalidates and
