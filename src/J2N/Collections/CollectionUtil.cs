@@ -28,9 +28,6 @@ using System.Text;
 
 namespace J2N.Collections
 {
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-
     /// <summary>
     /// Static methods for assisting with making .NET collections check for equality and print
     /// strings the same way they are done in Java.
@@ -437,7 +434,5 @@ namespace J2N.Collections
             dynamic? genericType = Convert.ChangeType(obj, type);
             return ToString(genericType, provider);
         }
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
     }
 }

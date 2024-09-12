@@ -18,9 +18,6 @@ namespace J2N.Collections.Generic
 {
     using SR = J2N.Resources.Strings;
 
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted on the key.
     /// <para/>
@@ -1961,7 +1958,4 @@ namespace J2N.Collections.Generic
             return ret;
         }
     }
-
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
 }
