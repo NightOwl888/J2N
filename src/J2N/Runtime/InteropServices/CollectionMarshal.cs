@@ -2,8 +2,10 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.Generic;
+using J2N.Runtime.CompilerServices;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -25,7 +27,7 @@ namespace J2N.Runtime.InteropServices
 #if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Span<T> AsSpan<T>(List<T>? list)
+        public static Span<T> AsSpan<T>(List<T>? list) // J2N NOTE: This implementation is from .NET 9 RC1
         {
             Span<T> span = default;
             if (list is not null)
@@ -45,12 +47,38 @@ namespace J2N.Runtime.InteropServices
                 // Per the comments, this is the equivalent of the Span<T>(ref T reference, int length) constructor.
                 span = MemoryMarshal.CreateSpan<T>(ref MemoryMarshal.GetArrayDataReference(items), size);
 #else
-                span = items.AsSpan(0, size);
+                span = new Span<T>(items, 0, size);
 #endif
             }
 
             return span;
         }
+
+        /// <summary>
+        /// Gets either a ref to a <typeparamref name="TValue"/> in the <see cref="Dictionary{TKey, TValue}"/> or a ref null if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <remarks>
+        /// Items should not be added or removed from the <see cref="Dictionary{TKey, TValue}"/> while the ref <typeparamref name="TValue"/> is in use.
+        /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
+        /// </remarks>
+        public static ref TValue GetValueRefOrNullRef<TKey, TValue>(Dictionary<TKey, TValue> dictionary, [AllowNull] TKey key)
+            => ref dictionary.FindValue(key);
+
+        /// <summary>
+        /// Gets a ref to a <typeparamref name="TValue"/> in the <see cref="Dictionary{TKey, TValue}"/>, adding a new entry with a default value if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <param name="exists">Whether or not a new entry for the given key was added to the dictionary.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <remarks>Items should not be added to or removed from the <see cref="Dictionary{TKey, TValue}"/> while the ref <typeparamref name="TValue"/> is in use.</remarks>
+        public static ref TValue? GetValueRefOrAddDefault<TKey, TValue>(Dictionary<TKey, TValue> dictionary, [AllowNull] TKey key, out bool exists)
+            => ref Dictionary<TKey, TValue>.CollectionsMarshalHelper.GetValueRefOrAddDefault(dictionary, key, out exists);
 
         /// <summary>
         /// Sets the count of the <see cref="List{T}"/> to the specified value.
@@ -83,11 +111,7 @@ namespace J2N.Runtime.InteropServices
             {
                 list.Grow(count);
             }
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            else if (count < list._size && RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            else if (count < list._size && List<T>.TIsNullableType)
-#endif
+            else if (count < list._size && RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 Array.Clear(list._items, count, list._size - count);
             }
