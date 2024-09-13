@@ -25,6 +25,7 @@ THE SOFTWARE.
 #endregion
 
 using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -781,7 +782,7 @@ namespace J2N.Collections.Generic
         private static bool IsCompatibleKey(object? key)
         {
             if (key is null)
-                return typeof(TKey).IsNullableType();
+                return default(TKey) == null;
 
             return (key is TKey);
         }
@@ -883,9 +884,9 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: Only throw if the generic closing type is not nullable
-                if (key is null && !typeof(TKey).IsNullableType())
+                if (!(default(TKey) == null) && key is null)
                     throw new ArgumentNullException(nameof(key));
-                if (value is null && !typeof(TValue).IsNullableType())
+                if (!(default(TValue) == null) && value is null)
                     throw new ArgumentNullException(nameof(value));
 
                 try
@@ -910,9 +911,9 @@ namespace J2N.Collections.Generic
         void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
-            if (key is null && !typeof(TKey).IsNullableType())
+            if (!(default(TKey) == null) && key is null)
                 throw new ArgumentNullException(nameof(key));
-            if (value is null && !typeof(TValue).IsNullableType())
+            if (!(default(TValue) == null) && value is null)
                 throw new ArgumentNullException(nameof(value));
 
             try

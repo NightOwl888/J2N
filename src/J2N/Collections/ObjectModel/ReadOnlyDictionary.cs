@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.Generic;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -37,7 +38,6 @@ namespace J2N.Collections.ObjectModel
     {
         private static readonly bool TKeyIsValueTypeOrStringOrStructuralEquatable = typeof(TKey).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TKey)) || typeof(string).Equals(typeof(TKey));
         private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TValue)) || typeof(string).Equals(typeof(TValue));
-        private static readonly bool TKeyIsNullable = typeof(TKey).IsNullableType();
 
         internal readonly IDictionary<TKey, TValue> dictionary; // Internal for testing
         private readonly DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer;
@@ -231,7 +231,7 @@ namespace J2N.Collections.ObjectModel
         private static bool IsCompatibleKey(object? key)
         {
             if (key is null)
-                return TKeyIsNullable;
+                return default(TKey) == null;
 
             return key is TKey;
         }
@@ -432,7 +432,7 @@ namespace J2N.Collections.ObjectModel
 
 #endregion
 
-#region ToString
+        #region ToString
 
         /// <summary>
         /// Returns a string that represents the current dictionary using the specified

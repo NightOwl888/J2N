@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -55,10 +56,6 @@ namespace J2N.Collections.Generic
     {
         private const int MaxArrayLength = 0X7FEFFFFF;
         private const int DefaultCapacity = 4;
-
-#if !FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-        internal static readonly bool TIsNullableType = typeof(T).IsNullableType();
-#endif
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
@@ -696,11 +693,7 @@ namespace J2N.Collections.Generic
         internal virtual void DoClear()
         {
             _version++;
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            if (TIsNullableType)
-#endif
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 int size = _size;
                 _size = 0;
@@ -1956,11 +1949,7 @@ namespace J2N.Collections.Generic
                 _items[freeIndex++] = _items[current++];
             }
 
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            if (TIsNullableType)
-#endif
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 Array.Clear(_items, freeIndex, _size - freeIndex); // Clear the elements so that the gc can reclaim the references.
             }
@@ -2003,11 +1992,7 @@ namespace J2N.Collections.Generic
             {
                 Array.Copy(_items, index + 1, _items, index, _size - index);
             }
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            if (TIsNullableType)
-#endif
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 _items[_size] = default!;
             }
@@ -2055,11 +2040,7 @@ namespace J2N.Collections.Generic
                 }
 
                 _version++;
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-                if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-                if (TIsNullableType)
-#endif
+                if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
                 {
                     Array.Clear(_items, _size, count);
                 }
