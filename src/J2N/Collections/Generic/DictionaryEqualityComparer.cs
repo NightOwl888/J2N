@@ -138,7 +138,7 @@ namespace J2N.Collections.Generic
                     }
                     else
                     {
-                        if (!dictionaryA.TryGetValue(keyB, out TValue valueA) || !valueEquals(valueA, valueB))
+                        if (!dictionaryA.TryGetValue(keyB, out TValue? valueA) || !valueEquals(valueA, valueB))
                             return false;
                     }
                 }

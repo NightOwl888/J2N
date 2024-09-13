@@ -719,7 +719,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         {
@@ -878,7 +878,7 @@ namespace J2N.Collections.Generic
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TryGetValue((TKey)key, out TValue value))
+                    if (TryGetValue((TKey)key!, out TValue? value))
                     {
                         return value;
                     }
@@ -896,7 +896,7 @@ namespace J2N.Collections.Generic
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
                     try
                     {
                         this[tempKey] = (TValue)value!;
@@ -923,11 +923,11 @@ namespace J2N.Collections.Generic
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
-                    Add(tempKey, (TValue)value);
+                    Add(tempKey, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -944,7 +944,7 @@ namespace J2N.Collections.Generic
         {
             if (IsCompatibleKey(key))
             {
-                return ContainsKey((TKey)key);
+                return ContainsKey((TKey)key!);
             }
             return false;
         }
@@ -958,7 +958,7 @@ namespace J2N.Collections.Generic
         {
             if (IsCompatibleKey(key))
             {
-                Remove((TKey)key);
+                Remove((TKey)key!);
             }
         }
 

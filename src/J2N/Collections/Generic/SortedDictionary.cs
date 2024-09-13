@@ -742,7 +742,7 @@ namespace J2N.Collections.Generic
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TryGetValue((TKey)key, out TValue value))
+                    if (TryGetValue((TKey)key, out TValue? value))
                     {
                         return value;
                     }

@@ -799,7 +799,7 @@ namespace J2N.Collections.Concurrent
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TryGetValue((TKey)key, out TValue value))
+                    if (TryGetValue((TKey)key, out TValue? value))
                     {
                         return value;
                     }
@@ -817,7 +817,7 @@ namespace J2N.Collections.Concurrent
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
                     try
                     {
                         this[tempKey!] = (TValue)value!;
@@ -844,11 +844,11 @@ namespace J2N.Collections.Concurrent
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
-                    Add(tempKey!, (TValue)value!);
+                    Add(tempKey, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -985,7 +985,7 @@ namespace J2N.Collections.Concurrent
         {
             get
             {
-                if (!TryGetValue(key, out TValue value))
+                if (!TryGetValue(key, out TValue? value))
                     throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
                 return value;
             }
@@ -1306,7 +1306,7 @@ namespace J2N.Collections.Concurrent
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
         {
-            if (TryGetValue(item.Key, out TValue test))
+            if (TryGetValue(item.Key, out TValue? test))
                 return J2N.Collections.Generic.EqualityComparer<TValue>.Default.Equals(item.Value, test);
             return false;
         }
@@ -2439,7 +2439,7 @@ namespace J2N.Collections.Concurrent
                     {
                         temp = _entries[index >> _shift][index & _shiftMask].Value;
                         var original = temp;
-                        if (value.UpdateValue(key, ref temp))
+                        if (value.UpdateValue(key, ref temp!))
                         {
                             _entries[index >> _shift][index & _shiftMask].Value = temp;
 
@@ -2460,7 +2460,7 @@ namespace J2N.Collections.Concurrent
                     }
                     index = _entries[index >> _shift][index & _shiftMask].Link;
                 }
-                if (value.CreateValue(key, out temp))
+                if (value.CreateValue(key, out temp!))
                 {
                     index = AllocSlot();
                     _entries[index >> _shift][index & _shiftMask].Hash = hash;

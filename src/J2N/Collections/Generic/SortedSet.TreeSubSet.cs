@@ -187,7 +187,7 @@ namespace J2N.Collections.Generic
                 get
                 {
                     Node? current = root;
-                    T result = default!;
+                    T? result = default;
 
                     while (current != null)
                     {
@@ -221,7 +221,7 @@ namespace J2N.Collections.Generic
                 get
                 {
                     Node? current = root;
-                    T result = default!;
+                    T? result = default;
 
                     while (current != null)
                     {
