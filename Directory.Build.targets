@@ -62,10 +62,6 @@
     <!--<DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ENUMERATOR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
 
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_ENSURECAPACITY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_REMOVE_OUTVALUE</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMBER_TRYFORMAT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_FILL_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>

@@ -290,8 +290,6 @@ namespace J2N.Collections.Tests
 
         #region EnsureCapacity
 
-#if FEATURE_DICTIONARY_ENSURECAPACITY
-
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void EnsureCapacity_Generic_RequestingLargerCapacity_DoesInvalidateEnumeration(int count)
@@ -415,13 +413,9 @@ namespace J2N.Collections.Tests
             Assert.Equal(17, dictionary.EnsureCapacity(13));
         }
 
-#endif
-
         #endregion
 
         #region TrimExcess
-
-#if FEATURE_DICTIONARY_TRIMEXCESS
 
         [Fact]
         public void TrimExcess_Generic_NegativeCapacity_Throw()
@@ -625,8 +619,6 @@ namespace J2N.Collections.Tests
 
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
         }
-
-#endif
 
         #endregion
     }

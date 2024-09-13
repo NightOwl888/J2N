@@ -310,9 +310,6 @@ namespace J2N.Collections.Generic
                 array[index++] = item;
         }
 
-
-#if FEATURE_DICTIONARY_ENSURECAPACITY
-
         /// <summary>
         /// Ensures that the dictionary can hold up to a specified number of entries without any
         /// further expansion of its backing storage.
@@ -328,7 +325,7 @@ namespace J2N.Collections.Generic
             version++;
             return dictionary.EnsureCapacity(capacity);
         }
-#endif
+
 #if FEATURE_SERIALIZABLE
 
         /// <summary>
@@ -403,8 +400,6 @@ namespace J2N.Collections.Generic
         }
 #endif
 
-#if FEATURE_DICTIONARY_TRIMEXCESS
-
         /// <summary>
         /// Sets the capacity of this dictionary to hold up a specified number of entries
         /// without any further expansion of its backing storage.
@@ -440,7 +435,6 @@ namespace J2N.Collections.Generic
             version++;
             dictionary.TrimExcess();
         }
-#endif
 
         /// <summary>
         /// Attempts to add the specified key and value to the dictionary.
