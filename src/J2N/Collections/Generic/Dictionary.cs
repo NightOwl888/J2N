@@ -28,7 +28,7 @@ namespace J2N.Collections.Generic
     /// <list type="bullet">
     ///     <item><description>
     ///         If <typeparamref name="TKey"/> is <see cref="Nullable{T}"/> or a reference type, the key can be
-    ///         <c>null</c> without throwing an exception.
+    ///         <c>null</c> and the value can be retrieved again by with a <c>null</c> key.
     ///     </description></item>
     ///     <item><description>
     ///         Overrides the <see cref="Equals(object)"/> and <see cref="GetHashCode()"/> methods to compare collections
@@ -36,13 +36,18 @@ namespace J2N.Collections.Generic
     ///         default behavior can be overridden.
     ///     </description></item>
     ///     <item><description>
-    ///         Overrides the <see cref="ToString()"/> method to list the contents of the set
+    ///         Overrides the <see cref="ToString()"/> method to list the contents of the dictionary
     ///         by default. Also, <see cref="IFormatProvider"/> is implemented so the
     ///         default behavior can be overridden.
     ///     </description></item>
     ///     <item><description>
     ///         Uses <see cref="EqualityComparer{T}.Default"/> by default, which provides some specialized equality comparisons
     ///         for specific types to match the behavior of Java.
+    ///     </description></item>
+    ///     <item><description>
+    ///         This implementation allows deleting while enumerating, much like the collections in Java and .NET Core 3.0+ do.
+    ///         However, rather than having a method to delete on the enumerator itself, one must call
+    ///         <see cref="Dictionary{TKey, TValue}.Remove(TKey)"/>.
     ///     </description></item>
     /// </list>
     /// <para/>
