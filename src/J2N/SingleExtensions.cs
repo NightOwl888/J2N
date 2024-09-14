@@ -35,9 +35,7 @@ namespace J2N
         /// </summary>
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is finite (zero, subnormal or normal); otherwise <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsFinite(this float f)
         {
             int bits = BitConversion.SingleToRawInt32Bits(f);
@@ -54,9 +52,7 @@ namespace J2N
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the value evaluates to <see cref="float.PositiveInfinity"/> or
         /// <see cref="float.NegativeInfinity"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsInfinity(this float f)
         {
             int bits = BitConversion.SingleToRawInt32Bits(f);
@@ -74,9 +70,7 @@ namespace J2N
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the value evaluates to <see cref="float.NaN"/>;
         /// otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool IsNaN(this float f)
         {
             // A NaN will never equal itself so this is an
@@ -97,9 +91,7 @@ namespace J2N
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is negative; otherwise, <c>false</c>.</returns>
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsNegative(this float f)
         {
             return BitConversion.SingleToRawInt32Bits(f) < 0;
@@ -116,9 +108,7 @@ namespace J2N
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if <paramref name="f"/> evaluates to <see cref="float.NegativeInfinity"/>;
         /// otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsNegativeInfinity(this float f)
         {
             return f == float.NegativeInfinity;
@@ -135,9 +125,7 @@ namespace J2N
         /// </summary>
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool IsNegativeZero(this float f)
         {
             return f == 0 && IsNegative(f);
@@ -152,9 +140,7 @@ namespace J2N
         /// </summary>
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is normal; <c>false</c> otherwise.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsNormal(this float f)
         {
             int bits = BitConversion.SingleToRawInt32Bits(f);
@@ -171,9 +157,7 @@ namespace J2N
         /// </summary>
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if <paramref name="f"/> evaluates to <see cref="float.PositiveInfinity"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool IsPositiveInfinity(this float f)
         {
             return f == float.PositiveInfinity;
@@ -188,9 +172,7 @@ namespace J2N
         /// </summary>
         /// <param name="f">A single-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is subnormal; <c>false</c> otherwise.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsSubnormal(this float f)
         {
             int bits = BitConversion.SingleToRawInt32Bits(f);

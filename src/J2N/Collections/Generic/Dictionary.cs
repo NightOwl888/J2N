@@ -2043,9 +2043,7 @@ namespace J2N.Collections.Generic
             _freeCount = 0;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private ref int GetBucket(uint hashCode)
         {
             int[] buckets = _buckets!;

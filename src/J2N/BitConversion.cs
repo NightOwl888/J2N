@@ -82,9 +82,7 @@ namespace J2N
         /// </summary>
         /// <param name="value">The integer to convert.</param>
         /// <returns>A single-precision floating-point value that represents the converted integer.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe float Int32BitsToSingle(int value)
         {
             return *((float*)&value);
@@ -127,9 +125,7 @@ namespace J2N
         /// </summary>
         /// <param name="value">A floating-point number.</param>
         /// <returns>The bits that represent the floating-point number.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe int SingleToRawInt32Bits(float value)
         {
             return *((int*)&value);
@@ -169,9 +165,7 @@ namespace J2N
         /// </summary>
         /// <param name="value">A floating-point number.</param>
         /// <returns>The bits that represent the floating-point number.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe int SingleToInt32Bits(float value)
         {
             if (float.IsNaN(value))
@@ -190,9 +184,7 @@ namespace J2N
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe long SingleToInt64Bits(float value)
         {
             return *((long*)&value);
@@ -262,9 +254,7 @@ namespace J2N
         /// <param name="value">Any <see cref="long"/> integer.</param>
         /// <returns>The <see cref="double"/> floating-point value with
         /// the same bit pattern.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static double Int64BitsToDouble(long value)
         {
             return BitConverter.Int64BitsToDouble(value);
@@ -305,9 +295,7 @@ namespace J2N
         /// </summary>
         /// <param name="value">A <see cref="double"/> precision floating-point number.</param>
         /// <returns>The bits that represent the floating-point number.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static long DoubleToInt64Bits(double value)
         {
             if (double.IsNaN(value))
@@ -354,9 +342,7 @@ namespace J2N
         /// </summary>
         /// <param name="value">A <see cref="double"/> precision floating-point number.</param>
         /// <returns>The bits that represent the floating-point number.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static long DoubleToRawInt64Bits(double value)
         {
             return BitConverter.DoubleToInt64Bits(value);

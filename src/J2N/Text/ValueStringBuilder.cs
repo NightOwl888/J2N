@@ -167,9 +167,7 @@ namespace J2N.Text
             _pos += count;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Append(char c)
         {
             int pos = _pos;
@@ -184,9 +182,7 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Append(string? s)
         {
             if (s == null)
@@ -265,9 +261,7 @@ namespace J2N.Text
             _pos += value.Length;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public Span<char> AppendSpan(int length)
         {
             int origPos = _pos;
@@ -314,9 +308,7 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Dispose()
         {
             char[]? toReturn = _arrayToReturnToPool;

@@ -786,9 +786,7 @@ namespace J2N.Numerics
             return false;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         internal static ParsingStatus TryParseInt32(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out int result)
         {
             if ((styles & ~NumberStyle.Integer) == 0)
@@ -1169,9 +1167,7 @@ namespace J2N.Numerics
             goto DoneAtEndButPotentialOverflow;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         internal static ParsingStatus TryParseInt64(ReadOnlySpan<char> value, NumberStyle styles, NumberFormatInfo info, out long result)
         {
             if ((styles & ~NumberStyle.Integer) == 0)

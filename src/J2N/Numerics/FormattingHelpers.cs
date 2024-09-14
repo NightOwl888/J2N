@@ -9,9 +9,7 @@ namespace J2N.Numerics //J2N.Buffers.Text
 {
     internal static partial class FormattingHelpers
     {
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int CountDigits(ulong value)
         {
             int digits = 1;
@@ -67,9 +65,7 @@ namespace J2N.Numerics //J2N.Buffers.Text
             return digits;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int CountDigits(uint value)
         {
             int digits = 1;
@@ -104,9 +100,7 @@ namespace J2N.Numerics //J2N.Buffers.Text
             return digits;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int CountHexDigits(ulong value)
         {
             // The number of hex digits is log16(value) + 1, or log2(value) / 4 + 1
@@ -117,9 +111,7 @@ namespace J2N.Numerics //J2N.Buffers.Text
         // e.g., value =      0 => retVal = 0, valueWithoutTrailingZeros = 0
         //       value =   1234 => retVal = 0, valueWithoutTrailingZeros = 1234
         //       value = 320900 => retVal = 2, valueWithoutTrailingZeros = 3209
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int CountDecimalTrailingZeros(uint value, out uint valueWithoutTrailingZeros)
         {
             int zeroCount = 0;

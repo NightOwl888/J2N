@@ -316,9 +316,7 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool ContentEquals(this string? text, ICharSequence? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
@@ -338,9 +336,7 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool ContentEquals(this string? text, char[]? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
@@ -360,9 +356,7 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool ContentEquals(this string? text, StringBuilder? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);
@@ -382,9 +376,7 @@ namespace J2N.Text
         /// <param name="charSequence">The character sequence to compare to.</param>
         /// <returns><c>true</c> if this <see cref="string"/> represents the same
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool ContentEquals(this string? text, string? charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             return ContentEquals(text, charSequence, StringComparison.Ordinal);

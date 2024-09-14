@@ -27,9 +27,7 @@ namespace J2N.Runtime.CompilerServices
 {
     internal static class UnsafeHelpers
     {
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static ref T NullRef<T>()
 #if FEATURE_UNSAFE_NULLREF
             => ref Unsafe.NullRef<T>();
@@ -42,9 +40,7 @@ namespace J2N.Runtime.CompilerServices
         }
 #endif
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING && FEATURE_UNSAFE_ISNULLREF
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool IsNullRef<T>(ref T source)
 #if FEATURE_UNSAFE_ISNULLREF
             => Unsafe.IsNullRef<T>(ref source);

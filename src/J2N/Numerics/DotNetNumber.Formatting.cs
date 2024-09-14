@@ -1565,9 +1565,7 @@ namespace J2N.Numerics
         //    }
         //}
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // called from only one location
-#endif
         private static unsafe void Int32ToNumber(int value, ref NumberBuffer number)
         {
             number.DigitsCount = Int32Precision;
@@ -1704,9 +1702,7 @@ namespace J2N.Numerics
             return buffer;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // called from only one location
-#endif
         private static unsafe void UInt32ToNumber(uint value, ref NumberBuffer number)
         {
             number.DigitsCount = UInt32Precision;

@@ -23,9 +23,7 @@ namespace J2N
         /// <param name="text">The span to search.</param>
         /// <param name="value">The value to search for.</param>
         /// <returns>The index of the occurrence of the value in the span. If not found, returns -1.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int IndexOf(this ReadOnlySpan<char> text, char value)
             => System.MemoryExtensions.IndexOf(text, value);
 
@@ -41,9 +39,7 @@ namespace J2N
         /// <param name="text">The span to search.</param>
         /// <param name="value">The value to search for.</param>
         /// <returns>The index of the occurrence of the value in the span. If not found, returns -1.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int IndexOf(this Span<char> text, char value)
             => System.MemoryExtensions.IndexOf(text, value);
 
@@ -179,9 +175,7 @@ namespace J2N
         /// <param name="text">The span to search.</param>
         /// <param name="value">The value to search for.</param>
         /// <returns>The index of the last occurrence of the value in the span. If not found, returns -1.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int LastIndexOf(this ReadOnlySpan<char> text, char value)
             => System.MemoryExtensions.LastIndexOf(text, value);
 
@@ -197,9 +191,7 @@ namespace J2N
         /// <param name="text">The span to search.</param>
         /// <param name="value">The value to search for.</param>
         /// <returns>The index of the last occurrence of the value in the span. If not found, returns -1.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int LastIndexOf(this Span<char> text, char value)
             => System.MemoryExtensions.LastIndexOf(text, value);
 

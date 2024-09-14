@@ -35,9 +35,7 @@ namespace J2N.Runtime.CompilerServices
         /// <typeparam name="T">The type.</typeparam>
         /// <returns><c>true</c> if the given type is a reference type or a value type that
         /// contains references; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool IsReferenceOrContainsReferences<T>()
 #if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
             => RuntimeHelpers.IsReferenceOrContainsReferences<T>();

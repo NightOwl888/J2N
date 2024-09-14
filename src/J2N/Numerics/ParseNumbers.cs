@@ -1511,9 +1511,7 @@ namespace J2N.Numerics
 
         #region IsLongOverflow
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool IsLongOverflow(long value, int radix, int flags, int sign)
         {
             // Return the value properly signed.
@@ -1532,9 +1530,7 @@ namespace J2N.Numerics
 
         #region IsIntOverflow
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool IsIntOverflow(int value, int radix, int flags, int sign)
         {
             if ((flags & TreatAsI1) != 0 && ((flags & TreatAsUnsigned) != 0))
@@ -1584,9 +1580,7 @@ namespace J2N.Numerics
 
         #region GetLongOverflowTypeCode
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static TypeCode GetLongOverflowTypeCode(int flags)
         {
             return (flags & TreatAsUnsigned) != 0 ? TypeCode.UInt64 : TypeCode.Int64;
@@ -1596,9 +1590,7 @@ namespace J2N.Numerics
 
         #region GetIntOverflowTypeCode
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static TypeCode GetIntOverflowTypeCode(int flags)
         {
             bool isUnsigned = (flags & TreatAsUnsigned) != 0;
@@ -1615,9 +1607,7 @@ namespace J2N.Numerics
 
         #region IsDigit
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool IsDigit(ReadOnlySpan<char> s, int i, int end, int radix, out int result, out int charCount) // KEEP OVERLOADS FOR ICharSequence and ReadOnlySpan<char> IN SYNC
         {
             if (char.IsHighSurrogate(s[i]) && i + 1 < end && char.IsLowSurrogate(s[i + 1]))
@@ -1631,9 +1621,7 @@ namespace J2N.Numerics
             return result != -1;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool IsDigit(ICharSequence s, int i, int end, int radix, out int result, out int charCount) // KEEP OVERLOADS FOR ICharSequence and ReadOnlySpan<char> IN SYNC
         {
             if (char.IsHighSurrogate(s[i]) && i + 1 < end && char.IsLowSurrogate(s[i + 1]))

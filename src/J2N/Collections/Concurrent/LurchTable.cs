@@ -2690,17 +2690,13 @@ namespace J2N.Collections.Concurrent
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private int GetHash([AllowNull] TKey key)
         {
             return (key is null ? 0 : _comparer.GetHashCode(key)) & int.MaxValue;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private bool KeyEquals([AllowNull] TKey key1, [AllowNull] TKey key2)
         {
             if (key1 is null)

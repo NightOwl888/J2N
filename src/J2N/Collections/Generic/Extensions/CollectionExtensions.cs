@@ -43,9 +43,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static ICollection<T> AsReadOnly<T>(this ICollection<T> collection)
         {
             return new ReadOnlyCollection<T>(collection);
@@ -61,9 +59,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <typeparam name="T">The type of the elements of <paramref name="source"/>.</typeparam>
         /// <param name="source">An <see cref="ICollection{T}"/> to create an array from.</param>
         /// <returns>An array that contains the elements from the input sequence.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static T[] ToArray<T>(this ICollection<T> source)
         {
             if (source == null)

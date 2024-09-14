@@ -2292,9 +2292,7 @@ namespace J2N.Collections.Generic
         /// <param name="item"></param>
         /// <param name="comparer"></param>
         /// <returns>hash code</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private static int InternalGetHashCode(T item, IEqualityComparer<T>? comparer)
         {
             if (item == null)
@@ -2306,9 +2304,7 @@ namespace J2N.Collections.Generic
             return hashCode & Lower31BitMask;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private static int InternalGetHashCode(int hashCode)
         {
             return hashCode & Lower31BitMask;

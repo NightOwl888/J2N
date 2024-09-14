@@ -402,9 +402,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <param name="value">A floating-point number.</param>
         /// <returns>The bits that represent the floating-point number.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int SingleToInt32Bits(float value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.SingleToInt32Bits(value);
@@ -451,9 +449,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <param name="value">A floating-point number.</param>
         /// <returns>The bits that represent the floating-point number.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int SingleToRawInt32Bits(float value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.SingleToRawInt32Bits(value);
@@ -537,9 +533,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <param name="value">The integer to convert.</param>
         /// <returns>A single-precision floating-point value that represents the converted integer.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static float Int32BitsToSingle(int value) // J2N: Only used as a proxy for testing purposes
         {
             return BitConversion.Int32BitsToSingle(value);
@@ -553,9 +547,7 @@ namespace J2N.Numerics
         /// Determines whether this object's value is finite (zero, subnormal, or normal).
         /// </summary>
         /// <returns><c>true</c> if the value is finite (zero, subnormal or normal); otherwise <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsFinite()
         {
             return value.IsFinite();
@@ -570,9 +562,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <returns><c>true</c> if this object's value evaluates to <see cref="float.PositiveInfinity"/> or
         /// <see cref="float.NegativeInfinity"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsInfinity()
         {
             return value.IsInfinity();
@@ -588,9 +578,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <returns><c>true</c> if this object's' value evaluates to <see cref="float.NaN"/>;
         /// otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsNaN()
         {
             return value.IsNaN();
@@ -605,9 +593,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <returns><c>true</c> if the value is negative; otherwise, <c>false</c>.</returns>
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsNegative()
         {
             return value.IsNegative();
@@ -623,9 +609,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <returns><c>true</c> if the value evaluates to <see cref="float.NegativeInfinity"/>;
         /// otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsNegativeInfinity()
         {
             return value.IsNegativeInfinity();
@@ -641,9 +625,7 @@ namespace J2N.Numerics
         /// this feature. This method allows a simple way to check whether the current <see cref="float"/> has the value negative zero.
         /// </summary>
         /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsNegativeZero()
         {
             return value.IsNegativeZero();
@@ -657,9 +639,7 @@ namespace J2N.Numerics
         /// Determines whether this object's value specified value is normal.
         /// </summary>
         /// <returns><c>true</c> if the value is normal; <c>false</c> otherwise.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsNormal()
         {
             return value.IsNormal();
@@ -673,9 +653,7 @@ namespace J2N.Numerics
         /// Returns a value indicating whether this object's value evaluates to positive infinity.
         /// </summary>
         /// <returns><c>true</c> if the value evaluates to <see cref="float.PositiveInfinity"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsPositiveInfinity()
         {
             return value.IsPositiveInfinity();
@@ -689,9 +667,7 @@ namespace J2N.Numerics
         /// Determines whether this object's value is subnormal.
         /// </summary>
         /// <returns><c>true</c> if the value is subnormal; <c>false</c> otherwise.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public bool IsSubnormal()
         {
             return value.IsSubnormal();
@@ -3110,9 +3086,7 @@ namespace J2N.Numerics
         ///     </item>
         /// </list>
         /// </returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int Compare(float floatA, float floatB)
         {
             return JCG.Comparer<float>.Default.Compare(floatA, floatB);
@@ -3611,9 +3585,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A hex string representing the current instance.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public string ToHexString(IFormatProvider? provider)
         {
             return value.ToHexString(provider);

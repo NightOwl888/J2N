@@ -1589,9 +1589,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
         /// <seealso cref="Parse(string, int)"/>
         /// <seealso cref="Number.ToString()"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse([NotNullWhen(true)] string? s, out int result)
         {
             if (s == null)
@@ -1668,9 +1666,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string?, out int)"/>
         /// <seealso cref="Number.ToString()"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool TryParse(ReadOnlySpan<char> s, out int result)
         {
             return DotNetNumber.TryParseInt32IntegerStyle(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result) == DotNetNumber.ParsingStatus.OK;
@@ -2337,9 +2333,7 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(string?, out int)"/>
         /// <seealso cref="Number.ToString()"/>
         /// <seealso cref="NumberStyle"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse([NotNullWhen(true)] string? s, NumberStyle style, IFormatProvider? provider, out int result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -2575,9 +2569,7 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(ReadOnlySpan{char}, out int)"/>
         /// <seealso cref="Number.ToString()"/>
         /// <seealso cref="NumberStyle"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out int result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -2593,9 +2585,7 @@ namespace J2N.Numerics
         /// returned string is a concatenation of '0' and '1' characters.
         /// </summary>
         /// <returns>The binary string representation of this instance.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public string ToBinaryString()
         {
             return value.ToBinaryString();
@@ -2611,9 +2601,7 @@ namespace J2N.Numerics
         /// concatenation of characters from '0' to '9' and 'a' to 'f'.
         /// </summary>
         /// <returns>The hexadecimal string representation of this instance.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public string ToHexString()
         {
             return value.ToHexString();
@@ -2628,9 +2616,7 @@ namespace J2N.Numerics
         /// returned string is a concatenation of characters from '0' to '7'.
         /// </summary>
         /// <returns>The octal string representation of this instance.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public string ToOctalString()
         {
             return value.ToOctalString();
@@ -3195,9 +3181,7 @@ namespace J2N.Numerics
         /// <returns>An <see cref="int"/> value with a single one-bit, in the position
         /// of the highest-order one-bit in the specified <paramref name="value"/>, or zero if
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         internal static int HighestOneBit(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.HighestOneBit();
@@ -3218,9 +3202,7 @@ namespace J2N.Numerics
         /// <returns>An <see cref="int"/> value with a single one-bit, in the position
         /// of the lowest-order one-bit in the specified <paramref name="value"/>, or zero if
         /// the specified <paramref name="value"/> is itself equal to zero.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int LowestOneBit(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.LowestOneBit();
@@ -3251,9 +3233,7 @@ namespace J2N.Numerics
         /// ("leftmost") one-bit in the two's complement binary representation
         /// of the specified <paramref name="value"/>, or 32 if the value
         /// is equal to zero.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int LeadingZeroCount(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.LeadingZeroCount();
@@ -3277,9 +3257,7 @@ namespace J2N.Numerics
         /// one-bit in the two's complement binary representation of the
         /// specified <paramref name="value"/>, or 32 if the value is equal
         /// to zero.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int TrailingZeroCount(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.TrailingZeroCount();
@@ -3297,9 +3275,7 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="int"/> to examine.</param>
         /// <returns>The number of one-bits in the two's complement binary
         /// representation of the specified <paramref name="value"/>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int PopCount(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.PopCount();
@@ -3327,9 +3303,7 @@ namespace J2N.Numerics
         /// <returns>The value obtained by rotating the two's complement binary
         /// representation of the specified <paramref name="value"/> left by the
         /// specified number of bits.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int RotateLeft(int value, int distance) // J2N: Only used as a proxy for testing purposes
         {
             return value.RotateLeft(distance);
@@ -3357,9 +3331,7 @@ namespace J2N.Numerics
         /// <returns>The value obtained by rotating the two's complement binary
         /// representation of the specified <paramref name="value"/> right by the
         /// specified number of bits.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int RotateRight(int value, int distance) // J2N: Only used as a proxy for testing purposes
         {
             return value.RotateRight(distance);
@@ -3376,9 +3348,7 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="int"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int ReverseBytes(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.ReverseBytes();
@@ -3395,9 +3365,7 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="int"/> value for which to reverse the bit order.</param>
         /// <returns>The value obtained by reversing order of the bits in the
         /// specified <paramref name="value"/>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int Reverse(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.Reverse();
@@ -3417,9 +3385,7 @@ namespace J2N.Numerics
         /// </summary>
         /// <param name="value">The value whose signum has to be computed.</param>
         /// <returns>The signum function of the specified <see cref="int"/> value.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         internal static int Signum(int value) // J2N: Only used as a proxy for testing purposes
         {
             return value.Signum();

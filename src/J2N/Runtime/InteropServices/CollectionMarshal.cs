@@ -24,9 +24,7 @@ namespace J2N.Runtime.InteropServices
         /// </summary>
         /// <param name="list">The list to get the data view over.</param>
         /// <typeparam name="T">The type of the elements in the list.</typeparam>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static Span<T> AsSpan<T>(List<T>? list) // J2N NOTE: This implementation is from .NET 9 RC1
         {
             Span<T> span = default;

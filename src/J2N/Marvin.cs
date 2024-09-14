@@ -15,9 +15,7 @@ namespace J2N
         /// <summary>
         /// Compute a Marvin hash and collapse it into a 32-bit hash.
         /// </summary>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int ComputeHash32(ReadOnlySpan<byte> data, ulong seed) => ComputeHash32(ref MemoryMarshal.GetReference(data), (uint)data.Length, (uint)seed, (uint)(seed >> 32));
 
         /// <summary>
@@ -217,9 +215,7 @@ namespace J2N
             goto DoFinalRoundsAndReturn;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static void Block(ref uint rp0, ref uint rp1)
         {
             // Intrinsified in mono interpreter

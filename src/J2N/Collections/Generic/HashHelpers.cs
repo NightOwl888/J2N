@@ -4,7 +4,9 @@
 using J2N;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-
+#if !FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
+using MethodImplOptions = J2N.MethodImplOptions;
+#endif
 
 namespace System.Collections
 {
@@ -95,9 +97,7 @@ namespace System.Collections
         public static ulong GetFastModMultiplier(uint divisor)
             => ulong.MaxValue / divisor + 1;
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static uint FastMod(uint value, uint divisor, ulong multiplier)
         {
             // Using fastmod from Daniel Lemire https://lemire.me/blog/2019/02/08/faster-remainders-when-the-divisor-is-a-constant-beating-compilers-and-libdivide/
