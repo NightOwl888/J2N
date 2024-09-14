@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -59,10 +60,6 @@ namespace J2N.Collections.Generic
         , System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
 #endif
     {
-#if !FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-        private static readonly bool TIsNullableType = typeof(T).IsNullableType();
-#endif
-
         // store lower 31 bits of hash code
         private const int Lower31BitMask = 0x7FFFFFFF;
         // cutoff point, above which we won't do stackallocs. This corresponds to 100 integers.
@@ -577,11 +574,7 @@ namespace J2N.Collections.Generic
                 slots[last].next = slots[i].next;
             }
             slots[i].hashCode = -1;
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            if (TIsNullableType)
-#endif
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 slots[i].value = default!;
             }
@@ -2299,9 +2292,7 @@ namespace J2N.Collections.Generic
         /// <param name="item"></param>
         /// <param name="comparer"></param>
         /// <returns>hash code</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private static int InternalGetHashCode(T item, IEqualityComparer<T>? comparer)
         {
             if (item == null)
@@ -2313,9 +2304,7 @@ namespace J2N.Collections.Generic
             return hashCode & Lower31BitMask;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private static int InternalGetHashCode(int hashCode)
         {
             return hashCode & Lower31BitMask;

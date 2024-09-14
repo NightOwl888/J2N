@@ -16,6 +16,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_CURRENTCULTURE_SETTER</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ENCODINGPROVIDERS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_GETBYTES_OFFSET_COUNT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEINFORMATION</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_CHARPTR</DefineConstants>
 
@@ -25,6 +26,7 @@
   <!-- Features in .NET 6.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net6.')) ">
 
+    <DefineConstants>$(DefineConstants);FEATURE_ARRAY_CLEAR_ARRAY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTINT64</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTSINGLE</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 5.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
@@ -45,7 +47,7 @@
   <!-- Features in .NET Core 3.x, .NET 5.x, and .NET 6.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
 
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_MODIFY_CONTINUEENUMERATION</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
 
   </PropertyGroup>
@@ -53,18 +55,15 @@
   <!-- Features in .NET Standard 2.1, .NET Core 3.x, .NET 5.x, and .NET 6.x only -->
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
 
+    <DefineConstants>$(DefineConstants);FEATURE_BIGINTEGER_CTOR_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CHARUNICODEINFO_GETUNICODECATEGORY_CODEPOINT</DefineConstants>
 
     <!--<DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ENUMERATOR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
 
-    <DefineConstants>$(DefineConstants);FEATURE_BIGINTEGER_CTOR_READONLYSPAN</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_ENSURECAPACITY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_REMOVE_OUTVALUE</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRIMEXCESS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_DICTIONARY_TRYADD</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMBER_TRYFORMAT</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_FILL_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CONTAINS_CHAR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CREATE</DefineConstants>
@@ -75,6 +74,8 @@
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_EQUALS_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_INSERT_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TEXTWRITER_WRITE_READONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_UNSAFE_ISNULLREF</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_UNSAFE_NULLREF</DefineConstants>
 
   </PropertyGroup>
 
@@ -104,6 +105,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_APPCONTEXT_BASEDIRECTORY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_GETBYTES_OFFSET_COUNT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_CHARPTR</DefineConstants>
 
   </PropertyGroup>

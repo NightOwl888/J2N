@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -55,10 +56,6 @@ namespace J2N.Collections.Generic
     {
         private const int MaxArrayLength = 0X7FEFFFFF;
         private const int DefaultCapacity = 4;
-
-#if !FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-        internal static readonly bool TIsNullableType = typeof(T).IsNullableType();
-#endif
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
@@ -384,9 +381,7 @@ namespace J2N.Collections.Generic
         }
 
         // From System.ThrowHelper
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool NullAndNullsAreIllegal(object? value)
         {
             // Note that default(T) is not equal to null for value types except when T is Nullable<U>.
@@ -428,15 +423,11 @@ namespace J2N.Collections.Generic
         /// capacity needs to be increased to accommodate the new element, this method becomes an O(<c>n</c>)
         /// operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Add(T item)
             => DoAdd(item); // Hack so we can override
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         internal virtual void DoAdd(T item)
         {
             _version++;
@@ -571,9 +562,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is the number of elements in the range.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public int BinarySearch(int index, int count, T item, IComparer<T>? comparer)
         {
             CoModificationCheck();
@@ -686,9 +675,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public void Clear()
             => DoClear(); // Hack so we can override
 
@@ -696,11 +683,7 @@ namespace J2N.Collections.Generic
         internal virtual void DoClear()
         {
             _version++;
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            if (TIsNullableType)
-#endif
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 int size = _size;
                 _size = 0;
@@ -1956,11 +1939,7 @@ namespace J2N.Collections.Generic
                 _items[freeIndex++] = _items[current++];
             }
 
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            if (TIsNullableType)
-#endif
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 Array.Clear(_items, freeIndex, _size - freeIndex); // Clear the elements so that the gc can reclaim the references.
             }
@@ -2003,11 +1982,7 @@ namespace J2N.Collections.Generic
             {
                 Array.Copy(_items, index + 1, _items, index, _size - index);
             }
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-            if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-            if (TIsNullableType)
-#endif
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {
                 _items[_size] = default!;
             }
@@ -2055,11 +2030,7 @@ namespace J2N.Collections.Generic
                 }
 
                 _version++;
-#if FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES
-                if (RuntimeHelpers.IsReferenceOrContainsReferences<T>())
-#else
-                if (TIsNullableType)
-#endif
+                if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
                 {
                     Array.Clear(_items, _size, count);
                 }

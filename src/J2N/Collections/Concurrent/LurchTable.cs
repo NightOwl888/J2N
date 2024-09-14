@@ -62,15 +62,11 @@ namespace J2N.Collections.Concurrent
     [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Using Microsoft's code styles")]
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     public class LurchTable<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
         IDisposable
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
     {
         /// <summary> Method signature for the ItemUpdated event </summary>
         public delegate void ItemUpdatedMethod(KeyValuePair<TKey, TValue> previous, KeyValuePair<TKey, TValue> next);
@@ -277,11 +273,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary) : this(dictionary, LurchTableOrder.None, null) { }
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements
@@ -309,11 +301,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering) : this(dictionary, ordering, null) { }
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements copied
@@ -346,11 +334,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer) : this(dictionary, LurchTableOrder.None, comparer) { }
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LurchTable{TKey, TValue}"/> class that contains elements copied
@@ -384,11 +368,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, IEqualityComparer<TKey>? comparer)
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
             : this(dictionary, ordering, int.MaxValue, comparer) { }
 
         /// <summary>
@@ -424,11 +404,7 @@ namespace J2N.Collections.Concurrent
         /// <para/>
         /// This constructor is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in <paramref name="dictionary"/>.
         /// </remarks>
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
             : this(dictionary is null ? 0 : dictionary.Count, ordering, limit, comparer)
         {
             if (dictionary == null)
@@ -823,7 +799,7 @@ namespace J2N.Collections.Concurrent
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TryGetValue((TKey)key, out TValue value))
+                    if (TryGetValue((TKey)key, out TValue? value))
                     {
                         return value;
                     }
@@ -834,14 +810,14 @@ namespace J2N.Collections.Concurrent
             set
             {
                 // J2N: Only throw if the generic closing type is not nullable
-                if (key is null && !typeof(TKey).IsNullableType())
+                if (!(default(TKey) == null) && key is null)
                     throw new ArgumentNullException(nameof(key));
-                if (value is null && !typeof(TValue).IsNullableType())
+                if (!(default(TValue) == null) && value is null)
                     throw new ArgumentNullException(nameof(value));
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
                     try
                     {
                         this[tempKey!] = (TValue)value!;
@@ -861,18 +837,18 @@ namespace J2N.Collections.Concurrent
         void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
-            if (key is null && !typeof(TKey).IsNullableType())
+            if (!(default(TKey) == null) && key is null)
                 throw new ArgumentNullException(nameof(key));
-            if (value is null && !typeof(TValue).IsNullableType())
+            if (!(default(TValue) == null) && value is null)
                 throw new ArgumentNullException(nameof(value));
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
-                    Add(tempKey!, (TValue)value!);
+                    Add(tempKey, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -950,7 +926,7 @@ namespace J2N.Collections.Concurrent
         private static bool IsCompatibleKey(object key)
         {
             if (key is null)
-                return typeof(TKey).IsNullableType();
+                return default(TKey) == null;
 
             return (key is TKey);
         }
@@ -1009,7 +985,7 @@ namespace J2N.Collections.Concurrent
         {
             get
             {
-                if (!TryGetValue(key, out TValue value))
+                if (!TryGetValue(key, out TValue? value))
                     throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
                 return value;
             }
@@ -1330,7 +1306,7 @@ namespace J2N.Collections.Concurrent
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
         {
-            if (TryGetValue(item.Key, out TValue test))
+            if (TryGetValue(item.Key, out TValue? test))
                 return J2N.Collections.Generic.EqualityComparer<TValue>.Default.Equals(item.Value, test);
             return false;
         }
@@ -1896,15 +1872,11 @@ namespace J2N.Collections.Concurrent
         /// </summary>
         public KeyCollection Keys => _keyCollection ??= new KeyCollection(this);
 
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
 #if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 #endif
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
 
         #endregion
 
@@ -2199,15 +2171,11 @@ namespace J2N.Collections.Concurrent
         /// </summary>
         public ValueCollection Values => _valueCollection ??= new ValueCollection(this);
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
 #if FEATURE_IREADONLYCOLLECTIONS
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
 #endif
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion
 
@@ -2471,7 +2439,7 @@ namespace J2N.Collections.Concurrent
                     {
                         temp = _entries[index >> _shift][index & _shiftMask].Value;
                         var original = temp;
-                        if (value.UpdateValue(key, ref temp))
+                        if (value.UpdateValue(key, ref temp!))
                         {
                             _entries[index >> _shift][index & _shiftMask].Value = temp;
 
@@ -2492,7 +2460,7 @@ namespace J2N.Collections.Concurrent
                     }
                     index = _entries[index >> _shift][index & _shiftMask].Link;
                 }
-                if (value.CreateValue(key, out temp))
+                if (value.CreateValue(key, out temp!))
                 {
                     index = AllocSlot();
                     _entries[index >> _shift][index & _shiftMask].Hash = hash;
@@ -2722,17 +2690,13 @@ namespace J2N.Collections.Concurrent
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private int GetHash([AllowNull] TKey key)
         {
             return (key is null ? 0 : _comparer.GetHashCode(key)) & int.MaxValue;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         private bool KeyEquals([AllowNull] TKey key1, [AllowNull] TKey key2)
         {
             if (key1 is null)

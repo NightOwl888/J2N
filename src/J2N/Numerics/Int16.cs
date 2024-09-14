@@ -1748,9 +1748,7 @@ namespace J2N.Numerics
         /// </remarks>
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
         /// <seealso cref="Number.ToString()"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse([NotNullWhen(true)] string? s, out short result)
         {
             if (s == null)
@@ -1827,9 +1825,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string?, out short)"/>
         /// <seealso cref="Number.ToString()"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse(ReadOnlySpan<char> s, out short result)
         {
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
@@ -2299,9 +2295,7 @@ namespace J2N.Numerics
 
         #region TryParse_CharSequence_NumberStyle_NumberFormatInfo_Int16
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, NumberFormatInfo info, out short result)
         {
             // For hex number styles AllowHexSpecifier << 6 == 0x8000 and cancels out MinValue so the check is effectively: (uint)i > ushort.MaxValue
@@ -2541,9 +2535,7 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(string?, out short)"/>
         /// <seealso cref="Number.ToString()"/>
         /// <seealso cref="NumberStyle"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse([NotNullWhen(true)] string? s, NumberStyle style, IFormatProvider? provider, out short result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -2779,9 +2771,7 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(ReadOnlySpan{char}, out short)"/>
         /// <seealso cref="Number.ToString()"/>
         /// <seealso cref="NumberStyle"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse(ReadOnlySpan<char> s, NumberStyle style, IFormatProvider? provider, out short result)
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
@@ -3343,9 +3333,7 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="short"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         internal static short ReverseBytes(short value) // J2N: Only used as a proxy for testing purposes
         {
             return value.ReverseBytes();

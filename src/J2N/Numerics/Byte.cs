@@ -1799,9 +1799,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out byte)"/>
         /// <seealso cref="Number.ToString()"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse([NotNullWhen(true)] string? s, out byte result) // Culture Sensitive!
         {
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);
@@ -1873,9 +1871,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(ReadOnlySpan{char}, NumberStyle, IFormatProvider?)"/>
         /// <seealso cref="TryParse(string?, out byte)"/>
         /// <seealso cref="Number.ToString()"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool TryParse(ReadOnlySpan<char> s, out byte result) // Culture Sensitive!
         {
             return TryParse(s, NumberStyle.Integer, NumberFormatInfo.CurrentInfo, out result);

@@ -47,9 +47,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static ReadOnlyList<T> AsReadOnly<T>(this IList<T> collection)
         {
             return new ReadOnlyList<T>(collection);
@@ -72,9 +70,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <returns>The non-negative index of the element, or a negative index which
         /// is the <c>-index - 1</c> where the element would be inserted.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static int BinarySearch<T>(this IList<T> list, T item)
             => BinarySearch(list, item, null);
 
@@ -439,9 +435,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="list">The <see cref="IList{T}"/> to shuffle.</param>
         /// <exception cref="ArgumentNullException">If <paramref name="list"/> is <c>null</c>.</exception>
         /// <seealso cref="Shuffle{T}(IList{T}, System.Random)"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static void Shuffle<T>(this IList<T> list)
         {
             Shuffle(list, new Random());

@@ -89,9 +89,7 @@ namespace J2N
         /// double seconds = ((dobule)t1 - t0) / Time.SecondsPerNanosecond;
         /// </code>
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static long NanoTime()
         {
             return unchecked((long)(1_000_000_000.0d * Stopwatch.GetTimestamp() / Stopwatch.Frequency));
@@ -108,9 +106,7 @@ namespace J2N
         /// </summary>
         /// <returns>The difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC
         /// also known as the "epoch".</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static long CurrentTimeMilliseconds()
         {
             return (long)(DateTime.UtcNow - UnixEpoch).TotalMilliseconds;
@@ -125,9 +121,7 @@ namespace J2N
         /// <returns>The number of milliseconds since January 1, 1970, 00:00:00 UTC represented by <paramref name="dateTime"/>.</returns>
         /// <seealso cref="GetTimeSpanSinceUnixEpoch(DateTime)"/>
         /// <seealso cref="UnixEpoch"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static long GetMillisecondsSinceUnixEpoch(this DateTime dateTime)
         {
             return (long)(dateTime - UnixEpoch).TotalMilliseconds;
@@ -143,9 +137,7 @@ namespace J2N
         /// <returns>The <see cref="TimeSpan"/> since January 1, 1970, 00:00:00 UTC represented by <paramref name="dateTime"/>.</returns>
         /// <seealso cref="GetMillisecondsSinceUnixEpoch(DateTime)"/>
         /// <seealso cref="UnixEpoch"/>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         public static TimeSpan GetTimeSpanSinceUnixEpoch(this DateTime dateTime)
         {
             return dateTime - UnixEpoch;

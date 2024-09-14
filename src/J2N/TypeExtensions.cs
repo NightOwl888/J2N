@@ -120,27 +120,5 @@ namespace J2N
 
             return AssemblyExtensions.FindResource(type.Assembly, type, name);
         }
-
-        /// <summary>
-        /// Returns <c>true</c> if a type is either a reference type
-        /// or is a <see cref="Nullable{T}"/> type.
-        /// </summary>
-        /// <param name="type">The type to check.</param>
-        /// <returns><c>true</c> if a type is either a reference type
-        /// or is a <see cref="Nullable{T}"/> type; otherwise, <c>false</c>.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="type"/> is <c>null</c>.</exception>
-        internal static bool IsNullableType(this Type type)
-        {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-
-            // If this is not a value type, it is a reference type, so it is automatically nullable
-            //  (NOTE: All forms of Nullable<T> are value types)
-            if (!type.IsValueType)
-                return true;
-
-            // Report whether type is a form of the Nullable<> type
-            return Nullable.GetUnderlyingType(type) != null;
-        }
     }
 }

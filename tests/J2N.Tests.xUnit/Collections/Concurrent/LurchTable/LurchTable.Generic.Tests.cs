@@ -18,9 +18,11 @@ namespace J2N.Collections.Concurrent.Tests
     {
         protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.None;
 
-        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Add | ModifyOperation.Insert | ModifyOperation.Remove | ModifyOperation.Clear;
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Add | ModifyOperation.Insert | ModifyOperation.Overwrite | ModifyOperation.Remove | ModifyOperation.Clear;
 
         //protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
+
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
 
         /// <summary>
         /// Used in IDictionary_Generic_Values_Enumeration_ParentDictionaryModifiedInvalidates and
@@ -315,8 +317,6 @@ namespace J2N.Collections.Concurrent.Tests
 
         //        #region EnsureCapacity
 
-        //#if FEATURE_DICTIONARY_ENSURECAPACITY
-
         //        [Theory]
         //        [MemberData(nameof(ValidCollectionSizes))]
         //        public void EnsureCapacity_Generic_RequestingLargerCapacity_DoesInvalidateEnumeration(int count)
@@ -440,13 +440,9 @@ namespace J2N.Collections.Concurrent.Tests
         //            Assert.Equal(17, dictionary.EnsureCapacity(13));
         //        }
 
-        //#endif
-
         //        #endregion
 
         //        #region TrimExcess
-
-        //#if FEATURE_DICTIONARY_TRIMEXCESS
 
         //        [Fact]
         //        public void TrimExcess_Generic_NegativeCapacity_Throw()
@@ -650,8 +646,6 @@ namespace J2N.Collections.Concurrent.Tests
 
         //            Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
         //        }
-
-        //#endif
 
         //        #endregion
     }

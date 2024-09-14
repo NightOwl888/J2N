@@ -54,9 +54,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static void Swap(Span<T> a, int i, int j)
         {
             Debug.Assert(i != j);
@@ -252,9 +250,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static void Swap(T[] a, int i, int j)
         {
             Debug.Assert(i != j);

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.Generic;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -29,25 +30,16 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
     public class ReadOnlyDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
         IStructuralEquatable, IStructuralFormattable
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
     {
         private static readonly bool TKeyIsValueTypeOrStringOrStructuralEquatable = typeof(TKey).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TKey)) || typeof(string).Equals(typeof(TKey));
         private static readonly bool TValueIsValueTypeOrStringOrStructuralEquatable = typeof(TValue).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(TValue)) || typeof(string).Equals(typeof(TValue));
-        private static readonly bool TKeyIsNullable = typeof(TKey).IsNullableType();
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         internal readonly IDictionary<TKey, TValue> dictionary; // Internal for testing
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
         private readonly DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer;
         private readonly IFormatProvider toStringFormatProvider;
 
@@ -69,11 +61,7 @@ namespace J2N.Collections.ObjectModel
         /// </summary>
         /// <param name="dictionary">The dictionary to wrap.</param>
         /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary)
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
            : this(dictionary,
                  TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable ? 
                     DictionaryEqualityComparer<TKey, TValue>.Default :
@@ -82,11 +70,7 @@ namespace J2N.Collections.ObjectModel
         {
         }
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         internal ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary, DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
             this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
@@ -96,11 +80,7 @@ namespace J2N.Collections.ObjectModel
         /// <summary>
         /// Gets the dictionary that is wrapped by this <see cref="ReadOnlyDictionary{TKey, TValue}"/> object.
         /// </summary>
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         protected internal IDictionary<TKey, TValue> Dictionary => dictionary;
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         /// <summary>
         /// Gets a key collection that contains the keys of the dictionary.
@@ -146,11 +126,7 @@ namespace J2N.Collections.ObjectModel
             return dictionary.ContainsKey(key);
         }
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         /// <summary>
         /// Retrieves the value that is associated with the specified key.
@@ -168,11 +144,7 @@ namespace J2N.Collections.ObjectModel
 #pragma warning restore IDE0079 // Remove unnecessary suppression
             => dictionary.TryGetValue(key!, out value!);
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         /// <summary>
         /// Gets the element that has the specified key.
@@ -181,8 +153,6 @@ namespace J2N.Collections.ObjectModel
         /// <returns>The element that has the specified key.</returns>
         public TValue this[[AllowNull] TKey key] => dictionary[key];
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         void IDictionary<TKey, TValue>.Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
             throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
@@ -198,8 +168,6 @@ namespace J2N.Collections.ObjectModel
             get => dictionary[key];
             set => throw new NotSupportedException(SR.NotSupported_ReadOnlyCollection);
         }
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion
 
@@ -263,7 +231,7 @@ namespace J2N.Collections.ObjectModel
         private static bool IsCompatibleKey(object? key)
         {
             if (key is null)
-                return TKeyIsNullable;
+                return default(TKey) == null;
 
             return key is TKey;
         }
@@ -409,13 +377,9 @@ namespace J2N.Collections.ObjectModel
 
 #if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary members
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion IReadOnlyDictionary members
 #endif
@@ -468,7 +432,7 @@ namespace J2N.Collections.ObjectModel
 
 #endregion
 
-#region ToString
+        #region ToString
 
         /// <summary>
         /// Returns a string that represents the current dictionary using the specified
@@ -538,18 +502,10 @@ namespace J2N.Collections.ObjectModel
 #endif
         private struct DictionaryEnumerator : IDictionaryEnumerator
         {
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             private readonly IDictionary<TKey, TValue> dictionary;
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
             private readonly IEnumerator<KeyValuePair<TKey, TValue>> enumerator;
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
             public DictionaryEnumerator(IDictionary<TKey, TValue> dictionary)
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
             {
                 this.dictionary = dictionary;
                 enumerator = this.dictionary.GetEnumerator();

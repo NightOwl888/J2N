@@ -50,7 +50,7 @@ namespace J2N.Collections.Tests
             while (set.Count < numberOfItemsToAdd)
             {
                 T toAdd = CreateT(seed++);
-                while (set.Contains(toAdd) || (InvalidValues != ArrayEmpty && InvalidValues.Contains(toAdd, GetIEqualityComparer())))
+                while (set.Contains(toAdd) || (InvalidValues != Arrays.Empty<T>() && InvalidValues.Contains(toAdd, GetIEqualityComparer())))
                     toAdd = CreateT(seed++);
                 set.Add(toAdd);
             }

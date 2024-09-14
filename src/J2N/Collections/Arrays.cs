@@ -55,9 +55,7 @@ namespace J2N.Collections
         /// same length and the elements at each index in the two arrays are
         /// equal according to <see cref="IEqualityComparer{T}.Equals(T, T)"/> of
         /// <see cref="EqualityComparer{T}.Default"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool DeepEquals<T>(T[]? arrayA, T[]? arrayB)
         {
             return StructuralEqualityComparer.Default.Equals(arrayA, arrayB);
@@ -82,9 +80,7 @@ namespace J2N.Collections
         /// <see cref="IList{T}"/>, or <see cref="ISet{T}"/>, its values and any nested collection values
         /// will be compared for equality as well.
         /// </returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool Equals<T>(T[]? arrayA, T[]? arrayB)
         {
             return ArrayEqualityComparer<T>.OneDimensional.Equals(arrayA!, arrayB!);
@@ -116,9 +112,7 @@ namespace J2N.Collections
         /// <typeparam name="T">The type of array.</typeparam>
         /// <param name="array">The array whose hash code to compute.</param>
         /// <returns>The deep hash code for <paramref name="array"/>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static int GetDeepHashCode<T>(T[]? array)
         {
             return StructuralEqualityComparer.Default.GetHashCode(array);
@@ -133,9 +127,7 @@ namespace J2N.Collections
         /// <typeparam name="T">The array element type.</typeparam>
         /// <param name="array">The array whose hash code to compute.</param>
         /// <returns>The hash code for <paramref name="array"/>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static int GetHashCode<T>(T[]? array)
         {
             return ArrayEqualityComparer<T>.OneDimensional.GetHashCode(array!); // J2N TODO: array can be null here, but need to override the constraint
@@ -302,9 +294,7 @@ namespace J2N.Collections
         /// <returns>A copy of the original array, truncated or padded with zeros to obtain the specified length.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="original"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newLength"/> is less than zero.</exception>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static T[] CopyOf<T>(T[] original, int newLength)
         {
             if (original is null)
@@ -329,9 +319,7 @@ namespace J2N.Collections
         /// <returns>An empty array.</returns>
         // J2N: Since Array.Empty<T>() doesn't exist in all supported platforms, we
         // have this wrapper method to add support.
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static T[] Empty<T>()
         {
 #if FEATURE_ARRAYEMPTY

@@ -1177,9 +1177,7 @@ namespace J2N.Numerics
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private unsafe static void WriteBuffer(char* result, ref int index, long output, int olength, bool upperCase, bool sign, int exp, bool scientificNotation, string negSign, int negSignLength, string decimalSeparator, int decimalSeparatorLength)
         {
             if (sign)
@@ -1303,17 +1301,13 @@ namespace J2N.Numerics
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int Pow5bits(int e)
         {
             return ((e * 1217359).TripleShift(19)) + 1;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // J2N: Only called in one place
-#endif
         private static int DecimalLength(long v)
         {
             if (v >= 1000000000000000000L) return 19;
@@ -1337,17 +1331,13 @@ namespace J2N.Numerics
             return 1;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static bool MultipleOfPowerOf5(long value, int q)
         {
             return Pow5Factor(value) >= q;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int Pow5Factor(long value)
         {
             // We want to find the largest power of 5 that divides value.

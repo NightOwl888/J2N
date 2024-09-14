@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -17,9 +18,6 @@ using SCG = System.Collections.Generic;
 namespace J2N.Collections.Generic
 {
     using SR = J2N.Resources.Strings;
-
-#pragma warning disable IDE0079 // Remove unnecessary supppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
 
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted on the key.
@@ -745,7 +743,7 @@ namespace J2N.Collections.Generic
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TryGetValue((TKey)key, out TValue value))
+                    if (TryGetValue((TKey)key, out TValue? value))
                     {
                         return value;
                     }
@@ -761,9 +759,9 @@ namespace J2N.Collections.Generic
                 //}
 
                 // J2N: Only throw if the generic closing type is not nullable
-                if (key is null && !typeof(TKey).IsNullableType())
+                if (!(default(TKey) == null) && key is null)
                     throw new ArgumentNullException(nameof(key));
-                if (value is null && !typeof(TValue).IsNullableType())
+                if (!(default(TValue) == null) && value is null)
                     throw new ArgumentNullException(nameof(value));
 
                 try
@@ -793,9 +791,9 @@ namespace J2N.Collections.Generic
             //}
 
             // J2N: Only throw if the generic closing type is not nullable
-            if (key is null && !typeof(TKey).IsNullableType())
+            if (!(default(TKey) == null) && key is null)
                 throw new ArgumentNullException(nameof(key));
-            if (value is null && !typeof(TValue).IsNullableType())
+            if (!(default(TValue) == null) && value is null)
                 throw new ArgumentNullException(nameof(value));
 
             try
@@ -833,7 +831,7 @@ namespace J2N.Collections.Generic
             //    throw new ArgumentNullException(nameof(key));
             //}
             if (key is null)
-                return typeof(TKey).IsNullableType();
+                return default(TKey) == null;
 
             return (key is TKey);
         }
@@ -1961,7 +1959,4 @@ namespace J2N.Collections.Generic
             return ret;
         }
     }
-
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary supppression
 }

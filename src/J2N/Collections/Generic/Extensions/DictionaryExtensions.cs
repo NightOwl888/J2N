@@ -43,14 +43,8 @@ namespace J2N.Collections.Generic.Extensions
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public static J2N.Collections.ObjectModel.ReadOnlyDictionary<TKey, TValue> AsReadOnly<TKey, TValue>(this IDictionary<TKey, TValue> collection)
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             return new J2N.Collections.ObjectModel.ReadOnlyDictionary<TKey, TValue>(collection);
         }

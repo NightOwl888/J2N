@@ -35,9 +35,7 @@ namespace J2N
         /// </summary>
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is finite (zero, subnormal or normal); otherwise <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsFinite(this double d)
         {
             long bits = BitConversion.DoubleToRawInt64Bits(d);
@@ -54,9 +52,7 @@ namespace J2N
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if the value evaluates to <see cref="double.PositiveInfinity"/> or
         /// <see cref="double.NegativeInfinity"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsInfinity(this double d)
         {
             long bits = BitConversion.DoubleToRawInt64Bits(d);
@@ -74,9 +70,7 @@ namespace J2N
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if the value evaluates to <see cref="double.NaN"/>;
         /// otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool IsNaN(this double d)
         {
             // A NaN will never equal itself so this is an
@@ -97,9 +91,7 @@ namespace J2N
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is negative; otherwise, <c>false</c>.</returns>
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsNegative(this double d)
         {
             return BitConversion.DoubleToRawInt64Bits(d) < 0;
@@ -116,9 +108,7 @@ namespace J2N
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if <paramref name="d"/> evaluates to <see cref="double.NegativeInfinity"/>;
         /// otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsNegativeInfinity(this double d)
         {
             return d == double.NegativeInfinity;
@@ -135,9 +125,7 @@ namespace J2N
         /// </summary>
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if the current value represents negative zero; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool IsNegativeZero(this double d)
         {
             return d == 0 && IsNegative(d);
@@ -152,9 +140,7 @@ namespace J2N
         /// </summary>
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is normal; <c>false</c> otherwise.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsNormal(this double d)
         {
             long bits = BitConversion.DoubleToRawInt64Bits(d);
@@ -171,9 +157,7 @@ namespace J2N
         /// </summary>
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if <paramref name="d"/> evaluates to <see cref="double.PositiveInfinity"/>; otherwise, <c>false</c>.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static bool IsPositiveInfinity(this double d)
         {
             return d == double.PositiveInfinity;
@@ -188,9 +172,7 @@ namespace J2N
         /// </summary>
         /// <param name="d">A double-precision floating-point number.</param>
         /// <returns><c>true</c> if the value is subnormal; <c>false</c> otherwise.</returns>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif 
         public static unsafe bool IsSubnormal(this double d)
         {
             long bits = BitConversion.DoubleToRawInt64Bits(d);

@@ -104,9 +104,7 @@ namespace J2N.Collections.Generic
             return true;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode(double? obj) => obj.HasValue ? DoubleComparer.Default.GetHashCode(obj.Value) : 0;
 
         // Equals method for the comparer itself.
@@ -145,9 +143,7 @@ namespace J2N.Collections.Generic
             return true;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override int GetHashCode(float? obj) => obj.HasValue ? SingleComparer.Default.GetHashCode(obj.Value) : 0;
 
         // Equals method for the comparer itself.

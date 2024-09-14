@@ -453,9 +453,7 @@ namespace J2N.Numerics
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private unsafe static void WriteBuffer(char* result, ref int index, int output, int olength, bool upperCase, bool sign, int exp, bool scientificNotation, string negSign, int negSignLength, string decimalSeparator, int decimalSeparatorLength)
         {
             if (sign)
@@ -572,9 +570,7 @@ namespace J2N.Numerics
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int Pow5Bits(int e)
         {
             return e == 0 ? 1 : (int)((e * LOG2_5_NUMERATOR + LOG2_5_DENOMINATOR - 1) / LOG2_5_DENOMINATOR);
@@ -639,9 +635,7 @@ namespace J2N.Numerics
             return (uint)shiftedSum;
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // J2N: Only called in one place
-#endif
         private static int DecimalLength(int v)
         {
             int length = 10;

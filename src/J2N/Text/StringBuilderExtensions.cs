@@ -960,9 +960,7 @@ namespace J2N.Text
             };
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int IndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
             int length = value.Length;
@@ -1005,9 +1003,7 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int IndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
             int length = value.Length;
@@ -1680,9 +1676,7 @@ namespace J2N.Text
             };
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int LastIndexOfOrdinal(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;
@@ -1747,9 +1741,7 @@ namespace J2N.Text
             }
         }
 
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         private static int LastIndexOfOrdinalIgnoreCase(StringBuilder text, string value, int startIndex)
         {
             int textLength = text.Length;

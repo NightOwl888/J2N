@@ -491,9 +491,7 @@ namespace J2N.Numerics
         /// remove this method. This is only intended for integral types
         /// that do not actually support the "J" format.
         /// </summary>
-#if FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         internal static string? ConvertFormat(string? format)
         {
             if (string.IsNullOrEmpty(format))

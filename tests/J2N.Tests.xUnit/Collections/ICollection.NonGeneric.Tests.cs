@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System;
 using System.Collections.Generic;
@@ -157,7 +156,10 @@ namespace J2N.Collections.Tests
             {
                 ICollection collection1 = NonGenericICollectionFactory(count);
                 ICollection collection2 = NonGenericICollectionFactory(count);
-                Assert.NotSame(collection1.SyncRoot, collection2.SyncRoot);
+                if (!ReferenceEquals(collection1, collection2))
+                {
+                    Assert.NotSame(collection1.SyncRoot, collection2.SyncRoot);
+                }
             }
         }
 
@@ -186,19 +188,18 @@ namespace J2N.Collections.Tests
             }
         }
 
-        // J2N TODO: Finish
-//#pragma warning disable xUnit1013 // xunit analyzer bug https://github.com/xunit/xunit/issues/1973
-//        [ConditionalTheory(typeof(PlatformDetection), nameof(PlatformDetection.IsNonZeroLowerBoundArraySupported))]
-//        [MemberData(nameof(ValidCollectionSizes))]
-//        public virtual void ICollection_NonGeneric_CopyTo_NonZeroLowerBound(int count)
-//        {
-//            ICollection collection = NonGenericICollectionFactory(count);
-//            Array arr = Array.CreateInstance(typeof(object), new int[1] { count }, new int[1] { 2 });
-//            Assert.Equal(1, arr.Rank);
-//            Assert.Equal(2, arr.GetLowerBound(0));
-//            Assert.Throws(ICollection_NonGeneric_CopyTo_NonZeroLowerBound_ThrowType, () => collection.CopyTo(arr, 0));
-//        }
-//#pragma warning restore xUnit1013
+#pragma warning disable xUnit1013 // xunit analyzer bug https://github.com/xunit/xunit/issues/1973
+        [ConditionalTheory(typeof(PlatformDetection), nameof(PlatformDetection.IsNonZeroLowerBoundArraySupported))]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public virtual void ICollection_NonGeneric_CopyTo_NonZeroLowerBound(int count)
+        {
+            ICollection collection = NonGenericICollectionFactory(count);
+            Array arr = Array.CreateInstance(typeof(object), new int[1] { count }, new int[1] { 2 });
+            Assert.Equal(1, arr.Rank);
+            Assert.Equal(2, arr.GetLowerBound(0));
+            Assert.Throws(ICollection_NonGeneric_CopyTo_NonZeroLowerBound_ThrowType, () => collection.CopyTo(arr, 0));
+        }
+#pragma warning restore xUnit1013
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]

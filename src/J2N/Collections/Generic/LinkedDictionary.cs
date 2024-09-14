@@ -25,6 +25,7 @@ THE SOFTWARE.
 #endregion
 
 using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -79,12 +80,7 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
-
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type 'TKey' cannot be used as type parameter 'TKey' in the generic type or method 'IDictionary<TKey, TValue>'. Nullability of type argument 'TKey' doesn't match 'notnull' constraint.
     public class LinkedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
-#pragma warning restore CS8714 // The type 'TKey' cannot be used as type parameter 'TKey' in the generic type or method 'IDictionary<TKey, TValue>'. Nullability of type argument 'TKey' doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -153,13 +149,9 @@ namespace J2N.Collections.Generic
             list = new LinkedList<KeyValuePair<TKey, TValue>>();
         }
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         public LinkedDictionary(IDictionary<TKey, TValue> dictionary) : this(dictionary, null) { }
 
         public LinkedDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer)
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
             : this(dictionary != null ? dictionary.Count : 0, comparer)
         {
             if (dictionary == null)
@@ -319,9 +311,6 @@ namespace J2N.Collections.Generic
                 array[index++] = item;
         }
 
-
-#if FEATURE_DICTIONARY_ENSURECAPACITY
-
         /// <summary>
         /// Ensures that the dictionary can hold up to a specified number of entries without any
         /// further expansion of its backing storage.
@@ -337,7 +326,7 @@ namespace J2N.Collections.Generic
             version++;
             return dictionary.EnsureCapacity(capacity);
         }
-#endif
+
 #if FEATURE_SERIALIZABLE
 
         /// <summary>
@@ -412,8 +401,6 @@ namespace J2N.Collections.Generic
         }
 #endif
 
-#if FEATURE_DICTIONARY_TRIMEXCESS
-
         /// <summary>
         /// Sets the capacity of this dictionary to hold up a specified number of entries
         /// without any further expansion of its backing storage.
@@ -449,7 +436,6 @@ namespace J2N.Collections.Generic
             version++;
             dictionary.TrimExcess();
         }
-#endif
 
         /// <summary>
         /// Attempts to add the specified key and value to the dictionary.
@@ -728,7 +714,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         {
@@ -796,7 +782,7 @@ namespace J2N.Collections.Generic
         private static bool IsCompatibleKey(object? key)
         {
             if (key is null)
-                return typeof(TKey).IsNullableType();
+                return default(TKey) == null;
 
             return (key is TKey);
         }
@@ -887,7 +873,7 @@ namespace J2N.Collections.Generic
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TryGetValue((TKey)key, out TValue value))
+                    if (TryGetValue((TKey)key!, out TValue? value))
                     {
                         return value;
                     }
@@ -898,14 +884,14 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: Only throw if the generic closing type is not nullable
-                if (key is null && !typeof(TKey).IsNullableType())
+                if (!(default(TKey) == null) && key is null)
                     throw new ArgumentNullException(nameof(key));
-                if (value is null && !typeof(TValue).IsNullableType())
+                if (!(default(TValue) == null) && value is null)
                     throw new ArgumentNullException(nameof(value));
 
                 try
                 {
-                    TKey tempKey = (TKey)key;
+                    TKey tempKey = (TKey)key!;
                     try
                     {
                         this[tempKey] = (TValue)value!;
@@ -925,18 +911,18 @@ namespace J2N.Collections.Generic
         void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
-            if (key is null && !typeof(TKey).IsNullableType())
+            if (!(default(TKey) == null) && key is null)
                 throw new ArgumentNullException(nameof(key));
-            if (value is null && !typeof(TValue).IsNullableType())
+            if (!(default(TValue) == null) && value is null)
                 throw new ArgumentNullException(nameof(value));
 
             try
             {
-                TKey tempKey = (TKey)key;
+                TKey tempKey = (TKey)key!;
 
                 try
                 {
-                    Add(tempKey, (TValue)value);
+                    Add(tempKey, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -953,7 +939,7 @@ namespace J2N.Collections.Generic
         {
             if (IsCompatibleKey(key))
             {
-                return ContainsKey((TKey)key);
+                return ContainsKey((TKey)key!);
             }
             return false;
         }
@@ -967,7 +953,7 @@ namespace J2N.Collections.Generic
         {
             if (IsCompatibleKey(key))
             {
-                Remove((TKey)key);
+                Remove((TKey)key!);
             }
         }
 
@@ -1016,13 +1002,9 @@ namespace J2N.Collections.Generic
 #if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary<TKey, TValue> Members
 
-#pragma warning disable IDE0079 // Remove unnecessary suppression
-#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
         IEnumerable<TKey> IReadOnlyDictionary<TKey, TValue>.Keys => Keys;
 
         IEnumerable<TValue> IReadOnlyDictionary<TKey, TValue>.Values => Values;
-#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
-#pragma warning restore IDE0079 // Remove unnecessary suppression
 
         #endregion IReadOnlyDictionary<TKey, TValue> Members
 #endif
