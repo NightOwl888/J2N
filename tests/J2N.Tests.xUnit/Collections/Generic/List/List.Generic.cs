@@ -10,6 +10,7 @@ namespace J2N.Collections.Tests
 {
     public class List_Generic_Tests_string : List_Generic_Tests<string>
     {
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
         protected override string CreateT(int seed)
         {
             int stringLength = seed % 10 + 5;
@@ -22,6 +23,7 @@ namespace J2N.Collections.Tests
 
     public class List_Generic_Tests_int : List_Generic_Tests<int>
     {
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
         protected override int CreateT(int seed)
         {
             Random rand = new Random(seed);
