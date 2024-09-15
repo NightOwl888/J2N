@@ -21,6 +21,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using SCG = System.Collections.Generic;
@@ -174,6 +175,8 @@ namespace J2N.Collections.Generic
         /// the information required to serialize the <see cref="HashSet{T}"/> object.</param>
         /// <param name="context">A <see cref="System.Runtime.Serialization.StreamingContext"/> structure that contains
         /// the source and destination of the serialized stream associated with the <see cref="HashSet{T}"/> object.</param>
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected LinkedHashSet(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             hashSet = new HashSetWrapper(info, context);
@@ -206,6 +209,7 @@ namespace J2N.Collections.Generic
         [Serializable]
         private class HashSetWrapper : HashSet<T>
         {
+            [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
             public HashSetWrapper(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
         }
 #endif
@@ -314,6 +318,8 @@ namespace J2N.Collections.Generic
         /// Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter"/>
         /// </permission>
         [System.Security.SecurityCritical]
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
             => hashSet.GetObjectData(info, context);
 

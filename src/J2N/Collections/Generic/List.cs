@@ -7,6 +7,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -162,6 +163,8 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This constructor is called during deserialization to reconstitute an object that is transmitted over a stream.
         /// </remarks>
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected List(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             siInfo = info;
@@ -2378,11 +2381,13 @@ namespace J2N.Collections.Generic
             return true;
         }
 
-#endregion
+        #endregion
 
         #region Custom Serialization
 
 #if FEATURE_SERIALIZABLE
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         void System.Runtime.Serialization.ISerializable.GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) => GetObjectData(info, context);
 
         /// <summary>
@@ -2395,6 +2400,8 @@ namespace J2N.Collections.Generic
         /// of the serialized stream associated with the <see cref="List{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="info"/> is <c>null</c>.</exception>
         /// <remarks>Calling this method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             if (info == null)

@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.ComponentModel;
 
 namespace J2N.Text
 {
@@ -82,17 +83,22 @@ namespace J2N.Text
         /// </summary>
         /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected ParseException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
             : base(info, context)
         {
             errorOffset = info.GetInt32(ErrorOffsetName);
         }
 
+#pragma warning disable CS0809 // Obsolete member overrides non-obsolete member
         /// <summary>
         /// Sets the <see cref="System.Runtime.Serialization.SerializationInfo"/> with information about the exception.
         /// </summary>
         /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo"/> that holds the serialized object data about the exception being thrown.</param>
         /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext"/> that contains contextual information about the source or destination.</param>
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             if (info is null)
@@ -102,6 +108,7 @@ namespace J2N.Text
 
             base.GetObjectData(info, context);
         }
+#pragma warning restore CS0809 // Obsolete member overrides non-obsolete member
 #endif
 
         /// <summary>

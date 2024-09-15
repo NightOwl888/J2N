@@ -11,6 +11,8 @@
     <NoWarn Label="Do not use typeof() expression to check the exception type.">$(NoWarn);xUnit2015</NoWarn>
     <NoWarn Label="Do not use Contains() to check if a value exists in a collection.">$(NoWarn);xUnit2017</NoWarn>
     <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
+    <NoWarn Label="FormatterConverter serialization is obsolete">$(NoWarn);SYSLIB0050</NoWarn>
+    <NoWarn Label=".ctor(SerializationInfo, StreamingContext) is obsolete">$(NoWarn);SYSLIB0051</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

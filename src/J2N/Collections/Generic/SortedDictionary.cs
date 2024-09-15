@@ -7,6 +7,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 #if FEATURE_SERIALIZABLE
@@ -1946,6 +1947,7 @@ namespace J2N.Collections.Generic
         public TreeSet(IComparer<T> comparer) : base(comparer) { }
 
 #if FEATURE_SERIALIZABLE
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
         private TreeSet(SerializationInfo siInfo, StreamingContext context) : base(siInfo, context) { }
 #endif
 
