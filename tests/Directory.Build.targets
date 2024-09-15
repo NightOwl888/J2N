@@ -1,4 +1,4 @@
-<Project>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   
   <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
   
@@ -32,5 +32,80 @@
     <NoWarn Label="Remove unused parameter">$(NoWarn);IDE0060</NoWarn>
     <NoWarn Label="Naming Styles">$(NoWarn);IDE1006</NoWarn>
   </PropertyGroup>
+  
+  <UsingTask TaskName="UpdateRuntimeConfigProperty" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <RuntimeConfigFile ParameterType="System.String" Required="true" />
+      <PropertyName ParameterType="System.String" Required="true" />
+      <PropertyValue ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+        if (File.Exists(RuntimeConfigFile))
+        {
+            // Read the file content
+            string jsonContent = File.ReadAllText(RuntimeConfigFile);
+
+            // Ensure runtimeOptions and configProperties sections exist
+            if (!jsonContent.Contains("\"runtimeOptions\""))
+            {
+                jsonContent = jsonContent.TrimEnd('}', '\n', '\r') + ",\n  \"runtimeOptions\": {\n    \"configProperties\": {\n    }\n  }\n}";
+            }
+            if (!jsonContent.Contains("\"configProperties\""))
+            {
+                int runtimeOptionsIndex = jsonContent.IndexOf("\"runtimeOptions\"");
+                int insertPosition = jsonContent.IndexOf('}', runtimeOptionsIndex);
+                jsonContent = jsonContent.Insert(insertPosition, ",\n    \"configProperties\": {\n    }\n");
+            }
+
+            // Check if the property already exists
+            int configPropertiesIndex = jsonContent.IndexOf("\"configProperties\"");
+            int propertyIndex = jsonContent.IndexOf("\"" + PropertyName + "\"", configPropertiesIndex);
+
+            if (propertyIndex != -1)
+            {
+                // Property exists, update its value
+                int valueStartIndex = jsonContent.IndexOf(':', propertyIndex) + 1;
+                int valueEndIndex = jsonContent.IndexOfAny(new char[] { ',', '}', '\n' }, valueStartIndex);
+                jsonContent = jsonContent.Remove(valueStartIndex, valueEndIndex - valueStartIndex)
+                                         .Insert(valueStartIndex, " " + PropertyValue);
+            }
+            else
+            {
+                // Property does not exist, add it
+                int closingBraceIndex = jsonContent.IndexOf('}', configPropertiesIndex);
+                jsonContent = jsonContent.Insert(closingBraceIndex, "  \"" + PropertyName + "\": " + PropertyValue + ",\n");
+            }
+
+            // Write the updated content back to the file
+            File.WriteAllText(RuntimeConfigFile, jsonContent);
+        }
+        else
+        {
+            Log.LogError("File not found: " + RuntimeConfigFile);
+        }
+        ]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
+  <!-- Target to invoke the task after build -->
+  <Target Name="UpdateRuntimeConfig" AfterTargets="Build">
+    <PropertyGroup>
+      <RuntimeConfigFile>$(TargetDir)$(AssemblyName).runtimeconfig.json</RuntimeConfigFile>
+      <DotNet_8_0_OrGreater>false</DotNet_8_0_OrGreater>
+      <DotNet_8_0_OrGreater Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And ($(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) Or ($(TargetFramework.StartsWith('net')) And $(TargetFramework.IndexOf('.')) > 4))">true</DotNet_8_0_OrGreater>
+    </PropertyGroup>
+
+    <!-- Example usage -->
+    <UpdateRuntimeConfigProperty 
+        RuntimeConfigFile="$(RuntimeConfigFile)" 
+        PropertyName="System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization" 
+        PropertyValue="true" 
+        Condition="Exists('$(RuntimeConfigFile)') And '$(DotNet_8_0_OrGreater)' == 'true'" />
+  </Target>
   
 </Project>
