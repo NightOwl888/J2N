@@ -6,6 +6,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Xunit;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -15,7 +16,7 @@ namespace J2N.Collections.Tests
 
         protected override IDictionary NonGenericIDictionaryFactory()
         {
-            return new SortedDictionary<string, string>();
+            return new JCG.SortedDictionary<string, string>();
         }
 
         /// <summary>
@@ -47,7 +48,7 @@ namespace J2N.Collections.Tests
         [Fact]
         public void IDictionary_NonGeneric_ItemSet_NullValueWhenDefaultValueIsNonNull()
         {
-            IDictionary dictionary = new SortedDictionary<string, int>();
+            IDictionary dictionary = new JCG.SortedDictionary<string, int>();
             Assert.Throws<ArgumentNullException>(() => dictionary[GetNewKey(dictionary)] = null);
         }
 
@@ -56,7 +57,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new SortedDictionary<string, string>();
+                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
                 AssertExtensions.Throws<ArgumentException>("key", () => dictionary[23] = CreateTValue(12345));
                 Assert.Empty(dictionary);
             }
@@ -67,7 +68,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new SortedDictionary<string, string>();
+                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
                 object missingKey = GetNewKey(dictionary);
                 AssertExtensions.Throws<ArgumentException>("value", () => dictionary[missingKey] = 324);
                 Assert.Empty(dictionary);
@@ -79,7 +80,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new SortedDictionary<string, string>();
+                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
                 object missingKey = 23;
                 AssertExtensions.Throws<ArgumentException>("key", () => dictionary.Add(missingKey, CreateTValue(12345)));
                 Assert.Empty(dictionary);
@@ -91,7 +92,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new SortedDictionary<string, string>();
+                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
                 object missingKey = GetNewKey(dictionary);
                 AssertExtensions.Throws<ArgumentException>("value", () => dictionary.Add(missingKey, 324));
                 Assert.Empty(dictionary);
@@ -103,7 +104,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new SortedDictionary<string, int>();
+                IDictionary dictionary = new JCG.SortedDictionary<string, int>();
                 object missingKey = GetNewKey(dictionary);
                 Assert.Throws<ArgumentNullException>(() => dictionary.Add(missingKey, null));
                 Assert.Empty(dictionary);
@@ -115,7 +116,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new SortedDictionary<string, int>();
+                IDictionary dictionary = new JCG.SortedDictionary<string, int>();
                 Assert.False(dictionary.Contains(1));
             }
         }
@@ -124,7 +125,7 @@ namespace J2N.Collections.Tests
         public void CantAcceptDuplicateKeysFromSourceDictionary()
         {
             Dictionary<string, int> source = new Dictionary<string, int> { { "a", 1 }, { "A", 1 } };
-            AssertExtensions.Throws<ArgumentException>(null, () => new SortedDictionary<string, int>(source, StringComparer.OrdinalIgnoreCase));
+            AssertExtensions.Throws<ArgumentException>(null, () => new JCG.SortedDictionary<string, int>(source, StringComparer.OrdinalIgnoreCase));
         }
 
         #endregion
