@@ -63,7 +63,7 @@ steps:
     & $installScriptPath -Version $sdkVersion -Architecture $architecture -InstallDir $installPath
     Write-Host "##vso[task.setvariable variable=DOTNET_ROOT_X86;]$installPath"
   displayName: 'Use .NET SDK ${{ parameters.dotNetSdkVersion }} (x86)'
-  condition: and(succeeded(), contains('${{ parameters.framework }}', 'net8.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net8.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
 
 - task: UseDotNet@2
   displayName: 'Use .NET SDK 6.0.421'
@@ -71,7 +71,7 @@ steps:
     packageType: 'sdk'
     version: '6.0.421'
     performMultiLevelLookup: '${{ variables.PerformMultiLevelLookup }}'
-  condition: and(succeeded(), contains('${{ parameters.framework }}', 'net6.'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net6.'))
 
     # Hack: .NET 8 no longer installs the x86 bits and they must be installed separately. However, it is not
     # trivial to get it into the path and to get it to pass the minimum SDK version check in runbuild.ps1.
@@ -88,7 +88,7 @@ steps:
     & $installScriptPath -Version $sdkVersion -Architecture $architecture -InstallDir $installPath
     Write-Host "##vso[task.setvariable variable=DOTNET_ROOT_X86;]$installPath"
   displayName: 'Use .NET SDK 6.0.421 (x86)'
-  condition: and(succeeded(), contains('${{ parameters.framework }}', 'net6.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net6.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
 
 - task: UseDotNet@2
   displayName: 'Use .NET SDK 5.0.408'
@@ -96,7 +96,7 @@ steps:
     packageType: 'sdk'
     version: '5.0.408'
     performMultiLevelLookup: '${{ variables.PerformMultiLevelLookup }}'
-  condition: and(succeeded(), contains('${{ parameters.framework }}', 'net5.'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net5.'))
 
     # Hack: .NET 8 no longer installs the x86 bits and they must be installed separately. However, it is not
     # trivial to get it into the path and to get it to pass the minimum SDK version check in runbuild.ps1.
@@ -113,7 +113,7 @@ steps:
     & $installScriptPath -Version $sdkVersion -Architecture $architecture -InstallDir $installPath
     Write-Host "##vso[task.setvariable variable=DOTNET_ROOT_X86;]$installPath"
   displayName: 'Use .NET SDK 5.0.408 (x86)'
-  condition: and(succeeded(), contains('${{ parameters.framework }}', 'net5.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net5.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
 
 - task: DownloadPipelineArtifact@2
   displayName: 'Download Pipeline Artifacts: ${{ parameters.binaryArtifactName }}'
