@@ -143,38 +143,43 @@ steps:
     
     function RunTests([string]$framework, [string]$fileRegexPattern) {
         if (!(IsSupportedFramework($framework))) { continue }
-    
+        
         $testBinaries = Get-ChildItem -Path "$testBinaryRootDirectory" -File -Recurse | Where-Object {$_.FullName -match "$framework"} | Where-Object {$_.FullName -match "$fileRegexPattern"} | Select -ExpandProperty FullName
         foreach ($testBinary in $testBinaries) {
             $testName = [System.IO.Path]::GetFileNameWithoutExtension($testBinary)
-    
-            # Pause if we have queued too many parallel jobs
-            #$running = @(Get-Job | Where-Object { $_.State -eq 'Running' })
-            #if ($running.Count -ge $maximumParalellJobs) {
-            #    Write-Host ""
-            #    Write-Host "  Running tests in parallel on $($running.Count) projects." -ForegroundColor Cyan
-            #    Write-Host "  Next in queue is $projectName on $framework. This will take a bit, please wait..." -ForegroundColor Cyan
-            #    $running | Wait-Job -Any | Out-Null
-            #}
-              
+            
+            if ($maximumParalellJobs -gt 1) {
+                # Pause if we have queued too many parallel jobs
+                $running = @(Get-Job | Where-Object { $_.State -eq 'Running' })
+                if ($running.Count -ge $maximumParalellJobs) {
+                    Write-Host ""
+                    Write-Host "  Running tests in parallel on $($running.Count) projects." -ForegroundColor Cyan
+                    Write-Host "  Next in queue is $projectName on $framework. This will take a bit, please wait..." -ForegroundColor Cyan
+                    $running | Wait-Job -Any | Out-Null
+                }
+            }
+            
             $testResultDirectory = "$testResultsArtifactDirectory/$testOSName/$framework/$testPlatform/$testName"
             if (!(Test-Path "$testResultDirectory")) {
                 New-Item "$testResultDirectory" -ItemType Directory -Force
             }
-    
+            
             Write-Host "Testing '$testBinary' on framework '$framework' and outputting test results to '$testResultDirectory/${{ parameters.testResultsFileName }}'..."
-            dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform
-    
-
-            $testExpression = "$testExpression -- RunConfiguration.TargetPlatform=$testPlatform"
-
-            #$scriptBlock = {
-            #    param([string]$testBinary, [string]$fwork, [string]$testPlatform, [string]$testResultDirectory)
-            #    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
-            #}
-    
-            # Execute the jobs in parallel
-            #Start-Job $scriptBlock -ArgumentList $testBinary,$fwork,$testPlatform,$testResultDirectory
+            if ($maximumParalellJobs -le 1) {
+                dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform
+            } else {
+            
+                $scriptBlock = {
+                    param([string]$testName, [string]$testBinary, [string]$framework, [string]$testPlatform, [string]$testResultDirectory)
+                    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
+                }
+                
+                # Avoid dotnet test collisions by delaying for 500ms
+                Start-Sleep -Milliseconds 500
+                
+                # Execute the jobs in parallel
+                Start-Job -Name "$testName,$framework,$testPlatform" -ScriptBlock $scriptBlock -ArgumentList $testName,$testBinary,$framework,$testPlatform,$testResultDirectory
+            }
         }
     }
     
@@ -182,15 +187,23 @@ steps:
         RunTests -Framework "$framework" -FileRegexPattern "$testBinaryFilesPattern"
     }
     
-    # Wait for it all to complete
-    #do {
-    #    $running = @(Get-Job | Where-Object { $_.State -eq 'Running' })
-    #    if ($running.Count -gt 0) {
-    #        Write-Host ""
-    #        Write-Host "  Almost finished, only $($running.Count) projects left..." -ForegroundColor Cyan
-    #        $running | Wait-Job -Any
-    #    }
-    #} until ($running.Count -eq 0)
+    if ($maximumParalellJobs -gt 1) {
+        # Wait for it all to complete
+        do {
+            $running = @(Get-Job | Where-Object { $_.State -eq 'Running' })
+            if ($running.Count -gt 0) {
+                Write-Host ""
+                Write-Host "  Almost finished, only $($running.Count) projects left..." -ForegroundColor Cyan
+                [int]$number = 0
+                foreach ($runningJob in $running) {
+                    $number++
+                    $jobName = $runningJob | Select -ExpandProperty Name
+                    Write-Host "$number. $jobName"
+                }
+                $running | Wait-Job -Any
+            }
+        } until ($running.Count -eq 0)
+    }
     
     $global:LASTEXITCODE = 0 # Force the script to continue on error
   displayName: 'dotnet test ${{ parameters.testTargetFrameworks }}'
@@ -210,7 +223,7 @@ steps:
 # Publish Test Results task or the (deprecated) TfsPublisher
 # our only other option is to make a task for every supported
 # platform and project and update it whenever a new platform 
-# is targeted or test project is created in ICU4N.
+# is targeted or test project is created in J2N.
 
 - template: 'publish-test-results-for-test-projects.yml'
   parameters:
