@@ -1,22 +1,25 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
+using J2N.Collections.Generic;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using Xunit;
-using JCG = J2N.Collections.Generic;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
     public class SortedDictionary_IDictionary_NonGeneric_Tests : IDictionary_NonGeneric_Tests
     {
         #region IDictionary Helper Methods
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
+
+        protected override bool NullAllowed => true; // J2N allows null keys
 
         protected override IDictionary NonGenericIDictionaryFactory()
         {
-            return new JCG.SortedDictionary<string, string>();
+            return new SortedDictionary<string, string>();
         }
 
         /// <summary>
@@ -48,7 +51,7 @@ namespace J2N.Collections.Tests
         [Fact]
         public void IDictionary_NonGeneric_ItemSet_NullValueWhenDefaultValueIsNonNull()
         {
-            IDictionary dictionary = new JCG.SortedDictionary<string, int>();
+            IDictionary dictionary = new SortedDictionary<string, int>();
             Assert.Throws<ArgumentNullException>(() => dictionary[GetNewKey(dictionary)] = null);
         }
 
@@ -57,7 +60,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
+                IDictionary dictionary = new SortedDictionary<string, string>();
                 AssertExtensions.Throws<ArgumentException>("key", () => dictionary[23] = CreateTValue(12345));
                 Assert.Empty(dictionary);
             }
@@ -68,7 +71,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
+                IDictionary dictionary = new SortedDictionary<string, string>();
                 object missingKey = GetNewKey(dictionary);
                 AssertExtensions.Throws<ArgumentException>("value", () => dictionary[missingKey] = 324);
                 Assert.Empty(dictionary);
@@ -80,7 +83,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
+                IDictionary dictionary = new SortedDictionary<string, string>();
                 object missingKey = 23;
                 AssertExtensions.Throws<ArgumentException>("key", () => dictionary.Add(missingKey, CreateTValue(12345)));
                 Assert.Empty(dictionary);
@@ -92,7 +95,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new JCG.SortedDictionary<string, string>();
+                IDictionary dictionary = new SortedDictionary<string, string>();
                 object missingKey = GetNewKey(dictionary);
                 AssertExtensions.Throws<ArgumentException>("value", () => dictionary.Add(missingKey, 324));
                 Assert.Empty(dictionary);
@@ -104,7 +107,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new JCG.SortedDictionary<string, int>();
+                IDictionary dictionary = new SortedDictionary<string, int>();
                 object missingKey = GetNewKey(dictionary);
                 Assert.Throws<ArgumentNullException>(() => dictionary.Add(missingKey, null));
                 Assert.Empty(dictionary);
@@ -116,7 +119,7 @@ namespace J2N.Collections.Tests
         {
             if (!IsReadOnly)
             {
-                IDictionary dictionary = new JCG.SortedDictionary<string, int>();
+                IDictionary dictionary = new SortedDictionary<string, int>();
                 Assert.False(dictionary.Contains(1));
             }
         }
@@ -125,7 +128,7 @@ namespace J2N.Collections.Tests
         public void CantAcceptDuplicateKeysFromSourceDictionary()
         {
             Dictionary<string, int> source = new Dictionary<string, int> { { "a", 1 }, { "A", 1 } };
-            AssertExtensions.Throws<ArgumentException>(null, () => new JCG.SortedDictionary<string, int>(source, StringComparer.OrdinalIgnoreCase));
+            AssertExtensions.Throws<ArgumentException>(null, () => new SortedDictionary<string, int>(source, StringComparer.OrdinalIgnoreCase));
         }
 
         #endregion
@@ -137,7 +140,7 @@ namespace J2N.Collections.Tests
         public void ICollection_NonGeneric_CopyTo_ArrayOfIncorrectKeyValuePairType(int count)
         {
             ICollection collection = NonGenericICollectionFactory(count);
-            KeyValuePair<string, int>[] array = new KeyValuePair<string, int>[count * 3 / 2];
+            SCG.KeyValuePair<string, int>[] array = new SCG.KeyValuePair<string, int>[count * 3 / 2];
             AssertExtensions.Throws<ArgumentException>("array", null, () => collection.CopyTo(array, 0));
         }
 
@@ -146,7 +149,7 @@ namespace J2N.Collections.Tests
         public void ICollection_NonGeneric_CopyTo_ArrayOfCorrectKeyValuePairType(int count)
         {
             ICollection collection = NonGenericICollectionFactory(count);
-            KeyValuePair<string, string>[] array = new KeyValuePair<string, string>[count];
+            SCG.KeyValuePair<string, string>[] array = new SCG.KeyValuePair<string, string>[count];
             collection.CopyTo(array, 0);
             int i = 0;
             foreach (object obj in collection)

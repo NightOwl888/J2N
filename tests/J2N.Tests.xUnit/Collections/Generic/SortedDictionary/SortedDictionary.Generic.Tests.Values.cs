@@ -1,29 +1,31 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
+using J2N.Collections.Generic;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using Xunit;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
     public class SortedDictionary_Generic_Tests_Values : ICollection_Generic_Tests<string>
     {
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool DefaultValueAllowed => true;
         protected override bool DuplicateValuesAllowed => true;
         protected override bool IsReadOnly => true;
 
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override SCG.IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
 
-        protected override ICollection<string> GenericICollectionFactory()
+        protected override SCG.ICollection<string> GenericICollectionFactory()
         {
             return new SortedDictionary<string, string>().Values;
         }
 
-        protected override ICollection<string> GenericICollectionFactory(int count)
+        protected override SCG.ICollection<string> GenericICollectionFactory(int count)
         {
             SortedDictionary<string, string> list = new SortedDictionary<string, string>();
             int seed = 13453;
@@ -64,8 +66,9 @@ namespace J2N.Collections.Tests
         protected override bool NullAllowed => true;
         protected override bool DuplicateValuesAllowed => true;
         protected override bool IsReadOnly => true;
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
-        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+        protected override SCG.IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
         protected override bool SupportsSerialization => false;
 
         protected override ICollection NonGenericICollectionFactory()

@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
+using J2N.Numerics;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -92,6 +93,9 @@ namespace J2N.Collections.Generic
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyCollection<T>,
 #endif
+#if FEATURE_READONLYSET
+        IReadOnlySet<T>,
+#endif
         IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
         , ISerializable, IDeserializationCallback
@@ -167,7 +171,7 @@ namespace J2N.Collections.Generic
         /// This constructor is an <c>O(n log n)</c> operation, where <c>n</c> is the number of elements
         /// in the <paramref name="collection"/> parameter.
         /// </remarks>
-        public SortedSet(IEnumerable<T> collection) : this(collection, Comparer<T>.Default) { }
+        public SortedSet(IEnumerable<T> collection) : this(collection, Comparer<T>.Default) { /* Intentionally empty */ }
 
 
         /// <summary>
@@ -731,7 +735,6 @@ namespace J2N.Collections.Generic
                             {
                                 parentOfMatch = newGrandParent;
                             }
-                            grandParent = newGrandParent;
                         }
                     }
                 }
@@ -911,7 +914,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an <c>O(log n)</c> operation.
         /// </remarks>
-        public IEnumerator<T> GetEnumerator() => new Enumerator(this);
+        public Enumerator GetEnumerator() => new Enumerator(this);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
@@ -1061,9 +1064,9 @@ namespace J2N.Collections.Generic
             return -1;
         }
 
-        internal Node? FindRange([AllowNull] T from, [AllowNull]  T to) => FindRange(from, to, lowerBoundInclusive: true, upperBoundInclusive: true, lowerBoundActive: true, upperBoundActive: true);
+        internal Node? FindRange(T? from, T? to) => FindRange(from, to, lowerBoundInclusive: true, upperBoundInclusive: true, lowerBoundActive: true, upperBoundActive: true);
 
-        internal Node? FindRange([AllowNull] T from, [AllowNull] T to, bool lowerBoundInclusive, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
+        internal Node? FindRange(T? from, T? to, bool lowerBoundInclusive, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
         {
             Node? current = root;
             while (current != null)
@@ -1200,8 +1203,8 @@ namespace J2N.Collections.Generic
                 // First do a merge sort to an array.
                 T[] merged = new T[asSorted.Count + this.Count];
                 int c = 0;
-                IEnumerator<T> mine = this.GetEnumerator();
-                IEnumerator<T> theirs = asSorted.GetEnumerator();
+                Enumerator mine = this.GetEnumerator();
+                Enumerator theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
                 while (!mineEnded && !theirsEnded)
                 {
@@ -1356,8 +1359,8 @@ namespace J2N.Collections.Generic
                 // First do a merge sort to an array.
                 T[] merged = new T[this.Count];
                 int c = 0;
-                IEnumerator<T> mine = this.GetEnumerator();
-                IEnumerator<T> theirs = asSorted.GetEnumerator();
+                Enumerator mine = this.GetEnumerator();
+                Enumerator theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
                 T? max = Max;
 
@@ -1779,8 +1782,8 @@ namespace J2N.Collections.Generic
             SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
             {
-                IEnumerator<T> mine = GetEnumerator();
-                IEnumerator<T> theirs = asSorted.GetEnumerator();
+                Enumerator mine = GetEnumerator();
+                Enumerator theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext();
                 bool theirsEnded = !theirs.MoveNext();
                 while (!mineEnded && !theirsEnded)
@@ -1967,11 +1970,9 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Min"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        [MaybeNull]
-        public T Min => MinInternal;
+        public T? Min => MinInternal;
 
-        [MaybeNull]
-        internal virtual T MinInternal
+        internal virtual T? MinInternal
         {
             get
             {
@@ -1997,11 +1998,9 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Max"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        [MaybeNull]
-        public T Max => MaxInternal;
+        public T? Max => MaxInternal;
 
-        [MaybeNull]
-        internal virtual T MaxInternal
+        internal virtual T? MaxInternal
         {
             get
             {
@@ -2054,7 +2053,7 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
         /// </remarks>
-        public virtual SortedSet<T> GetViewBetween([AllowNull] T lowerValue, [AllowNull] T upperValue)
+        public virtual SortedSet<T> GetViewBetween(T? lowerValue, T? upperValue)
         {
             if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
@@ -2088,7 +2087,7 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
         /// </remarks>
-        public virtual SortedSet<T> GetViewBetween([AllowNull] T lowerValue, bool lowerValueInclusive, [AllowNull] T upperValue, bool upperValueInclusive)
+        public virtual SortedSet<T> GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive)
         {
             if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
@@ -2240,6 +2239,32 @@ namespace J2N.Collections.Generic
                 Debug.Assert(count == GetCount());
 #endif
 
+#if FEATURE_STACK_TRYPOP
+                Node newRoot = ShallowClone();
+
+                var pendingNodes = new Stack<(Node source, Node target)>(2 * Log2(count) + 2);
+                pendingNodes.Push((this, newRoot));
+
+                while (pendingNodes.TryPop(out var next))
+                {
+                    Node clonedNode;
+
+                    if (next.source.Left is Node left)
+                    {
+                        clonedNode = left.ShallowClone();
+                        next.target.Left = clonedNode;
+                        pendingNodes.Push((left, clonedNode));
+                    }
+
+                    if (next.source.Right is Node right)
+                    {
+                        clonedNode = right.ShallowClone();
+                        next.target.Right = clonedNode;
+                        pendingNodes.Push((right, clonedNode));
+                    }
+                }
+#else
+                // J2N: This was code from .NET 5
                 // Breadth-first traversal to recreate nodes, preorder traversal to replicate nodes.
 
                 var originalNodes = new Stack<Node>(2 * Log2(count) + 2);
@@ -2276,7 +2301,7 @@ namespace J2N.Collections.Generic
                         newRight = newRight.Left;
                     }
                 }
-
+#endif
                 return newRoot;
             }
 
@@ -2494,19 +2519,19 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal struct Enumerator : IEnumerator<T>, IEnumerator
+        public struct Enumerator : IEnumerator<T>, IEnumerator
 #if FEATURE_SERIALIZABLE
             , ISerializable, IDeserializationCallback
 #endif
         {
-            private SortedSet<T> _tree;
-            private int _version;
+            private /* readonly */ SortedSet<T> _tree;
+            private /* readonly */ int _version;
 
-            private Stack<Node> _stack;
+            private /* readonly */ Stack<Node> _stack;
             private Node? _current;
             static readonly Node dummyNode = new Node(default!, NodeColor.Red);
 
-            private bool _reverse;
+            private /* readonly */ bool _reverse;
 
 #if FEATURE_SERIALIZABLE
 #pragma warning disable IDE0044 // Add readonly modifier
@@ -2596,7 +2621,7 @@ namespace J2N.Collections.Generic
             {
                 _current = null;
                 Node? node = _tree.root;
-                Node? next = null, other = null;
+                Node? next, other;
                 while (node != null)
                 {
                     next = (_reverse ? node.Right : node.Left);
@@ -2654,7 +2679,7 @@ namespace J2N.Collections.Generic
 
                 _current = _stack.Pop();
                 Node? node = (_reverse ? _current.Left : _current.Right);
-                Node? next = null, other = null;
+                Node? next, other;
                 while (node != null)
                 {
                     next = (_reverse ? node.Right : node.Left);
@@ -2679,7 +2704,7 @@ namespace J2N.Collections.Generic
             /// <summary>
             /// Releases all resources used by the <see cref="SortedSet{T}.Enumerator"/>.
             /// </summary>
-            public void Dispose() { }
+            public void Dispose() { /* Intentionally blank */ }
 
             /// <summary>
             /// Gets the element at the current position of the enumerator.
@@ -2785,16 +2810,7 @@ namespace J2N.Collections.Generic
         }
 
         // Used for set checking operations (using enumerables) that rely on counting
-        private static int Log2(int value)
-        {
-            int result = 0;
-            while (value > 0)
-            {
-                result++;
-                value >>= 1;
-            }
-            return result;
-        }
+        private static int Log2(int value) => BitOperation.Log2((uint)value);
 
         #endregion
 

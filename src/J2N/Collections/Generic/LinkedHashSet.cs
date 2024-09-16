@@ -56,6 +56,9 @@ namespace J2N.Collections.Generic
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyCollection<T>,
 #endif
+#if FEATURE_READONLYSET
+        IReadOnlySet<T>,
+#endif
         IStructuralEquatable, IStructuralFormattable
 #if FEATURE_SERIALIZABLE
         , System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable

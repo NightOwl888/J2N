@@ -25,7 +25,7 @@
 
   <!-- Features in .NET 8.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net8.')) ">
-    
+
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
     
   </PropertyGroup>
@@ -36,6 +36,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_ARRAY_CLEAR_ARRAY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTINT64</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTSINGLE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYSET</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 5.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
 
@@ -72,6 +73,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_NUMBER_TRYFORMAT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_FILL_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STACK_TRYPOP</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CONTAINS_CHAR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CREATE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_READONLYSPAN</DefineConstants>
@@ -97,6 +99,17 @@
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->
     <DefineConstants Condition=" '$(IncludeICloneable)' == 'true' ">$(DefineConstants);FEATURE_CLONEABLE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, and .NET 6.x (No .NET 8+ support) -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+
+    <!-- JCG.ReadOnlyList subclasses SCG.ReadOnlyCollection. SCG.ReadOnlyCollection has differing exception behaviors when calling .Current
+         depending on .NET version. Unfortunately, SCG.ReadOnlyCollection.GetEnumerator() is not virtual and removing this superclass would
+         constitute a breaking API change, so there is no way to normalize this behavior until a major J2N version bump. Ideally, we would
+         remove this superclass and provide our own implementation that doesn't drift across .NET versions. -->
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW</DefineConstants>
+    
   </PropertyGroup>
 
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, and .NET Core 3.x (No .NET 5+ support) -->

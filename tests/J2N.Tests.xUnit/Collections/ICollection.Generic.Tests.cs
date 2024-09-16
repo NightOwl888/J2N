@@ -408,8 +408,10 @@ namespace J2N.Collections.Tests
         public void ICollection_Generic_Contains_DefaultValueOnCollectionNotContainingDefaultValue(int count)
         {
             ICollection<T> collection = GenericICollectionFactory(count);
-            if (DefaultValueAllowed)
+            if (DefaultValueAllowed && default(T) is null) // it's true only for reference types and for Nullable<T>
+            {
                 Assert.False(collection.Contains(default(T)));
+            }
         }
 
         [Theory]
@@ -491,7 +493,7 @@ namespace J2N.Collections.Tests
             ICollection<T> collection = GenericICollectionFactory(count);
             T[] array = new T[count];
             if (count > 0)
-                Assert.Throws<ArgumentException>(() => collection.CopyTo(array, count));
+                Assert.ThrowsAny<ArgumentException>(() => collection.CopyTo(array, count));
             else
                 collection.CopyTo(array, count); // does nothing since the array is empty
         }
@@ -513,7 +515,7 @@ namespace J2N.Collections.Tests
             {
                 ICollection<T> collection = GenericICollectionFactory(count);
                 T[] array = new T[count];
-                Assert.Throws<ArgumentException>(() => collection.CopyTo(array, 1));
+                Assert.ThrowsAny<ArgumentException>(() => collection.CopyTo(array, 1));
             }
         }
 

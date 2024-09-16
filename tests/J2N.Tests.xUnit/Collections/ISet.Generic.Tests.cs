@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
 using System;
@@ -305,38 +304,58 @@ namespace J2N.Collections.Tests
         public void ISet_Generic_NullEnumerableArgument(int count)
         {
             ISet<T> set = GenericISetFactory(count);
-            Assert.Throws<ArgumentNullException>(() => set.ExceptWith(null));
-            Assert.Throws<ArgumentNullException>(() => set.IntersectWith(null));
             Assert.Throws<ArgumentNullException>(() => set.IsProperSubsetOf(null));
             Assert.Throws<ArgumentNullException>(() => set.IsProperSupersetOf(null));
             Assert.Throws<ArgumentNullException>(() => set.IsSubsetOf(null));
             Assert.Throws<ArgumentNullException>(() => set.IsSupersetOf(null));
             Assert.Throws<ArgumentNullException>(() => set.Overlaps(null));
             Assert.Throws<ArgumentNullException>(() => set.SetEquals(null));
-            Assert.Throws<ArgumentNullException>(() => set.SymmetricExceptWith(null));
-            Assert.Throws<ArgumentNullException>(() => set.UnionWith(null));
+            if (!IsReadOnly)
+            {
+                Assert.Throws<ArgumentNullException>(() => set.ExceptWith(null));
+                Assert.Throws<ArgumentNullException>(() => set.IntersectWith(null));
+                Assert.Throws<ArgumentNullException>(() => set.SymmetricExceptWith(null));
+                Assert.Throws<ArgumentNullException>(() => set.UnionWith(null));
+            }
+            else
+            {
+                Assert.Throws<NotSupportedException>(() => set.Add(CreateT(0)));
+                Assert.Throws<NotSupportedException>(() => set.ExceptWith(null));
+                Assert.Throws<NotSupportedException>(() => set.IntersectWith(null));
+                Assert.Throws<NotSupportedException>(() => set.SymmetricExceptWith(null));
+                Assert.Throws<NotSupportedException>(() => set.UnionWith(null));
+            }
         }
+
+        public static IEnumerable<object[]> SetTestData() =>
+            new[] { EnumerableType.HashSet, EnumerableType.List }.SelectMany(GetEnumerableTestData);
 
         [Theory]
         [MemberData(nameof(EnumerableTestData))]
         public void ISet_Generic_ExceptWith(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
-            Validate_ExceptWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
+                Validate_ExceptWith(set, enumerable);
+            }
         }
 
         [Theory]
         [MemberData(nameof(EnumerableTestData))]
         public void ISet_Generic_IntersectWith(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
-            Validate_IntersectWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
+                Validate_IntersectWith(set, enumerable);
+            }
         }
 
         [Theory]
-        [MemberData(nameof(EnumerableTestData))]
+        [MemberData(nameof(SetTestData))]
         public void ISet_Generic_IsProperSubsetOf(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
             ISet<T> set = GenericISetFactory(setLength);
@@ -345,7 +364,7 @@ namespace J2N.Collections.Tests
         }
 
         [Theory]
-        [MemberData(nameof(EnumerableTestData))]
+        [MemberData(nameof(SetTestData))]
         public void ISet_Generic_IsProperSupersetOf(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
             ISet<T> set = GenericISetFactory(setLength);
@@ -354,7 +373,7 @@ namespace J2N.Collections.Tests
         }
 
         [Theory]
-        [MemberData(nameof(EnumerableTestData))]
+        [MemberData(nameof(SetTestData))]
         public void ISet_Generic_IsSubsetOf(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
             ISet<T> set = GenericISetFactory(setLength);
@@ -363,7 +382,7 @@ namespace J2N.Collections.Tests
         }
 
         [Theory]
-        [MemberData(nameof(EnumerableTestData))]
+        [MemberData(nameof(SetTestData))]
         public void ISet_Generic_IsSupersetOf(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
             ISet<T> set = GenericISetFactory(setLength);
@@ -372,7 +391,7 @@ namespace J2N.Collections.Tests
         }
 
         [Theory]
-        [MemberData(nameof(EnumerableTestData))]
+        [MemberData(nameof(SetTestData))]
         public void ISet_Generic_Overlaps(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
             ISet<T> set = GenericISetFactory(setLength);
@@ -381,7 +400,7 @@ namespace J2N.Collections.Tests
         }
 
         [Theory]
-        [MemberData(nameof(EnumerableTestData))]
+        [MemberData(nameof(SetTestData))]
         public void ISet_Generic_SetEquals(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
             ISet<T> set = GenericISetFactory(setLength);
@@ -393,18 +412,24 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(EnumerableTestData))]
         public void ISet_Generic_SymmetricExceptWith(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
-            Validate_SymmetricExceptWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
+                Validate_SymmetricExceptWith(set, enumerable);
+            }
         }
 
         [Theory]
         [MemberData(nameof(EnumerableTestData))]
         public void ISet_Generic_UnionWith(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
-            Validate_UnionWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
+                Validate_UnionWith(set, enumerable);
+            }
         }
 
         #endregion
@@ -415,8 +440,11 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void ISet_Generic_ExceptWith_Itself(int setLength)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            Validate_ExceptWith(set, set);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                Validate_ExceptWith(set, set);
+            }
         }
 
         [Theory]
@@ -424,8 +452,11 @@ namespace J2N.Collections.Tests
         //[SkipOnTargetFramework(TargetFrameworkMonikers.NetFramework, "Full framework throws InvalidOperationException")]
         public void ISet_Generic_IntersectWith_Itself(int setLength)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            Validate_IntersectWith(set, set);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                Validate_IntersectWith(set, set);
+            }
         }
 
         [Theory]
@@ -480,16 +511,22 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void ISet_Generic_SymmetricExceptWith_Itself(int setLength)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            Validate_SymmetricExceptWith(set, set);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                Validate_SymmetricExceptWith(set, set);
+            }
         }
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void ISet_Generic_UnionWith_Itself(int setLength)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            Validate_UnionWith(set, set);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                Validate_UnionWith(set, set);
+            }
         }
 
         #endregion
@@ -500,18 +537,24 @@ namespace J2N.Collections.Tests
         //[OuterLoop]
         public void ISet_Generic_ExceptWith_LargeSet()
         {
-            ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
-            IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
-            Validate_ExceptWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
+                IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
+                Validate_ExceptWith(set, enumerable);
+            }
         }
 
         [Fact]
         //[OuterLoop]
         public void ISet_Generic_IntersectWith_LargeSet()
         {
-            ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
-            IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
-            Validate_IntersectWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
+                IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
+                Validate_IntersectWith(set, enumerable);
+            }
         }
 
         [Fact]
@@ -572,18 +615,24 @@ namespace J2N.Collections.Tests
         //[OuterLoop]
         public void ISet_Generic_SymmetricExceptWith_LargeSet()
         {
-            ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
-            IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
-            Validate_SymmetricExceptWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
+                IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
+                Validate_SymmetricExceptWith(set, enumerable);
+            }
         }
 
         [Fact]
         //[OuterLoop]
         public void ISet_Generic_UnionWith_LargeSet()
         {
-            ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
-            IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
-            Validate_UnionWith(set, enumerable);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(ISet_Large_Capacity);
+                IEnumerable<T> enumerable = CreateEnumerable(EnumerableType.List, set, 150, 0, 0);
+                Validate_UnionWith(set, enumerable);
+            }
         }
 
         #endregion
@@ -594,25 +643,28 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(EnumerableTestData))]
         public void ISet_Generic_SymmetricExceptWith_AfterRemovingElements(EnumerableType enumerableType, int setLength, int enumerableLength, int numberOfMatchingElements, int numberOfDuplicateElements)
         {
-            ISet<T> set = GenericISetFactory(setLength);
-            T value = CreateT(532);
-            if (!set.Contains(value))
-                set.Add(value);
-            set.Remove(value);
-            IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
-            Debug.Assert(enumerable != null);
+            if (!IsReadOnly)
+            {
+                ISet<T> set = GenericISetFactory(setLength);
+                T value = CreateT(532);
+                if (!set.Contains(value))
+                    set.Add(value);
+                set.Remove(value);
+                IEnumerable<T> enumerable = CreateEnumerable(enumerableType, set, enumerableLength, numberOfMatchingElements, numberOfDuplicateElements);
+                Debug.Assert(enumerable != null);
 
-            IEqualityComparer<T> comparer = GetIEqualityComparer();
-            System.Collections.Generic.HashSet<T> expected = new System.Collections.Generic.HashSet<T>(comparer);
-            foreach (T element in enumerable)
-                if (!set.Contains(element, comparer))
-                    expected.Add(element);
-            foreach (T element in set)
-                if (!enumerable.Contains(element, comparer))
-                    expected.Add(element);
-            set.SymmetricExceptWith(enumerable);
-            Assert.Equal(expected.Count, set.Count);
-            Assert.True(expected.SetEquals(set));
+                IEqualityComparer<T> comparer = GetIEqualityComparer();
+                System.Collections.Generic.HashSet<T> expected = new System.Collections.Generic.HashSet<T>(comparer);
+                foreach (T element in enumerable)
+                    if (!set.Contains(element, comparer))
+                        expected.Add(element);
+                foreach (T element in set)
+                    if (!enumerable.Contains(element, comparer))
+                        expected.Add(element);
+                set.SymmetricExceptWith(enumerable);
+                Assert.Equal(expected.Count, set.Count);
+                Assert.True(expected.SetEquals(set));
+            }
         }
 
         #endregion

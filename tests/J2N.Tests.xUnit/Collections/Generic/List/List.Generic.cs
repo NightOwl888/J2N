@@ -42,6 +42,11 @@ namespace J2N.Collections.Tests
             return Convert.ToBase64String(bytes);
         }
 
+        // J2N: See the comment in the root Directory.Build.targets file
+#if FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
+#endif
+
         protected override bool IsReadOnly => true;
 
         protected override IList<string> GenericIListFactory(int setLength)
@@ -65,6 +70,10 @@ namespace J2N.Collections.Tests
             return rand.Next();
         }
 
+        // J2N: See the comment in the root Directory.Build.targets file
+#if FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
+#endif
         protected override bool IsReadOnly => true;
 
         protected override IList<int> GenericIListFactory(int setLength)
