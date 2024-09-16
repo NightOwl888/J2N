@@ -34,26 +34,35 @@ steps:
   displayName: 'Validate Template Parameters'
 
 - pwsh: |
+    $testTargetFrameworks = '${{ parameters.testTargetFrameworks }}'
     $testPlatform = '${{ parameters.vsTestPlatform }}'
+    $dotnetSdkVersion = '${{ parameters.dotNetSdkVersion }}'
     if ($IsWindows -eq $null) {
         $IsWindows = $env:OS.StartsWith('Win')
     }
+    # .NET Framework tests are SLOW when using the .NET 8 SDK (especially those for net47 targeting net40).
+    # So, we use .NET 6 SDK instead.
+    if ($testTargetFrameworks.StartsWith('net4')) {
+        $dotnetSdkVersion = '6.0.421'
+    }
+    Write-Host "Using SDK Version: $dotnetSdkVersion"
     $performMulitLevelLookup = if ($IsWindows -and $testPlatform.Equals('x86')) { 'true' } else { 'false' }
     Write-Host "##vso[task.setvariable variable=PerformMultiLevelLookup;]$performMulitLevelLookup"
+    Write-Host "##vso[task.setvariable variable=DotNetSdkVersion;]$dotnetSdkVersion"
 
 #- template: 'show-all-environment-variables.yml' # Uncomment for debugging
 
 - template: 'install-dotnet-sdk.yml'
   parameters:
-    sdkVersion: '${{ parameters.dotNetSdkVersion }}'
-    performMultiLevelLookup: '${{ variables.PerformMultiLevelLookup }}'
+    sdkVersion: '$(DotNetSdkVersion)'
+    performMultiLevelLookup: '$(PerformMultiLevelLookup)'
 
     # Hack: .NET 8 no longer installs the x86 bits and they must be installed separately. However, it is not
     # trivial to get it into the path and to get it to pass the minimum SDK version check in runbuild.ps1.
     # So, we install it afterward and set the environment variable so the above SDK can delegate to it.
     # This code only works on Windows.
 - pwsh: |
-    $sdkVersion = '${{ parameters.dotNetSdkVersion }}'
+    $sdkVersion = '$(DotNetSdkVersion)'
     $architecture = '${{ parameters.vsTestPlatform }}'
     $installScriptPath = "${env:AGENT_TEMPDIRECTORY}/dotnet-install.ps1"
     $installScriptUrl = "https://raw.githubusercontent.com/dotnet/install-scripts/main/src/dotnet-install.ps1"
@@ -62,7 +71,7 @@ steps:
     $installPath = "${env:ProgramFiles(x86)}/dotnet"
     & $installScriptPath -Version $sdkVersion -Architecture $architecture -InstallDir $installPath
     Write-Host "##vso[task.setvariable variable=DOTNET_ROOT_X86;]$installPath"
-  displayName: 'Use .NET SDK ${{ parameters.dotNetSdkVersion }} (x86)'
+  displayName: 'Use .NET SDK $(DotNetSdkVersion) (x86)'
   condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net8.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
 
 - task: UseDotNet@2
