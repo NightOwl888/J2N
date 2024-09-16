@@ -93,13 +93,6 @@ namespace J2N.Collections.Tests
 
     public abstract class SubList_Tests<T> : IList_Generic_Tests<T>
     {
-//        // J2N: See the comment in the root Directory.Build.targets file
-//#if FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW
-//        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
-//#else
-//        //protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
-//#endif
-
         private SCG.List<T> OriginalList { get; set; }
 
         #region IList<T> Helper Methods
