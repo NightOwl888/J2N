@@ -25,8 +25,8 @@
   </ItemGroup>
   
   <!-- See the following post to understand this approach: https://duanenewman.net/blog/post/a-better-way-to-override-references-with-packagereference/ -->
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <!-- On net452, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
+    <!-- On net47, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
         ExcludeAssets=compile removes the dependency from being referenced. ExcludeAssets=runtime removes the dependency from the build output. -->
     <PackageReference Include="System.Buffers"
                       Version="$(SystemBuffersPackageReferenceVersion)"

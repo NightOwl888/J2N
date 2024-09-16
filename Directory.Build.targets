@@ -130,8 +130,8 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4.5+ only (excluding .NET Framework 4.6.1, the target framework we use for testing .NET Standard 2.0)  -->
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('net4')) And '$(TargetFramework)' != 'net461'">
+  <!-- Features in .NET Framework 4.5+ only (excluding .NET Framework 4.7.1, the target framework we use for testing .NET Standard 2.0)  -->
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net4')) And '$(TargetFramework)' != 'net471'">
 
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_RANDOM</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_STRINGS</DefineConstants>
@@ -146,8 +146,8 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
 
-  <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
+  <!-- Features not in .NET Framework 4.0 and .NET Framework 4.7 (the target framework we use for testing .NET Framework 4.0) -->
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net47'">
 
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>

@@ -4,12 +4,13 @@
     <!-- Changing this setting will allow testing on all target frameworks within Visual Studio 2017.
     Note that the main libraries are multi-targeted, so this has no effect on how they are compiled,
     this setting only affects the test projects. -->
-    <!--<TargetFramework>net452</TargetFramework>-->
-    <!--<TargetFramework>net461</TargetFramework>-->
+    <!--<TargetFramework>net47</TargetFramework>-->
+    <!--<TargetFramework>net471</TargetFramework>-->
     <!--<TargetFramework>net472</TargetFramework>-->
     <!--<TargetFramework>net48</TargetFramework>-->
     <!--<TargetFramework>net5.0</TargetFramework>-->
     <!--<TargetFramework>net6.0</TargetFramework>-->
+    <!--<TargetFramework>net8.0</TargetFramework>-->
     <TestAllTargetFrameworks>true</TestAllTargetFrameworks>
 
     <!-- Allow the build script to pass in the test frameworks to build for.
@@ -17,23 +18,25 @@
       TODO: Due to a parsing bug, we cannot pass a string with a ; to dotnet msbuild, so passing true as a workaround -->
     
     <!-- Test Client to DLL target works as follows:
+
       Test Client       | Target Under Test
+      net8.0            | net8.0
       net6.0            | net6.0
       net5.0            | netstandard2.1
       net48             | net462
       net472            | net45
-      net461            | netstandard2.0
-      net452            | net40
-      
+      net471            | netstandard2.0
+      net47             | net40
+
     -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net8.0;net6.0;net5.0;net48;net472;net461;net452</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net8.0;net6.0;net5.0;net48;net472;net471;net47</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup Label="Mismatched Target Framework (to override the target framework under test)">
     <SetTargetFramework></SetTargetFramework>
-    <SetTargetFramework Condition=" '$(TargetFramework)' == 'net452' ">TargetFramework=net40</SetTargetFramework>
-    <SetTargetFramework Condition=" '$(TargetFramework)' == 'net461' ">TargetFramework=netstandard2.0</SetTargetFramework>
+    <SetTargetFramework Condition=" '$(TargetFramework)' == 'net47' ">TargetFramework=net40</SetTargetFramework>
+    <SetTargetFramework Condition=" '$(TargetFramework)' == 'net471' ">TargetFramework=netstandard2.0</SetTargetFramework>
     <SetTargetFramework Condition=" '$(TargetFramework)' == 'net472' ">TargetFramework=net45</SetTargetFramework>
   </PropertyGroup>
   

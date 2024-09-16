@@ -23,7 +23,7 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 
 variables:
 - name: TestTargetFrameworks
-  value: 'net8.0;net6.0;net5.0;net48;net472;net461;net452'
+  value: 'net8.0;net6.0;net5.0;net48;net472;net471;net47'
 - name: DotNetSDKVersion
   value: '8.0.401'
 - name: BinaryArtifactName
@@ -323,61 +323,61 @@ stages:
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
-  - job: Test_net461_x64
+  - job: Test_net471_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    displayName: 'Test net461,x64 on Windows'
+    displayName: 'Test net4671,x64 on Windows'
     pool:
       vmImage: 'windows-latest'
     steps:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net461'
+        testTargetFrameworks: 'net471'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
-  - job: Test_net461_x86 # Only run if explicitly enabled with RunX86Tests
+  - job: Test_net471_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
-    displayName: 'Test net461,x86 on Windows'
+    displayName: 'Test net471,x86 on Windows'
     pool:
       vmImage: 'windows-latest'
     steps:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net461'
+        testTargetFrameworks: 'net471'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
-  - job: Test_net452_x64
+  - job: Test_net47_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    displayName: 'Test net452,x64 on Windows'
+    displayName: 'Test net47,x64 on Windows'
     pool:
       vmImage: 'windows-latest'
     steps:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net452'
+        testTargetFrameworks: 'net47'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
-  - job: Test_net452_x86 # Only run if explicitly enabled with RunX86Tests
+  - job: Test_net47_x86 # Only run if explicitly enabled with RunX86Tests
     condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
-    displayName: 'Test net452,x86 on Windows'
+    displayName: 'Test net47,x86 on Windows'
     pool:
       vmImage: 'windows-latest'
     steps:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net452'
+        testTargetFrameworks: 'net47'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
