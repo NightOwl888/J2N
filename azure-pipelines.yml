@@ -325,7 +325,7 @@ stages:
 
   - job: Test_net471_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    displayName: 'Test net4671,x64 on Windows'
+    displayName: 'Test net471,x64 on Windows'
     pool:
       vmImage: 'windows-latest'
     steps:
