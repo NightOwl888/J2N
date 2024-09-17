@@ -1990,7 +1990,7 @@ namespace J2N
             assertTrue(Character.GetType((int)'\u2029') == UnicodeCategory.ParagraphSeparator);
 
 #if FEATURE_UNICODE_DEFINED_0x9FFF
-            assertTrue(Character.GetType(0x9FFF) == UnicodeCategory.OtherLetter);
+            assertTrue(Character.GetType(0x9FFF) == UnicodeCategory.OtherLetter); // This character is now defined in .NET 8
 #else
             assertTrue(Character.GetType(0x9FFF) == UnicodeCategory.OtherNotAssigned);
 #endif
