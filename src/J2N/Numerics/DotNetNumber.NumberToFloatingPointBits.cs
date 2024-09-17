@@ -634,14 +634,18 @@ namespace J2N.Numerics
             // earlier, or one greater than that shift:
             uint fractionalExponent = fractionalShift;
 
+#pragma warning disable CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
             if (BigInteger.Compare(ref fractionalNumerator, ref fractionalDenominator) < 0)
             {
                 fractionalExponent++;
             }
+#pragma warning restore CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
 
             fractionalNumerator.ShiftLeft(remainingBitsOfPrecisionRequired);
 
+#pragma warning disable CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
             BigInteger.DivRem(ref fractionalNumerator, ref fractionalDenominator, out BigInteger bigFractionalMantissa, out BigInteger fractionalRemainder);
+#pragma warning restore CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
             ulong fractionalMantissa = bigFractionalMantissa.ToUInt64();
             bool hasZeroTail = !number.HasNonZeroTail && fractionalRemainder.IsZero();
 

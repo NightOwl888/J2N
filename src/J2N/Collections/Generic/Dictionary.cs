@@ -8,6 +8,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -454,6 +455,8 @@ namespace J2N.Collections.Generic
         /// For more information, see
         /// <a href="https://docs.microsoft.com/en-us/dotnet/standard/serialization/xml-and-soap-serialization">XML and SOAP Serialization</a>.
         /// </remarks>
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected Dictionary(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             // We can't do anything with the keys and values until the entire graph has been deserialized
@@ -659,6 +662,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException"><paramref name="info"/> is <c>null</c>.</exception>
         /// <remarks>This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         [System.Security.SecurityCritical]
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             // Customized serialization for Dictionary.

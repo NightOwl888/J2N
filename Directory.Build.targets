@@ -8,8 +8,8 @@
     <NoWarn Label="Use range operator">$(NoWarn);IDE0057</NoWarn>
   </PropertyGroup>
 
-  <!-- Features in .NET Standard, .NET Core, .NET 5.x, and .NET 6.x only (no .NET Framework support) -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+  <!-- Features in .NET Standard, .NET Core, .NET 5.x, .NET 6.x, and .NET 8.x only (no .NET Framework support) -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_APPCONTEXT_BASEDIRECTORY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
@@ -23,37 +23,45 @@
     <DebugType>portable</DebugType>
   </PropertyGroup>
 
-  <!-- Features in .NET 6.x only -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net6.')) ">
+  <!-- Features in .NET 8.x only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net8.')) ">
+
+    <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
+    
+  </PropertyGroup>
+
+  <!-- Features in .NET 6.x and .NET 8.x only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_ARRAY_CLEAR_ARRAY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTINT64</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTSINGLE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYSET</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 5.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
 
   </PropertyGroup>
 
-  <!-- Features in .NET 5.x and .NET 6.x only -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+  <!-- Features in .NET 5.x, .NET 6.x, and .NET 8.x only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_PREDEFINEDONLY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_ICU</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x30000</DefineConstants>
 
   </PropertyGroup>
 
-  <!-- Features in .NET Core 3.x, .NET 5.x, and .NET 6.x only -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+  <!-- Features in .NET Core 3.x, .NET 5.x, .NET 6.x, and .NET 8.x only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
 
   </PropertyGroup>
 
-  <!-- Features in .NET Standard 2.1, .NET Core 3.x, .NET 5.x, and .NET 6.x only -->
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+  <!-- Features in .NET Standard 2.1, .NET Core 3.x, .NET 5.x, .NET 6.x, and .NET 8.x only -->
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_BIGINTEGER_CTOR_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
@@ -65,6 +73,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_NUMBER_TRYFORMAT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_FILL_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STACK_TRYPOP</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CONTAINS_CHAR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_CREATE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_READONLYSPAN</DefineConstants>
@@ -79,11 +88,11 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, and .NET 6.x -->
-  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, .NET 6.x, and .NET 8.x -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
-
+    
     <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
 
@@ -92,7 +101,18 @@
     <DefineConstants Condition=" '$(IncludeICloneable)' == 'true' ">$(DefineConstants);FEATURE_CLONEABLE</DefineConstants>
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, and .NET Core 3.x (No .NET 5 or .NET 6 support) -->
+  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, and .NET 6.x (No .NET 8+ support) -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+
+    <!-- JCG.ReadOnlyList subclasses SCG.ReadOnlyCollection. SCG.ReadOnlyCollection has differing exception behaviors when calling .Current
+         depending on .NET version. Unfortunately, SCG.ReadOnlyCollection.GetEnumerator() is not virtual and removing this superclass would
+         constitute a breaking API change, so there is no way to normalize this behavior until a major J2N version bump. Ideally, we would
+         remove this superclass and provide our own implementation that doesn't drift across .NET versions. -->
+    <DefineConstants>$(DefineConstants);FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW</DefineConstants>
+    
+  </PropertyGroup>
+
+  <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, and .NET Core 3.x (No .NET 5+ support) -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_THREADABORT</DefineConstants>
@@ -110,8 +130,8 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4.5+ only (excluding .NET Framework 4.6.1, the target framework we use for testing .NET Standard 2.0)  -->
-  <PropertyGroup Condition="$(TargetFramework.StartsWith('net4')) And '$(TargetFramework)' != 'net461'">
+  <!-- Features in .NET Framework 4.5+ only (excluding .NET Framework 4.7.1, the target framework we use for testing .NET Standard 2.0)  -->
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net4')) And '$(TargetFramework)' != 'net471'">
 
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_RANDOM</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_STRINGS</DefineConstants>
@@ -126,14 +146,15 @@
     <DebugType>full</DebugType>
   </PropertyGroup>
 
-  <!-- Features not in .NET Framework 4.0 and .NET Framework 4.5.2 (the target framework we use for testing .NET Framework 4.0) -->
-  <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net452'">
+  <!-- Features not in .NET Framework 4.0 and .NET Framework 4.7 (the target framework we use for testing .NET Framework 4.0) -->
+  <PropertyGroup Condition="'$(TargetFramework)' != 'net40' And '$(TargetFramework)' != 'net47'">
 
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_IREADONLYCOLLECTIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_THREAD_ISENTERED</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TYPEINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_VOLATILE</DefineConstants>
 
   </PropertyGroup>
 

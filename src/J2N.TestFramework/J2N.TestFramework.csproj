@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework></TargetFramework>
-    <TargetFrameworks>net6.0;netstandard2.1;netstandard2.0;net462;net45;net40</TargetFrameworks>
+    <TargetFrameworks>net8.0;net6.0;netstandard2.1;netstandard2.0;net462;net45;net40</TargetFrameworks>
     <RootNamespace>J2N</RootNamespace>
 
     <IsPackable>false</IsPackable>
@@ -18,6 +18,8 @@
     <NoWarn Label="Naming rule violation: Must begin with upper case characters">$(NoWarn);IDE1006</NoWarn>
     
     <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
+    <NoWarn Label="FormatterConverter serialization is obsolete">$(NoWarn);SYSLIB0050</NoWarn>
+    <NoWarn Label=".ctor(SerializationInfo, StreamingContext) is obsolete">$(NoWarn);SYSLIB0051</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

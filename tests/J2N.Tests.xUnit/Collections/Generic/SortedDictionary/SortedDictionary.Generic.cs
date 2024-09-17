@@ -1,18 +1,18 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
+using J2N.Collections.Generic;
 using System;
-using System.Collections.Generic;
 using Xunit;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
     public class SortedDictionary_Generic_Tests_string_string : SortedDictionary_Generic_Tests<string, string>
     {
-        protected override KeyValuePair<string, string> CreateT(int seed)
+        protected override SCG.KeyValuePair<string, string> CreateT(int seed)
         {
-            return new KeyValuePair<string, string>(CreateTKey(seed), CreateTKey(seed + 500));
+            return new SCG.KeyValuePair<string, string>(CreateTKey(seed), CreateTKey(seed + 500));
         }
 
         protected override string CreateTKey(int seed)
@@ -33,10 +33,10 @@ namespace J2N.Collections.Tests
     public class SortedDictionary_Generic_Tests_int_int : SortedDictionary_Generic_Tests<int, int>
     {
         protected override bool DefaultValueAllowed { get { return true; } }
-        protected override KeyValuePair<int, int> CreateT(int seed)
+        protected override SCG.KeyValuePair<int, int> CreateT(int seed)
         {
             Random rand = new Random(seed);
-            return new KeyValuePair<int, int>(rand.Next(), rand.Next());
+            return new SCG.KeyValuePair<int, int>(rand.Next(), rand.Next());
         }
 
         protected override int CreateTKey(int seed)
@@ -54,10 +54,10 @@ namespace J2N.Collections.Tests
     //[OuterLoop]
     public class SortedDictionary_Generic_Tests_EquatableBackwardsOrder_int : SortedDictionary_Generic_Tests<EquatableBackwardsOrder, int>
     {
-        protected override KeyValuePair<EquatableBackwardsOrder, int> CreateT(int seed)
+        protected override SCG.KeyValuePair<EquatableBackwardsOrder, int> CreateT(int seed)
         {
             Random rand = new Random(seed);
-            return new KeyValuePair<EquatableBackwardsOrder, int>(new EquatableBackwardsOrder(rand.Next()), rand.Next());
+            return new SCG.KeyValuePair<EquatableBackwardsOrder, int>(new EquatableBackwardsOrder(rand.Next()), rand.Next());
         }
 
         protected override EquatableBackwardsOrder CreateTKey(int seed)
@@ -72,9 +72,9 @@ namespace J2N.Collections.Tests
             return rand.Next();
         }
 
-        protected override IDictionary<EquatableBackwardsOrder, int> GenericIDictionaryFactory()
+        protected override SCG.IDictionary<EquatableBackwardsOrder, int> GenericIDictionaryFactory()
         {
-            return new J2N.Collections.Generic.SortedDictionary<EquatableBackwardsOrder, int>();
+            return new SortedDictionary<EquatableBackwardsOrder, int>();
         }
     }
 }

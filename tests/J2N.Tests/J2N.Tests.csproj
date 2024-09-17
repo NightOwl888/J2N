@@ -15,6 +15,8 @@
     <NoWarn Label="Use compound assignment">$(NoWarn);IDE0054</NoWarn>
     
     <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
+    <NoWarn Label="FormatterConverter serialization is obsolete">$(NoWarn);SYSLIB0050</NoWarn>
+    <NoWarn Label=".ctor(SerializationInfo, StreamingContext) is obsolete">$(NoWarn);SYSLIB0051</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,8 +25,8 @@
   </ItemGroup>
   
   <!-- See the following post to understand this approach: https://duanenewman.net/blog/post/a-better-way-to-override-references-with-packagereference/ -->
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net452' ">
-    <!-- On net452, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
+    <!-- On net47, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
         ExcludeAssets=compile removes the dependency from being referenced. ExcludeAssets=runtime removes the dependency from the build output. -->
     <PackageReference Include="System.Buffers"
                       Version="$(SystemBuffersPackageReferenceVersion)"
@@ -39,7 +41,7 @@
                       Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
     <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
   </ItemGroup>
 

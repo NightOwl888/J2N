@@ -1,17 +1,21 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
+using J2N.Collections.Generic;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using Xunit;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
     public class SortedDictionary_IDictionary_NonGeneric_Tests : IDictionary_NonGeneric_Tests
     {
         #region IDictionary Helper Methods
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
+
+        protected override bool NullAllowed => true; // J2N allows null keys
 
         protected override IDictionary NonGenericIDictionaryFactory()
         {
@@ -136,7 +140,7 @@ namespace J2N.Collections.Tests
         public void ICollection_NonGeneric_CopyTo_ArrayOfIncorrectKeyValuePairType(int count)
         {
             ICollection collection = NonGenericICollectionFactory(count);
-            KeyValuePair<string, int>[] array = new KeyValuePair<string, int>[count * 3 / 2];
+            SCG.KeyValuePair<string, int>[] array = new SCG.KeyValuePair<string, int>[count * 3 / 2];
             AssertExtensions.Throws<ArgumentException>("array", null, () => collection.CopyTo(array, 0));
         }
 
@@ -145,7 +149,7 @@ namespace J2N.Collections.Tests
         public void ICollection_NonGeneric_CopyTo_ArrayOfCorrectKeyValuePairType(int count)
         {
             ICollection collection = NonGenericICollectionFactory(count);
-            KeyValuePair<string, string>[] array = new KeyValuePair<string, string>[count];
+            SCG.KeyValuePair<string, string>[] array = new SCG.KeyValuePair<string, string>[count];
             collection.CopyTo(array, 0);
             int i = 0;
             foreach (object obj in collection)

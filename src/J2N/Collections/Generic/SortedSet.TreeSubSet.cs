@@ -5,6 +5,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 #if FEATURE_SERIALIZABLE
@@ -76,6 +77,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
             [SuppressMessage("Microsoft.Usage", "CA2236:CallBaseClassMethodsOnISerializableTypes", Justification = "special case TreeSubSet serialization")]
             [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2236 doesn't fire on all target frameworks")]
+            [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
             private TreeSubSet(SerializationInfo info, StreamingContext context)
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
@@ -446,8 +448,12 @@ namespace J2N.Collections.Generic
 
 #if FEATURE_SERIALIZABLE
 
+            [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+            [EditorBrowsable(EditorBrowsableState.Never)]
             void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context) => GetObjectData(info, context);
 
+            [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+            [EditorBrowsable(EditorBrowsableState.Never)]
             protected override void GetObjectData(SerializationInfo info, StreamingContext context)
             {
                 if (info == null)

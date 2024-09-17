@@ -254,7 +254,9 @@ namespace J2N.Numerics
 
                 if (pScaledMarginHigh != &scaledMarginLow)
                 {
+#pragma warning disable CS9091 // This returns local by reference but it is not a ref local
                     BigInteger.Multiply(ref scaledMarginLow, 2, out *pScaledMarginHigh);
+#pragma warning restore CS9091 // This returns local by reference but it is not a ref local
                 }
             }
 
@@ -268,7 +270,9 @@ namespace J2N.Numerics
                 // shorter strings for various edge case values like 1.23E+22
 
                 BigInteger.Add(ref scaledValue, ref *pScaledMarginHigh, out BigInteger scaledValueHigh);
+#pragma warning disable CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
                 int cmpHigh = BigInteger.Compare(ref scaledValueHigh, ref scale);
+#pragma warning restore CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
                 estimateTooLow = isEven ? (cmpHigh >= 0) : (cmpHigh > 0);
             }
             else
@@ -292,7 +296,9 @@ namespace J2N.Numerics
 
                 if (pScaledMarginHigh != &scaledMarginLow)
                 {
+#pragma warning disable CS9091 // This returns local by reference but it is not a ref local
                     BigInteger.Multiply(ref scaledMarginLow, 2, out *pScaledMarginHigh);
+#pragma warning restore CS9091 // This returns local by reference but it is not a ref local
                 }
             }
 
@@ -351,7 +357,9 @@ namespace J2N.Numerics
 
                 if (pScaledMarginHigh != &scaledMarginLow)
                 {
+#pragma warning disable CS9091 // This returns local by reference but it is not a ref local
                     BigInteger.Multiply(ref scaledMarginLow, 2, out *pScaledMarginHigh);
+#pragma warning restore CS9091 // This returns local by reference but it is not a ref local
                 }
             }
 
@@ -379,7 +387,9 @@ namespace J2N.Numerics
 
                     // stop looping if we are far enough away from our neighboring values or if we have reached the cutoff digit
                     int cmpLow = BigInteger.Compare(ref scaledValue, ref scaledMarginLow);
+#pragma warning disable CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
                     int cmpHigh = BigInteger.Compare(ref scaledValueHigh, ref scale);
+#pragma warning restore CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
 
                     if (isEven)
                     {
@@ -407,7 +417,9 @@ namespace J2N.Numerics
 
                     if (pScaledMarginHigh != &scaledMarginLow)
                     {
+#pragma warning disable CS9091 // This returns local by reference but it is not a ref local
                         BigInteger.Multiply(ref scaledMarginLow, 2, out *pScaledMarginHigh);
+#pragma warning restore CS9091 // This returns local by reference but it is not a ref local
                     }
 
                     digitExponent--;

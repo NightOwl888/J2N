@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
 using System;
@@ -17,7 +16,9 @@ namespace J2N.Collections.Tests
     public abstract class SortedDictionary_Generic_Tests<TKey, TValue> : IDictionary_Generic_Tests<TKey, TValue>
     {
         #region IDictionary<TKey, TValue> Helper Methods
-
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
         protected override bool DefaultValueWhenNotAllowed_Throws { get { return false; } }
 
         protected override SCG.IDictionary<TKey, TValue> GenericIDictionaryFactory()
@@ -61,9 +62,18 @@ namespace J2N.Collections.Tests
         {
             SCG.IComparer<TKey> comparer = GetKeyIComparer();
             SCG.IDictionary<TKey, TValue> source = GenericIDictionaryFactory(count);
-            SortedDictionary<TKey, TValue> copied = new SortedDictionary<TKey, TValue>(source, comparer);
-            Assert.Equal(source, copied);
+            SortedDictionary<TKey, TValue> sourceSorted = new SortedDictionary<TKey, TValue>(source, comparer);
+            Assert.Equal(source, sourceSorted);
+            Assert.Equal(comparer, sourceSorted.Comparer);
+            // Test copying a sorted dictionary.
+            SortedDictionary<TKey, TValue> copied = new SortedDictionary<TKey, TValue>(sourceSorted, comparer);
+            Assert.Equal(sourceSorted, copied);
             Assert.Equal(comparer, copied.Comparer);
+            // Test copying a sorted dictionary with a different comparer.
+            SCG.IComparer<TKey> reverseComparer = SCG.Comparer<TKey>.Create((key1, key2) => -comparer.Compare(key1, key2));
+            SortedDictionary<TKey, TValue> copiedReverse = new SortedDictionary<TKey, TValue>(sourceSorted, reverseComparer);
+            Assert.Equal(sourceSorted, copiedReverse);
+            Assert.Equal(reverseComparer, copiedReverse.Comparer);
         }
 
         #endregion
@@ -125,7 +135,7 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_Generic_DictionaryIsProperlySortedAccordingToComparer(int setLength)
         {
             SortedDictionary<TKey, TValue> set = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
-            List<SCG.KeyValuePair<TKey, TValue>> expected = set.ToList();
+            J2N.Collections.Generic.List<SCG.KeyValuePair<TKey, TValue>> expected = set.ToList();
             expected.Sort(GetIComparer());
             int expectedIndex = 0;
             foreach (SCG.KeyValuePair<TKey, TValue> value in set)

@@ -7,6 +7,7 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 #if FEATURE_SERIALIZABLE
@@ -152,11 +153,22 @@ namespace J2N.Collections.Generic
                 throw new ArgumentNullException(nameof(dictionary));
             }
 
-            _set = new TreeSet<KeyValuePair<TKey, TValue>>(new KeyValuePairComparer(comparer));
+            var keyValuePairComparer = new KeyValuePairComparer(comparer);
 
-            foreach (KeyValuePair<TKey, TValue> pair in dictionary)
+            if (dictionary is SortedDictionary<TKey, TValue> sortedDictionary &&
+            sortedDictionary._set.Comparer is KeyValuePairComparer kv &&
+                kv.keyComparer.Equals(keyValuePairComparer.keyComparer))
             {
-                _set.Add(pair);
+                _set = new TreeSet<KeyValuePair<TKey, TValue>>(sortedDictionary._set, keyValuePairComparer);
+            }
+            else
+            {
+                _set = new TreeSet<KeyValuePair<TKey, TValue>>(keyValuePairComparer);
+
+                foreach (KeyValuePair<TKey, TValue> pair in dictionary)
+                {
+                    _set.Add(pair);
+                }
             }
         }
 
@@ -272,7 +284,7 @@ namespace J2N.Collections.Generic
         /// Getting the value of this property is an O(log <c>n</c>) operation; setting the property is also
         /// an O(log <c>n</c>) operation.
         /// </remarks>
-        public TValue this[TKey key]
+        public TValue this[[AllowNull]TKey key]
         {
             get
             {
@@ -284,7 +296,7 @@ namespace J2N.Collections.Generic
                 TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
                 {
-                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
+                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key?.ToString() ?? "null"));
                 }
 
                 return node.Item.Value;
@@ -348,14 +360,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public ICollection<TKey> Keys
-        {
-            get
-            {
-                if (_keys == null) _keys = new KeyCollection(this);
-                return _keys;
-            }
-        }
+        public KeyCollection Keys => _keys ??= new KeyCollection(this);
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
@@ -379,14 +384,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public ICollection<TValue> Values
-        {
-            get
-            {
-                if (_values == null) _values = new ValueCollection(this);
-                return _values;
-            }
-        }
+        public ValueCollection Values => _values ??= new ValueCollection(this);
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
@@ -414,13 +412,13 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public void Add(TKey key, TValue value)
+        public void Add([AllowNull] TKey key, [AllowNull]TValue value)
         {
             //if (key == null) // J2N: Making key nullable
             //{
             //    throw new ArgumentNullException(nameof(key));
             //}
-            _set.Add(new KeyValuePair<TKey, TValue>(key, value));
+            _set.Add(new KeyValuePair<TKey, TValue>(key!, value!));
         }
 
         /// <summary>
@@ -446,14 +444,14 @@ namespace J2N.Collections.Generic
         /// <returns><c>true</c> if the <see cref="SortedDictionary{TKey, TValue}"/> contains an element
         /// with the specified key; otherwise, <c>false</c>.</returns>
         /// <remarks>This method is an O(log <c>n</c>) operation.</remarks>
-        public bool ContainsKey(TKey key)
+        public bool ContainsKey([AllowNull] TKey key)
         {
             //if (key == null) // J2N: Making key nullable
             //{
             //    throw new ArgumentNullException(nameof(key));
             //}
 
-            return _set.Contains(new KeyValuePair<TKey, TValue>(key, default!));
+            return _set.Contains(new KeyValuePair<TKey, TValue>(key!, default!));
         }
 
         /// <summary>
@@ -474,7 +472,7 @@ namespace J2N.Collections.Generic
         {
             // NOTE: We do this check here to override the .NET default equality comparer
             // with J2N's version
-            return ContainsValue(value, EqualityComparer<TValue>.Default);
+            return ContainsValue(value, null);
         }
 
         /// <summary>
@@ -492,14 +490,14 @@ namespace J2N.Collections.Generic
         /// is proportional to <see cref="Count"/>. That is, this method is an O(<c>n</c>) operation,
         /// where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public bool ContainsValue(TValue value, IEqualityComparer<TValue> valueComparer) // Overload added so end user can override J2N's equality comparer
+        public bool ContainsValue([AllowNull] TValue value, IEqualityComparer<TValue>? valueComparer) // Overload added so end user can override J2N's equality comparer
         {
             bool found = false;
-            if (value == null)
+            if (value is null)
             {
                 _set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node)
                 {
-                    if (node.Item.Value == null)
+                    if (node.Item.Value is null)
                     {
                         found = true;
                         return false;  // stop the walk
@@ -509,6 +507,7 @@ namespace J2N.Collections.Generic
             }
             else
             {
+				valueComparer ??= EqualityComparer<TValue>.Default;
                 _set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node)
                 {
                     if (valueComparer.Equals(node.Item.Value, value))
@@ -587,15 +586,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(this, Enumerator.KeyValuePair);
-        }
+        public Enumerator GetEnumerator() => new Enumerator(this, Enumerator.KeyValuePair);
 
-        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
-        {
-            return new Enumerator(this, Enumerator.KeyValuePair);
-        }
+        IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() =>
+            Count == 0 ? EnumerableHelpers.GetEmptyEnumerator<KeyValuePair<TKey, TValue>>() :
+            GetEnumerator();
 
         /// <summary>
         /// Removes the element with the specified key from the <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -609,14 +604,14 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation.
         /// </remarks>
-        public bool Remove(TKey key)
+        public bool Remove([AllowNull] TKey key)
         {
             //if (key == null) // J2N: Making key nullable
             //{
             //    throw new ArgumentNullException(nameof(key));
             //}
 
-            return _set.Remove(new KeyValuePair<TKey, TValue>(key, default!));
+            return _set.Remove(new KeyValuePair<TKey, TValue>(key!, default!));
         }
 
         /// <summary>
@@ -633,11 +628,11 @@ namespace J2N.Collections.Generic
         /// </remarks>
         // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
         // It is redefined here to ensure we have it in prior platforms.
-        public bool Remove(TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool Remove([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (TryGetValue(key, out value))
             {
-                _set.Remove(new KeyValuePair<TKey, TValue>(key, default!));
+                _set.Remove(new KeyValuePair<TKey, TValue>(key!, default!));
                 return true;
             }
 
@@ -657,7 +652,7 @@ namespace J2N.Collections.Generic
         /// <see cref="TryAdd(TKey, TValue)"/> does nothing and returns <c>false</c>.</remarks>
         // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
         // It is redefined here to ensure we have it in prior platforms.
-        public bool TryAdd(TKey key, TValue value)
+        public bool TryAdd([AllowNull] TKey key, TValue value)
         {
             if (!ContainsKey(key))
             {
@@ -694,7 +689,7 @@ namespace J2N.Collections.Generic
 
 
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
-        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         {
             //if (key == null) // J2N: Making key nullable
@@ -729,21 +724,21 @@ namespace J2N.Collections.Generic
 
         ICollection IDictionary.Keys
         {
-            get { return (ICollection)Keys; }
+            get { return Keys; }
         }
 
         ICollection IDictionary.Values
         {
-            get { return (ICollection)Values; }
+            get { return Values; }
         }
 
-        object? IDictionary.this[object key]
+        object? IDictionary.this[object? key]
         {
             get
             {
                 if (IsCompatibleKey(key))
                 {
-                    if (TryGetValue((TKey)key, out TValue? value))
+                    if (TryGetValue((TKey)key!, out TValue? value))
                     {
                         return value;
                     }
@@ -769,7 +764,7 @@ namespace J2N.Collections.Generic
                     TKey tempKey = (TKey)key!;
                     try
                     {
-                        this[tempKey!] = (TValue)value!;
+                        this[tempKey] = (TValue)value!;
                     }
                     catch (InvalidCastException)
                     {
@@ -802,7 +797,7 @@ namespace J2N.Collections.Generic
 
                 try
                 {
-                    Add(tempKey!, (TValue)value!);
+                    Add(tempKey, (TValue)value!);
                 }
                 catch (InvalidCastException)
                 {
@@ -836,10 +831,7 @@ namespace J2N.Collections.Generic
             return (key is TKey);
         }
 
-        IDictionaryEnumerator IDictionary.GetEnumerator()
-        {
-            return new Enumerator(this, Enumerator.DictEntry);
-        }
+        IDictionaryEnumerator IDictionary.GetEnumerator() => new Enumerator(this, Enumerator.DictEntry);
 
         void IDictionary.Remove(object? key)
         {
@@ -853,10 +845,7 @@ namespace J2N.Collections.Generic
 
         object ICollection.SyncRoot => ((ICollection)_set).SyncRoot;
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new Enumerator(this, Enumerator.KeyValuePair);
-        }
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<KeyValuePair<TKey, TValue>>)this).GetEnumerator();
 
         #endregion
 
@@ -1041,8 +1030,8 @@ namespace J2N.Collections.Generic
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
         public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>, IDictionaryEnumerator
         {
-            private readonly IEnumerator<KeyValuePair<TKey, TValue>> _treeEnum;
-            private readonly int _getEnumeratorRetType;  // What should Enumerator.Current return?
+            private /*readonly*/ TreeSet<KeyValuePair<TKey, TValue>>.Enumerator _treeEnum;
+            private /*readonly*/ int _getEnumeratorRetType;  // What should Enumerator.Current return?
 
             internal const int KeyValuePair = 1;
             internal const int DictEntry = 2;
@@ -1122,7 +1111,7 @@ namespace J2N.Collections.Generic
             {
                 get
                 {
-                    return ((SortedSet<KeyValuePair<TKey, TValue>>.Enumerator)_treeEnum).NotStartedOrEnded;
+                    return _treeEnum.NotStartedOrEnded;
                 }
             }
 
@@ -1137,7 +1126,7 @@ namespace J2N.Collections.Generic
                 _treeEnum.Reset();
             }
 
-            object IEnumerator.Current
+            object? IEnumerator.Current
             {
                 get
                 {
@@ -1224,7 +1213,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        internal sealed class KeyCollection : ICollection<TKey>, ICollection
+        public sealed class KeyCollection : ICollection<TKey>, ICollection
 #if FEATURE_IREADONLYCOLLECTIONS
             , IReadOnlyCollection<TKey>
 #endif
@@ -1289,20 +1278,13 @@ namespace J2N.Collections.Generic
             /// <para/>
             /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
             /// </remarks>
-            public IEnumerator<TKey> GetEnumerator()
-            {
-                return new Enumerator(_dictionary);
-            }
+            public Enumerator GetEnumerator() => new Enumerator(_dictionary);
 
-            IEnumerator<TKey> IEnumerable<TKey>.GetEnumerator()
-            {
-                return new Enumerator(_dictionary);
-            }
+            IEnumerator<TKey> IEnumerable<TKey>.GetEnumerator() =>
+                Count == 0 ? EnumerableHelpers.GetEmptyEnumerator<TKey>() :
+                GetEnumerator();
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return new Enumerator(_dictionary);
-            }
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TKey>)this).GetEnumerator();
 
             /// <summary>
             /// Copies the <see cref="KeyCollection"/> elements to an existing one-dimensional array,
@@ -1348,17 +1330,12 @@ namespace J2N.Collections.Generic
                 if (array.Length - index < _dictionary.Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
-                TKey[]? keys = array as TKey[];
-                if (keys != null)
+                if (array is TKey[] keys)
                 {
                     CopyTo(keys, index);
                 }
                 else
                 {
-                    if (!(array is object?[]))
-                    {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
-                    }
                     try
                     {
                         object?[] objects = (object?[])array;
@@ -1395,7 +1372,12 @@ namespace J2N.Collections.Generic
                 throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
             }
 
-            bool ICollection<TKey>.Contains(TKey item)
+            /// <summary>
+            /// Determines whether the <see cref="ICollection{T}"/> contains a specific value.
+            /// </summary>
+            /// <param name="item">The object to locate in the <see cref="ICollection{T}"/>.</param>
+            /// <returns><c>true</c> if item is found in the <see cref="ICollection{T}"/>; otherwise, <c>false</c>.</returns>
+            public bool Contains([AllowNull] TKey item)
             {
                 return _dictionary.ContainsKey(item);
             }
@@ -1448,7 +1430,7 @@ namespace J2N.Collections.Generic
             /// </remarks>
             [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
             [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-            internal struct Enumerator : IEnumerator<TKey>, IEnumerator
+            public struct Enumerator : IEnumerator<TKey>, IEnumerator
             {
                 [SuppressMessage("Style", "IDE0044:Add readonly modifier", Justification = "Following Microsoft's code style")]
                 private SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
@@ -1561,7 +1543,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        internal sealed class ValueCollection : ICollection<TValue>, ICollection
+        public sealed class ValueCollection : ICollection<TValue>, ICollection
 #if FEATURE_IREADONLYCOLLECTIONS
             , IReadOnlyCollection<TValue>
 #endif
@@ -1626,20 +1608,13 @@ namespace J2N.Collections.Generic
             /// <para/>
             /// This method is an O(1) operation.
             /// </remarks>
-            public IEnumerator<TValue> GetEnumerator()
-            {
-                return new Enumerator(_dictionary);
-            }
+            public Enumerator GetEnumerator() => new Enumerator(_dictionary);
 
-            IEnumerator<TValue> IEnumerable<TValue>.GetEnumerator()
-            {
-                return new Enumerator(_dictionary);
-            }
+            IEnumerator<TValue> IEnumerable<TValue>.GetEnumerator() =>
+                Count == 0 ? EnumerableHelpers.GetEmptyEnumerator<TValue>() :
+                GetEnumerator();
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return new Enumerator(_dictionary);
-            }
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TValue>)this).GetEnumerator();
 
             /// <summary>
             /// Copies the <see cref="ValueCollection"/> elements to an existing one-dimensional
@@ -1698,17 +1673,12 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
                 }
 
-                TValue[]? values = array as TValue[];
-                if (values != null)
+                if (array is TValue[] values)
                 {
                     CopyTo(values, index);
                 }
                 else
                 {
-                    if (!(array is object?[]))
-                    {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
-                    }
                     try
                     {
                         object?[] objects = (object?[])array;
@@ -1802,9 +1772,9 @@ namespace J2N.Collections.Generic
             /// </remarks>
             [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
             [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-            internal struct Enumerator : IEnumerator<TValue>, IEnumerator
+            public struct Enumerator : IEnumerator<TValue>, IEnumerator
             {
-                private readonly SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
+                private SortedDictionary<TKey, TValue>.Enumerator _dictEnum;
 
                 internal Enumerator(SortedDictionary<TKey, TValue> dictionary)
                 {
@@ -1899,7 +1869,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>>
+        internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>> // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
         {
             internal IComparer<TKey> keyComparer; // Do not rename (binary serialization)
 
@@ -1919,6 +1889,21 @@ namespace J2N.Collections.Generic
             {
                 return keyComparer.Compare(x.Key, y.Key);
             }
+
+            public override bool Equals(object? obj)
+            {
+                if (obj is KeyValuePairComparer other)
+                {
+                    // Commonly, both comparers will be the default comparer (and reference-equal). Avoid a virtual method call to Equals() in that case.
+                    return this.keyComparer == other.keyComparer || this.keyComparer.Equals(other.keyComparer);
+                }
+                return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return this.keyComparer.GetHashCode();
+            }
         }
 
         #endregion
@@ -1937,16 +1922,19 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    internal sealed class TreeSet<T> : SortedSet<T>
+    internal sealed class TreeSet<T> : SortedSet<T> // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
     {
         public TreeSet()
             : base()
-        { }
+        { /* Intentionally blank */ }
 
-        public TreeSet(IComparer<T> comparer) : base(comparer) { }
+        public TreeSet(IComparer<T> comparer) : base(comparer) { /* Intentionally blank */ }
+
+        internal TreeSet(TreeSet<T> set, IComparer<T>? comparer) : base(set, comparer) { /* Intentionally blank */ }
 
 #if FEATURE_SERIALIZABLE
-        private TreeSet(SerializationInfo siInfo, StreamingContext context) : base(siInfo, context) { }
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        private TreeSet(SerializationInfo siInfo, StreamingContext context) : base(siInfo, context) { /* Intentionally blank */ }
 #endif
 
         internal override bool AddIfNotPresent(T item)

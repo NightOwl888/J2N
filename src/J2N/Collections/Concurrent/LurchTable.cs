@@ -18,6 +18,7 @@ using J2N.Collections.ObjectModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -2927,15 +2928,17 @@ namespace J2N.Collections.Concurrent
     /// Exception class: LurchTableCorruptionException
     /// The LurchTable internal datastructure appears to be corrupted.
     /// </summary>
-#if FEATURE_SERIALIZABLE
+#if FEATURE_SERIALIZABLE_EXCEPTIONS
     [Serializable]
 #endif
     public class LurchTableCorruptionException : Exception
     {
-#if FEATURE_SERIALIZABLE
+#if FEATURE_SERIALIZABLE_EXCEPTIONS
         /// <summary>
         /// Serialization constructor
         /// </summary>
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         protected LurchTableCorruptionException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context)
         {
         }

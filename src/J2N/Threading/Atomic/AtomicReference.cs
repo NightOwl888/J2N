@@ -35,7 +35,9 @@ namespace J2N.Threading.Atomic
     public class AtomicReference<T> where T : class
     {
         private T? value;
+#if !FEATURE_VOLATILE
         private static readonly T Comparand = (T)FormatterServices.GetUninitializedObject(typeof(T)); //does not call ctor
+#endif
 
         /// <summary>
         /// Creates a new <see cref="AtomicReference{T}"/> with the given initial <paramref name="value"/>.
@@ -66,7 +68,11 @@ namespace J2N.Threading.Atomic
         /// </summary>
         public T? Value
         {
+#if FEATURE_VOLATILE
+            get => Volatile.Read(ref value);
+#else
             get => Interlocked.CompareExchange(ref value, Comparand, Comparand);
+#endif
             set => Interlocked.Exchange(ref this.value, value);
         }
 

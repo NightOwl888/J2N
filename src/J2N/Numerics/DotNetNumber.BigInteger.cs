@@ -558,14 +558,18 @@ namespace J2N.Numerics
                         if (digit > 0)
                         {
                             // Now it's time to subtract our current quotient
+#pragma warning disable CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
                             uint carry = SubtractDivisor(ref rem, n, ref rhs, digit);
+#pragma warning restore CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
 
                             if (carry != t)
                             {
                                 Debug.Assert(carry == t + 1);
 
                                 // Our guess was still exactly one too high
+#pragma warning disable CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
                                 carry = AddDivisor(ref rem, n, ref rhs);
+#pragma warning restore CS9080 // Use of variable in this context may expose referenced variables outside of their declaration scope
                                 digit--;
 
                                 Debug.Assert(carry == 1);
@@ -870,7 +874,9 @@ namespace J2N.Numerics
                         fixed (uint* pBigNumEntry = &s_Pow10BigNumTable[s_Pow10BigNumTableIndices[index]])
                         {
                             ref BigInteger rhs = ref *(BigInteger*)(pBigNumEntry);
+#pragma warning disable CS9082 // Local is returned by reference but was initialized to a value that cannot be returned by reference
                             Multiply(ref lhs, ref rhs, out product);
+#pragma warning restore CS9082 // Local is returned by reference but was initialized to a value that cannot be returned by reference
                         }
 
                         // Swap to the next temporary
@@ -884,7 +890,9 @@ namespace J2N.Numerics
                     exponent >>= 1;
                 }
 
+#pragma warning disable CS9082 // Local is returned by reference but was initialized to a value that cannot be returned by reference
                 SetValue(out result, ref lhs);
+#pragma warning restore CS9082 // Local is returned by reference but was initialized to a value that cannot be returned by reference
             }
 
             private static uint AddDivisor(ref BigInteger lhs, int lhsStartIndex, ref BigInteger rhs)
@@ -1025,19 +1033,25 @@ namespace J2N.Numerics
 
             public void Multiply(uint value)
             {
+#pragma warning disable CS9084 // Struct member returns 'this' or other instance members by reference
                 Multiply(ref this, value, out this);
+#pragma warning restore CS9084 // Struct member returns 'this' or other instance members by reference
             }
 
             public void Multiply(ref BigInteger value)
             {
                 if (value._length <= 1)
                 {
+#pragma warning disable CS9084 // Struct member returns 'this' or other instance members by reference
                     Multiply(ref this, value.ToUInt32(), out this);
+#pragma warning restore CS9084 // Struct member returns 'this' or other instance members by reference
                 }
                 else
                 {
                     SetValue(out BigInteger temp, ref this);
+#pragma warning disable CS9080, CS9091, CS9094
                     Multiply(ref temp, ref value, out this);
+#pragma warning restore CS9080, CS9091, CS9094
                 }
             }
 

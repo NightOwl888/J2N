@@ -36,7 +36,9 @@ namespace J2N.Threading.Atomic
     public class AtomicReferenceArray<T> : IStructuralFormattable where T : class
     {
         private readonly T?[] array;
+#if !FEATURE_VOLATILE
         private static readonly T Comparand = (T)FormatterServices.GetUninitializedObject(typeof(T)); //does not call ctor
+#endif
 
         /// <summary>
         /// Creates a new <see cref="AtomicReferenceArray{T}"/> of given <paramref name="length"/>.
@@ -78,7 +80,11 @@ namespace J2N.Threading.Atomic
         /// <returns>The current value.</returns>
         public T? this[int index]
         {
+#if FEATURE_VOLATILE
+            get => Volatile.Read(ref array[index]);
+#else
             get => Interlocked.CompareExchange(ref array[index], Comparand, Comparand);
+#endif
             set => Interlocked.Exchange(ref array[index], value);
         }
 

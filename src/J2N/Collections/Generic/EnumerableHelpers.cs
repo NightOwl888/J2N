@@ -16,6 +16,10 @@ namespace J2N.Collections.Generic
     [SuppressMessage("Style", "IDE0063:Use simple 'using' statement", Justification = "Using Microsoft's code styles")]
     internal static partial class EnumerableHelpers
     {
+        /// <summary>Gets an enumerator singleton for an empty collection.</summary>
+        internal static IEnumerator<T> GetEmptyEnumerator<T>() =>
+            ((IEnumerable<T>)Arrays.Empty<T>()).GetEnumerator();
+
         /// <summary>Converts an enumerable to an array using the same logic as <see cref="List{T}"/>.</summary>
         /// <param name="source">The enumerable to convert.</param>
         /// <param name="length">The number of items stored in the resulting array, 0-indexed.</param>

@@ -3,14 +3,14 @@
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>1.0.2</MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>
-    <MicrosoftNETTestSdkPackageReferenceVersion>16.1.1</MicrosoftNETTestSdkPackageReferenceVersion>
+    <MicrosoftNETTestSdkPackageReferenceVersion>17.11.0</MicrosoftNETTestSdkPackageReferenceVersion>
     <MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>1.1.1</MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>
     <MicrosoftSourceLinkGitHubPackageReferenceVersion>$(MicrosoftSourceLinkAzureReposGitPackageReferenceVersion)</MicrosoftSourceLinkGitHubPackageReferenceVersion>
     <NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>
     <NetFxSystemMemoryPackageReferenceVersion>4.0.0</NetFxSystemMemoryPackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.10.1</NUnitPackageReferenceVersion>
-    <NUnit3TestAdapterPackageReferenceVersion>3.13.0</NUnit3TestAdapterPackageReferenceVersion>
+    <NUnit3TestAdapterPackageReferenceVersion>4.6.0</NUnit3TestAdapterPackageReferenceVersion>
     <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8</RandomizedTestingGeneratorsPackageReferenceVersion>
     <SystemBuffersPackageReferenceVersion>4.5.1</SystemBuffersPackageReferenceVersion>
     <SystemMemoryPackageReferenceVersion>4.5.5</SystemMemoryPackageReferenceVersion>

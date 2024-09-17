@@ -51,6 +51,9 @@ namespace J2N.Collections.ObjectModel
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyCollection<T>,
 #endif
+#if FEATURE_READONLYSET
+        IReadOnlySet<T>,
+#endif
         IStructuralEquatable, IStructuralFormattable
     {
         private static readonly bool TIsValueTypeOrStringOrStructuralEquatable = typeof(T).IsValueType || typeof(IStructuralEquatable).IsAssignableFrom(typeof(T)) || typeof(string).Equals(typeof(T));
@@ -341,6 +344,27 @@ namespace J2N.Collections.ObjectModel
         }
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)set).GetEnumerator();
+
+        #endregion
+
+        #region IReadOnlySet<T> Members
+
+#if FEATURE_READONLYSET
+
+        bool IReadOnlySet<T>.Contains(T item) => set.Contains(item);
+
+        bool IReadOnlySet<T>.IsProperSubsetOf(IEnumerable<T> other) => set.IsProperSubsetOf(other);
+
+        bool IReadOnlySet<T>.IsProperSupersetOf(IEnumerable<T> other) => set.IsProperSupersetOf(other);
+
+        bool IReadOnlySet<T>.IsSubsetOf(IEnumerable<T> other) => set.IsSubsetOf(other);
+
+        bool IReadOnlySet<T>.IsSupersetOf(IEnumerable<T> other) => set.IsSupersetOf(other);
+
+        bool IReadOnlySet<T>.Overlaps(IEnumerable<T> other) => set.Overlaps(other);
+
+        bool IReadOnlySet<T>.SetEquals(IEnumerable<T> other) => set.SetEquals(other);
+#endif
 
         #endregion
 

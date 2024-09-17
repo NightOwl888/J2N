@@ -44,7 +44,7 @@ namespace J2N.Collections.Generic
         }
 
         // This is used by the serialization engine.
-        //[Obsolete(Obsoletions.LegacyFormatterImplMessage, DiagnosticId = Obsoletions.LegacyFormatterImplDiagId, UrlFormat = Obsoletions.SharedUrlFormat)]
+        [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected NonRandomizedStringEqualityComparer(SerializationInfo information, StreamingContext context)
             : this(EqualityComparer<string?>.Default)

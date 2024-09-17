@@ -620,6 +620,7 @@ namespace J2N.Collections.Tests
         #endregion
 
         #region Non-randomized comparers
+
         [Fact]
         public void Dictionary_Comparer_NonRandomizedStringComparers()
         {
@@ -641,14 +642,17 @@ namespace J2N.Collections.Tests
 
                 Assert.Same(expected, dict.EqualityComparer);
 
+#if FEATURE_SERIALIZABLE
                 // Then pretend to serialize the dictionary and check the stored Comparer instance
 
                 SerializationInfo si = new SerializationInfo(typeof(Dictionary<string, object>), new FormatterConverter());
                 dict.GetObjectData(si, new StreamingContext(StreamingContextStates.All));
 
                 Assert.Same(expected, si.GetValue("EqualityComparer", typeof(SCG.IEqualityComparer<string>)));
+#endif
             }
         }
+
         #endregion
     }
 }
