@@ -223,7 +223,7 @@ stages:
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         Linux:
           osName: 'Linux'
-          imageName: 'ubuntu-latest'
+          imageName: 'ubuntu-22.04' # 24.04 now fails for net5.0 because of OpenSLL version issue, so we have to pin this.
           maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         macOS:
           osName: 'macOS'
