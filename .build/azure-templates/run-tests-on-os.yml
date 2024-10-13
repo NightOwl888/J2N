@@ -163,7 +163,7 @@ steps:
                 if ($running.Count -ge $maximumParalellJobs) {
                     Write-Host ""
                     Write-Host "  Running tests in parallel on $($running.Count) projects." -ForegroundColor Cyan
-                    Write-Host "  Next in queue is $projectName on $framework. This will take a bit, please wait..." -ForegroundColor Cyan
+                    Write-Host "  Next in queue is $testName on $framework. This will take a bit, please wait..." -ForegroundColor Cyan
                     $running | Wait-Job -Any | Out-Null
                 }
             }
