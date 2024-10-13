@@ -20,7 +20,7 @@ properties {
     [string]$minimumSdkVersion     = "8.0.100"
 
     #test parameters
-    [string]$testPlatforms         = "x64"
+    [string]$testPlatforms         = ""
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -122,6 +122,15 @@ task Test -depends Pack -description "This task runs the tests" {
     $testProjects = $testProjects | Sort-Object -Property FullName
     Ensure-Directory-Exists $testResultsDirectory
 
+    if ([String]::IsNullOrWhiteSpace($testPlatforms)) {
+        $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
+        $testPlatforms = switch ($architecture) {
+            "X64"  { "x64" }
+            "Arm64" { "arm64" }
+            Default { "x64" }
+        }
+    }
+
     foreach ($testProject in $testProjects) {
         $testName = $testProject.Directory.Name
     
@@ -139,6 +148,11 @@ task Test -depends Pack -description "This task runs the tests" {
 
             $testPlatformArray = $testPlatforms -split '\s*[;,]\s*'
             foreach ($testPlatform in $testPlatformArray) {
+
+                if ([System.Runtime.InteropServices.RuntimeInformation]::OSDescription -match "Darwin" -and $testPlatform -eq "arm64" -and $framework -eq "net5.0") {
+                    Write-Host "Using x64 test platform on macOS for .NET 5" -ForegroundColor DarkYellow
+                    $testPlatform = "x64"
+                }
 
                 $testResultDirectory = "$testResultsDirectory/$framework/$testPlatform/$testName"
                 Ensure-Directory-Exists $testResultDirectory
