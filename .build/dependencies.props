@@ -14,9 +14,11 @@
     <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8</RandomizedTestingGeneratorsPackageReferenceVersion>
     <SystemBuffersPackageReferenceVersion>4.5.1</SystemBuffersPackageReferenceVersion>
     <SystemMemoryPackageReferenceVersion>4.5.5</SystemMemoryPackageReferenceVersion>
+    <SystemNetHttpPackageReferenceVersion>4.3.4</SystemNetHttpPackageReferenceVersion>
     <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>6.0.0</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion Condition=" '$(TargetFramework)' == 'net45' ">4.7.1</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
+    <SystemTextRegularExpressionsPackageReferenceVersion>4.3.1</SystemTextRegularExpressionsPackageReferenceVersion>
     <XunitPackageReferenceVersion>2.4.1</XunitPackageReferenceVersion>
     <XunitRunnerVisualStudioPackageReferenceVersion>$(XunitPackageReferenceVersion)</XunitRunnerVisualStudioPackageReferenceVersion>
   </PropertyGroup>
