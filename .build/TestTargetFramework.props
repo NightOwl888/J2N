@@ -29,7 +29,8 @@
       net47             | net40
 
     -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net8.0;net6.0;net5.0;net48;net472;net471;net47</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net8.0;net6.0;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' AND $([MSBuild]::IsOsPlatform('Windows')) ">$(TargetFrameworks);net48;net472;net471;net47</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>
 
