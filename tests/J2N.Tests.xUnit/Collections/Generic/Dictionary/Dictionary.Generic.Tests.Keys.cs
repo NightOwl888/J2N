@@ -75,7 +75,7 @@ namespace J2N.Collections.Tests
 
         protected override ICollection NonGenericICollectionFactory()
         {
-            return new JCG.Dictionary<string, string>().Keys;
+            return (ICollection)new JCG.Dictionary<string, string>().Keys;
         }
 
         protected override ICollection NonGenericICollectionFactory(int count)
@@ -84,7 +84,7 @@ namespace J2N.Collections.Tests
             int seed = 13453;
             for (int i = 0; i < count; i++)
                 list.Add(CreateT(seed++), CreateT(seed++));
-            return list.Keys;
+            return (ICollection)list.Keys;
         }
 
         private string CreateT(int seed)

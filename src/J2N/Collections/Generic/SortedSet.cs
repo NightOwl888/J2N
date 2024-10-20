@@ -914,7 +914,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an <c>O(log n)</c> operation.
         /// </remarks>
-        public Enumerator GetEnumerator() => new Enumerator(this);
+        public IEnumerator<T> GetEnumerator() => new Enumerator(this);
+
+        internal Enumerator GetEnumeratorInternal() => new Enumerator(this);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
@@ -1203,8 +1205,8 @@ namespace J2N.Collections.Generic
                 // First do a merge sort to an array.
                 T[] merged = new T[asSorted.Count + this.Count];
                 int c = 0;
-                Enumerator mine = this.GetEnumerator();
-                Enumerator theirs = asSorted.GetEnumerator();
+                IEnumerator<T> mine = this.GetEnumerator();
+                IEnumerator<T> theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
                 while (!mineEnded && !theirsEnded)
                 {
@@ -1359,8 +1361,8 @@ namespace J2N.Collections.Generic
                 // First do a merge sort to an array.
                 T[] merged = new T[this.Count];
                 int c = 0;
-                Enumerator mine = this.GetEnumerator();
-                Enumerator theirs = asSorted.GetEnumerator();
+                IEnumerator<T> mine = this.GetEnumerator();
+                IEnumerator<T> theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
                 T? max = Max;
 
@@ -1782,8 +1784,8 @@ namespace J2N.Collections.Generic
             SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
             {
-                Enumerator mine = GetEnumerator();
-                Enumerator theirs = asSorted.GetEnumerator();
+                IEnumerator<T> mine = GetEnumerator();
+                IEnumerator<T> theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext();
                 bool theirsEnded = !theirs.MoveNext();
                 while (!mineEnded && !theirsEnded)

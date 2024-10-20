@@ -360,7 +360,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public KeyCollection Keys => _keys ??= new KeyCollection(this);
+        public ICollection<TKey> Keys => _keys ??= new KeyCollection(this);
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
@@ -384,7 +384,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public ValueCollection Values => _values ??= new ValueCollection(this);
+        public ICollection<TValue> Values => _values ??= new ValueCollection(this);
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
@@ -724,12 +724,12 @@ namespace J2N.Collections.Generic
 
         ICollection IDictionary.Keys
         {
-            get { return Keys; }
+            get { return (ICollection)Keys; }
         }
 
         ICollection IDictionary.Values
         {
-            get { return Values; }
+            get { return (ICollection)Values; }
         }
 
         object? IDictionary.this[object? key]
@@ -1038,7 +1038,7 @@ namespace J2N.Collections.Generic
 
             internal Enumerator(SortedDictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
             {
-                _treeEnum = dictionary._set.GetEnumerator();
+                _treeEnum = dictionary._set.GetEnumeratorInternal();
                 _getEnumeratorRetType = getEnumeratorRetType;
             }
 

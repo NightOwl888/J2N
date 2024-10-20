@@ -835,7 +835,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public KeyCollection Keys => _keys ??= new KeyCollection(this);
+        public ICollection<TKey> Keys => _keys ??= new KeyCollection(this);
 
         ICollection<TKey> IDictionary<TKey, TValue>.Keys => Keys;
 
@@ -854,7 +854,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
-        public ValueCollection Values => _values ??= new ValueCollection(this);
+        public ICollection<TValue> Values => _values ??= new ValueCollection(this);
 
         ICollection<TValue> IDictionary<TKey, TValue>.Values => Values;
 
@@ -1404,7 +1404,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public Enumerator GetEnumerator() => new Enumerator(this, Enumerator.KeyValuePair);
+        public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => new Enumerator(this, Enumerator.KeyValuePair);
 
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() =>
             Count == 0 ? GenericEmptyEnumerator<KeyValuePair<TKey, TValue>>.Instance :
@@ -1418,9 +1418,9 @@ namespace J2N.Collections.Generic
 
         bool IDictionary.IsFixedSize => false;
 
-        ICollection IDictionary.Keys => Keys;
+        ICollection IDictionary.Keys => (ICollection)Keys;
 
-        ICollection IDictionary.Values => Values;
+        ICollection IDictionary.Values => (ICollection)Values;
 
         bool IDictionary.IsReadOnly => false;
 
