@@ -244,7 +244,7 @@ namespace J2N.Numerics
         private OldFDBigIntForTest doubleToBigInt(double dval)
         {
             long lbits = BitConversion.DoubleToInt64Bits(dval) & ~signMask;
-            int binexp = (int)(lbits.TripleShift(expShift));
+            int binexp = (int)(lbits >>> expShift);
             lbits &= fractMask;
             if (binexp > 0)
             {
@@ -267,8 +267,7 @@ namespace J2N.Numerics
              * and we know how many there are.
              */
             int lowOrderZeros = expShift + 1 - nbits;
-            //lbits >>>= lowOrderZeros;
-            lbits = lbits.TripleShift(lowOrderZeros);
+            lbits >>>= lowOrderZeros;
 
             bigIntExp = binexp + 1 - nbits;
             bigIntNBits = nbits;
@@ -284,7 +283,7 @@ namespace J2N.Numerics
         private static double ulp(double dval, bool subtracting)
         {
             long lbits = BitConversion.DoubleToInt64Bits(dval) & ~signMask;
-            int binexp = (int)(lbits.TripleShift(expShift));
+            int binexp = (int)(lbits >>> expShift);
             double ulpval;
             if (subtracting && (binexp >= expShift) && ((lbits & fractMask) == 0L))
             {
@@ -661,7 +660,7 @@ namespace J2N.Numerics
                         }
                         else
                         {
-                            fractBits = fractBits.TripleShift(expShift - binExp);
+                            fractBits >>>= (expShift - binExp);
                         }
                         developLongDigits(0, fractBits, halfULP);
                         return;
@@ -743,7 +742,7 @@ namespace J2N.Numerics
              * OldFDBigIntForTest. The resulting whole number will be
              *      d * 2^(nFractBits-1-binExp).
              */
-            fractBits = fractBits.TripleShift(expShift + 1 - nFractBits);
+            fractBits >>>= (expShift + 1 - nFractBits);
             B2 -= nFractBits - 1;
             int common2factor = Math.Min(B2, S2);
             B2 -= common2factor;

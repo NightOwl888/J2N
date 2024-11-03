@@ -16,12 +16,10 @@
  */
 #endregion
 
-using J2N.Numerics;
 using System;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-
 
 namespace J2N
 {
@@ -54,7 +52,7 @@ namespace J2N
         public static int Signum(this int value)
         {
             // HD, Section 2-7
-            return (value >> 31) | ((-value).TripleShift(31));
+            return (value >> 31) | (-value >>> 31);
         }
 
         /// <summary>
@@ -68,7 +66,7 @@ namespace J2N
         public static int Signum(this long value)
         {
             // HD, Section 2-7
-            return (int)((value >> 63) | ((-value).TripleShift(63)));
+            return (int)((value >> 63) | (-value >>> 63));
         }
 
         /// <summary>

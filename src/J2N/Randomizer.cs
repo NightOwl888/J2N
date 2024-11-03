@@ -16,10 +16,8 @@
  */
 #endregion
 
-using J2N.Numerics;
 using System;
 using SR2 = J2N.Resources.Strings;
-
 
 namespace J2N
 {
@@ -135,7 +133,7 @@ namespace J2N
             lock (syncRoot)
             {
                 internalSeed = (internalSeed * multiplier + 0xbL) & ((1L << 48) - 1);
-                return (int)(internalSeed.TripleShift(48 - bits));
+                return (int)(internalSeed >>> (48 - bits));
             }
         }
 

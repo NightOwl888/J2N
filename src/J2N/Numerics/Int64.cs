@@ -454,7 +454,7 @@ namespace J2N.Numerics
         /// <returns>A 32-bit signed integer hash code.</returns>
         public override int GetHashCode()
         {
-            return (int)(value ^ (value.TripleShift(32)));
+            return (int)(value ^ (value >>> 32));
         }
 
         #endregion GetHashCode

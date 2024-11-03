@@ -82,9 +82,9 @@ namespace J2N.Numerics
             int mantissaBits = format.MantissaBits;
             int exponentBits = format.ExponentBits;
 
-            int ieeeExponent = (int)((bits.TripleShift(mantissaBits)) & ((1 << exponentBits) - 1));
+            int ieeeExponent = (int)((bits >>> mantissaBits) & ((1 << exponentBits) - 1));
             long ieeeMantissa = bits & ((1L << mantissaBits) - 1);
-            bool sign = ((bits.TripleShift(mantissaBits + exponentBits)) & 1) != 0;
+            bool sign = ((bits >>> (mantissaBits + exponentBits)) & 1) != 0;
             bool even = (bits & 1) == 0;
 
             // Exit early if it's NaN, Infinity, or 0.
