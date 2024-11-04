@@ -176,7 +176,7 @@ namespace J2N.Numerics
             int n = Math.Max((nDigits + 8) / 9, 2);        // estimate size needed.
             data = new int[n];      // allocate enough space
             data[0] = (int)lValue;    // starting value
-            data[1] = (int)(lValue.TripleShift(32));
+            data[1] = (int)(lValue >>> 32);
             offset = 0;
             nWords = 2;
             int i = kDigits;
@@ -240,7 +240,7 @@ namespace J2N.Numerics
                     {
                         return new FDBigInteger(new int[]{
                             pow5 << bitcount,
-                            pow5.TripleShift(32 - bitcount)
+                            pow5 >>> (32 - bitcount)
                     }, wordcount);
                     }
                 }
@@ -274,7 +274,7 @@ namespace J2N.Numerics
             Debug.Assert(p5 >= 0, p5.ToString());
             Debug.Assert(p2 >= 0, p2.ToString());
             int v0 = (int)value;
-            int v1 = (int)(value.TripleShift(32));
+            int v1 = (int)(value >>> 32);
             int wordcount = p2 >> 5;
             int bitcount = p2 & 0x1f;
             if (p5 != 0)
@@ -284,11 +284,10 @@ namespace J2N.Numerics
                     long pow5 = SMALL_5_POW[p5] & LONG_MASK;
                     long carry = (v0 & LONG_MASK) * pow5;
                     v0 = (int)carry;
-                    //carry >>>= 32;
-                    carry = carry.TripleShift(32);
+                    carry >>>= 32;
                     carry = (v1 & LONG_MASK) * pow5 + carry;
                     v1 = (int)carry;
-                    int v2 = (int)(carry.TripleShift(32));
+                    int v2 = (int)(carry >>> 32);
                     if (bitcount == 0)
                     {
                         return new FDBigInteger(new int[] { v0, v1, v2 }, wordcount);
@@ -297,9 +296,9 @@ namespace J2N.Numerics
                     {
                         return new FDBigInteger(new int[]{
                             v0 << bitcount,
-                            (v1 << bitcount) | (v0.TripleShift(32 - bitcount)),
-                            (v2 << bitcount) | (v1.TripleShift(32 - bitcount)),
-                            v2.TripleShift(32 - bitcount)
+                            (v1 << bitcount) | (v0 >>> (32 - bitcount)),
+                            (v2 << bitcount) | (v1 >>> (32 - bitcount)),
+                            v2 >>> (32 - bitcount)
                     }, wordcount);
                     }
                 }
@@ -330,8 +329,8 @@ namespace J2N.Numerics
                 {
                     return new FDBigInteger(new int[]{
                          v0 << bitcount,
-                        (v1 << bitcount) | (v0.TripleShift(32 - bitcount)),
-                        v1.TripleShift(32 - bitcount)
+                        (v1 << bitcount) | (v0 >>> (32 - bitcount)),
+                        v1 >>> (32 - bitcount)
                 }, wordcount);
                 }
             }
@@ -431,7 +430,7 @@ namespace J2N.Numerics
             {
                 int v2 = (prev << bitcount);
                 prev = src[idx - 1];
-                v2 |= (prev.TripleShift(anticount));
+                v2 |= (prev >>> anticount);
                 result[idx] = v2;
             }
             int v = prev << bitcount;
@@ -483,7 +482,7 @@ namespace J2N.Numerics
                     int anticount = 32 - bitcount;
                     int idx = nWords - 1;
                     int prev = data[idx];
-                    int hi = prev.TripleShift(anticount);
+                    int hi = prev >>> anticount;
                     int[] result;
                     if (hi != 0)
                     {
@@ -509,12 +508,12 @@ namespace J2N.Numerics
                         int prev = data[idx];
                         for (; idx < nWords - 1; idx++)
                         {
-                            int v2 = (prev.TripleShift(anticount));
+                            int v2 = (prev >>> anticount);
                             prev = data[idx + 1];
                             v2 |= (prev << bitcount);
                             data[idx] = v2;
                         }
-                        int v = prev.TripleShift(anticount);
+                        int v = prev >>> anticount;
                         data[idx] = v;
                         if (v == 0)
                         {
@@ -526,7 +525,7 @@ namespace J2N.Numerics
                     {
                         int idx = nWords - 1;
                         int prev = data[idx];
-                        int hi = prev.TripleShift(anticount);
+                        int hi = prev >>> anticount;
                         int[] result = data;
                         int[] src = data;
                         if (hi != 0)
@@ -642,8 +641,7 @@ namespace J2N.Numerics
                     {
                         sum += (td[tIndex] & LONG_MASK) + (sd[sIndex] & LONG_MASK);
                         td[tIndex] = (int)sum;
-                        //sum >>>= 32; // Signed or unsigned, answer is 0 or 1
-                        sum = sum.TripleShift(32); // Signed or unsigned, answer is 0 or 1
+                        sum >>>= 32; // Signed or unsigned, answer is 0 or 1
                     }
                     //
                     // Originally the following line read
@@ -811,8 +809,7 @@ namespace J2N.Numerics
                 {
                     p += (dst[i + j] & LONG_MASK) + v * (s2[j] & LONG_MASK);
                     dst[i + j] = (int)p;
-                    //p >>>= 32;
-                    p = p.TripleShift(32);
+                    p >>>= 32;
                 }
                 dst[i + s2Len] = (int)p;
             }
@@ -1168,9 +1165,9 @@ namespace J2N.Numerics
             {
                 top += (small.data[small.nWords - 1] & LONG_MASK);
             }
-            if ((top.TripleShift(32)) == 0)
+            if ((top >>> 32) == 0)
             {
-                if (((top + 1).TripleShift(32)) == 0)
+                if (((top + 1) >>> 32) == 0)
                 {
                     // good case - no carry extension
                     if (bSize < thSize)
@@ -1196,8 +1193,7 @@ namespace J2N.Numerics
                     return -1;
                 }
                 // here sum.nWords == this.nWords
-                //top >>>= 32;
-                top = top.TripleShift(32);
+                top >>>= 32;
                 long v = (this.data[this.nWords - 1] & LONG_MASK);
                 if (v < top)
                 {
@@ -1372,14 +1368,12 @@ namespace J2N.Numerics
             // unroll 0th iteration, doing addition.
             long p = v * (data[0] & LONG_MASK) + (addend & LONG_MASK);
             data[0] = (int)p;
-            //p >>>= 32;
-            p = p.TripleShift(32);
+            p >>>= 32;
             for (int i = 1; i < nWords; i++)
             {
                 p += v * (data[i] & LONG_MASK);
                 data[i] = (int)p;
-                //p >>>= 32;
-                p = p.TripleShift(32);
+                p >>>= 32;
             }
             if (p != 0L)
             {
@@ -1496,7 +1490,7 @@ namespace J2N.Numerics
             {
                 long product = (src[i] & LONG_MASK) * 10L + carry;
                 dst[i] = (int)product;
-                carry = product.TripleShift(32);
+                carry = product >>> 32;
             }
             return (int)carry;
         }
@@ -1523,7 +1517,7 @@ namespace J2N.Numerics
             {
                 long product = (src[i] & LONG_MASK) * val + carry;
                 dst[i] = (int)product;
-                carry = product.TripleShift(32);
+                carry = product >>> 32;
             }
             dst[srcLen] = (int)carry;
         }
@@ -1552,7 +1546,7 @@ namespace J2N.Numerics
             {
                 long product = v * (src[j] & LONG_MASK) + carry;
                 dst[j] = (int)product;
-                carry = product.TripleShift(32);
+                carry = product >>> 32;
             }
             dst[srcLen] = (int)carry;
             v = v1 & LONG_MASK;
@@ -1561,7 +1555,7 @@ namespace J2N.Numerics
             {
                 long product = (dst[j + 1] & LONG_MASK) + v * (src[j] & LONG_MASK) + carry;
                 dst[j + 1] = (int)product;
-                carry = product.TripleShift(32);
+                carry = product >>> 32;
             }
             dst[srcLen + 1] = (int)carry;
         }

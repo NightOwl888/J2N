@@ -465,7 +465,7 @@ namespace J2N.Numerics
         public override int GetHashCode()
         {
             long v = BitConversion.DoubleToInt64Bits(value);
-            return (int)(v ^ (v.TripleShift(32)));
+            return (int)(v ^ (v >>> 32));
         }
 
         #endregion GetHashCode

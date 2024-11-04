@@ -48,7 +48,7 @@ namespace J2N.Numerics
         {
             data = new int[2];
             data[0] = (int)v;
-            data[1] = (int)(v.TripleShift(32));
+            data[1] = (int)(v >>> 32);
             nWords = (data[1] == 0) ? 1 : 2;
         }
 
@@ -70,7 +70,7 @@ namespace J2N.Numerics
             if (n < 2) n = 2;
             data = new int[n];      // allocate enough space
             data[0] = (int)seed;    // starting value
-            data[1] = (int)(seed.TripleShift(32));
+            data[1] = (int)(seed >>> 32);
             nWords = (data[1] == 0) ? 1 : 2;
             int i = nd0;
             int limit = nd - 5;       // slurp digits 5 at a time.
@@ -131,10 +131,10 @@ namespace J2N.Numerics
             }
             else
             {
-                t[target--] = s[src].TripleShift(anticount);
+                t[target--] = s[src] >>> anticount;
                 while (src >= 1)
                 {
-                    t[target--] = (s[src] << bitcount) | (s[--src].TripleShift(anticount));
+                    t[target--] = (s[src] << bitcount) | (s[--src] >>> anticount);
                 }
                 t[target--] = s[src] << bitcount;
             }
@@ -193,8 +193,7 @@ namespace J2N.Numerics
                 // will have to shift up into the next word.
                 // too bad.
                 for (bitcount = 32; (v & 0xf0000000) != 0; bitcount--)
-                    //v >>>= 1;
-                    v = v.TripleShift(1);
+                    v >>>= 1;
             }
             else
             {
@@ -233,8 +232,7 @@ namespace J2N.Numerics
             {
                 p += v * ((long)data[i] & 0xffffffffL);
                 r[i] = (int)p;
-                //p >>>= 32;
-                p = p.TripleShift(32);
+                p >>>= 32;
             }
             if (p == 0L)
             {
@@ -260,14 +258,12 @@ namespace J2N.Numerics
             // unroll 0th iteration, doing addition.
             p = v * ((long)data[0] & 0xffffffffL) + ((long)addend & 0xffffffffL);
             data[0] = (int)p;
-            //p >>>= 32;
-            p = p.TripleShift(32);
+            p >>>= 32;
             for (int i = 1; i < nWords; i++)
             {
                 p += v * ((long)data[i] & 0xffffffffL);
                 data[i] = (int)p;
-                //p >>>= 32;
-                p = p.TripleShift(32);
+                p >>>= 32;
             }
             if (p != 0L)
             {
@@ -296,8 +292,7 @@ namespace J2N.Numerics
                 {
                     p += ((long)r[i + j] & 0xffffffffL) + v * ((long)other.data[j] & 0xffffffffL); // UNSIGNED CONVERSIONS ALL 'ROUND.
                     r[i + j] = (int)p;
-                    //p >>>= 32;
-                    p = p.TripleShift(32);
+                    p >>>= 32;
                 }
                 r[i + j] = (int)p;
             }
@@ -501,8 +496,7 @@ namespace J2N.Numerics
                     {
                         sum += ((long)data[i] & 0xffffffffL) + ((long)S.data[i] & 0xffffffffL);
                         data[i] = (int)sum;
-                        //sum >>= 32; // Signed or unsigned, answer is 0 or 1
-                        sum = sum.TripleShift(32);
+                        sum >>>= 32; // Signed or unsigned, answer is 0 or 1
                     }
                     /*
                      * Originally the following line read

@@ -44,11 +44,11 @@ namespace J2N.Numerics
             return System.Numerics.BitOperations.PopCount((uint)value);
 #else
             // Hacker's Delight, Figure 5-2
-            value -= ((value.TripleShift(1)) & 0x55555555);
-            value = (value & 0x33333333) + ((value.TripleShift(2)) & 0x33333333);
-            value = (value + (value.TripleShift(4))) & 0x0f0f0f0f;
-            value += (value.TripleShift(8));
-            value += (value.TripleShift(16));
+            value -= ((value >>> 1) & 0x55555555);
+            value = (value & 0x33333333) + ((value >>> 2) & 0x33333333);
+            value = (value + (value >>> 4)) & 0x0f0f0f0f;
+            value += (value >>> 8);
+            value += (value >>> 16);
             return value & 0x3f;
 #endif
         }
@@ -67,12 +67,12 @@ namespace J2N.Numerics
             return System.Numerics.BitOperations.PopCount((ulong)value);
 #else
             // Hacker's Delight, Figure 5-14
-            value -= ((value.TripleShift(1)) & 0x5555555555555555L);
-            value = (value & 0x3333333333333333L) + ((value.TripleShift(2)) & 0x3333333333333333L);
-            value = (value + (value.TripleShift(4))) & 0x0f0f0f0f0f0f0f0fL;
-            value += (value.TripleShift(8));
-            value += (value.TripleShift(16));
-            value += (value.TripleShift(32));
+            value -= ((value >>> 1) & 0x5555555555555555L);
+            value = (value & 0x3333333333333333L) + ((value >>> 2) & 0x3333333333333333L);
+            value = (value + (value >>> 4)) & 0x0f0f0f0f0f0f0f0fL;
+            value += (value >>> 8);
+            value += (value >>> 16);
+            value += (value >>> 32);
             return (int)value & 0x7f;
 #endif
         }
@@ -239,7 +239,7 @@ namespace J2N.Numerics
             value |= (value >> 4);
             value |= (value >> 8);
             value |= (value >> 16);
-            return (value & ~(value.TripleShift(1)));
+            return (value & ~(value >>> 1));
         }
 
         /// <summary>
@@ -262,7 +262,7 @@ namespace J2N.Numerics
             value |= (value >> 8);
             value |= (value >> 16);
             value |= (value >> 32);
-            return (value & ~(value.TripleShift(1)));
+            return (value & ~(value >>> 1));
         }
 
         #endregion HighestOneBit
@@ -347,11 +347,11 @@ namespace J2N.Numerics
         public static int Reverse(this int value)
         {
             // From Hacker's Delight, 7-1, Figure 7-1
-            value = (value & 0x55555555) << 1 | (value.TripleShift(1)) & 0x55555555;
-            value = (value & 0x33333333) << 2 | (value.TripleShift(2)) & 0x33333333;
-            value = (value & 0x0f0f0f0f) << 4 | (value.TripleShift(4)) & 0x0f0f0f0f;
+            value = (value & 0x55555555) << 1 | (value >>> 1) & 0x55555555;
+            value = (value & 0x33333333) << 2 | (value >>> 2) & 0x33333333;
+            value = (value & 0x0f0f0f0f) << 4 | (value >>> 4) & 0x0f0f0f0f;
             value = (value << 24) | ((value & 0xff00) << 8) |
-                ((value.TripleShift(8)) & 0xff00) | (value.TripleShift(24));
+                ((value >>> 8) & 0xff00) | (value >>> 24);
             return value;
         }
 
@@ -365,12 +365,12 @@ namespace J2N.Numerics
         public static long Reverse(this long value)
         {
             // From Hacker's Delight, 7-1, Figure 7-1
-            value = (value & 0x5555555555555555L) << 1 | (value.TripleShift(1)) & 0x5555555555555555L;
-            value = (value & 0x3333333333333333L) << 2 | (value.TripleShift(2)) & 0x3333333333333333L;
-            value = (value & 0x0f0f0f0f0f0f0f0fL) << 4 | (value.TripleShift(4)) & 0x0f0f0f0f0f0f0f0fL;
-            value = (value & 0x00ff00ff00ff00ffL) << 8 | (value.TripleShift(8)) & 0x00ff00ff00ff00ffL;
+            value = (value & 0x5555555555555555L) << 1 | (value >>> 1) & 0x5555555555555555L;
+            value = (value & 0x3333333333333333L) << 2 | (value >>> 2) & 0x3333333333333333L;
+            value = (value & 0x0f0f0f0f0f0f0f0fL) << 4 | (value >>> 4) & 0x0f0f0f0f0f0f0f0fL;
+            value = (value & 0x00ff00ff00ff00ffL) << 8 | (value >>> 8) & 0x00ff00ff00ff00ffL;
             value = (value << 48) | ((value & 0xffff0000L) << 16) |
-                ((value.TripleShift(16)) & 0xffff0000L) | (value.TripleShift(48));
+                ((value >>> 16) & 0xffff0000L) | (value >>> 48);
             return value;
         }
 
@@ -401,7 +401,7 @@ namespace J2N.Numerics
         /// <paramref name="value"/>.</returns>
         public static int ReverseBytes(this int value)
         {
-            return ((value.TripleShift(24))) |
+            return ((value >>> 24)) |
                    ((value >> 8) & 0xFF00) |
                    ((value << 8) & 0xFF0000) |
                    ((value << 24));
@@ -417,11 +417,11 @@ namespace J2N.Numerics
         public static long ReverseBytes(this long value)
         {
             value = (value & 0x00ff00ff00ff00ffL) << 8 |
-                (value.TripleShift(8)) & 0x00ff00ff00ff00ffL;
+                (value >>> 8) & 0x00ff00ff00ff00ffL;
             return (value << 48) |
                 ((value & 0xffff0000L) << 16) |
-                ((value.TripleShift(16)) & 0xffff0000L) |
-                (value.TripleShift(48));
+                ((value >>> 16) & 0xffff0000L) |
+                (value >>> 48);
         }
 
         #endregion
@@ -459,7 +459,7 @@ namespace J2N.Numerics
 #if FEATURE_NUMERICBITOPERATIONS
             return (int)System.Numerics.BitOperations.RotateLeft((uint)value, distance);
 #else
-            return ((value << distance) | (value.TripleShift(-distance)));
+            return ((value << distance) | (value >>> -distance));
 #endif
         }
 
@@ -497,7 +497,7 @@ namespace J2N.Numerics
 #if FEATURE_NUMERICBITOPERATIONS
             return (long)System.Numerics.BitOperations.RotateLeft((ulong)value, distance);
 #else
-            return ((value << distance) | (value.TripleShift(-distance)));
+            return ((value << distance) | (value >>> -distance));
 #endif
         }
 
@@ -536,7 +536,7 @@ namespace J2N.Numerics
 #if FEATURE_NUMERICBITOPERATIONS
             return (int)System.Numerics.BitOperations.RotateRight((uint)value, distance);
 #else
-            return ((value.TripleShift(distance)) | (value << (-distance)));
+            return ((value >>> distance) | (value << (-distance)));
 #endif
         }
 
@@ -571,7 +571,7 @@ namespace J2N.Numerics
 #if FEATURE_NUMERICBITOPERATIONS
             return (long)System.Numerics.BitOperations.RotateRight((ulong)value, distance);
 #else
-            return ((value.TripleShift(distance)) | (value << (-distance)));
+            return ((value >>> distance) | (value << -distance));
 #endif
         }
 

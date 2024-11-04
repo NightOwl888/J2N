@@ -16,7 +16,6 @@
  */
 #endregion
 
-using J2N.Numerics;
 using System;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -311,11 +310,11 @@ namespace J2N.Collections
             int idx1 = position1 >> Offset;
             int idx2 = (position2 - 1) >> Offset;
             long factor1 = (~0L) << (position1 & RightBits);
-            long factor2 = (~0L).TripleShift(ElmSize - (position2 & RightBits));
+            long factor2 = (~0L) >>> (ElmSize - (position2 & RightBits));
 
             if (idx1 == idx2)
             {
-                long result = (bits[idx1] & (factor1 & factor2)).TripleShift(position1 % ElmSize);
+                long result = (bits[idx1] & (factor1 & factor2)) >>> (position1 % ElmSize);
                 if (result == 0)
                 {
                     return new BitSet(0);
@@ -343,7 +342,7 @@ namespace J2N.Collections
                 {
                     // shift the current element to the right regardless of
                     // sign
-                    newbits[i] = newbits[i].TripleShift(numBitsToShift);
+                    newbits[i] >>>= numBitsToShift;
 
                     // apply the last x bits of newbits[i+1] to the current
                     // element
@@ -440,7 +439,7 @@ namespace J2N.Collections
             int idx1 = position1 >> Offset;
             int idx2 = (position2 - 1) >> Offset;
             long factor1 = (~0L) << (position1 & RightBits);
-            long factor2 = (~0L).TripleShift(ElmSize - (position2 & RightBits));
+            long factor2 = (~0L) >>> (ElmSize - (position2 & RightBits));
 
             if (idx1 == idx2)
             {
@@ -572,7 +571,7 @@ namespace J2N.Collections
             int idx1 = position1 >> Offset;
             int idx2 = (position2 - 1) >> Offset;
             long factor1 = (~0L) << (position1 & RightBits);
-            long factor2 = (~0L).TripleShift(ElmSize - (position2 & RightBits));
+            long factor2 = (~0L) >>> (ElmSize - (position2 & RightBits));
 
             if (idx1 == idx2)
             {
@@ -651,7 +650,7 @@ namespace J2N.Collections
             int idx1 = position1 >> Offset;
             int idx2 = (position2 - 1) >> Offset;
             long factor1 = (~0L) << (position1 & RightBits);
-            long factor2 = (~0L).TripleShift(ElmSize - (position2 & RightBits));
+            long factor2 = (~0L) >>> (ElmSize - (position2 & RightBits));
 
             if (idx1 == idx2)
             {
@@ -1115,7 +1114,7 @@ namespace J2N.Collections
                 for (int idx = 0; idx < length; idx++)
                 {
                     count += Pop(bits[idx] & 0xffffffffL);
-                    count += Pop(bits[idx].TripleShift(32));
+                    count += Pop(bits[idx] >>> 32);
                 }
                 return count;
             }
@@ -1124,11 +1123,11 @@ namespace J2N.Collections
         [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
         private static int Pop(long x)
         {
-            x = x - (x.TripleShift(1) & 0x55555555);
-            x = (x & 0x33333333) + ((x.TripleShift(2)) & 0x33333333);
-            x = (x + (x.TripleShift(4))) & 0x0f0f0f0f;
-            x = x + (x.TripleShift(8));
-            x = x + (x.TripleShift(16));
+            x = x - ((x >>> 1) & 0x55555555);
+            x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+            x = (x + (x >>> 4)) & 0x0f0f0f0f;
+            x = x + (x >>> 8);
+            x = x + (x >>> 16);
             return (int)x & 0x0000003f;
         }
 

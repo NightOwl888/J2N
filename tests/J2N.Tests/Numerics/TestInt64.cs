@@ -661,10 +661,10 @@ namespace J2N.Numerics
         [Test]
         public void Test_hashCode()
         {
-            assertEquals((int)(1L ^ (1L.TripleShift(32))), new Int64(1).GetHashCode());
-            assertEquals((int)(2L ^ (2L.TripleShift(32))), new Int64(2).GetHashCode());
-            assertEquals((int)(0L ^ (0L.TripleShift(32))), new Int64(0).GetHashCode());
-            assertEquals((int)(-1L ^ ((-1L).TripleShift(32))), new Int64(-1).GetHashCode());
+            assertEquals((int)(1L ^ (1L >>> 32)), new Int64(1).GetHashCode());
+            assertEquals((int)(2L ^ (2L >>> 32)), new Int64(2).GetHashCode());
+            assertEquals((int)(0L ^ (0L >>> 32)), new Int64(0).GetHashCode());
+            assertEquals(unchecked((int)(-1L ^ (-1L >>> 32))), new Int64(-1).GetHashCode());
         }
 
         // J2N: Removed this overload because all of the constructors are deprecated in JDK 16

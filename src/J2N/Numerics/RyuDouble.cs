@@ -899,7 +899,7 @@ namespace J2N.Numerics
             if (bits == unchecked((long)0x8000000000000000L)) return string.Concat(info.NegativeSign, "0", info.NumberDecimalSeparator, "0");
 
             // Otherwise extract the mantissa and exponent bits and run the full algorithm.
-            int ieeeExponent = (int)((bits.TripleShift(DOUBLE_MANTISSA_BITS)) & DOUBLE_EXPONENT_MASK);
+            int ieeeExponent = (int)((bits >>> DOUBLE_MANTISSA_BITS) & DOUBLE_EXPONENT_MASK);
             long ieeeMantissa = bits & DOUBLE_MANTISSA_MASK;
             int e2;
             long m2;
@@ -971,7 +971,7 @@ namespace J2N.Numerics
             bool dmIsTrailingZeros = false, dvIsTrailingZeros = false;
             if (e2 >= 0)
             {
-                int q = Math.Max(0, (e2 * 78913).TripleShift(18) - 1);
+                int q = Math.Max(0, ((e2 * 78913) >>> 18) - 1);
                 // k = constant + floor(log_2(5^q))
                 int k = POW5_INV_BITCOUNT + Pow5bits(q) - 1;
                 int i = -e2 + q + k;
@@ -1018,7 +1018,7 @@ namespace J2N.Numerics
             }
             else
             {
-                int q = Math.Max(0, ((-e2 * 732923).TripleShift(20)) - 1);
+                int q = Math.Max(0, ((-e2 * 732923) >>> 20) - 1);
                 int i = -e2 - q;
                 int k = Pow5bits(i) - POW5_BITCOUNT;
                 int j = q - k;
@@ -1304,7 +1304,7 @@ namespace J2N.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static int Pow5bits(int e)
         {
-            return ((e * 1217359).TripleShift(19)) + 1;
+            return ((e * 1217359) >>> 19) + 1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)] // J2N: Only called in one place
@@ -1367,7 +1367,7 @@ namespace J2N.Numerics
         private static long MulPow5divPow2(long m, int i, int j)
         {
             // m has at most 55 bits.
-            long mHigh = m.TripleShift(31);
+            long mHigh = m >>> 31;
             long mLow = m & 0x7fffffff;
             long bits13 = mHigh * POW5_SPLIT[i][0]; // 124
             long bits03 = mLow * POW5_SPLIT[i][0];  // 93
@@ -1383,10 +1383,10 @@ namespace J2N.Numerics
                 throw new ArgumentException("" + actualShift);
             }
             return ((((((
-                ((bits00.TripleShift(31)) + bits01 + bits10).TripleShift(31))
-                                 + bits02 + bits11).TripleShift(31))
-                                 + bits03 + bits12).TripleShift(21))
-                                 + (bits13 << 10)).TripleShift(actualShift);
+                ((bits00 >>> 31) + bits01 + bits10) >>> 31)
+                                 + bits02 + bits11) >>> 31)
+                                 + bits03 + bits12) >>> 21)
+                                 + (bits13 << 10)) >>> actualShift;
         }
 
         /// <summary>
@@ -1396,7 +1396,7 @@ namespace J2N.Numerics
         private static long MulPow5InvDivPow2(long m, int i, int j)
         {
             // m has at most 55 bits.
-            long mHigh = m.TripleShift(31);
+            long mHigh = m >>> 31;
             long mLow = m & 0x7fffffff;
             long bits13 = mHigh * POW5_INV_SPLIT[i][0];
             long bits03 = mLow * POW5_INV_SPLIT[i][0];
@@ -1413,10 +1413,10 @@ namespace J2N.Numerics
                 throw new ArgumentException("" + actualShift);
             }
             return ((((((
-                ((bits00.TripleShift(31)) + bits01 + bits10).TripleShift(31))
-                                 + bits02 + bits11).TripleShift(31))
-                                 + bits03 + bits12).TripleShift(21))
-                                 + (bits13 << 10)).TripleShift(actualShift);
+                ((bits00 >>> 31) + bits01 + bits10) >>> 31)
+                                 + bits02 + bits11) >>> 31)
+                                 + bits03 + bits12) >>> 21)
+                                 + (bits13 << 10)) >>> actualShift;
         }
     }
 }

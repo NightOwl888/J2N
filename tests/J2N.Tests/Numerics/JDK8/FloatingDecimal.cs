@@ -675,8 +675,7 @@ namespace J2N.Numerics
                             }
                             else
                             {
-                                //fractBits >>>= (EXP_SHIFT - binExp);
-                                fractBits = fractBits.TripleShift(EXP_SHIFT - binExp);
+                                fractBits >>>= (EXP_SHIFT - binExp);
                             }
                             DevelopLongDigits(0, fractBits, insignificant);
                             return;
@@ -739,8 +738,7 @@ namespace J2N.Numerics
                 // FDBigInteger. The resulting whole number will be
                 //      d * 2^(nFractBits-1-binExp).
                 //
-                //fractBits >>>= tailZeros;
-                fractBits = fractBits.TripleShift(tailZeros);
+                fractBits >>>= tailZeros;
                 B2 -= nFractBits - 1;
                 int common2factor = Math.Min(B2, S2);
                 B2 -= common2factor;
@@ -1578,7 +1576,7 @@ namespace J2N.Numerics
                 while (true)
                 {
                     // here ieeeBits can't be NaN, Infinity or zero
-                    int binexp = (int)(ieeeBits.TripleShift(EXP_SHIFT));
+                    int binexp = (int)(ieeeBits >>> EXP_SHIFT);
                     long bigBbits = ieeeBits & DoubleConsts.SIGNIF_BIT_MASK;
                     if (binexp > 0)
                     {
@@ -1594,8 +1592,7 @@ namespace J2N.Numerics
                     }
                     binexp -= DoubleConsts.EXP_BIAS;
                     int lowOrderZeros = bigBbits.TrailingZeroCount();
-                    //bigBbits >>>= lowOrderZeros;
-                    bigBbits = bigBbits.TripleShift(lowOrderZeros);
+                    bigBbits >>>= lowOrderZeros;
                     int bigIntExp = binexp - EXP_SHIFT + lowOrderZeros;
                     int bigIntNBits = EXP_SHIFT + 1 - lowOrderZeros;
 
@@ -1939,7 +1936,7 @@ namespace J2N.Numerics
                 while (true)
                 {
                     // here ieeeBits can't be NaN, Infinity or zero
-                    int binexp = ieeeBits.TripleShift(SINGLE_EXP_SHIFT);
+                    int binexp = ieeeBits >>> SINGLE_EXP_SHIFT;
                     int bigBbits = ieeeBits & FloatConsts.SIGNIF_BIT_MASK;
                     if (binexp > 0)
                     {
@@ -1955,8 +1952,7 @@ namespace J2N.Numerics
                     }
                     binexp -= FloatConsts.EXP_BIAS;
                     int lowOrderZeros = bigBbits.TrailingZeroCount();
-                    //bigBbits >>>= lowOrderZeros;
-                    bigBbits = bigBbits.TripleShift(lowOrderZeros);
+                    bigBbits >>>= lowOrderZeros;
                     int bigIntExp = binexp - SINGLE_EXP_SHIFT + lowOrderZeros;
                     int bigIntNBits = SINGLE_EXP_SHIFT + 1 - lowOrderZeros;
 
@@ -2893,7 +2889,7 @@ namespace J2N.Numerics
                     {
                         int threshShift = DoubleConsts.SIGNIFICAND_WIDTH - FloatConsts.SIGNIFICAND_WIDTH - 1;
                         bool floatSticky = (significand & ((1L << threshShift) - 1)) != 0 || round || sticky;
-                        int iValue = (int)(significand.TripleShift(threshShift));
+                        int iValue = (int)(significand >>> threshShift);
                         if ((iValue & 3) != 1 || floatSticky)
                         {
                             iValue++;
@@ -2914,7 +2910,7 @@ namespace J2N.Numerics
                         Debug.Assert(threshShift >= DoubleConsts.SIGNIFICAND_WIDTH - FloatConsts.SIGNIFICAND_WIDTH);
                         Debug.Assert(threshShift < DoubleConsts.SIGNIFICAND_WIDTH);
                         bool floatSticky = (significand & ((1L << threshShift) - 1)) != 0 || round || sticky;
-                        int iValue = (int)(significand.TripleShift(threshShift));
+                        int iValue = (int)(significand >>> threshShift);
                         if ((iValue & 3) != 1 || floatSticky)
                         {
                             iValue++;

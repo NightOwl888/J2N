@@ -513,7 +513,7 @@ namespace J2N.Numerics
 
             bool negative = (bitValue & unchecked((long)0x8000000000000000L)) != 0;
             // mask exponent bits and shift down
-            long exponent = (bitValue & 0x7FF0000000000000L).TripleShift(52);
+            long exponent = (bitValue & 0x7FF0000000000000L) >>> 52;
             // mask significand bits and shift up
             long significand = bitValue & 0x000FFFFFFFFFFFFFL;
 
@@ -542,7 +542,7 @@ namespace J2N.Numerics
                 // them
                 while ((significand != 0) && ((significand & 0xF) == 0))
                 {
-                    significand = significand.TripleShift(4);
+                    significand >>>= 4;
                     fractionDigits--;
                 }
                 string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
@@ -569,7 +569,7 @@ namespace J2N.Numerics
                 // them
                 while ((significand != 0) && ((significand & 0xF) == 0))
                 {
-                    significand = significand.TripleShift(4);
+                    significand >>>= 4;
                     fractionDigits--;
                 }
                 string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
@@ -913,7 +913,7 @@ namespace J2N.Numerics
 
             bool negative = (bitValue & 0x80000000) != 0;
             // mask exponent bits and shift down
-            int exponent = (bitValue & 0x7f800000).TripleShift(23);
+            int exponent = (bitValue & 0x7f800000) >>> 23;
             // mask significand bits and shift up
             // significand is 23-bits, so we shift to treat it like 24-bits
             int significand = (bitValue & 0x007FFFFF) << 1;
@@ -942,8 +942,7 @@ namespace J2N.Numerics
                 // them
                 while ((significand != 0) && ((significand & 0xF) == 0))
                 {
-                    //significand >>>= 4;
-                    significand = significand.TripleShift(4);
+                    significand >>>= 4;
                     fractionDigits--;
                 }
                 string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
@@ -970,8 +969,7 @@ namespace J2N.Numerics
                 // them
                 while ((significand != 0) && ((significand & 0xF) == 0))
                 {
-                    //significand >>>= 4;
-                    significand = significand.TripleShift(4);
+                    significand >>>= 4;
                     fractionDigits--;
                 }
                 string hexSignificand = significand.ToString(upperCase ? "X" : "x", info);
@@ -3228,4 +3226,3 @@ namespace J2N.Numerics
         }
     }
 }
-
