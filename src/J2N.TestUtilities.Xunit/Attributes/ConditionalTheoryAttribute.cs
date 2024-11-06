@@ -8,10 +8,9 @@ using System.Diagnostics.CodeAnalysis;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
-
-    [XunitTestCaseDiscoverer("Xunit.ConditionalTheoryDiscoverer", "J2N.Tests.xUnit")]
+    [XunitTestCaseDiscoverer("J2N.TestUtilities.Xunit.ConditionalTheoryDiscoverer", "J2N.TestUtilities.Xunit")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public sealed class ConditionalTheoryAttribute : TheoryAttribute
     {

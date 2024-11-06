@@ -1,0 +1,41 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="$(RepositoryRoot).build/TestTargetFramework.props" />
+
+  <PropertyGroup>
+    <Description>Extensions to Xunit for supporting test projects.</Description>
+
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Warnings to be Disabled in Test Projects">
+    <NoWarn Label="Missing XML comment for publicly visible type or member 'Type_or_Member'">$(NoWarn);CS1591</NoWarn>
+    <NoWarn Label="Do not use typeof() expression to check the exception type.">$(NoWarn);xUnit2015</NoWarn>
+    <NoWarn Label="Do not use Contains() to check if a value exists in a collection.">$(NoWarn);xUnit2017</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" Version="$(XunitPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' Or '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net48' ">
+    <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <!-- See the following post to understand this approach: https://duanenewman.net/blog/post/a-better-way-to-override-references-with-packagereference/ -->
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
+    <!-- On net47, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
+        ExcludeAssets=compile removes the dependency from being referenced. ExcludeAssets=runtime removes the dependency from the build output. -->
+    <PackageReference Include="System.Buffers" Version="$(SystemBuffersPackageReferenceVersion)" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="NetFx.System.Memory" Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\J2N\J2N.csproj">
+      <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>

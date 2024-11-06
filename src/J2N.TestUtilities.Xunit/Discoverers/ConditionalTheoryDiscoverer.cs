@@ -6,7 +6,7 @@ using System.Linq;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
     public class ConditionalTheoryDiscoverer : TheoryDiscoverer
     {

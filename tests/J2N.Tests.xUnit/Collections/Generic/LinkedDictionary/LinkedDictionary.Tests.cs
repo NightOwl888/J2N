@@ -3,6 +3,7 @@
 // See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections;
 using System.Collections.Generic;

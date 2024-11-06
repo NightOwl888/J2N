@@ -7,9 +7,9 @@ using System;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
-    [XunitTestCaseDiscoverer("Xunit.ConditionalFactDiscoverer", "J2N.Tests.xUnit")]
+    [XunitTestCaseDiscoverer("J2N.TestUtilities.Xunit.ConditionalFactDiscoverer", "J2N.TestUtilities.Xunit")]
     [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
     public sealed class ConditionalFactAttribute : FactAttribute
     {

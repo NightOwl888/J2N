@@ -8,7 +8,7 @@ using System.Reflection;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
     // Internal helper class for code common to conditional test discovery through
     // [ConditionalFact] and [ConditionalTheory]

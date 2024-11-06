@@ -9,7 +9,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
     /// <summary>Wraps another test case that should be skipped.</summary>
     internal sealed class SkippedTestCase : XunitTestCase

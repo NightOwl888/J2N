@@ -4,6 +4,7 @@
 
 using J2N.Collections.Generic;
 using J2N.Collections.Tests;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections;
 using System.Collections.Generic;

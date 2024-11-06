@@ -10,6 +10,7 @@ using System.Linq;
 using System;
 using System.Collections;
 using Tests.Collections;
+using J2N.TestUtilities.Xunit;
 
 namespace J2N.Collections.ObjectModel.Tests
 {

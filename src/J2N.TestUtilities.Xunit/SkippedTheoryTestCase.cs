@@ -8,7 +8,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
     /// <summary>Wraps RunAsync for ConditionalTheory.</summary>
     public class SkippedTheoryTestCase : XunitTheoryTestCase

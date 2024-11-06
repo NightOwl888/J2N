@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using Xunit;
 using J2N.TestUtilities;
+using J2N.TestUtilities.Xunit;
 
 namespace J2N.Collections.Tests
 {

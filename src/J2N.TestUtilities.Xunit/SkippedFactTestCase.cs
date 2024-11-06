@@ -10,7 +10,7 @@ using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
     /// <summary>Wraps RunAsync for ConditionalFact.</summary>
     public class SkippedFactTestCase : XunitTestCase

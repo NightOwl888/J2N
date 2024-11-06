@@ -8,6 +8,7 @@ using System.Linq;
 using Xunit;
 using SCG = System.Collections.Generic;
 using System.Reflection;
+using J2N.TestUtilities.Xunit;
 
 namespace J2N.Collections.Tests
 {

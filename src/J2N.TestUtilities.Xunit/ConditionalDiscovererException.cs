@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
     internal class ConditionalDiscovererException : Exception
     {

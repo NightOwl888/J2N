@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -4,7 +4,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Xunit
+namespace J2N.TestUtilities.Xunit
 {
     internal static class StaticReflectionConstants
     {

@@ -3,6 +3,7 @@
 
 using J2N.Collections.Generic;
 using J2N.Runtime.CompilerServices;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
