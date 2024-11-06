@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Text;
 using Xunit;
+using J2N.TestUtilities;
 
 namespace J2N.Collections.Tests
 {

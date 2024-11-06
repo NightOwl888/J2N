@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace J2N
+namespace J2N.TestUtilities
 {
     public static class PlatformDetection
     {
@@ -81,7 +81,7 @@ namespace J2N
 #endif
         public static bool IsNotReflectionEmitSupported => !IsReflectionEmitSupported;
 
-        private static volatile Tuple<bool> s_lazyNonZeroLowerBoundArraySupported;
+        private static volatile Tuple<bool>? s_lazyNonZeroLowerBoundArraySupported;
         public static bool IsNonZeroLowerBoundArraySupported
         {
             get

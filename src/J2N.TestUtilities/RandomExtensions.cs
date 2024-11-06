@@ -1,9 +1,12 @@
-﻿
-using System;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace J2N
+namespace J2N.TestUtilities
 {
-    internal static class RandomExtensions
+    public static class RandomExtensions
     {
         public static void Shuffle<T>(this Random random, T[] array)
         {

@@ -9,6 +9,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Xunit;
+using J2N.TestUtilities;
 
 namespace J2N.Collections.Tests
 {
