@@ -59,7 +59,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\TestAssemblyInfo.cs" Link="Properties\TestAssemblyInfo.cs" />
+    <Compile Include="..\..\TestAssemblyInfo.cs" Link="Properties\TestAssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -71,10 +71,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\J2N.TestFramework\J2N.TestFramework.csproj">
+    <ProjectReference Include="..\..\..\src\J2N.TestFramework\J2N.TestFramework.csproj">
       <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
-    <ProjectReference Include="..\..\src\J2N\J2N.csproj">
+    <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">
       <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
   </ItemGroup>
