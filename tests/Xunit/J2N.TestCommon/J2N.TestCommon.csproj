@@ -5,6 +5,7 @@
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
     <Description>Abstractions for testing in Xunit (common base classes and mocks).</Description>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <PropertyGroup Label="Assembly Publishing">

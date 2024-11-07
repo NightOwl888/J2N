@@ -6,6 +6,7 @@
     <Description>Extensions to Xunit for supporting test projects.</Description>
 
     <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <PropertyGroup Label="Assembly Publishing">

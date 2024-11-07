@@ -6,6 +6,7 @@
     <RootNamespace>J2N</RootNamespace>
 
     <IsPackable>false</IsPackable>
+    <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
   <PropertyGroup Label="Assembly Publishing">
