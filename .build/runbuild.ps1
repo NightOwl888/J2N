@@ -20,7 +20,7 @@ properties {
     [string]$minimumSdkVersion     = "8.0.100"
 
     #test parameters
-    [string]$testPlatforms         = "x64"
+    [string]$testPlatforms         = Get-DefaultPlatform # Pass a parameter (not a property) to override
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -140,6 +140,11 @@ task Test -depends Pack -description "This task runs the tests" {
             $testPlatformArray = $testPlatforms -split '\s*[;,]\s*'
             foreach ($testPlatform in $testPlatformArray) {
 
+                if ([System.Runtime.InteropServices.RuntimeInformation]::OSDescription -match "Darwin" -and $testPlatform -eq "arm64" -and $framework -eq "net5.0") {
+                    Write-Host "Skipping '$framework' because it is not supportd on ARM64"
+                    continue
+                }
+
                 $testResultDirectory = "$testResultsDirectory/$framework/$testPlatform/$testName"
                 Ensure-Directory-Exists $testResultDirectory
 
@@ -154,7 +159,7 @@ task Test -depends Pack -description "This task runs the tests" {
                     --results-directory "$testResultDirectory" `
                     --logger:"trx;LogFileName=$testResultsFileName" `
                     -- RunConfiguration.TargetPlatform=$testPlatform
-                #	--logger:"console;verbosity=normal"
+                #   --logger:"console;verbosity=normal"
             }
             Write-Host ""
             Write-Host "See the .trx logs in $(Normalize-FileSystemSlashes "$testResultsDirectory/$framework") for more details." -ForegroundColor DarkCyan
@@ -196,4 +201,14 @@ function New-TemporaryDirectory {
 function Normalize-FileSystemSlashes([string]$path) {
     $sep = [System.IO.Path]::DirectorySeparatorChar
     return $($path -replace '/',$sep -replace '\\',$sep)
+}
+
+function Get-DefaultPlatform {
+    $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+    $platform = switch ($architecture) {
+        "X64" { "x64"; break }
+        "Arm64" { "arm64"; break }
+        default { "x64" }
+    }
+    return $platform
 }
