@@ -141,8 +141,8 @@ task Test -depends Pack -description "This task runs the tests" {
             foreach ($testPlatform in $testPlatformArray) {
 
                 if ([System.Runtime.InteropServices.RuntimeInformation]::OSDescription -match "Darwin" -and $testPlatform -eq "arm64" -and $framework -eq "net5.0") {
-                    Write-Host "Using x64 test platform on macOS for .NET 5" -ForegroundColor DarkYellow
-                    $testPlatform = "x64"
+                    Write-Host "Skipping '$framework' because it is not supportd on ARM64"
+                    continue
                 }
 
                 $testResultDirectory = "$testResultsDirectory/$framework/$testPlatform/$testName"
@@ -159,7 +159,7 @@ task Test -depends Pack -description "This task runs the tests" {
                     --results-directory "$testResultDirectory" `
                     --logger:"trx;LogFileName=$testResultsFileName" `
                     -- RunConfiguration.TargetPlatform=$testPlatform
-                #	--logger:"console;verbosity=normal"
+                #   --logger:"console;verbosity=normal"
             }
             Write-Host ""
             Write-Host "See the .trx logs in $(Normalize-FileSystemSlashes "$testResultsDirectory/$framework") for more details." -ForegroundColor DarkCyan
