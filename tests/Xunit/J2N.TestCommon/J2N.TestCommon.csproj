@@ -7,6 +7,10 @@
     <Description>Abstractions for testing in Xunit (common base classes and mocks).</Description>
   </PropertyGroup>
 
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>false</IsPublishable>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="xunit" Version="$(XunitPackageReferenceVersion)" />
 

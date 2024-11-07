@@ -8,6 +8,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>false</IsPublishable>
+  </PropertyGroup>
+
   <PropertyGroup Label="Warnings to be Disabled in Test Projects">
     <NoWarn Label="Missing XML comment for publicly visible type or member 'Type_or_Member'">$(NoWarn);CS1591</NoWarn>
     <NoWarn Label="Do not use typeof() expression to check the exception type.">$(NoWarn);xUnit2015</NoWarn>

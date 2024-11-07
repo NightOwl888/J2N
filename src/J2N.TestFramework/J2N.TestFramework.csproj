@@ -8,6 +8,10 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>false</IsPublishable>
+  </PropertyGroup>
+
   <PropertyGroup Label="Warnings to be Disabled in Test Projects">
     <NoWarn Label="The variable 'var' is declared but never used">$(NoWarn);CS0168</NoWarn>
     <NoWarn Label="'member' is obsolete">$(NoWarn);CS0612;CS0618</NoWarn>
