@@ -17,17 +17,10 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
     <!-- On net47, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
         ExcludeAssets=compile removes the dependency from being referenced. ExcludeAssets=runtime removes the dependency from the build output. -->
-    <PackageReference Include="System.Buffers"
-                      Version="$(SystemBuffersPackageReferenceVersion)"
-                      ExcludeAssets="compile;runtime" />
-    <PackageReference Include="System.Memory"
-                      Version="$(SystemMemoryPackageReferenceVersion)"
-                      ExcludeAssets="compile;runtime" />
-    <PackageReference Include="System.Runtime.CompilerServices.Unsafe"
-                      Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)"
-                      ExcludeAssets="compile;runtime" />
-    <PackageReference Include="NetFx.System.Memory"
-                      Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
+    <PackageReference Include="System.Buffers" Version="$(SystemBuffersPackageReferenceVersion)" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" ExcludeAssets="compile;runtime" />
+    <PackageReference Include="NetFx.System.Memory" Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
@@ -60,10 +53,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\J2N.TestFramework\J2N.TestFramework.csproj">
+    <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">
       <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">
+    <ProjectReference Include="..\J2N.TestFramework\J2N.TestFramework.csproj">
       <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
   </ItemGroup>

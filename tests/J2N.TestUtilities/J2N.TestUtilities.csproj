@@ -6,17 +6,12 @@
 
     <Description>Utilities to assist with testing that are independent of any testing framework.</Description>
 
-    <IsPackable>false</IsPackable>
     <IsTestProject>false</IsTestProject>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <PropertyGroup Label="Assembly Publishing">
     <IsPublishable>false</IsPublishable>
-  </PropertyGroup>
-
-  <PropertyGroup Label="Warnings to be Disabled in Test Projects">
-    <NoWarn Label="Missing XML comment for publicly visible type or member 'Type_or_Member'">$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
 </Project>
