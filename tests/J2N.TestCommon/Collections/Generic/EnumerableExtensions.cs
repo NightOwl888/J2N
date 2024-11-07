@@ -1,5 +1,5 @@
-﻿using System;
-using J2N.Collections.Generic;
+﻿using J2N.Collections.Generic;
+using System;
 using System.Text;
 using SCG = System.Collections.Generic;
 

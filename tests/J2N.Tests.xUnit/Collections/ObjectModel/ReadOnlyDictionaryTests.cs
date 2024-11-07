@@ -9,8 +9,9 @@ using System.Reflection;
 using System.Linq;
 using System;
 using System.Collections;
-using Tests.Collections;
+using J2N.Collections.Tests;
 using J2N.TestUtilities.Xunit;
+using J2N.Diagnostics;
 
 namespace J2N.Collections.ObjectModel.Tests
 {

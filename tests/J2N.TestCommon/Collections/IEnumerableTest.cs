@@ -5,7 +5,7 @@ using System;
 using System.Collections;
 using Xunit;
 
-namespace Tests.Collections
+namespace J2N.Collections.Tests
 {
     public enum CollectionOrder
     {
@@ -100,7 +100,7 @@ namespace Tests.Collections
             if (IsGenericCompatibility)
             {
                 return;
-                    // apparently it is okay if enumerator.Current doesn't throw when the collection is generic.
+                // apparently it is okay if enumerator.Current doesn't throw when the collection is generic.
             }
 
             RepeatTest(

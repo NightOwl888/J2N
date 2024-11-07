@@ -11,7 +11,7 @@ using System.Linq;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Tests.Collections
+namespace J2N.Collections.Tests
 {
     public abstract class ICollectionTest<T> : IEnumerableTest<T>
     {

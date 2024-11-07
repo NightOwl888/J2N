@@ -1,22 +1,22 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Text;
 
-namespace System.Diagnostics
+namespace J2N.Diagnostics
 {
-    internal class DebuggerAttributeInfo
+    public class DebuggerAttributeInfo
     {
         public object Instance { get; set; }
         public IEnumerable<PropertyInfo> Properties { get; set; }
     }
 
-    internal static class DebuggerAttributes
+    public static class DebuggerAttributes
     {
         internal static object GetFieldValue(object obj, string fieldName)
         {
@@ -32,17 +32,17 @@ namespace System.Diagnostics
             }
         }
 
-        internal static DebuggerAttributeInfo ValidateDebuggerTypeProxyProperties(object obj)
+        public static DebuggerAttributeInfo ValidateDebuggerTypeProxyProperties(object obj)
         {
             return ValidateDebuggerTypeProxyProperties(obj.GetType(), obj);
         }
 
-        internal static DebuggerAttributeInfo ValidateDebuggerTypeProxyProperties(Type type, object obj)
+        public static DebuggerAttributeInfo ValidateDebuggerTypeProxyProperties(Type type, object obj)
         {
             return ValidateDebuggerTypeProxyProperties(type, type.GenericTypeArguments, obj);
         }
 
-        internal static DebuggerAttributeInfo ValidateDebuggerTypeProxyProperties(Type type, Type[] genericTypeArguments, object obj)
+        public static DebuggerAttributeInfo ValidateDebuggerTypeProxyProperties(Type type, Type[] genericTypeArguments, object obj)
         {
             Type proxyType = GetProxyType(type, genericTypeArguments);
 
@@ -111,7 +111,7 @@ namespace System.Diagnostics
             return proxyType;
         }
 
-        internal static string ValidateDebuggerDisplayReferences(object obj)
+        public static string ValidateDebuggerDisplayReferences(object obj)
         {
             // Get the DebuggerDisplayAttribute for obj
             var objType = obj.GetType();

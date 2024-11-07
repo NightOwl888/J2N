@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using Xunit;
 using Xunit.Sdk;
 
-namespace Tests.Collections
+namespace J2N.Collections.Tests
 {
     public abstract class IDictionaryTest<TKey, TValue> : ICollectionTest<KeyValuePair<TKey, TValue>>
     {

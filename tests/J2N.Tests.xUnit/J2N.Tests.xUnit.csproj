@@ -45,6 +45,7 @@
     <ProjectReference Include="..\..\src\J2N\J2N.csproj">
       <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
+    <ProjectReference Include="..\J2N.TestCommon\J2N.TestCommon.csproj" />
     <ProjectReference Include="..\..\src\J2N.TestUtilities\J2N.TestUtilities.csproj" />
     <ProjectReference Include="..\..\src\J2N.TestUtilities.Xunit\J2N.TestUtilities.Xunit.csproj" />
   </ItemGroup>
