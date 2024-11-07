@@ -20,7 +20,7 @@ properties {
     [string]$minimumSdkVersion     = "8.0.100"
 
     #test parameters
-    [string]$testPlatforms         = ""
+    [string]$testPlatforms         = Get-DefaultPlatform # Pass a parameter (not a property) to override
 }
 
 $backedUpFiles = New-Object System.Collections.ArrayList
@@ -122,15 +122,6 @@ task Test -depends Pack -description "This task runs the tests" {
     $testProjects = $testProjects | Sort-Object -Property FullName
     Ensure-Directory-Exists $testResultsDirectory
 
-    if ([String]::IsNullOrWhiteSpace($testPlatforms)) {
-        $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture
-        $testPlatforms = switch ($architecture) {
-            "X64"  { "x64" }
-            "Arm64" { "arm64" }
-            Default { "x64" }
-        }
-    }
-
     foreach ($testProject in $testProjects) {
         $testName = $testProject.Directory.Name
     
@@ -210,4 +201,14 @@ function New-TemporaryDirectory {
 function Normalize-FileSystemSlashes([string]$path) {
     $sep = [System.IO.Path]::DirectorySeparatorChar
     return $($path -replace '/',$sep -replace '\\',$sep)
+}
+
+function Get-DefaultPlatform {
+    $architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString()
+    $platform = switch ($architecture) {
+        "X64" { "x64"; break }
+        "Arm64" { "arm64"; break }
+        default { "x64" }
+    }
+    return $platform
 }
