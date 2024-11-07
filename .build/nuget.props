@@ -12,8 +12,8 @@
     <PackageReadmeFile>readme.md</PackageReadmeFile>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="$(SolutionDir)$(PackageLicenseFile)" Pack="true" PackagePath="$(PackageLicenseFile)"/>
-    <None Include="$(SolutionDir)README.md" Pack="true" PackagePath="\readme.md"/>
-    <None Include="$(SolutionDir)branding\$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)"/>
+    <None Include="$(RepositoryRoot)$(PackageLicenseFile)" Pack="true" PackagePath="$(PackageLicenseFile)"/>
+    <None Include="$(RepositoryRoot)README.md" Pack="true" PackagePath="\readme.md"/>
+    <None Include="$(RepositoryRoot)branding\$(PackageIcon)" Pack="true" PackagePath="$(PackageIcon)"/>
   </ItemGroup>
 </Project>
