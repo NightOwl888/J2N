@@ -7,18 +7,7 @@
     <RootNamespace>J2N</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
-
-  <PropertyGroup>
-    <NoWarn Label="Do not ignore method results">$(NoWarn);CA1806</NoWarn>
-    <NoWarn Label="Consider using String.Contains instead of String.IndexOf">$(NoWarn);CA2249</NoWarn>
-    
-    <NoWarn Label="Use compound assignment">$(NoWarn);IDE0054</NoWarn>
-    
-    <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
-    <NoWarn Label="FormatterConverter serialization is obsolete">$(NoWarn);SYSLIB0050</NoWarn>
-    <NoWarn Label=".ctor(SerializationInfo, StreamingContext) is obsolete">$(NoWarn);SYSLIB0051</NoWarn>
-  </PropertyGroup>
-
+  
   <ItemGroup>
     <PackageReference Include="ICU4N" Version="$(ICU4NPackageReferenceVersion)" />
     <PackageReference Include="RandomizedTesting.Generators" Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)" />

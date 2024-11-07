@@ -76,8 +76,14 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.TestCommon", "tests\Xunit\J2N.TestCommon\J2N.TestCommon.csproj", "{BF7D5FBB-9446-4AEF-8886-61F9C0572064}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnit", "NUnit", "{191CAB5C-E46E-4E72-87C8-4543C838770A}"
+	ProjectSection(SolutionItems) = preProject
+		tests\NUnit\Directory.Build.targets = tests\NUnit\Directory.Build.targets
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xunit", "Xunit", "{CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}"
+	ProjectSection(SolutionItems) = preProject
+		tests\Xunit\Directory.Build.targets = tests\Xunit\Directory.Build.targets
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
