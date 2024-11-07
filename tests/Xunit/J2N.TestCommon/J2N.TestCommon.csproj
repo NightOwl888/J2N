@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="$(RepositoryRoot).build/TestTargetFramework.props" />
-  
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
     <Description>Abstractions for testing in Xunit (common base classes and mocks).</Description>

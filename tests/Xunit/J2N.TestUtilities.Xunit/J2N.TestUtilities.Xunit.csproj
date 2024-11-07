@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="$(RepositoryRoot).build/TestTargetFramework.props" />
-
   <PropertyGroup>
     <Description>Extensions to Xunit for supporting test projects.</Description>
 

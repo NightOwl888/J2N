@@ -76,6 +76,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnit", "NUnit", "{191CAB5C
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xunit", "Xunit", "{CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}"
 	ProjectSection(SolutionItems) = preProject
+		tests\Xunit\Directory.Build.props = tests\Xunit\Directory.Build.props
 		tests\Xunit\Directory.Build.targets = tests\Xunit\Directory.Build.targets
 	EndProjectSection
 EndProject
