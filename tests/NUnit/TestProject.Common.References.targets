@@ -1,0 +1,13 @@
+<Project>
+
+  <ItemGroup Label="Test Project Common References">
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="$(MicrosoftNETTestSdkPackageReferenceVersion)" />
+    <PackageReference Include="NUnit" Version="$(NUnitPackageReferenceVersion)" />
+    <PackageReference Include="NUnit3TestAdapter" Version="$(NUnit3TestAdapterPackageReferenceVersion)" />
+
+    <!-- These are transitive dependencies, but the version being resolved is vulnerable, so we are upgrading here. -->
+    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpPackageReferenceVersion)" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="$(SystemTextRegularExpressionsPackageReferenceVersion)" />
+  </ItemGroup>
+
+</Project>

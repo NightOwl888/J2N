@@ -26,7 +26,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".build", ".build", "{216D65
 		.build\dependencies.props = .build\dependencies.props
 		.build\nuget.props = .build\nuget.props
 		.build\runbuild.ps1 = .build\runbuild.ps1
-		.build\TestReferences.Common.targets = .build\TestReferences.Common.targets
 		.build\TestTargetFramework.props = .build\TestTargetFramework.props
 		version.json = version.json
 		.build\version.ps1 = .build\version.ps1
@@ -73,12 +72,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NUnit", "NUnit", "{191CAB5C-E46E-4E72-87C8-4543C838770A}"
 	ProjectSection(SolutionItems) = preProject
 		tests\NUnit\Directory.Build.targets = tests\NUnit\Directory.Build.targets
+		tests\NUnit\TestProject.Common.References.targets = tests\NUnit\TestProject.Common.References.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Xunit", "Xunit", "{CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}"
 	ProjectSection(SolutionItems) = preProject
 		tests\Xunit\Directory.Build.props = tests\Xunit\Directory.Build.props
 		tests\Xunit\Directory.Build.targets = tests\Xunit\Directory.Build.targets
+		tests\Xunit\TestProject.Common.References.targets = tests\Xunit\TestProject.Common.References.targets
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.TestUtilities", "tests\J2N.TestUtilities\J2N.TestUtilities.csproj", "{F3097ECC-DF5E-48F8-AF55-22F5DFC53B0C}"

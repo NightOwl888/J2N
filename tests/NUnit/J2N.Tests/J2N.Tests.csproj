@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="$(RepositoryRoot).build/TestTargetFramework.props" />
-  <Import Project="$(RepositoryRoot).build/TestReferences.Common.targets" />
+  <Import Project="..\TestProject.Common.References.targets" />
   
   <PropertyGroup>
     <RootNamespace>J2N</RootNamespace>
