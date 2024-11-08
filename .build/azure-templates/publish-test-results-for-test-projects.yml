@@ -60,7 +60,97 @@ steps:
 
 - template: publish-test-results-for-target-frameworks.yml
   parameters:
-    testProjectName: 'J2N.Tests.xUnit'
+    testProjectName: 'J2N.Collections.Concurrent.LurchTable.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.Dictionary.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.Extensions.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.HashSet.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.LinkedDictionary.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.LinkedHashSet.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.List.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.SortedDictionary.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.Generic.SortedSet.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Collections.ObjectModel.Tests'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results-for-target-frameworks.yml
+  parameters:
+    testProjectName: 'J2N.Runtime.Tests'
     osName: '${{ parameters.osName }}'
     testPlatform: '${{ parameters.testPlatform }}'
     testResultsFormat: '${{ parameters.testResultsFormat }}'
