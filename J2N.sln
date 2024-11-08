@@ -102,6 +102,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.Lis
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.SortedDictionary.Tests", "tests\Xunit\J2N.Collections.Generic.SortedDictionary.Tests\J2N.Collections.Generic.SortedDictionary.Tests.csproj", "{406982C9-9A5A-42ED-B800-83D7D23A93B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.SortedSet.Tests", "tests\Xunit\J2N.Collections.Generic.SortedSet.Tests\J2N.Collections.Generic.SortedSet.Tests.csproj", "{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -164,6 +166,10 @@ Global
 		{406982C9-9A5A-42ED-B800-83D7D23A93B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{406982C9-9A5A-42ED-B800-83D7D23A93B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{406982C9-9A5A-42ED-B800-83D7D23A93B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -186,6 +192,7 @@ Global
 		{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{9CA73641-0FE6-4AD5-873B-9176293F7976} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{406982C9-9A5A-42ED-B800-83D7D23A93B4} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
+		{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B477AD9F-26BF-44CF-B94C-50D89AC24836}
