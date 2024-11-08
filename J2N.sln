@@ -98,6 +98,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.Lin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.LinkedHashSet.Tests", "tests\Xunit\J2N.Collections.Generic.LinkedHashSet.Tests\J2N.Collections.Generic.LinkedHashSet.Tests.csproj", "{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.List.Tests", "tests\Xunit\J2N.Collections.Generic.List.Tests\J2N.Collections.Generic.List.Tests.csproj", "{9CA73641-0FE6-4AD5-873B-9176293F7976}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -152,6 +154,10 @@ Global
 		{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CA73641-0FE6-4AD5-873B-9176293F7976}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CA73641-0FE6-4AD5-873B-9176293F7976}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CA73641-0FE6-4AD5-873B-9176293F7976}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CA73641-0FE6-4AD5-873B-9176293F7976}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,6 +178,7 @@ Global
 		{7E7BD76E-E08F-49B1-A706-4770693AA210} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{4F3BD8AE-8E07-47C1-8462-826CFBD8AEC5} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
+		{9CA73641-0FE6-4AD5-873B-9176293F7976} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B477AD9F-26BF-44CF-B94C-50D89AC24836}
