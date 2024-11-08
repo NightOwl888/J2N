@@ -10,10 +10,6 @@
     <IsPublishable>false</IsPublishable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="xunit" Version="$(XunitPackageReferenceVersion)" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' Or '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net48' ">
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
