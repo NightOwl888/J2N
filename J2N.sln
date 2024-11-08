@@ -92,6 +92,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Concurrent.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.Dictionary.Tests", "tests\Xunit\J2N.Collections.Generic.Dictionary.Tests\J2N.Collections.Generic.Dictionary.Tests.csproj", "{466424CD-C2A3-45EA-916D-ED73AFB24C2A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.HashSet.Tests", "tests\Xunit\J2N.Collections.Generic.HashSet.Tests\J2N.Collections.Generic.HashSet.Tests.csproj", "{7E7BD76E-E08F-49B1-A706-4770693AA210}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -134,6 +136,10 @@ Global
 		{466424CD-C2A3-45EA-916D-ED73AFB24C2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{466424CD-C2A3-45EA-916D-ED73AFB24C2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{466424CD-C2A3-45EA-916D-ED73AFB24C2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7E7BD76E-E08F-49B1-A706-4770693AA210}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7E7BD76E-E08F-49B1-A706-4770693AA210}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7E7BD76E-E08F-49B1-A706-4770693AA210}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7E7BD76E-E08F-49B1-A706-4770693AA210}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,6 +157,7 @@ Global
 		{2B1B9500-8306-4901-9E6C-D2F9EEC2FEB5} = {191CAB5C-E46E-4E72-87C8-4543C838770A}
 		{9787B58E-9BBA-4F6A-957F-77AC954A66E5} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{466424CD-C2A3-45EA-916D-ED73AFB24C2A} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
+		{7E7BD76E-E08F-49B1-A706-4770693AA210} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B477AD9F-26BF-44CF-B94C-50D89AC24836}
