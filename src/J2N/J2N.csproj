@@ -66,6 +66,7 @@
     <InternalsVisibleTo Include="J2N.Collections.Concurrent.LurchTable.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.Extensions.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.LinkedDictionary.Tests" />
+    <InternalsVisibleTo Include="J2N.Runtime.Tests" />
   </ItemGroup>
 
 </Project>
