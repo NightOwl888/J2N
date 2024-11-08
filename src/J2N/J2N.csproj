@@ -63,6 +63,7 @@
     <InternalsVisibleTo Include="J2N.Tests" />
     <InternalsVisibleTo Include="J2N.Tests.xUnit" />
     <InternalsVisibleTo Include="J2N.TestCommon" />
+    <InternalsVisibleTo Include="J2N.Collections.Concurrent.LurchTable.Tests" />
   </ItemGroup>
 
 </Project>
