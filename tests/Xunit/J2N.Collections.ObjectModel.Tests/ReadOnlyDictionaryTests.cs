@@ -2,16 +2,16 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System.Collections.Generic;
-using System.Diagnostics;
-using Xunit;
-using System.Reflection;
-using System.Linq;
+using J2N.Collections.Tests;
+using J2N.Diagnostics;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections;
-using J2N.Collections.Tests;
-using J2N.TestUtilities.Xunit;
-using J2N.Diagnostics;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using Xunit;
 
 namespace J2N.Collections.ObjectModel.Tests
 {
