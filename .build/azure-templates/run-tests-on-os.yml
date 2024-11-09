@@ -237,7 +237,7 @@ steps:
 - template: 'publish-test-results-for-test-projects.yml'
   parameters:
     osName: '${{ parameters.osName }}'
-    framework: '${{ parameters.framework }}'
+    framework: '${{ parameters.testTargetFrameworks }}' # J2N TODO: Change this to framework (and only allow one)
     testPlatform: '${{ parameters.vsTestPlatform }}'
 
 - pwsh: |
