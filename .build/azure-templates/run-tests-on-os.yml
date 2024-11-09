@@ -220,12 +220,11 @@ steps:
 
 #- template: 'show-all-files.yml' # Uncomment for debugging
 
-- task: PublishPipelineArtifact@1
+- task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact: ${{ parameters.testResultsArtifactName }}'
   inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}'
-    artifact: '${{ parameters.testResultsArtifactName }}'
-    publishLocation: 'pipeline'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/${{ parameters.testResultsArtifactName }}'
+    ArtifactName: '${{ parameters.testResultsArtifactName }}'
   condition: succeededOrFailed()
 
 # Due to the fact that it is not possible to loop a task and
