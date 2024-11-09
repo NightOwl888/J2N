@@ -32,6 +32,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.fileVersionFileName }}', 'fileVersionFileName')
     EnsureNotNullOrEmpty('${{ parameters.buildNumberFileName }}', 'buildNumberFileName')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
 - pwsh: |
     $versionScriptFile = "$(Build.SourcesDirectory)/.build/version.ps1"

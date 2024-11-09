@@ -23,6 +23,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.testResultsArtifactName }}', 'testResultsArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.testResultsFileName }}', 'testResultsFileName')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
 - template: publish-test-results.yml
   parameters:

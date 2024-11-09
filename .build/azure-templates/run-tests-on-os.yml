@@ -32,6 +32,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
     EnsureNotNullOrEmpty('${{ parameters.dotNetSdkVersion }}', 'dotNetSdkVersion')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
 - pwsh: |
     $testTargetFrameworks = '${{ parameters.testTargetFrameworks }}'

@@ -30,6 +30,7 @@ steps:
     }
     EnsureNotNullOrEmpty('${{ parameters.sdkVersion }}', 'sdkVersion')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
 - bash: |
     echo "##vso[task.setvariable variable=DOTNET_NOLOGO;]1"

@@ -42,6 +42,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.binaryArtifactName }}', 'binaryArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.solutionFilesConvention }}', 'solutionFilesConvention')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
   # Runs dotnet build 
 - task: DotNetCoreCLI@2
