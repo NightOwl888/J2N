@@ -141,7 +141,7 @@ task Test -depends Pack -description "This task runs the tests" {
             foreach ($testPlatform in $testPlatformArray) {
 
                 if ([System.Runtime.InteropServices.RuntimeInformation]::OSDescription -match "Darwin" -and $testPlatform -eq "arm64" -and $framework -eq "net5.0") {
-                    Write-Host "Skipping '$framework' because it is not supportd on ARM64"
+                    Write-Host "Skipping '$framework' because it is not supported on ARM64"
                     continue
                 }
 
