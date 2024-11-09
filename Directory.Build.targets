@@ -1,11 +1,15 @@
 ﻿<Project>
 
   <Import Project="$(MSBuildThisFileDirectory)/.build/dependencies.props" Condition="Exists('$(MSBuildThisFileDirectory)/.build/dependencies.props')" />
-
+  
   <PropertyGroup Label="Warnings to be Disabled in Solution">
     <!-- .NET Framework doesn't support range or index operators -->
     <NoWarn Label="Use index operator">$(NoWarn);IDE0056</NoWarn>
     <NoWarn Label="Use range operator">$(NoWarn);IDE0057</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Solution-level Publish to Project-specific Directory">
+    <PublishDir Condition="'$(AlternatePublishRootDirectory)' != ''">$(AlternatePublishRootDirectory)/$(TargetFramework)/$(MSBuildProjectName)/</PublishDir>
   </PropertyGroup>
 
   <!-- Features in .NET Standard, .NET Core, .NET 5.x, .NET 6.x, and .NET 8.x only (no .NET Framework support) -->
