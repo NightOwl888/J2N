@@ -1,0 +1,25 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <Description>Extensions to Xunit for supporting test projects.</Description>
+
+    <IsTestProject>false</IsTestProject>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Publishing">
+    <IsPublishable>false</IsPublishable>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net471' Or '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net48' ">
+    <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <Import Project="..\..\SystemMemoryReferenceOverride.targets" />
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">
+      <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,15 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+  
+  <PropertyGroup Label="Warnings to be Disabled in NUnit Test Projects">
+    <NoWarn Label="Do not ignore method results">$(NoWarn);CA1806</NoWarn>
+    <NoWarn Label="Consider using String.Contains instead of String.IndexOf">$(NoWarn);CA2249</NoWarn>
+
+    <NoWarn Label="Member 'member1' overrides obsolete member 'member2. Add the Obsolete attribute to 'member1'">$(NoWarn);CS0672</NoWarn>
+    <NoWarn Label="Obsolete member 'memberA' overrides non-obsolete member 'memberB'.">$(NoWarn);CS0809</NoWarn>
+
+    <NoWarn Label="Use compound assignment">$(NoWarn);IDE0054</NoWarn>
+  </PropertyGroup>
+  
+</Project>

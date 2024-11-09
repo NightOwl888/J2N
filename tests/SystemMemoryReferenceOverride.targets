@@ -1,0 +1,19 @@
+<Project>
+  
+  <!-- See the following post to understand this approach: https://duanenewman.net/blog/post/a-better-way-to-override-references-with-packagereference/ -->
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47' ">
+    <!-- On net47, we incorrectly get references to System.Memory. We can exclude the DLL and dependencies as follows. The IDE view is wrong, these references don't actually exist.
+        ExcludeAssets=compile removes the dependency from being referenced. ExcludeAssets=runtime removes the dependency from the build output. -->
+    <PackageReference Include="System.Buffers" Version="$(SystemBuffersPackageReferenceVersion)">
+      <ExcludeAssets>compile;runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)">
+      <ExcludeAssets>compile;runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)">
+      <ExcludeAssets>compile;runtime</ExcludeAssets>
+    </PackageReference>
+    <PackageReference Include="NetFx.System.Memory" Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
+  </ItemGroup>
+  
+</Project>

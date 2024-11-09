@@ -20,6 +20,7 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.artifactFeedID }}', 'artifactFeedID')
     EnsureNotNullOrEmpty('${{ parameters.testSymbolFilesConvention }}', 'testSymbolFilesConvention')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
 - task: DownloadBuildArtifacts@0
   displayName: 'Download Build Artifacts: ${{ parameters.nugetArtifactName }}'

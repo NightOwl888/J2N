@@ -4,7 +4,7 @@
 
 parameters:
   osName: 'Windows' # The name of the operating system for display purposes.
-  testTargetFrameworks: '' # A semicolon separated list of target frameworks indicating which frameworks tests will be run on. See: https://docs.microsoft.com/en-us/dotnet/standard/frameworks.
+  testTargetFramework: '' # A target framework indicating which framework tests will be run on. See: https://docs.microsoft.com/en-us/dotnet/standard/frameworks.
   binaryArtifactName: 'testbinaries' # The name of the Azure DevOps build artifact where the test assemblies will be downloaded from. Default 'testbinaries'.
   testResultsArtifactName: 'testresults' # The name of the Azure DevOps build artifact where the test results will be published. Default 'testresults'.
   vsTestPlatform: 'x64' # Target platform architecture used for test execution. Valid values are x86, x64, and ARM.
@@ -23,7 +23,7 @@ steps:
         }
     }
     EnsureNotNullOrEmpty('${{ parameters.osName }}', 'osName')
-    EnsureNotNullOrEmpty('${{ parameters.testTargetFrameworks }}', 'testTargetFrameworks')
+    EnsureNotNullOrEmpty('${{ parameters.testTargetFramework }}', 'testTargetFramework')
     EnsureNotNullOrEmpty('${{ parameters.binaryArtifactName }}', 'binaryArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.testResultsArtifactName }}', 'testResultsArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.vsTestPlatform }}', 'vsTestPlatform')
@@ -32,9 +32,10 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.maximumParallelJobs }}', 'maximumParallelJobs')
     EnsureNotNullOrEmpty('${{ parameters.dotNetSdkVersion }}', 'dotNetSdkVersion')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
 - pwsh: |
-    $testTargetFrameworks = '${{ parameters.testTargetFrameworks }}'
+    $testTargetFramework = '${{ parameters.testTargetFramework }}'
     $testPlatform = '${{ parameters.vsTestPlatform }}'
     $dotnetSdkVersion = '${{ parameters.dotNetSdkVersion }}'
     if ($IsWindows -eq $null) {
@@ -42,7 +43,7 @@ steps:
     }
     # .NET Framework tests are SLOW when using the .NET 8 SDK (especially those for net47 targeting net40).
     # So, we use .NET 6 SDK instead.
-    if ($testTargetFrameworks.StartsWith('net4')) {
+    if ($testTargetFramework.StartsWith('net4')) {
         $dotnetSdkVersion = '6.0.421'
     }
     Write-Host "Using SDK Version: $dotnetSdkVersion"
@@ -72,7 +73,7 @@ steps:
     & $installScriptPath -Version $sdkVersion -Architecture $architecture -InstallDir $installPath
     Write-Host "##vso[task.setvariable variable=DOTNET_ROOT_X86;]$installPath"
   displayName: 'Use .NET SDK $(DotNetSdkVersion) (x86)'
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net8.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFramework }}', 'net8.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
 
 - task: UseDotNet@2
   displayName: 'Use .NET SDK 6.0.421'
@@ -80,7 +81,7 @@ steps:
     packageType: 'sdk'
     version: '6.0.421'
     performMultiLevelLookup: '${{ variables.PerformMultiLevelLookup }}'
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net6.'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFramework }}', 'net6.'))
 
     # Hack: .NET 8 no longer installs the x86 bits and they must be installed separately. However, it is not
     # trivial to get it into the path and to get it to pass the minimum SDK version check in runbuild.ps1.
@@ -97,7 +98,7 @@ steps:
     & $installScriptPath -Version $sdkVersion -Architecture $architecture -InstallDir $installPath
     Write-Host "##vso[task.setvariable variable=DOTNET_ROOT_X86;]$installPath"
   displayName: 'Use .NET SDK 6.0.421 (x86)'
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net6.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFramework }}', 'net6.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
 
 - task: UseDotNet@2
   displayName: 'Use .NET SDK 5.0.408'
@@ -105,7 +106,7 @@ steps:
     packageType: 'sdk'
     version: '5.0.408'
     performMultiLevelLookup: '${{ variables.PerformMultiLevelLookup }}'
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net5.'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFramework }}', 'net5.'))
 
     # Hack: .NET 8 no longer installs the x86 bits and they must be installed separately. However, it is not
     # trivial to get it into the path and to get it to pass the minimum SDK version check in runbuild.ps1.
@@ -122,7 +123,7 @@ steps:
     & $installScriptPath -Version $sdkVersion -Architecture $architecture -InstallDir $installPath
     Write-Host "##vso[task.setvariable variable=DOTNET_ROOT_X86;]$installPath"
   displayName: 'Use .NET SDK 5.0.408 (x86)'
-  condition: and(succeeded(), contains('${{ parameters.testTargetFrameworks }}', 'net5.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
+  condition: and(succeeded(), contains('${{ parameters.testTargetFramework }}', 'net5.'), eq('${{ parameters.vsTestPlatform }}', 'x86'))
 
 - task: DownloadPipelineArtifact@2
   displayName: 'Download Pipeline Artifacts: ${{ parameters.binaryArtifactName }}'
@@ -131,14 +132,13 @@ steps:
     targetPath: '$(System.DefaultWorkingDirectory)'
 
 - pwsh: |
-    $testTargetFrameworksString = '${{ parameters.testTargetFrameworks }}'
+    $framework = '${{ parameters.testTargetFramework }}'
     $testBinaryRootDirectory = "$(System.DefaultWorkingDirectory)"
     $testResultsArtifactDirectory = "${{ format('$(Build.ArtifactStagingDirectory)/{0}',parameters.testResultsArtifactName) }}"
     $testPlatform = '${{ parameters.vsTestPlatform }}'
     $testOSName = '${{ parameters.osName }}'
     $testBinaryFilesPattern = '${{ parameters.testBinaryFilesPattern }}'
     $maximumParalellJobs = '${{ parameters.maximumParallelJobs }}'
-    $testTargetFrameworks = $testTargetFrameworksString.Split([char]',',[char]';')
     
     function IsSupportedFramework([string]$framework) {
         if ($IsWindows -eq $null) {
@@ -153,7 +153,7 @@ steps:
     function RunTests([string]$framework, [string]$fileRegexPattern) {
         if (!(IsSupportedFramework($framework))) { continue }
         
-        $testBinaries = Get-ChildItem -Path "$testBinaryRootDirectory" -File -Recurse | Where-Object {$_.FullName -match "$framework"} | Where-Object {$_.FullName -match "$fileRegexPattern"} | Select -ExpandProperty FullName
+        $testBinaries = Get-ChildItem -Path "$testBinaryRootDirectory" -File -Recurse | Where-Object {$_.FullName -match "$framework"} | Where-Object {$_.FullName -match "$fileRegexPattern"} | Select -ExpandProperty FullName | Sort-Object -Descending
         foreach ($testBinary in $testBinaries) {
             $testName = [System.IO.Path]::GetFileNameWithoutExtension($testBinary)
             
@@ -192,9 +192,7 @@ steps:
         }
     }
     
-    foreach ($framework in $testTargetFrameworks) {
-        RunTests -Framework "$framework" -FileRegexPattern "$testBinaryFilesPattern"
-    }
+    RunTests -Framework "$framework" -FileRegexPattern "$testBinaryFilesPattern"
     
     if ($maximumParalellJobs -gt 1) {
         # Wait for it all to complete
@@ -215,7 +213,7 @@ steps:
     }
     
     $global:LASTEXITCODE = 0 # Force the script to continue on error
-  displayName: 'dotnet test ${{ parameters.testTargetFrameworks }}'
+  displayName: 'dotnet test ${{ parameters.testTargetFramework }}'
   ignoreLASTEXITCODE: true
 
 #- template: 'show-all-files.yml' # Uncomment for debugging
@@ -237,7 +235,7 @@ steps:
 - template: 'publish-test-results-for-test-projects.yml'
   parameters:
     osName: '${{ parameters.osName }}'
-    framework: '${{ parameters.framework }}'
+    framework: '${{ parameters.testTargetFramework }}'
     testPlatform: '${{ parameters.vsTestPlatform }}'
 
 - pwsh: |

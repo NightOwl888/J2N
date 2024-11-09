@@ -1,0 +1,21 @@
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  
+  <Import Project="$([MSBuild]::GetPathOfFileAbove('Directory.Build.targets', '$(MSBuildThisFileDirectory)../'))" />
+  
+  <PropertyGroup Label="Warnings to be Disabled in Xunit Test Projects">
+    <NoWarn Label="Use Length/Count property instead of Enumerable.Count method">$(NoWarn);CA1829</NoWarn>
+    
+    <NoWarn Label="Do not use equality check to check for collection size.">$(NoWarn);xUnit2013</NoWarn>
+    <NoWarn Label="Do not use typeof() expression to check the exception type.">$(NoWarn);xUnit2015</NoWarn>
+    <NoWarn Label="Do not use Contains() to check if a value exists in a collection.">$(NoWarn);xUnit2017</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Label="Shared PackageReferences for Xunit Test Projects">
+    <PackageReference Include="xunit" Version="$(XunitPackageReferenceVersion)" />
+
+    <!-- These are transitive dependencies, but the version being resolved is vulnerable, so we are upgrading here. -->
+    <PackageReference Include="System.Net.Http" Version="$(SystemNetHttpPackageReferenceVersion)" />
+    <PackageReference Include="System.Text.RegularExpressions" Version="$(SystemTextRegularExpressionsPackageReferenceVersion)" />
+  </ItemGroup>
+  
+</Project>

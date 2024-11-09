@@ -16,7 +16,8 @@
     <NoWarn Label="Do not use Count/LongCount when Any can be used">$(NoWarn);CA1827</NoWarn>
     <NoWarn Label="Prefer Dictionary Contains methods">$(NoWarn);CA1841</NoWarn>
     <NoWarn Label="Mark ISerializable types with SerializableAttribute">$(NoWarn);CA2237</NoWarn>
-    
+
+    <NoWarn Label="'member' is obsolete: 'text'">$(NoWarn);CS0618;CS0612</NoWarn>
     <NoWarn Label="The variable 'var' is declared but never used">$(NoWarn);CS0168</NoWarn>
     <NoWarn Label="Missing XML comment for publicly visible type or member 'Type_or_Member'">$(NoWarn);CS1591</NoWarn>
 
@@ -31,6 +32,10 @@
     <NoWarn Label="Unnecessary assignment of a value">$(NoWarn);IDE0059</NoWarn>
     <NoWarn Label="Remove unused parameter">$(NoWarn);IDE0060</NoWarn>
     <NoWarn Label="Naming Styles">$(NoWarn);IDE1006</NoWarn>
+    
+    <NoWarn Label="BinaryFormatter serialization is obsolete">$(NoWarn);SYSLIB0011</NoWarn>
+    <NoWarn Label="FormatterConverter serialization is obsolete">$(NoWarn);SYSLIB0050</NoWarn>
+    <NoWarn Label=".ctor(SerializationInfo, StreamingContext) is obsolete">$(NoWarn);SYSLIB0051</NoWarn>
   </PropertyGroup>
   
   <UsingTask TaskName="UpdateRuntimeConfigProperty" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">

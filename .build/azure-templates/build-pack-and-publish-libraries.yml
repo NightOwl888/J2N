@@ -19,7 +19,7 @@ parameters:
   buildPlatform: 'Any CPU' # Defines the build platform. Default 'Any CPU'.
   nugetArtifactName: 'nuget' # The name of the Azure DevOps build artifact where the NuGet assets (.nupkg and .pdb files) will be output. Default 'nuget'.
   binaryArtifactName: 'testbinaries' # The name of the Azure DevOps build artifact where the test assemblies will be output. Default 'testbinaries'.
-  solutionFilesConvention: '**/*.sln' # The glob pattern where to look for solution files. Default '**\*.sln'.
+  solution: '$(Build.SourcesDirectory)/J2N.sln' # The solution to build.
 
 
 steps:
@@ -40,15 +40,16 @@ steps:
     EnsureNotNullOrEmpty('${{ parameters.buildPlatform }}', 'buildPlatform')
     EnsureNotNullOrEmpty('${{ parameters.nugetArtifactName }}', 'nugetArtifactName')
     EnsureNotNullOrEmpty('${{ parameters.binaryArtifactName }}', 'binaryArtifactName')
-    EnsureNotNullOrEmpty('${{ parameters.solutionFilesConvention }}', 'solutionFilesConvention')
+    EnsureNotNullOrEmpty('${{ parameters.solution }}', 'solution')
   displayName: 'Validate Template Parameters'
+  condition: eq(variables['System.Debug'], 'true')
 
   # Runs dotnet build 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet build ${{ parameters.solutionFilesConvention }}'
+  displayName: 'dotnet build ${{ parameters.solution }}'
   inputs:
     command: custom
-    projects: '${{ parameters.solutionFilesConvention }}'
+    projects: '${{ parameters.solution }}'
     custom: build
     arguments: '--configuration ${{ parameters.buildConfiguration }} --verbosity normal /p:Platform="${{ parameters.buildPlatform }}" /p:InformationalVersion="${{ parameters.informationalVersion }}" /p:FileVersion="${{ parameters.fileVersion }}" /p:AssemblyVersion="${{ parameters.assemblyVersion }}" /p:TestAllTargetFrameworks=true /p:PortableDebugTypeOnly=true'
 
@@ -59,7 +60,7 @@ steps:
   displayName: 'dotnet pack'
   inputs:
     command: custom
-    projects: '${{ parameters.solutionFilesConvention }}'
+    projects: '${{ parameters.solution }}'
     custom: pack
     arguments: '--configuration ${{ parameters.buildConfiguration }} --output "$(Build.ArtifactStagingDirectory)/${{ parameters.nugetArtifactName }}" --no-build --verbosity normal /p:PackageVersion="${{ parameters.packageVersion }}"'
 
@@ -84,15 +85,16 @@ steps:
   # publishes the project in the artifact staging directory with the framework
   # and project name as part of the folder structure.
 - pwsh: |
+    $solution = "${{ parameters.solution }}"
     $testTargetFrameworksString = "${{ parameters.testTargetFrameworks }}"
     $outputRoot = "$(Build.ArtifactStagingDirectory)/${{ parameters.binaryArtifactName }}"
     $configuration = "${{ parameters.buildConfiguration }}"
-    $sourcesDirectory = "$(Build.SourcesDirectory)"
+    $platform = "${{ parameters.buildPlatform }}"
     
     $testTargetFrameworks = $testTargetFrameworksString.Split([char]';',[char]',')
     foreach ($framework in $testTargetFrameworks) {
         $outputPath = "$outputRoot/$framework"
         Write-Host "Publishing '$framework' to '$outputPath'..."
-        dotnet publish --output "$outputPath" --framework "$framework" --configuration "$configuration" --no-build --no-restore --verbosity normal /p:TestAllTargetFrameworks=true
+        & dotnet publish "$solution" --configuration "$configuration" --framework "$framework"  --no-build --no-restore --verbosity normal /p:TestAllTargetFrameworks=true /p:Platform="$platform" /p:AlternatePublishRootDirectory="$outputRoot"
     }
   displayName: 'dotnet publish ${{ parameters.testTargetFrameworks }}'

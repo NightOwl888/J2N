@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="$(RepositoryRoot).build/TestTargetFramework.props" />
+  <Import Project="..\TestProject.Common.References.targets" />
+  
+  <PropertyGroup>
+    <RootNamespace>J2N</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="ICU4N" Version="$(ICU4NPackageReferenceVersion)" />
+    <PackageReference Include="RandomizedTesting.Generators" Version="$(RandomizedTestingGeneratorsPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <Import Project="..\..\SystemMemoryReferenceOverride.targets" />
+
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) ">
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition="$(TargetFramework.StartsWith('net4'))">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Collections\Generic\legacy-list-int.bin" />
+    <None Remove="Collections\Generic\legacy-list-string.bin" />
+    <None Remove="hyts_PropertiesTest.properties" />
+    <None Remove="IO\ReadFully.txt" />
+    <None Remove="test_resource.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\TestAssemblyInfo.cs" Link="Properties\TestAssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Collections\Generic\legacy-list-int.bin" />
+    <EmbeddedResource Include="Collections\Generic\legacy-list-string.bin" />
+    <EmbeddedResource Include="hyts_PropertiesTest.properties" />
+    <EmbeddedResource Include="IO\ReadFully.txt" />
+    <EmbeddedResource Include="test_resource.txt" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">
+      <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
+    </ProjectReference>
+    <ProjectReference Include="..\J2N.TestFramework\J2N.TestFramework.csproj">
+      <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
+    </ProjectReference>
+  </ItemGroup>
+
+</Project>
