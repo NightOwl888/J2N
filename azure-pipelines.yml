@@ -136,7 +136,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
-        testTargetFrameworks: 'net8.0'
+        testTargetFramework: 'net8.0'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
@@ -157,7 +157,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
-        testTargetFrameworks: 'net8.0'
+        testTargetFramework: 'net8.0'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
@@ -186,7 +186,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
-        testTargetFrameworks: 'net6.0'
+        testTargetFramework: 'net6.0'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
@@ -207,7 +207,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
-        testTargetFrameworks: 'net6.0'
+        testTargetFramework: 'net6.0'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
@@ -236,7 +236,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
-        testTargetFrameworks: 'net5.0'
+        testTargetFramework: 'net5.0'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
@@ -257,7 +257,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: $(osName)
-        testTargetFrameworks: 'net5.0'
+        testTargetFramework: 'net5.0'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
@@ -272,7 +272,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net48'
+        testTargetFramework: 'net48'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
@@ -287,7 +287,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net48'
+        testTargetFramework: 'net48'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
@@ -302,7 +302,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net472'
+        testTargetFramework: 'net472'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
@@ -317,7 +317,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net472'
+        testTargetFramework: 'net472'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
@@ -332,7 +332,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net471'
+        testTargetFramework: 'net471'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
@@ -347,7 +347,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net471'
+        testTargetFramework: 'net471'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
@@ -362,7 +362,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net47'
+        testTargetFramework: 'net47'
         vsTestPlatform: 'x64'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
@@ -377,7 +377,7 @@ stages:
     - template: '.build/azure-templates/run-tests-on-os.yml'
       parameters:
         osName: 'Windows'
-        testTargetFrameworks: 'net47'
+        testTargetFramework: 'net47'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
