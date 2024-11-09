@@ -37,7 +37,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "azure-templates", "azure-te
 		.build\azure-templates\gitversioning-increment-and-persist-versions.yml = .build\azure-templates\gitversioning-increment-and-persist-versions.yml
 		.build\azure-templates\install-dotnet-sdk.yml = .build\azure-templates\install-dotnet-sdk.yml
 		.build\azure-templates\publish-nuget-packages.yml = .build\azure-templates\publish-nuget-packages.yml
-		.build\azure-templates\publish-test-results-for-target-frameworks.yml = .build\azure-templates\publish-test-results-for-target-frameworks.yml
 		.build\azure-templates\publish-test-results-for-test-projects.yml = .build\azure-templates\publish-test-results-for-test-projects.yml
 		.build\azure-templates\publish-test-results.yml = .build\azure-templates\publish-test-results.yml
 		.build\azure-templates\run-tests-on-os.yml = .build\azure-templates\run-tests-on-os.yml
@@ -90,23 +89,23 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Concurrent.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.Dictionary.Tests", "tests\Xunit\J2N.Collections.Generic.Dictionary.Tests\J2N.Collections.Generic.Dictionary.Tests.csproj", "{466424CD-C2A3-45EA-916D-ED73AFB24C2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.HashSet.Tests", "tests\Xunit\J2N.Collections.Generic.HashSet.Tests\J2N.Collections.Generic.HashSet.Tests.csproj", "{7E7BD76E-E08F-49B1-A706-4770693AA210}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.HashSet.Tests", "tests\Xunit\J2N.Collections.Generic.HashSet.Tests\J2N.Collections.Generic.HashSet.Tests.csproj", "{7E7BD76E-E08F-49B1-A706-4770693AA210}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.LinkedDictionary.Tests", "tests\Xunit\J2N.Collections.Generic.LinkedDictionary.Tests\J2N.Collections.Generic.LinkedDictionary.Tests.csproj", "{4F3BD8AE-8E07-47C1-8462-826CFBD8AEC5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.LinkedDictionary.Tests", "tests\Xunit\J2N.Collections.Generic.LinkedDictionary.Tests\J2N.Collections.Generic.LinkedDictionary.Tests.csproj", "{4F3BD8AE-8E07-47C1-8462-826CFBD8AEC5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.LinkedHashSet.Tests", "tests\Xunit\J2N.Collections.Generic.LinkedHashSet.Tests\J2N.Collections.Generic.LinkedHashSet.Tests.csproj", "{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.LinkedHashSet.Tests", "tests\Xunit\J2N.Collections.Generic.LinkedHashSet.Tests\J2N.Collections.Generic.LinkedHashSet.Tests.csproj", "{5D3BDD43-E0F3-49B7-B3D0-9D80C445A9A5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.List.Tests", "tests\Xunit\J2N.Collections.Generic.List.Tests\J2N.Collections.Generic.List.Tests.csproj", "{9CA73641-0FE6-4AD5-873B-9176293F7976}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.List.Tests", "tests\Xunit\J2N.Collections.Generic.List.Tests\J2N.Collections.Generic.List.Tests.csproj", "{9CA73641-0FE6-4AD5-873B-9176293F7976}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.SortedDictionary.Tests", "tests\Xunit\J2N.Collections.Generic.SortedDictionary.Tests\J2N.Collections.Generic.SortedDictionary.Tests.csproj", "{406982C9-9A5A-42ED-B800-83D7D23A93B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.SortedDictionary.Tests", "tests\Xunit\J2N.Collections.Generic.SortedDictionary.Tests\J2N.Collections.Generic.SortedDictionary.Tests.csproj", "{406982C9-9A5A-42ED-B800-83D7D23A93B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.SortedSet.Tests", "tests\Xunit\J2N.Collections.Generic.SortedSet.Tests\J2N.Collections.Generic.SortedSet.Tests.csproj", "{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.SortedSet.Tests", "tests\Xunit\J2N.Collections.Generic.SortedSet.Tests\J2N.Collections.Generic.SortedSet.Tests.csproj", "{17BC0DD3-CBB4-4EE0-8558-7E8D57BDADB0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.Extensions.Tests", "tests\Xunit\J2N.Collections.Generic.Extensions.Tests\J2N.Collections.Generic.Extensions.Tests.csproj", "{5EAF8BF5-9660-4E2E-AD97-10CCC99604D3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.Generic.Extensions.Tests", "tests\Xunit\J2N.Collections.Generic.Extensions.Tests\J2N.Collections.Generic.Extensions.Tests.csproj", "{5EAF8BF5-9660-4E2E-AD97-10CCC99604D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.ObjectModel.Tests", "tests\Xunit\J2N.Collections.ObjectModel.Tests\J2N.Collections.ObjectModel.Tests.csproj", "{A101FA42-5184-4D92-9B9C-E0AE5E98664C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.ObjectModel.Tests", "tests\Xunit\J2N.Collections.ObjectModel.Tests\J2N.Collections.ObjectModel.Tests.csproj", "{A101FA42-5184-4D92-9B9C-E0AE5E98664C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Runtime.Tests", "tests\Xunit\J2N.Runtime.Tests\J2N.Runtime.Tests.csproj", "{6B1280F0-7B29-4A86-B404-6E04641B4C0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Runtime.Tests", "tests\Xunit\J2N.Runtime.Tests\J2N.Runtime.Tests.csproj", "{6B1280F0-7B29-4A86-B404-6E04641B4C0D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
