@@ -101,16 +101,13 @@
   <Target Name="UpdateRuntimeConfig" AfterTargets="Build">
     <PropertyGroup>
       <RuntimeConfigFile>$(TargetDir)$(AssemblyName).runtimeconfig.json</RuntimeConfigFile>
-      <DotNet_8_0_OrGreater>false</DotNet_8_0_OrGreater>
-      <DotNet_8_0_OrGreater Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' And ($(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) Or ($(TargetFramework.StartsWith('net')) And $(TargetFramework.IndexOf('.')) > 4))">true</DotNet_8_0_OrGreater>
     </PropertyGroup>
 
-    <!-- Example usage -->
     <UpdateRuntimeConfigProperty 
         RuntimeConfigFile="$(RuntimeConfigFile)" 
         PropertyName="System.Runtime.Serialization.EnableUnsafeBinaryFormatterSerialization" 
         PropertyValue="true" 
-        Condition="Exists('$(RuntimeConfigFile)') And '$(DotNet_8_0_OrGreater)' == 'true'" />
+        Condition="Exists('$(RuntimeConfigFile)') And '$(TargetFramework)' == 'net8.0'" />
   </Target>
   
 </Project>

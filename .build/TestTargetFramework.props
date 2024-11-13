@@ -20,16 +20,16 @@
     <!-- Test Client to DLL target works as follows:
 
       Test Client       | Target Under Test
+      net9.0            | net9.0
       net8.0            | net8.0
-      net6.0            | net6.0
-      net5.0            | netstandard2.1
+      net6.0            | netstandard2.1
       net48             | net462
       net472            | net45
       net471            | netstandard2.0
       net47             | net40
 
     -->
-    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net8.0;net6.0;net5.0</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' ">net9.0;net8.0;net6.0</TargetFrameworks>
     <TargetFrameworks Condition=" '$(TestAllTargetFrameworks)' == 'true' AND $([MSBuild]::IsOsPlatform('Windows')) ">$(TargetFrameworks);net48;net472;net471;net47</TargetFrameworks>
     <TargetFramework Condition=" '$(TargetFrameworks)' != '' "></TargetFramework>
   </PropertyGroup>

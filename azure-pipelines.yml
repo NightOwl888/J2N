@@ -23,9 +23,9 @@ name: 'vNext$(rev:.r)' # Format for build number (will be overridden)
 
 variables:
 - name: TestTargetFrameworks
-  value: 'net8.0;net6.0;net5.0;net48;net472;net471;net47'
+  value: 'net9.0;net8.0;net6.0;net48;net472;net471;net47'
 - name: DotNetSDKVersion
-  value: '8.0.401'
+  value: '9.0.100'
 - name: BinaryArtifactName
   value: 'testbinaries'
 - name: NuGetArtifactName
@@ -233,6 +233,56 @@ stages:
         maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
         dotNetSdkVersion: '$(DotNetSDKVersion)'
 
+  - job: Test_net9_0_x64
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
+    strategy:
+      matrix:
+        Windows:
+          osName: 'Windows'
+          imageName: 'windows-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        Linux:
+          osName: 'Linux'
+          imageName: 'ubuntu-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+        macOS:
+          osName: 'macOS'
+          imageName: 'macOS-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+    displayName: 'Test net9.0,x64 on'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - template: '.build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: $(osName)
+        testTargetFramework: 'net9.0'
+        vsTestPlatform: 'x64'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
+
+  - job: Test_net9_0_x86 # Only run if explicitly enabled with RunX86Tests
+    condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
+    strategy:
+      matrix:
+        Windows:
+          osName: 'Windows'
+          imageName: 'windows-latest'
+          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
+    displayName: 'Test net9.0,x86 on'
+    pool:
+      vmImage: $(imageName)
+    steps:
+    - template: '.build/azure-templates/run-tests-on-os.yml'
+      parameters:
+        osName: $(osName)
+        testTargetFramework: 'net9.0'
+        vsTestPlatform: 'x86'
+        testResultsArtifactName: '$(TestResultsArtifactName)'
+        maximumAllowedFailures: $(maximumAllowedFailures)
+        dotNetSdkVersion: '$(DotNetSDKVersion)'
+
   - job: Test_net8_0_x64
     condition: and(succeeded(), ne(variables['RunTests'], 'false'))
     strategy:
@@ -328,56 +378,6 @@ stages:
       parameters:
         osName: $(osName)
         testTargetFramework: 'net6.0'
-        vsTestPlatform: 'x86'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: $(maximumAllowedFailures)
-        dotNetSdkVersion: '$(DotNetSDKVersion)'
-
-  - job: Test_net5_0_x64
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'))
-    strategy:
-      matrix:
-        Windows:
-          osName: 'Windows'
-          imageName: 'windows-latest'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        Linux:
-          osName: 'Linux'
-          imageName: 'ubuntu-22.04' # 24.04 now fails for net5.0 because of OpenSLL version issue, so we have to pin this.
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-        macOS:
-          osName: 'macOS'
-          imageName: 'macOS-latest'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-    displayName: 'Test net5.0,x64 on'
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - template: '.build/azure-templates/run-tests-on-os.yml'
-      parameters:
-        osName: $(osName)
-        testTargetFramework: 'net5.0'
-        vsTestPlatform: 'x64'
-        testResultsArtifactName: '$(TestResultsArtifactName)'
-        maximumAllowedFailures: $(maximumAllowedFailures)
-        dotNetSdkVersion: '$(DotNetSDKVersion)'
-
-  - job: Test_net5_0_x86 # Only run if explicitly enabled with RunX86Tests
-    condition: and(succeeded(), ne(variables['RunTests'], 'false'), eq(variables['RunX86Tests'], 'true'))
-    strategy:
-      matrix:
-        Windows:
-          osName: 'Windows'
-          imageName: 'windows-latest'
-          maximumAllowedFailures: 0 # Maximum allowed failures for a successful build
-    displayName: 'Test net5.0,x86 on'
-    pool:
-      vmImage: $(imageName)
-    steps:
-    - template: '.build/azure-templates/run-tests-on-os.yml'
-      parameters:
-        osName: $(osName)
-        testTargetFramework: 'net5.0'
         vsTestPlatform: 'x86'
         testResultsArtifactName: '$(TestResultsArtifactName)'
         maximumAllowedFailures: $(maximumAllowedFailures)
