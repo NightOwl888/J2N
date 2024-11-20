@@ -265,10 +265,8 @@ namespace J2N.Text
         /// </returns>
         public static int CompareToOrdinal(this char[]? str, ReadOnlySpan<char> value)
         {
-#pragma warning disable CA2265 // Do not compare Span<T> to null or default
-            if (str is null) return (value == default) ? 0 : -1;
-            if (value == default) return 1;
-#pragma warning restore CA2265 // Do not compare Span<T> to null or default
+            // J2N: Compare null only on the left side. When value == default, we treat it as empty. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
+            if (str is null) return -1;
 
             unsafe
             {
