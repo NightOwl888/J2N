@@ -220,8 +220,8 @@ namespace J2N.Text
         /// </returns>
         public static int CompareToOrdinal(this string? str, ReadOnlySpan<char> value) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            // J2N: Compare null only on the left side. When value == default, we treat it as empty. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
-            if (str is null) return -1;
+            // J2N: Only consider whether the right side is empty if the left side is null. This is the equivalent of calling str.AsSpan() and then doing the comparison. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
+            if (str is null) return value.IsEmpty ? 0 : -1;
 
             unsafe
             {
@@ -398,8 +398,10 @@ namespace J2N.Text
         /// sequence of characters as the specified <paramref name="charSequence"/>; otherwise, <c>false</c>.</returns>
         public static bool ContentEquals(this string? text, ReadOnlySpan<char> charSequence) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            // J2N: Compare null only on the left side. When value == default, we treat it as empty. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
-            if (text is null) return false;
+#pragma warning disable CA2265 // Do not compare Span<T> to null or default
+            if (text is null)
+                return charSequence == default;
+#pragma warning restore CA2265 // Do not compare Span<T> to null or default
 
             int len = charSequence.Length;
             if (len != text.Length)
@@ -551,8 +553,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool ContentEquals(this string? text, ReadOnlySpan<char> charSequence, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            // J2N: Compare null only on the left side. When value == default, we treat it as empty. See: https://github.com/NightOwl888/J2N/pull/122#discussion_r1850836158
-            if (text is null) return false;
+#pragma warning disable CA2265 // Do not compare Span<T> to null or default
+            if (text is null)
+                return charSequence == default;
+#pragma warning restore CA2265 // Do not compare Span<T> to null or default
 
             int len = charSequence.Length;
             if (len != text.Length)
