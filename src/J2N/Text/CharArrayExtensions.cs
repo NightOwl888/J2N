@@ -19,6 +19,7 @@
 using J2N.Buffers;
 using System;
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -277,6 +278,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe static int CompareToOrdinalCore(char[] str, char* value, int valueLength)
         {
             int length = Math.Min(str.Length, valueLength);

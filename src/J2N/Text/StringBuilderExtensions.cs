@@ -709,6 +709,7 @@ namespace J2N.Text
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe static int CompareToOrdinalCore(StringBuilder text, char* value, int valueLength)
         {
             int length = Math.Min(text.Length, valueLength);
