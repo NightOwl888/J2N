@@ -8,8 +8,6 @@ using System.Runtime.Serialization;
 
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     public partial class List<T>
     {
         /// <summary>

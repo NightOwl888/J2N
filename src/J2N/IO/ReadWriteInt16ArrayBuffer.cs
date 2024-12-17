@@ -19,11 +19,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="Int16ArrayBuffer"/>, <see cref="ReadWriteInt16ArrayBuffer"/> and <see cref="ReadOnlyInt16ArrayBuffer"/>
     /// compose the implementation of array based short buffers.

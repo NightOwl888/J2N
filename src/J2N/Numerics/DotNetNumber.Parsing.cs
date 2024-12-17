@@ -11,8 +11,6 @@ using System.Runtime.InteropServices;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     // The Parse methods provided by the numeric classes convert a
     // string to a numeric value. The optional style parameter specifies the
     // permitted style of the numeric string. It must be a combination of bit flags

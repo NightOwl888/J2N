@@ -11,8 +11,6 @@ using System.Runtime.InteropServices;
 
 namespace J2N.Runtime.InteropServices
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An unsafe class that provides a set of methods to access the underlying data representations of collections.
     /// </summary>

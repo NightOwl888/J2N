@@ -12,11 +12,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Reflection;
 
-
 namespace J2N.Collections.ObjectModel
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Provides the base class for a generic read-only collection of key/value pairs that is structurally equatable.
     /// </summary>

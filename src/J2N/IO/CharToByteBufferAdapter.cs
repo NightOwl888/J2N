@@ -18,11 +18,8 @@
 
 using System;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// This class wraps a byte buffer to be a <see cref="char"/> buffer.
     /// </summary>

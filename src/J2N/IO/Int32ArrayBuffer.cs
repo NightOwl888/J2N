@@ -18,11 +18,8 @@
 
 using System;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="Int32ArrayBuffer"/>, <see cref="ReadWriteInt32ArrayBuffer"/> and <see cref="ReadOnlyInt32ArrayBuffer"/> compose
     /// the implementation of array based <see cref="int"/> buffers.

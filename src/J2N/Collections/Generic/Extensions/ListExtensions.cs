@@ -24,8 +24,6 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic.Extensions
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Extensions to the <see cref="IList{T}"/> interface.
     /// </summary>

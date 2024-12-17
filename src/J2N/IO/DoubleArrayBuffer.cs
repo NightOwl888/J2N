@@ -21,8 +21,6 @@ using System;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="DoubleArrayBuffer"/>, <see cref="ReadWriteDoubleArrayBuffer"/>, and <see cref="ReadOnlyDoubleArrayBuffer"/>
     /// compose the implementation of array based float buffers.

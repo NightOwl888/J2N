@@ -19,11 +19,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="CharArrayBuffer"/>, <see cref="ReadWriteCharArrayBuffer"/> and <see cref="ReadOnlyCharArrayBuffer"/> compose
     /// the implementation of array based char buffers.

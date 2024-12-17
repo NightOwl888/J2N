@@ -20,11 +20,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A buffer of <see cref="long"/>s.
     /// <para/>

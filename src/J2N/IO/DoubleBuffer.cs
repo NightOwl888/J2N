@@ -23,8 +23,6 @@ using System.Text;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A buffer of <see cref="double"/>s.
     /// <para/>

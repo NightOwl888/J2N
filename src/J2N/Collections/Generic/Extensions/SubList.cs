@@ -12,8 +12,6 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Wraps an <see cref="IList{T}"/> as a sublist. However, since we can make no assumptions as to the internals of the
     /// passed in implementation, we make a best effort to throw an exception when the Count property of the list has changed

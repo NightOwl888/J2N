@@ -15,11 +15,8 @@ using System.Runtime.Serialization;
 #endif
 using SCG = System.Collections.Generic;
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted on the key.
     /// <para/>

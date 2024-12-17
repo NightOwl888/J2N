@@ -24,8 +24,6 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// The abstract superclass of the classes which represent numeric base types
     /// (that is <see cref="System.Byte"/>, <see cref="System.SByte"/>, <see cref="System.Int16"/>, <see cref="System.Int32"/>,

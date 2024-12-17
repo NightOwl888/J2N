@@ -28,8 +28,6 @@ using System.Text;
 
 namespace J2N.Text
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Extensions to the <see cref="StringBuilder"/> class.
     /// </summary>

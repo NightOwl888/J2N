@@ -21,8 +21,6 @@ using System;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /////     <item><description>
     /////         A buffer can be direct or indirect. A direct buffer will try its best to
     /////         take advantage of native memory APIs and it may not stay in the heap,

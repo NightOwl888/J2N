@@ -8,8 +8,6 @@ using System.Diagnostics;
 
 namespace J2N
 {
-    using SR2 = J2N.Resources.Strings;
-
     internal abstract class SZGenericArrayEnumeratorBase : IDisposable
     {
         protected int _index;
@@ -64,7 +62,7 @@ namespace J2N
             get
             {
                 if ((uint)_index >= (uint)_endIndex)
-                    throw new InvalidOperationException(_index < 0 ? SR2.InvalidOperation_EnumNotStarted : SR2.InvalidOperation_EnumEnded);
+                    throw new InvalidOperationException(_index < 0 ? SR.InvalidOperation_EnumNotStarted : SR.InvalidOperation_EnumEnded);
                 return _array![_index];
             }
         }
@@ -81,7 +79,7 @@ namespace J2N
         {
             get
             {
-                throw new InvalidOperationException(SR2.InvalidOperation_EnumNotStarted);
+                throw new InvalidOperationException(SR.InvalidOperation_EnumNotStarted);
             }
         }
 
@@ -107,7 +105,7 @@ namespace J2N
         {
             get
             {
-                throw new InvalidOperationException(SR2.InvalidOperation_EnumNotStarted);
+                throw new InvalidOperationException(SR.InvalidOperation_EnumNotStarted);
             }
         }
     }

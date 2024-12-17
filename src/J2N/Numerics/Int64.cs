@@ -27,8 +27,6 @@ using System.Text;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An immutable reference type that wraps the primitive <see cref="long"/> type.
     /// <para/>
@@ -1885,7 +1883,7 @@ namespace J2N.Numerics
         /// </remarks>
         /// <seealso cref="TryParse(string?, NumberStyle, IFormatProvider?, out long)"/>
         /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
-        public static long Parse(string s, NumberStyle style , IFormatProvider? provider) // J2N: Renamed from ParseLong()
+        public static long Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseLong()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s == null) throw new ArgumentNullException(nameof(s));

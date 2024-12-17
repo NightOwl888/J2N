@@ -23,8 +23,6 @@ using System.Text;
 
 namespace J2N.Text
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A wrapper class that represents a <see cref="string"/> and implements <see cref="ICharSequence"/>.
     /// </summary>

@@ -22,11 +22,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Text;
 
-
 namespace J2N.Collections
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Provides comparers that use structural equality rules for one dimensional arrays similar to those in Java.
     /// </summary>

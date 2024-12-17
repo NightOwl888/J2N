@@ -22,8 +22,6 @@ using System.IO;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Wraps an existing <see cref="Stream"/> and reads typed data from it.
     /// Typically, this stream has been written by a DataOutputStream. Types that can

@@ -19,8 +19,6 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Represents a collection of keys and values.
     /// <para/>

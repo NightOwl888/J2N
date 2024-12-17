@@ -16,15 +16,11 @@
  */
 #endregion
 
-
 using System;
 using System.IO.MemoryMappedFiles;
 
-
 namespace J2N.IO.MemoryMappedFiles
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="MemoryMappedViewByteBuffer"/>, <see cref="ReadWriteMemoryMappedViewByteBuffer"/> and <see cref="ReadOnlyMemoryMappedViewByteBuffer"/> compose
     /// the implementation of array based byte buffers.

@@ -30,8 +30,6 @@ using JCG = J2N.Collections.Generic;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An immutable reference type that wraps the primitive <see cref="double"/> type.
     /// <para/>

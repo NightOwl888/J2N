@@ -23,9 +23,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using SR2 = J2N.Resources.Strings;
 using StringBuffer = System.Text.StringBuilder;
-
 
 namespace J2N
 {
@@ -975,7 +973,7 @@ namespace J2N
                                     value = (value << 4) + 10 + aChar - 'A';
                                     break;
                                 default:
-                                    throw new ArgumentException(SR2.Arg_InvalidANSIString);
+                                    throw new ArgumentException(SR.Arg_InvalidANSIString);
                             }
                         }
                         output[outLen++] = (char)value;

@@ -24,11 +24,8 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-
 namespace J2N.Collections.ObjectModel
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Provides the base class for a generic read-only set that is structurally equatable.
     /// </summary>

@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
-using SR2 = J2N.Resources.Strings;
 
 namespace J2N.Collections
 {
@@ -300,7 +299,7 @@ namespace J2N.Collections
             if (original is null)
                 throw new ArgumentNullException(nameof(original));
             if (newLength < 0)
-                throw new ArgumentOutOfRangeException(nameof(newLength), newLength, SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(newLength), newLength, SR.ArgumentOutOfRange_NeedNonNegNum);
 
             T[] newArray = new T[newLength];
 

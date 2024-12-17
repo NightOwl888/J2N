@@ -39,8 +39,6 @@ using System.Text;
 namespace J2N.Collections.Generic
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted based on insertion order.
     /// <para/>

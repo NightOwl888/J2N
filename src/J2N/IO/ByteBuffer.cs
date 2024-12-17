@@ -23,8 +23,6 @@ using System.Text;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /////     <item><description><see cref="AllocateDirect(int)"/> a memory block and create a direct
     /////     buffer based on it</description></item>
 

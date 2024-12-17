@@ -25,8 +25,6 @@ using System.Text;
 
 namespace J2N.Text
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Extensions to <see cref="T:char[]"/> arrays.
     /// </summary>

@@ -19,11 +19,8 @@
 using System;
 using System.Collections;
 
-
 namespace J2N.Text
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An implementation of <see cref="ICharacterEnumerator"/> for strings.
     /// </summary>

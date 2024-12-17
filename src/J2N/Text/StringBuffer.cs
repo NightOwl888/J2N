@@ -6,11 +6,8 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Text;
 
-
 namespace J2N.Text
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A thread-safe, mutable sequence of characters.
     /// A string buffer is like a <see cref="string"/>, but can be modified. At any

@@ -15,11 +15,8 @@ using System.Runtime.Serialization;
 #endif
 using Interlocked = System.Threading.Interlocked;
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     // A binary search tree is a red-black tree if it satisfies the following red-black properties:
     // 1. Every node is either red or black
     // 2. Every leaf (nil node) is black

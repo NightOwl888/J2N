@@ -13,8 +13,6 @@ using System.Text;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     // The Format methods provided by the numeric classes convert
     // the numeric value to a string using the format string given by the
     // format parameter. If the format parameter is null or

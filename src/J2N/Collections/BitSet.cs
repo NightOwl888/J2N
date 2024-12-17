@@ -23,8 +23,6 @@ using System.Text;
 
 namespace J2N.Collections
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// The <see cref="BitSet"/> class implements a bit field. Each element in a
     /// <see cref="BitSet"/> can be on(1) or off(0). A <see cref="BitSet"/> is created with a

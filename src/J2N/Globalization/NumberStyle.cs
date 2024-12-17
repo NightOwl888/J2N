@@ -6,8 +6,6 @@ using System.Globalization;
 
 namespace J2N.Globalization
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Determines the styles permitted in numeric string arguments that are passed to
     /// the Parse and TryParse methods of the integral and floating-point numeric types

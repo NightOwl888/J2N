@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using SR2 = J2N.Resources.Strings;
 
 namespace J2N
 {
@@ -286,7 +285,7 @@ namespace J2N
         public override int Next(int minValue, int maxValue)
         {
             if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue), SR.Format(SR2.Argument_MinMaxValue, nameof(minValue), nameof(maxValue)));
+                throw new ArgumentOutOfRangeException(nameof(minValue), SR.Format(SR.Argument_MinMaxValue, nameof(minValue), nameof(maxValue)));
 
             if ((maxValue & -maxValue) == maxValue)
             {

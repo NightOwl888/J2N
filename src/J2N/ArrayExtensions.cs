@@ -17,8 +17,6 @@
 #endregion
 
 using System;
-using SR2 = J2N.Resources.Strings;
-
 
 namespace J2N
 {
@@ -72,7 +70,7 @@ namespace J2N
             if (length < 0)
                 throw new ArgumentOutOfRangeException(nameof(length));
             if (startIndex > array.Length - length)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             int end = startIndex + length;
             for (int i = startIndex; i < end; i++)

@@ -11,8 +11,6 @@ using System.Text;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>Methods for parsing numbers and strings.</summary>
     internal static class ParseNumbers
     {

@@ -24,7 +24,6 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using SR2 = J2N.Resources.Strings;
 
 namespace J2N
 {
@@ -590,7 +589,7 @@ namespace J2N
 
             int len = seq.Length;
             if (index < 0 || index >= len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
             if (index >= len)
@@ -628,7 +627,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 0 || index >= len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
             if (index >= len)
@@ -672,7 +671,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 0 || index >= len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             // J2N NOTE: Looking up 1 or 2 characters is faster through the StringBuilder than an indexer
             char high = seq[index++];
@@ -711,7 +710,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 0 || index >= len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
             if (index >= len)
@@ -746,7 +745,7 @@ namespace J2N
         {
             int len = seq.Length;
             if (index < 0 || index >= len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
             if (index >= len)
@@ -824,7 +823,7 @@ namespace J2N
 
             int len = seq.Length;
             if (index < 1 || index > len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
             if (--index < 0)
@@ -859,7 +858,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 1 || index > len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
             if (--index < 0)
@@ -900,7 +899,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 1 || index > len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             // J2N NOTE: Looking up 1 or 2 characters is faster through the StringBuilder than an indexer
             char low = seq[--index];
@@ -936,7 +935,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (index < 1 || index > len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
             if (--index < 0)
@@ -968,7 +967,7 @@ namespace J2N
         {
             int len = seq.Length;
             if (index < 1 || index > len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_IndexBefore);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
             if (--index < 0)
@@ -1060,7 +1059,7 @@ namespace J2N
         public static int ToChars(int codePoint, Span<char> destination, int destinationIndex)
         {
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
             if (destinationIndex < 0 || destinationIndex >= destination.Length)
                 throw new ArgumentOutOfRangeException(nameof(destinationIndex));
 
@@ -1108,7 +1107,7 @@ namespace J2N
         public static int ToChars(int codePoint, char[] destination, int destinationIndex)
         {
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
             if (destination is null)
                 throw new ArgumentNullException(nameof(destination));
             if (destinationIndex < 0 || destinationIndex >= destination.Length)
@@ -1155,7 +1154,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -1193,7 +1192,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -1232,7 +1231,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -1280,11 +1279,11 @@ namespace J2N
 
             int len = seq.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -1328,11 +1327,11 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -1376,11 +1375,11 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             char[]? arrayToReturnToPool = null;
             try
@@ -1441,11 +1440,11 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int len = seq.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex + length > len)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             int endIndex = startIndex + length;
             int n = length;
@@ -1519,7 +1518,7 @@ namespace J2N
 
             int length = seq.Length;
             if (index < 0 || index > length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
             if (codePointOffset >= 0)
@@ -1591,7 +1590,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int length = seq.Length;
             if (index < 0 || index > length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
             if (codePointOffset >= 0)
@@ -1663,7 +1662,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int length = seq.Length;
             if (index < 0 || index > length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
             char[]? arrayToReturnToPool = null;
@@ -1752,7 +1751,7 @@ namespace J2N
                 throw new ArgumentNullException(nameof(seq));
             int length = seq.Length;
             if (index < 0 || index > length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
             if (codePointOffset >= 0)
@@ -1821,7 +1820,7 @@ namespace J2N
         {
             int length = seq.Length;
             if (index < 0 || index > length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR2.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
             if (codePointOffset >= 0)
@@ -1908,9 +1907,9 @@ namespace J2N
             if (seq is null)
                 throw new ArgumentNullException(nameof(seq));
             if (start < 0)
-                throw new ArgumentOutOfRangeException(nameof(start), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(start), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
             if (count > seq.Length - start || index < start || index > start + count)
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CA2208 // Instantiate argument exceptions correctly
@@ -2879,7 +2878,7 @@ namespace J2N
             if (culture is null)
                 throw new ArgumentNullException(nameof(culture));
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -2918,7 +2917,7 @@ namespace J2N
         public static int ToLowerInvariant(int codePoint)
         {
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -2984,7 +2983,7 @@ namespace J2N
             if (culture is null)
                 throw new ArgumentNullException(nameof(culture));
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -3020,10 +3019,10 @@ namespace J2N
         /// <returns>The uppercase equivalent of the character, if any;
         /// otherwise, the character itself.</returns>
         /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
-        public static int ToUpperInvariant(int codePoint) 
+        public static int ToUpperInvariant(int codePoint)
         {
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -3141,11 +3140,11 @@ namespace J2N
         public static string ToString(ReadOnlySpan<int> codePoints, int startIndex, int length)
         {
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex > codePoints.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
             if (length <= CodePointStackBufferSize)
@@ -3192,11 +3191,11 @@ namespace J2N
             if (codePoints is null)
                 throw new ArgumentNullException(nameof(codePoints));
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR2.ArgumentOutOfRange_NeedNonNegNum);
+                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (startIndex > codePoints.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             // 256 code points max. Since we don't measure the char length, we will allocate up to 512 chars on the stack (1024 bytes).
             if (length <= CodePointStackBufferSize)
@@ -3303,7 +3302,7 @@ namespace J2N
             {
                 int codePoint = codePoints[i];
                 if (!IsValidCodePoint(codePoint))
-                    throw new ArgumentException(J2N.SR.Format(SR2.Argument_InvalidCodePoint, codePoint));
+                    throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
                 if (codePoint < MinSupplementaryCodePoint) // BMP char
                 {

@@ -21,11 +21,8 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-
 namespace J2N.Collections
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A comparer that provides structural equality rules for collections.
     /// </summary>

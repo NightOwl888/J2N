@@ -21,11 +21,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.MemoryMappedFiles;
 
-
 namespace J2N.IO.MemoryMappedFiles
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A byte buffer whose content is a memory-mapped region of a file.
     /// 

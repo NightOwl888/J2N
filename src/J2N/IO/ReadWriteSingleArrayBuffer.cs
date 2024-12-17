@@ -18,11 +18,8 @@
 
 using System;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="SingleArrayBuffer"/>, <see cref="ReadWriteSingleArrayBuffer"/> and <see cref="ReadOnlySingleArrayBuffer"/>
     /// compose the implementation of array based float buffers.

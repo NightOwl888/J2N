@@ -23,11 +23,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A <see cref="PriorityQueue{T}"/> holds elements on a priority heap, which orders the elements
     /// according to their natural order or according to the comparator specified at

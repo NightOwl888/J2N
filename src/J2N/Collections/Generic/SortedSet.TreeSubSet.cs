@@ -12,11 +12,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 #endif
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     public partial class SortedSet<T>
     {
         /// <summary>

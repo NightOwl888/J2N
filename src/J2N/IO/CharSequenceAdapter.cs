@@ -23,8 +23,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// This class wraps a char sequence to be a <see cref="char"/> buffer.
     /// <para/>

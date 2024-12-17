@@ -15,8 +15,6 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Represents a strongly typed list of objects that can be accessed by index. Provides methods to search, sort, and manipulate lists.
     /// <para/>

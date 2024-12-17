@@ -26,8 +26,6 @@ using System.Text;
 
 namespace J2N.Text
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Extenions to the <see cref="System.String"/> class.
     /// </summary>

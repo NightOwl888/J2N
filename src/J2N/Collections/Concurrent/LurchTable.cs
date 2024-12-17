@@ -24,11 +24,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-
 namespace J2N.Collections.Concurrent
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Defines if and how items added to a LurchTable are linked together, this defines
     /// the value returned from Peek/Dequeue as the oldest entry of the specified operation.

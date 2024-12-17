@@ -27,8 +27,6 @@ using System.Text;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An immutable reference type that wraps the primitive <see cref="byte"/> type.
     /// <para/>
