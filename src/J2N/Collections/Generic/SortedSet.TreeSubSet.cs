@@ -453,8 +453,7 @@ namespace J2N.Collections.Generic
             [EditorBrowsable(EditorBrowsableState.Never)]
             protected override void GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                if (info == null)
-                    throw new ArgumentNullException(nameof(info));
+                ThrowHelper.ThrowIfNull(info, ExceptionArgument.info);
 
                 info.AddValue(maxName, _max, typeof(T));
                 info.AddValue(minName, _min, typeof(T));

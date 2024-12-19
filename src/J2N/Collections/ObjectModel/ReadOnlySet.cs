@@ -22,7 +22,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace J2N.Collections.ObjectModel
 {
@@ -84,9 +83,12 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlySet(ISet<T> set, SetEqualityComparer<T> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            this.set = set ?? throw new ArgumentNullException(nameof(set));
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
-            this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
+            ThrowHelper.ThrowIfNull(set, ExceptionArgument.set);
+            ThrowHelper.ThrowIfNull(structuralEqualityComparer, ExceptionArgument.structuralEqualityComparer);
+            ThrowHelper.ThrowIfNull(toStringFormatProvider, ExceptionArgument.toStringFormatProvider);
+            this.set = set;
+            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.toStringFormatProvider = toStringFormatProvider;
         }
 
         /// <summary>
@@ -393,8 +395,7 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
             if (array.GetLowerBound(0) != 0)

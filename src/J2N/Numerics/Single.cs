@@ -1308,8 +1308,7 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out float)"/>
         public static float Parse(string s, NumberStyle style, IFormatProvider? provider)
         {
-            if (s is null)
-                throw new ArgumentNullException(nameof(s));
+            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
             return DotNetNumber.ParseSingle(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }

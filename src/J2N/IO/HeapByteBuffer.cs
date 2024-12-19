@@ -67,8 +67,7 @@ namespace J2N.IO
         /// <seealso cref="ByteBuffer.Get(byte[], int, int)"/>
         public override sealed ByteBuffer Get(byte[] destination, int offset, int length)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
 
             int len = destination.Length;
             if (offset < 0)

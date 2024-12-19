@@ -70,8 +70,7 @@ namespace J2N.IO
 
         public override sealed SingleBuffer Get(float[] destination, int offset, int length)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
 
             int len = destination.Length;
             if (offset < 0)

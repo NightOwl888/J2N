@@ -12,7 +12,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
-
 namespace J2N.Collections.Generic
 {
     /// <summary>
@@ -102,8 +101,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
         public List(IEnumerable<T> collection)
         {
-            if (collection is null)
-                throw new ArgumentNullException(nameof(collection));
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
 
             if (collection is ICollection<T> c)
             {
@@ -381,21 +379,12 @@ namespace J2N.Collections.Generic
             return (value is T) || (value == null && default(T) == null);
         }
 
-        // From System.ThrowHelper
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool NullAndNullsAreIllegal(object? value)
-        {
-            // Note that default(T) is not equal to null for value types except when T is Nullable<U>.
-            return !(default(T) == null) && value == null;
-        }
-
         object? IList.this[int index]
         {
             get => this[index];
             set
             {
-                if (NullAndNullsAreIllegal(value))
-                    throw new ArgumentNullException(nameof(value));
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<T>(value, ExceptionArgument.value);
 
                 try
                 {
@@ -457,8 +446,7 @@ namespace J2N.Collections.Generic
 
         int IList.Add(object? item)
         {
-            if (NullAndNullsAreIllegal(item))
-                throw new ArgumentNullException(nameof(item));
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<T>(item, ExceptionArgument.item);
 
             try
             {
@@ -758,8 +746,7 @@ namespace J2N.Collections.Generic
         public List<TOutput> ConvertAll<TOutput>(Converter<T, TOutput> converter)
         {
             CoModificationCheck();
-            if (converter is null)
-                throw new ArgumentNullException(nameof(converter));
+            ThrowHelper.ThrowIfNull(converter, ExceptionArgument.converter);
 
             int size = Size;
             List<TOutput> list = new List<TOutput>(size);
@@ -976,8 +963,7 @@ namespace J2N.Collections.Generic
         public T Find(Predicate<T> match)
         {
             CoModificationCheck();
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             int offset = Offset;
             int limit = Size + offset;
@@ -1011,8 +997,7 @@ namespace J2N.Collections.Generic
         public List<T> FindAll(Predicate<T> match)
         {
             CoModificationCheck();
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             List<T> list = new List<T>();
             int offset = Offset;
@@ -1129,8 +1114,7 @@ namespace J2N.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
             if (count < 0 || startIndex > Size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             int offset = Offset;
             int endIndex = startIndex + offset + count;
@@ -1169,8 +1153,7 @@ namespace J2N.Collections.Generic
         public T FindLast(Predicate<T> match)
         {
             CoModificationCheck();
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             int offset = Offset;
             int limit = Size + offset;
@@ -1273,8 +1256,7 @@ namespace J2N.Collections.Generic
         public int FindLastIndex(int startIndex, int count, Predicate<T> match)
         {
             CoModificationCheck();
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             if (Size == 0)
             {
@@ -1330,8 +1312,7 @@ namespace J2N.Collections.Generic
         public void ForEach(Action<T> action)
         {
             CoModificationCheck();
-            if (action is null)
-                throw new ArgumentNullException(nameof(action));
+            ThrowHelper.ThrowIfNull(action, ExceptionArgument.action);
 
             int version = _version;
             int offset = Offset;
@@ -1600,8 +1581,7 @@ namespace J2N.Collections.Generic
 
         void IList.Insert(int index, object? item)
         {
-            if (NullAndNullsAreIllegal(item))
-                throw new ArgumentNullException(nameof(item));
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<T>(item, ExceptionArgument.item);
 
             try
             {
@@ -1648,8 +1628,7 @@ namespace J2N.Collections.Generic
 
         internal virtual int DoInsertRange(int index, IEnumerable<T> collection)
         {
-            if (collection is null)
-                throw new ArgumentNullException(nameof(collection));
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
             if ((uint)index > (uint)_size)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
 
@@ -1908,8 +1887,7 @@ namespace J2N.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
             if (count < 0 || startIndex > size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             int offset = Offset;
             int freeIndex = offset;   // the first free slot in items array
@@ -2278,8 +2256,7 @@ namespace J2N.Collections.Generic
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
             if (count < 0 || index > size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
-            if (comparison is null)
-                throw new ArgumentNullException(nameof(comparison));
+            ThrowHelper.ThrowIfNull(comparison, ExceptionArgument.comparison);
 
             if (size > 1)
             {
@@ -2365,8 +2342,7 @@ namespace J2N.Collections.Generic
         public bool TrueForAll(Predicate<T> match)
         {
             CoModificationCheck();
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             int size = Size;
             for (int i = Offset; i < size; i++)
@@ -2402,8 +2378,7 @@ namespace J2N.Collections.Generic
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            if (info == null)
-                throw new ArgumentNullException(nameof(info));
+            ThrowHelper.ThrowIfNull(info, ExceptionArgument.info);
 
             info.AddValue(CountName, _size);
             info.AddValue(VersionName, _version);

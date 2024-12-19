@@ -424,14 +424,11 @@ namespace J2N.Numerics
 
 #endregion
 
-            // From System.Convert
-            internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
+        // From System.Convert
+        internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
         {
             Debug.Assert(value != null, "[Convert.DefaultToType]value!=null");
-            if (targetType == null)
-            {
-                throw new ArgumentNullException(nameof(targetType));
-            }
+            ThrowHelper.ThrowIfNull(targetType, ExceptionArgument.targetType);
 
             if (ReferenceEquals(value!.GetType(), targetType))
             {

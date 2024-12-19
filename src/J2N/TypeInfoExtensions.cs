@@ -22,7 +22,6 @@ using System;
 using System.Linq;
 using System.Reflection;
 
-
 namespace J2N
 {
     /// <summary>
@@ -45,13 +44,11 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="target"/> or <paramref name="interfaceType"/> is <c>null</c>.</exception>
         public static bool ImplementsGenericInterface(this TypeInfo target, Type interfaceType)
         {
-            if (target is null)
-                throw new ArgumentNullException(nameof(target));
-            if (interfaceType is null)
-                throw new ArgumentNullException(nameof(interfaceType));
+            ThrowHelper.ThrowIfNull(target, ExceptionArgument.target);
+            ThrowHelper.ThrowIfNull(interfaceType, ExceptionArgument.interfaceType);
 
             return target.IsGenericType && target.GetGenericTypeDefinition().GetInterfaces().Any(
-                x => x.GetTypeInfo().IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())
+                x => x.IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())
             );
         }
     }

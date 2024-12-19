@@ -62,9 +62,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static Int64Buffer Wrap(long[] array)
         {
-            if (array is null)
-                throw new ArgumentNullException(nameof(array));
-
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             return Wrap(array, 0, array.Length);
         }
 
@@ -90,8 +88,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static Int64Buffer Wrap(long[] array, int startIndex, int length)
         {
-            if (array is null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
 
             int len = array.Length;
             if (startIndex < 0)
@@ -270,9 +267,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual Int64Buffer Get(long[] destination)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
-
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
             return Get(destination, 0, destination.Length);
         }
 
@@ -298,8 +293,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual Int64Buffer Get(long[] destination, int offset, int length)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
 
             int len = destination.Length;
             if (offset < 0)
@@ -421,9 +415,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public Int64Buffer Put(long[] source)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             return Put(source, 0, source.Length);
         }
 
@@ -449,8 +441,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual Int64Buffer Put(long[] source, int offset, int length)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
 
             int len = source.Length;
             if (offset < 0)
@@ -482,8 +473,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual Int64Buffer Put(Int64Buffer source)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             if (ReferenceEquals(source, this))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
             if (source.Remaining > Remaining)

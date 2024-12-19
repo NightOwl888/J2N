@@ -405,8 +405,7 @@ namespace J2N.Collections.Concurrent
         public LurchTable(IDictionary<TKey, TValue> dictionary, LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
             : this(dictionary is null ? 0 : dictionary.Count, ordering, limit, comparer)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary));
+            ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
 
             CopyConstructorAddRange(dictionary);
         }
@@ -571,8 +570,7 @@ namespace J2N.Collections.Concurrent
         public LurchTable(IEnumerable<KeyValuePair<TKey, TValue>> collection, LurchTableOrder ordering, int limit, IEqualityComparer<TKey>? comparer)
             : this(collection is ICollection<KeyValuePair<TKey, TValue>> col ? col.Count : 0, ordering, limit, comparer)
         {
-            if (collection is null)
-                throw new ArgumentNullException(nameof(collection));
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
 
             CopyConstructorAddRange(collection);
         }
@@ -809,9 +807,9 @@ namespace J2N.Collections.Concurrent
             {
                 // J2N: Only throw if the generic closing type is not nullable
                 if (!(default(TKey) == null) && key is null)
-                    throw new ArgumentNullException(nameof(key));
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
                 if (!(default(TValue) == null) && value is null)
-                    throw new ArgumentNullException(nameof(value));
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
 
                 try
                 {
@@ -836,9 +834,9 @@ namespace J2N.Collections.Concurrent
         {
             // J2N: Only throw if the generic closing type is not nullable
             if (!(default(TKey) == null) && key is null)
-                throw new ArgumentNullException(nameof(key));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
             if (!(default(TValue) == null) && value is null)
-                throw new ArgumentNullException(nameof(value));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
 
             try
             {
@@ -883,8 +881,7 @@ namespace J2N.Collections.Concurrent
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
@@ -1130,8 +1127,7 @@ namespace J2N.Collections.Concurrent
         /// <exception cref="ArgumentNullException"><paramref name="fnCreate"/> is <c>null</c>.</exception>
         public TValue GetOrAdd(TKey key, Func<TKey, TValue> fnCreate)
         {
-            if (fnCreate == null)
-                throw new ArgumentNullException(nameof(fnCreate));
+            ThrowHelper.ThrowIfNull(fnCreate, ExceptionArgument.fnCreate);
 
             var info = new Add2Info<TKey, TValue> { Create = fnCreate };
             Insert(key, ref info);
@@ -1147,8 +1143,7 @@ namespace J2N.Collections.Concurrent
         /// <param name="fnUpdate">The delegate to call to update the value with if it already exists.</param>
         public TValue AddOrUpdate(TKey key, TValue addValue, KeyValueUpdate<TKey, TValue> fnUpdate)
         {
-            if (fnUpdate == null)
-                throw new ArgumentNullException(nameof(fnUpdate));
+            ThrowHelper.ThrowIfNull(fnUpdate, ExceptionArgument.fnUpdate);
 
             var info = new Add2Info<TKey, TValue>(addValue) { Update = fnUpdate };
             Insert(key, ref info);
@@ -1176,10 +1171,8 @@ namespace J2N.Collections.Concurrent
         /// </remarks>
         public TValue AddOrUpdate(TKey key, Func<TKey, TValue> fnCreate, KeyValueUpdate<TKey, TValue> fnUpdate)
         {
-            if (fnCreate == null)
-                throw new ArgumentNullException(nameof(fnCreate));
-            if (fnUpdate == null)
-                throw new ArgumentNullException(nameof(fnUpdate));
+            ThrowHelper.ThrowIfNull(fnCreate, ExceptionArgument.fnCreate);
+            ThrowHelper.ThrowIfNull(fnUpdate, ExceptionArgument.fnUpdate);
 
             var info = new Add2Info<TKey, TValue> { Create = fnCreate, Update = fnUpdate };
             Insert(key, ref info);
@@ -1215,8 +1208,7 @@ namespace J2N.Collections.Concurrent
         /// <exception cref="ArgumentNullException"><paramref name="fnCreate"/> is <c>null</c>.</exception>
         public bool TryAdd(TKey key, Func<TKey, TValue> fnCreate)
         {
-            if (fnCreate == null)
-                throw new ArgumentNullException(nameof(fnCreate));
+            ThrowHelper.ThrowIfNull(fnCreate, ExceptionArgument.fnCreate);
 
             var info = new Add2Info<TKey, TValue> { Create = fnCreate };
             return InsertResult.Inserted == Insert(key, ref info);
@@ -1232,8 +1224,7 @@ namespace J2N.Collections.Concurrent
         /// <exception cref="ArgumentNullException"><paramref name="fnUpdate"/> is <c>null</c>.</exception>
         public bool TryUpdate(TKey key, KeyValueUpdate<TKey, TValue> fnUpdate)
         {
-            if (fnUpdate == null)
-                throw new ArgumentNullException(nameof(fnUpdate));
+            ThrowHelper.ThrowIfNull(fnUpdate, ExceptionArgument.fnUpdate);
 
             var info = new Add2Info<TKey, TValue> { Update = fnUpdate };
             return InsertResult.Updated == Insert(key, ref info);
@@ -1266,8 +1257,7 @@ namespace J2N.Collections.Concurrent
         /// <exception cref="ArgumentNullException"><paramref name="fnCondition"/> is <c>null</c>.</exception>
         public bool TryRemove(TKey key, KeyValuePredicate<TKey, TValue> fnCondition)
         {
-            if (fnCondition == null)
-                throw new ArgumentNullException(nameof(fnCondition));
+            ThrowHelper.ThrowIfNull(fnCondition, ExceptionArgument.fnCondition);
 
             var info = new DelInfo<TKey, TValue> { Condition = fnCondition };
             return Delete(key, ref info);
@@ -1324,8 +1314,7 @@ namespace J2N.Collections.Concurrent
         /// <remarks>This method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (index < 0 || index > array.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (array.Length - index < Count)
@@ -1448,7 +1437,8 @@ namespace J2N.Collections.Concurrent
 
             internal Enumerator(LurchTable<TKey, TValue> owner, int getEnumeratorRetType)
             {
-                _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+                ThrowHelper.ThrowIfNull(owner, ExceptionArgument.owner);
+                _owner = owner;
                 _state = new EnumState();
                 _state.Init();
                 _getEnumeratorRetType = getEnumeratorRetType;
@@ -1618,7 +1608,8 @@ namespace J2N.Collections.Concurrent
 
             internal KeyCollection(LurchTable<TKey, TValue> owner)
             {
-                _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+                ThrowHelper.ThrowIfNull(owner, ExceptionArgument.owner);
+                _owner = owner;
             }
 
             #region ICollection<TKey> Members
@@ -1652,8 +1643,7 @@ namespace J2N.Collections.Concurrent
             /// </remarks>
             public void CopyTo(TKey[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
                 if (index < 0 || index > array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
@@ -1665,8 +1655,7 @@ namespace J2N.Collections.Concurrent
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
                 if (array.Rank != 1)
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
                 if (array.GetLowerBound(0) != 0)
@@ -1761,7 +1750,8 @@ namespace J2N.Collections.Concurrent
 
                 internal Enumerator(LurchTable<TKey, TValue> owner)
                 {
-                    _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+                    ThrowHelper.ThrowIfNull(owner, ExceptionArgument.owner);
+                    _owner = owner;
                     _state = new EnumState();
                     _state.Init();
                 }
@@ -1909,7 +1899,8 @@ namespace J2N.Collections.Concurrent
 
             internal ValueCollection(LurchTable<TKey, TValue> owner)
             {
-                _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+                ThrowHelper.ThrowIfNull(owner, ExceptionArgument.owner);
+                _owner = owner;
             }
 
             bool ICollection.IsSynchronized => false;
@@ -1953,8 +1944,7 @@ namespace J2N.Collections.Concurrent
             /// </remarks>
             public void CopyTo(TValue[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
                 if (index < 0 || index > array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
@@ -1966,8 +1956,7 @@ namespace J2N.Collections.Concurrent
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
                 if (array.Rank != 1)
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
@@ -2060,7 +2049,8 @@ namespace J2N.Collections.Concurrent
 
                 internal Enumerator(LurchTable<TKey, TValue> owner)
                 {
-                    _owner = owner ?? throw new ArgumentNullException(nameof(owner));
+                    ThrowHelper.ThrowIfNull(owner, ExceptionArgument.owner);
+                    _owner = owner;
                     _state = new EnumState();
                     _state.Init();
                 }
@@ -2763,7 +2753,8 @@ namespace J2N.Collections.Concurrent
 
             public NullableKeyComparer(IEqualityComparer<TKey> wrappedComparer)
             {
-                this.wrappedComparer = wrappedComparer ?? throw new ArgumentNullException(nameof(wrappedComparer));
+                Debug.Assert(wrappedComparer is not null);
+                this.wrappedComparer = wrappedComparer!;
             }
 
             public bool Equals([AllowNull] TKey x, [AllowNull] TKey y)

@@ -21,7 +21,6 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-
 namespace J2N.Collections.Generic.Extensions
 {
     /// <summary>
@@ -62,8 +61,7 @@ namespace J2N.Collections.Generic.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T[] ToArray<T>(this ICollection<T> source)
         {
-            if (source == null)
-                throw new ArgumentNullException(nameof(source));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
 
             int count = source.Count;
             if (count == 0)

@@ -155,8 +155,7 @@ namespace J2N
         /// <seealso cref="NextInt(int)"/>
         public override void NextBytes(byte[] buffer)
         {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
+            ThrowHelper.ThrowIfNull(buffer, ExceptionArgument.buffer);
 
             int rand = 0, count = 0, loop = 0;
             while (count < buffer.Length)

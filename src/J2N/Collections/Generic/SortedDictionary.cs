@@ -145,10 +145,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public SortedDictionary(IDictionary<TKey, TValue> dictionary, IComparer<TKey>? comparer)
         {
-            if (dictionary == null)
-            {
-                throw new ArgumentNullException(nameof(dictionary));
-            }
+            ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
 
             var keyValuePairComparer = new KeyValuePairComparer(comparer);
 
@@ -752,9 +749,9 @@ namespace J2N.Collections.Generic
 
                 // J2N: Only throw if the generic closing type is not nullable
                 if (!(default(TKey) == null) && key is null)
-                    throw new ArgumentNullException(nameof(key));
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
                 if (!(default(TValue) == null) && value is null)
-                    throw new ArgumentNullException(nameof(value));
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
 
                 try
                 {
@@ -784,9 +781,9 @@ namespace J2N.Collections.Generic
 
             // J2N: Only throw if the generic closing type is not nullable
             if (!(default(TKey) == null) && key is null)
-                throw new ArgumentNullException(nameof(key));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
             if (!(default(TValue) == null) && value is null)
-                throw new ArgumentNullException(nameof(value));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
 
             try
             {
@@ -1234,7 +1231,8 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public KeyCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+                ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+                _dictionary = dictionary;
             }
 
             /// <summary>
@@ -1304,8 +1302,7 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TKey[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
                 if (index < 0)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
@@ -1316,8 +1313,7 @@ namespace J2N.Collections.Generic
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
                 if (array.Rank != 1)
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
                 if (array.GetLowerBound(0) != 0)
@@ -1562,7 +1558,8 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public ValueCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+                ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+                _dictionary = dictionary;
             }
 
             /// <summary>
@@ -1633,8 +1630,7 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TValue[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
                 if (index < 0)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
@@ -1645,10 +1641,7 @@ namespace J2N.Collections.Generic
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                {
-                    throw new ArgumentNullException(nameof(array));
-                }
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
 
                 if (array.Rank != 1)
                 {

@@ -16,7 +16,6 @@
  */
 #endregion
 
-
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.MemoryMappedFiles;
@@ -102,8 +101,7 @@ namespace J2N.IO.MemoryMappedFiles
         // Implementation provided by Vincent Van Den Berghe: http://git.net/ml/general/2017-02/msg31639.html
         public override ByteBuffer Get(byte[] destination, int offset, int length)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
 
             int len = destination.Length;
             if (offset < 0)

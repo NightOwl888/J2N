@@ -22,7 +22,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 
-
 namespace J2N.Text
 {
     /// <summary>
@@ -88,7 +87,8 @@ namespace J2N.Text
         public StringFormatter(CultureInfo culture)
             : this(CultureType.CustomCulture)
         {
-            this.culture = culture ?? throw new ArgumentNullException(nameof(culture));
+            ThrowHelper.ThrowIfNull(culture, ExceptionArgument.culture);
+            this.culture = culture;
             this.cultureSymbol = this.culture.Name.ToCharArray(); // For deserialization
         }
 
@@ -104,7 +104,8 @@ namespace J2N.Text
         public StringFormatter(IFormatProvider formatProvider)
             : this(CultureType.IFormatProvider)
         {
-            this.formatProvider = formatProvider ?? throw new ArgumentNullException(nameof(formatProvider));
+            ThrowHelper.ThrowIfNull(formatProvider, ExceptionArgument.formatProvider);
+            this.formatProvider = formatProvider;
         }
 
         internal StringFormatter(CultureType cultureType)

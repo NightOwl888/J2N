@@ -13,7 +13,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SCG = System.Collections.Generic;
 
-
 namespace J2N.Collections.Generic
 {
     /// <summary>
@@ -182,10 +181,7 @@ namespace J2N.Collections.Generic
         public HashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
             : this(comparer)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
 
             var otherAsHashSet = collection as HashSet<T>;
             if (otherAsHashSet != null && AreEqualityComparersEqual(this, otherAsHashSet))
@@ -707,10 +703,7 @@ namespace J2N.Collections.Generic
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            if (info == null)
-            {
-                throw new ArgumentNullException(nameof(info));
-            }
+            ThrowHelper.ThrowIfNull(info, ExceptionArgument.info);
 
             info.AddValue(VersionName, _version); // need to serialize version to avoid problems with serializing while enumerating
             info.AddValue(EqualityComparerName, _comparer ?? EqualityComparer<T>.Default, typeof(IEqualityComparer<T>));
@@ -850,10 +843,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void UnionWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             foreach (T item in other)
             {
@@ -876,10 +866,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public void IntersectWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // intersection of anything with empty set is empty set, so return if count is 0
             if (_count == 0)
@@ -928,10 +915,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void ExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // this is already the empty set; return
             if (_count == 0)
@@ -968,10 +952,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // if set is empty, then symmetric difference is other
             if (_count == 0)
@@ -1025,10 +1006,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // The empty set is a subset of any set
             if (_count == 0)
@@ -1087,10 +1065,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // no set is a proper subset of itself.
             if (other == this)
@@ -1151,10 +1126,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool IsSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // a set is always a superset of itself
             if (other == this)
@@ -1206,10 +1178,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // the empty set isn't a proper superset of any set.
             if (_count == 0)
@@ -1261,10 +1230,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool Overlaps(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (_count == 0)
             {
@@ -1306,10 +1272,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool SetEquals(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // a set is equal to itself
             if (other == this)
@@ -1392,8 +1355,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void CopyTo(T[] array, int arrayIndex, int count)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
 
             // check array index valid index into array
             if (arrayIndex < 0)
@@ -1430,10 +1392,7 @@ namespace J2N.Collections.Generic
         /// <see cref="HashSet{T}"/> collection.</returns>
         public int RemoveWhere(Predicate<T> match)
         {
-            if (match == null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             int numRemoved = 0;
             for (int i = 0; i < _lastIndex; i++)

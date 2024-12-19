@@ -236,8 +236,7 @@ namespace J2N.Numerics
         /// </exception>
         public static SByte Decode(string s)
         {
-            if (s is null)
-                throw new ArgumentNullException(nameof(s));
+            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
 
             int length = s.Length, i = 0;
             if (length == 0)
@@ -610,8 +609,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static sbyte Parse(string s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            if (s is null)
-                throw new ArgumentNullException(nameof(s));
+            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
@@ -696,8 +694,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static sbyte Parse(char[] s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            if (s is null)
-                throw new ArgumentNullException(nameof(s));
+            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
@@ -782,8 +779,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static sbyte Parse(StringBuilder s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            if (s is null)
-                throw new ArgumentNullException(nameof(s));
+            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
@@ -868,8 +864,7 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static sbyte Parse(ICharSequence s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            if (s is null || !s.HasValue)
-                throw new ArgumentNullException(nameof(s));
+            ThrowHelper.ThrowIfNullOrNullValue(s, ExceptionArgument.s);
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (length < 0)
@@ -2040,8 +2035,7 @@ namespace J2N.Numerics
         public static sbyte Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseByte()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            if (s is null)
-                throw new ArgumentNullException(nameof(s));
+            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
             DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i);
             if (status != DotNetNumber.ParsingStatus.OK)
             {

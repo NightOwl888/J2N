@@ -20,7 +20,6 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-
 namespace J2N.IO
 {
     /////     <item><description><see cref="AllocateDirect(int)"/> a memory block and create a direct
@@ -75,9 +74,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static ByteBuffer Wrap(byte[] array)
         {
-            if (array is null)
-                throw new ArgumentNullException(nameof(array));
-
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             return new ReadWriteHeapByteBuffer(array);
         }
 
@@ -106,8 +103,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static ByteBuffer Wrap(byte[] array, int startIndex, int length)
         {
-            if (array is null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
 
             int actualLength = array.Length;
             if (startIndex < 0)
@@ -401,9 +397,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Get(byte[] destination)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
-
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
             return Get(destination, 0, destination.Length);
         }
 
@@ -432,8 +426,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Get(byte[] destination, int offset, int length)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
 
             int len = destination.Length;
             if (offset < 0)
@@ -708,9 +701,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public ByteBuffer Put(byte[] source)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             return Put(source, 0, source.Length);
         }
 
@@ -741,8 +732,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Put(byte[] source, int offset, int length)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
 
             int len = source.Length;
             if (offset < 0)
@@ -774,8 +764,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual ByteBuffer Put(ByteBuffer source)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             if (ReferenceEquals(source, this))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
             if (source.Remaining > Remaining)

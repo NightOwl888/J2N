@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.Generic;
-using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -10,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Reflection;
 
 namespace J2N.Collections.ObjectModel
 {
@@ -69,9 +67,12 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary, DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
-            this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
+            ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+            ThrowHelper.ThrowIfNull(structuralEqualityComparer, ExceptionArgument.structuralEqualityComparer);
+            ThrowHelper.ThrowIfNull(toStringFormatProvider, ExceptionArgument.toStringFormatProvider);
+            this.dictionary = dictionary;
+            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.toStringFormatProvider = toStringFormatProvider;
         }
 
         /// <summary>
@@ -302,8 +303,7 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
@@ -813,10 +813,7 @@ namespace J2N.Collections.ObjectModel
             // Abstracted away to avoid redundant implementations.
             internal static void CopyToNonGenericICollectionHelper<T>(ICollection<T> collection, Array array, int index)
             {
-                if (array == null)
-                {
-                    throw new ArgumentNullException(nameof(array));
-                }
+                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
 
                 if (array.Rank != 1)
                 {

@@ -90,8 +90,7 @@ namespace J2N.Collections.Generic
         public void CopyTo(T[] array, int index)
         {
             CoModificationCheck();
-            if (array is null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (array.Length - index < size)

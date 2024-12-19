@@ -80,8 +80,7 @@ namespace J2N.IO
 
         public override sealed CharBuffer Get(char[] destination, int offset, int length)
         {
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
 
             int len = destination.Length;
             if (offset < 0)
@@ -129,8 +128,7 @@ namespace J2N.IO
 
         public override sealed CharBuffer Put(char[] source, int offset, int length)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             if (offset < 0)
                 throw new ArgumentOutOfRangeException(nameof(offset));
             if (length < 0)
@@ -145,8 +143,7 @@ namespace J2N.IO
 
         public override CharBuffer Put(string source, int startIndex, int length)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             int len = source.Length;
             if (startIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));

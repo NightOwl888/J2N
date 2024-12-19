@@ -90,8 +90,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
         public static int BinarySearch<T>(this IList<T> list, T item, IComparer<T>? comparer)
         {
-            if (list is null)
-                throw new ArgumentNullException(nameof(list));
+            ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
 
             comparer ??= J2N.Collections.Generic.Comparer<T>.Default;
 
@@ -144,8 +143,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <exception cref="ArgumentNullException"><paramref name="list"/> is <c>null</c>.</exception>
         public static int BinarySearch<T>(this IList<T> list, int index, int count, T item, IComparer<T>? comparer)
         {
-            if (list is null)
-                throw new ArgumentNullException(nameof(list));
+            ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (count < 0)
@@ -222,10 +220,8 @@ namespace J2N.Collections.Generic.Extensions
         /// than the available space from <paramref name="destinationIndex"/> plus <paramref name="length"/>.</exception>
         public static void CopyTo<T>(this IList<T> source, int sourceIndex, IList<T> destination, int destinationIndex, int length)
         {
-            if (source is null)
-                throw new ArgumentNullException(nameof(source));
-            if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
             if (sourceIndex < 0)
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex), sourceIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (destinationIndex < 0)
@@ -285,8 +281,7 @@ namespace J2N.Collections.Generic.Extensions
         /// </remarks>
         public static IList<T> GetView<T>(this IList<T> list, int index, int count)
         {
-            if (list is null)
-                throw new ArgumentNullException(nameof(list));
+            ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (count < 0)
@@ -326,8 +321,7 @@ namespace J2N.Collections.Generic.Extensions
         /// </remarks>
         public static int RemoveAll<T>(this IList<T> list, Predicate<T> match)
         {
-            if (list is null)
-                throw new ArgumentNullException(nameof(list));
+            ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
             if (list is List<T> jcgList)
                 return jcgList.RemoveAll(match); // Delegate remaining guard clauses
             if (list is SCG.List<T> scgList)
@@ -365,8 +359,7 @@ namespace J2N.Collections.Generic.Extensions
         /// </remarks>
         public static int RemoveAll<T>(this IList<T> list, int startIndex, int count, Predicate<T> match)
         {
-            if (list is null)
-                throw new ArgumentNullException(nameof(list));
+            ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
             if (list is List<T> jcgList)
                 return jcgList.DoRemoveAll(startIndex, count, match); // Delegate remaining guard clauses
 
@@ -380,8 +373,7 @@ namespace J2N.Collections.Generic.Extensions
                 throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
             if (count < 0 || startIndex > size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
-            if (match is null)
-                throw new ArgumentNullException(nameof(match));
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
 
             int freeIndex = startIndex;   // the first free slot in items array
             uint limit = (uint)startIndex + (uint)count; // The first index at the end of the range (this is outside of the valid range)
@@ -452,10 +444,8 @@ namespace J2N.Collections.Generic.Extensions
         // This shuffles the list in place without using LINQ, which is fast and efficient.
         public static void Shuffle<T>(this IList<T> list, System.Random random)
         {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
-            if (random == null)
-                throw new ArgumentNullException(nameof(random));
+            ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
+            ThrowHelper.ThrowIfNull(random, ExceptionArgument.random);
 
             for (int i = list.Count - 1; i > 0; i--)
             {
@@ -489,8 +479,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <exception cref="ArgumentNullException">If <paramref name="list"/> is <c>null</c>.</exception>
         public static void Swap<T>(this IList<T> list, int index1, int index2)
         {
-            if (list is null)
-                throw new ArgumentNullException(nameof(list));
+            ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
             int size = list.Count;
             if (index1 < 0 || index1 >= size)
                 throw new ArgumentOutOfRangeException(nameof(index1), index1, SR.ArgumentOutOfRange_Index);

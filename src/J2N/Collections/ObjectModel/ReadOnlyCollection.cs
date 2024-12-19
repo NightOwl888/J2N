@@ -21,7 +21,6 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace J2N.Collections.ObjectModel
 {
@@ -79,9 +78,12 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlyCollection(ICollection<T> collection, StructuralEqualityComparer structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
-            this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
+            ThrowHelper.ThrowIfNull(structuralEqualityComparer, ExceptionArgument.structuralEqualityComparer);
+            ThrowHelper.ThrowIfNull(toStringFormatProvider, ExceptionArgument.toStringFormatProvider);
+            this.collection = collection;
+            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.toStringFormatProvider = toStringFormatProvider;
         }
 
         /// <summary>
@@ -169,8 +171,7 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)

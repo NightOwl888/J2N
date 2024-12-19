@@ -22,7 +22,6 @@ using System.Runtime.ExceptionServices;
 #endif
 using System.Threading;
 
-
 namespace J2N.Threading
 {
     /// <summary>
@@ -96,7 +95,8 @@ namespace J2N.Threading
         /// <exception cref="ArgumentNullException">If <paramref name="threadStart"/> is <c>null</c>.</exception>
         public ThreadJob(ThreadStart threadStart)
         {
-            this.threadStart = threadStart ?? throw new ArgumentNullException(nameof(threadStart));
+            ThrowHelper.ThrowIfNull(threadStart, ExceptionArgument.threadStart);
+            this.threadStart = threadStart;
             this.thread = new Thread(() => SafeRun(this.threadStart));
         }
 
@@ -111,7 +111,8 @@ namespace J2N.Threading
         /// <exception cref="ArgumentNullException">If <paramref name="threadStart"/> is <c>null</c>.</exception>
         public ThreadJob(ThreadStart threadStart, string threadName)
         {
-            this.threadStart = threadStart ?? throw new ArgumentNullException(nameof(threadStart));
+            ThrowHelper.ThrowIfNull(threadStart, ExceptionArgument.threadStart);
+            this.threadStart = threadStart;
             this.thread = new Thread(() => SafeRun(this.threadStart));
             this.name = threadName;
         }

@@ -181,10 +181,7 @@ namespace J2N.Collections.Generic
         public SortedSet(IEnumerable<T> collection, IComparer<T>? comparer)
             : this(comparer)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
 
             // These are explicit type checks in the mold of HashSet. It would have worked better with
             // something like an ISorted<T> interface. (We could make this work for SortedList.Keys, etc.)
@@ -831,8 +828,7 @@ namespace J2N.Collections.Generic
         /// <remarks>This method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         public void CopyTo(T[] array, int index, int count)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (index < 0)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (count < 0)
@@ -856,8 +852,7 @@ namespace J2N.Collections.Generic
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
             if (array.GetLowerBound(0) != 0)
@@ -1176,10 +1171,7 @@ namespace J2N.Collections.Generic
         /// <remarks>Any duplicate elements in <paramref name="other"/> are ignored.</remarks>
         public void UnionWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             SortedSet<T>? asSorted = other as SortedSet<T>;
             TreeSubSet? treeSubset = this as TreeSubSet;
@@ -1333,10 +1325,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual void IntersectWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (Count == 0)
                 return;
@@ -1430,10 +1419,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void ExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (count == 0)
                 return;
@@ -1485,10 +1471,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (Count == 0)
             {
@@ -1571,10 +1554,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (Count == 0)
             {
@@ -1629,10 +1609,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (other is ICollection c)
             {
@@ -1675,10 +1652,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool IsSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (other is ICollection c && c.Count == 0)
                 return true;
@@ -1722,10 +1696,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (Count == 0)
                 return false;
@@ -1773,10 +1744,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool SetEquals(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             SortedSet<T>? asSorted = other as SortedSet<T>;
             if (asSorted != null && HasEqualComparer(asSorted))
@@ -1810,10 +1778,7 @@ namespace J2N.Collections.Generic
         /// least one common element; otherwise, <c>false</c>.</returns>
         public bool Overlaps(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (Count == 0)
                 return false;
@@ -1930,10 +1895,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
         public int RemoveWhere(Predicate<T> match)
         {
-            if (match == null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
+            ThrowHelper.ThrowIfNull(match, ExceptionArgument.match);
             List<T> matches = new List<T>(this.Count);
 
             BreadthFirstTreeWalk(n =>
@@ -2126,10 +2088,7 @@ namespace J2N.Collections.Generic
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (info == null)
-            {
-                throw new ArgumentNullException(nameof(info));
-            }
+            ThrowHelper.ThrowIfNull(info, ExceptionArgument.info);
 
             info.AddValue(CountName, count); // This is the length of the bucket array.
             info.AddValue(ComparerName, comparer, typeof(IComparer<T>));
@@ -2577,10 +2536,7 @@ namespace J2N.Collections.Generic
             [EditorBrowsable(EditorBrowsableState.Never)]
             void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                if (info == null)
-                {
-                    throw new ArgumentNullException(nameof(info));
-                }
+                ThrowHelper.ThrowIfNull(info, ExceptionArgument.info);
                 info.AddValue(TreeName, _tree, typeof(SortedSet<T>));
                 info.AddValue(EnumVersionName, _version);
                 info.AddValue(ReverseName, _reverse);

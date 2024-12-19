@@ -57,8 +57,7 @@ namespace J2N.Threading.Atomic
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public AtomicReferenceArray(T?[] array)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             int length = array.Length;
             this.array = new T?[length];
             if (length > 0)

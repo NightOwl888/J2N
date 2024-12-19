@@ -16,10 +16,8 @@
  */
 #endregion
 
-
 using System;
 using System.IO.MemoryMappedFiles;
-
 
 namespace J2N.IO.MemoryMappedFiles
 {
@@ -93,8 +91,7 @@ namespace J2N.IO.MemoryMappedFiles
 
         internal static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, long size, MemoryMappedFileAccess access, int bufferOffset, int bufferSize)
         {
-            if (memoryMappedFile is null)
-                throw new ArgumentNullException(nameof(memoryMappedFile));
+            ThrowHelper.ThrowIfNull(memoryMappedFile, ExceptionArgument.memoryMappedFile);
 
             switch (access)
             {

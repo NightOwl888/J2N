@@ -21,7 +21,6 @@ using System.Globalization;
 using System.IO;
 using System.Text;
 
-
 namespace J2N.IO
 {
     /// <summary>
@@ -153,7 +152,8 @@ namespace J2N.IO
         public StreamTokenizer(Stream input)
             : this() // Calls private constructor
         {
-            inStream = input ?? throw new ArgumentNullException(nameof(input));
+            ThrowHelper.ThrowIfNull(input, ExceptionArgument.input);
+            inStream = input;
         }
 
         /// <summary>
@@ -172,7 +172,8 @@ namespace J2N.IO
         public StreamTokenizer(TextReader reader)
             : this() // Calls private constructor
         {
-            inReader = reader ?? throw new ArgumentNullException(nameof(reader));
+            ThrowHelper.ThrowIfNull(reader, ExceptionArgument.reader);
+            inReader = reader;
         }
 
         /// <summary>

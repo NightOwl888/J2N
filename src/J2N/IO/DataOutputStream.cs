@@ -76,7 +76,8 @@ namespace J2N.IO
         /// <seealso cref="DataInputStream"/>
         public DataOutputStream(Stream output, bool leaveOpen)
         {
-            this.output = output ?? throw new ArgumentNullException(nameof(output));
+            ThrowHelper.ThrowIfNull(output, ExceptionArgument.output);
+            this.output = output;
             this.leaveOpen = leaveOpen;
             buff = new byte[8];
         }

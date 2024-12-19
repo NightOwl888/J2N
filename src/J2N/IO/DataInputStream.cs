@@ -70,7 +70,8 @@ namespace J2N.IO
         /// <seealso cref="DataOutputStream"/>
         public DataInputStream(Stream input, bool leaveOpen)
         {
-            this.input = input ?? throw new ArgumentNullException(nameof(input));
+            ThrowHelper.ThrowIfNull(input, ExceptionArgument.input);
+            this.input = input;
             this.leaveOpen = leaveOpen;
             buff = new byte[8];
         }
@@ -501,9 +502,7 @@ namespace J2N.IO
         /// <seealso cref="DataOutputStream.WriteUTF(string)"/>
         public static string ReadUTF(IDataInput input)
         {
-            if (input is null)
-                throw new ArgumentNullException(nameof(input));
-
+            ThrowHelper.ThrowIfNull(input, ExceptionArgument.input);
             return DecodeUTF(input.ReadUInt16(), input);
         }
 

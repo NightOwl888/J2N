@@ -15,8 +15,7 @@ namespace J2N.Collections.Generic
 
         public IDictionaryDebugView(IDictionary<K, V> dictionary)
         {
-            if (dictionary is null)
-                throw new ArgumentNullException(nameof(dictionary));
+            ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
 
             _dict = dictionary;
         }
@@ -39,8 +38,7 @@ namespace J2N.Collections.Generic
 
         public DictionaryKeyCollectionDebugView(ICollection<TKey> collection)
         {
-            if (collection is null)
-                throw new ArgumentNullException(nameof(collection));
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
 
             _collection = collection;
         }
@@ -63,8 +61,7 @@ namespace J2N.Collections.Generic
 
         public DictionaryValueCollectionDebugView(ICollection<TValue> collection)
         {
-            if (collection is null)
-                throw new ArgumentNullException(nameof(collection));
+            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
 
             _collection = collection;
         }

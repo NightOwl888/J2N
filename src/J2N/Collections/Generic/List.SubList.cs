@@ -102,8 +102,7 @@ namespace J2N.Collections.Generic
             internal override int DoInsertRange(int index, IEnumerable<T> collection)
             {
                 CoModificationCheck();
-                if (collection is null)
-                    throw new ArgumentNullException(nameof(collection));
+                ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
                 // Note that insertions at the end are legal.
                 if ((uint)index > (uint)size)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_ListInsert);

@@ -500,8 +500,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void ExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // this is already the empty set; return
             if (hashSet.Count == 0)
@@ -579,8 +578,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public void IntersectWith(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             int previousCount = hashSet.Count;
 
@@ -619,8 +617,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // no set is a proper subset of itself.
             if (other == this)
@@ -649,8 +646,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // a set is never a strict superset of itself
             if (other == this)
@@ -682,8 +678,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // Set is always a subset of itself
             if (other == this)
@@ -714,8 +709,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool IsSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // a set is always a superset of itself
             if (other == this)
@@ -737,8 +731,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool Overlaps(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             if (hashSet.Count == 0)
                 return false;
@@ -789,8 +782,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool SetEquals(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // a set is equal to itself
             if (other == this)
@@ -814,8 +806,7 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-                throw new ArgumentNullException(nameof(other));
+            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
 
             // if set is empty, then symmetric difference is other
             if (hashSet.Count == 0)

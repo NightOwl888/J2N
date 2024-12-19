@@ -144,8 +144,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="str"/> or <paramref name="delimiters"/> is <c>null</c>.</exception>
         public StringTokenizer(string str, string delimiters, bool returnDelimiters)
         {
-            this.str = str ?? throw new ArgumentNullException(nameof(str));
-            this.delimiters = delimiters ?? throw new ArgumentNullException(nameof(delimiters));
+            ThrowHelper.ThrowIfNull(str, ExceptionArgument.str);
+            ThrowHelper.ThrowIfNull(delimiters, ExceptionArgument.delimiters);
+            this.str = str;
+            this.delimiters = delimiters;
             this.returnDelimiters = returnDelimiters;
             this.position = 0;
             this.remainingTokens = CountTokens();
@@ -277,7 +279,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="delimiters"/> is <c>null</c>.</exception>
         public bool MoveNext(string delimiters)
         {
-            this.delimiters = delimiters ?? throw new ArgumentNullException(nameof(delimiters));
+            ThrowHelper.ThrowIfNull(delimiters, ExceptionArgument.delimiters);
+            this.delimiters = delimiters;
             this.remainingTokens = CountTokens();
 
             return MoveNext();
