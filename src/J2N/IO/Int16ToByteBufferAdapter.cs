@@ -149,7 +149,7 @@ namespace J2N.IO
 
         public override short Get(int index)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -189,7 +189,7 @@ namespace J2N.IO
 
         public override Int16Buffer Put(int index, short value)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }

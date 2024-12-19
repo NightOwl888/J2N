@@ -95,7 +95,7 @@ namespace J2N.IO
 
         public override sealed byte Get(int index)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -138,7 +138,7 @@ namespace J2N.IO
         public override sealed int GetInt32(int index)
         {
             int newIndex = index + 4;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -161,7 +161,7 @@ namespace J2N.IO
         public override sealed long GetInt64(int index)
         {
             int newIndex = index + 8;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -184,7 +184,7 @@ namespace J2N.IO
         public override sealed short GetInt16(int index)
         {
             int newIndex = index + 2;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }

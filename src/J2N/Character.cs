@@ -588,7 +588,7 @@ namespace J2N
                 return CodePointAt(stringBuffer.builder, index);
 
             int len = seq.Length;
-            if (index < 0 || index >= len)
+            if ((uint)index >= (uint)len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
@@ -626,7 +626,7 @@ namespace J2N
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int len = seq.Length;
-            if (index < 0 || index >= len)
+            if ((uint)index >= (uint)len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
@@ -670,7 +670,7 @@ namespace J2N
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int len = seq.Length;
-            if (index < 0 || index >= len)
+            if ((uint)index >= (uint)len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             // J2N NOTE: Looking up 1 or 2 characters is faster through the StringBuilder than an indexer
@@ -709,7 +709,7 @@ namespace J2N
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int len = seq.Length;
-            if (index < 0 || index >= len)
+            if ((uint)index >= (uint)len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
@@ -744,7 +744,7 @@ namespace J2N
         public static int CodePointAt(this ReadOnlySpan<char> seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             int len = seq.Length;
-            if (index < 0 || index >= len)
+            if ((uint)index >= (uint)len)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             char high = seq[index++];
@@ -782,9 +782,9 @@ namespace J2N
         {
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
                 throw new ArgumentOutOfRangeException(nameof(index));
-            if (limit < 0 || limit > seq.Length)
+            if ((uint)limit > (uint)seq.Length)
                 throw new ArgumentOutOfRangeException(nameof(limit));
 
             char high = seq[index++];
@@ -821,8 +821,7 @@ namespace J2N
             if (seq is StringBuffer stringBuffer)
                 return CodePointBefore(stringBuffer.builder, index);
 
-            int len = seq.Length;
-            if (index < 1 || index > len)
+            if ((uint)(index - 1) >= (uint)seq.Length) // J2N: Simplified version of (index < 1 || index > seq.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
@@ -856,8 +855,7 @@ namespace J2N
         {
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
-            int len = seq.Length;
-            if (index < 1 || index > len)
+            if ((uint)(index - 1) >= (uint)seq.Length) // J2N: Simplified version of (index < 1 || index > seq.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
@@ -897,8 +895,7 @@ namespace J2N
         {
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
-            int len = seq.Length;
-            if (index < 1 || index > len)
+            if ((uint)(index - 1) >= (uint)seq.Length) // J2N: Simplified version of (index < 1 || index > seq.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             // J2N NOTE: Looking up 1 or 2 characters is faster through the StringBuilder than an indexer
@@ -933,8 +930,7 @@ namespace J2N
         {
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
-            int len = seq.Length;
-            if (index < 1 || index > len)
+            if ((uint)(index - 1) >= (uint)seq.Length) // J2N: Simplified version of (index < 1 || index > seq.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
@@ -965,8 +961,7 @@ namespace J2N
         /// the length of <paramref name="seq"/>.</exception>
         public static int CodePointBefore(this ReadOnlySpan<char> seq, int index) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            int len = seq.Length;
-            if (index < 1 || index > len)
+            if ((uint)(index - 1) >= (uint)seq.Length) // J2N: Simplified version of (index < 1 || index > seq.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexBefore);
 
             char low = seq[--index];
@@ -1016,7 +1011,7 @@ namespace J2N
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int len = seq.Length;
-            if (start < 0 || start >= len)
+            if ((uint)start >= (uint)len)
                 throw new ArgumentOutOfRangeException(nameof(start));
             if (index <= start || index > len)
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -1060,7 +1055,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
-            if (destinationIndex < 0 || destinationIndex >= destination.Length)
+            if ((uint)destinationIndex >= (uint)destination.Length)
                 throw new ArgumentOutOfRangeException(nameof(destinationIndex));
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -1110,7 +1105,7 @@ namespace J2N
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
             if (destination is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
-            if (destinationIndex < 0 || destinationIndex >= destination.Length)
+            if ((uint)destinationIndex >= (uint)destination.Length)
                 throw new ArgumentOutOfRangeException(nameof(destinationIndex));
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -1517,7 +1512,7 @@ namespace J2N
                 return OffsetByCodePoints(stringBuffer.builder, index, codePointOffset);
 
             int length = seq.Length;
-            if (index < 0 || index > length)
+            if ((uint)index > (uint)length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
@@ -1589,7 +1584,7 @@ namespace J2N
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int length = seq.Length;
-            if (index < 0 || index > length)
+            if ((uint)index > (uint)length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
@@ -1661,7 +1656,7 @@ namespace J2N
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int length = seq.Length;
-            if (index < 0 || index > length)
+            if ((uint)index > (uint)length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
@@ -1750,7 +1745,7 @@ namespace J2N
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int length = seq.Length;
-            if (index < 0 || index > length)
+            if ((uint)index > (uint)length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;
@@ -1819,7 +1814,7 @@ namespace J2N
         public static int OffsetByCodePoints(this ReadOnlySpan<char> seq, int index, int codePointOffset) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
             int length = seq.Length;
-            if (index < 0 || index > length)
+            if ((uint)index > (uint)length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
             int x = index;

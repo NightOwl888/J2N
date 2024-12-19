@@ -889,7 +889,7 @@ namespace J2N.Collections.Concurrent
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
                 throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-            if (index < 0 || index > array.Length)
+            if ((uint)index > (uint)array.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (array.Length - index < Count)
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
@@ -1326,7 +1326,7 @@ namespace J2N.Collections.Concurrent
         {
             if (array is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
-            if (index < 0 || index > array.Length)
+            if ((uint)index > (uint)array.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (array.Length - index < Count)
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
@@ -1658,7 +1658,7 @@ namespace J2N.Collections.Concurrent
             {
                 if (array is null)
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
-                if (index < 0 || index > array.Length)
+                if ((uint)index > (uint)array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
@@ -1675,7 +1675,7 @@ namespace J2N.Collections.Concurrent
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
                 if (array.GetLowerBound(0) != 0)
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
-                if (index < 0 || index > array.Length)
+                if ((uint)index > (uint)array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < _owner.Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
@@ -1963,7 +1963,7 @@ namespace J2N.Collections.Concurrent
             {
                 if (array is null)
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
-                if (index < 0 || index > array.Length)
+                if ((uint)index > (uint)array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
@@ -1980,7 +1980,7 @@ namespace J2N.Collections.Concurrent
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-                if (index < 0 || index > array.Length)
+                if ((uint)index > (uint)array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
                     throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);

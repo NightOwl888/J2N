@@ -339,7 +339,7 @@ namespace J2N.IO
         {
             get
             {
-                if (index < 0 || index >= Remaining)
+                if ((uint)index >= (uint)Remaining)
                     throw new ArgumentOutOfRangeException(nameof(index));
                 return Get(position + index);
             }

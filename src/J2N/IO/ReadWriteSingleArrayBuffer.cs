@@ -87,7 +87,7 @@ namespace J2N.IO
 
         public override SingleBuffer Put(int index, float value)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }

@@ -733,7 +733,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns></returns>
         internal int CheckIndex(int index)
         {
-            if ((index < 0) || (index >= limit))
+            if ((uint)index >= (uint)limit)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             return index;

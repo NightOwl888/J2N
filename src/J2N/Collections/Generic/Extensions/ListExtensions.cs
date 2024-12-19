@@ -492,9 +492,9 @@ namespace J2N.Collections.Generic.Extensions
             if (list is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             int size = list.Count;
-            if (index1 < 0 || index1 >= size)
+            if ((uint)index1 >= (uint)size)
                 throw new ArgumentOutOfRangeException(nameof(index1), index1, SR.ArgumentOutOfRange_Index);
-            if (index2 < 0 || index2 >= size)
+            if ((uint)index2 >= (uint)size)
                 throw new ArgumentOutOfRangeException(nameof(index2), index2, SR.ArgumentOutOfRange_Index);
 
             T temp = list[index1];

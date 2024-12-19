@@ -61,7 +61,7 @@ namespace J2N.IO
 
         public override sealed int Get(int index)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }

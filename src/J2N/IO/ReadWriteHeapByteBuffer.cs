@@ -91,7 +91,7 @@ namespace J2N.IO
 
         public override ByteBuffer Put(int index, byte value)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -161,7 +161,7 @@ namespace J2N.IO
         public override ByteBuffer PutInt32(int index, int value)
         {
             int newIndex = index + 4;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             Store(index, value);
@@ -171,7 +171,7 @@ namespace J2N.IO
         public override ByteBuffer PutInt64(int index, long value)
         {
             int newIndex = index + 8;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             Store(index, value);
@@ -192,7 +192,7 @@ namespace J2N.IO
         public override ByteBuffer PutInt16(int index, short value)
         {
             int newIndex = index + 2;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             Store(index, value);
