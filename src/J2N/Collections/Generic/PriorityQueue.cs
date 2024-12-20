@@ -103,10 +103,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than 1.</exception>
         public PriorityQueue(int capacity, IComparer<T>? comparer, IEqualityComparer<T>? equalityComparer)
         {
-            if (capacity < 1)
-            {
-                throw new ArgumentOutOfRangeException(SR.ArgumentOutOfRange_NeedCapacityAtLeast1);
-            }
+            if (capacity <= 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(capacity, ExceptionArgument.capacity);
 
             elements = NewElementArray(capacity);
             this.comparer = comparer;
@@ -693,7 +691,7 @@ namespace J2N.Collections.Generic
         {
             ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
 
             // will array, starting at arrayIndex, be able to hold elements? Note: not
             // checking arrayIndex >= array.Length (consistency with list of allowing

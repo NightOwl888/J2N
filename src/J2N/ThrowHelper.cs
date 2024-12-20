@@ -56,6 +56,7 @@ namespace J2N
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static void ThrowIfNullOrNullValue([NotNull] ICharSequence? argument, ExceptionArgument paramName)
         {
             if (argument is null || !argument.HasValue)
@@ -147,6 +148,41 @@ namespace J2N
         //{
         //    throw new ArgumentException(J2N.SR.Format(SR.ArgumentException_ValueTupleIncorrectType, obj.GetType()), "other");
         //}
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegative(int value, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(value, argument,
+                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegative(object? value, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(value, argument,
+                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegative(ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(argument,
+                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(int value, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(value, argument,
+                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(object? value, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(value, argument,
+                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero);
+        }
 
         [DoesNotReturn]
         internal static void ThrowArgumentOutOfRange_IndexMustBeLessException()
@@ -756,6 +792,11 @@ namespace J2N
             return new ArgumentOutOfRangeException(GetArgumentName(argument), GetResourceString(resource));
         }
 
+        private static ArgumentOutOfRangeException GetArgumentOutOfRangeException(object? actualValue, ExceptionArgument argument, ExceptionResource resource)
+        {
+            return new ArgumentOutOfRangeException(GetArgumentName(argument), actualValue, GetResourceString(resource));
+        }
+
         private static ArgumentException GetArgumentException(ExceptionResource resource, ExceptionArgument argument)
         {
             return new ArgumentException(GetResourceString(resource), GetArgumentName(argument));
@@ -873,19 +914,27 @@ namespace J2N
             {
                 case ExceptionArgument.action:
                     return "action";
+                case ExceptionArgument.allocSize:
+                    return "allocSize";
                 case ExceptionArgument.appendable:
                     return "appendable";
                 case ExceptionArgument.array:
                     return "array";
+                case ExceptionArgument.arrayIndex:
+                    return "arrayIndex";
                 case ExceptionArgument.assembly:
                     return "assembly";
                 case ExceptionArgument.bitSet:
                     return "bitSet";
                 case ExceptionArgument.buffer:
                     return "buffer";
+                case ExceptionArgument.capacity:
+                    return "capacity";
                 case ExceptionArgument.characterSequence:
                     return "characterSequence";
-                case ExceptionArgument.charSequence: // J2N TODO: Normalize
+                case ExceptionArgument.charCount:
+                    return "charCount";
+                case ExceptionArgument.charSequence: // J2N TODO: Normalize to characterSequence
                     return "charSequence";
                 case ExceptionArgument.codePoints:
                     return "codePoints";
@@ -903,10 +952,14 @@ namespace J2N
                     return "count";
                 case ExceptionArgument.culture:
                     return "culture";
+                case ExceptionArgument.currPos:
+                    return "currPos";
                 case ExceptionArgument.delimiters:
                     return "delimiters";
                 case ExceptionArgument.destination:
                     return "destination";
+                case ExceptionArgument.destinationIndex:
+                    return "destinationIndex";
                 case ExceptionArgument.dictionary:
                     return "dictionary";
                 case ExceptionArgument.encoding:
@@ -921,6 +974,8 @@ namespace J2N
                     return "fnUpdate";
                 case ExceptionArgument.formatProvider:
                     return "formatProvider";
+                case ExceptionArgument.hashSize:
+                    return "hashSize";
                 case ExceptionArgument.index:
                     return "index";
                 case ExceptionArgument.info:
@@ -935,16 +990,32 @@ namespace J2N
                     return "key";
                 case ExceptionArgument.length:
                     return "length";
+                case ExceptionArgument.limit:
+                    return "limit";
                 case ExceptionArgument.list:
                     return "list";
+                case ExceptionArgument.lockSize:
+                    return "lockSize";
                 case ExceptionArgument.match:
                     return "match";
+                case ExceptionArgument.maxValue:
+                    return "maxValue";
                 case ExceptionArgument.memoryMappedFile:
                     return "memoryMappedFile";
                 case ExceptionArgument.name:
                     return "name";
+                case ExceptionArgument.nbits:
+                    return "nbits";
+                case ExceptionArgument.newLength:
+                    return "newLength";
+                case ExceptionArgument.newLimit:
+                    return "newLimit";
+                case ExceptionArgument.newPosition:
+                    return "newPosition";
                 case ExceptionArgument.newValue:
                     return "newValue";
+                case ExceptionArgument.offset:
+                    return "offset";
                 case ExceptionArgument.original:
                     return "original";
                 case ExceptionArgument.other:
@@ -953,6 +1024,12 @@ namespace J2N
                     return "output";
                 case ExceptionArgument.owner:
                     return "owner";
+                case ExceptionArgument.position:
+                    return "position";
+                case ExceptionArgument.position1:
+                    return "position1";
+                case ExceptionArgument.position2:
+                    return "position2";
                 case ExceptionArgument.priorityQueue:
                     return "priorityQueue";
                 case ExceptionArgument.prefix:
@@ -971,6 +1048,10 @@ namespace J2N
                     return "set";
                 case ExceptionArgument.source:
                     return "source";
+                case ExceptionArgument.sourceIndex:
+                    return "sourceIndex";
+                case ExceptionArgument.start:
+                    return "start";
                 case ExceptionArgument.startIndex:
                     return "startIndex";
                 case ExceptionArgument.str:
@@ -1023,16 +1104,14 @@ namespace J2N
                 //    return "chars";
                 //case ExceptionArgument.charIndex:
                 //    return "charIndex";
-                //case ExceptionArgument.charCount:
-                //    return "charCount";
+                
                 
                 
                 //case ExceptionArgument.ownedMemory:
                 //    return "ownedMemory";
                 
 
-                //case ExceptionArgument.capacity:
-                //    return "capacity";
+                
                 
                 
                 
@@ -1046,14 +1125,12 @@ namespace J2N
                 //    return "exception";
                 //case ExceptionArgument.pointer:
                 //    return "pointer";
-                //case ExceptionArgument.start:
-                //    return "start";
+                
                 //case ExceptionArgument.format:
                 //    return "format";
                 //case ExceptionArgument.formats:
                 //    return "formats";
-                //case ExceptionArgument.culture:
-                //    return "culture";
+                
                 
                 //case ExceptionArgument.comparable:
                 //    return "comparable";
@@ -1105,12 +1182,10 @@ namespace J2N
                 //    return "timeout";
                 //case ExceptionArgument.type:
                 //    return "type";
-                //case ExceptionArgument.sourceIndex:
-                //    return "sourceIndex";
+                
                 //case ExceptionArgument.sourceArray:
                 //    return "sourceArray";
-                //case ExceptionArgument.destinationIndex:
-                //    return "destinationIndex";
+                
                 //case ExceptionArgument.destinationArray:
                 //    return "destinationArray";
                 //case ExceptionArgument.pHandle:
@@ -1138,8 +1213,7 @@ namespace J2N
                 //    return "endIndex";
                 //case ExceptionArgument.elementType:
                 //    return "elementType";
-                //case ExceptionArgument.arrayIndex:
-                //    return "arrayIndex";
+                
 
                 //case ExceptionArgument.codePoint:
                 //    return "codePoint";
@@ -1152,8 +1226,7 @@ namespace J2N
                 
                 //case ExceptionArgument.buffers:
                 //    return "buffers";
-                //case ExceptionArgument.offset:
-                //    return "offset";
+                
                 //case ExceptionArgument.stream:
                 //    return "stream";
                 //case ExceptionArgument.anyOf:
@@ -1195,6 +1268,10 @@ namespace J2N
                     return SR.Arg_EmptySpan;
                 case ExceptionResource.ArgumentNull_NullOrNullValue:
                     return SR.ArgumentNull_NullOrNullValue;
+                case ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative:
+                    return SR.ArgumentOutOfRange_Generic_MustBeNonNegative;
+                case ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero:
+                    return SR.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero;
                 case ExceptionResource.ArgumentOutOfRange_Capacity:
                     return SR.ArgumentOutOfRange_Capacity;
                 case ExceptionResource.ArgumentOutOfRange_OffsetOut:
@@ -1376,12 +1453,16 @@ namespace J2N
     internal enum ExceptionArgument
     {
         action,
+        allocSize,
         appendable,
         array,
+        arrayIndex,
         assembly,
         bitSet,
         buffer,
+        capacity,
         characterSequence,
+        charCount,
         charSequence,
         codePoints,
         collection,
@@ -1391,8 +1472,10 @@ namespace J2N
         converter,
         count,
         culture,
+        currPos,
         delimiters,
         destination,
+        destinationIndex,
         dictionary,
         encoding,
         enumerator,
@@ -1400,6 +1483,7 @@ namespace J2N
         fnCreate,
         fnUpdate,
         formatProvider,
+        hashSize,
         index,
         info,
         input,
@@ -1407,24 +1491,37 @@ namespace J2N
         item,
         key,
         length,
+        limit,
         list,
+        lockSize,
+        match,
+        maxValue,
+        memoryMappedFile,
+        name,
+        nbits,
+        newLength,
+        newLimit,
+        newPosition,
+        newValue,
+        offset,
         original,
         other,
         output,
         owner,
+        position,
+        position1,
+        position2,
         priorityQueue,
         prefix,
         properties,
-        match,
-        memoryMappedFile,
-        name,
-        newValue,
         random,
         reader,
         s,
         seq,
         set,
         source,
+        sourceIndex,
+        start,
         startIndex,
         str,
         structuralEqualityComparer,
@@ -1454,13 +1551,13 @@ namespace J2N
         //ch,
         //chars,
         //charIndex,
-        //charCount,
+        
         
         
         //ownedMemory,
         
 
-        //capacity,
+        
 
         
        
@@ -1471,7 +1568,7 @@ namespace J2N
         //exceptions,
         //exception,
         //pointer,
-        //start,
+
         //format,
         //formats,
         //culture,
@@ -1502,9 +1599,9 @@ namespace J2N
         //stateMachine,
         //timeout,
         //type,
-        //sourceIndex,
+
         //sourceArray,
-        //destinationIndex,
+        
         //destinationArray,
         //pHandle,
         //handle,
@@ -1519,7 +1616,7 @@ namespace J2N
         //index3,
         //endIndex,
         //elementType,
-        //arrayIndex,
+       
 
         //codePoint,
         
@@ -1528,7 +1625,7 @@ namespace J2N
         //suffix,
         
         //buffers,
-        //offset,
+        
         //stream,
         //anyOf,
         //overlapped,
@@ -1546,6 +1643,8 @@ namespace J2N
     {
         Arg_EmptySpan,
         ArgumentNull_NullOrNullValue,
+        ArgumentOutOfRange_Generic_MustBeNonNegative,
+        ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero,
         ArgumentOutOfRange_Capacity,
         ArgumentOutOfRange_OffsetOut,
         ArgumentOutOfRange_StartIndexLargerThanLength,

@@ -64,9 +64,9 @@ namespace J2N
         {
             ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > array.Length - length)
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 

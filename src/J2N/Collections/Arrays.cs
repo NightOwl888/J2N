@@ -19,7 +19,6 @@
 using J2N.Text;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -298,7 +297,7 @@ namespace J2N.Collections
         {
             ThrowHelper.ThrowIfNull(original, ExceptionArgument.original);
             if (newLength < 0)
-                throw new ArgumentOutOfRangeException(nameof(newLength), newLength, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(newLength, ExceptionArgument.newLength);
 
             T[] newArray = new T[newLength];
 

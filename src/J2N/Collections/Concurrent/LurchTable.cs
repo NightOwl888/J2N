@@ -212,17 +212,17 @@ namespace J2N.Collections.Concurrent
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             if (limit <= 0)
-                throw new ArgumentOutOfRangeException(nameof(limit), SR.ArgumentOutOfRange_NeedLimitAtLeast1);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(limit, ExceptionArgument.limit);
             if (ordering == LurchTableOrder.None && limit < int.MaxValue)
                 throw new ArgumentOutOfRangeException(nameof(limit), SR.LurchTable_NeedLimitIntMaxValue);
             if (hashSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(hashSize), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(hashSize, ExceptionArgument.hashSize);
             if (allocSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(allocSize), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(allocSize, ExceptionArgument.allocSize);
             if (lockSize < 0)
-                throw new ArgumentOutOfRangeException(nameof(lockSize), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(lockSize, ExceptionArgument.lockSize);
 
             _limit = limit;
             _comparer = comparer ?? J2N.Collections.Generic.EqualityComparer<TKey>.Default;
@@ -640,7 +640,7 @@ namespace J2N.Collections.Concurrent
             set
             {
                 if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value), SR.ArgumentOutOfRange_NeedLimitAtLeast1);
+                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(value, ExceptionArgument.value);
                 if (_ordering == LurchTableOrder.None && value < int.MaxValue)
                     throw new ArgumentOutOfRangeException(nameof(value), SR.LurchTable_NeedLimitIntMaxValue);
 

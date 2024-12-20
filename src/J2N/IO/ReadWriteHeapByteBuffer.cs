@@ -107,16 +107,14 @@ namespace J2N.IO
          * @see java.nio.ByteBuffer#put(byte[], int, int)
          */
 
-        public override ByteBuffer Put(byte[] source, int offset, int length)
+        public override ByteBuffer Put(byte[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
-
-            int len = source.Length;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > source.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
             if (length > Remaining)
                 throw new BufferOverflowException();

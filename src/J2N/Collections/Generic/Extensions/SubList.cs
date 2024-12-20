@@ -92,7 +92,7 @@ namespace J2N.Collections.Generic
             CoModificationCheck();
             ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (array.Length - index < size)
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
@@ -178,7 +178,7 @@ namespace J2N.Collections.Generic
         {
             CoModificationCheck();
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if ((uint)index >= (uint)size)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
 

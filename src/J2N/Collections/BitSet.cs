@@ -115,7 +115,7 @@ namespace J2N.Collections
         public BitSet(int nbits)
         {
             if (nbits < 0)
-                throw new ArgumentOutOfRangeException(nameof(nbits), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(nbits, ExceptionArgument.nbits);
 
             bits = new long[(nbits >> Offset) + ((nbits & RightBits) > 0 ? 1 : 0)];
             actualArrayLength = 0;
@@ -262,7 +262,7 @@ namespace J2N.Collections
         {
             // Negative index specified
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position, ExceptionArgument.position); //$NON-NLS-1$
 
             int arrayPos = position >> Offset;
             if (arrayPos < actualArrayLength)
@@ -289,9 +289,9 @@ namespace J2N.Collections
         public virtual BitSet Get(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position1, ExceptionArgument.position1);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
@@ -370,7 +370,7 @@ namespace J2N.Collections
         public virtual void Set(int position)
         {
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position, ExceptionArgument.position); //$NON-NLS-1$
 
             int len = (position >> Offset) + 1;
             if (len > bits.Length)
@@ -418,9 +418,9 @@ namespace J2N.Collections
         public virtual void Set(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position1, ExceptionArgument.position1);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
@@ -515,9 +515,9 @@ namespace J2N.Collections
         /// <seealso cref="Clear(int, int)"/>
         public virtual void Clear(int position)
         {
+            // Negative index specified
             if (position < 0)
-                // Negative index specified
-                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position, ExceptionArgument.position); //$NON-NLS-1$
 
             if (!needClear)
             {
@@ -546,9 +546,9 @@ namespace J2N.Collections
         public virtual void Clear(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position1, ExceptionArgument.position1);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
@@ -599,9 +599,9 @@ namespace J2N.Collections
         /// <seealso cref="Flip(int, int)"/>
         public virtual void Flip(int position)
         {
+            // Negative index specified
             if (position < 0)
-                // Negative index specified
-                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position, ExceptionArgument.position); //$NON-NLS-1$
 
             int len = (position >> Offset) + 1;
             if (len > bits.Length)
@@ -629,9 +629,9 @@ namespace J2N.Collections
         public virtual void Flip(int position1, int position2)
         {
             if (position1 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position1), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position1, ExceptionArgument.position1);
             if (position2 < 0)
-                throw new ArgumentOutOfRangeException(nameof(position2), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
 
@@ -967,7 +967,7 @@ namespace J2N.Collections
         public virtual int NextSetBit(int position)
         {
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position, ExceptionArgument.position); //$NON-NLS-1$
 
             if (position >= actualArrayLength << Offset)
             {
@@ -1020,7 +1020,7 @@ namespace J2N.Collections
         public virtual int NextClearBit(int position)
         {
             if (position < 0)
-                throw new ArgumentOutOfRangeException(nameof(position), SR.ArgumentOutOfRange_NeedNonNegNum); //$NON-NLS-1$
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position, ExceptionArgument.position); //$NON-NLS-1$
 
             int length = actualArrayLength;
             int bssize = length << Offset;

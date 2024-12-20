@@ -144,12 +144,6 @@
   <data name="ArgumentOutOfRange_ListInsert" xml:space="preserve">
     <value>Index must be within the bounds of the List.</value>
   </data>
-  <data name="ArgumentOutOfRange_NeedCapacityAtLeast1" xml:space="preserve">
-    <value>capacity must be at least 1.</value>
-  </data>
-  <data name="ArgumentOutOfRange_NeedLimitAtLeast1" xml:space="preserve">
-    <value>limit must be at least 1.</value>
-  </data>
   <data name="ArgumentOutOfRange_NeedNonNegNum" xml:space="preserve">
     <value>Non-negative number required.</value>
   </data>
@@ -446,5 +440,8 @@
   </data>
   <data name="ArgumentOutOfRange_Capacity" xml:space="preserve">
     <value>Capacity exceeds maximum capacity.</value>
+  </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero" xml:space="preserve">
+    <value>{0} ('{1}') must be a non-negative and non-zero value.</value>
   </data>
 </root>

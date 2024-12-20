@@ -155,9 +155,9 @@ namespace J2N.Text
             if (charSequence is null && (startIndex != 0 || charCount != 0))
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.charSequence); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (charCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(charCount, ExceptionArgument.charCount);
 
             if (charSequence == null || !charSequence.HasValue)
                 return text;
@@ -327,9 +327,9 @@ namespace J2N.Text
             if (charSequence is null && (startIndex != 0 || charCount != 0))
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.charSequence); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (charCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(charCount, ExceptionArgument.charCount);
             if (charSequence is null)
                 return text;
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
@@ -765,8 +765,7 @@ namespace J2N.Text
         public static void CopyTo(this StringBuilder text, int sourceIndex, Span<char> destination, int count)
         {
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), J2N.SR.Format(SR.ArgumentOutOfRange_Generic_MustBeNonNegative, nameof(count), count));
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if ((uint)sourceIndex > (uint)text.Length)
             {
                 throw new ArgumentOutOfRangeException(nameof(sourceIndex), SR.ArgumentOutOfRange_IndexMustBeLessOrEqual);
@@ -848,7 +847,7 @@ namespace J2N.Text
             if (startIndex < 0 || startIndex > text.Length)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             if (startIndex + count > text.Length)
                 count = text.Length - startIndex;
@@ -1167,9 +1166,9 @@ namespace J2N.Text
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (charCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(charCount, ExceptionArgument.charCount);
             if (charSequence is null && (startIndex != 0 || charCount != 0))
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.charSequence); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (charSequence is null || !charSequence.HasValue)
@@ -1323,9 +1322,9 @@ namespace J2N.Text
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (charCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(charCount, ExceptionArgument.charCount);
             if (charSequence is null && (startIndex != 0 || charCount != 0))
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.charSequence); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (charSequence is null)
@@ -1402,9 +1401,9 @@ namespace J2N.Text
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (charCount < 0)
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(charCount, ExceptionArgument.charCount);
             if (value is null)
             {
                 if (startIndex != 0 || charCount != 0)
@@ -1532,7 +1531,7 @@ namespace J2N.Text
         {
             ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), string.Format(SR.ArgumentOutOfRange_Generic_MustBeNonNegative, nameof(index), index));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (!Character.IsValidCodePoint(codePoint))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
@@ -1826,9 +1825,9 @@ namespace J2N.Text
             ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
             ThrowHelper.ThrowIfNull(newValue, ExceptionArgument.newValue);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if (text.MaxCapacity > 0 && startIndex > text.MaxCapacity - count)
                 throw new ArgumentOutOfRangeException(nameof(count), 
                     $"{nameof(startIndex)}: {startIndex} + {nameof(count)}: {count} > {nameof(text.MaxCapacity)}: {text.MaxCapacity}");
@@ -1940,9 +1939,9 @@ namespace J2N.Text
         {
             ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if (text.MaxCapacity > 0 && startIndex > text.MaxCapacity - count)
                 throw new ArgumentOutOfRangeException(nameof(count),
                     $"{nameof(startIndex)}: {startIndex} + {nameof(count)}: {count} > {nameof(text.MaxCapacity)}: {text.MaxCapacity}");
@@ -2136,9 +2135,9 @@ namespace J2N.Text
                 return text.AsCharSequence();
             }
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > text.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 

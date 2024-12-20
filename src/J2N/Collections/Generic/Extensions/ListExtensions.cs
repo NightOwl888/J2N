@@ -145,9 +145,9 @@ namespace J2N.Collections.Generic.Extensions
         {
             ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if (list.Count - index < count)
                 throw new ArgumentException(SR.Argument_InvalidOffLen);
 
@@ -223,11 +223,11 @@ namespace J2N.Collections.Generic.Extensions
             ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
             if (sourceIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(sourceIndex), sourceIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(sourceIndex, ExceptionArgument.sourceIndex);
             if (destinationIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(destinationIndex), destinationIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(destinationIndex, ExceptionArgument.destinationIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if ((source.Count - sourceIndex < length) || (destination.Count - destinationIndex < length))
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 
@@ -283,9 +283,9 @@ namespace J2N.Collections.Generic.Extensions
         {
             ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if (list.Count - index < count)
                 throw new ArgumentException(SR.Argument_InvalidOffLen);
 

@@ -142,8 +142,7 @@ namespace J2N.Collections.Generic
         public LinkedDictionary(int capacity, IEqualityComparer<TKey>? comparer)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), capacity, SR.ArgumentOutOfRange_NeedNonNegNum);
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             dictionary = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>(capacity, comparer ?? EqualityComparer<TKey>.Default);
             list = new LinkedList<KeyValuePair<TKey, TValue>>();
         }
@@ -319,8 +318,7 @@ namespace J2N.Collections.Generic
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             version++;
             return dictionary.EnsureCapacity(capacity);
         }

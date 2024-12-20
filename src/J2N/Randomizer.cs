@@ -265,8 +265,7 @@ namespace J2N
         public override int Next(int maxValue)
         {
             if (maxValue <= 0)
-                throw new ArgumentOutOfRangeException(nameof(maxValue));
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
             return Next(0, maxValue);
         }
 

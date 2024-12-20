@@ -78,16 +78,14 @@ namespace J2N.IO
             return sequence[index];
         }
 
-        public override sealed CharBuffer Get(char[] destination, int offset, int length)
+        public override sealed CharBuffer Get(char[] destination, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
         {
             ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
-
-            int len = destination.Length;
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (offset > len - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > destination.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
             if (length > Remaining)
                 throw new BufferUnderflowException();
@@ -126,13 +124,13 @@ namespace J2N.IO
             throw new ReadOnlyBufferException();
         }
 
-        public override sealed CharBuffer Put(char[] source, int offset, int length)
+        public override sealed CharBuffer Put(char[] source, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
         {
             ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (offset > source.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
             if (length > Remaining)
@@ -144,12 +142,11 @@ namespace J2N.IO
         public override CharBuffer Put(string source, int startIndex, int length)
         {
             ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
-            int len = source.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
-            if (startIndex > len - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (startIndex > source.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             throw new ReadOnlyBufferException();
@@ -163,9 +160,9 @@ namespace J2N.IO
         public override CharBuffer Subsequence(int startIndex, int length)
         {
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > Remaining - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 

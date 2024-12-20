@@ -94,11 +94,8 @@ namespace J2N.Runtime.InteropServices
         public static void SetCount<T>(List<T> list, int count)
         {
             ThrowHelper.ThrowIfNull(list, ExceptionArgument.list);
-
             if (count < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             list._version++;
 

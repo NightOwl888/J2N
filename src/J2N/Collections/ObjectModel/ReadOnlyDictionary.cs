@@ -58,7 +58,7 @@ namespace J2N.Collections.ObjectModel
         /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
         public ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary)
            : this(dictionary,
-                 TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable ? 
+                 TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable ?
                     DictionaryEqualityComparer<TKey, TValue>.Default :
                     DictionaryEqualityComparer<TKey, TValue>.Aggressive,
                  StringFormatter.CurrentCulture)
@@ -427,7 +427,7 @@ namespace J2N.Collections.ObjectModel
         public override int GetHashCode()
             => GetHashCode(structuralEqualityComparer);
 
-#endregion
+        #endregion
 
         #region ToString
 
@@ -564,7 +564,7 @@ namespace J2N.Collections.ObjectModel
                 this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
             }
 
-#region ICollection<T> Members
+            #region ICollection<T> Members
 
             void ICollection<TKey>.Add(TKey item)
             {
@@ -631,7 +631,7 @@ namespace J2N.Collections.ObjectModel
                 return collection.GetEnumerator();
             }
 
-#endregion
+            #endregion
 
             #region IEnumerable Members
 
@@ -827,7 +827,7 @@ namespace J2N.Collections.ObjectModel
 
                 if (index < 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 }
 
                 if (array.Length - index < collection.Count)

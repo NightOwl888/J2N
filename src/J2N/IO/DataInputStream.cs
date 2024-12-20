@@ -274,16 +274,16 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="buffer"/> is <c>null</c>.</exception>
         /// <seealso cref="IDataOutput.Write(byte[])"/>
         /// <seealso cref="IDataOutput.Write(byte[], int, int)"/>
-        public void ReadFully(byte[] buffer, int offset, int length)
+        public void ReadFully(byte[] buffer, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
         {
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (length == 0)
                 return;
             if (buffer is null)
                 throw new ArgumentNullException(nameof(buffer));
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (offset > buffer.Length - length)
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 

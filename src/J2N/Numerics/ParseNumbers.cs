@@ -47,7 +47,7 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
@@ -132,7 +132,7 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
@@ -264,9 +264,9 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
@@ -360,9 +360,9 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
@@ -500,7 +500,7 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
@@ -586,7 +586,7 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
@@ -719,9 +719,9 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
@@ -817,9 +817,9 @@ namespace J2N.Numerics
             if (radix < Character.MinRadix || radix > Character.MaxRadix)
                 throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 

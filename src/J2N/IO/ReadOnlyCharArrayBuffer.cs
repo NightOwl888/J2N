@@ -92,13 +92,11 @@ namespace J2N.IO
         public override CharBuffer Put(string source, int startIndex, int length)
         {
             ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
-
-            int len = source.Length;
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (startIndex > len - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (startIndex > source.Length - length) // Checks for int overflow
                 throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
 
             throw new ReadOnlyBufferException();

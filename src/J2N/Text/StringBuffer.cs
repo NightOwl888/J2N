@@ -151,11 +151,11 @@ namespace J2N.Text
         public StringBuffer(ICharSequence? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             Contract.EndContractBlock();
 
             string stringValue;
@@ -166,7 +166,7 @@ namespace J2N.Text
             else
             {
                 if (startIndex > value.Length - length)
-                    throw new ArgumentOutOfRangeException(nameof(length));
+                    throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
                 stringValue = value.Subsequence(startIndex, length).ToString();
             }
 
@@ -217,11 +217,11 @@ namespace J2N.Text
         public StringBuffer(StringBuilder? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             Contract.EndContractBlock();
 
             string stringValue;
@@ -232,7 +232,7 @@ namespace J2N.Text
             else
             {
                 if (startIndex > value.Length - length)
-                    throw new ArgumentOutOfRangeException(nameof(length));
+                    throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
                 stringValue = value.ToString(startIndex, length);
             }
 
@@ -283,11 +283,11 @@ namespace J2N.Text
         public StringBuffer(char[]? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             Contract.EndContractBlock();
 
             string stringValue;
@@ -298,7 +298,7 @@ namespace J2N.Text
             else
             {
                 if (startIndex > value.Length - length)
-                    throw new ArgumentOutOfRangeException(nameof(length));
+                    throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
                 stringValue = new string(value, startIndex, length);
             }
 

@@ -193,7 +193,7 @@ namespace J2N.Collections.Generic
         public Dictionary(int capacity, IEqualityComparer<TKey>? comparer)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
             if (capacity > 0)
             {
@@ -620,9 +620,7 @@ namespace J2N.Collections.Generic
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
             int currentCapacity = _entries == null ? 0 : _entries.Length;
             if (currentCapacity >= capacity)
@@ -1403,7 +1401,7 @@ namespace J2N.Collections.Generic
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<KeyValuePair<TKey, TValue>>)this).GetEnumerator();
 
-#endregion IDictionary<TKey, TValue> Members
+        #endregion IDictionary<TKey, TValue> Members
 
         #region IDictionary Members
 

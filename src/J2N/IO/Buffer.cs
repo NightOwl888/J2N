@@ -105,9 +105,7 @@ namespace J2N.IO
         internal Buffer(int capacity)
         {
             if (capacity < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(capacity), capacity, SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             this.capacity = this.limit = capacity;
         }
 
@@ -194,7 +192,7 @@ namespace J2N.IO
         public Buffer SetLimit(int newLimit)
         {
             if (newLimit < 0)
-                throw new ArgumentOutOfRangeException(nameof(newLimit), newLimit, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(newLimit, ExceptionArgument.newLimit);
             if (newLimit > capacity)
                 throw new ArgumentOutOfRangeException(nameof(newLimit), newLimit, J2N.SR.Format(SR.Argument_MinMaxValue, nameof(newLimit), nameof(Capacity)));
 
@@ -242,7 +240,7 @@ namespace J2N.IO
         public Buffer SetPosition(int newPosition)
         {
             if (newPosition < 0)
-                throw new ArgumentOutOfRangeException(nameof(newPosition), newPosition, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(newPosition, ExceptionArgument.newPosition);
             if (newPosition > limit)
                 throw new ArgumentOutOfRangeException(nameof(newPosition), newPosition, J2N.SR.Format(SR.Argument_MinMaxValue, nameof(newPosition), nameof(Limit)));
 
