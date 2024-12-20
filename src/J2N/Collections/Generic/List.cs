@@ -1113,7 +1113,7 @@ namespace J2N.Collections.Generic
         {
             CoModificationCheck();
             if ((uint)startIndex > (uint)Size)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess(startIndex);
             if (count < 0 || startIndex > Size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
             if (match is null)
@@ -1276,7 +1276,7 @@ namespace J2N.Collections.Generic
                 // Make sure we're not out of range
                 if ((uint)startIndex >= (uint)Size)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                    ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess(startIndex);
                 }
             }
 
@@ -1891,7 +1891,7 @@ namespace J2N.Collections.Generic
         {
             int size = Size;
             if ((uint)startIndex > (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess(startIndex);
             if (count < 0 || startIndex > size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
             if (match is null)

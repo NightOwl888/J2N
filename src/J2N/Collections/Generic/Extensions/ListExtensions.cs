@@ -377,7 +377,7 @@ namespace J2N.Collections.Generic.Extensions
         {
             int size = list.Count;
             if ((uint)startIndex > (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_IndexMustBeLess);
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess(startIndex);
             if (count < 0 || startIndex > size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
             if (match is null)
