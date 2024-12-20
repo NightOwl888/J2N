@@ -786,7 +786,7 @@ namespace J2N.Collections.Generic
         {
             CoModificationCheck();
             if ((array != null) && (array.Rank != 1))
-                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
 
             try
             {
@@ -795,7 +795,7 @@ namespace J2N.Collections.Generic
             }
             catch (ArrayTypeMismatchException)
             {
-                throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
             }
         }
 

@@ -233,7 +233,7 @@ namespace J2N.Collections.Generic.Extensions
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if ((source.Count - sourceIndex < length) || (destination.Count - destinationIndex < length))
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             for (int i = sourceIndex, j = 0; j < length; i++, j++)
             {

@@ -886,13 +886,13 @@ namespace J2N.Collections.Concurrent
             if (array is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
-                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
-                throw new ArgumentException(SR.Arg_NonZeroLowerBound);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
             if ((uint)index > (uint)array.Length)
                 ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
             if (array.Length - index < Count)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             if (array is KeyValuePair<TKey, TValue>[] pairs)
             {
@@ -905,18 +905,19 @@ namespace J2N.Collections.Concurrent
             }
             else
             {
-                if (!(array is object[] objects))
+                if (!(array is object[]))
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
                 try
                 {
+                    object?[] objects = (object?[])array;
                     foreach (var item in this)
                         objects[index++] = item;
                 }
                 catch (ArrayTypeMismatchException)
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
             }
         }
@@ -1329,7 +1330,7 @@ namespace J2N.Collections.Concurrent
             if ((uint)index > (uint)array.Length)
                 ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
             if (array.Length - index < Count)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             foreach (var item in this)
                 array[index++] = item;
@@ -1661,7 +1662,7 @@ namespace J2N.Collections.Concurrent
                 if ((uint)index > (uint)array.Length)
                     ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 foreach (var item in _owner)
                     array[index++] = item.Key;
@@ -1672,13 +1673,13 @@ namespace J2N.Collections.Concurrent
                 if (array is null)
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 if ((uint)index > (uint)array.Length)
                     ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < _owner.Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 TKey[]? keys = array as TKey[];
                 if (keys != null)
@@ -1689,7 +1690,7 @@ namespace J2N.Collections.Concurrent
                 {
                     if (!(array is object?[]))
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                     try
                     {
@@ -1699,7 +1700,7 @@ namespace J2N.Collections.Concurrent
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
@@ -1966,7 +1967,7 @@ namespace J2N.Collections.Concurrent
                 if ((uint)index > (uint)array.Length)
                     ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 foreach (var item in _owner)
                     array[index++] = item.Value;
@@ -1977,13 +1978,13 @@ namespace J2N.Collections.Concurrent
                 if (array is null)
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 if ((uint)index > (uint)array.Length)
                     ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 if (array is TValue[] values)
                 {
@@ -1993,7 +1994,7 @@ namespace J2N.Collections.Concurrent
                 {
                     if (!(array is object?[]))
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                     try
                     {
@@ -2003,7 +2004,7 @@ namespace J2N.Collections.Concurrent
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }

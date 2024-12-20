@@ -171,9 +171,6 @@
   <data name="Argument_InvalidArgumentForComparison" xml:space="preserve">
     <value>Type of argument is not compatible with the generic comparer.</value>
   </data>
-  <data name="Argument_InvalidArrayType" xml:space="preserve">
-    <value>Target array type is not compatible with the type of items in the collection.</value>
-  </data>
   <data name="Argument_InvalidCodePoint" xml:space="preserve">
     <value>'{0}' is not a valid Unicode code point.</value>
   </data>
@@ -455,5 +452,8 @@
   </data>
   <data name="ArgumentOutOfRange_IndexCount" xml:space="preserve">
     <value>Index and count must refer to a location within the string.</value>
+  </data>
+  <data name="Argument_IncompatibleArrayType" xml:space="preserve">
+    <value>Target array type is not compatible with the type of items in the collection.</value>
   </data>
 </root>

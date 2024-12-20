@@ -560,11 +560,11 @@ namespace J2N
         //    throw new OutOfMemoryException(SR.Lock_Enter_WaiterCountOverflow_OutOfMemoryException);
         //}
 
-        //[DoesNotReturn]
-        //internal static void ThrowArgumentException_Argument_IncompatibleArrayType()
-        //{
-        //    throw new ArgumentException(SR.Argument_IncompatibleArrayType);
-        //}
+        [DoesNotReturn]
+        internal static void ThrowArgumentException_Argument_IncompatibleArrayType()
+        {
+            throw new ArgumentException(SR.Argument_IncompatibleArrayType);
+        }
 
         //[DoesNotReturn]
         //internal static void ThrowArgumentException_InvalidHandle(string? paramName)
