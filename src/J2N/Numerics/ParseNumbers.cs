@@ -55,7 +55,7 @@ namespace J2N.Numerics
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -140,7 +140,7 @@ namespace J2N.Numerics
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -508,7 +508,7 @@ namespace J2N.Numerics
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -594,7 +594,7 @@ namespace J2N.Numerics
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
