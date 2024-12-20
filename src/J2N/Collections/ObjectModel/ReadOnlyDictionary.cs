@@ -313,7 +313,7 @@ namespace J2N.Collections.ObjectModel
             if (array.GetLowerBound(0) != 0)
                 throw new ArgumentException(SR.Arg_NonZeroLowerBound);
             if ((uint)index > (uint)array.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
             if (array.Length - index < Count)
                 throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
 

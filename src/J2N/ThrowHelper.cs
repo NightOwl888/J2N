@@ -194,6 +194,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowIndexArgumentOutOfRange_NeedNonNegNumException(int index)
+        {
+            throw GetArgumentOutOfRangeException(index, ExceptionArgument.index,
+                                                    ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
+        }
+
+        [DoesNotReturn]
         internal static void ThrowValueArgumentOutOfRange_NeedNonNegNumException()
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.value,
@@ -410,6 +417,12 @@ namespace J2N
         internal static void ThrowArgumentOutOfRangeException(ExceptionArgument argument, int paramNumber, ExceptionResource resource)
         {
             throw GetArgumentOutOfRangeException(argument, paramNumber, resource);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRangeException(int value, ExceptionArgument argument, ExceptionResource resource)
+        {
+            throw GetArgumentOutOfRangeException(value, argument, resource);
         }
 
         //[DoesNotReturn]

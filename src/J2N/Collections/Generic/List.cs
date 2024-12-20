@@ -1807,7 +1807,7 @@ namespace J2N.Collections.Generic
         {
             CoModificationCheck();
             if ((Count != 0) && (index < 0))
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
             if ((Count != 0) && (count < 0))
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
 
