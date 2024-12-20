@@ -282,11 +282,11 @@ namespace J2N.IO
             if (length == 0)
                 return;
             if (buffer is null)
-                throw new ArgumentNullException(nameof(buffer));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.buffer);
             if (offset < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (offset > buffer.Length - length)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLengthArray);
 
             while (length > 0)
             {

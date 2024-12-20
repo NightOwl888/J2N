@@ -444,4 +444,16 @@
   <data name="ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero" xml:space="preserve">
     <value>{0} ('{1}') must be a non-negative and non-zero value.</value>
   </data>
+  <data name="ArgumentOutOfRange_IndexLengthArray" xml:space="preserve">
+    <value>Index and length must refer to a location within the array.</value>
+  </data>
+  <data name="ArgumentOutOfRange_IndexLengthBuffer" xml:space="preserve">
+    <value>Index and length must refer to a location within the buffer.</value>
+  </data>
+  <data name="ArgumentOutOfRange_IndexString" xml:space="preserve">
+    <value>Index was out of range. Must be non-negative and less than the length of the string.</value>
+  </data>
+  <data name="ArgumentOutOfRange_IndexCount" xml:space="preserve">
+    <value>Index and count must refer to a location within the string.</value>
+  </data>
 </root>

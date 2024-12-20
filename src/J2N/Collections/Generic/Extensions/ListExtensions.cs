@@ -377,7 +377,7 @@ namespace J2N.Collections.Generic.Extensions
         {
             int size = list.Count;
             if ((uint)startIndex > (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_IndexMustBeLess);
             if (count < 0 || startIndex > size - count)
                 throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
             if (match is null)
@@ -493,9 +493,9 @@ namespace J2N.Collections.Generic.Extensions
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             int size = list.Count;
             if ((uint)index1 >= (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(index1), index1, SR.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index1), index1, SR.ArgumentOutOfRange_IndexMustBeLessOrEqual);
             if ((uint)index2 >= (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(index2), index2, SR.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index2), index2, SR.ArgumentOutOfRange_IndexMustBeLessOrEqual);
 
             T temp = list[index1];
             list[index1] = list[index2];

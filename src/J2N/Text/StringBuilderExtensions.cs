@@ -774,7 +774,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if ((uint)sourceIndex > (uint)text.Length)
             {
-                throw new ArgumentOutOfRangeException(nameof(sourceIndex), SR.ArgumentOutOfRange_IndexMustBeLessOrEqual);
+                throw new ArgumentOutOfRangeException(nameof(sourceIndex), SR.ArgumentOutOfRange_IndexString);
             }
 
             if (sourceIndex > text.Length - count)
@@ -852,7 +852,7 @@ namespace J2N.Text
             if (text is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)startIndex > (uint)text.Length)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_IndexString);
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
@@ -939,7 +939,7 @@ namespace J2N.Text
             if (value is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             if ((uint)startIndex > (uint)text.Length)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_IndexString);
 
             if (value.Length == 0)
                 return 0;
@@ -1087,7 +1087,7 @@ namespace J2N.Text
             if (text is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
 
             // For null values, this is a no-op
             if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
@@ -1175,7 +1175,7 @@ namespace J2N.Text
             if (text is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (charCount < 0)
@@ -1185,7 +1185,7 @@ namespace J2N.Text
             if (charSequence is null || !charSequence.HasValue)
                 return text;
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexCount);
 
             if (charSequence is StringCharSequence stringCharSequence)
                 return text.Insert(index, stringCharSequence.Value, startIndex, charCount);
@@ -1343,7 +1343,7 @@ namespace J2N.Text
             if (charSequence is null)
                 return text;
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexCount);
 
             int start = startIndex;
             int remainingCount = charCount;
@@ -1413,7 +1413,7 @@ namespace J2N.Text
             if (text is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (charCount < 0)
@@ -1425,7 +1425,7 @@ namespace J2N.Text
                 return text;
             }
             if (startIndex > value.Length - charCount) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexCount);
 
 #if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN // If this method isn't supported, we are buffering to an array pool to get to the stack, anyway.
             return text.Insert(index, value.AsSpan(startIndex, charCount));
@@ -1480,7 +1480,7 @@ namespace J2N.Text
             return text.Insert(index, charSequence);
 #else
             if ((uint)index > (uint)text.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
+                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
 
             if (charSequence.Length > 0)
             {
@@ -1656,7 +1656,7 @@ namespace J2N.Text
             if (value is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             if ((uint)startIndex > (uint)text.Length)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_IndexString);
 
             if (value.Length == 0)
                 return text.Length;
