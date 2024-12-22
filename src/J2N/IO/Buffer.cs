@@ -175,7 +175,21 @@ namespace J2N.IO
         public int Limit
         {
             get { return limit; }
-            set { SetLimit(value); }
+            set
+            {
+                if ((uint)value > (uint)capacity)
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.value, ExceptionResource.ArgumentOutOfRange_LimitMustBeLessThanCapacity);
+
+                limit = value;
+                if (position > value)
+                {
+                    position = value;
+                }
+                if ((mark != UnsetMark) && (mark > value))
+                {
+                    mark = UnsetMark;
+                }
+            }
         }
 
         /// <summary>
@@ -191,10 +205,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newLimit"/> is less than zero or greater than <see cref="Capacity"/>.</exception>
         public Buffer SetLimit(int newLimit)
         {
-            if (newLimit < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(newLimit, ExceptionArgument.newLimit);
-            if (newLimit > capacity)
-                throw new ArgumentOutOfRangeException(nameof(newLimit), newLimit, J2N.SR.Format(SR.Argument_MinMaxValue, nameof(newLimit), nameof(Capacity)));
+            if ((uint)newLimit > (uint)capacity)
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.newLimit, ExceptionResource.ArgumentOutOfRange_LimitMustBeLessThanCapacity);
 
             limit = newLimit;
             if (position > newLimit)
@@ -225,7 +237,17 @@ namespace J2N.IO
         public int Position
         {
             get { return position; }
-            set { SetPosition(value); }
+            set
+            {
+                if ((uint)value > (uint)limit)
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.value, ExceptionResource.ArgumentOutOfRange_PositionMustBeLessThanLimit);
+
+                position = value;
+                if (mark != UnsetMark && mark > position)
+                {
+                    mark = UnsetMark;
+                }
+            }
         }
 
         /// <summary>
@@ -239,13 +261,11 @@ namespace J2N.IO
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newPosition"/> is less than zero or greater than <see cref="Limit"/>.</exception>
         public Buffer SetPosition(int newPosition)
         {
-            if (newPosition < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(newPosition, ExceptionArgument.newPosition);
-            if (newPosition > limit)
-                throw new ArgumentOutOfRangeException(nameof(newPosition), newPosition, J2N.SR.Format(SR.Argument_MinMaxValue, nameof(newPosition), nameof(Limit)));
-
+            if ((uint)newPosition > (uint)limit)
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.newPosition, ExceptionResource.ArgumentOutOfRange_PositionMustBeLessThanLimit);
+            
             position = newPosition;
-            if ((mark != UnsetMark) && (mark > position))
+            if (mark != UnsetMark && mark > position)
             {
                 mark = UnsetMark;
             }

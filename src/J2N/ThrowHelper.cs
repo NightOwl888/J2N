@@ -1464,6 +1464,10 @@ namespace J2N
                 //    return SR.Argument_HasToBeArrayClass;
                 //case ExceptionResource.InvalidOperation_IncompatibleComparer:
                 //    return SR.InvalidOperation_IncompatibleComparer;
+                case ExceptionResource.ArgumentOutOfRange_PositionMustBeLessThanLimit:
+                    return SR.ArgumentOutOfRange_PositionMustBeLessThanLimit;
+                case ExceptionResource.ArgumentOutOfRange_LimitMustBeLessThanCapacity:
+                    return SR.ArgumentOutOfRange_LimitMustBeLessThanCapacity;
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1757,5 +1761,7 @@ namespace J2N
         //Format_ExpectedAsciiDigit,
         //Argument_HasToBeArrayClass,
         //InvalidOperation_IncompatibleComparer,
+        ArgumentOutOfRange_PositionMustBeLessThanLimit,
+        ArgumentOutOfRange_LimitMustBeLessThanCapacity,
     }
 }
