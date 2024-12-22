@@ -293,7 +293,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                ThrowHelper.ThrowArgumentException_Argument_MinMaxValue(ExceptionArgument.position1, ExceptionArgument.position2);
 
             int last = actualArrayLength << Offset;
             if (position1 >= last || position1 == position2)
@@ -422,7 +422,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                ThrowHelper.ThrowArgumentException_Argument_MinMaxValue(ExceptionArgument.position1, ExceptionArgument.position2);
 
             if (position1 == position2)
             {
@@ -550,7 +550,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                ThrowHelper.ThrowArgumentException_Argument_MinMaxValue(ExceptionArgument.position1, ExceptionArgument.position2);
 
             if (!needClear)
             {
@@ -633,7 +633,7 @@ namespace J2N.Collections
             if (position2 < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(position2, ExceptionArgument.position2);
             if (position2 < position1)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_MinMaxValue, nameof(position1), nameof(position2)));
+                ThrowHelper.ThrowArgumentException_Argument_MinMaxValue(ExceptionArgument.position1, ExceptionArgument.position2);
 
             if (position1 == position2)
             {

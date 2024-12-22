@@ -648,6 +648,12 @@ namespace J2N
             throw new ArgumentException(SR.Format(SR.Argument_InvalidCodePoint, codePoint));
         }
 
+        [DoesNotReturn]
+        internal static void ThrowArgumentException_Argument_MinMaxValue(ExceptionArgument min, ExceptionArgument max)
+        {
+            throw new ArgumentException(SR.Format(SR.Argument_MinMaxValue, GetArgumentName(min), GetArgumentName(max)));
+        }
+
         //[DoesNotReturn]
         //internal static void ThrowArgumentException_InvalidHandle(string? paramName)
         //{
