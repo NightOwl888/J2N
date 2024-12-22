@@ -284,7 +284,7 @@ namespace J2N
         public override int Next(int minValue, int maxValue)
         {
             if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue), SR.Format(SR.Argument_MinMaxValue, nameof(minValue), nameof(maxValue)));
+                ThrowHelper.ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument.minValue, ExceptionArgument.maxValue);
 
             if ((maxValue & -maxValue) == maxValue)
             {

@@ -256,6 +256,13 @@ namespace J2N
                                                     ExceptionResource.ArgumentOutOfRange_Radix);
         }
 
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument min, ExceptionArgument max) // J2N TODO: API - this should be ArgumentException rather than ArgumentOutOfRangeException.
+        {
+            string minName = GetArgumentName(min);
+            throw new ArgumentOutOfRangeException(minName, SR.Format(SR.Argument_MinMaxValue, minName, GetArgumentName(max)));
+        }
+
         //[DoesNotReturn]
         //internal static void ThrowArgumentOutOfRange_Year()
         //{
@@ -1024,6 +1031,8 @@ namespace J2N
                     return "maxValue";
                 case ExceptionArgument.memoryMappedFile:
                     return "memoryMappedFile";
+                case ExceptionArgument.minValue:
+                    return "minValue";
                 case ExceptionArgument.name:
                     return "name";
                 case ExceptionArgument.nbits:
@@ -1531,6 +1540,7 @@ namespace J2N
         match,
         maxValue,
         memoryMappedFile,
+        minValue,
         name,
         nbits,
         newLength,
