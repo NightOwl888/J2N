@@ -589,7 +589,7 @@ namespace J2N
 
             int len = seq.Length;
             if ((uint)index >= (uint)len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             char high = seq[index++];
             if (index >= len)
@@ -627,7 +627,7 @@ namespace J2N
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int len = seq.Length;
             if ((uint)index >= (uint)len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             char high = seq[index++];
             if (index >= len)
@@ -671,7 +671,7 @@ namespace J2N
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int len = seq.Length;
             if ((uint)index >= (uint)len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             // J2N NOTE: Looking up 1 or 2 characters is faster through the StringBuilder than an indexer
             char high = seq[index++];
@@ -710,7 +710,7 @@ namespace J2N
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int len = seq.Length;
             if ((uint)index >= (uint)len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             char high = seq[index++];
             if (index >= len)
@@ -745,7 +745,7 @@ namespace J2N
         {
             int len = seq.Length;
             if ((uint)index >= (uint)len)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             char high = seq[index++];
             if (index >= len)
@@ -1513,7 +1513,7 @@ namespace J2N
 
             int length = seq.Length;
             if ((uint)index > (uint)length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             int x = index;
             if (codePointOffset >= 0)
@@ -1585,7 +1585,7 @@ namespace J2N
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int length = seq.Length;
             if ((uint)index > (uint)length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             int x = index;
             if (codePointOffset >= 0)
@@ -1657,7 +1657,7 @@ namespace J2N
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int length = seq.Length;
             if ((uint)index > (uint)length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             int x = index;
             char[]? arrayToReturnToPool = null;
@@ -1746,7 +1746,7 @@ namespace J2N
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
             int length = seq.Length;
             if ((uint)index > (uint)length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             int x = index;
             if (codePointOffset >= 0)
@@ -1815,7 +1815,7 @@ namespace J2N
         {
             int length = seq.Length;
             if ((uint)index > (uint)length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_IndexString);
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(index, ExceptionArgument.index);
 
             int x = index;
             if (codePointOffset >= 0)

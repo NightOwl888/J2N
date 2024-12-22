@@ -243,6 +243,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(int value, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(value, argument,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexString);
+        }
+
+        [DoesNotReturn]
         internal static void ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count()
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.count,
