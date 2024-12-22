@@ -2145,13 +2145,9 @@ namespace J2N
         {
             // if radix or digit is out of range,
             // return the null character.
-            if (radix < MinRadix)
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // J2N: Optimized version of: (radix < MinRadix || radix > MaxRadix)
                 return charNull;
-            if (radix > MaxRadix)
-                return charNull;
-            if (digit < 0)
-                return charNull;
-            if (digit >= radix)
+            if ((uint)digit >= (uint)radix) // J2N: Optimized version of: (digit < 0 || digit >= radix)
                 return charNull;
 
             // if digit is less than 10,
