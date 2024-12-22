@@ -507,7 +507,8 @@ namespace J2N
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsSupplementaryCodePoint(int codePoint)
         {
-            return (MinSupplementaryCodePoint <= codePoint && MaxCodePoint >= codePoint);
+            // J2N: Optimized version of: (MinSupplementaryCodePoint <= codePoint && MaxCodePoint >= codePoint);
+            return (uint)(codePoint - MinSupplementaryCodePoint) <= (MaxCodePoint - MinSupplementaryCodePoint);
         }
 
         // IsHighSurrogate - use char.IsHighSurrogate
