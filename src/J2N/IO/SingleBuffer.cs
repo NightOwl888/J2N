@@ -453,7 +453,7 @@ namespace J2N.IO
             if (source is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (ReferenceEquals(source, this))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
+                ThrowHelper.ThrowArgumentException_Argument_MustNotBeThis(ExceptionArgument.source);
             if (source.Remaining > Remaining)
                 throw new BufferOverflowException();
             if (IsReadOnly)

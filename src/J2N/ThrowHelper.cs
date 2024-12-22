@@ -654,6 +654,12 @@ namespace J2N
             throw new ArgumentException(SR.Format(SR.Argument_MinMaxValue, GetArgumentName(min), GetArgumentName(max)));
         }
 
+        [DoesNotReturn]
+        internal static void ThrowArgumentException_Argument_MustNotBeThis(ExceptionArgument argument)
+        {
+            throw new ArgumentException(SR.Format(SR.Argument_MustNotBeThis, GetArgumentName(argument)));
+        }
+
         //[DoesNotReturn]
         //internal static void ThrowArgumentException_InvalidHandle(string? paramName)
         //{
