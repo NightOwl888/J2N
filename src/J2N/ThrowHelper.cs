@@ -1348,6 +1348,8 @@ namespace J2N
             {
                 case ExceptionResource.Arg_EmptySpan:
                     return SR.Arg_EmptySpan;
+                case ExceptionResource.Arg_HSCapacityOverflow:
+                    return SR.Arg_HSCapacityOverflow;
                 case ExceptionResource.ArgumentNull_NullOrNullValue:
                     return SR.ArgumentNull_NullOrNullValue;
                 case ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative:
@@ -1743,6 +1745,7 @@ namespace J2N
     internal enum ExceptionResource
     {
         Arg_EmptySpan,
+        Arg_HSCapacityOverflow,
         ArgumentNull_NullOrNullValue,
         ArgumentOutOfRange_Generic_MustBeNonNegative,
         ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero,

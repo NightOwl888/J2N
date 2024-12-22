@@ -388,7 +388,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -411,7 +411,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -432,7 +432,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -509,7 +509,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -531,7 +531,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -552,7 +552,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -760,7 +760,7 @@ namespace J2N.Collections.Generic
 
                 if (array == null)
                 {
-                    throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MissingKeys);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
                 }
 
                 // there are no resizes here because we already set capacity above
@@ -1568,7 +1568,7 @@ namespace J2N.Collections.Generic
             int newSize = HashHelpers.ExpandPrime(_count);
             if (newSize <= _count)
             {
-                throw new ArgumentException(SR.Arg_HSCapacityOverflow);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_HSCapacityOverflow);
             }
 
             // Able to increase capacity; copy elements to larger array and rehash
@@ -1643,7 +1643,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1665,7 +1665,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1686,7 +1686,7 @@ namespace J2N.Collections.Generic
                     if (collisionCount >= slots.Length)
                     {
                         // The chain of entries forms a loop, which means a concurrent update has happened.
-                        throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
                     collisionCount++;
                 }
@@ -1880,7 +1880,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1903,7 +1903,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1924,7 +1924,7 @@ namespace J2N.Collections.Generic
                     if (collisionCount >= slots.Length)
                     {
                         // The chain of entries forms a loop, which means a concurrent update has happened.
-                        throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
                     collisionCount++;
                 }
@@ -2050,7 +2050,7 @@ namespace J2N.Collections.Generic
                 if (collisionCount >= slots.Length)
                 {
                     // The chain of entries forms a loop, which means a concurrent update has happened.
-                    throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                    ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                 }
                 collisionCount++;
             }
@@ -2435,7 +2435,7 @@ namespace J2N.Collections.Generic
             {
                 if (_version != _set._version)
                 {
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 while (_index < _set._lastIndex)
@@ -2461,7 +2461,7 @@ namespace J2N.Collections.Generic
                 {
                     if (_index == 0 || _index == _set._lastIndex + 1)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
                     return Current;
                 }
@@ -2471,7 +2471,7 @@ namespace J2N.Collections.Generic
             {
                 if (_version != _set._version)
                 {
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 _index = 0;
