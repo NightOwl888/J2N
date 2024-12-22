@@ -66,6 +66,8 @@ namespace J2N.Collections.Concurrent
 #endif
         IDisposable
     {
+        private static readonly string ThisTypeName = nameof(LurchTable<TKey, TValue>);
+
         /// <summary> Method signature for the ItemUpdated event </summary>
         public delegate void ItemUpdatedMethod(KeyValuePair<TKey, TValue> previous, KeyValuePair<TKey, TValue> next);
 
@@ -216,7 +218,7 @@ namespace J2N.Collections.Concurrent
             if (limit <= 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(limit, ExceptionArgument.limit);
             if (ordering == LurchTableOrder.None && limit < int.MaxValue)
-                throw new ArgumentOutOfRangeException(nameof(limit), SR.LurchTable_NeedLimitIntMaxValue);
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.limit, ExceptionResource.LurchTable_NeedLimitIntMaxValue);
             if (hashSize < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(hashSize, ExceptionArgument.hashSize);
             if (allocSize < 0)
@@ -644,7 +646,7 @@ namespace J2N.Collections.Concurrent
                 if (value <= 0)
                     ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(value, ExceptionArgument.value);
                 if (_ordering == LurchTableOrder.None && value < int.MaxValue)
-                    throw new ArgumentOutOfRangeException(nameof(value), SR.LurchTable_NeedLimitIntMaxValue);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.limit, ExceptionResource.LurchTable_NeedLimitIntMaxValue);
 
                 Interlocked.Exchange(ref _limit, value);
             }
@@ -808,10 +810,8 @@ namespace J2N.Collections.Concurrent
             set
             {
                 // J2N: Only throw if the generic closing type is not nullable
-                if (!(default(TKey) == null) && key is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
-                if (!(default(TValue) == null) && value is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 try
                 {
@@ -822,12 +822,12 @@ namespace J2N.Collections.Concurrent
                     }
                     catch (InvalidCastException)
                     {
-                        throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                        ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                     }
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                    ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
                 }
             }
         }
@@ -835,10 +835,8 @@ namespace J2N.Collections.Concurrent
         void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
-            if (!(default(TKey) == null) && key is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
-            if (!(default(TValue) == null) && value is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
             try
             {
@@ -850,12 +848,12 @@ namespace J2N.Collections.Concurrent
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                 }
             }
             catch (InvalidCastException)
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
             }
         }
 
@@ -940,7 +938,7 @@ namespace J2N.Collections.Concurrent
         /// <exception cref="ObjectDisposedException"><see cref="Dispose()"/> has already been called.</exception>
         public void Clear()
         {
-            if (_entries == null) throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+            if (_entries == null) throw new ObjectDisposedException(ThisTypeName);
             foreach (var item in this)
                 Remove(item.Key);
         }
@@ -951,7 +949,7 @@ namespace J2N.Collections.Concurrent
         /// <exception cref="ObjectDisposedException"><see cref="Dispose()"/> has already been called.</exception>
         public bool ContainsKey(TKey key)
         {
-            if (_entries == null) throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+            if (_entries == null) throw new ObjectDisposedException(ThisTypeName);
             return TryGetValue(key, out _);
         }
 
@@ -985,7 +983,8 @@ namespace J2N.Collections.Concurrent
             get
             {
                 if (!TryGetValue(key, out TValue? value))
-                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
+                    ThrowHelper.ThrowKeyNotFoundException<TKey>(key);
+
                 return value;
             }
             set
@@ -1023,7 +1022,7 @@ namespace J2N.Collections.Concurrent
         {
             var info = new AddInfo<TKey, TValue> { Value = value! };
             if (InsertResult.Inserted != Insert(key, ref info))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(key);
         }
 
         /// <summary>
@@ -1348,7 +1347,7 @@ namespace J2N.Collections.Concurrent
 
         private bool MoveNext(ref EnumState state)
         {
-            if (_entries == null) throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+            if (_entries == null) throw new ObjectDisposedException(ThisTypeName);
 
             if (state.Current > 0)
                 state.Current = state.Next;
@@ -1471,7 +1470,7 @@ namespace J2N.Collections.Concurrent
                 {
                     int index = _state.Current;
                     if (index <= 0)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
 
                     if (_getEnumeratorRetType == DictEntry)
                     {
@@ -1493,9 +1492,9 @@ namespace J2N.Collections.Concurrent
                 {
                     int index = _state.Current;
                     if (index < 0)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     if (_owner._entries == null)
-                        throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                        ThrowHelper.ThrowObjectDisposedException(this);
 
                     return new KeyValuePair<TKey, TValue>
                         (
@@ -1544,7 +1543,7 @@ namespace J2N.Collections.Concurrent
                 {
                     int index = _state.Current;
                     if (index <= 0)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
 
                     return Current.Key;
                 }
@@ -1556,7 +1555,7 @@ namespace J2N.Collections.Concurrent
                 {
                     int index = _state.Current;
                     if (index <= 0)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
 
                     return Current.Value;
                 }
@@ -1568,7 +1567,7 @@ namespace J2N.Collections.Concurrent
                 {
                     int index = _state.Current;
                     if (index <= 0)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
 
                     return new DictionaryEntry(Current.Key!, Current.Value);
                 }
@@ -1787,9 +1786,9 @@ namespace J2N.Collections.Concurrent
                     {
                         int index = _state.Current;
                         if (index <= 0)
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         if (_owner._entries == null)
-                            throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                            ThrowHelper.ThrowObjectDisposedException(this);
                         return _owner._entries[index >> _owner._shift][index & _owner._shiftMask].Key;
                     }
                 }
@@ -1803,9 +1802,9 @@ namespace J2N.Collections.Concurrent
                     {
                         int index = _state.Current;
                         if (index < 0)
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         if (_owner._entries == null)
-                            throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                            ThrowHelper.ThrowObjectDisposedException(this);
                         return _owner._entries[index >> _owner._shift][index & _owner._shiftMask].Key;
                     }
                 }
@@ -1853,17 +1852,18 @@ namespace J2N.Collections.Concurrent
 
             void ICollection<TKey>.Add(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             void ICollection<TKey>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             bool ICollection<TKey>.Remove(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
+                return false;
             }
 
             #endregion
@@ -2090,9 +2090,9 @@ namespace J2N.Collections.Concurrent
                     {
                         int index = _state.Current;
                         if (index <= 0)
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         if (_owner._entries == null)
-                            throw new ObjectDisposedException(GetType().Name);
+                            ThrowHelper.ThrowObjectDisposedException(this);
                         return _owner._entries[index >> _owner._shift][index & _owner._shiftMask].Value;
                     }
                 }
@@ -2106,9 +2106,9 @@ namespace J2N.Collections.Concurrent
                     {
                         int index = _state.Current;
                         if (index < 0)
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         if (_owner._entries == null)
-                            throw new ObjectDisposedException(GetType().Name);
+                            ThrowHelper.ThrowObjectDisposedException(this);
                         return _owner._entries[index >> _owner._shift][index & _owner._shiftMask].Value;
                     }
                 }
@@ -2157,17 +2157,18 @@ namespace J2N.Collections.Concurrent
 
             void ICollection<TValue>.Add(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             void ICollection<TValue>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             bool ICollection<TValue>.Remove(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
+                return false;
             }
 
             #endregion
@@ -2200,7 +2201,7 @@ namespace J2N.Collections.Concurrent
             if (_ordering == LurchTableOrder.None)
                 throw new InvalidOperationException();
             if (_entries == null)
-                throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                throw new ObjectDisposedException(ThisTypeName);
 
             while (true)
             {
@@ -2242,7 +2243,7 @@ namespace J2N.Collections.Concurrent
             if (_ordering == LurchTableOrder.None)
                 throw new InvalidOperationException();
             if (_entries == null)
-                throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                throw new ObjectDisposedException(ThisTypeName);
 
             KeyValuePair<TKey, TValue> value;
             while (!TryDequeue(out value))
@@ -2274,7 +2275,7 @@ namespace J2N.Collections.Concurrent
             if (_ordering == LurchTableOrder.None)
                 throw new InvalidOperationException();
             if (_entries == null)
-                throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                throw new ObjectDisposedException(ThisTypeName);
 
             while (true)
             {
@@ -2360,7 +2361,7 @@ namespace J2N.Collections.Concurrent
         private bool InternalGetValue(int hash, [AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (_entries == null)
-                throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                throw new ObjectDisposedException(ThisTypeName);
 
             int bucket = hash % _hsize;
             lock (_locks[bucket % _lsize])
@@ -2393,7 +2394,7 @@ namespace J2N.Collections.Concurrent
         private bool InternalContainsValue(Predicate<TValue> matchPredicate)
         {
             if (_entries == null)
-                throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                throw new ObjectDisposedException(ThisTypeName);
 
             for (int bucket = 0; bucket < _buckets.Length; bucket++)
             {
@@ -2421,7 +2422,7 @@ namespace J2N.Collections.Concurrent
         private InsertResult Insert<T>([AllowNull] TKey key, [MaybeNull] ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
         {
             if (_entries == null)
-                throw new ObjectDisposedException(nameof(LurchTable<TKey, TValue>));
+                throw new ObjectDisposedException(ThisTypeName);
 
             int hash = GetHash(key);
 
@@ -2507,7 +2508,7 @@ namespace J2N.Collections.Concurrent
                     if (hash == _entries[index >> _shift][index & _shiftMask].Hash &&
                         KeyEquals(pair.Key, _entries[index >> _shift][index & _shiftMask].Key))
                     {
-                        throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, pair.Key));
+                        ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(pair.Key);
                     }
                     index = _entries[index >> _shift][index & _shiftMask].Link;
                 }
@@ -2533,7 +2534,7 @@ namespace J2N.Collections.Concurrent
         private bool Delete<T>(TKey key, ref T value) where T : IRemoveValue<TKey, TValue>
         {
             if (_entries == null)
-                throw new ObjectDisposedException(GetType().Name);
+                throw new ObjectDisposedException(ThisTypeName);
 
             int hash = GetHash(key);
             int bucket = hash % _hsize;

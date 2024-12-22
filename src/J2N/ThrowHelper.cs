@@ -404,7 +404,7 @@ namespace J2N
         }
 
         [DoesNotReturn]
-        internal static void ThrowWrongValueTypeArgumentException<T>(T value, Type targetType)
+        internal static void ThrowWrongValueTypeArgumentException<T>([AllowNull] T value, Type targetType)
         {
             // Generic key to move the boxing to the right hand side of throw
             throw GetWrongValueTypeArgumentException((object?)value, targetType);
@@ -416,7 +416,7 @@ namespace J2N
         }
 
         [DoesNotReturn]
-        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>(T key)
+        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key)
         {
             // Generic key to move the boxing to the right hand side of throw
             throw GetAddingDuplicateWithKeyArgumentException((object?)key);
@@ -1540,6 +1540,8 @@ namespace J2N
                     return SR.ArgumentOutOfRange_LimitMustBeLessThanCapacity;
                 case ExceptionResource.InvalidOperation_ViewFailedVersion:
                     return SR.InvalidOperation_ViewFailedVersion;
+                case ExceptionResource.LurchTable_NeedLimitIntMaxValue:
+                    return SR.LurchTable_NeedLimitIntMaxValue;
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1841,5 +1843,6 @@ namespace J2N
         ArgumentOutOfRange_PositionMustBeLessThanLimit,
         ArgumentOutOfRange_LimitMustBeLessThanCapacity,
         InvalidOperation_ViewFailedVersion,
+        LurchTable_NeedLimitIntMaxValue,
     }
 }
