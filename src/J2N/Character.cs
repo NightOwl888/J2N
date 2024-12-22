@@ -1272,12 +1272,11 @@ namespace J2N
             if (seq is StringBuffer stringBuffer)
                 return CodePointCount(stringBuffer.builder, startIndex, length);
 
-            int len = seq.Length;
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if (startIndex + length > len)
+            if (startIndex > seq.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             int endIndex = startIndex + length;
@@ -1320,12 +1319,11 @@ namespace J2N
         {
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
-            int len = seq.Length;
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if (startIndex + length > len)
+            if (startIndex > seq.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             int endIndex = startIndex + length;
@@ -1368,12 +1366,11 @@ namespace J2N
         {
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
-            int len = seq.Length;
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if (startIndex + length > len)
+            if (startIndex > seq.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             char[]? arrayToReturnToPool = null;
@@ -1433,12 +1430,11 @@ namespace J2N
         {
             if (seq is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.seq);
-            int len = seq.Length;
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if (startIndex + length > len)
+            if (startIndex > seq.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             int endIndex = startIndex + length;
