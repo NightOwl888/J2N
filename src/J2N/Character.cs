@@ -1965,7 +1965,7 @@ namespace J2N
         public static int Digit(char c, int radix)
         {
             int result;
-            if (radix >= MinRadix && radix <= MaxRadix)
+            if ((uint)(radix - Character.MinRadix) <= (Character.MaxRadix - Character.MinRadix)) // J2N: Optimized version of: (radix >= MinRadix && radix <= MaxRadix)
             {
                 // Optimized for ASCII
                 if (c < 128)
@@ -2006,7 +2006,7 @@ namespace J2N
         public static int Digit(int codePoint, int radix)
         {
             int result;
-            if (radix >= MinRadix && radix <= MaxRadix)
+            if ((uint)(radix - Character.MinRadix) <= (Character.MaxRadix - Character.MinRadix)) // J2N: Optimized version of: (radix >= MinRadix && radix <= MaxRadix)
             {
                 // Optimized for ASCII
                 if (codePoint < 128)
