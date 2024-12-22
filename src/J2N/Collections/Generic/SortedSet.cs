@@ -2640,7 +2640,7 @@ namespace J2N.Collections.Generic
 
                 if (_version != _tree.version)
                 {
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 if (_stack.Count == 0)
@@ -2724,7 +2724,7 @@ namespace J2N.Collections.Generic
                 {
                     if (_current == null)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return _current.Item;
@@ -2737,7 +2737,7 @@ namespace J2N.Collections.Generic
             {
                 if (_version != _tree.version)
                 {
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 _stack.Clear();
