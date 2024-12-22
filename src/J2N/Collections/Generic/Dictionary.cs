@@ -724,7 +724,7 @@ namespace J2N.Collections.Generic
 
                 if (array == null)
                 {
-                    throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MissingKeys);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
                 }
 
                 for (int i = 0; i < array.Length; i++)
@@ -759,8 +759,7 @@ namespace J2N.Collections.Generic
         {
             if (capacity < Count)
             {
-                //ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity);
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_SmallCapacity);
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity, ExceptionResource.ArgumentOutOfRange_SmallCapacity);
             }
 
             int newSize = HashHelpers.GetPrime(capacity);
@@ -903,10 +902,12 @@ namespace J2N.Collections.Generic
 
                 if (key is null)
                 {
-                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, "null"));
+                    ThrowHelper.ThrowKeyNotFoundException("(null)");
+                    return default;
                 }
 
-                throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
+                ThrowHelper.ThrowKeyNotFoundException(key);
+                return default;
             }
             set
             {
@@ -1031,7 +1032,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -1078,7 +1079,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -1291,7 +1292,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -1340,7 +1341,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -1438,10 +1439,8 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: Only throw if the generic closing type is not nullable
-                if (!(default(TKey) == null) && key is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
-                if (!(default(TValue) == null) && value is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 try
                 {
@@ -1453,12 +1452,12 @@ namespace J2N.Collections.Generic
                     }
                     catch (InvalidCastException)
                     {
-                        throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                        ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                     }
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                    ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
                 }
             }
         }
@@ -1466,10 +1465,8 @@ namespace J2N.Collections.Generic
         void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
-            if (!(default(TKey) == null) && key is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
-            if (!(default(TValue) == null) && value is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
             try
             {
@@ -1481,12 +1478,12 @@ namespace J2N.Collections.Generic
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                 }
             }
             catch (InvalidCastException)
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
             }
         }
 
@@ -1719,7 +1716,7 @@ namespace J2N.Collections.Generic
             goto ReturnNotFound;
 
         ConcurrentOperation:
-            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
         ReturnFound:
             ref TValue value = ref entry.value;
         Return:
@@ -1796,7 +1793,7 @@ namespace J2N.Collections.Generic
 
                             if (behavior == InsertionBehavior.ThrowOnExisting)
                             {
-                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
+                                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(key);
                             }
 
                             return false;
@@ -1809,7 +1806,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -1834,7 +1831,7 @@ namespace J2N.Collections.Generic
 
                             if (behavior == InsertionBehavior.ThrowOnExisting)
                             {
-                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, "null"));
+                                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException("(null)");
                             }
 
                             return false;
@@ -1847,7 +1844,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -1876,7 +1873,7 @@ namespace J2N.Collections.Generic
 
                             if (behavior == InsertionBehavior.ThrowOnExisting)
                             {
-                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
+                                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(key);
                             }
 
                             return false;
@@ -1889,7 +1886,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -1914,7 +1911,7 @@ namespace J2N.Collections.Generic
 
                             if (behavior == InsertionBehavior.ThrowOnExisting)
                             {
-                                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, "null"));
+                                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException("(null)");
                             }
 
                             return false;
@@ -1927,7 +1924,7 @@ namespace J2N.Collections.Generic
                         {
                             // The chain of entries forms a loop; which means a concurrent update has happened.
                             // Break out of the loop and throw, rather than looping forever.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
@@ -2231,10 +2228,10 @@ namespace J2N.Collections.Generic
             object ICollection.SyncRoot => ((ICollection)dictionary).SyncRoot;
 
             void ICollection<TKey>.Add(TKey item)
-                => throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             void ICollection<TKey>.Clear()
-                => throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             bool ICollection<TKey>.Contains([AllowNull] TKey item)
             {
@@ -2328,8 +2325,10 @@ namespace J2N.Collections.Generic
             IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TKey>)this).GetEnumerator();
 
             bool ICollection<TKey>.Remove(TKey item)
-                => throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
-
+            {
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
+                return false;
+            }
             void ICollection.CopyTo(Array array, int index)
             {
                 if (array is null)
@@ -2462,7 +2461,7 @@ namespace J2N.Collections.Generic
                     {
                         if (index == 0 || (index == dictionary._count + 1))
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return currentKey;
@@ -2498,7 +2497,7 @@ namespace J2N.Collections.Generic
                 public bool MoveNext()
                 {
                     if (version != dictionary._version)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
 
                     while ((uint)index < (uint)dictionary._count)
                     {
@@ -2519,7 +2518,7 @@ namespace J2N.Collections.Generic
                 void IEnumerator.Reset()
                 {
                     if (version != dictionary._version)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
 
                     index = 0;
                     currentKey = default;
@@ -2597,10 +2596,10 @@ namespace J2N.Collections.Generic
             bool ICollection<TValue>.IsReadOnly => true;
 
             void ICollection<TValue>.Add(TValue item)
-                => throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             void ICollection<TValue>.Clear()
-                => throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             bool ICollection<TValue>.Contains([AllowNull] TValue item) => dictionary.ContainsValue(item);
 
@@ -2683,7 +2682,10 @@ namespace J2N.Collections.Generic
             IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<TValue>)this).GetEnumerator();
 
             bool ICollection<TValue>.Remove(TValue item)
-                => throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+            {
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
+                return false;
+            }
 
             /// <summary>
             /// Returns an enumerator that iterates through the <see cref="Dictionary{TKey,TValue}.ValueCollection"/>.
@@ -2827,7 +2829,7 @@ namespace J2N.Collections.Generic
                     {
                         if (index == 0 || (index == dictionary._count + 1))
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return currentValue;
@@ -2863,7 +2865,7 @@ namespace J2N.Collections.Generic
                 public bool MoveNext()
                 {
                     if (version != dictionary._version)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
 
                     while ((uint)index < (uint)dictionary._count)
                     {
@@ -2883,7 +2885,7 @@ namespace J2N.Collections.Generic
                 void IEnumerator.Reset()
                 {
                     if (version != dictionary._version)
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
 
                     index = 0;
                     currentValue = default;
@@ -2965,7 +2967,7 @@ namespace J2N.Collections.Generic
                 get
                 {
                     if (index == 0 || (index == dictionary._count + 1))
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
 
                     if (getEnumeratorRetType == DictEntry)
                     {
@@ -3006,7 +3008,7 @@ namespace J2N.Collections.Generic
             public bool MoveNext()
             {
                 if (version != dictionary._version)
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
 
                 // Use unsigned comparison since we set index to dictionary.count+1 when the enumeration ends.
                 // dictionary.count+1 could be negative if dictionary.count is int.MaxValue
@@ -3029,7 +3031,7 @@ namespace J2N.Collections.Generic
             void IEnumerator.Reset()
             {
                 if (version != dictionary._version)
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
 
                 index = 0;
                 current = default;
@@ -3042,7 +3044,7 @@ namespace J2N.Collections.Generic
                 get
                 {
                     if (index == 0 || (index == dictionary._count + 1))
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen(); ;
 
                     return new DictionaryEntry(current.Key!, current.Value);
                 }
@@ -3057,7 +3059,7 @@ namespace J2N.Collections.Generic
 #pragma warning restore IDE0079 // Remove unnecessary suppression
                 {
                     if (index == 0 || (index == dictionary._count + 1))
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
 
                     return current.Key;
                 }
@@ -3068,7 +3070,7 @@ namespace J2N.Collections.Generic
                 get
                 {
                     if (index == 0 || (index == dictionary._count + 1))
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
 
                     return current.Value;
                 }
@@ -3142,7 +3144,7 @@ namespace J2N.Collections.Generic
                             {
                                 // The chain of entries forms a loop; which means a concurrent update has happened.
                                 // Break out of the loop and throw, rather than looping forever.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                         }
                     }
@@ -3171,7 +3173,7 @@ namespace J2N.Collections.Generic
                             {
                                 // The chain of entries forms a loop; which means a concurrent update has happened.
                                 // Break out of the loop and throw, rather than looping forever.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                         }
                     }
@@ -3204,7 +3206,7 @@ namespace J2N.Collections.Generic
                             {
                                 // The chain of entries forms a loop; which means a concurrent update has happened.
                                 // Break out of the loop and throw, rather than looping forever.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                         }
                     }
@@ -3234,7 +3236,7 @@ namespace J2N.Collections.Generic
                             {
                                 // The chain of entries forms a loop; which means a concurrent update has happened.
                                 // Break out of the loop and throw, rather than looping forever.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                         }
                     }

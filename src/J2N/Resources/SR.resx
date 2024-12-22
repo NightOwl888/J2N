@@ -462,4 +462,7 @@
   <data name="ArgumentOutOfRange_LimitMustBeLessThanCapacity" xml:space="preserve">
     <value>Value was out of range. Limit must be non-negative and less than Capacity.</value>
   </data>
+  <data name="Argument_AddingDuplicateWithKey" xml:space="preserve">
+    <value>An item with the same key has already been added. Key: {0}</value>
+  </data>
 </root>
