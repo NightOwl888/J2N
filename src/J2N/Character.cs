@@ -494,7 +494,8 @@ namespace J2N
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsValidCodePoint(int codePoint)
         {
-            return (MinCodePoint <= codePoint && MaxCodePoint >= codePoint);
+            // J2N: Optimized version of: (MinCodePoint <= codePoint && MaxCodePoint >= codePoint);
+            return (uint)codePoint <= MaxCodePoint;
         }
 
         /// <summary>
