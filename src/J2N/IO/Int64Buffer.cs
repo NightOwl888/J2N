@@ -95,7 +95,7 @@ namespace J2N.IO
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > array.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLengthArray);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(startIndex, length);
 
             return new ReadWriteInt64ArrayBuffer(array)
             {
@@ -300,7 +300,7 @@ namespace J2N.IO
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (offset > destination.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLengthArray);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
 
             if (length > Remaining)
             {
@@ -448,7 +448,7 @@ namespace J2N.IO
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (offset > source.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLengthArray);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferOverflowException();
 

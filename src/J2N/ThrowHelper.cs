@@ -236,7 +236,7 @@ namespace J2N
         }
 
         [DoesNotReturn]
-        internal static void ThrowArgumentOutOfRange_IndexLengthString(int startIndex, int length) // J2N TODO: API - This should be converted to ArgumentExceptino becasue we are dealing with 2 arguemtns
+        internal static void ThrowArgumentOutOfRange_IndexLengthString(int startIndex, int length) // J2N TODO: API - This should be converted to ArgumentException becasue we are dealing with 2 arguemtns
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.length,
                                                     ExceptionResource.ArgumentOutOfRange_IndexLength);
@@ -247,6 +247,20 @@ namespace J2N
         {
             throw GetArgumentOutOfRangeException(value, argument,
                                                     ExceptionResource.ArgumentOutOfRange_IndexString);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_IndexLengthArray(int startIndex, int length) // J2N TODO: API - This should be converted to ArgumentException becasue we are dealing with 2 arguemtns
+        {
+            throw GetArgumentOutOfRangeException(ExceptionArgument.startIndex,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexLengthArray);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_IndexLengthArray(int startIndex, ExceptionArgument startArgument, int length) // J2N TODO: API - This should be converted to ArgumentException becasue we are dealing with 2 arguemtns
+        {
+            throw GetArgumentOutOfRangeException(startArgument,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexLengthArray);
         }
 
         [DoesNotReturn]
@@ -1329,6 +1343,8 @@ namespace J2N
                 //    return SR.ArgumentOutOfRange_IndexCountBuffer;
                 case ExceptionResource.ArgumentOutOfRange_IndexLength:
                     return SR.ArgumentOutOfRange_IndexLength;
+                case ExceptionResource.ArgumentOutOfRange_IndexLengthArray:
+                    return SR.ArgumentOutOfRange_IndexLengthArray;
                 case ExceptionResource.ArgumentOutOfRange_IndexString:
                     return SR.ArgumentOutOfRange_IndexString;
                 case ExceptionResource.ArgumentOutOfRange_Count:
@@ -1706,6 +1722,7 @@ namespace J2N
         //ArgumentOutOfRange_IndexCount,
         //ArgumentOutOfRange_IndexCountBuffer,
         ArgumentOutOfRange_IndexLength,
+        ArgumentOutOfRange_IndexLengthArray,
         ArgumentOutOfRange_IndexString,
         ArgumentOutOfRange_Count,
         ArgumentOutOfRange_Radix,

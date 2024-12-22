@@ -286,7 +286,7 @@ namespace J2N.IO
             if (offset < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (offset > buffer.Length - length)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLengthArray);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
 
             while (length > 0)
             {
