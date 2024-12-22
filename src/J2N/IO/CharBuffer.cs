@@ -63,7 +63,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(char[] array)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             return Wrap(array, 0, array.Length);
         }
 
@@ -89,7 +90,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(char[] array, int startIndex, int length)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -117,7 +119,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(string characterSequence)
         {
-            ThrowHelper.ThrowIfNull(characterSequence, ExceptionArgument.characterSequence);
+            if (characterSequence is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringAdapter?
         }
 
@@ -147,7 +150,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(string characterSequence, int startIndex, int length)
         {
-            ThrowHelper.ThrowIfNull(characterSequence, ExceptionArgument.characterSequence);
+            if (characterSequence is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -173,7 +177,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(StringBuilder characterSequence)
         {
-            ThrowHelper.ThrowIfNull(characterSequence, ExceptionArgument.characterSequence);
+            if (characterSequence is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringBuilderAdapter?
         }
 
@@ -203,7 +208,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(StringBuilder characterSequence, int startIndex, int length)
         {
-            ThrowHelper.ThrowIfNull(characterSequence, ExceptionArgument.characterSequence);
+            if (characterSequence is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -231,7 +237,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence)
         {
-            ThrowHelper.ThrowIfNull(characterSequence, ExceptionArgument.characterSequence);
+            if (characterSequence is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             return new CharSequenceAdapter(characterSequence);
         }
 
@@ -261,7 +268,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence, int startIndex, int length)
         {
-            ThrowHelper.ThrowIfNull(characterSequence, ExceptionArgument.characterSequence);
+            if (characterSequence is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -448,7 +456,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual CharBuffer Get(char[] destination)
         {
-            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             return Get(destination, 0, destination.Length);
         }
 
@@ -474,7 +483,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         public virtual CharBuffer Get(char[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
-            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (offset < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
@@ -598,7 +608,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public CharBuffer Put(char[] source)
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             return Put(source, 0, source.Length);
         }
 
@@ -625,7 +636,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public virtual CharBuffer Put(char[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (offset < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
@@ -657,7 +669,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public virtual CharBuffer Put(CharBuffer source)
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (ReferenceEquals(source, this))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
             if (source.Remaining > Remaining)
@@ -696,7 +709,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public CharBuffer Put(string source)
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             return Put(source, 0, source.Length);
         }
 
@@ -726,7 +740,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException"><paramref name="source"/> is <c>null</c>.</exception>
         public virtual CharBuffer Put(string source, int startIndex, int length)
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1078,7 +1093,8 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="target"/> is <c>null</c>.</exception>
         public virtual int Read(CharBuffer target)
         {
-            ThrowHelper.ThrowIfNull(target, ExceptionArgument.target);
+            if (target is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.target);
 
             int remaining = Remaining;
             if (target == this)

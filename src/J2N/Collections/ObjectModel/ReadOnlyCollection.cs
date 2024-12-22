@@ -78,9 +78,12 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlyCollection(ICollection<T> collection, StructuralEqualityComparer structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
-            ThrowHelper.ThrowIfNull(structuralEqualityComparer, ExceptionArgument.structuralEqualityComparer);
-            ThrowHelper.ThrowIfNull(toStringFormatProvider, ExceptionArgument.toStringFormatProvider);
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
+            if (toStringFormatProvider is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.toStringFormatProvider);
             this.collection = collection;
             this.structuralEqualityComparer = structuralEqualityComparer;
             this.toStringFormatProvider = toStringFormatProvider;
@@ -171,7 +174,8 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)

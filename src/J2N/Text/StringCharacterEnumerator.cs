@@ -274,7 +274,8 @@ namespace J2N.Text
         /// </exception>
         public void Reset(string value, int startIndex, int length, int position)
         {
-            ThrowHelper.ThrowIfNull(value, ExceptionArgument.value);
+            if (value is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)

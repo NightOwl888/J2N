@@ -47,24 +47,6 @@ namespace J2N
     [StackTraceHidden]
     internal class ThrowHelper
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void ThrowIfNull([NotNull] object? argument, ExceptionArgument paramName)
-        {
-            if (argument is null)
-            {
-                ThrowHelper.ThrowArgumentNullException(paramName);
-            }
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal static void ThrowIfNullOrNullValue([NotNull] ICharSequence? argument, ExceptionArgument paramName)
-        {
-            if (argument is null || !argument.HasValue)
-            {
-                ThrowHelper.ThrowArgumentNullException(paramName, ExceptionResource.ArgumentNull_NullOrNullValue);
-            }
-        }
-
         //[DoesNotReturn]
         //internal static void ThrowUnreachableException()
         //{

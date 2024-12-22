@@ -1301,7 +1301,8 @@ namespace J2N.Numerics
         /// <seealso cref="TryParse(string, NumberStyle, IFormatProvider?, out double)"/>
         public static double Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseDouble()
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
 
             return DotNetNumber.ParseDouble(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));

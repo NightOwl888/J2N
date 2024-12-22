@@ -101,7 +101,8 @@ namespace J2N.Text
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            ThrowHelper.ThrowIfNull(info, ExceptionArgument.info);
+            if (info is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
 
             info.AddValue(ErrorOffsetName, errorOffset);
 

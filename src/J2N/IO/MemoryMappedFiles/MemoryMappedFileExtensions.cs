@@ -91,7 +91,8 @@ namespace J2N.IO.MemoryMappedFiles
 
         internal static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, long size, MemoryMappedFileAccess access, int bufferOffset, int bufferSize)
         {
-            ThrowHelper.ThrowIfNull(memoryMappedFile, ExceptionArgument.memoryMappedFile);
+            if (memoryMappedFile is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.memoryMappedFile);
 
             switch (access)
             {

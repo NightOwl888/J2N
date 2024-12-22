@@ -70,7 +70,8 @@ namespace J2N.IO
 
         public override sealed Int64Buffer Get(long[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
-            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
 
             int len = destination.Length;
             if (offset < 0)

@@ -681,7 +681,8 @@ namespace J2N.Collections
         /// <exception cref="ArgumentNullException">If <paramref name="bitSet"/> is <c>null</c>.</exception>
         public virtual bool Intersects(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
-            ThrowHelper.ThrowIfNull(bitSet, ExceptionArgument.bitSet);
+            if (bitSet is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.bitSet);
 
             long[] bsBits = bitSet.bits;
             int length1 = actualArrayLength, length2 = bitSet.actualArrayLength;
@@ -720,7 +721,8 @@ namespace J2N.Collections
         /// <seealso cref="Xor(BitSet)"/>
         public virtual void And(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
-            ThrowHelper.ThrowIfNull(bitSet, ExceptionArgument.bitSet);
+            if (bitSet is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.bitSet);
 
             long[] bsBits = bitSet.bits;
             if (!needClear)
@@ -758,7 +760,8 @@ namespace J2N.Collections
         /// <exception cref="ArgumentNullException">If <paramref name="bitSet"/> is <c>null</c>.</exception>
         public virtual void AndNot(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
-            ThrowHelper.ThrowIfNull(bitSet, ExceptionArgument.bitSet);
+            if (bitSet is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.bitSet);
 
             long[] bsBits = bitSet.bits;
             if (!needClear)
@@ -789,7 +792,8 @@ namespace J2N.Collections
         /// <seealso cref="And(BitSet)"/>
         public virtual void Or(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
-            ThrowHelper.ThrowIfNull(bitSet, ExceptionArgument.bitSet);
+            if (bitSet is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.bitSet);
 
             int bsActualLen = bitSet.ActualArrayLength;
             if (bsActualLen > bits.Length)
@@ -830,7 +834,8 @@ namespace J2N.Collections
         /// <seealso cref="And(BitSet)"/>
         public virtual void Xor(BitSet bitSet) // TODO: API - Make a member of ISet<T>?
         {
-            ThrowHelper.ThrowIfNull(bitSet, ExceptionArgument.bitSet);
+            if (bitSet is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.bitSet);
 
             int bsActualLen = bitSet.ActualArrayLength;
             if (bsActualLen > bits.Length)

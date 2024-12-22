@@ -67,9 +67,12 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary, DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
-            ThrowHelper.ThrowIfNull(structuralEqualityComparer, ExceptionArgument.structuralEqualityComparer);
-            ThrowHelper.ThrowIfNull(toStringFormatProvider, ExceptionArgument.toStringFormatProvider);
+            if (dictionary is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
+            if (toStringFormatProvider is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.toStringFormatProvider);
             this.dictionary = dictionary;
             this.structuralEqualityComparer = structuralEqualityComparer;
             this.toStringFormatProvider = toStringFormatProvider;
@@ -303,7 +306,8 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
@@ -813,7 +817,10 @@ namespace J2N.Collections.ObjectModel
             // Abstracted away to avoid redundant implementations.
             internal static void CopyToNonGenericICollectionHelper<T>(ICollection<T> collection, Array array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                {
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+                }
 
                 if (array.Rank != 1)
                 {

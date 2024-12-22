@@ -26,7 +26,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="appendable"/> is <c>null</c>.</exception>
         public static T Append<T>(this T appendable, ReadOnlySpan<char> value) where T : IAppendable
         {
-            ThrowHelper.ThrowIfNull(appendable, ExceptionArgument.appendable);
+            if (appendable is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.appendable);
 
             if (appendable is ISpanAppendable spanAppendable)
             {

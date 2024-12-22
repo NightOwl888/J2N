@@ -295,7 +295,8 @@ namespace J2N.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T[] CopyOf<T>(T[] original, int newLength)
         {
-            ThrowHelper.ThrowIfNull(original, ExceptionArgument.original);
+            if (original is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.original);
             if (newLength < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(newLength, ExceptionArgument.newLength);
 

@@ -145,7 +145,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public SortedDictionary(IDictionary<TKey, TValue> dictionary, IComparer<TKey>? comparer)
         {
-            ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+            if (dictionary is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
 
             var keyValuePairComparer = new KeyValuePairComparer(comparer);
 
@@ -1231,7 +1232,8 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public KeyCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
                 _dictionary = dictionary;
             }
 
@@ -1302,7 +1304,8 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TKey[] array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (index < 0)
                     ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 if (array.Length - index < Count)
@@ -1313,7 +1316,8 @@ namespace J2N.Collections.Generic
 
             void ICollection.CopyTo(Array array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
                 if (array.GetLowerBound(0) != 0)
@@ -1558,7 +1562,8 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public ValueCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
                 _dictionary = dictionary;
             }
 
@@ -1630,7 +1635,8 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TValue[] array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (index < 0)
                     ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 if (array.Length - index < Count)
@@ -1641,7 +1647,10 @@ namespace J2N.Collections.Generic
 
             void ICollection.CopyTo(Array array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                {
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+                }
 
                 if (array.Rank != 1)
                 {

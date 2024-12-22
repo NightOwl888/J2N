@@ -287,7 +287,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException"><paramref name="input"/> is <c>null</c>.</exception>
         public static bool Contains(this string input, char value) // For compatibility with < .NET Standard 2.1
         {
-            ThrowHelper.ThrowIfNull(input, ExceptionArgument.input);
+            if (input is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.input);
 
             for (int i = 0; i < input.Length; i++)
             {
@@ -580,8 +581,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="encoding"/> is <c>null</c>.</exception>
         public static byte[] GetBytes(this string text, Encoding encoding)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(encoding, ExceptionArgument.encoding);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (encoding is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.encoding);
 
             return encoding.GetBytes(text);
         }
@@ -664,7 +667,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static int IndexOf(this string text, int codePoint, int startIndex) // KEEP IN SYNC WITH MemoryExtensions.IndexOf()
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             if (startIndex < 0)
             {
@@ -763,7 +767,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static int LastIndexOf(this string text, int codePoint) // KEEP IN SYNC WITH MemoryExtensions.LastIndexOf()
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             return LastIndexOf(text, codePoint, text.Length - 1);
         }
 
@@ -806,7 +811,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static int LastIndexOf(this string text, int codePoint, int startIndex) // KEEP IN SYNC WITH MemoryExtensions.LastIndexOf()
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             if (codePoint < Character.MinSupplementaryCodePoint)
             {
@@ -872,8 +878,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, ICharSequence other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNullOrNullValue(other, ExceptionArgument.other);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (other is null || !other.HasValue)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other, ExceptionResource.ArgumentNull_NullOrNullValue);
 
             if (other is StringBuilderCharSequence sb)
                 return RegionMatches(text, thisStartIndex, sb.Value!, otherStartIndex, length, comparisonType);
@@ -936,8 +944,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, char[] other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
                 return false;
@@ -995,8 +1005,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, StringBuilder other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
                 return false;
@@ -1078,8 +1090,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, string other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(other, ExceptionArgument.other);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
                 return false;
@@ -1136,7 +1150,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool RegionMatches(this string text, int thisStartIndex, ReadOnlySpan<char> other, int otherStartIndex, int length, StringComparison comparisonType) // KEEP OVERLOADS FOR ReadOnlySpan<char>, ICharSequence, char[], StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             if (other.Length - otherStartIndex < length || otherStartIndex < 0)
                 return false;
@@ -1186,7 +1201,8 @@ namespace J2N.Text
         /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
         public static string ReverseText(this string text)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (text.Length < 2) return text;
 
 #if FEATURE_STRING_CREATE
@@ -1253,8 +1269,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static bool StartsWith(this string text, string prefix, int startIndex, StringComparison comparisonType)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(prefix, ExceptionArgument.prefix);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (prefix is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.prefix);
 
             return RegionMatches(text, startIndex, prefix, 0, prefix.Length, comparisonType);
         }

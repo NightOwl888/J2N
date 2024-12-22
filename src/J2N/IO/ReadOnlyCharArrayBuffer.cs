@@ -91,7 +91,8 @@ namespace J2N.IO
 
         public override CharBuffer Put(string source, int startIndex, int length)
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)

@@ -97,7 +97,8 @@ namespace J2N.IO
 
         public override Int64Buffer Put(long[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (offset < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)

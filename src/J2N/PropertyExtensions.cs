@@ -66,8 +66,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static bool GetPropertyAsBoolean(this IDictionary<string, string> properties, string name, bool defaultValue)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(name, ExceptionArgument.name);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             return GetProperty(properties, name, defaultValue,
                 (stringValue) =>
@@ -123,8 +125,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static int GetPropertyAsInt32(this IDictionary<string, string> properties, string name, int defaultValue)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(name, ExceptionArgument.name);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             return GetProperty(properties, name, defaultValue,
                 (stringValue) =>
@@ -150,8 +154,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static int GetPropertyAsInt32(this IDictionary<string, string> properties, IFormatProvider provider, string name, int defaultValue)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(name, ExceptionArgument.name);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             return GetProperty(properties, name, defaultValue,
                 (stringValue) =>
@@ -163,7 +169,8 @@ namespace J2N
 
         private static T GetProperty<T>(IDictionary<string, string> properties, string key, T defaultValue, Func<string, T> conversionFunction)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
 
             if (properties.TryGetValue(key, out string? setting))
                 return string.IsNullOrEmpty(setting)
@@ -185,8 +192,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string? GetProperty(this IDictionary<string, string> properties, string name)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(name, ExceptionArgument.name);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             return properties.TryGetValue(name, out string? value) ? value : null;
         }
@@ -203,8 +212,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string GetProperty(this IDictionary<string, string> properties, string name, string defaultValue)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(name, ExceptionArgument.name);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             return properties.TryGetValue(name, out string? value) ? (!string.IsNullOrEmpty(value) ? value : defaultValue) : defaultValue;
         }
@@ -230,8 +241,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="input"/> is <c>null</c>.</exception>
         public static void LoadProperties(this IDictionary<string, string> properties, Stream input)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(input, ExceptionArgument.input);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (input is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.input);
 
             lock (properties.GetSyncRoot())
             {
@@ -400,8 +413,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="properties"/> or <paramref name="reader"/> is <c>null</c>.</exception>
         public static void LoadProperties(this IDictionary<string, string> properties, TextReader reader)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(reader, ExceptionArgument.reader);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (reader is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.reader);
 
             lock (properties.GetSyncRoot())
             {
@@ -460,8 +475,10 @@ namespace J2N
         /// <paramref name="output"/> is <c>null</c>.</exception>
         public static void SaveProperties(this IDictionary<string, string> properties, Stream output)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(output, ExceptionArgument.output);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (output is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.output);
 
             using var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), bufferSize: 1024);
             Store0(properties, sw, null, true);
@@ -519,9 +536,12 @@ namespace J2N
         /// <paramref name="output"/>, or <paramref name="comments"/> is <c>null</c>.</exception>
         public static void SaveProperties(this IDictionary<string, string> properties, Stream output, string comments)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(output, ExceptionArgument.output);
-            ThrowHelper.ThrowIfNull(comments, ExceptionArgument.comments);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (output is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.output);
+            if (comments is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comments);
 
             using var sw = new StreamWriter(output, Encoding.GetEncoding("iso-8859-1"), bufferSize: 1024);
             Store0(properties, sw, comments, true);
@@ -573,8 +593,10 @@ namespace J2N
         /// <paramref name="writer"/> is <c>null</c>.</exception>
         public static void SaveProperties(this IDictionary<string, string> properties, TextWriter writer)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(writer, ExceptionArgument.writer);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (writer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.writer);
 
             Store0(properties, writer,
                null,
@@ -637,9 +659,12 @@ namespace J2N
         /// <paramref name="writer"/>, or <paramref name="comments"/> is <c>null</c>.</exception>
         public static void SaveProperties(this IDictionary<string, string> properties, TextWriter writer, string comments)
         {
-            ThrowHelper.ThrowIfNull(properties, ExceptionArgument.properties);
-            ThrowHelper.ThrowIfNull(writer, ExceptionArgument.writer);
-            ThrowHelper.ThrowIfNull(comments, ExceptionArgument.comments);
+            if (properties is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.properties);
+            if (writer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.writer);
+            if (comments is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comments);
 
             Store0(properties, writer,
                comments,
@@ -738,7 +763,8 @@ namespace J2N
 
             public LineReader(TextReader reader)
             {
-                ThrowHelper.ThrowIfNull(reader, ExceptionArgument.reader);
+                if (reader is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.reader);
                 this.reader = reader;
                 inCharBuf = new char[8192];
             }

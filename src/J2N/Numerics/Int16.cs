@@ -230,7 +230,8 @@ namespace J2N.Numerics
         /// </exception>
         public static Int16 Decode(string s)
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
 
             int length = s.Length, i = 0;
             if (length == 0)
@@ -603,7 +604,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static short Parse(string s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -688,7 +690,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static short Parse(char[] s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -773,7 +776,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static short Parse(StringBuilder s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -858,7 +862,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static short Parse(ICharSequence s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNullOrNullValue(s, ExceptionArgument.s);
+            if (s is null || !s.HasValue)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s, ExceptionResource.ArgumentNull_NullOrNullValue);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1669,7 +1674,8 @@ namespace J2N.Numerics
         /// <seealso cref="GetInstance(string, IFormatProvider?)"/>
         public static short Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             return Parse(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
         }
 
@@ -2041,7 +2047,8 @@ namespace J2N.Numerics
         public static short Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseShort()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             return Parse(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }
 

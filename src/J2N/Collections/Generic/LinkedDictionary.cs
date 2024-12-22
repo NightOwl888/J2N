@@ -152,7 +152,8 @@ namespace J2N.Collections.Generic
         public LinkedDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer)
             : this(dictionary != null ? dictionary.Count : 0, comparer)
         {
-            ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+            if (dictionary is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
 
             foreach (var pair in dictionary)
                 Add(pair.Key, pair.Value);
@@ -165,7 +166,8 @@ namespace J2N.Collections.Generic
         public LinkedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer)
             : this(collection is ICollection<KeyValuePair<TKey, TValue>> col ? col.Count : 0, comparer)
         {
-            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             foreach (var pair in collection)
                 Add(pair.Key, pair.Value);
@@ -298,7 +300,8 @@ namespace J2N.Collections.Generic
         /// <remarks>This method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (index < 0 || index > array.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
             if (array.Length - index < Count)
@@ -341,7 +344,8 @@ namespace J2N.Collections.Generic
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             // Customized serialization for LinkedDictionary
-            ThrowHelper.ThrowIfNull(info, ExceptionArgument.info);
+            if (info is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
 
             int count = Count;
             info.AddValue(CountName, count);
@@ -956,7 +960,8 @@ namespace J2N.Collections.Generic
 
         void ICollection.CopyTo(Array array, int index)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
                 throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
@@ -1168,7 +1173,8 @@ namespace J2N.Collections.Generic
 
             internal Enumerator(LinkedDictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
             {
-                ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
                 this.dictionary = dictionary;
                 enumerator = dictionary.list.GetEnumerator();
                 _getEnumeratorRetType = getEnumeratorRetType;
@@ -1331,7 +1337,8 @@ namespace J2N.Collections.Generic
 
             public KeyCollection(LinkedDictionary<TKey, TValue> dictionary)
             {
-                ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
                 this.dictionary = dictionary;
             }
 
@@ -1362,7 +1369,8 @@ namespace J2N.Collections.Generic
 
             public void CopyTo(TKey[] array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (index < 0 || index > array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
@@ -1384,7 +1392,8 @@ namespace J2N.Collections.Generic
 
             void ICollection.CopyTo(Array array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
@@ -1434,7 +1443,8 @@ namespace J2N.Collections.Generic
 
                 public Enumerator(IEnumerator<KeyValuePair<TKey, TValue>> enumerator)
                 {
-                    ThrowHelper.ThrowIfNull(enumerator, ExceptionArgument.enumerator);
+                    if (enumerator is null)
+                        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.enumerator);
                     this.enumerator = enumerator;
                     notStartedOrEnded = true;
                 }
@@ -1494,7 +1504,8 @@ namespace J2N.Collections.Generic
 
             public ValueCollection(LinkedDictionary<TKey, TValue> dictionary)
             {
-                ThrowHelper.ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
                 this.dictionary = dictionary;
             }
 
@@ -1547,7 +1558,8 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TValue[] array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (index < 0 || index > array.Length)
                     throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
                 if (array.Length - index < Count)
@@ -1559,7 +1571,8 @@ namespace J2N.Collections.Generic
 
             void ICollection.CopyTo(Array array, int index)
             {
-                ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
                     throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
@@ -1619,7 +1632,8 @@ namespace J2N.Collections.Generic
 
                 public Enumerator(IEnumerator<KeyValuePair<TKey, TValue>> enumerator)
                 {
-                    ThrowHelper.ThrowIfNull(enumerator, ExceptionArgument.enumerator);
+                    if (enumerator is null)
+                        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.enumerator);
                     this.enumerator = enumerator;
                     notStartedOrEnded = true;
                 }

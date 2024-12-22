@@ -80,7 +80,8 @@ namespace J2N.IO
 
         public override sealed CharBuffer Get(char[] destination, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
         {
-            ThrowHelper.ThrowIfNull(destination, ExceptionArgument.destination);
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (offset < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
@@ -126,7 +127,8 @@ namespace J2N.IO
 
         public override sealed CharBuffer Put(char[] source, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (offset < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
@@ -141,7 +143,8 @@ namespace J2N.IO
 
         public override CharBuffer Put(string source, int startIndex, int length)
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)

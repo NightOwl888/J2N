@@ -428,7 +428,8 @@ namespace J2N.Numerics
         internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
         {
             Debug.Assert(value != null, "[Convert.DefaultToType]value!=null");
-            ThrowHelper.ThrowIfNull(targetType, ExceptionArgument.targetType);
+            if (targetType is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.targetType);
 
             if (ReferenceEquals(value!.GetType(), targetType))
             {

@@ -82,7 +82,8 @@ namespace J2N.Collections.Generic
         internal SetEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
-            ThrowHelper.ThrowIfNull(structuralEqualityComparer, ExceptionArgument.structuralEqualityComparer);
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
             this.structuralEqualityComparer = structuralEqualityComparer;
             LoadEqualityDelegates();
         }
@@ -236,7 +237,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public static bool Equals(ISet<T> set, object? other, IEqualityComparer comparer)
         {
-            ThrowHelper.ThrowIfNull(comparer, ExceptionArgument.comparer);
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
 
             if (!(other is ISet<T> otherSet))
                 return false;
@@ -264,7 +266,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public static int GetHashCode(ISet<T> set, IEqualityComparer comparer)
         {
-            ThrowHelper.ThrowIfNull(comparer, ExceptionArgument.comparer);
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
 
             if (TryGetSetEqualityComparer(comparer, out SetEqualityComparer<T>? setComparer))
                 return setComparer.GetHashCode(set);

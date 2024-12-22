@@ -58,7 +58,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static StringBuilder Append(this StringBuilder text, ICharSequence? charSequence)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             // For null values, this is a no-op
             if (charSequence is null || !charSequence.HasValue || charSequence.Length == 0)
@@ -151,7 +152,8 @@ namespace J2N.Text
         /// </exception>
         public static StringBuilder Append(this StringBuilder text, ICharSequence? charSequence, int startIndex, int charCount)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (charSequence is null && (startIndex != 0 || charCount != 0))
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.charSequence); // J2N: Unlike Java, we are throwing an exception (to match .NET Core 3) rather than writing "null" to the StringBuilder
             if (startIndex < 0)
@@ -256,7 +258,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static StringBuilder Append(this StringBuilder text, StringBuilder? charSequence)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (charSequence is null || charSequence.Length == 0)
                 return text;
 
@@ -320,7 +323,8 @@ namespace J2N.Text
         /// </exception>
         public static StringBuilder Append(this StringBuilder text, StringBuilder? charSequence, int startIndex, int charCount)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 #if FEATURE_STRINGBUILDER_APPEND_STRINGBUILDER
             return text.Append(charSequence, startIndex, charCount);
 #else
@@ -373,7 +377,8 @@ namespace J2N.Text
         // J2N: Added to cover the missing .NET API on older .NET target frameworks.
         public static StringBuilder Append(this StringBuilder text, ReadOnlySpan<char> charSequence)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (charSequence.Length == 0)
                 return text;
 
@@ -440,7 +445,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public static StringBuilder AppendCodePoint(this StringBuilder text, int codePoint)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (!Character.IsValidCodePoint(codePoint))
                 throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
 
@@ -843,7 +849,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static StringBuilder Delete(this StringBuilder text, int startIndex, int count)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (startIndex < 0 || startIndex > text.Length)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
             if (count < 0)
@@ -927,8 +934,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static int IndexOf(this StringBuilder text, string value, int startIndex, StringComparison comparisonType)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(value, ExceptionArgument.value);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (value is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             if (startIndex < 0 || startIndex > text.Length)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
 
@@ -1075,7 +1084,8 @@ namespace J2N.Text
         /// </exception>
         public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence? charSequence)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
 
@@ -1162,7 +1172,8 @@ namespace J2N.Text
         /// </exception>
         public static StringBuilder Insert(this StringBuilder text, int index, ICharSequence? charSequence, int startIndex, int charCount)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
@@ -1247,7 +1258,8 @@ namespace J2N.Text
         /// </exception>
         public static StringBuilder Insert(this StringBuilder text, int index, StringBuilder? charSequence)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (charSequence is null || charSequence.Length == 0)
@@ -1318,7 +1330,8 @@ namespace J2N.Text
         /// </exception>
         public static StringBuilder Insert(this StringBuilder text, int index, StringBuilder? charSequence, int startIndex, int charCount)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
@@ -1397,7 +1410,8 @@ namespace J2N.Text
         /// </exception>
         public static StringBuilder Insert(this StringBuilder text, int index, string? value, int startIndex, int charCount)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if ((uint)index > (uint)text.Length)
                 throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_Index);
             if (startIndex < 0)
@@ -1460,7 +1474,8 @@ namespace J2N.Text
         // J2N: Added to cover the missing .NET API on older .NET target frameworks.
         public static StringBuilder Insert(this StringBuilder text, int index, ReadOnlySpan<char> charSequence)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 #if FEATURE_STRINGBUILDER_INSERT_READONLYSPAN
             return text.Insert(index, charSequence);
 #else
@@ -1529,7 +1544,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public static StringBuilder InsertCodePoint(this StringBuilder text, int index, int codePoint)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (index < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (!Character.IsValidCodePoint(codePoint))
@@ -1578,7 +1594,8 @@ namespace J2N.Text
         ///// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
         //public static int LastIndexOf(this StringBuilder text, string value)
         //{
-        //    ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+        //    if (text is null)
+        //        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
         //    return LastIndexOf(text, value, text.Length, StringComparison.CurrentCulture);
         //}
 
@@ -1598,7 +1615,8 @@ namespace J2N.Text
         ///// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="value"/> is <c>null</c>.</exception>
         //public static int LastIndexOf(this StringBuilder text, string value, int startIndex)
         //{
-        //    ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+        //    if (text is null)
+        //        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
         //    return LastIndexOf(text, value, startIndex, StringComparison.CurrentCulture);
         //}
 
@@ -1614,7 +1632,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static int LastIndexOf(this StringBuilder text, string value, StringComparison comparisonType)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             return LastIndexOf(text, value, text.Length - 1, comparisonType);
         }
 
@@ -1632,8 +1651,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a <see cref="StringComparison"/> value.</exception>
         public static int LastIndexOf(this StringBuilder text, string value, int startIndex, StringComparison comparisonType)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(value, ExceptionArgument.value);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (value is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             if (startIndex < 0 || startIndex > text.Length)
                 throw new ArgumentOutOfRangeException(nameof(startIndex));
 
@@ -1822,8 +1843,10 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> or <paramref name="newValue"/> is <c>null</c>.</exception>
         public static StringBuilder Replace(this StringBuilder text, int startIndex, int count, string newValue)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
-            ThrowHelper.ThrowIfNull(newValue, ExceptionArgument.newValue);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
+            if (newValue is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.newValue);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (count < 0)
@@ -1937,7 +1960,8 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="text"/> is <c>null</c>.</exception>
         public static StringBuilder Replace(this StringBuilder text, int startIndex, int count, ReadOnlySpan<char> newValue)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (count < 0)
@@ -2060,7 +2084,8 @@ namespace J2N.Text
         /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
         public static StringBuilder Reverse(this StringBuilder text)
         {
-            ThrowHelper.ThrowIfNull(text, ExceptionArgument.text);
+            if (text is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
 
             int length = text.Length;
             if (length <= 1) return text;

@@ -236,7 +236,8 @@ namespace J2N.Numerics
         /// </exception>
         public static Int32 Decode(string s)
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
 
             int length = s.Length, i = 0;
             if (length == 0)
@@ -458,7 +459,8 @@ namespace J2N.Numerics
 
         internal static int ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -627,7 +629,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static int Parse(string s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -706,7 +709,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static int Parse(char[] s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -785,7 +789,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static int Parse(StringBuilder s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -864,7 +869,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static int Parse(ICharSequence s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
-            ThrowHelper.ThrowIfNullOrNullValue(s, ExceptionArgument.s);
+            if (s is null || !s.HasValue)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s, ExceptionResource.ArgumentNull_NullOrNullValue);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1508,7 +1514,8 @@ namespace J2N.Numerics
         /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         public static int Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             return DotNetNumber.ParseInt32(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
         }
 
@@ -1881,7 +1888,8 @@ namespace J2N.Numerics
         public static int Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            ThrowHelper.ThrowIfNull(s, ExceptionArgument.s);
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             return DotNetNumber.ParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }
 

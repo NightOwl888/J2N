@@ -152,7 +152,8 @@ namespace J2N.IO
         public StreamTokenizer(Stream input)
             : this() // Calls private constructor
         {
-            ThrowHelper.ThrowIfNull(input, ExceptionArgument.input);
+            if (input is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.input);
             inStream = input;
         }
 
@@ -172,7 +173,8 @@ namespace J2N.IO
         public StreamTokenizer(TextReader reader)
             : this() // Calls private constructor
         {
-            ThrowHelper.ThrowIfNull(reader, ExceptionArgument.reader);
+            if (reader is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.reader);
             inReader = reader;
         }
 

@@ -61,7 +61,8 @@ namespace J2N.Collections.Generic.Extensions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T[] ToArray<T>(this ICollection<T> source)
         {
-            ThrowHelper.ThrowIfNull(source, ExceptionArgument.source);
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
 
             int count = source.Count;
             if (count == 0)

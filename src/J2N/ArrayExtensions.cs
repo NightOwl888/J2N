@@ -34,7 +34,8 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="array"/> is <c>null</c>.</exception>
         public static void Fill<T>(this T[] array, T value)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
 
             for (int i = 0; i < array.Length; i++)
                 array[i] = value;
@@ -62,7 +63,8 @@ namespace J2N
         /// </exception>
         public static void Fill<T>(this T[] array, int startIndex, int length, T value)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)

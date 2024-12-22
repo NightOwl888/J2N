@@ -44,8 +44,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="target"/> or <paramref name="interfaceType"/> is <c>null</c>.</exception>
         public static bool ImplementsGenericInterface(this TypeInfo target, Type interfaceType)
         {
-            ThrowHelper.ThrowIfNull(target, ExceptionArgument.target);
-            ThrowHelper.ThrowIfNull(interfaceType, ExceptionArgument.interfaceType);
+            if (target is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.target);
+            if (interfaceType is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.interfaceType);
 
             return target.IsGenericType && target.GetGenericTypeDefinition().GetInterfaces().Any(
                 x => x.IsGenericType && interfaceType.IsAssignableFrom(x.GetGenericTypeDefinition())

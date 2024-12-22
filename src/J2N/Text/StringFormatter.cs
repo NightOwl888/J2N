@@ -87,7 +87,8 @@ namespace J2N.Text
         public StringFormatter(CultureInfo culture)
             : this(CultureType.CustomCulture)
         {
-            ThrowHelper.ThrowIfNull(culture, ExceptionArgument.culture);
+            if (culture is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.culture);
             this.culture = culture;
             this.cultureSymbol = this.culture.Name.ToCharArray(); // For deserialization
         }
@@ -104,7 +105,8 @@ namespace J2N.Text
         public StringFormatter(IFormatProvider formatProvider)
             : this(CultureType.IFormatProvider)
         {
-            ThrowHelper.ThrowIfNull(formatProvider, ExceptionArgument.formatProvider);
+            if (formatProvider is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.formatProvider);
             this.formatProvider = formatProvider;
         }
 

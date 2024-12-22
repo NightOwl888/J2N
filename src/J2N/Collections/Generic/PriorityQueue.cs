@@ -191,7 +191,8 @@ namespace J2N.Collections.Generic
         public PriorityQueue(IEnumerable<T> collection, IEqualityComparer<T>? equalityComparer)
 #pragma warning restore CS8618
         {
-            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             this.equalityComparer = equalityComparer ?? EqualityComparer<T>.Default;
 
@@ -232,7 +233,8 @@ namespace J2N.Collections.Generic
         public PriorityQueue(IEnumerable<T> collection, IComparer<T>? comparer, IEqualityComparer<T>? equalityComparer)
 #pragma warning restore CS8618
         {
-            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             this.equalityComparer = equalityComparer ?? EqualityComparer<T>.Default;
 
@@ -311,7 +313,9 @@ namespace J2N.Collections.Generic
         /// <remarks>This is similar to the Offer() method in the JDK.</remarks>
         public virtual bool Enqueue(T item) // J2N: renamed from Offer() to match .NET
         {
-            ThrowHelper.ThrowIfNull(item, ExceptionArgument.item);
+            if (item is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.item);
+
             GrowToSize(count + 1);
             elements[count] = item;
             SiftUp(count++);
@@ -433,7 +437,8 @@ namespace J2N.Collections.Generic
         /// This can only happen if <see cref="Enqueue(T)"/> is overridden and returns <c>false</c>.</exception>
         public virtual bool Add(T item)
         {
-            ThrowHelper.ThrowIfNull(item, ExceptionArgument.item);
+            if (item is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.item);
 
             if (Enqueue(item))
                 return true;
@@ -450,7 +455,8 @@ namespace J2N.Collections.Generic
 
             public Enumerator(PriorityQueue<T> priorityQueue)
             {
-                ThrowHelper.ThrowIfNull(priorityQueue, ExceptionArgument.priorityQueue);
+                if (priorityQueue is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.priorityQueue);
                 this.priorityQueue = priorityQueue;
                 currentIndex = -1;
                 current = default!;
@@ -624,7 +630,9 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentException"><paramref name="collection"/> is the same instance as this collection.</exception>
         public virtual bool AddRange(IEnumerable<T> collection)
         {
-            ThrowHelper.ThrowIfNull(collection, ExceptionArgument.collection);
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+
             if (ReferenceEquals(this, collection))
             {
                 throw new ArgumentException(SR.Argument_CollectionMustNotBeThis, nameof(collection));
@@ -689,7 +697,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual void CopyTo(T[] array, int arrayIndex)
         {
-            ThrowHelper.ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (arrayIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
 
