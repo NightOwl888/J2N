@@ -47,7 +47,7 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if ((uint)index >= (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
                 parent.DoSet(index + parentOffset, value);
                 _version = parent._version;
@@ -89,7 +89,7 @@ namespace J2N.Collections.Generic
                 CoModificationCheck();
                 // Note that insertions at the end are legal.
                 if ((uint)index > (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_ListInsert);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(index, ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_ListInsert);
 
                 parent.DoInsert(index + parentOffset, item);
                 _version = parent._version;
@@ -106,7 +106,7 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
                 // Note that insertions at the end are legal.
                 if ((uint)index > (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_ListInsert);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
 
                 int originalParentSize = parent._size;
                 try
@@ -152,9 +152,9 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if ((uint)startIndex > (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                    ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess(startIndex);
                 if (count < 0 || startIndex > size - count)
-                    throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+                    ThrowHelper.ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count(count);
 
                 int removed = parent.DoRemoveAll(startIndex + parentOffset, count, match);
                 _version = parent._version;
@@ -166,10 +166,8 @@ namespace J2N.Collections.Generic
             internal override void DoRemoveAt(int index)
             {
                 CoModificationCheck();
-                if (index < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 if ((uint)index >= (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_ListInsert);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
                 parent.DoRemoveAt(index + parentOffset);
                 _version = parent._version;
@@ -181,11 +179,11 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if (index < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (count < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
                 if (size - index < count)
-                    throw new ArgumentException(SR.Argument_InvalidOffLen);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);
 
                 parent.DoRemoveRange(index + parentOffset, count);
                 _version = parent._version;
@@ -197,11 +195,11 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if (index < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (count < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
                 if (size - index < count)
-                    throw new ArgumentException(SR.Argument_InvalidOffLen);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);
 
                 parent.DoReverse(index + parentOffset, count);
                 _version = parent._version;
@@ -211,9 +209,11 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if (index < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
+                if (count < 0)
+                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
                 if (size - index < count)
-                    throw new ArgumentException(SR.Argument_InvalidOffLen);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);
 
                 parent.DoSort(index + parentOffset, count, comparison);
                 _version = parent._version;
@@ -223,11 +223,11 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if (index < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (count < 0)
-                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_NeedNonNegNum);
                 if (size - index < count)
-                    throw new ArgumentException(SR.Argument_InvalidOffLen);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidOffLen);
 
                 parent.DoSort(index + parentOffset, count, comparer);
                 _version = parent._version;
@@ -236,7 +236,7 @@ namespace J2N.Collections.Generic
             internal override void CoModificationCheck()
             {
                 if (AncestralVersion != _version)
-                    throw new InvalidOperationException(SR.InvalidOperation_ViewFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_ViewFailedVersion);
             }
         }
     }

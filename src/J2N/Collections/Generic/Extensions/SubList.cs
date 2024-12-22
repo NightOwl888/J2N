@@ -45,7 +45,7 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if ((uint)index >= (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
                 return parent[index + parentOffset];
             }
@@ -53,7 +53,7 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if ((uint)index >= (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
                 parent[index + parentOffset] = value;
             }
@@ -155,7 +155,7 @@ namespace J2N.Collections.Generic
             CoModificationCheck();
             // Note that insertions at the end are legal.
             if ((uint)index > (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_ListInsert);
+                ThrowHelper.ThrowArgumentOutOfRangeException(index, ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_ListInsert);
 
             parent.Insert(index + parentOffset, item);
             size++;
@@ -181,7 +181,7 @@ namespace J2N.Collections.Generic
             if (index < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if ((uint)index >= (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
             size--;
             parent.RemoveAt(index + parentOffset);

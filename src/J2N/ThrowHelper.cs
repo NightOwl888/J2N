@@ -132,16 +132,9 @@ namespace J2N
         //}
 
         [DoesNotReturn]
-        internal static void ThrowArgumentOutOfRange_MustBeNonNegative(int value, ExceptionArgument argument)
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegative<T>(T actualValue, ExceptionArgument argument)
         {
-            throw GetArgumentOutOfRangeException(value, argument,
-                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative);
-        }
-
-        [DoesNotReturn]
-        internal static void ThrowArgumentOutOfRange_MustBeNonNegative(object? value, ExceptionArgument argument)
-        {
-            throw GetArgumentOutOfRangeException(value, argument,
+            throw GetArgumentOutOfRangeException(actualValue, argument,
                                                     ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative);
         }
 
@@ -174,9 +167,23 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_IndexMustBeLessException<T>(T actualValue)
+        {
+            throw GetArgumentOutOfRangeException(actualValue, ExceptionArgument.index,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexMustBeLess);
+        }
+
+        [DoesNotReturn]
         internal static void ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException()
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.index,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException<T>(T actualValue)
+        {
+            throw GetArgumentOutOfRangeException(actualValue, ExceptionArgument.index,
                                                     ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
         }
 
@@ -222,6 +229,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual<T>(T actualValue)
+        {
+            throw GetArgumentOutOfRangeException(actualValue, ExceptionArgument.startIndex,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
+        }
+
+        [DoesNotReturn]
         internal static void ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess()
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.startIndex,
@@ -229,9 +243,9 @@ namespace J2N
         }
 
         [DoesNotReturn]
-        internal static void ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess(int startIndex)
+        internal static void ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess<T>(T actualValue)
         {
-            throw GetArgumentOutOfRangeException(startIndex, ExceptionArgument.startIndex,
+            throw GetArgumentOutOfRangeException(actualValue, ExceptionArgument.startIndex,
                                                     ExceptionResource.ArgumentOutOfRange_IndexMustBeLess);
         }
 
@@ -267,6 +281,13 @@ namespace J2N
         internal static void ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count()
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.count,
+                                                    ExceptionResource.ArgumentOutOfRange_Count);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count<T>(T actualValue)
+        {
+            throw GetArgumentOutOfRangeException(actualValue, ExceptionArgument.count,
                                                     ExceptionResource.ArgumentOutOfRange_Count);
         }
 
@@ -469,9 +490,9 @@ namespace J2N
         }
 
         [DoesNotReturn]
-        internal static void ThrowArgumentOutOfRangeException(int value, ExceptionArgument argument, ExceptionResource resource)
+        internal static void ThrowArgumentOutOfRangeException<T>(T actualValue, ExceptionArgument argument, ExceptionResource resource)
         {
-            throw GetArgumentOutOfRangeException(value, argument, resource);
+            throw GetArgumentOutOfRangeException(actualValue, argument, resource);
         }
 
         //[DoesNotReturn]
@@ -1028,6 +1049,12 @@ namespace J2N
                     return "hashSize";
                 case ExceptionArgument.index:
                     return "index";
+                case ExceptionArgument.index1:
+                    return "index1";
+                case ExceptionArgument.index2:
+                    return "index2";
+                case ExceptionArgument.index3:
+                    return "index3";
                 case ExceptionArgument.info:
                     return "info";
                 case ExceptionArgument.input:
@@ -1257,12 +1284,7 @@ namespace J2N
                 //    return "keys";
                 //case ExceptionArgument.indices:
                 //    return "indices";
-                //case ExceptionArgument.index1:
-                //    return "index1";
-                //case ExceptionArgument.index2:
-                //    return "index2";
-                //case ExceptionArgument.index3:
-                //    return "index3";
+                
                 //case ExceptionArgument.endIndex:
                 //    return "endIndex";
                 //case ExceptionArgument.elementType:
@@ -1506,6 +1528,8 @@ namespace J2N
                     return SR.ArgumentOutOfRange_PositionMustBeLessThanLimit;
                 case ExceptionResource.ArgumentOutOfRange_LimitMustBeLessThanCapacity:
                     return SR.ArgumentOutOfRange_LimitMustBeLessThanCapacity;
+                case ExceptionResource.InvalidOperation_ViewFailedVersion:
+                    return SR.InvalidOperation_ViewFailedVersion;
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1551,6 +1575,9 @@ namespace J2N
         formatProvider,
         hashSize,
         index,
+        index1,
+        index2,
+        index3,
         info,
         input,
         interfaceType,
@@ -1679,9 +1706,7 @@ namespace J2N
         //len,
         //keys,
         //indices,
-        //index1,
-        //index2,
-        //index3,
+        
         //endIndex,
         //elementType,
        
@@ -1803,5 +1828,6 @@ namespace J2N
         //InvalidOperation_IncompatibleComparer,
         ArgumentOutOfRange_PositionMustBeLessThanLimit,
         ArgumentOutOfRange_LimitMustBeLessThanCapacity,
+        InvalidOperation_ViewFailedVersion,
     }
 }
