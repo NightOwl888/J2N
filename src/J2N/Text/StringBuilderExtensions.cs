@@ -165,7 +165,7 @@ namespace J2N.Text
                 return text;
 
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexCount);
 
             if (charSequence is CharArrayCharSequence charArrayCharSequence)
                 return text.Append(charArrayCharSequence.Value, startIndex, charCount);
@@ -337,7 +337,7 @@ namespace J2N.Text
             if (charSequence is null)
                 return text;
             if (startIndex > charSequence.Length - charCount) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(charCount), SR.ArgumentOutOfRange_IndexCount);
 
             int start = startIndex;
             int remainingCount = charCount;
@@ -2164,7 +2164,7 @@ namespace J2N.Text
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > text.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return text.ToString(startIndex, length).AsCharSequence();
         }

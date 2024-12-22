@@ -236,6 +236,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_IndexLengthString(int startIndex, int length) // J2N TODO: API - This should be converted to ArgumentExceptino becasue we are dealing with 2 arguemtns
+        {
+            throw GetArgumentOutOfRangeException(ExceptionArgument.length,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexLength);
+        }
+
+        [DoesNotReturn]
         internal static void ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count()
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.count,
@@ -1289,6 +1296,8 @@ namespace J2N
                 //    return SR.ArgumentOutOfRange_IndexCount;
                 //case ExceptionResource.ArgumentOutOfRange_IndexCountBuffer:
                 //    return SR.ArgumentOutOfRange_IndexCountBuffer;
+                case ExceptionResource.ArgumentOutOfRange_IndexLength:
+                    return SR.ArgumentOutOfRange_IndexLength;
                 case ExceptionResource.ArgumentOutOfRange_IndexString:
                     return SR.ArgumentOutOfRange_IndexString;
                 case ExceptionResource.ArgumentOutOfRange_Count:
@@ -1657,6 +1666,7 @@ namespace J2N
         ArgumentOutOfRange_IndexMustBeLess,
         //ArgumentOutOfRange_IndexCount,
         //ArgumentOutOfRange_IndexCountBuffer,
+        ArgumentOutOfRange_IndexLength,
         ArgumentOutOfRange_IndexString,
         ArgumentOutOfRange_Count,
         //ArgumentOutOfRange_Year,

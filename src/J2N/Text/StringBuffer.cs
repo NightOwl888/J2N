@@ -166,7 +166,7 @@ namespace J2N.Text
             else
             {
                 if (startIndex > value.Length - length)
-                    throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
                 stringValue = value.Subsequence(startIndex, length).ToString();
             }
 
@@ -232,7 +232,7 @@ namespace J2N.Text
             else
             {
                 if (startIndex > value.Length - length)
-                    throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
                 stringValue = value.ToString(startIndex, length);
             }
 
@@ -298,7 +298,7 @@ namespace J2N.Text
             else
             {
                 if (startIndex > value.Length - length)
-                    throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
                 stringValue = new string(value, startIndex, length);
             }
 
