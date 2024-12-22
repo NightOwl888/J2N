@@ -587,6 +587,12 @@ namespace J2N
             throw new ArgumentException(SR.Argument_IncompatibleArrayType);
         }
 
+        [DoesNotReturn]
+        internal static void ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument argument)
+        {
+            throw new ArgumentException(SR.Argument_IncompatibleArrayType, GetArgumentName(argument));
+        }
+
         //[DoesNotReturn]
         //internal static void ThrowArgumentException_InvalidHandle(string? paramName)
         //{

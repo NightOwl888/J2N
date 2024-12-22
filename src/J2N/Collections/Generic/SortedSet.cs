@@ -875,7 +875,7 @@ namespace J2N.Collections.Generic
                 object?[]? objects = array as object[];
                 if (objects == null)
                 {
-                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
                 }
 
                 try
@@ -888,7 +888,7 @@ namespace J2N.Collections.Generic
                 }
                 catch (ArrayTypeMismatchException)
                 {
-                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
                 }
             }
         }
