@@ -291,7 +291,8 @@ namespace J2N.Collections.Generic
                 TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
                 {
-                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key?.ToString() ?? "null"));
+                    ThrowHelper.ThrowKeyNotFoundException(key?.ToString() ?? "(null)");
+                    return default;
                 }
 
                 return node.Item.Value;
@@ -502,7 +503,7 @@ namespace J2N.Collections.Generic
             }
             else
             {
-				valueComparer ??= EqualityComparer<TValue>.Default;
+                valueComparer ??= EqualityComparer<TValue>.Default;
                 _set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node)
                 {
                     if (valueComparer.Equals(node.Item.Value, value))
@@ -749,10 +750,8 @@ namespace J2N.Collections.Generic
                 //}
 
                 // J2N: Only throw if the generic closing type is not nullable
-                if (!(default(TKey) == null) && key is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
-                if (!(default(TValue) == null) && value is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 try
                 {
@@ -763,12 +762,12 @@ namespace J2N.Collections.Generic
                     }
                     catch (InvalidCastException)
                     {
-                        throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                        ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                     }
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                    ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
                 }
             }
         }
@@ -781,10 +780,8 @@ namespace J2N.Collections.Generic
             //}
 
             // J2N: Only throw if the generic closing type is not nullable
-            if (!(default(TKey) == null) && key is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
-            if (!(default(TValue) == null) && value is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
             try
             {
@@ -796,12 +793,12 @@ namespace J2N.Collections.Generic
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                 }
             }
             catch (InvalidCastException)
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
             }
         }
 
@@ -1127,7 +1124,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     if (_getEnumeratorRetType == DictEntry)
@@ -1149,7 +1146,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return Current.Key;
@@ -1162,7 +1159,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return Current.Value;
@@ -1175,7 +1172,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return new DictionaryEntry(Current.Key!, Current.Value);
@@ -1361,12 +1358,12 @@ namespace J2N.Collections.Generic
 
             void ICollection<TKey>.Add(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             void ICollection<TKey>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             /// <summary>
@@ -1381,7 +1378,8 @@ namespace J2N.Collections.Generic
 
             bool ICollection<TKey>.Remove(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
+                return false;
             }
 
             bool ICollection.IsSynchronized => false;
@@ -1502,7 +1500,7 @@ namespace J2N.Collections.Generic
                     {
                         if (_dictEnum.NotStartedOrEnded)
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return Current;
@@ -1702,12 +1700,12 @@ namespace J2N.Collections.Generic
 
             void ICollection<TValue>.Add(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             void ICollection<TValue>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             bool ICollection<TValue>.Contains(TValue item)
@@ -1717,7 +1715,8 @@ namespace J2N.Collections.Generic
 
             bool ICollection<TValue>.Remove(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
+                return false;
             }
 
             bool ICollection.IsSynchronized
@@ -1845,7 +1844,7 @@ namespace J2N.Collections.Generic
                     {
                         if (_dictEnum.NotStartedOrEnded)
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return Current;
@@ -1941,7 +1940,7 @@ namespace J2N.Collections.Generic
             bool ret = base.AddIfNotPresent(item);
             if (!ret)
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, item));
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<T>(item);
             }
             return ret;
         }
