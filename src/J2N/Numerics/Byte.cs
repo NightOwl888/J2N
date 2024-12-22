@@ -252,7 +252,7 @@ namespace J2N.Numerics
             {
                 if (length == 1)
                 {
-                    throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                    ThrowHelper.ThrowFormatException(s);
                 }
                 firstDigit = s[++i];
             }
@@ -268,7 +268,7 @@ namespace J2N.Numerics
                 {
                     if (++i == length)
                     {
-                        throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                        ThrowHelper.ThrowFormatException(s);
                     }
                     @base = 16;
                 }
@@ -281,14 +281,14 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                    ThrowHelper.ThrowFormatException(s);
                 }
                 @base = 16;
             }
 
             // Special case: since StringToInt also checks for + or - at position i, we need to ensure the string passed doesn't include it.
             if (s[i] == '-' || s[i] == '+')
-                throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                ThrowHelper.ThrowFormatException(s);
 
             int r = ParseNumbers.StringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign, ref i, s.Length - i);
 
@@ -2101,7 +2101,7 @@ namespace J2N.Numerics
                 if (status == DotNetNumber.ParsingStatus.Overflow)
                     DotNetNumber.ThrowOverflowException(TypeCode.Byte);
                 if (status == DotNetNumber.ParsingStatus.Failed)
-                    DotNetNumber.ThrowFormatException(s.ToString());
+                    ThrowHelper.ThrowFormatException(s);
             }
 
             // J2N: Allow negative sbyte values for compatibility, even though we return byte rather than sbyte
@@ -2332,7 +2332,7 @@ namespace J2N.Numerics
                 if (status == DotNetNumber.ParsingStatus.Overflow)
                     DotNetNumber.ThrowOverflowException(TypeCode.Byte);
                 if (status == DotNetNumber.ParsingStatus.Failed)
-                    DotNetNumber.ThrowFormatException(s.ToString());
+                    ThrowHelper.ThrowFormatException(s);
             }
 
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue

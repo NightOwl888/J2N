@@ -211,7 +211,7 @@ namespace J2N.Numerics
                 if (status == ParsingStatus.Overflow)
                     ThrowOverflowException(TypeCode.Int32);
                 else
-                    ThrowFormatException(value.ToString());
+                    ThrowHelper.ThrowFormatException(value);
             }
 
             return result;
@@ -225,7 +225,7 @@ namespace J2N.Numerics
                 if (status == ParsingStatus.Overflow)
                     ThrowOverflowException(TypeCode.Int64);
                 else
-                    ThrowFormatException(value.ToString());
+                    ThrowHelper.ThrowFormatException(value);
             }
 
             return result;
@@ -2016,7 +2016,7 @@ namespace J2N.Numerics
         {
             if (!TryParseDouble(value, styles, info, out double result))
             {
-                ThrowFormatException(value.ToString());
+                ThrowHelper.ThrowFormatException(value.ToString());
             }
 
             return result;
@@ -2026,7 +2026,7 @@ namespace J2N.Numerics
         {
             if (!TryParseSingle(value, styles, info, out float result))
             {
-                ThrowFormatException(value.ToString());
+                ThrowHelper.ThrowFormatException(value);
             }
 
             return result;
@@ -2583,8 +2583,7 @@ namespace J2N.Numerics
         //[DoesNotReturn]
         //internal static void ThrowOverflowOrFormatException(ParsingStatus status, TypeCode type = 0) => throw GetException(status, type);
 
-        [DoesNotReturn]
-        internal static void ThrowFormatException(string value) => throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, value));
+        
 
         [DoesNotReturn]
         internal static void ThrowOverflowException(TypeCode type) => throw GetException(type);

@@ -739,6 +739,18 @@ namespace J2N
         //}
 
         [DoesNotReturn]
+        internal static void ThrowFormatException(ReadOnlySpan<char> value)
+        {
+            throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, value.ToString()));
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowFormatException(string value)
+        {
+            throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, value));
+        }
+
+        [DoesNotReturn]
         internal static void ThrowFormatException_BadFormatSpecifier()
         {
             throw new FormatException(SR.Argument_BadFormatSpecifier);

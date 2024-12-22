@@ -250,7 +250,7 @@ namespace J2N.Numerics
             {
                 if (length == 1)
                 {
-                    throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                    ThrowHelper.ThrowFormatException(s);
                 }
                 firstDigit = s[++i];
             }
@@ -266,7 +266,7 @@ namespace J2N.Numerics
                 {
                     if (++i == length)
                     {
-                        throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                        ThrowHelper.ThrowFormatException(s);
                     }
                     @base = 16;
                 }
@@ -279,14 +279,14 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                    ThrowHelper.ThrowFormatException(s);
                 }
                 @base = 16;
             }
 
             // Special case: since StringToInt also checks for + or - at position i, we need to ensure the string passed doesn't include it.
             if (s[i] == '-' || s[i] == '+')
-                throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                ThrowHelper.ThrowFormatException(s);
 
             int r = ParseNumbers.StringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight, sign, ref i, s.Length - i);
 
