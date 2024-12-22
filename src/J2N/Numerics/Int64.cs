@@ -949,7 +949,7 @@ namespace J2N.Numerics
             result = default;
 
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1017,7 +1017,7 @@ namespace J2N.Numerics
             if (s is null)
                 return false;
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1085,7 +1085,7 @@ namespace J2N.Numerics
             if (s is null)
                 return false;
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1153,7 +1153,7 @@ namespace J2N.Numerics
             if (s is null)
                 return false;
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1221,7 +1221,7 @@ namespace J2N.Numerics
             if (s is null || !s.HasValue)
                 return false;
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
@@ -1385,7 +1385,7 @@ namespace J2N.Numerics
         public static bool TryParse(ReadOnlySpan<char> s, int radix, out long result)
         {
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
 
             return ParseNumbers.TryStringToLong(s, radix, ParseNumbers.IsTight, out result);
         }
@@ -1427,7 +1427,7 @@ namespace J2N.Numerics
         public static bool TryParse(string? s, int radix, out long result)
         {
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
 
             if (s is null)
             {

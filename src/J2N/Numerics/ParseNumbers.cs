@@ -45,7 +45,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
@@ -130,7 +130,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
@@ -262,7 +262,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
@@ -358,7 +358,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
@@ -498,7 +498,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
@@ -584,7 +584,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
@@ -717,7 +717,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
@@ -815,7 +815,7 @@ namespace J2N.Numerics
 
             // Do some bounds checking.
             if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)

@@ -249,6 +249,13 @@ namespace J2N
                                                     ExceptionResource.ArgumentOutOfRange_Count);
         }
 
+        [DoesNotReturn]
+        internal static void ThrowRadixArgumentOutOfRange(int radix)
+        {
+            throw GetArgumentOutOfRangeException(radix, ExceptionArgument.radix,
+                                                    ExceptionResource.ArgumentOutOfRange_Radix);
+        }
+
         //[DoesNotReturn]
         //internal static void ThrowArgumentOutOfRange_Year()
         //{
@@ -1045,6 +1052,8 @@ namespace J2N
                     return "prefix";
                 case ExceptionArgument.properties:
                     return "properties";
+                case ExceptionArgument.radix:
+                    return "radix";
                 case ExceptionArgument.random:
                     return "random";
                 case ExceptionArgument.reader:
@@ -1302,6 +1311,8 @@ namespace J2N
                     return SR.ArgumentOutOfRange_IndexString;
                 case ExceptionResource.ArgumentOutOfRange_Count:
                     return SR.ArgumentOutOfRange_Count;
+                case ExceptionResource.ArgumentOutOfRange_Radix:
+                    return SR.ArgumentOutOfRange_Radix;
                 //case ExceptionResource.ArgumentOutOfRange_Year:
                 //    return SR.ArgumentOutOfRange_Year;
                 case ExceptionResource.Arg_ArrayPlusOffTooSmall:
@@ -1527,6 +1538,7 @@ namespace J2N
         priorityQueue,
         prefix,
         properties,
+        radix,
         random,
         reader,
         s,
@@ -1669,6 +1681,7 @@ namespace J2N
         ArgumentOutOfRange_IndexLength,
         ArgumentOutOfRange_IndexString,
         ArgumentOutOfRange_Count,
+        ArgumentOutOfRange_Radix,
         //ArgumentOutOfRange_Year,
         Arg_ArrayPlusOffTooSmall,
         //Arg_ByteArrayTooSmallForValue,
