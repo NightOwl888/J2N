@@ -642,6 +642,12 @@ namespace J2N
             throw new ArgumentException(SR.Argument_IncompatibleArrayType, GetArgumentName(argument));
         }
 
+        [DoesNotReturn]
+        internal static void ThrowArgumentException_Argument_InvalidCodePoint(int codePoint)
+        {
+            throw new ArgumentException(SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+        }
+
         //[DoesNotReturn]
         //internal static void ThrowArgumentException_InvalidHandle(string? paramName)
         //{

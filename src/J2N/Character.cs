@@ -1054,7 +1054,7 @@ namespace J2N
         public static int ToChars(int codePoint, Span<char> destination, int destinationIndex)
         {
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
             if ((uint)destinationIndex >= (uint)destination.Length)
                 throw new ArgumentOutOfRangeException(nameof(destinationIndex));
 
@@ -1102,7 +1102,7 @@ namespace J2N
         public static int ToChars(int codePoint, char[] destination, int destinationIndex)
         {
             if (!IsValidCodePoint(codePoint))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
             if (destination is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if ((uint)destinationIndex >= (uint)destination.Length)
@@ -1149,7 +1149,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -1187,7 +1187,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -1226,7 +1226,7 @@ namespace J2N
         {
             if (!IsValidCodePoint(codePoint))
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
             }
 
             if (IsSupplementaryCodePoint(codePoint))
@@ -2873,7 +2873,7 @@ namespace J2N
             if (culture is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.culture);
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -2912,7 +2912,7 @@ namespace J2N
         public static int ToLowerInvariant(int codePoint)
         {
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -2978,7 +2978,7 @@ namespace J2N
             if (culture is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.culture);
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -3017,7 +3017,7 @@ namespace J2N
         public static int ToUpperInvariant(int codePoint)
         {
             if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
             if (codePoint < MinSupplementaryCodePoint)
@@ -3297,7 +3297,7 @@ namespace J2N
             {
                 int codePoint = codePoints[i];
                 if (!IsValidCodePoint(codePoint))
-                    throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                    ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
                 if (codePoint < MinSupplementaryCodePoint) // BMP char
                 {

@@ -448,7 +448,7 @@ namespace J2N.Text
             if (text is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.text);
             if (!Character.IsValidCodePoint(codePoint))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             if (codePoint < Character.MinSupplementaryCodePoint)
             {
@@ -1552,7 +1552,7 @@ namespace J2N.Text
             if (index < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (!Character.IsValidCodePoint(codePoint))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+                ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             if (codePoint < Character.MinSupplementaryCodePoint)
             {
