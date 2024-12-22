@@ -1410,6 +1410,8 @@ namespace J2N
                     return SR.Serialization_MissingKeys;
                 //case ExceptionResource.Serialization_NullKey:
                 //    return SR.Serialization_NullKey;
+                case ExceptionResource.Serialization_MismatchedCount:
+                    return SR.Serialization_MismatchedCount;
                 case ExceptionResource.NotSupported_KeyCollectionSet:
                     return SR.NotSupported_KeyCollectionSet;
                 case ExceptionResource.NotSupported_ValueCollectionSet:
@@ -1773,6 +1775,7 @@ namespace J2N
         ArgumentOutOfRange_BiggerThanCollection,
         Serialization_MissingKeys,
         //Serialization_NullKey,
+        Serialization_MismatchedCount,
         NotSupported_KeyCollectionSet,
         NotSupported_ValueCollectionSet,
         //InvalidOperation_NullArray,
