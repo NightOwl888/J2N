@@ -824,12 +824,12 @@ namespace J2N.Collections.ObjectModel
 
                 if (array.Rank != 1)
                 {
-                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 }
 
                 if (array.GetLowerBound(0) != 0)
                 {
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 }
 
                 if (index < 0)
