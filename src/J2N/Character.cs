@@ -1055,27 +1055,19 @@ namespace J2N
         /// </exception>
         public static int ToChars(int codePoint, Span<char> destination, int destinationIndex)
         {
-            if (!IsValidCodePoint(codePoint))
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
             if ((uint)destinationIndex >= (uint)destination.Length)
-                throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(destinationIndex, ExceptionArgument.destinationIndex);
 
-            if (IsSupplementaryCodePoint(codePoint))
+            if (codePoint < MinSupplementaryCodePoint) // BMP char
             {
-                if (destinationIndex == destination.Length - 1)
-                    throw new ArgumentOutOfRangeException(nameof(destinationIndex));
-                // See RFC 2781, Section 2.1
-                // http://www.faqs.org/rfcs/rfc2781.html
-                int cpPrime = codePoint - 0x10000;
-                int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
-                int low = 0xDC00 | (cpPrime & 0x3FF);
-                destination[destinationIndex] = (char)high;
-                destination[destinationIndex + 1] = (char)low;
-                return 2;
+                destination[destinationIndex] = (char)codePoint;
+                return 1;
             }
 
-            destination[destinationIndex] = (char)codePoint;
-            return 1;
+            ToCharsSupplementary(codePoint, destination, destinationIndex);
+            return 2;
         }
 
         /// <summary>
@@ -1103,29 +1095,21 @@ namespace J2N
         /// </exception>
         public static int ToChars(int codePoint, char[] destination, int destinationIndex)
         {
-            if (!IsValidCodePoint(codePoint))
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
             if (destination is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if ((uint)destinationIndex >= (uint)destination.Length)
-                throw new ArgumentOutOfRangeException(nameof(destinationIndex));
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(destinationIndex, ExceptionArgument.destinationIndex);
 
-            if (IsSupplementaryCodePoint(codePoint))
+            if (codePoint < MinSupplementaryCodePoint) // BMP char
             {
-                if (destinationIndex == destination.Length - 1)
-                    throw new ArgumentOutOfRangeException(nameof(destinationIndex));
-                // See RFC 2781, Section 2.1
-                // http://www.faqs.org/rfcs/rfc2781.html
-                int cpPrime = codePoint - 0x10000;
-                int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
-                int low = 0xDC00 | (cpPrime & 0x3FF);
-                destination[destinationIndex] = (char)high;
-                destination[destinationIndex + 1] = (char)low;
-                return 2;
+                destination[destinationIndex] = (char)codePoint;
+                return 1;
             }
 
-            destination[destinationIndex] = (char)codePoint;
-            return 1;
+            ToCharsSupplementary(codePoint, destination, destinationIndex);
+            return 2;
         }
 
         /// <summary>
@@ -1149,19 +1133,16 @@ namespace J2N
         /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public static char[] ToChars(int codePoint)
         {
-            if (!IsValidCodePoint(codePoint))
-            {
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
+
+            if (codePoint < MinSupplementaryCodePoint) // BMP char
+            {
+                return new char[] { (char)codePoint };
             }
 
-            if (IsSupplementaryCodePoint(codePoint))
-            {
-                int cpPrime = codePoint - 0x10000;
-                int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
-                int low = 0xDC00 | (cpPrime & 0x3FF);
-                return new char[] { (char)high, (char)low };
-            }
-            return new char[] { (char)codePoint };
+            ToCharsSupplementary(codePoint, out char high, out char low);
+            return new char[] { high, low };
         }
 
         /// <summary>
@@ -1187,22 +1168,17 @@ namespace J2N
         /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public static ReadOnlySpan<char> ToChars(int codePoint, Span<char> buffer)
         {
-            if (!IsValidCodePoint(codePoint))
-            {
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
+
+            if (codePoint < MinSupplementaryCodePoint) // BMP char
+            {
+                buffer[0] = (char)codePoint;
+                return buffer.Slice(0, 1);
             }
 
-            if (IsSupplementaryCodePoint(codePoint))
-            {
-                int cpPrime = codePoint - 0x10000;
-                int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
-                int low = 0xDC00 | (cpPrime & 0x3FF);
-                buffer[0] = (char)high;
-                buffer[1] = (char)low;
-                return buffer.Slice(0, 2);
-            }
-            buffer[0] = (char)codePoint;
-            return buffer.Slice(0, 1);
+            ToCharsSupplementary(codePoint, buffer, destinationIndex: 0);
+            return buffer.Slice(0, 2);
         }
 
         /// <summary>
@@ -1226,21 +1202,37 @@ namespace J2N
         /// <exception cref="ArgumentException">If <paramref name="codePoint"/> is not a valid Unicode code point.</exception>
         public static int ToChars(int codePoint, out char high, out char low)
         {
-            if (!IsValidCodePoint(codePoint))
-            {
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
+
+            if (codePoint < MinSupplementaryCodePoint) // BMP char
+            {
+                high = (char)codePoint;
+                low = charNull;
+                return 1;
             }
 
-            if (IsSupplementaryCodePoint(codePoint))
-            {
-                int cpPrime = codePoint - 0x10000;
-                high = (char)(0xD800 | ((cpPrime >> 10) & 0x3FF));
-                low = (char)(0xDC00 | (cpPrime & 0x3FF));
-                return 2;
-            }
-            high = (char)codePoint;
-            low = charNull;
-            return 1;
+            ToCharsSupplementary(codePoint, out high, out low);
+            return 2;
+        }
+        private static void ToCharsSupplementary(int codePoint, Span<char> destination, int destinationIndex)
+        {
+            if (destinationIndex == destination.Length - 1)
+                ThrowHelper.ThrowArgumentOutOfRangeException(destinationIndex, ExceptionArgument.destinationIndex, ExceptionResource.ArgumentOutOfRange_OffsetOut);
+
+            // See RFC 2781, Section 2.1
+            // http://www.faqs.org/rfcs/rfc2781.html
+            int cpPrime = codePoint - 0x10000;
+            int high = 0xD800 | ((cpPrime >> 10) & 0x3FF);
+            int low = 0xDC00 | (cpPrime & 0x3FF);
+            destination[destinationIndex] = (char)high;
+            destination[destinationIndex + 1] = (char)low;
+        }
+        private static void ToCharsSupplementary(int codePoint, out char high, out char low)
+        {
+            int cpPrime = codePoint - 0x10000;
+            high = (char)(0xD800 | ((cpPrime >> 10) & 0x3FF));
+            low = (char)(0xDC00 | (cpPrime & 0x3FF));
         }
 
         /// <summary>
@@ -2021,7 +2013,7 @@ namespace J2N
                     return -1;
                 }
                 int value = -1;
-                if (codePoint < MinSupplementaryCodePoint)
+                if (codePoint < MinSupplementaryCodePoint) // BMP char
                 {
                     result = BinarySearchRange(digitKeys, (char)codePoint);
                     if (result >= 0 && codePoint <= digitValues[result * 2])
@@ -2298,7 +2290,7 @@ namespace J2N
         /// <returns>The <see cref="UnicodeCategory"/> of <paramref name="codePoint"/>.</returns>
         public static UnicodeCategory GetType(int codePoint)
         {
-            if (!IsValidCodePoint(codePoint))
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 return UnicodeCategory.OtherNotAssigned;
 #if FEATURE_CHARUNICODEINFO_GETUNICODECATEGORY_CODEPOINT
             return CharUnicodeInfo.GetUnicodeCategory(codePoint);
@@ -2866,7 +2858,7 @@ namespace J2N
         {
             if (culture is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.culture);
-            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
@@ -2905,7 +2897,7 @@ namespace J2N
         /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
         public static int ToLowerInvariant(int codePoint)
         {
-            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
@@ -2971,7 +2963,7 @@ namespace J2N
         {
             if (culture is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.culture);
-            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
@@ -3010,7 +3002,7 @@ namespace J2N
         /// <exception cref="ArgumentException">If the <paramref name="codePoint"/> is invalid.</exception>
         public static int ToUpperInvariant(int codePoint)
         {
-            if (codePoint < MinCodePoint && codePoint > MaxCodePoint)
+            if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                 ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
             // Fast path - convert using char if not a surrogate pair
@@ -3290,7 +3282,7 @@ namespace J2N
             for (int i = startIndex; i < end; i++)
             {
                 int codePoint = codePoints[i];
-                if (!IsValidCodePoint(codePoint))
+                if ((uint)codePoint > MaxCodePoint) // Optimized version of !IsValidCodePoint()
                     ThrowHelper.ThrowArgumentException_Argument_InvalidCodePoint(codePoint);
 
                 if (codePoint < MinSupplementaryCodePoint) // BMP char

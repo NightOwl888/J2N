@@ -174,6 +174,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_IndexMustBeLessException<T>(T actualValue, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(actualValue, argument,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexMustBeLess);
+        }
+
+        [DoesNotReturn]
         internal static void ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException()
         {
             throw GetArgumentOutOfRangeException(ExceptionArgument.index,
@@ -184,6 +191,13 @@ namespace J2N
         internal static void ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException<T>(T actualValue)
         {
             throw GetArgumentOutOfRangeException(actualValue, ExceptionArgument.index,
+                                                    ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException<T>(T actualValue, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(actualValue, argument,
                                                     ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
         }
 
