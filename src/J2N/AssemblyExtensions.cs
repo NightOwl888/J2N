@@ -24,7 +24,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-
 namespace J2N
 {
     /// <summary>
@@ -48,8 +47,8 @@ namespace J2N
         /// <exception cref="ArgumentNullException"><paramref name="assembly"/> is <c>null</c>.</exception>
         public static string GetManifestResourceBaseName(this Assembly assembly, string suffix)
         {
-            if (assembly == null)
-                throw new ArgumentNullException(nameof(assembly));
+            if (assembly is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.assembly);
 
             var resourceNames = assembly.GetManifestResourceNames();
             string assemblyName = assembly.GetName().Name!;
@@ -100,10 +99,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException"><paramref name="assembly"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static Stream? FindAndGetManifestResourceStream(this Assembly assembly, string name)
         {
-            if (assembly == null)
-                throw new ArgumentNullException(nameof(assembly));
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (assembly is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.assembly);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             string? resourceName = FindResource(assembly, name);
             if (string.IsNullOrEmpty(resourceName))
@@ -142,12 +141,12 @@ namespace J2N
         /// <seealso cref="TypeExtensions.FindAndGetManifestResourceStream(Type, string)"/>
         public static Stream? FindAndGetManifestResourceStream(this Assembly assembly, Type type, string name)
         {
-            if (assembly == null)
-                throw new ArgumentNullException(nameof(assembly));
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (assembly is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.assembly);
+            if (type is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.type);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             string? resourceName = FindResource(assembly, type, name);
             if (string.IsNullOrEmpty(resourceName))
@@ -186,10 +185,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException"><paramref name="assembly"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string? FindResource(this Assembly assembly, string name)
         {
-            if (assembly == null)
-                throw new ArgumentNullException(nameof(assembly));
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (assembly is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.assembly);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             var key = new TypeAndResource(null, name);
             return resourceCache.GetOrAdd(key, (key) =>
@@ -252,12 +251,12 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="assembly"/>, <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string? FindResource(this Assembly assembly, Type type, string name)
         {
-            if (assembly == null)
-                throw new ArgumentNullException(nameof(assembly));
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (assembly is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.assembly);
+            if (type is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.type);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             TypeAndResource key =  new TypeAndResource(type, name);
             return resourceCache.GetOrAdd(key, (key) =>

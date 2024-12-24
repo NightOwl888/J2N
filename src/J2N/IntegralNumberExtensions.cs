@@ -195,7 +195,7 @@ namespace J2N
         /// <returns>The string representation of <paramref name="value"/>.</returns>
         public static string ToString(this int value, int radix)
         {
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
                 radix = 10;
             if (value == 0)
                 return "0"; //$NON-NLS-1$
@@ -258,7 +258,7 @@ namespace J2N
         /// <returns>The string representation of <paramref name="value"/>.</returns>
         public static string ToString(this long value, int radix)
         {
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
                 radix = 10;
             if (value == 0)
                 return "0"; //$NON-NLS-1$

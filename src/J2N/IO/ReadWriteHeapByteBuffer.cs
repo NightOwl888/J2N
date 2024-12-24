@@ -18,11 +18,8 @@
 
 using System;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="HeapByteBuffer"/>, <see cref="ReadWriteHeapByteBuffer"/> and <see cref="ReadOnlyHeapByteBuffer"/> compose
     /// the implementation of array based byte buffers.
@@ -94,7 +91,7 @@ namespace J2N.IO
 
         public override ByteBuffer Put(int index, byte value)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -110,18 +107,16 @@ namespace J2N.IO
          * @see java.nio.ByteBuffer#put(byte[], int, int)
          */
 
-        public override ByteBuffer Put(byte[] source, int offset, int length)
+        public override ByteBuffer Put(byte[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
-            int len = source.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > source.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferOverflowException();
             if (IsReadOnly)
@@ -166,7 +161,7 @@ namespace J2N.IO
         public override ByteBuffer PutInt32(int index, int value)
         {
             int newIndex = index + 4;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             Store(index, value);
@@ -176,7 +171,7 @@ namespace J2N.IO
         public override ByteBuffer PutInt64(int index, long value)
         {
             int newIndex = index + 8;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             Store(index, value);
@@ -197,7 +192,7 @@ namespace J2N.IO
         public override ByteBuffer PutInt16(int index, short value)
         {
             int newIndex = index + 2;
-            if (index < 0 || newIndex > limit || newIndex < 0) // J2N: Added check for overflowing integer
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             Store(index, value);

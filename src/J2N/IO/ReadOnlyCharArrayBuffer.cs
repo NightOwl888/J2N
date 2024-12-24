@@ -19,11 +19,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="CharArrayBuffer"/>, <see cref="ReadWriteCharArrayBuffer"/> and <see cref="ReadOnlyCharArrayBuffer"/> compose
     /// the implementation of array based char buffers.
@@ -95,15 +92,13 @@ namespace J2N.IO
         public override CharBuffer Put(string source, int startIndex, int length)
         {
             if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
-            int len = source.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (startIndex > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (startIndex > source.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(startIndex, length);
 
             throw new ReadOnlyBufferException();
         }

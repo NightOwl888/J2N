@@ -27,8 +27,6 @@ using System.Text;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An immutable reference type that wraps the primitive <see cref="int"/> type.
     /// <para/>
@@ -239,7 +237,7 @@ namespace J2N.Numerics
         public static Int32 Decode(string s)
         {
             if (s is null)
-                throw new ArgumentNullException(nameof(s));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
 
             int length = s.Length, i = 0;
             if (length == 0)
@@ -252,7 +250,7 @@ namespace J2N.Numerics
             {
                 if (length == 1)
                 {
-                    throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                    ThrowHelper.ThrowFormatException(s);
                 }
                 firstDigit = s[++i];
             }
@@ -268,7 +266,7 @@ namespace J2N.Numerics
                 {
                     if (++i == length)
                     {
-                        throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                        ThrowHelper.ThrowFormatException(s);
                     }
                     @base = 16;
                 }
@@ -281,14 +279,14 @@ namespace J2N.Numerics
             {
                 if (++i == length)
                 {
-                    throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                    ThrowHelper.ThrowFormatException(s);
                 }
                 @base = 16;
             }
 
             // Special case: since StringToInt also checks for + or - at position i, we need to ensure the string passed doesn't include it.
             if (s[i] == '-' || s[i] == '+')
-                throw new FormatException(J2N.SR.Format(SR.Format_InvalidString, s));
+                ThrowHelper.ThrowFormatException(s);
 
             int r = ParseNumbers.StringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight, sign, ref i, s.Length - i);
 
@@ -462,13 +460,13 @@ namespace J2N.Numerics
         internal static int ParseUnsigned(string s, int startIndex, int length, int radix) // For testing purposes (actual method will eventually go on the UInt64 type when it is created)
         {
             if (s is null)
-                throw new ArgumentNullException(nameof(s));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsUnsigned, sign: 1, ref startIndex, length);
         }
@@ -554,11 +552,11 @@ namespace J2N.Numerics
         public static int Parse(ReadOnlySpan<char> s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
@@ -632,13 +630,13 @@ namespace J2N.Numerics
         public static int Parse(string s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
             if (s is null)
-                throw new ArgumentNullException(nameof(s));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
@@ -712,13 +710,13 @@ namespace J2N.Numerics
         public static int Parse(char[] s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
             if (s is null)
-                throw new ArgumentNullException(nameof(s));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
@@ -792,13 +790,13 @@ namespace J2N.Numerics
         public static int Parse(StringBuilder s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
             if (s is null)
-                throw new ArgumentNullException(nameof(s));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length);
         }
@@ -872,13 +870,13 @@ namespace J2N.Numerics
         public static int Parse(ICharSequence s, int startIndex, int length, int radix) // KEEP OVERLOADS FOR ICharSequence, char[], ReadOnlySpan<char>, StringBuilder, and string IN SYNC
         {
             if (s is null || !s.HasValue)
-                throw new ArgumentNullException(nameof(s));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s, ExceptionResource.ArgumentNull_NullOrNullValue);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             if (s is StringBuilderCharSequence stringBuilderCharSequence)
             {
@@ -953,14 +951,14 @@ namespace J2N.Numerics
         {
             result = default;
 
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
@@ -1021,14 +1019,14 @@ namespace J2N.Numerics
 
             if (s is null)
                 return false;
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.TryStringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
@@ -1089,14 +1087,14 @@ namespace J2N.Numerics
 
             if (s is null)
                 return false;
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
@@ -1157,14 +1155,14 @@ namespace J2N.Numerics
 
             if (s is null)
                 return false;
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             return ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight, sign: 1, ref startIndex, length, out result);
         }
@@ -1225,14 +1223,14 @@ namespace J2N.Numerics
 
             if (s is null || !s.HasValue)
                 return false;
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             if (s is StringBuilderCharSequence stringBuilderCharSequence)
             {
@@ -1383,8 +1381,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(ReadOnlySpan{char}, int)"/>
         public static bool TryParse(ReadOnlySpan<char> s, int radix, out int result) // J2N: Renamed from ParseInt()
         {
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
 
             return ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight, out result);
         }
@@ -1423,8 +1421,8 @@ namespace J2N.Numerics
         /// <seealso cref="Parse(string?, int)"/>
         public static bool TryParse(string? s, int radix, out int result) // J2N: Renamed from ParseInt()
         {
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
 
             if (s is null)
             {
@@ -1516,7 +1514,8 @@ namespace J2N.Numerics
         /// <seealso cref="GetInstance(string, NumberStyle, IFormatProvider?)"/>
         public static int Parse(string s, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
-            if (s == null) throw new ArgumentNullException(nameof(s));
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             return DotNetNumber.ParseInt32(s.AsSpan(), NumberStyle.Integer, NumberFormatInfo.GetInstance(provider));
         }
 
@@ -1889,7 +1888,8 @@ namespace J2N.Numerics
         public static int Parse(string s, NumberStyle style, IFormatProvider? provider) // J2N: Renamed from ParseInt()
         {
             NumberStyleExtensions.ValidateParseStyleInteger(style);
-            if (s == null) throw new ArgumentNullException(nameof(s));
+            if (s is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             return DotNetNumber.ParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }
 

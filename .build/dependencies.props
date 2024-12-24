@@ -1,5 +1,6 @@
 <Project>
   <PropertyGroup Label="NuGet Package Reference Versions">
+    <AigamoResXGeneratorPackageReferenceVersion>4.2.0</AigamoResXGeneratorPackageReferenceVersion>
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>1.0.3</MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>

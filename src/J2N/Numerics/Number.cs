@@ -24,8 +24,6 @@ using System.Runtime.CompilerServices;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// The abstract superclass of the classes which represent numeric base types
     /// (that is <see cref="System.Byte"/>, <see cref="System.SByte"/>, <see cref="System.Int16"/>, <see cref="System.Int32"/>,
@@ -426,14 +424,12 @@ namespace J2N.Numerics
 
 #endregion
 
-            // From System.Convert
-            internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
+        // From System.Convert
+        internal static object DefaultToType(IConvertible value, Type targetType, IFormatProvider? provider)
         {
             Debug.Assert(value != null, "[Convert.DefaultToType]value!=null");
-            if (targetType == null)
-            {
-                throw new ArgumentNullException(nameof(targetType));
-            }
+            if (targetType is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.targetType);
 
             if (ReferenceEquals(value!.GetType(), targetType))
             {

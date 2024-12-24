@@ -12,11 +12,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
 #endif
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     public partial class SortedSet<T>
     {
         /// <summary>
@@ -456,8 +453,8 @@ namespace J2N.Collections.Generic
             [EditorBrowsable(EditorBrowsableState.Never)]
             protected override void GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                if (info == null)
-                    throw new ArgumentNullException(nameof(info));
+                if (info is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
 
                 info.AddValue(maxName, _max, typeof(T));
                 info.AddValue(minName, _min, typeof(T));

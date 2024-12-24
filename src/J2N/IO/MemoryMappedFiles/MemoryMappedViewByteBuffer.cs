@@ -16,16 +16,12 @@
  */
 #endregion
 
-
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.MemoryMappedFiles;
 
-
 namespace J2N.IO.MemoryMappedFiles
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A byte buffer whose content is a memory-mapped region of a file.
     /// 
@@ -103,18 +99,16 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="BufferUnderflowException">If <paramref name="length"/> is greater than <see cref="Buffer.Remaining"/>.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
         // Implementation provided by Vincent Van Den Berghe: http://git.net/ml/general/2017-02/msg31639.html
-        public override ByteBuffer Get(byte[] destination, int offset, int length)
+        public override ByteBuffer Get(byte[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
-
-            int len = destination.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > destination.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferUnderflowException();
 
@@ -739,7 +733,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns></returns>
         internal int CheckIndex(int index)
         {
-            if ((index < 0) || (index >= limit))
+            if ((uint)index >= (uint)limit)
                 throw new ArgumentOutOfRangeException(nameof(index));
 
             return index;
@@ -748,7 +742,7 @@ namespace J2N.IO.MemoryMappedFiles
         internal int CheckIndex(int index, int numberOfBytes)
         {
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (numberOfBytes > limit - index)
                 throw new ArgumentOutOfRangeException(nameof(numberOfBytes));
 

@@ -18,11 +18,8 @@
 
 using System;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="CharArrayBuffer"/>, <see cref="ReadWriteCharArrayBuffer"/> and <see cref="ReadOnlyCharArrayBuffer"/> compose
     /// the implementation of array based char buffers.
@@ -66,25 +63,23 @@ namespace J2N.IO
 
         public override sealed char Get(int index)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
             return backingArray[offset + index];
         }
 
-        public override sealed CharBuffer Get(char[] destination, int offset, int length)
+        public override sealed CharBuffer Get(char[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
-
-            int len = destination.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > destination.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferUnderflowException();
 
@@ -100,11 +95,11 @@ namespace J2N.IO
         public override sealed CharBuffer Subsequence(int startIndex, int length)
         {
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > Remaining - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLengthBuffer);
 
             CharBuffer result = Duplicate();
             result.Limit = position + startIndex + length;

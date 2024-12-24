@@ -15,11 +15,8 @@ using System.Runtime.Serialization;
 #endif
 using SCG = System.Collections.Generic;
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted on the key.
     /// <para/>
@@ -148,10 +145,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public SortedDictionary(IDictionary<TKey, TValue> dictionary, IComparer<TKey>? comparer)
         {
-            if (dictionary == null)
-            {
-                throw new ArgumentNullException(nameof(dictionary));
-            }
+            if (dictionary is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
 
             var keyValuePairComparer = new KeyValuePairComparer(comparer);
 
@@ -296,7 +291,8 @@ namespace J2N.Collections.Generic
                 TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
                 {
-                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key?.ToString() ?? "null"));
+                    ThrowHelper.ThrowKeyNotFoundException(key?.ToString() ?? "(null)");
+                    return default;
                 }
 
                 return node.Item.Value;
@@ -507,7 +503,7 @@ namespace J2N.Collections.Generic
             }
             else
             {
-				valueComparer ??= EqualityComparer<TValue>.Default;
+                valueComparer ??= EqualityComparer<TValue>.Default;
                 _set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node)
                 {
                     if (valueComparer.Equals(node.Item.Value, value))
@@ -754,10 +750,8 @@ namespace J2N.Collections.Generic
                 //}
 
                 // J2N: Only throw if the generic closing type is not nullable
-                if (!(default(TKey) == null) && key is null)
-                    throw new ArgumentNullException(nameof(key));
-                if (!(default(TValue) == null) && value is null)
-                    throw new ArgumentNullException(nameof(value));
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 try
                 {
@@ -768,12 +762,12 @@ namespace J2N.Collections.Generic
                     }
                     catch (InvalidCastException)
                     {
-                        throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                        ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                     }
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                    ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
                 }
             }
         }
@@ -786,10 +780,8 @@ namespace J2N.Collections.Generic
             //}
 
             // J2N: Only throw if the generic closing type is not nullable
-            if (!(default(TKey) == null) && key is null)
-                throw new ArgumentNullException(nameof(key));
-            if (!(default(TValue) == null) && value is null)
-                throw new ArgumentNullException(nameof(value));
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
             try
             {
@@ -801,12 +793,12 @@ namespace J2N.Collections.Generic
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                 }
             }
             catch (InvalidCastException)
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
             }
         }
 
@@ -1132,7 +1124,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     if (_getEnumeratorRetType == DictEntry)
@@ -1154,7 +1146,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return Current.Key;
@@ -1167,7 +1159,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return Current.Value;
@@ -1180,7 +1172,7 @@ namespace J2N.Collections.Generic
                 {
                     if (NotStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return new DictionaryEntry(Current.Key!, Current.Value);
@@ -1237,7 +1229,9 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public KeyCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
+                _dictionary = dictionary;
             }
 
             /// <summary>
@@ -1307,28 +1301,28 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TKey[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (index < 0)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Key; return true; });
             }
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 if (index < 0)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 if (array.Length - index < _dictionary.Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 if (array is TKey[] keys)
                 {
@@ -1343,7 +1337,7 @@ namespace J2N.Collections.Generic
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
@@ -1364,12 +1358,12 @@ namespace J2N.Collections.Generic
 
             void ICollection<TKey>.Add(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             void ICollection<TKey>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             /// <summary>
@@ -1384,7 +1378,8 @@ namespace J2N.Collections.Generic
 
             bool ICollection<TKey>.Remove(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
+                return false;
             }
 
             bool ICollection.IsSynchronized => false;
@@ -1505,7 +1500,7 @@ namespace J2N.Collections.Generic
                     {
                         if (_dictEnum.NotStartedOrEnded)
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return Current;
@@ -1565,7 +1560,9 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public ValueCollection(SortedDictionary<TKey, TValue> dictionary)
             {
-                _dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
+                _dictionary = dictionary;
             }
 
             /// <summary>
@@ -1636,41 +1633,41 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TValue[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (index < 0)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Value; return true; });
             }
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
+                if (array is null)
                 {
-                    throw new ArgumentNullException(nameof(array));
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 }
 
                 if (array.Rank != 1)
                 {
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 }
 
                 if (array.GetLowerBound(0) != 0)
                 {
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 }
 
                 if (index < 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 }
 
                 if (array.Length - index < _dictionary.Count)
                 {
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 }
 
                 if (array is TValue[] values)
@@ -1686,7 +1683,7 @@ namespace J2N.Collections.Generic
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
@@ -1703,12 +1700,12 @@ namespace J2N.Collections.Generic
 
             void ICollection<TValue>.Add(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             void ICollection<TValue>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             bool ICollection<TValue>.Contains(TValue item)
@@ -1718,7 +1715,8 @@ namespace J2N.Collections.Generic
 
             bool ICollection<TValue>.Remove(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
+                return false;
             }
 
             bool ICollection.IsSynchronized
@@ -1846,7 +1844,7 @@ namespace J2N.Collections.Generic
                     {
                         if (_dictEnum.NotStartedOrEnded)
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return Current;
@@ -1942,7 +1940,7 @@ namespace J2N.Collections.Generic
             bool ret = base.AddIfNotPresent(item);
             if (!ret)
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, item));
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<T>(item);
             }
             return ret;
         }

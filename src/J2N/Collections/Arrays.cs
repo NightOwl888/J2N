@@ -19,10 +19,8 @@
 using J2N.Text;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Text;
-using SR2 = J2N.Resources.Strings;
 
 namespace J2N.Collections
 {
@@ -298,9 +296,9 @@ namespace J2N.Collections
         public static T[] CopyOf<T>(T[] original, int newLength)
         {
             if (original is null)
-                throw new ArgumentNullException(nameof(original));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.original);
             if (newLength < 0)
-                throw new ArgumentOutOfRangeException(nameof(newLength), newLength, SR2.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(newLength, ExceptionArgument.newLength);
 
             T[] newArray = new T[newLength];
 

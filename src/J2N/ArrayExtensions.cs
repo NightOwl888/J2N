@@ -17,8 +17,6 @@
 #endregion
 
 using System;
-using SR2 = J2N.Resources.Strings;
-
 
 namespace J2N
 {
@@ -37,7 +35,7 @@ namespace J2N
         public static void Fill<T>(this T[] array, T value)
         {
             if (array is null)
-                throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
 
             for (int i = 0; i < array.Length; i++)
                 array[i] = value;
@@ -66,13 +64,13 @@ namespace J2N
         public static void Fill<T>(this T[] array, int startIndex, int length, T value)
         {
             if (array is null)
-                throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > array.Length - length)
-                throw new ArgumentOutOfRangeException(nameof(length), SR2.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(startIndex, length);
 
             int end = startIndex + length;
             for (int i = startIndex; i < end; i++)

@@ -24,8 +24,6 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic.Extensions
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Extensions to the <see cref="IList{T}"/> interface.
     /// </summary>
@@ -93,7 +91,7 @@ namespace J2N.Collections.Generic.Extensions
         public static int BinarySearch<T>(this IList<T> list, T item, IComparer<T>? comparer)
         {
             if (list is null)
-                throw new ArgumentNullException(nameof(list));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
 
             comparer ??= J2N.Collections.Generic.Comparer<T>.Default;
 
@@ -147,11 +145,11 @@ namespace J2N.Collections.Generic.Extensions
         public static int BinarySearch<T>(this IList<T> list, int index, int count, T item, IComparer<T>? comparer)
         {
             if (list is null)
-                throw new ArgumentNullException(nameof(list));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if (list.Count - index < count)
                 throw new ArgumentException(SR.Argument_InvalidOffLen);
 
@@ -225,17 +223,17 @@ namespace J2N.Collections.Generic.Extensions
         public static void CopyTo<T>(this IList<T> source, int sourceIndex, IList<T> destination, int destinationIndex, int length)
         {
             if (source is null)
-                throw new ArgumentNullException(nameof(source));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (sourceIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(sourceIndex), sourceIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(sourceIndex, ExceptionArgument.sourceIndex);
             if (destinationIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(destinationIndex), destinationIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(destinationIndex, ExceptionArgument.destinationIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if ((source.Count - sourceIndex < length) || (destination.Count - destinationIndex < length))
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             for (int i = sourceIndex, j = 0; j < length; i++, j++)
             {
@@ -288,11 +286,11 @@ namespace J2N.Collections.Generic.Extensions
         public static IList<T> GetView<T>(this IList<T> list, int index, int count)
         {
             if (list is null)
-                throw new ArgumentNullException(nameof(list));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
             if (list.Count - index < count)
                 throw new ArgumentException(SR.Argument_InvalidOffLen);
 
@@ -329,7 +327,7 @@ namespace J2N.Collections.Generic.Extensions
         public static int RemoveAll<T>(this IList<T> list, Predicate<T> match)
         {
             if (list is null)
-                throw new ArgumentNullException(nameof(list));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             if (list is List<T> jcgList)
                 return jcgList.RemoveAll(match); // Delegate remaining guard clauses
             if (list is SCG.List<T> scgList)
@@ -368,7 +366,7 @@ namespace J2N.Collections.Generic.Extensions
         public static int RemoveAll<T>(this IList<T> list, int startIndex, int count, Predicate<T> match)
         {
             if (list is null)
-                throw new ArgumentNullException(nameof(list));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             if (list is List<T> jcgList)
                 return jcgList.DoRemoveAll(startIndex, count, match); // Delegate remaining guard clauses
 
@@ -379,11 +377,11 @@ namespace J2N.Collections.Generic.Extensions
         {
             int size = list.Count;
             if ((uint)startIndex > (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), startIndex, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLess(startIndex);
             if (count < 0 || startIndex > size - count)
-                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_Count);
+                ThrowHelper.ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count(count);
             if (match is null)
-                throw new ArgumentNullException(nameof(match));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);
 
             int freeIndex = startIndex;   // the first free slot in items array
             uint limit = (uint)startIndex + (uint)count; // The first index at the end of the range (this is outside of the valid range)
@@ -454,10 +452,10 @@ namespace J2N.Collections.Generic.Extensions
         // This shuffles the list in place without using LINQ, which is fast and efficient.
         public static void Shuffle<T>(this IList<T> list, System.Random random)
         {
-            if (list == null)
-                throw new ArgumentNullException(nameof(list));
-            if (random == null)
-                throw new ArgumentNullException(nameof(random));
+            if (list is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
+            if (random is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.random);
 
             for (int i = list.Count - 1; i > 0; i--)
             {
@@ -492,12 +490,12 @@ namespace J2N.Collections.Generic.Extensions
         public static void Swap<T>(this IList<T> list, int index1, int index2)
         {
             if (list is null)
-                throw new ArgumentNullException(nameof(list));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             int size = list.Count;
-            if (index1 < 0 || index1 >= size)
-                throw new ArgumentOutOfRangeException(nameof(index1), index1, SR.ArgumentOutOfRange_Index);
-            if (index2 < 0 || index2 >= size)
-                throw new ArgumentOutOfRangeException(nameof(index2), index2, SR.ArgumentOutOfRange_Index);
+            if ((uint)index1 >= (uint)size)
+                ThrowHelper.ThrowArgumentOutOfRangeException(index1, ExceptionArgument.index1, ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
+            if ((uint)index2 >= (uint)size)
+                ThrowHelper.ThrowArgumentOutOfRangeException(index2, ExceptionArgument.index2, ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
 
             T temp = list[index1];
             list[index1] = list[index2];

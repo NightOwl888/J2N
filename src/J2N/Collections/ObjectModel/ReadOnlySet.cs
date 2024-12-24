@@ -22,13 +22,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-
 
 namespace J2N.Collections.ObjectModel
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Provides the base class for a generic read-only set that is structurally equatable.
     /// </summary>
@@ -87,9 +83,15 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlySet(ISet<T> set, SetEqualityComparer<T> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            this.set = set ?? throw new ArgumentNullException(nameof(set));
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
-            this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
+            if (set is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.set);
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
+            if (toStringFormatProvider is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.toStringFormatProvider);
+            this.set = set;
+            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.toStringFormatProvider = toStringFormatProvider;
         }
 
         /// <summary>
@@ -396,16 +398,16 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
-                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
-                throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (array.Length - index < Count)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             T[]? tarray = array as T[];
             if (tarray != null)
@@ -417,7 +419,7 @@ namespace J2N.Collections.ObjectModel
                 object?[]? objects = array as object[];
                 if (objects == null)
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
 
                 try
@@ -427,7 +429,7 @@ namespace J2N.Collections.ObjectModel
                 }
                 catch (ArrayTypeMismatchException)
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
             }
         }

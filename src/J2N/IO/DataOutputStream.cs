@@ -22,8 +22,6 @@ using System.IO;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Wraps an existing <see cref="Stream"/> and writes typed data to it.
     /// Typically, this stream can be read in by <see cref="DataInputStream"/>. Types that can be
@@ -78,7 +76,9 @@ namespace J2N.IO
         /// <seealso cref="DataInputStream"/>
         public DataOutputStream(Stream output, bool leaveOpen)
         {
-            this.output = output ?? throw new ArgumentNullException(nameof(output));
+            if (output is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.output);
+            this.output = output;
             this.leaveOpen = leaveOpen;
             buff = new byte[8];
         }

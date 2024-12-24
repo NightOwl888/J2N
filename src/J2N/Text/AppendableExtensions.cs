@@ -27,7 +27,7 @@ namespace J2N.Text
         public static T Append<T>(this T appendable, ReadOnlySpan<char> value) where T : IAppendable
         {
             if (appendable is null)
-                throw new ArgumentNullException(nameof(appendable));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.appendable);
 
             if (appendable is ISpanAppendable spanAppendable)
             {

@@ -20,11 +20,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A buffer of <see cref="int"/>s.
     /// </summary>
@@ -47,8 +44,7 @@ namespace J2N.IO
         public static Int32Buffer Allocate(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             return new ReadWriteInt32ArrayBuffer(capacity);
         }
 
@@ -64,8 +60,7 @@ namespace J2N.IO
         public static Int32Buffer Wrap(int[] array)
         {
             if (array is null)
-                throw new ArgumentNullException(nameof(array));
-
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             return Wrap(array, 0, array.Length);
         }
 
@@ -91,13 +86,13 @@ namespace J2N.IO
         public static Int32Buffer Wrap(int[] array, int startIndex, int length)
         {
             if (array is null)
-                throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > array.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(startIndex, length);
 
             return new ReadWriteInt32ArrayBuffer(array)
             {
@@ -261,8 +256,7 @@ namespace J2N.IO
         public virtual Int32Buffer Get(int[] destination)
         {
             if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
-
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             return Get(destination, 0, destination.Length);
         }
 
@@ -286,18 +280,16 @@ namespace J2N.IO
         /// </exception>
         /// <exception cref="BufferUnderflowException">If <paramref name="length"/> is greater than <see cref="Buffer.Remaining"/>.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="destination"/> is <c>null</c>.</exception>
-        public virtual Int32Buffer Get(int[] destination, int offset, int length)
+        public virtual Int32Buffer Get(int[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
-
-            int len = destination.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > destination.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferUnderflowException();
 
@@ -405,8 +397,7 @@ namespace J2N.IO
         public Int32Buffer Put(int[] source)
         {
             if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             return Put(source, 0, source.Length);
         }
 
@@ -430,18 +421,16 @@ namespace J2N.IO
         /// </exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
-        public virtual Int32Buffer Put(int[] source, int offset, int length)
+        public virtual Int32Buffer Put(int[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
-            int len = source.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > source.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferOverflowException();
 
@@ -466,9 +455,9 @@ namespace J2N.IO
         public virtual Int32Buffer Put(Int32Buffer source)
         {
             if (source is null)
-                throw new ArgumentNullException(nameof(source));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (ReferenceEquals(source, this))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_MustNotBeThis, nameof(source), nameof(source)));
+                ThrowHelper.ThrowArgumentException_Argument_MustNotBeThis(ExceptionArgument.source);
             if (source.Remaining > Remaining)
                 throw new BufferOverflowException();
             if (IsReadOnly)

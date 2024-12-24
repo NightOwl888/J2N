@@ -146,7 +146,7 @@ namespace J2N.IO
         }
         public override double Get(int index)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -183,7 +183,7 @@ namespace J2N.IO
 
         public override DoubleBuffer Put(int index, double value)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }

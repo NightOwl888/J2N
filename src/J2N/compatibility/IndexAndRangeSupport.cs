@@ -29,6 +29,7 @@
 
 #if NETSTANDARD2_0 || NET45_OR_GREATER
 
+using J2N;
 using J2N.Collections;
 using System.Runtime.CompilerServices;
 
@@ -56,9 +57,7 @@ namespace System
         public Index(int value, bool fromEnd = false)
         {
             if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "value must be non-negative");
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(value, ExceptionArgument.value);
 
             if (fromEnd)
                 _value = ~value;
@@ -84,9 +83,7 @@ namespace System
         public static Index FromStart(int value)
         {
             if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "value must be non-negative");
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(value, ExceptionArgument.value);
 
             return new Index(value);
         }
@@ -97,9 +94,7 @@ namespace System
         public static Index FromEnd(int value)
         {
             if (value < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(value), "value must be non-negative");
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(value, ExceptionArgument.value);
 
             return new Index(~value);
         }

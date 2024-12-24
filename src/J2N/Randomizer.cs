@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using SR2 = J2N.Resources.Strings;
 
 namespace J2N
 {
@@ -156,8 +155,8 @@ namespace J2N
         /// <seealso cref="NextInt(int)"/>
         public override void NextBytes(byte[] buffer)
         {
-            if (buffer == null)
-                throw new ArgumentNullException(nameof(buffer));
+            if (buffer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.buffer);
 
             int rand = 0, count = 0, loop = 0;
             while (count < buffer.Length)
@@ -267,8 +266,7 @@ namespace J2N
         public override int Next(int maxValue)
         {
             if (maxValue <= 0)
-                throw new ArgumentOutOfRangeException(nameof(maxValue));
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
             return Next(0, maxValue);
         }
 
@@ -286,7 +284,7 @@ namespace J2N
         public override int Next(int minValue, int maxValue)
         {
             if (minValue > maxValue)
-                throw new ArgumentOutOfRangeException(nameof(minValue), SR.Format(SR2.Argument_MinMaxValue, nameof(minValue), nameof(maxValue)));
+                ThrowHelper.ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument.minValue, ExceptionArgument.maxValue);
 
             if ((maxValue & -maxValue) == maxValue)
             {

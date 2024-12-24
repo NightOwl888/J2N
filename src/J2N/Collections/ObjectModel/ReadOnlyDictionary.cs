@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.Generic;
-using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -10,13 +9,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
-using System.Reflection;
-
 
 namespace J2N.Collections.ObjectModel
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Provides the base class for a generic read-only collection of key/value pairs that is structurally equatable.
     /// </summary>
@@ -63,7 +58,7 @@ namespace J2N.Collections.ObjectModel
         /// <exception cref="ArgumentNullException"><paramref name="dictionary"/> is <c>null</c>.</exception>
         public ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary)
            : this(dictionary,
-                 TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable ? 
+                 TKeyIsValueTypeOrStringOrStructuralEquatable && TValueIsValueTypeOrStringOrStructuralEquatable ?
                     DictionaryEqualityComparer<TKey, TValue>.Default :
                     DictionaryEqualityComparer<TKey, TValue>.Aggressive,
                  StringFormatter.CurrentCulture)
@@ -72,9 +67,15 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlyDictionary(IDictionary<TKey, TValue> dictionary, DictionaryEqualityComparer<TKey, TValue> structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
-            this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
+            if (dictionary is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
+            if (toStringFormatProvider is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.toStringFormatProvider);
+            this.dictionary = dictionary;
+            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.toStringFormatProvider = toStringFormatProvider;
         }
 
         /// <summary>
@@ -305,16 +306,16 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
-                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
-                throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-            if (index < 0 || index > array.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
+            if ((uint)index > (uint)array.Length)
+                ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
             if (array.Length - index < Count)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             if (array is KeyValuePair<TKey, TValue>[] pairs)
             {
@@ -334,7 +335,7 @@ namespace J2N.Collections.ObjectModel
                     object[]? objects = array as object[];
                     if (objects == null)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
 
                     try
@@ -346,7 +347,7 @@ namespace J2N.Collections.ObjectModel
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType);
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
@@ -430,7 +431,7 @@ namespace J2N.Collections.ObjectModel
         public override int GetHashCode()
             => GetHashCode(structuralEqualityComparer);
 
-#endregion
+        #endregion
 
         #region ToString
 
@@ -567,7 +568,7 @@ namespace J2N.Collections.ObjectModel
                 this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
             }
 
-#region ICollection<T> Members
+            #region ICollection<T> Members
 
             void ICollection<TKey>.Add(TKey item)
             {
@@ -634,7 +635,7 @@ namespace J2N.Collections.ObjectModel
                 return collection.GetEnumerator();
             }
 
-#endregion
+            #endregion
 
             #region IEnumerable Members
 
@@ -816,29 +817,29 @@ namespace J2N.Collections.ObjectModel
             // Abstracted away to avoid redundant implementations.
             internal static void CopyToNonGenericICollectionHelper<T>(ICollection<T> collection, Array array, int index)
             {
-                if (array == null)
+                if (array is null)
                 {
-                    throw new ArgumentNullException(nameof(array));
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 }
 
                 if (array.Rank != 1)
                 {
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 }
 
                 if (array.GetLowerBound(0) != 0)
                 {
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 }
 
                 if (index < 0)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
                 }
 
                 if (array.Length - index < collection.Count)
                 {
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 }
 
                 // Easy out if the ICollection<T> implements the non-generic ICollection
@@ -864,7 +865,7 @@ namespace J2N.Collections.ObjectModel
                     Type sourceType = typeof(T);
                     if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
 
                     //
@@ -874,7 +875,7 @@ namespace J2N.Collections.ObjectModel
                     object?[]? objects = array as object?[];
                     if (objects == null)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
 
                     try
@@ -886,7 +887,7 @@ namespace J2N.Collections.ObjectModel
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }

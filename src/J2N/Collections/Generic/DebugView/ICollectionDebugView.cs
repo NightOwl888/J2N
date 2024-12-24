@@ -16,9 +16,7 @@ namespace J2N.Collections.Generic
         public ICollectionDebugView(ICollection<T> collection)
         {
             if (collection is null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             _collection = collection;
         }

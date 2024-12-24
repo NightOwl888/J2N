@@ -10,8 +10,6 @@ using MethodImplOptions = J2N.MethodImplOptions;
 
 namespace System.Collections
 {
-    using SR = J2N.Resources.Strings;
-
     internal static partial class HashHelpers
     {
         public const uint HashCollisionThreshold = 100;

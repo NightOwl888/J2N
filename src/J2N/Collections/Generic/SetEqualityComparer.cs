@@ -20,8 +20,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-
 
 namespace J2N.Collections.Generic
 {
@@ -84,7 +82,9 @@ namespace J2N.Collections.Generic
         internal SetEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
+            this.structuralEqualityComparer = structuralEqualityComparer;
             LoadEqualityDelegates();
         }
 
@@ -237,8 +237,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public static bool Equals(ISet<T> set, object? other, IEqualityComparer comparer)
         {
-            if (comparer == null)
-                throw new ArgumentNullException(nameof(comparer));
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
 
             if (!(other is ISet<T> otherSet))
                 return false;
@@ -266,8 +266,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public static int GetHashCode(ISet<T> set, IEqualityComparer comparer)
         {
-            if (comparer == null)
-                throw new ArgumentNullException(nameof(comparer));
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
 
             if (TryGetSetEqualityComparer(comparer, out SetEqualityComparer<T>? setComparer))
                 return setComparer.GetHashCode(set);

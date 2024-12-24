@@ -16,6 +16,13 @@
     <Description>J2N is a library that helps bridge the gap between .NET and Java. It provides components to assist with porting Java code to .NET, such as collections, adapters, and extensions. It contains some features from Java that also make it generally useful in any .NET application.</Description>
     <!--<PackageTags>$(PackageTags)</PackageTags>-->
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aigamo.ResXGenerator" Version="$(AigamoResXGeneratorPackageReferenceVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
   
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Microsoft.CSharp" Version="$(MicrosoftCSharpPackageReferenceVersion)" />
@@ -39,18 +46,14 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
+  <PropertyGroup Label="RESX Code Generation Settings">
+    <ResXGenerator_NullForgivingOperators>true</ResXGenerator_NullForgivingOperators>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <Compile Update="Resources\Strings.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Strings.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Update="Resources\Strings.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Strings.Designer.cs</LastGenOutput>
+    <EmbeddedResource Update="Resources\SR.resx">
+      <CustomToolNamespace>J2N</CustomToolNamespace>
+      <PartialClass>true</PartialClass>
     </EmbeddedResource>
   </ItemGroup>
 

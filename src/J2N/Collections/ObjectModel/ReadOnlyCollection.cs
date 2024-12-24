@@ -21,13 +21,9 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Reflection;
-
 
 namespace J2N.Collections.ObjectModel
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Provides the base class for a generic read-only collection that is structurally equatable.
     /// </summary>
@@ -82,9 +78,15 @@ namespace J2N.Collections.ObjectModel
 
         internal ReadOnlyCollection(ICollection<T> collection, StructuralEqualityComparer structuralEqualityComparer, IFormatProvider toStringFormatProvider)
         {
-            this.collection = collection ?? throw new ArgumentNullException(nameof(collection));
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
-            this.toStringFormatProvider = toStringFormatProvider ?? throw new ArgumentNullException(nameof(toStringFormatProvider));
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
+            if (toStringFormatProvider is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.toStringFormatProvider);
+            this.collection = collection;
+            this.structuralEqualityComparer = structuralEqualityComparer;
+            this.toStringFormatProvider = toStringFormatProvider;
         }
 
         /// <summary>
@@ -172,16 +174,16 @@ namespace J2N.Collections.ObjectModel
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
-                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
-                throw new ArgumentException(SR.Arg_NonZeroLowerBound);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (array.Length - index < Count)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             if (array is T[] items)
             {
@@ -202,20 +204,21 @@ namespace J2N.Collections.ObjectModel
 
                 if (!(targetType.IsAssignableFrom(sourceType) || sourceType.IsAssignableFrom(targetType)))
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
 
                 //
                 // We can't cast array of value type to object[], so we don't support 
                 // widening of primitive types here.
                 //
-                if (!(array is object?[] objects))
+                if (!(array is object?[]))
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
 
                 try
                 {
+                    object?[] objects = (object?[])array;
                     foreach (var item in collection)
                     {
                         objects[index++] = item;
@@ -223,7 +226,7 @@ namespace J2N.Collections.ObjectModel
                 }
                 catch (ArrayTypeMismatchException)
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
             }
         }

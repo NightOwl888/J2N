@@ -20,8 +20,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-
 
 namespace J2N.Collections.Generic
 {
@@ -92,7 +90,9 @@ namespace J2N.Collections.Generic
         internal DictionaryEqualityComparer(StructuralEqualityComparer structuralEqualityComparer)
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
-            this.structuralEqualityComparer = structuralEqualityComparer ?? throw new ArgumentNullException(nameof(structuralEqualityComparer));
+            if (structuralEqualityComparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.structuralEqualityComparer);
+            this.structuralEqualityComparer = structuralEqualityComparer;
             LoadEqualityDelegates();
         }
 
@@ -253,8 +253,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public static bool Equals(IDictionary<TKey, TValue> dictionary, object? other, IEqualityComparer comparer)
         {
-            if (comparer == null)
-                throw new ArgumentNullException(nameof(comparer));
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
 
             if (!(other is IDictionary<TKey, TValue> otherDictionary))
                 return false;
@@ -282,8 +282,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException">If <paramref name="comparer"/> is <c>null</c>.</exception>
         public static int GetHashCode(IDictionary<TKey, TValue> dictionary, IEqualityComparer comparer)
         {
-            if (comparer == null)
-                throw new ArgumentNullException(nameof(comparer));
+            if (comparer is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.comparer);
 
             if (TryGetDictionaryEqualityComparer(comparer, out DictionaryEqualityComparer<TKey, TValue>? dictionaryComparer))
                 return dictionaryComparer.GetHashCode(dictionary);

@@ -19,11 +19,8 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="CharArrayBuffer"/>, <see cref="ReadWriteCharArrayBuffer"/> and <see cref="ReadOnlyCharArrayBuffer"/> compose
     /// the implementation of array based char buffers.
@@ -90,7 +87,7 @@ namespace J2N.IO
 
         public override CharBuffer Put(int index, char value)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -98,18 +95,16 @@ namespace J2N.IO
             return this;
         }
 
-        public override CharBuffer Put(char[] source, int offset, int length)
+        public override CharBuffer Put(char[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (source is null)
-                throw new ArgumentNullException(nameof(source));
-
-            int len = source.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > source.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferOverflowException();
 

@@ -19,8 +19,6 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-
 
 namespace J2N
 {
@@ -42,10 +40,10 @@ namespace J2N
         /// <param name="interfaceType">The type of generic inteface to check.</param>
         /// <returns><c>true</c> if the type implements the generic interface; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="target"/> is <c>null</c>.</exception>
-        public static bool ImplementsGenericInterface(this Type target, Type interfaceType)
+        public static bool ImplementsGenericInterface(this Type target, Type interfaceType) // J2N TODO: API - This should throw an ArgumentNullException like TypeInfoExtensions when interfaceType is null
         {
             if (target is null)
-                throw new ArgumentNullException(nameof(target));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.target);
             if (interfaceType is null)
                 return false;
 
@@ -81,9 +79,9 @@ namespace J2N
         public static Stream? FindAndGetManifestResourceStream(this Type type, string name)
         {
             if (type is null)
-                throw new ArgumentNullException(nameof(type));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.type);
             if (name is null)
-                throw new ArgumentNullException(nameof(name));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             return AssemblyExtensions.FindAndGetManifestResourceStream(type.Assembly, type, name);
         }
@@ -113,10 +111,10 @@ namespace J2N
         /// <exception cref="ArgumentNullException">If <paramref name="type"/> or <paramref name="name"/> is <c>null</c>.</exception>
         public static string? FindResource(this Type type, string name)
         {
-            if (type == null)
-                throw new ArgumentNullException(nameof(type));
-            if (name == null)
-                throw new ArgumentNullException(nameof(name));
+            if (type is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.type);
+            if (name is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.name);
 
             return AssemblyExtensions.FindResource(type.Assembly, type, name);
         }

@@ -20,8 +20,6 @@ using System;
 
 namespace J2N.Collections
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Utilities for array equality of arrays and collections.
     /// </summary>

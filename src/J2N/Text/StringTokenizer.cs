@@ -22,8 +22,6 @@ using System.Collections.Generic;
 
 namespace J2N.Text
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// The <see cref="StringTokenizer"/> class allows an application to break a string
     /// into tokens by performing code point comparison. The <see cref="StringTokenizer"/>
@@ -146,8 +144,12 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="str"/> or <paramref name="delimiters"/> is <c>null</c>.</exception>
         public StringTokenizer(string str, string delimiters, bool returnDelimiters)
         {
-            this.str = str ?? throw new ArgumentNullException(nameof(str));
-            this.delimiters = delimiters ?? throw new ArgumentNullException(nameof(delimiters));
+            if (str is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.str);
+            if (delimiters is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.delimiters);
+            this.str = str;
+            this.delimiters = delimiters;
             this.returnDelimiters = returnDelimiters;
             this.position = 0;
             this.remainingTokens = CountTokens();
@@ -279,7 +281,9 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="delimiters"/> is <c>null</c>.</exception>
         public bool MoveNext(string delimiters)
         {
-            this.delimiters = delimiters ?? throw new ArgumentNullException(nameof(delimiters));
+            if (delimiters is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.delimiters);
+            this.delimiters = delimiters;
             this.remainingTokens = CountTokens();
 
             return MoveNext();

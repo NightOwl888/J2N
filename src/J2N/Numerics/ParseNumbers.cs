@@ -11,8 +11,6 @@ using System.Text;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>Methods for parsing numbers and strings.</summary>
     internal static class ParseNumbers
     {
@@ -46,18 +44,18 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -131,18 +129,18 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), radix, SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -263,14 +261,14 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 return false;
@@ -359,14 +357,14 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 return false;
@@ -499,18 +497,18 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -585,18 +583,18 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 throw new FormatException(SR.Format_EmptyInputString); // J2N specific - deviating from .NET which throws ArgumentOutOfRange here because of inconsistent behavior with long.Parse()
 
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(currPos, ExceptionArgument.currPos);
 
             int end = i + length; // Calculate the exclusive end index now, so we don't lose track when we increment i later
 
@@ -718,14 +716,14 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 return false;
@@ -816,14 +814,14 @@ namespace J2N.Numerics
             int i = currPos;
 
             // Do some bounds checking.
-            if (radix < Character.MinRadix || radix > Character.MaxRadix)
-                throw new ArgumentOutOfRangeException(nameof(radix), SR.ArgumentOutOfRange_Radix);
+            if ((uint)(radix - Character.MinRadix) > (Character.MaxRadix - Character.MinRadix)) // Check both bounds MinRadix and MaxRadix (inclusive) at once
+                ThrowHelper.ThrowRadixArgumentOutOfRange(radix);
             if (i < 0)
-                throw new ArgumentOutOfRangeException(nameof(currPos), currPos, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(i, ExceptionArgument.currPos);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), length, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (i > s.Length - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(i, length);
 
             if (length == 0)
                 return false;

@@ -39,8 +39,6 @@ using System.Text;
 namespace J2N.Collections.Generic
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted based on insertion order.
     /// <para/>
@@ -144,8 +142,7 @@ namespace J2N.Collections.Generic
         public LinkedDictionary(int capacity, IEqualityComparer<TKey>? comparer)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), capacity, SR.ArgumentOutOfRange_NeedNonNegNum);
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             dictionary = new Dictionary<TKey, LinkedListNode<KeyValuePair<TKey, TValue>>>(capacity, comparer ?? EqualityComparer<TKey>.Default);
             list = new LinkedList<KeyValuePair<TKey, TValue>>();
         }
@@ -155,8 +152,8 @@ namespace J2N.Collections.Generic
         public LinkedDictionary(IDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey>? comparer)
             : this(dictionary != null ? dictionary.Count : 0, comparer)
         {
-            if (dictionary == null)
-                throw new ArgumentNullException(nameof(dictionary));
+            if (dictionary is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
 
             foreach (var pair in dictionary)
                 Add(pair.Key, pair.Value);
@@ -169,8 +166,8 @@ namespace J2N.Collections.Generic
         public LinkedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer)
             : this(collection is ICollection<KeyValuePair<TKey, TValue>> col ? col.Count : 0, comparer)
         {
-            if (collection == null)
-                throw new ArgumentNullException(nameof(collection));
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             foreach (var pair in collection)
                 Add(pair.Key, pair.Value);
@@ -303,12 +300,12 @@ namespace J2N.Collections.Generic
         /// <remarks>This method is an <c>O(n)</c> operation, where <c>n</c> is <see cref="Count"/>.</remarks>
         public void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
-            if (index < 0 || index > array.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            if ((uint)index > (uint)array.Length)
+                ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
             if (array.Length - index < Count)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             foreach (var item in list)
                 array[index++] = item;
@@ -324,8 +321,7 @@ namespace J2N.Collections.Generic
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity), SR.ArgumentOutOfRange_NeedNonNegNum);
-
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             version++;
             return dictionary.EnsureCapacity(capacity);
         }
@@ -348,8 +344,8 @@ namespace J2N.Collections.Generic
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             // Customized serialization for LinkedDictionary
-            if (info == null)
-                throw new ArgumentNullException(nameof(info));
+            if (info is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
 
             int count = Count;
             info.AddValue(CountName, count);
@@ -388,7 +384,7 @@ namespace J2N.Collections.Generic
 
                 if (array == null)
                 {
-                    throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MissingKeys);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
                 }
 
                 for (int i = 0; i < array.Length; i++)
@@ -400,7 +396,7 @@ namespace J2N.Collections.Generic
             // Overwrite the version with the original after all of the items were added
             version = siInfo.GetInt32(VersionName);
             if (Count != count)
-                throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MismatchedCount);
+                ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MismatchedCount);
 
             siInfo = null;
         }
@@ -637,7 +633,8 @@ namespace J2N.Collections.Generic
             {
                 if (!dictionary.TryGetValue(key, out LinkedListNode<KeyValuePair<TKey, TValue>>? node))
                 {
-                    throw new KeyNotFoundException(J2N.SR.Format(SR.Arg_KeyNotFoundWithKey, key));
+                    ThrowHelper.ThrowKeyNotFoundException(key);
+                    return default;
                 }
 
                 if (node is null)
@@ -679,7 +676,7 @@ namespace J2N.Collections.Generic
         public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
             if (dictionary.ContainsKey(key))
-                throw new ArgumentException(J2N.SR.Format(SR.Argument_AddingDuplicate, key));
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(key);
             DoAdd(key, value);
         }
 
@@ -889,10 +886,8 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: Only throw if the generic closing type is not nullable
-                if (!(default(TKey) == null) && key is null)
-                    throw new ArgumentNullException(nameof(key));
-                if (!(default(TValue) == null) && value is null)
-                    throw new ArgumentNullException(nameof(value));
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 try
                 {
@@ -903,12 +898,12 @@ namespace J2N.Collections.Generic
                     }
                     catch (InvalidCastException)
                     {
-                        throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                        ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                     }
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                    ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
                 }
             }
         }
@@ -916,10 +911,8 @@ namespace J2N.Collections.Generic
         void IDictionary.Add(object? key, object? value)
         {
             // J2N: Only throw if the generic closing type is not nullable
-            if (!(default(TKey) == null) && key is null)
-                throw new ArgumentNullException(nameof(key));
-            if (!(default(TValue) == null) && value is null)
-                throw new ArgumentNullException(nameof(value));
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
             try
             {
@@ -931,12 +924,12 @@ namespace J2N.Collections.Generic
                 }
                 catch (InvalidCastException)
                 {
-                    throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
                 }
             }
             catch (InvalidCastException)
             {
-                throw new ArgumentException(J2N.SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
             }
         }
 
@@ -964,16 +957,16 @@ namespace J2N.Collections.Generic
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (array.Rank != 1)
-                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
             if (array.GetLowerBound(0) != 0)
-                throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-            if (index < 0 || index > array.Length)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
+            if ((uint)index > (uint)array.Length)
+                ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
             if (array.Length - index < Count)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             if (array is KeyValuePair<TKey, TValue>[] pairs)
             {
@@ -986,9 +979,10 @@ namespace J2N.Collections.Generic
             }
             else
             {
-                if (!(array is object[] objects))
+                object[]? objects = array as object[];
+                if (objects is null)
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
                 try
                 {
@@ -997,7 +991,7 @@ namespace J2N.Collections.Generic
                 }
                 catch (ArrayTypeMismatchException)
                 {
-                    throw new ArgumentException(SR.Argument_InvalidArrayType);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                 }
             }
         }
@@ -1177,7 +1171,9 @@ namespace J2N.Collections.Generic
 
             internal Enumerator(LinkedDictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
             {
-                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
+                this.dictionary = dictionary;
                 enumerator = dictionary.list.GetEnumerator();
                 _getEnumeratorRetType = getEnumeratorRetType;
                 notStartedOrEnded = true;
@@ -1208,7 +1204,7 @@ namespace J2N.Collections.Generic
             {
                 if (version != dictionary.version)
                 {
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 if (enumerator.MoveNext())
@@ -1256,6 +1252,11 @@ namespace J2N.Collections.Generic
 
             void IEnumerator.Reset()
             {
+                if (version != dictionary.version)
+                {
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
+                }
+
                 notStartedOrEnded = true;
                 enumerator.Reset();
             }
@@ -1266,7 +1267,7 @@ namespace J2N.Collections.Generic
                 {
                     if (notStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     if (_getEnumeratorRetType == DictEntry)
@@ -1290,7 +1291,7 @@ namespace J2N.Collections.Generic
                 {
                     if (notStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return Current.Key;
@@ -1303,7 +1304,7 @@ namespace J2N.Collections.Generic
                 {
                     if (notStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return Current.Value;
@@ -1316,7 +1317,7 @@ namespace J2N.Collections.Generic
                 {
                     if (notStartedOrEnded)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
 
                     return new DictionaryEntry(Current.Key!, Current.Value);
@@ -1339,7 +1340,9 @@ namespace J2N.Collections.Generic
 
             public KeyCollection(LinkedDictionary<TKey, TValue> dictionary)
             {
-                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
+                this.dictionary = dictionary;
             }
 
             public int Count => dictionary.Count;
@@ -1354,12 +1357,12 @@ namespace J2N.Collections.Generic
 
             void ICollection<TKey>.Add(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             void ICollection<TKey>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             bool ICollection<TKey>.Contains(TKey item)
@@ -1369,12 +1372,12 @@ namespace J2N.Collections.Generic
 
             public void CopyTo(TKey[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
-                if (index < 0 || index > array.Length)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+                if ((uint)index > (uint)array.Length)
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 foreach (var element in dictionary.list)
                     array[index++] = element.Key;
@@ -1387,21 +1390,22 @@ namespace J2N.Collections.Generic
 
             bool ICollection<TKey>.Remove(TKey item)
             {
-                throw new NotSupportedException(SR.NotSupported_KeyCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
+                return false;
             }
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-                if (index < 0 || index > array.Length)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
+                if ((uint)index > (uint)array.Length)
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 if (array is TKey[] keys)
                 {
@@ -1411,7 +1415,7 @@ namespace J2N.Collections.Generic
                 {
                     if (!(array is object?[]))
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                     try
                     {
@@ -1421,7 +1425,7 @@ namespace J2N.Collections.Generic
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
@@ -1443,7 +1447,9 @@ namespace J2N.Collections.Generic
 
                 public Enumerator(IEnumerator<KeyValuePair<TKey, TValue>> enumerator)
                 {
-                    this.enumerator = enumerator ?? throw new ArgumentNullException(nameof(enumerator));
+                    if (enumerator is null)
+                        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.enumerator);
+                    this.enumerator = enumerator;
                     notStartedOrEnded = true;
                 }
 
@@ -1455,7 +1461,7 @@ namespace J2N.Collections.Generic
                     {
                         if (notStartedOrEnded)
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return enumerator.Current.Key;
@@ -1502,7 +1508,9 @@ namespace J2N.Collections.Generic
 
             public ValueCollection(LinkedDictionary<TKey, TValue> dictionary)
             {
-                this.dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+                if (dictionary is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
+                this.dictionary = dictionary;
             }
 
             public int Count => dictionary.Count;
@@ -1515,12 +1523,12 @@ namespace J2N.Collections.Generic
 
             void ICollection<TValue>.Add(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             void ICollection<TValue>.Clear()
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             bool ICollection<TValue>.Contains(TValue item)
@@ -1554,12 +1562,12 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public void CopyTo(TValue[] array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
-                if (index < 0 || index > array.Length)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+                if ((uint)index > (uint)array.Length)
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 foreach (var element in dictionary.list)
                     array[index++] = element.Value;
@@ -1567,16 +1575,16 @@ namespace J2N.Collections.Generic
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                    throw new ArgumentNullException(nameof(array));
+                if (array is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if (array.Rank != 1)
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 if (array.GetLowerBound(0) != 0)
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound);
-                if (index < 0 || index > array.Length)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
+                if ((uint)index > (uint)array.Length)
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
                 if (array.Length - index < Count)
-                    throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
                 if (array is TValue[] values)
                 {
@@ -1586,7 +1594,7 @@ namespace J2N.Collections.Generic
                 {
                     if (!(array is object?[]))
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                     try
                     {
@@ -1596,7 +1604,7 @@ namespace J2N.Collections.Generic
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_InvalidArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
@@ -1608,7 +1616,8 @@ namespace J2N.Collections.Generic
 
             bool ICollection<TValue>.Remove(TValue item)
             {
-                throw new NotSupportedException(SR.NotSupported_ValueCollectionSet);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
+                return false;
             }
 
             IEnumerator IEnumerable.GetEnumerator()
@@ -1628,7 +1637,9 @@ namespace J2N.Collections.Generic
 
                 public Enumerator(IEnumerator<KeyValuePair<TKey, TValue>> enumerator)
                 {
-                    this.enumerator = enumerator ?? throw new ArgumentNullException(nameof(enumerator));
+                    if (enumerator is null)
+                        ThrowHelper.ThrowArgumentNullException(ExceptionArgument.enumerator);
+                    this.enumerator = enumerator;
                     notStartedOrEnded = true;
                 }
 
@@ -1640,7 +1651,7 @@ namespace J2N.Collections.Generic
                     {
                         if (notStartedOrEnded)
                         {
-                            throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                            ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                         }
 
                         return enumerator.Current.Value;

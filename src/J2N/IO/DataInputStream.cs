@@ -22,8 +22,6 @@ using System.IO;
 
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Wraps an existing <see cref="Stream"/> and reads typed data from it.
     /// Typically, this stream has been written by a DataOutputStream. Types that can
@@ -72,7 +70,9 @@ namespace J2N.IO
         /// <seealso cref="DataOutputStream"/>
         public DataInputStream(Stream input, bool leaveOpen)
         {
-            this.input = input ?? throw new ArgumentNullException(nameof(input));
+            if (input is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.input);
+            this.input = input;
             this.leaveOpen = leaveOpen;
             buff = new byte[8];
         }
@@ -275,18 +275,18 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="buffer"/> is <c>null</c>.</exception>
         /// <seealso cref="IDataOutput.Write(byte[])"/>
         /// <seealso cref="IDataOutput.Write(byte[], int, int)"/>
-        public void ReadFully(byte[] buffer, int offset, int length)
+        public void ReadFully(byte[] buffer, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
         {
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (length == 0)
                 return;
             if (buffer is null)
-                throw new ArgumentNullException(nameof(buffer));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.buffer);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (offset > buffer.Length - length)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
 
             while (length > 0)
             {
@@ -504,8 +504,7 @@ namespace J2N.IO
         public static string ReadUTF(IDataInput input)
         {
             if (input is null)
-                throw new ArgumentNullException(nameof(input));
-
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.input);
             return DecodeUTF(input.ReadUInt16(), input);
         }
 

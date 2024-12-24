@@ -23,11 +23,8 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// A <see cref="PriorityQueue{T}"/> holds elements on a priority heap, which orders the elements
     /// according to their natural order or according to the comparator specified at
@@ -106,10 +103,8 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than 1.</exception>
         public PriorityQueue(int capacity, IComparer<T>? comparer, IEqualityComparer<T>? equalityComparer)
         {
-            if (capacity < 1)
-            {
-                throw new ArgumentOutOfRangeException(SR.ArgumentOutOfRange_NeedCapacityAtLeast1);
-            }
+            if (capacity <= 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(capacity, ExceptionArgument.capacity);
 
             elements = NewElementArray(capacity);
             this.comparer = comparer;
@@ -196,10 +191,8 @@ namespace J2N.Collections.Generic
         public PriorityQueue(IEnumerable<T> collection, IEqualityComparer<T>? equalityComparer)
 #pragma warning restore CS8618
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             this.equalityComparer = equalityComparer ?? EqualityComparer<T>.Default;
 
@@ -240,10 +233,8 @@ namespace J2N.Collections.Generic
         public PriorityQueue(IEnumerable<T> collection, IComparer<T>? comparer, IEqualityComparer<T>? equalityComparer)
 #pragma warning restore CS8618
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             this.equalityComparer = equalityComparer ?? EqualityComparer<T>.Default;
 
@@ -313,19 +304,18 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Inserts the specified element into this priority queue.
         /// </summary>
-        /// <param name="item">The object to add to the <see cref="PriorityQueue{T}"/>.
-        /// The value can be <c>null</c> for reference types.</param>
+        /// <param name="item">The object to add to the <see cref="PriorityQueue{T}"/>.</param>
         /// <returns>always <c>true</c></returns>
+        /// <exception cref="ArgumentNullException"><paramref name="item"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">The specified element cannot be
         /// compared with elements currently in this priority queue
         /// according to the priority queue's ordering.</exception>
         /// <remarks>This is similar to the Offer() method in the JDK.</remarks>
-        public virtual bool Enqueue(T item) // J2N: renamed from Offer(), made item nullable to match .NET
+        public virtual bool Enqueue(T item) // J2N: renamed from Offer() to match .NET
         {
-            if (item == null)
-            {
-                throw new ArgumentNullException(nameof(item), SR.ArgumentNull_CollectionDoesntSupportNull);
-            }
+            if (item is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.item);
+
             GrowToSize(count + 1);
             elements[count] = item;
             SiftUp(count++);
@@ -447,8 +437,8 @@ namespace J2N.Collections.Generic
         /// This can only happen if <see cref="Enqueue(T)"/> is overridden and returns <c>false</c>.</exception>
         public virtual bool Add(T item)
         {
-            if (item == null)
-                throw new ArgumentNullException(nameof(item));
+            if (item is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.item);
 
             if (Enqueue(item))
                 return true;
@@ -465,7 +455,9 @@ namespace J2N.Collections.Generic
 
             public Enumerator(PriorityQueue<T> priorityQueue)
             {
-                this.priorityQueue = priorityQueue ?? throw new ArgumentNullException(nameof(priorityQueue));
+                if (priorityQueue is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.priorityQueue);
+                this.priorityQueue = priorityQueue;
                 currentIndex = -1;
                 current = default!;
             }
@@ -638,10 +630,9 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentException"><paramref name="collection"/> is the same instance as this collection.</exception>
         public virtual bool AddRange(IEnumerable<T> collection)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+
             if (ReferenceEquals(this, collection))
             {
                 throw new ArgumentException(SR.Argument_CollectionMustNotBeThis, nameof(collection));
@@ -706,16 +697,16 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual void CopyTo(T[] array, int arrayIndex)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
 
             // will array, starting at arrayIndex, be able to hold elements? Note: not
             // checking arrayIndex >= array.Length (consistency with list of allowing
             // count of 0; subsequent check takes care of the rest)
             if (arrayIndex > array.Length || count > array.Length - arrayIndex)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             int size = this.count;
             if (array.Length < size)

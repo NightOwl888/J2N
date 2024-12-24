@@ -18,11 +18,8 @@
 
 using System;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// This class wraps a byte buffer to be a <see cref="char"/> buffer.
     /// </summary>
@@ -157,7 +154,7 @@ namespace J2N.IO
 
         public override char Get(int index)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -194,7 +191,7 @@ namespace J2N.IO
 
         public override CharBuffer Put(int index, char value)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
@@ -214,11 +211,11 @@ namespace J2N.IO
         public override CharBuffer Subsequence(int startIndex, int length)
         {
             if (startIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(startIndex), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > Remaining - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLengthBuffer);
 
             CharBuffer result = Duplicate();
             result.Limit = position + startIndex + length;

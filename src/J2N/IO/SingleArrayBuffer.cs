@@ -18,11 +18,8 @@
 
 using System;
 
-
 namespace J2N.IO
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// <see cref="SingleArrayBuffer"/>, <see cref="ReadWriteSingleArrayBuffer"/>, and <see cref="ReadOnlySingleArrayBuffer"/>
     /// compose the implementation of array based float buffers.
@@ -64,25 +61,23 @@ namespace J2N.IO
 
         public override sealed float Get(int index)
         {
-            if (index < 0 || index >= limit)
+            if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
             return backingArray[offset + index];
         }
 
-        public override sealed SingleBuffer Get(float[] destination, int offset, int length)
+        public override sealed SingleBuffer Get(float[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (destination is null)
-                throw new ArgumentNullException(nameof(destination));
-
-            int len = destination.Length;
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (offset < 0)
-                throw new ArgumentOutOfRangeException(nameof(offset), SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(offset, ExceptionArgument.offset);
             if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_NeedNonNegNum);
-            if (offset > len - length) // Checks for int overflow
-                throw new ArgumentOutOfRangeException(nameof(length), SR.ArgumentOutOfRange_IndexLength);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+            if (offset > destination.Length - length) // Checks for int overflow
+                ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferUnderflowException();
 

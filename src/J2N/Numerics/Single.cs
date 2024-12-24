@@ -30,8 +30,6 @@ using JCG = J2N.Collections.Generic;
 
 namespace J2N.Numerics
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An immutable reference type that wraps the primitive <see cref="float"/> type.
     /// <para/>
@@ -1311,7 +1309,7 @@ namespace J2N.Numerics
         public static float Parse(string s, NumberStyle style, IFormatProvider? provider)
         {
             if (s is null)
-                throw new ArgumentNullException(nameof(s));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
             return DotNetNumber.ParseSingle(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
         }

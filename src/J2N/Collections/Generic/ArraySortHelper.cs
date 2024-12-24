@@ -10,8 +10,6 @@ using System.Runtime.InteropServices;
 
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     internal partial class ArraySortHelper<T>
     {
         // From Array class

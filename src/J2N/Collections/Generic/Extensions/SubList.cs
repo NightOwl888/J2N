@@ -12,8 +12,6 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Wraps an <see cref="IList{T}"/> as a sublist. However, since we can make no assumptions as to the internals of the
     /// passed in implementation, we make a best effort to throw an exception when the Count property of the list has changed
@@ -47,7 +45,7 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if ((uint)index >= (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
                 return parent[index + parentOffset];
             }
@@ -55,7 +53,7 @@ namespace J2N.Collections.Generic
             {
                 CoModificationCheck();
                 if ((uint)index >= (uint)size)
-                    throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
                 parent[index + parentOffset] = value;
             }
@@ -93,11 +91,11 @@ namespace J2N.Collections.Generic
         {
             CoModificationCheck();
             if (array is null)
-                throw new ArgumentNullException(nameof(array));
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if (array.Length - index < size)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             if (size == 0)
                 return;
@@ -157,7 +155,7 @@ namespace J2N.Collections.Generic
             CoModificationCheck();
             // Note that insertions at the end are legal.
             if ((uint)index > (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_ListInsert);
+                ThrowHelper.ThrowArgumentOutOfRangeException(index, ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_ListInsert);
 
             parent.Insert(index + parentOffset, item);
             size++;
@@ -181,9 +179,9 @@ namespace J2N.Collections.Generic
         {
             CoModificationCheck();
             if (index < 0)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
             if ((uint)index >= (uint)size)
-                throw new ArgumentOutOfRangeException(nameof(index), index, SR.ArgumentOutOfRange_Index);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException(index);
 
             size--;
             parent.RemoveAt(index + parentOffset);

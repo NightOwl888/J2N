@@ -11,8 +11,6 @@ using System.Runtime.InteropServices;
 
 namespace J2N.Runtime.InteropServices
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// An unsafe class that provides a set of methods to access the underlying data representations of collections.
     /// </summary>
@@ -96,12 +94,9 @@ namespace J2N.Runtime.InteropServices
         public static void SetCount<T>(List<T> list, int count)
         {
             if (list is null)
-                throw new ArgumentNullException(nameof(list));
-
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.list);
             if (count < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(count), SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             list._version++;
 

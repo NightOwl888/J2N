@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 
 namespace J2N
 {
-    internal partial class SR
+    internal static partial class SR
     {
         // This method is used to decide if we need to append the exception message parameters to the message when calling SR.Format.
         // by default it returns false.
@@ -28,7 +28,7 @@ namespace J2N
             string? resourceString = null;
             try
             {
-                resourceString = Resources.Strings.ResourceManager.GetString(resourceKey);
+                resourceString = ResourceManager.GetString(resourceKey);
             }
 #pragma warning disable CA1031 // Do not catch general exception types
             catch (MissingManifestResourceException) { }

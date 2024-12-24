@@ -13,11 +13,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SCG = System.Collections.Generic;
 
-
 namespace J2N.Collections.Generic
 {
-    using SR = J2N.Resources.Strings;
-
     /// <summary>
     /// Represents a set of values.
     /// <para/>
@@ -184,10 +181,8 @@ namespace J2N.Collections.Generic
         public HashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
             : this(comparer)
         {
-            if (collection == null)
-            {
-                throw new ArgumentNullException(nameof(collection));
-            }
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             var otherAsHashSet = collection as HashSet<T>;
             if (otherAsHashSet != null && AreEqualityComparersEqual(this, otherAsHashSet))
@@ -270,9 +265,7 @@ namespace J2N.Collections.Generic
             : this(comparer)
         {
             if (capacity < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(capacity));
-            }
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
             if (capacity > 0)
             {
@@ -395,7 +388,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -418,7 +411,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -439,7 +432,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -516,7 +509,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -538,7 +531,7 @@ namespace J2N.Collections.Generic
                             if (collisionCount >= slots.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
-                                throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
                             collisionCount++;
                         }
@@ -559,7 +552,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -709,10 +702,8 @@ namespace J2N.Collections.Generic
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            if (info == null)
-            {
-                throw new ArgumentNullException(nameof(info));
-            }
+            if (info is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
 
             info.AddValue(VersionName, _version); // need to serialize version to avoid problems with serializing while enumerating
             info.AddValue(EqualityComparerName, _comparer ?? EqualityComparer<T>.Default, typeof(IEqualityComparer<T>));
@@ -769,7 +760,7 @@ namespace J2N.Collections.Generic
 
                 if (array == null)
                 {
-                    throw new System.Runtime.Serialization.SerializationException(SR.Serialization_MissingKeys);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
                 }
 
                 // there are no resizes here because we already set capacity above
@@ -852,10 +843,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void UnionWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             foreach (T item in other)
             {
@@ -878,10 +867,8 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public void IntersectWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // intersection of anything with empty set is empty set, so return if count is 0
             if (_count == 0)
@@ -930,10 +917,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void ExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // this is already the empty set; return
             if (_count == 0)
@@ -970,10 +955,8 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // if set is empty, then symmetric difference is other
             if (_count == 0)
@@ -1027,10 +1010,8 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // The empty set is a subset of any set
             if (_count == 0)
@@ -1089,10 +1070,8 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // no set is a proper subset of itself.
             if (other == this)
@@ -1153,10 +1132,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool IsSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // a set is always a superset of itself
             if (other == this)
@@ -1208,10 +1185,8 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // the empty set isn't a proper superset of any set.
             if (_count == 0)
@@ -1263,10 +1238,8 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool Overlaps(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             if (_count == 0)
             {
@@ -1308,10 +1281,8 @@ namespace J2N.Collections.Generic
         [System.Security.SecurityCritical]
         public bool SetEquals(IEnumerable<T> other)
         {
-            if (other == null)
-            {
-                throw new ArgumentNullException(nameof(other));
-            }
+            if (other is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
             // a set is equal to itself
             if (other == this)
@@ -1394,22 +1365,22 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void CopyTo(T[] array, int arrayIndex, int count)
         {
-            if (array == null)
-                throw new ArgumentNullException(nameof(array));
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
 
             // check array index valid index into array
             if (arrayIndex < 0)
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
 
             // also throw if count less than 0
             if (count < 0)
-                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             // will array, starting at arrayIndex, be able to hold elements? Note: not
             // checking arrayIndex >= array.Length (consistency with list of allowing
             // count of 0; subsequent check takes care of the rest)
             if (arrayIndex > array.Length || count > array.Length - arrayIndex)
-                throw new ArgumentException(SR.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             int numCopied = 0;
             for (int i = 0; i < _lastIndex && numCopied < count; i++)
@@ -1432,10 +1403,8 @@ namespace J2N.Collections.Generic
         /// <see cref="HashSet{T}"/> collection.</returns>
         public int RemoveWhere(Predicate<T> match)
         {
-            if (match == null)
-            {
-                throw new ArgumentNullException(nameof(match));
-            }
+            if (match is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);
 
             int numRemoved = 0;
             for (int i = 0; i < _lastIndex; i++)
@@ -1475,7 +1444,7 @@ namespace J2N.Collections.Generic
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
-                throw new ArgumentOutOfRangeException(nameof(capacity));
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             int currentCapacity = _slots == null ? 0 : _slots.Length;
             if (currentCapacity >= capacity)
                 return currentCapacity;
@@ -1599,7 +1568,7 @@ namespace J2N.Collections.Generic
             int newSize = HashHelpers.ExpandPrime(_count);
             if (newSize <= _count)
             {
-                throw new ArgumentException(SR.Arg_HSCapacityOverflow);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_HSCapacityOverflow);
             }
 
             // Able to increase capacity; copy elements to larger array and rehash
@@ -1674,7 +1643,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1696,7 +1665,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1717,7 +1686,7 @@ namespace J2N.Collections.Generic
                     if (collisionCount >= slots.Length)
                     {
                         // The chain of entries forms a loop, which means a concurrent update has happened.
-                        throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
                     collisionCount++;
                 }
@@ -1911,7 +1880,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1934,7 +1903,7 @@ namespace J2N.Collections.Generic
                         if (collisionCount >= slots.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
-                            throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                         collisionCount++;
                     }
@@ -1955,7 +1924,7 @@ namespace J2N.Collections.Generic
                     if (collisionCount >= slots.Length)
                     {
                         // The chain of entries forms a loop, which means a concurrent update has happened.
-                        throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
                     collisionCount++;
                 }
@@ -2081,7 +2050,7 @@ namespace J2N.Collections.Generic
                 if (collisionCount >= slots.Length)
                 {
                     // The chain of entries forms a loop, which means a concurrent update has happened.
-                    throw new InvalidOperationException(SR.InvalidOperation_ConcurrentOperationsNotSupported);
+                    ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                 }
                 collisionCount++;
             }
@@ -2466,7 +2435,7 @@ namespace J2N.Collections.Generic
             {
                 if (_version != _set._version)
                 {
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 while (_index < _set._lastIndex)
@@ -2492,7 +2461,7 @@ namespace J2N.Collections.Generic
                 {
                     if (_index == 0 || _index == _set._lastIndex + 1)
                     {
-                        throw new InvalidOperationException(SR.InvalidOperation_EnumOpCantHappen);
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
                     return Current;
                 }
@@ -2502,7 +2471,7 @@ namespace J2N.Collections.Generic
             {
                 if (_version != _set._version)
                 {
-                    throw new InvalidOperationException(SR.InvalidOperation_EnumFailedVersion);
+                    ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 _index = 0;
