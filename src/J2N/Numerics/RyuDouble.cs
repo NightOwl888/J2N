@@ -1216,7 +1216,11 @@ namespace J2N.Numerics
                 result[index++] = upperCase ? 'E' : 'e';
                 if (exp < 0)
                 {
-                    result[index++] = '-';
+                    foreach (var nc in negSign)
+                    {
+                        result[index++] = nc;
+                    }
+
                     exp = -exp;
                 }
                 if (exp >= 100)
