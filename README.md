@@ -5,6 +5,7 @@ J2N - Java-like Components for .NET
 [![Azure DevOps builds (branch)](https://img.shields.io/azure-devops/build/NightOwl888/b2719dac-eeb4-46ff-9380-13b45ff0277b/1/main)](https://dev.azure.com/NightOwl888/J2N/_build?definitionId=1)
 [![GitHub](https://img.shields.io/github/license/NightOwl888/J2N)](https://github.com/NightOwl888/J2N/blob/main/LICENSE.txt)
 [![GitHub Sponsors](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/NightOwl888)
+[<img src="https://api.gitsponsors.com/api/badge/img?id=225337593" height="20">](https://api.gitsponsors.com/api/badge/link?p=bnuVBk0uqcDNlDyhD2UF9E8yqBJsKCFV3s2SnfkgSjzknt7uyJvWxOEEPZWJRJc9+oGK6hwetqXRBqtj0sPzaQ==)
 
 J2N is a library that helps bridge the gap between .NET and Java.
 
@@ -50,3 +51,4 @@ To build the project from source, see the [Building and Testing documentation](h
 If you find this library to be useful, please star us [on GitHub](https://github.com/NightOwl888/J2N) and consider a sponsorship so we can continue bringing you great free tools like this one.
 
 [![GitHub Sponsors](https://img.shields.io/badge/-Sponsor-fafbfc?logo=GitHub%20Sponsors)](https://github.com/sponsors/NightOwl888)
+[<img src="https://api.gitsponsors.com/api/badge/img?id=225337593" height="20">](https://api.gitsponsors.com/api/badge/link?p=bnuVBk0uqcDNlDyhD2UF9E8yqBJsKCFV3s2SnfkgSjzknt7uyJvWxOEEPZWJRJc9+oGK6hwetqXRBqtj0sPzaQ==)
