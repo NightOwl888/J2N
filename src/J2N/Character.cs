@@ -568,9 +568,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c> or its <see cref="ICharSequence.HasValue"/> property returns <c>false</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -611,9 +611,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -655,9 +655,9 @@ namespace J2N
         /// or <see cref="string"/> and to call the appropriate overload, instead.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -694,9 +694,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -732,9 +732,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index"/> is greater than or equal to the length of <paramref name="seq"/>.
@@ -2086,6 +2086,14 @@ namespace J2N
             return false;
         }
 
+        /// <summary>Indicates whether a character is categorized as an ASCII digit.</summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <returns>true if <paramref name="c"/> is an ASCII digit; otherwise, false.</returns>
+        /// <remarks>
+        /// This determines whether the character is in the range '0' through '9', inclusive.
+        /// </remarks>
+        internal static bool IsAsciiDigit(char c) => IsBetween(c, '0', '9'); // J2N TODO: API - make public once we have implemented all members
+
         /// <summary>Indicates whether a character is within the specified inclusive range.</summary>
         /// <param name="c">The character to evaluate.</param>
         /// <param name="minInclusive">The lower bound, inclusive.</param>
@@ -2097,7 +2105,7 @@ namespace J2N
         /// <paramref name="minInclusive"/>, the behavior is undefined.
         /// </remarks>
         internal static bool IsBetween(char c, char minInclusive, char maxInclusive) =>
-            (uint)(c - minInclusive) <= (uint)(maxInclusive - minInclusive);
+            (uint)(c - minInclusive) <= (uint)(maxInclusive - minInclusive); // J2N TODO: API - make public once we have implemented all members
 
         /// <summary>
         /// Search the sorted characters in the string and return the nearest index.

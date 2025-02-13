@@ -131,7 +131,7 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (length < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
-            if (startIndex > Value.Length - length) // Checks for int overflow
+            if ((uint)startIndex + (uint)length > Value.Length)
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
             // NOTE: This benchmarked slightly faster than
