@@ -16,7 +16,6 @@
  */
 #endregion
 
-using J2N.Runtime.CompilerServices;
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -25,7 +24,6 @@ namespace J2N.Runtime.InteropServices
 {
     internal class MemoryMarshalHelper
     {
-
 #pragma warning disable IDE0060 // https://github.com/dotnet/roslyn-analyzers/issues/6228
         /// <summary>
         /// Returns a reference to the 0th element of the Span. If the Span is empty, returns a reference to fake non-null pointer. Such a reference can be used
