@@ -106,10 +106,8 @@
     <DefineConstants>$(DefineConstants);FEATURE_BIGINTEGER_CTOR_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CHARUNICODEINFO_GETUNICODECATEGORY_CODEPOINT</DefineConstants>
-
-    <!--<DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ENUMERATOR</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
-
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_CREATEREADONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_CREATESPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMBER_TRYFORMAT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTBYTES_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_FILL_SPAN</DefineConstants>
