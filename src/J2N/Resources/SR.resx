@@ -477,16 +477,34 @@
   <data name="NotSupported_StringComparison" xml:space="preserve">
     <value>The string comparison type passed in is currently not supported.</value>
   </data>
-  <data name="NotSupported_SerializationDeprecated" xml:space="preserve">
+ <data name="NotSupported_SerializationDeprecated" xml:space="preserve">
     <value>Binary serialization has been deprecated and is no longer supported.</value>
   </data>
   <data name="PlatformNotSupported_DynamicCode" xml:space="preserve">
     <value>This operation requires dynamic code generation and is not supported on this runtime.</value>
   </data>
+  <data name="PlatformNotSupported_NoAggressiveMode" xml:space="preserve">
+    <value>Aggressive mode is not supported on this platform. The collections in the BCL do not support structural equality and Aggressive mode uses Reflection to patch this behavior. We recommend using J2N collections exclusively which implement structural equality directly.</value>
+  </data>
   <data name="InvalidOperation_UnexpectedDispatcherType" xml:space="preserve">
     <value>Unexpected type '{0}' encountered during generic dispatch.</value>
   </data>
-  <data name="PlatformNotSupported_NoAggressiveMode" xml:space="preserve">
-    <value>Aggressive mode is not supported on this platform. The collections in the BCL do not support structural equality and Aggressive mode uses Reflection to patch this behavior. We recommend using J2N collections exclusively which implement structural equality directly.</value>
+  <data name="Format_UnexpectedClosingBrace" xml:space="preserve">
+    <value>Unexpected closing brace without a corresponding opening brace.</value>
+  </data>
+  <data name="Format_UnclosedFormatItem" xml:space="preserve">
+    <value>Format item ends prematurely.</value>
+  </data>
+  <data name="Format_ExpectedAsciiDigit" xml:space="preserve">
+    <value>Expected an ASCII digit.</value>
+  </data>
+  <data name="Format_InvalidStringWithOffsetAndReason" xml:space="preserve">
+    <value>Input string was not in a correct format. Failure to parse near offset {0}. {1}</value>
+  </data>
+  <data name="Format_IndexOutOfRange" xml:space="preserve">
+    <value>Index (zero based) must be greater than or equal to zero and less than the size of the argument list.</value>
+  </data>
+  <data name="ArgumentOutOfRange_LengthGreaterThanCapacity" xml:space="preserve">
+    <value>The length cannot be greater than the capacity.</value>
   </data>
 </root>
