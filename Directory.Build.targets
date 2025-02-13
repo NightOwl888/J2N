@@ -47,9 +47,17 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_BITOPERATIONS_UINTPTR</DefineConstants>
+    <!-- J2N TODO: Finish CompositeFormat support for OpenStringBuilder -->
+    <!--<DefineConstants>$(DefineConstants);FEATURE_COMPOSITEFORMAT</DefineConstants>-->
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTION_STATIC_GUARDCLAUSES</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_INLINEARRAYATTRIBUTE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_SPANFORMATTABLE</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 6.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
+
+    <!-- Supported in net7.0+ -->
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGSYNTAXATTRIBUTE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
 
   </PropertyGroup>
@@ -69,6 +77,8 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_PREDEFINEDONLY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_HALF</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x30000</DefineConstants>
 
@@ -81,6 +91,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MATH_LOG2</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_RUNE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRING_GETHASHCODE_READONLYSPAN_STRINGCOMPARISON</DefineConstants>
 
   </PropertyGroup>
@@ -116,6 +127,7 @@
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->
     <DefineConstants Condition=" '$(IncludeICloneable)' == 'true' ">$(DefineConstants);FEATURE_CLONEABLE</DefineConstants>
+    
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
     <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
@@ -165,7 +177,7 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4.5+ only -->
+  <!-- Features in .NET Framework 4.0+ only -->
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4'))">
 
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMAPPEDFILESECURITY</DefineConstants>

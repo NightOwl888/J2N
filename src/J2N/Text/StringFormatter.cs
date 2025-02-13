@@ -261,7 +261,7 @@ namespace J2N.Text
             return null!; // Not handled by this formatter
         }
 
-        private static string FormatBoolean(bool b)
+        internal static string FormatBoolean(bool b)
         {
             return b ? "true" : "false";
         }

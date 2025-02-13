@@ -2049,6 +2049,27 @@ namespace J2N
             return false;
         }
 
+        /// <summary>Indicates whether a character is categorized as an ASCII digit.</summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <returns>true if <paramref name="c"/> is an ASCII digit; otherwise, false.</returns>
+        /// <remarks>
+        /// This determines whether the character is in the range '0' through '9', inclusive.
+        /// </remarks>
+        internal static bool IsAsciiDigit(char c) => IsBetween(c, '0', '9'); // J2N TODO: API - make public once we have implemented all members
+
+        /// <summary>Indicates whether a character is within the specified inclusive range.</summary>
+        /// <param name="c">The character to evaluate.</param>
+        /// <param name="minInclusive">The lower bound, inclusive.</param>
+        /// <param name="maxInclusive">The upper bound, inclusive.</param>
+        /// <returns>true if <paramref name="c"/> is within the specified range; otherwise, false.</returns>
+        /// <remarks>
+        /// The method does not validate that <paramref name="maxInclusive"/> is greater than or equal
+        /// to <paramref name="minInclusive"/>.  If <paramref name="maxInclusive"/> is less than
+        /// <paramref name="minInclusive"/>, the behavior is undefined.
+        /// </remarks>
+        internal static bool IsBetween(char c, char minInclusive, char maxInclusive) =>
+            (uint)(c - minInclusive) <= (uint)(maxInclusive - minInclusive); // J2N TODO: API - make public once we have implemented all members
+
         /// <summary>
         /// Search the sorted characters in the string and return the nearest index.
         /// </summary>

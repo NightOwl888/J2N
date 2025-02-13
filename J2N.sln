@@ -117,6 +117,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.TestUtilities.Xunit.Tests", "tests\Xunit\J2N.TestUtilities.Xunit.Tests\J2N.TestUtilities.Xunit.Tests.csproj", "{9086D0A8-BE79-E669-3E44-1503094C8352}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.Net5.HashSet.Tests", "tests\Xunit\J2N.Collections.Generic.Net5.HashSet.Tests\J2N.Collections.Generic.Net5.HashSet.Tests.csproj", "{2BFD6D70-CA8A-4F1F-8FE8-43F0B3F22CE6}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Memory.Tests", "tests\Xunit\J2N.Memory.Tests\J2N.Memory.Tests.csproj", "{8859E44B-EF62-4504-95EB-D084221D4013}"
 EndProject
 Global

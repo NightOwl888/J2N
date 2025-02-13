@@ -141,29 +141,15 @@ namespace J2N
         [DoesNotReturn]
         internal static void ThrowArgumentOutOfRange_MustBeNonNegative<T>(T actualValue, ExceptionArgument argument)
         {
-            throw GetArgumentOutOfRangeException(actualValue, argument,
-                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative);
+            string argumentName = GetArgumentName(argument);
+            throw new ArgumentOutOfRangeException(argumentName, actualValue, SR.Format(SR.ArgumentOutOfRange_Generic_MustBeNonNegative, argumentName, actualValue));
         }
 
         [DoesNotReturn]
-        internal static void ThrowArgumentOutOfRange_MustBeNonNegative(ExceptionArgument argument)
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegativeNonZero<T>(T actualValue, ExceptionArgument argument)
         {
-            throw GetArgumentOutOfRangeException(argument,
-                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegative);
-        }
-
-        [DoesNotReturn]
-        internal static void ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(int value, ExceptionArgument argument)
-        {
-            throw GetArgumentOutOfRangeException(value, argument,
-                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero);
-        }
-
-        [DoesNotReturn]
-        internal static void ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(object? value, ExceptionArgument argument)
-        {
-            throw GetArgumentOutOfRangeException(value, argument,
-                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero);
+            string argumentName = GetArgumentName(argument);
+            throw new ArgumentOutOfRangeException(argumentName, actualValue, SR.Format(SR.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero, argumentName, actualValue));
         }
 
         [DoesNotReturn]
@@ -843,17 +829,17 @@ namespace J2N
             throw new FormatException(SR.Format_InvalidString);
         }
 
-        //[DoesNotReturn]
-        //internal static void ThrowFormatInvalidString(int offset, ExceptionResource resource)
-        //{
-        //    throw new FormatException(SR.Format(SR.Format_InvalidStringWithOffsetAndReason, offset, GetResourceString(resource)));
-        //}
+        [DoesNotReturn]
+        internal static void ThrowFormatInvalidString(int offset, ExceptionResource resource)
+        {
+            throw new FormatException(SR.Format(SR.Format_InvalidStringWithOffsetAndReason, offset, GetResourceString(resource)));
+        }
 
-        //[DoesNotReturn]
-        //internal static void ThrowFormatIndexOutOfRange()
-        //{
-        //    throw new FormatException(SR.Format_IndexOutOfRange);
-        //}
+        [DoesNotReturn]
+        internal static void ThrowFormatIndexOutOfRange()
+        {
+            throw new FormatException(SR.Format_IndexOutOfRange);
+        }
 
         //[DoesNotReturn]
         //internal static void ThrowSynchronizationLockException_LockExit()
@@ -1046,6 +1032,8 @@ namespace J2N
                     return "allocSize";
                 case ExceptionArgument.appendable:
                     return "appendable";
+                case ExceptionArgument.args:
+                    return "args";
                 case ExceptionArgument.array:
                     return "array";
                 case ExceptionArgument.arrayIndex:
@@ -1102,6 +1090,8 @@ namespace J2N
                     return "fnCreate";
                 case ExceptionArgument.fnUpdate:
                     return "fnUpdate";
+                case ExceptionArgument.format:
+                    return "format";
                 case ExceptionArgument.formatProvider:
                     return "formatProvider";
                 case ExceptionArgument.hashSize:
@@ -1134,6 +1124,8 @@ namespace J2N
                     return "lockSize";
                 case ExceptionArgument.match:
                     return "match";
+                case ExceptionArgument.maxCapacity:
+                    return "maxCapacity";
                 case ExceptionArgument.maxValue:
                     return "maxValue";
                 case ExceptionArgument.memoryMappedFile:
@@ -1154,6 +1146,8 @@ namespace J2N
                     return "newValue";
                 case ExceptionArgument.offset:
                     return "offset";
+                case ExceptionArgument.oldValue:
+                    return "oldValue";
                 case ExceptionArgument.original:
                     return "original";
                 case ExceptionArgument.other:
@@ -1180,6 +1174,8 @@ namespace J2N
                     return "random";
                 case ExceptionArgument.reader:
                     return "reader";
+                case ExceptionArgument.repeatCount:
+                    return "repeatCount";
                 case ExceptionArgument.s:
                     return "s";
                 case ExceptionArgument.seq:
@@ -1188,6 +1184,8 @@ namespace J2N
                     return "set";
                 case ExceptionArgument.source:
                     return "source";
+                case ExceptionArgument.sourceBytesToCopy:
+                    return "sourceBytesToCopy";
                 case ExceptionArgument.sourceIndex:
                     return "sourceIndex";
                 case ExceptionArgument.start:
@@ -1214,6 +1212,10 @@ namespace J2N
                     return "uiCulture";
                 case ExceptionArgument.value:
                     return "value";
+                case ExceptionArgument.valueCount:
+                    return "valueCount";
+                case ExceptionArgument.values:
+                    return "values";
                 case ExceptionArgument.writer:
                     return "writer";
                 case ExceptionArgument.year:
@@ -1222,12 +1224,11 @@ namespace J2N
 
                 //case ExceptionArgument.obj:
                 //    return "obj";
+                
 
-
-
-
-                //case ExceptionArgument.values:
-                //    return "values";
+                
+                
+                
 
 
                 //case ExceptionArgument.task:
@@ -1265,9 +1266,8 @@ namespace J2N
                 //    return "exception";
                 //case ExceptionArgument.pointer:
                 //    return "pointer";
-
-                //case ExceptionArgument.format:
-                //    return "format";
+                
+                
                 //case ExceptionArgument.formats:
                 //    return "formats";
 
@@ -1280,8 +1280,7 @@ namespace J2N
                 //    return "comparisonType";
                 //case ExceptionArgument.manager:
                 //    return "manager";
-                //case ExceptionArgument.sourceBytesToCopy:
-                //    return "sourceBytesToCopy";
+                
                 //case ExceptionArgument.callBack:
                 //    return "callBack";
                 //case ExceptionArgument.creationOptions:
@@ -1577,12 +1576,12 @@ namespace J2N
                 //    return SR.InvalidOperation_TimeProviderNullLocalTimeZone;
                 //case ExceptionResource.InvalidOperation_TimeProviderInvalidTimestampFrequency:
                 //    return SR.InvalidOperation_TimeProviderInvalidTimestampFrequency;
-                //case ExceptionResource.Format_UnexpectedClosingBrace:
-                //    return SR.Format_UnexpectedClosingBrace;
-                //case ExceptionResource.Format_UnclosedFormatItem:
-                //    return SR.Format_UnclosedFormatItem;
-                //case ExceptionResource.Format_ExpectedAsciiDigit:
-                //    return SR.Format_ExpectedAsciiDigit;
+                case ExceptionResource.Format_UnexpectedClosingBrace:
+                    return SR.Format_UnexpectedClosingBrace;
+                case ExceptionResource.Format_UnclosedFormatItem:
+                    return SR.Format_UnclosedFormatItem;
+                case ExceptionResource.Format_ExpectedAsciiDigit:
+                    return SR.Format_ExpectedAsciiDigit;
                 //case ExceptionResource.Argument_HasToBeArrayClass:
                 //    return SR.Argument_HasToBeArrayClass;
                 case ExceptionResource.InvalidOperation_IncompatibleComparer:
@@ -1595,6 +1594,8 @@ namespace J2N
                     return SR.InvalidOperation_ViewFailedVersion;
                 case ExceptionResource.LurchTable_NeedLimitIntMaxValue:
                     return SR.LurchTable_NeedLimitIntMaxValue;
+                case ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity:
+                    return SR.ArgumentOutOfRange_LengthGreaterThanCapacity;
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1610,6 +1611,7 @@ namespace J2N
         action,
         allocSize,
         appendable,
+        args,
         array,
         arrayIndex,
         assembly,
@@ -1639,6 +1641,7 @@ namespace J2N
         fnCondition,
         fnCreate,
         fnUpdate,
+        format,
         formatProvider,
         hashSize,
         index,
@@ -1655,6 +1658,7 @@ namespace J2N
         list,
         lockSize,
         match,
+        maxCapacity,
         maxValue,
         memoryMappedFile,
         minValue,
@@ -1665,6 +1669,7 @@ namespace J2N
         newPosition,
         newValue,
         offset,
+        oldValue,
         original,
         other,
         output,
@@ -1678,10 +1683,12 @@ namespace J2N
         radix,
         random,
         reader,
+        repeatCount,
         s,
         seq,
         set,
         source,
+        sourceBytesToCopy,
         sourceIndex,
         start,
         startIndex,
@@ -1695,15 +1702,17 @@ namespace J2N
         type,
         uiCulture,
         value,
+        valueCount,
+        values,
         writer,
         year,
 
         //obj,
+        
 
-
-
-
-        //values,
+        
+        
+        
 
 
         //task,
@@ -1731,7 +1740,7 @@ namespace J2N
         //exception,
         //pointer,
 
-        //format,
+        
         //formats,
         //culture,
 
@@ -1740,7 +1749,7 @@ namespace J2N
 
         
         //manager,
-        //sourceBytesToCopy,
+        
         //callBack,
         //creationOptions,
         //function,
@@ -1890,14 +1899,15 @@ namespace J2N
         InvalidOperation_SpanOverlappedOperation,
         //InvalidOperation_TimeProviderNullLocalTimeZone,
         //InvalidOperation_TimeProviderInvalidTimestampFrequency,
-        //Format_UnexpectedClosingBrace,
-        //Format_UnclosedFormatItem,
-        //Format_ExpectedAsciiDigit,
+        Format_UnexpectedClosingBrace,
+        Format_UnclosedFormatItem,
+        Format_ExpectedAsciiDigit,
         //Argument_HasToBeArrayClass,
         InvalidOperation_IncompatibleComparer,
         ArgumentOutOfRange_PositionMustBeLessThanLimit,
         ArgumentOutOfRange_LimitMustBeLessThanCapacity,
         InvalidOperation_ViewFailedVersion,
         LurchTable_NeedLimitIntMaxValue,
+        ArgumentOutOfRange_LengthGreaterThanCapacity,
     }
 }
