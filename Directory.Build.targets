@@ -21,6 +21,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_ENCODINGPROVIDERS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ENCODING_GETSTRING_BYTEPTR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_EXCEPTIONDISPATCHINFO</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_INDEX_RANGE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_GETBYTES_OFFSET_COUNT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEINFORMATION</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_CHARPTR</DefineConstants>
@@ -153,7 +154,12 @@
 
   </PropertyGroup>
 
-  <!-- Features in .NET Framework 4.5+ only (excluding .NET Framework 4.7.1, the target framework we use for testing .NET Standard 2.0)  -->
+  <!-- Features in .NET Framework 4.5+ only -->
+  <PropertyGroup Condition="$(TargetFramework.StartsWith('net45')) Or $(TargetFramework.StartsWith('net46')) Or $(TargetFramework.StartsWith('net47')) Or $(TargetFramework.StartsWith('net48'))">
+    <DefineConstants Condition="'$(TargetFramework)' != 'net47'">$(DefineConstants);FEATURE_INDEX_RANGE</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Features in .NET Framework 4.0+ only (excluding .NET Framework 4.7.1, the target framework we use for testing .NET Standard 2.0)  -->
   <PropertyGroup Condition="$(TargetFramework.StartsWith('net4')) And '$(TargetFramework)' != 'net471'">
 
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_RANDOM</DefineConstants>

@@ -2,6 +2,8 @@
   <PropertyGroup Label="NuGet Package Reference Versions">
     <AigamoResXGeneratorPackageReferenceVersion>4.2.0</AigamoResXGeneratorPackageReferenceVersion>
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
+    <IndexRangePackageReferenceVersion>1.0.3</IndexRangePackageReferenceVersion>
+    <MicrosoftBclMemoryPackageReferenceVersion>9.0.1</MicrosoftBclMemoryPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>1.0.3</MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>17.11.0</MicrosoftNETTestSdkPackageReferenceVersion>
