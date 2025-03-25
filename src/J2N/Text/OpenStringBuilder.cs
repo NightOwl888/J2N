@@ -1,25 +1,18 @@
 ﻿using J2N.Buffers;
-using J2N.Collections;
 using J2N.Collections.Generic;
-using J2N.Globalization;
 using J2N.Numerics;
 using J2N.Runtime.CompilerServices;
 using J2N.Runtime.InteropServices;
 using System;
 using System.Buffers;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Drawing;
 using System.Globalization;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 #pragma warning disable CS1591 // J2N TODO: Finish docs
 
@@ -47,8 +40,8 @@ namespace J2N.Text
     ///     </description></item>
     /// </list>
     /// </remarks>
-    public class OpenStringBuilder //: ICharSequence, ISpanAppendable 
-        //, IEnumerable<char> // ICU4N TODO: Implement?
+    public partial class OpenStringBuilder : IAppendable, ISpanAppendable, ICharSequence
+                                                                          //, IEnumerable<char> // ICU4N TODO: Implement?
 
     {
         private const int CharStackBufferSize = 32;
@@ -198,9 +191,9 @@ namespace J2N.Text
             m_MaxCapacity = int.MaxValue;
             if (capacity == 0)
             {
-                capacity = DefaultCapacity;
+                capacity = length + DefaultCapacity;
             }
-            capacity = Math.Max(capacity, length);
+            capacity = Math.Max(capacity, length + DefaultCapacity);
 
             m_Chars = AllocateArray(capacity);
             m_Position = length;
@@ -261,6 +254,60 @@ namespace J2N.Text
             m_Position = length;
 
             value.CopyTo(startIndex, m_Chars, 0, length);
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// </summary>
+        /// <param name="value">The initial contents of this builder.</param>
+        public OpenStringBuilder(ICharSequence? value)
+        {
+            m_MaxCapacity = int.MaxValue;
+            int length = value?.Length ?? 0;
+            int capacity = length + DefaultCapacity;
+
+            if (value is null || !value.HasValue)
+            {
+                m_Position = 0;
+                m_Chars = new char[capacity];
+                return;
+            }
+
+            m_Chars = AllocateArray(capacity);
+            m_Position = length;
+
+            if (value is StringCharSequence str)
+            {
+                str.Value!.CopyTo(0, m_Chars, 0, str.Length);
+            }
+            else if (value is StringBuilderCharSequence sb)
+            {
+                sb.Value!.CopyTo(0, m_Chars, 0, sb.Length);
+            }
+            else if (value is OpenStringBuilder osb)
+            {
+                osb.CopyTo(0, m_Chars, 0, osb.Length);
+            }
+            else if (value is CharArrayCharSequence chars)
+            {
+                chars.Value!.CopyTo(m_Chars, 0);
+            }
+            else if (value is StringBuffer sbuffer)
+            {
+                lock (sbuffer.SyncRoot)
+                {
+                    sbuffer.builder.CopyTo(0, m_Chars, 0, sbuffer.Length);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < value.Length; i++)
+                {
+                    m_Chars[i] = value[i];
+                }
+            }
+
+            m_Chars.AsSpan(value.Length).Fill('\0');
         }
 
         protected OpenStringBuilder(char[] initialBuffer) : this(initialBuffer, initialLength: 0) { }
@@ -375,9 +422,11 @@ namespace J2N.Text
             if (capacity < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
 
-            if (Capacity < capacity)
+            int currentCapacity = Capacity;
+            if (currentCapacity < capacity)
             {
-                Capacity = capacity;
+                int twice = (currentCapacity << 1) + 2;
+                Capacity = twice > capacity ? twice : capacity;
             }
             return Capacity;
         }
@@ -392,6 +441,15 @@ namespace J2N.Text
             }
 
             return m_Chars.AsSpan(0, m_Position).ToString();
+        }
+
+        public string ToString(int startIndex)
+        {
+            if ((uint)startIndex > this.Length)
+                ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual();
+
+            //AssertInvariants();
+            return m_Chars.AsSpan(startIndex, m_Position - startIndex).ToString();
         }
 
         /// <summary>
@@ -781,13 +839,18 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (destinationIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(destinationIndex, ExceptionArgument.destinationIndex);
-
-            if (destinationIndex > destination.Length - count)
-            {
+            if (count < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+            if ((uint)sourceIndex > (uint)Length)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(sourceIndex, ExceptionArgument.sourceIndex);
+            if ((uint)sourceIndex + (uint)count > Length)
+                throw new ArgumentException(SR.Arg_LongerThanSrcString);
+            if ((uint)destinationIndex + (uint)count > destination.Length)
                 ThrowHelper.ThrowArgumentException(ExceptionResource.ArgumentOutOfRange_OffsetOut);
-            }
 
-            CopyTo(sourceIndex, new Span<char>(destination).Slice(destinationIndex), count);
+            //AssertInvariants();
+
+            m_Chars.AsSpan(sourceIndex, count).CopyTo(new Span<char>(destination).Slice(destinationIndex));
         }
 
         public void CopyTo(int sourceIndex, Span<char> destination, int count)
@@ -882,11 +945,12 @@ namespace J2N.Text
             {
                 int endIndex = startIndex + length;
                 m_Chars.AsSpan(endIndex).CopyTo(m_Chars.AsSpan(startIndex));
+                m_Position -= length;
                 if (zeroBeyondPosition)
                 {
-                    m_Chars.AsSpan(endIndex, m_Position - endIndex).Fill((char)0); // Zero out the remaining chars
+                    m_Chars.AsSpan(m_Position).Fill('\0'); // Zero out the remaining chars
                 }
-                m_Position -= length;
+                
             }
         }
 
@@ -955,18 +1019,32 @@ namespace J2N.Text
 #endif
 
         public OpenStringBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
+        {
+            provider ??= NumberFormatInfo.InvariantInfo;
+            if (DotNetNumber.TryFormatSingle(value, format.AsSpan(), provider, m_Chars.AsSpan(m_Position), out int charsWritten))
+            {
+                m_Position += charsWritten;
+            }
+            else
+            {
+                Append(DotNetNumber.FormatSingle(value, format, provider));
+            }
+            return this;
+        }
 
         public OpenStringBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
+        {
+            provider ??= NumberFormatInfo.InvariantInfo;
+            if (DotNetNumber.TryFormatDouble(value, format.AsSpan(), provider, m_Chars.AsSpan(m_Position), out int charsWritten))
+            {
+                m_Position += charsWritten;
+            }
+            else
+            {
+                Append(DotNetNumber.FormatDouble(value, format, provider));
+            }
+            return this;
+        }
 
         public OpenStringBuilder Append(decimal value, string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -1036,6 +1114,8 @@ namespace J2N.Text
 #endif
             else if (value is IFormattable formattable)
                 return Append(formattable.ToString(format, provider));
+            else if (value is ICharSequence csq)
+                return Append(csq); // Not formattable
             else
                 return Append(value.ToString());
         }
@@ -1289,18 +1369,32 @@ namespace J2N.Text
 #endif
 
         public OpenStringBuilder Insert(int index, float value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
-#endif
+        {
+            provider ??= NumberFormatInfo.InvariantInfo;
+            Span<char> buffer = stackalloc char[CharStackBufferSize];
+            if (DotNetNumber.TryFormatSingle(value, format.AsSpan(), provider, buffer, out int charsWritten))
+            {
+                // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
+                // we want exceeding the maximum capacity to throw an OutOfMemoryException.
+                return Insert(index, buffer.Slice(0, charsWritten), 1);
+            }
+
+            return Insert(index, DotNetNumber.FormatSingle(value, format, provider), 1);
+        }
 
         public OpenStringBuilder Insert(int index, double value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
-#endif
+        {
+            provider ??= NumberFormatInfo.InvariantInfo;
+            Span<char> buffer = stackalloc char[CharStackBufferSize];
+            if (DotNetNumber.TryFormatDouble(value, format.AsSpan(), provider, buffer, out int charsWritten))
+            {
+                // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
+                // we want exceeding the maximum capacity to throw an OutOfMemoryException.
+                return Insert(index, buffer.Slice(0, charsWritten), 1);
+            }
+
+            return Insert(index, DotNetNumber.FormatDouble(value, format, provider), 1);
+        }
 
         public OpenStringBuilder Insert(int index, decimal value, string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -2445,17 +2539,14 @@ namespace J2N.Text
 
         // JDK overloads
 
-        public OpenStringBuilder Replace(int startIndex, int count, string? newValue) // J2N TODO: Tests
+        public OpenStringBuilder Replace(int startIndex, int count, string newValue)
         {
-            int currentLength = m_Position;
-            if ((uint)startIndex > (uint)currentLength)
-            {
+            if (newValue is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.newValue);
+            if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
-            }
-            if (count < 0 || startIndex > currentLength - count)
-            {
-                ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
-            }
+            if (count < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             ReplaceCore(startIndex, count, newValue.AsSpan());
             return this;
@@ -2463,15 +2554,10 @@ namespace J2N.Text
 
         public OpenStringBuilder Replace(int startIndex, int count, ReadOnlySpan<char> newValue) // J2N TODO: Tests
         {
-            int currentLength = m_Position;
-            if ((uint)startIndex > (uint)currentLength)
-            {
+            if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
-            }
-            if (count < 0 || startIndex > currentLength - count)
-            {
-                ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_IndexMustBeLessOrEqual);
-            }
+            if (count < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
 
             ReplaceCore(startIndex, count, newValue);
             return this;
@@ -2743,7 +2829,7 @@ namespace J2N.Text
         }
 
         private static string FormatBoolean(bool value, IFormatProvider? provider) =>
-            provider is StringFormatter ? StringFormatter.FormatBoolean(value) : value.ToString(provider);
+            provider is null || provider is StringFormatter ? StringFormatter.FormatBoolean(value) : value.ToString(provider);
 
 
         /// <summary>Round the specified value up to the next power of 2, if it isn't one already.</summary>
@@ -2817,5 +2903,92 @@ namespace J2N.Text
 
         // For testing
         internal char[] ToCharArray() => m_Position == m_Chars.Length ? m_Chars : m_Chars.AsSpan(0, m_Position).ToArray();
+
+
+        /// <summary>
+        /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
+        /// Shifts any remaining characters to the left.
+        /// <para/>
+        /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
+        /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
+        /// <para/>
+        /// This method differs from <see cref="OpenStringBuilder.Remove(int, int)"/> in that it will automatically
+        /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="OpenStringBuilder.Length"/></c>
+        /// to <c><see cref="OpenStringBuilder.Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="OpenStringBuilder.MaxCapacity"/>.
+        /// </summary>
+        /// <param name="startIndex">The start index.</param>
+        /// <param name="count">The number of characters to delete.</param>
+        /// <returns>This <see cref="OpenStringBuilder"/>, for chaining.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than <see cref="OpenStringBuilder.Length"/>.
+        /// </exception>
+        public OpenStringBuilder Delete(int startIndex, int count)
+        {
+            if ((uint)startIndex > (uint)m_Position)
+                ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
+            if (count < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+
+            int pos = m_Position;
+            if (startIndex + count > pos)
+                count = pos - startIndex;
+            if (count > 0)
+                RemoveCore(startIndex, count, zeroBeyondPosition: true);
+            return this;
+        }
+
+        /// <summary>
+        /// Causes this character sequence to be replaced by the reverse of
+        /// the sequence. If there are any surrogate pairs included in the
+        /// sequence, these are treated as single characters for the
+        /// reverse operation. Thus, the order of the high-low surrogates
+        /// is never reversed.
+        /// <para/>
+        /// IMPORTANT: This operation is done in-place. Although a <see cref="StringBuilder"/>
+        /// is returned, it is the SAME instance as the one that is passed in.
+        /// <para/>
+        /// Let <c>n</c> be the character length of this character sequence
+        /// (not the length in <see cref="char"/> values) just prior to
+        /// execution of the <see cref="Reverse()"/> method. Then the
+        /// character at index <c>k</c> in the new character sequence is
+        /// equal to the character at index <c>n-k-1</c> in the old
+        /// character sequence.
+        /// <para/>
+        /// Note that the reverse operation may result in producing
+        /// surrogate pairs that were unpaired low-surrogates and
+        /// high-surrogates before the operation. For example, reversing
+        /// "&#92;uDC00&#92;uD800" produces "&#92;uD800&#92;uDC00" which is
+        /// a valid surrogate pair.
+        /// <para/>
+        /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
+        /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
+        /// and <see cref="J2N.MemoryExtensions.ReverseText(Span{char})"/> which
+        /// don't require a <see cref="StringBuilder"/> instance.
+        /// </summary>
+        /// <returns>A reference to this <see cref="StringBuilder"/>, for chaining.</returns>
+        /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
+        /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
+        /// <seealso cref="J2N.Text.StringBuilderExtensions.Reverse(StringBuilder)"/>
+        public OpenStringBuilder Reverse()
+        {
+            m_Chars.AsSpan(0, m_Position).ReverseText();
+            return this;
+        }
+
+        /// <summary>
+        /// Trims off any extra capacity beyond the current length. Note, this method
+        /// is NOT guaranteed to change the capacity.
+        /// </summary>
+        public void TrimExcess()
+        {
+            if (m_Position < m_Chars.Length)
+            {
+                m_Chars = ReplaceBuffer(m_Chars.AsSpan(0, m_Position), m_Position);
+            }
+        }
     }
 }

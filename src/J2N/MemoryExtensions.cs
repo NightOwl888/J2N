@@ -332,7 +332,7 @@ namespace J2N
             return new ReadOnlyMemory<char>(text.m_Chars, start, length);
         }
 #endif
-#endregion AsMemory
+        #endregion AsMemory
 
         #region IndexOf
 
@@ -632,6 +632,56 @@ namespace J2N
             }
             return -1;
         }
+
+#if !FEATURE_MEMORYEXTENSIONS_LASTINDEXOF_COMPARISONTYPE
+
+        /// <summary>
+        /// Reports the zero-based index of the last occurrence of the specified <paramref name="value"/> in the current <paramref name="span"/>.
+        /// <param name="span">The source span.</param>
+        /// <param name="value">The value to seek within the source span.</param>
+        /// <param name="comparisonType">One of the enumeration values that determines how the <paramref name="span"/> and <paramref name="value"/> are compared.</param>
+        /// </summary>
+        public static int LastIndexOf(this ReadOnlySpan<char> span, string value, StringComparison comparisonType)
+        {
+            CheckStringComparison(comparisonType);
+
+            if (comparisonType == StringComparison.Ordinal)
+            {
+                return span.LastIndexOf(value.AsSpan());
+            }
+
+            // Hack for platforms older than .NET Core, since this overload didn't exist.
+            // J2N TODO: Optimize (this is rarely used)
+            return span.ToString().LastIndexOf(value, comparisonType);
+        }
+
+        /// <summary>
+        /// Reports the zero-based index of the last occurrence of the specified <paramref name="value"/> in the current <paramref name="span"/>.
+        /// <param name="span">The source span.</param>
+        /// <param name="value">The value to seek within the source span.</param>
+        /// <param name="comparisonType">One of the enumeration values that determines how the <paramref name="span"/> and <paramref name="value"/> are compared.</param>
+        /// </summary>
+        public static int LastIndexOf(this ReadOnlySpan<char> span, ReadOnlySpan<char> value, StringComparison comparisonType)
+        {
+            CheckStringComparison(comparisonType);
+
+            if (comparisonType == StringComparison.Ordinal)
+            {
+                return span.LastIndexOf(value);
+            }
+
+            // Hack for platforms older than .NET Core, since this overload didn't exist.
+            // J2N TODO: Optimize (this is rarely used)
+            return span.ToString().LastIndexOf(value.ToString(), comparisonType);
+        }
+
+        private static void CheckStringComparison(StringComparison comparisonType)
+        {
+            if (comparisonType < StringComparison.CurrentCulture || comparisonType > StringComparison.OrdinalIgnoreCase)
+                throw new ArgumentOutOfRangeException(nameof(comparisonType));
+        }
+
+#endif
 
         #endregion LastIndexOf
 
