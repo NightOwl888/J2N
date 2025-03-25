@@ -291,7 +291,7 @@ namespace J2N.Text.Tests
         }
         public static IEnumerable<object[]> Append_Double_TestData()
         {
-            yield return new object[] { "Hello", (double)0, "Hello0" };
+            yield return new object[] { "Hello", (double)0, "Hello0.0" }; // J2N: Use the "j" format, which always has at least 1 digit after the decimal
             yield return new object[] { "Hello", 1.23, "Hello1.23" };
             yield return new object[] { "", -4.56, "-4.56" };
         }
@@ -428,7 +428,7 @@ namespace J2N.Text.Tests
 
         public static IEnumerable<object[]> Append_Float_TestData()
         {
-            yield return new object[] { "Hello", (float)0, "Hello0" };
+            yield return new object[] { "Hello", (float)0, "Hello0.0" }; // J2N: Use the "j" format, which always has at least 1 digit after the decimal
             yield return new object[] { "Hello", (float)1.23, "Hello1.23" };
             yield return new object[] { "", (float)-4.56, "-4.56" };
         }
@@ -1350,7 +1350,7 @@ namespace J2N.Text.Tests
 
         public static IEnumerable<object[]> Insert_Float_TestData()
         {
-            yield return new object[] { "Hello", 0, (float)0, "0Hello" };
+            yield return new object[] { "Hello", 0, (float)0, "0.0Hello" }; // J2N: Use the "j" format, which always has at least 1 digit after the decimal
             yield return new object[] { "Hello", 3, (float)1.23, "Hel1.23lo" };
             yield return new object[] { "Hello", 5, (float)-4.56, "Hello-4.56" };
         }
@@ -1477,7 +1477,7 @@ namespace J2N.Text.Tests
 
         public static IEnumerable<object[]> Insert_Double_TestData()
         {
-            yield return new object[] { "Hello", 0, (double)0, "0Hello" };
+            yield return new object[] { "Hello", 0, (double)0, "0.0Hello" }; // J2N: Use the "j" format, which always has at least 1 digit after the decimal
             yield return new object[] { "Hello", 3, 1.23, "Hel1.23lo" };
             yield return new object[] { "Hello", 5, -4.56, "Hello-4.56" };
         }
@@ -1654,7 +1654,7 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[1])); // Index > builder.Length
             AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => builder.Insert(builder.Length + 1, new char[0], 0, 0)); // Index > builder.Length
 
-            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, null, 1, 1)); // Value is null (startIndex and count are not zero)
+            Assert.Throws<ArgumentNullException>(() => builder.Insert(0, (char[])null, 1, 1)); // Value is null (startIndex and count are not zero)
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[0], -1, 0)); // Start index < 0
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => builder.Insert(0, new char[3], 4, 0)); // Start index + char count > value.Length
@@ -1688,6 +1688,8 @@ namespace J2N.Text.Tests
         [InlineData("Hello", 1, 4, "H")]
         [InlineData("Hello", 1, 0, "Hello")]
         [InlineData("Hello", 5, 0, "Hello")]
+        [InlineData("Hello", 1, 2, "Hlo")]
+        [InlineData("HelloHello", 1, 2, "HloHello")]
         public static void Remove(string value, int startIndex, int length, string expected)
         {
             var builder = new OpenStringBuilder(value);

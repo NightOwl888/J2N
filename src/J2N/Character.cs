@@ -568,9 +568,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c> or its <see cref="ICharSequence.HasValue"/> property returns <c>false</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -611,9 +611,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -655,9 +655,9 @@ namespace J2N
         /// or <see cref="string"/> and to call the appropriate overload, instead.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -694,9 +694,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="seq"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
@@ -732,9 +732,9 @@ namespace J2N
         /// value at <paramref name="index"/> is returned.
         /// </summary>
         /// <param name="seq">The source sequence of <see cref="char"/> units.</param>
-        /// <param name="index">the position in <paramref name="seq"/> from which to retrieve the code
+        /// <param name="index">The position in <paramref name="seq"/> from which to retrieve the code
         /// point.</param>
-        /// <returns>the Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
+        /// <returns>The Unicode code point or <see cref="char"/> value at <paramref name="index"/> in
         /// <paramref name="seq"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="index"/> is greater than or equal to the length of <paramref name="seq"/>.
