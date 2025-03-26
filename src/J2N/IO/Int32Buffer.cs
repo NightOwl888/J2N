@@ -16,7 +16,9 @@
  */
 #endregion
 
+using J2N.Buffers;
 using System;
+using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -161,6 +163,8 @@ namespace J2N.IO
         /// <returns>a negative value if this is less than <paramref name="other"/>; 0 if this
         /// equals to <paramref name="other"/>; a positive value if this is greater
         /// than <paramref name="other"/>.</returns>
+        /// <remarks>Note to inheritors: This implementation reads <see cref="int"/>s one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public virtual int CompareTo(Int32Buffer? other)
         {
             if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
@@ -212,6 +216,8 @@ namespace J2N.IO
         /// <param name="other">The object to compare with this <see cref="Int32Buffer"/>.</param>
         /// <returns><c>true</c> if this <see cref="Int32Buffer"/> is equal to <paramref name="other"/>,
         /// <c>false</c> otherwise.</returns>
+        /// <remarks>Note to inheritors: This implementation reads <see cref="int"/>s one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public override bool Equals(object? other)
         {
             if (other is null || !(other is Int32Buffer otherBuffer))
@@ -271,6 +277,8 @@ namespace J2N.IO
         /// <param name="length">The number of <see cref="int"/>s to read, must be no less than zero and not
         /// greater than <c>destination.Length - offset</c>.</param>
         /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation reads <see cref="int"/>s one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="offset"/> plus <paramref name="length"/> indicates a position not within this instance.
         /// <para/>
@@ -301,6 +309,33 @@ namespace J2N.IO
         }
 
         /// <summary>
+        /// Reads <see cref="int"/>s from the current position into the specified span,
+        /// and increases the position by the number of <see cref="int"/>s read.
+        /// <para/>
+        /// The <see cref="Span{Int32}.Length"/> property is used to determine
+        /// how many <see cref="int"/>s to read.
+        /// </summary>
+        /// <param name="destination">The target span, sliced to the proper position, if necessary.</param>
+        /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation reads <see cref="int"/>s one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
+        /// <exception cref="BufferUnderflowException">If <see cref="Span{Int32}.Length"/> is greater than
+        /// <see cref="Buffer.Remaining"/>.</exception>
+        public virtual Int32Buffer Get(Span<int> destination) // J2N specific
+        {
+            int length = destination.Length;
+            if (length > Remaining)
+            {
+                throw new BufferUnderflowException();
+            }
+            for (int i = 0; i < length; i++)
+            {
+                destination[i] = Get();
+            }
+            return this;
+        }
+
+        /// <summary>
         /// Returns an <see cref="int"/> at the specified <paramref name="index"/>; the position is not changed.
         /// </summary>
         /// <param name="index">The index, must not be negative and less than limit.</param>
@@ -321,6 +356,8 @@ namespace J2N.IO
         /// position, limit, capacity and mark don't affect the hash code.
         /// </summary>
         /// <returns>The hash code calculated from the remaining <see cref="int"/>s.</returns>
+        /// <remarks>Note to inheritors: This implementation reads <see cref="int"/>s one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public override int GetHashCode()
         {
             int myPosition = position;
@@ -411,6 +448,8 @@ namespace J2N.IO
         /// <param name="length">The number of <see cref="int"/>s to write, must be no less than zero and not
         /// greater than <c>source.Length - offset</c>.</param>
         /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation writes <see cref="int"/>s one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <paramref name="length"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="offset"/> plus <paramref name="length"/> indicates a position not within this instance.
@@ -442,6 +481,32 @@ namespace J2N.IO
         }
 
         /// <summary>
+        /// Writes <see cref="int"/>s in the given span to the current position and increases the
+        /// position by the number of <see cref="int"/>s written.
+        /// <para/>
+        /// Calling this method has a similar effect as
+        /// <c>Put(source, 0, source.Length)</c>.
+        /// </summary>
+        /// <param name="source">The source span.</param>
+        /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation writes <see cref="int"/>s one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
+        /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <c>source.Length</c>.</exception>
+        /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
+        public virtual Int32Buffer Put(ReadOnlySpan<int> source) // J2N specific
+        {
+            int length = source.Length;
+            if (length > Remaining)
+                throw new BufferOverflowException();
+
+            for (int i = 0; i < length; i++)
+            {
+                Put(source[i]);
+            }
+            return this;
+        }
+
+        /// <summary>
         /// Writes all the remaining <see cref="int"/>s of the <paramref name="source"/> <see cref="Int32Buffer"/> to this
         /// buffer's current position, and increases both buffers' position by the
         /// number of <see cref="int"/>s copied.
@@ -463,10 +528,21 @@ namespace J2N.IO
             if (IsReadOnly)
                 throw new ReadOnlyBufferException(); // J2N: Harmony has a bug - it shouldn't read the source and change its position unless this buffer is writable
 
-            int[] contents = new int[source.Remaining];
-            source.Get(contents);
-            Put(contents);
-            return this;
+            int length = source.Remaining;
+            int[]? arrayToReturnToPool = null;
+            Span<int> contents = length * sizeof(int) > ByteStackBufferSize
+                ? (arrayToReturnToPool = ArrayPool<int>.Shared.Rent(length)).AsSpan(0, length)
+                : stackalloc int[length];
+            try
+            {
+                source.Get(contents);
+                Put(contents);
+                return this;
+            }
+            finally
+            {
+                ArrayPool<int>.Shared.ReturnIfNotNull(arrayToReturnToPool);
+            }
         }
 
         /// <summary>
