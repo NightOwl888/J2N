@@ -181,7 +181,7 @@ namespace J2N.IO
         {
             if (characterSequence is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringBuilderAdapter?
+            return new StringBuilderAdapter(characterSequence);
         }
 
         /// <summary>
@@ -219,7 +219,7 @@ namespace J2N.IO
             if (startIndex > characterSequence.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
+            return new StringBuilderAdapter(characterSequence)
             {
                 position = startIndex,
                 limit = startIndex + length
@@ -239,8 +239,14 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence)
         {
-            if (characterSequence is null)
+            if (characterSequence is null || !characterSequence.HasValue)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
+
+            if (characterSequence is StringBuilderCharSequence sb)
+            {
+                return new StringBuilderAdapter(sb.Value!);
+            }
+
             return new CharSequenceAdapter(characterSequence);
         }
 
@@ -270,7 +276,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence, int startIndex, int length)
         {
-            if (characterSequence is null)
+            if (characterSequence is null || !characterSequence.HasValue)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -278,6 +284,11 @@ namespace J2N.IO
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > characterSequence.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
+
+            if (characterSequence is StringBuilderCharSequence sb)
+            {
+                return new StringBuilderAdapter(sb.Value!);
+            }
 
             return new CharSequenceAdapter(characterSequence)
             {
