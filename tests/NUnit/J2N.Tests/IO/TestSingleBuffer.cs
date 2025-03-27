@@ -293,6 +293,44 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for SingleBuffer Get(Span<float>)
+         */
+        [Test]
+        public virtual void TestGetfloatSpan() // J2N specific
+        {
+            Span<float> array = new float[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                SingleBuffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i), 0.01);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Position = (buf.Limit);
+            //    buf.Get((float[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+            buf.Get(new float[0].AsSpan());
+        }
+
+        /*
          * Class under test for java.nio.SingleBuffer get(float[])
          */
         [Test]
@@ -512,6 +550,44 @@ namespace J2N.IO
             {
                 // expected
             }
+        }
+
+        /*
+         * Class under test for SingleBuffer Put(ReadOnlySpan<float>)
+         */
+        [Test]
+        public virtual void TestPutfloatSpan() // J2N specific
+        {
+            Span<float> array = new float[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (float)i;
+                SingleBuffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (float)i, 0.0);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Position = (buf.Limit);
+            //    buf.Put((float[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
         }
 
         /*

@@ -378,6 +378,42 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for ByteBuffer Get(Span<byte>)
+         */
+        [Test]
+        public virtual void TestGetbyteSpan() // J2N specific
+        {
+            Span<byte> array = new byte[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                ByteBuffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i));
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Get((byte[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        /*
          * Class under test for java.nio.ByteBuffer get(byte[])
          */
         [Test]
@@ -667,6 +703,57 @@ namespace J2N.IO
             {
                 // expected
             }
+        }
+
+        /*
+         * Class under test for ByteBuffer Put(ReadOnlySpan<byte>)
+         */
+        [Test]
+        public virtual void TestPutbyteSpan() // J2N specific
+        {
+            Span<byte> array = new byte[1];
+            if (buf.IsReadOnly)
+            {
+                try
+                {
+                    buf.Put(array);
+                    fail("Should throw Exception"); //$NON-NLS-1$
+                }
+                catch (ReadOnlyBufferException e)
+                {
+                    // expected
+                }
+                return;
+            }
+
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (byte)i;
+                ByteBuffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (byte)i);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Put((byte[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
         }
 
         /*

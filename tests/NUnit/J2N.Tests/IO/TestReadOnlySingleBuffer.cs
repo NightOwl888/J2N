@@ -93,6 +93,31 @@ namespace J2N.IO
         }
 
         [Test]
+        public override void TestPutfloatSpan() // J2N specific
+        {
+            Span<float> array = new float[1];
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ReadOnlyBufferException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Put((float[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        [Test]
         public override void TestPutfloatArray()
         {
             float[] array = new float[1];

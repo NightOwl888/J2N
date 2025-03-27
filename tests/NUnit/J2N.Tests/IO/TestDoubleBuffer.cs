@@ -304,6 +304,32 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for DoubleBuffer Get(Span<double>)
+         */
+        [Test]
+        public virtual void TestGetdoubleSpan() // J2N specific
+        {
+            Span<double> array = new double[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                DoubleBuffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i), 0.01);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+        }
+
+        /*
          * Class under test for java.nio.DoubleBuffer get(double[])
          */
         [Test]
@@ -324,6 +350,15 @@ namespace J2N.IO
                 fail("Should throw Exception"); //$NON-NLS-1$
             }
             catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            try // J2N: Added check for guard clause
+            {
+                buf.Get((double[])null);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ArgumentNullException e)
             {
                 // expected
             }
@@ -512,6 +547,44 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for DoubleBuffer Put(ReadOnlySpan<double>)
+         */
+        [Test]
+        public virtual void TestPutdoubleSpan() // J2N specific
+        {
+            Span<double> array = new double[1];
+
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (double)i;
+                DoubleBuffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (double)i, 0.0);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Put((double[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        /*
          * Class under test for java.nio.DoubleBuffer put(double[])
          */
         [Test]
@@ -534,6 +607,15 @@ namespace J2N.IO
                 fail("Should throw Exception"); //$NON-NLS-1$
             }
             catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            try
+            {
+                buf.Put((double[])null);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ArgumentNullException e)
             {
                 // expected
             }

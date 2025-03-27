@@ -268,6 +268,42 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for Int32Buffer Get(Span<int>)
+         */
+        [Test]
+        public virtual void TestGetintSpan() // J2N specific
+        {
+            Span<int> array = new int[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                Int32Buffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i));
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Get((int[])null);
+            //    fail("Should throw NPE"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        /*
          * Class under test for java.nio.Int32Buffer get(int[])
          */
         [Test]
@@ -482,6 +518,44 @@ namespace J2N.IO
             {
                 // expected
             }
+        }
+
+        /*
+         * Class under test for Int32Buffer Put(ReadOnlySpan<int>)
+         */
+        [Test]
+        public virtual void TestPutintSpan() // J2N specific
+        {
+            Span<int> array = new int[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (int)i;
+                Int32Buffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (int)i);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Position = (buf.Limit);
+            //    buf.Put((int[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
         }
 
         /*

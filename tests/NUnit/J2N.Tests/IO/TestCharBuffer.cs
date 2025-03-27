@@ -362,6 +362,32 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for CharBuffer Get(Span<char>)
+         */
+        [Test]
+        public virtual void TestGetcharSpan() // J2N specific
+        {
+            Span<char> array = new char[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                CharBuffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i));
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+        }
+
+        /*
          * Class under test for java.nio.CharBuffer get(char[])
          */
         [Test]
@@ -382,6 +408,15 @@ namespace J2N.IO
                 fail("Should throw Exception"); //$NON-NLS-1$
             }
             catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            try // J2N: Added check for guard clause
+            {
+                buf.Get((char[])null);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ArgumentNullException e)
             {
                 // expected
             }
@@ -548,6 +583,44 @@ namespace J2N.IO
             {
                 // expected
             }
+        }
+
+        /*
+         * Class under test for CharBuffer Put(ReadOnlySpan<char>)
+         */
+        [Test]
+        public virtual void TestPutcharSpan() // J2N specific
+        {
+            Span<char> array = new char[1];
+
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (char)i;
+                CharBuffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (char)i);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Put((char[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
         }
 
         /*

@@ -270,6 +270,43 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for Int64Buffer Get(Span<long>)
+         */
+        [Test]
+        public virtual void TestGetlongSpan() // J2N specific
+        {
+            Span<long> array = new long[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                Int64Buffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i));
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Position = (buf.Limit);
+            //    buf.Get((long[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        /*
          * Class under test for java.nio.Int64Buffer get(long[])
          */
         [Test]
@@ -485,6 +522,44 @@ namespace J2N.IO
             {
                 // expected
             }
+        }
+
+        /*
+         * Class under test for Int64Buffer Put(ReadOnlySpan<long>)
+         */
+        [Test]
+        public virtual void TestPutlongSpan() // J2N specific
+        {
+            Span<long> array = new long[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (long)i;
+                Int64Buffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (long)i);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Position = (buf.Limit);
+            //    buf.Put((long[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
         }
 
         /*
