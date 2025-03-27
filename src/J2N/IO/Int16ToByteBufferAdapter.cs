@@ -156,6 +156,8 @@ namespace J2N.IO
             return byteBuffer.GetInt16(index << 1);
         }
 
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) to shorts and override Get(Span<short>)
+
         //public override bool IsDirect => byteBuffer.IsDirect;
 
         public override bool IsReadOnly => byteBuffer.IsReadOnly;
@@ -196,6 +198,8 @@ namespace J2N.IO
             byteBuffer.PutInt16(index << 1, value);
             return this;
         }
+
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) from shorts and override Put(ReadOnlySpan<short>)
 
         public override Int16Buffer Slice()
         {

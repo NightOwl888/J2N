@@ -116,6 +116,17 @@ namespace J2N.IO
             return this;
         }
 
+        public override Int16Buffer Put(ReadOnlySpan<short> source) // J2N specific
+        {
+            int length = source.Length;
+            if (length > Remaining)
+                throw new BufferOverflowException();
+
+            source.CopyTo(backingArray.AsSpan(offset + position, length));
+            position += length;
+            return this;
+        }
+
         public override Int16Buffer Slice()
         {
             return new ReadWriteInt16ArrayBuffer(Remaining, backingArray, offset + position);

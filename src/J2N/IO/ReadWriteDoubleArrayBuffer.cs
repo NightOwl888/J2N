@@ -113,6 +113,17 @@ namespace J2N.IO
             return this;
         }
 
+        public override DoubleBuffer Put(ReadOnlySpan<double> source) // J2N specific
+        {
+            int length = source.Length;
+            if (length > Remaining)
+                throw new BufferOverflowException();
+
+            source.CopyTo(backingArray.AsSpan(offset + position, length));
+            position += length;
+            return this;
+        }
+
         public override DoubleBuffer Slice()
         {
             return new ReadWriteDoubleArrayBuffer(Remaining, backingArray, offset + position);

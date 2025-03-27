@@ -16,6 +16,8 @@
  */
 #endregion
 
+using System;
+
 namespace J2N.IO
 {
     /// <summary>
@@ -82,6 +84,11 @@ namespace J2N.IO
         }
 
         public override sealed SingleBuffer Put(float[] source, int offset, int length)
+        {
+            throw new ReadOnlyBufferException();
+        }
+
+        public override SingleBuffer Put(ReadOnlySpan<float> source) // J2N specific
         {
             throw new ReadOnlyBufferException();
         }

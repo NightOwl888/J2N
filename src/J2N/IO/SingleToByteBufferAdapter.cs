@@ -156,6 +156,7 @@ namespace J2N.IO
             return byteBuffer.GetSingle(index << 2);
         }
 
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) to floats and override Get(Span<float>)
 
         //public override bool IsDirect => byteBuffer.IsDirect;
 
@@ -195,6 +196,8 @@ namespace J2N.IO
             byteBuffer.PutSingle(index << 2, value);
             return this;
         }
+
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) from floats and override Put(ReadOnlySpan<float>)
 
         public override SingleBuffer Slice()
         {

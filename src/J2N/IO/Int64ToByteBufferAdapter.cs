@@ -155,6 +155,8 @@ namespace J2N.IO
             return byteBuffer.GetInt64(index << 3);
         }
 
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) to longs and override Get(Span<long>)
+
         //public override bool IsDirect => byteBuffer.IsDirect;
 
         public override bool IsReadOnly => byteBuffer.IsReadOnly;
@@ -192,6 +194,9 @@ namespace J2N.IO
             byteBuffer.PutInt64(index << 3, value);
             return this;
         }
+
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) from longs and override Put(ReadOnlySpan<long>)
+
         public override Int64Buffer Slice()
         {
             byteBuffer.SetLimit(limit << 3);

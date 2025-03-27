@@ -87,6 +87,16 @@ namespace J2N.IO
             return this;
         }
 
+        public override DoubleBuffer Get(Span<double> destination) // J2N specific
+        {
+            int length = destination.Length;
+            if (length > Remaining)
+                throw new BufferUnderflowException();
+
+            backingArray.AsSpan(offset + position, length).CopyTo(destination);
+            position += length;
+            return this;
+        }
 
         //public override sealed bool IsDirect => false;
 

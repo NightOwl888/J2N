@@ -92,7 +92,19 @@ namespace J2N.IO
                 throw new BufferUnderflowException();
 
             int newPosition = position + length;
-            sequence.ToString().CopyTo(position, destination, offset, length);
+            sequence.ToString().CopyTo(position, destination, offset, length); // J2N TODO: Create specialized adapter for StringBuilder as a separate class and then loop through the indexer here
+            position = newPosition;
+            return this;
+        }
+
+        public override CharBuffer Get(Span<char> destination) // J2N specific
+        {
+            int length = destination.Length;
+            if (length > Remaining)
+                throw new BufferUnderflowException();
+
+            int newPosition = position + length;
+            sequence.ToString().AsSpan(position, length).CopyTo(destination); // J2N TODO: Create specialized adapter for StringBuilder as a separate class and then loop through the indexer here
             position = newPosition;
             return this;
         }

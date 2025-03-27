@@ -153,6 +153,8 @@ namespace J2N.IO
             return byteBuffer.GetDouble(index << 3);
         }
 
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) to doubles and override Get(Span<double>)
+
         //public override bool IsDirect => byteBuffer.IsDirect;
 
         public override bool IsReadOnly => byteBuffer.IsReadOnly;
@@ -190,6 +192,8 @@ namespace J2N.IO
             byteBuffer.PutDouble(index << 3, value);
             return this;
         }
+
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) from doubles and override Put(ReadOnlySpan<double>)
 
         public override DoubleBuffer Slice()
         {

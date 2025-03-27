@@ -163,6 +163,8 @@ namespace J2N.IO
             return byteBuffer.GetInt32(index << 2);
         }
 
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) to ints and override Get(Span<int>)
+
         //public override bool IsDirect => byteBuffer.IsDirect;
 
         public override bool IsReadOnly => byteBuffer.IsReadOnly;
@@ -200,6 +202,8 @@ namespace J2N.IO
             byteBuffer.PutInt32(index << 2, value);
             return this;
         }
+
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) from ints and override Put(ReadOnlySpan<int>)
 
         public override Int32Buffer Slice()
         {
