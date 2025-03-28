@@ -16,9 +16,7 @@
  */
 #endregion
 
-using J2N.Text;
 using System;
-
 
 namespace J2N.IO
 {
@@ -27,14 +25,18 @@ namespace J2N.IO
     /// <para/>
     /// Implementation notice:
     /// <list type="bullet">
-    ///     <item><description>Char sequence based buffer is always readonly.</description></item>
+    ///     <item><description><see cref="ReadOnlyMemory{Char}"/> based buffer is always readonly.</description></item>
     /// </list>
     /// </summary>
-    internal sealed class CharSequenceAdapter : CharBuffer
+    // J2N: Note that this does the same job as ReadOnlyCharArrayBuffer and could effectively replace it,
+    // but also supports string without any allocations. We are only keeping ReadOnlyCharArrayBuffer around
+    // because it is paired and we cannot simply replace ReadWriteCharArrayBuffer's char[] backing field
+    // with Memory<char> because the char[] is exposed through the Array/ProtectedArray properties in those cases.
+    internal sealed class CharReadOnlyMemoryAdapter : CharBuffer
     {
-        internal static CharSequenceAdapter Copy(CharSequenceAdapter other)
+        internal static CharReadOnlyMemoryAdapter Copy(CharReadOnlyMemoryAdapter other)
         {
-            return new CharSequenceAdapter(other.sequence)
+            return new CharReadOnlyMemoryAdapter(other.sequence)
             {
                 limit = other.limit,
                 position = other.position,
@@ -42,12 +44,14 @@ namespace J2N.IO
             };
         }
 
-        internal readonly ICharSequence sequence;
+        internal readonly object? backingInstance; // Keeps the memory behind sequence in scope
+        internal readonly ReadOnlyMemory<char> sequence;
 
-        internal CharSequenceAdapter(ICharSequence chseq)
+        internal CharReadOnlyMemoryAdapter(ReadOnlyMemory<char> chseq)
             : base(chseq.Length)
         {
             sequence = chseq;
+            sequence.TryGetReference(ref backingInstance);
         }
 
         public override CharBuffer AsReadOnlyBuffer() => Duplicate();
@@ -65,7 +69,7 @@ namespace J2N.IO
             {
                 throw new BufferUnderflowException();
             }
-            return sequence[position++];
+            return sequence.Span[position++];
         }
 
         public override char Get(int index)
@@ -74,7 +78,7 @@ namespace J2N.IO
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
-            return sequence[index];
+            return sequence.Span[index];
         }
 
         public override sealed CharBuffer Get(char[] destination, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
@@ -91,7 +95,7 @@ namespace J2N.IO
                 throw new BufferUnderflowException();
 
             int newPosition = position + length;
-            sequence.ToString().CopyTo(position, destination, offset, length); // J2N TODO: Create specialized adapter for StringBuilder as a separate class and then loop through the indexer here
+            sequence.Slice(position, length).CopyTo(destination.AsMemory(offset, length));
             position = newPosition;
             return this;
         }
@@ -103,7 +107,7 @@ namespace J2N.IO
                 throw new BufferUnderflowException();
 
             int newPosition = position + length;
-            sequence.ToString().AsSpan(position, length).CopyTo(destination); // J2N TODO: Create specialized adapter for StringBuilder as a separate class and then loop through the indexer here
+            sequence.Span.Slice(position, length).CopyTo(destination);
             position = newPosition;
             return this;
         }
@@ -168,7 +172,7 @@ namespace J2N.IO
 
         public override CharBuffer Slice()
         {
-            return new CharSequenceAdapter(sequence.Subsequence(position, limit - position)); // J2N: Corrected 2nd parameter
+            return new CharReadOnlyMemoryAdapter(sequence.Slice(position, limit - position)); // J2N: Corrected 2nd parameter
         }
 
         public override CharBuffer Subsequence(int startIndex, int length)
@@ -180,7 +184,7 @@ namespace J2N.IO
             if (startIndex > Remaining - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            CharSequenceAdapter result = Copy(this);
+            CharReadOnlyMemoryAdapter result = Copy(this);
             result.position = position + startIndex;
             result.limit = position + startIndex + length;
             return result;

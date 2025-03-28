@@ -42,7 +42,10 @@ namespace J2N.IO
             string s = "A test string to test with.";
             char[] ca = s.ToCharArray();
             StringBuilder sb = new StringBuilder(s);
-            ICharSequence cs = s.AsCharSequence();
+            ICharSequence scs = s.AsCharSequence();
+            ICharSequence sbcs = sb.AsCharSequence();
+            ICharSequence cacs = ca.AsCharSequence();
+            ICharSequence customcs = new MockCharSequence(s.AsMemory());
 
             // Control - char[] was part of the original Java implementation
             // and used length rather than end index. So we will check that our conversion
@@ -57,9 +60,52 @@ namespace J2N.IO
             Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(sb).Limit);
             Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(sb, 6, 10).Limit);
 
-            // ICharSequence
-            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(cs).Limit);
-            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(cs, 6, 10).Limit);
+            // ICharSequence (string)
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(scs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(scs, 6, 10).Limit);
+
+            // ICharSequence (StringBuilder)
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(sbcs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(sbcs, 6, 10).Limit);
+
+            // ICharSequence (char[])
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(cacs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(cacs, 6, 10).Limit);
+
+            // ICharSequence (custom)
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(customcs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(customcs, 6, 10).Limit);
+        }
+
+        /// <summary>
+        /// A custom <see cref="ICharSequence"/> implementation used for testing unknown
+        /// implementations, since we generally optimize by using the underlying value of
+        /// <see cref="CharArrayCharSequence"/>, <see cref="StringCharSequence"/> or 
+        /// <see cref="StringBuilderCharSequence"/> rather than the interface itself.
+        /// </summary>
+        private sealed class MockCharSequence : ICharSequence
+        {
+            private readonly ReadOnlyMemory<char> value;
+            public MockCharSequence(ReadOnlyMemory<char> value)
+            {
+                this.value = value;
+            }
+
+            public char this[int index] => value.Span[index];
+
+            public bool HasValue => true;
+
+            public int Length => value.Length;
+
+            public ICharSequence Subsequence(int startIndex, int length)
+            {
+                return new MockCharSequence(value.Slice(startIndex, length));
+            }
+
+            public override string ToString()
+            {
+                return value.ToString();
+            }
         }
 
 

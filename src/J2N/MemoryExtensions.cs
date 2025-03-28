@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -428,5 +429,35 @@ namespace J2N
         }
 
         #endregion ReverseText
+
+        #region TryGetReference
+
+        /// <summary>
+        /// Sets the supplied <paramref name="reference"/> to the underlying <see cref="string"/> or <see cref="T:char[]"/>
+        /// of this <see cref="ReadOnlyMemory{Char}"/>. This allows use of <see cref="ReadOnlyMemory{Char}"/> as a field
+        /// of a struct or class without having the underlying <see cref="string"/> or <see cref="T:char[]"/> go out of scope.
+        /// </summary>
+        /// <param name="text">This <see cref="ReadOnlyMemory{Char}"/>.</param>
+        /// <param name="reference">When this method returns successfully, the refernce will be set by ref to the
+        /// underlying <see cref="string"/> or <see cref="T:char[]"/> of <paramref name="text"/>.</param>
+        /// <returns><c>true</c> if the underlying reference could be retrieved; otherwise, <c>false</c>.
+        /// Note that if the underlying memory is not a <see cref="string"/> or <see cref="T:char[]"/>,
+        /// this method will always return <c>false</c>.</returns>
+        internal static bool TryGetReference(this ReadOnlyMemory<char> text, [MaybeNullWhen(false)] ref object? reference)
+        {
+            if (MemoryMarshal.TryGetString(text, out string? stringValue, out _, out _) && stringValue is not null)
+            {
+                reference = stringValue;
+                return true;
+            }
+            else if (MemoryMarshal.TryGetArray(text, out ArraySegment<char> arraySegment) && arraySegment.Array is not null)
+            {
+                reference = arraySegment.Array;
+                return true;
+            }
+            return false;
+        }
+
+        #endregion
     }
 }

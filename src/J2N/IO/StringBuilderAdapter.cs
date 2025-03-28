@@ -169,8 +169,12 @@ namespace J2N.IO
 
         public override CharBuffer Slice()
         {
-            // J2N TODO: Copy the bytes and return a CharMemoryAdapter here
-            return new CharSequenceAdapter(sequence.Subsequence(position, limit - position)); // J2N: Corrected 2nd parameter
+            int length = Remaining;
+            // J2N NOTE: If the caller slices again, this will be more efficient than using CharSequenceAdapter around a string
+            // and will also index faster if the StringBuilder has more than one chunk.
+            char[] chars = new char[length];
+            sequence.CopyTo(position, chars, 0, length);
+            return new ReadOnlyCharArrayBuffer(length, chars, arrayOffset: 0);
         }
 
         public override CharBuffer Subsequence(int startIndex, int length)

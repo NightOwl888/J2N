@@ -123,7 +123,7 @@ namespace J2N.IO
         {
             if (characterSequence is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringAdapter?
+            return new CharReadOnlyMemoryAdapter(characterSequence.AsMemory());
         }
 
         /// <summary>
@@ -161,7 +161,7 @@ namespace J2N.IO
             if (startIndex > characterSequence.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
+            return new CharReadOnlyMemoryAdapter(characterSequence.AsMemory())
             {
                 position = startIndex,
                 limit = startIndex + length
@@ -176,6 +176,13 @@ namespace J2N.IO
         /// </summary>
         /// <param name="characterSequence">The <see cref="StringBuilder"/> which the new buffer will be based on.</param>
         /// <returns>The created char buffer.</returns>
+        /// <remarks><see cref="StringBuilder"/>'s <see cref="StringBuilder.this[int]"/> property is known to perform
+        /// poorly and some operations on a raw <see cref="StringBuilder"/> will suffer as a result. It is generally
+        /// preferable to use <see cref="ArrayPool{T}"/> to allocate a temporary array and then use the
+        /// <see cref="StringBuilder.CopyTo(int, char[], int, int)"/> method to transfer the chars to the temporary array,
+        /// then use the array to call the <see cref="Wrap(char[], int, int)"/> overload for better performance.
+        /// Be sure to call <see cref="ArrayPool{Char}.Return(Char[], bool)"/> to return the array to the pool when you
+        /// are finished with the <see cref="CharBuffer"/> instance.</remarks>
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(StringBuilder characterSequence)
         {
@@ -200,6 +207,13 @@ namespace J2N.IO
         /// <param name="length">The end index, must be no less than <paramref name="startIndex"/> and no
         /// greater than <c>characterSequence.Length</c>.</param>
         /// <returns>The created char buffer.</returns>
+        /// <remarks><see cref="StringBuilder"/>'s <see cref="StringBuilder.this[int]"/> property is known to perform
+        /// poorly and some operations on a raw <see cref="StringBuilder"/> will suffer as a result. It is generally
+        /// preferable to use <see cref="ArrayPool{T}"/> to allocate a temporary array and then use the
+        /// <see cref="StringBuilder.CopyTo(int, char[], int, int)"/> method to transfer the chars to the temporary array,
+        /// then use the array to call the <see cref="Wrap(char[], int, int)"/> overload for better performance.
+        /// Be sure to call <see cref="ArrayPool{Char}.Return(Char[], bool)"/> to return the array to the pool when you
+        /// are finished with the <see cref="CharBuffer"/> instance.</remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within this instance.
         /// <para/>
@@ -242,10 +256,12 @@ namespace J2N.IO
             if (characterSequence is null || !characterSequence.HasValue)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
 
+            if (characterSequence is StringCharSequence str)
+                return new CharReadOnlyMemoryAdapter(str.Value!.AsMemory());
+            if (characterSequence is CharArrayCharSequence ca)
+                return new ReadOnlyCharArrayBuffer(ca.Length, ca.Value!, arrayOffset: 0);
             if (characterSequence is StringBuilderCharSequence sb)
-            {
                 return new StringBuilderAdapter(sb.Value!);
-            }
 
             return new CharSequenceAdapter(characterSequence);
         }
@@ -285,9 +301,29 @@ namespace J2N.IO
             if (startIndex > characterSequence.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
+            if (characterSequence is StringCharSequence str)
+            {
+                return new CharReadOnlyMemoryAdapter(str.Value!.AsMemory())
+                {
+                    position = startIndex,
+                    limit = startIndex + length
+                };
+            }
+            if (characterSequence is CharArrayCharSequence ca)
+            {
+                return new ReadOnlyCharArrayBuffer(ca.Length, ca.Value!, arrayOffset: 0)
+                {
+                    position = startIndex,
+                    limit = startIndex + length
+                };
+            }
             if (characterSequence is StringBuilderCharSequence sb)
             {
-                return new StringBuilderAdapter(sb.Value!);
+                return new StringBuilderAdapter(sb.Value!)
+                {
+                    position = startIndex,
+                    limit = startIndex + length
+                };
             }
 
             return new CharSequenceAdapter(characterSequence)
