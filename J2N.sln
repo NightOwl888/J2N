@@ -107,6 +107,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Collections.ObjectModel
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Runtime.Tests", "tests\Xunit\J2N.Runtime.Tests\J2N.Runtime.Tests.csproj", "{6B1280F0-7B29-4A86-B404-6E04641B4C0D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Memory.Tests", "tests\Xunit\J2N.Memory.Tests\J2N.Memory.Tests.csproj", "{8859E44B-EF62-4504-95EB-D084221D4013}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -181,6 +183,10 @@ Global
 		{6B1280F0-7B29-4A86-B404-6E04641B4C0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6B1280F0-7B29-4A86-B404-6E04641B4C0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6B1280F0-7B29-4A86-B404-6E04641B4C0D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8859E44B-EF62-4504-95EB-D084221D4013}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8859E44B-EF62-4504-95EB-D084221D4013}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8859E44B-EF62-4504-95EB-D084221D4013}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8859E44B-EF62-4504-95EB-D084221D4013}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -206,6 +212,7 @@ Global
 		{5EAF8BF5-9660-4E2E-AD97-10CCC99604D3} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{A101FA42-5184-4D92-9B9C-E0AE5E98664C} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{6B1280F0-7B29-4A86-B404-6E04641B4C0D} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
+		{8859E44B-EF62-4504-95EB-D084221D4013} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B477AD9F-26BF-44CF-B94C-50D89AC24836}
