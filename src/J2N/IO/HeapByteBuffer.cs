@@ -16,7 +16,9 @@
  */
 #endregion
 
+using J2N.Buffers.Binary;
 using System;
+using System.Runtime.InteropServices;
 
 
 namespace J2N.IO
@@ -210,23 +212,29 @@ namespace J2N.IO
         protected int LoadInt32(int index)
         {
             int baseOffset = offset + index;
-            int bytes = 0;
+            int bytes = MemoryMarshal.Read<int>(backingArray.AsSpan(baseOffset, sizeof(int)));
             if (order == Endianness.BigEndian)
             {
-                for (int i = 0; i < 4; i++)
-                {
-                    bytes <<= 8;
-                    bytes |= (backingArray[baseOffset + i] & 0xFF);
-                }
+                bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
-            else
-            {
-                for (int i = 3; i >= 0; i--)
-                {
-                    bytes <<= 8;
-                    bytes |= (backingArray[baseOffset + i] & 0xFF);
-                }
-            }
+
+            //int bytes = 0;
+            //if (order == Endianness.BigEndian)
+            //{
+            //    for (int i = 0; i < 4; i++)
+            //    {
+            //        bytes <<= 8;
+            //        bytes |= (backingArray[baseOffset + i] & 0xFF);
+            //    }
+            //}
+            //else
+            //{
+            //    for (int i = 3; i >= 0; i--)
+            //    {
+            //        bytes <<= 8;
+            //        bytes |= (backingArray[baseOffset + i] & 0xFF);
+            //    }
+            //}
             return bytes;
         }
 
