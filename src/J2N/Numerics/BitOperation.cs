@@ -16,6 +16,7 @@
  */
 #endregion
 
+using J2N.Buffers.Binary;
 using System;
 using System.Runtime.CompilerServices;
 
@@ -385,12 +386,9 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="short"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
+        [Obsolete("Use BinaryPrimitive.ReverseEndianness(short) instead.")]
         public static short ReverseBytes(this short value)
-        {
-            int high = (value >> 8) & 0xFF;
-            int low = (value & 0xFF) << 8;
-            return (short)(low | high);
-        }
+            => BinaryPrimitive.ReverseEndianness(value);
 
         /// <summary>
         /// Returns the value obtained by reversing the order of the bytes in the
@@ -399,13 +397,9 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="int"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
+        [Obsolete("Use BinaryPrimitive.ReverseEndianness(int) instead.")]
         public static int ReverseBytes(this int value)
-        {
-            return ((value >>> 24)) |
-                   ((value >> 8) & 0xFF00) |
-                   ((value << 8) & 0xFF0000) |
-                   ((value << 24));
-        }
+            => BinaryPrimitive.ReverseEndianness(value);
 
         /// <summary>
         /// Returns the value obtained by reversing the order of the bytes in the
@@ -414,15 +408,9 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="long"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
+        [Obsolete("Use BinaryPrimitive.ReverseEndianness(long) instead.")]
         public static long ReverseBytes(this long value)
-        {
-            value = (value & 0x00ff00ff00ff00ffL) << 8 |
-                (value >>> 8) & 0x00ff00ff00ff00ffL;
-            return (value << 48) |
-                ((value & 0xffff0000L) << 16) |
-                ((value >>> 16) & 0xffff0000L) |
-                (value >>> 48);
-        }
+            => BinaryPrimitive.ReverseEndianness(value);
 
         #endregion
 

@@ -17,6 +17,7 @@
 #endregion
 
 using J2N.Buffers;
+using J2N.Buffers.Binary;
 using J2N.Text;
 using System;
 using System.Buffers;
@@ -2805,12 +2806,20 @@ namespace J2N
         /// </summary>
         /// <param name="c">The character to reverse.</param>
         /// <returns>The character with reordered bytes.</returns>
+        [Obsolete("Use ReverseEndianness(char) instead.")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char ReverseBytes(char c)
-        {
-            return (char)((c << 8) | (c >> 8));
-        }
+            => BinaryPrimitive.ReverseEndianness(c);
 
+        /// <summary>
+        /// Reverses the order of the first and second byte in the specified
+        /// character.
+        /// </summary>
+        /// <param name="value">The character to reverse.</param>
+        /// <returns>The character with reordered bytes.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static char ReverseEndianness(char value)
+            => BinaryPrimitive.ReverseEndianness(value);
 
         /// <summary>
         /// Converts the character argument to
