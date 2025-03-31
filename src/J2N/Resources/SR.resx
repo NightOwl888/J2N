@@ -465,4 +465,7 @@
   <data name="Argument_AddingDuplicateWithKey" xml:space="preserve">
     <value>An item with the same key has already been added. Key: {0}</value>
   </data>
+  <data name="Arg_BufferTooSmall" xml:space="preserve">
+    <value>Not enough space available in the buffer.</value>
+  </data>
 </root>
