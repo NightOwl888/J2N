@@ -3212,5 +3212,26 @@ namespace J2N.Numerics
 
             #endregion TryParse_CharSequence_Single
         }
+
+        // J2N specific - GitHub issue #128
+        [Test]
+        public void Issue128_UnicodeMinusSignExponentialNotation()
+        {
+            // Some cultures (such as sv-FI) use a Unicode minus sign (U+2212) instead of the ASCII hyphen-minus (U+002D) as the negative sign.
+            // Previously, the formatter was using a hyphen as the negative sign, which caused parsing to fail when the culture used a different character.
+            // This test verifies that the parser can handle Unicode minus signs in exponential notation, as well as i.e. decimal commas.
+            foreach (var culture in CultureInfo.GetCultures(CultureTypes.SpecificCultures))
+            {
+                float f = 6.815791e-4f; // small value that gets formatted as exponential notation
+
+                string formatted = Single.ToString(f, culture);
+
+                assertEquals($"6{culture.NumberFormat.NumberDecimalSeparator}815791E{culture.NumberFormat.NegativeSign}4", formatted);
+
+                double parsed = Single.Parse(formatted, culture);
+
+                assertEquals(f, parsed, 0.1e-10f);
+            }
+        }
     }
 }
