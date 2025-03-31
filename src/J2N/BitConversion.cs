@@ -85,7 +85,11 @@ namespace J2N
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe float Int32BitsToSingle(int value)
         {
+#if FEATURE_BITCONVERTER_INT32BITS
+            return BitConverter.Int32BitsToSingle(value);
+#else
             return *((float*)&value);
+#endif
         }
 
         /// <summary>
@@ -128,7 +132,11 @@ namespace J2N
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe int SingleToRawInt32Bits(float value)
         {
+#if FEATURE_BITCONVERTER_INT32BITS
+            return BitConverter.SingleToInt32Bits(value);
+#else
             return *((int*)&value);
+#endif
         }
 
         /// <summary>
@@ -171,7 +179,11 @@ namespace J2N
             if (float.IsNaN(value))
                 return 0x7fc00000;
 
+#if FEATURE_BITCONVERTER_INT32BITS
+            return BitConverter.SingleToInt32Bits(value);
+#else
             return *((int*)&value);
+#endif
         }
 
         /// <summary>
@@ -182,8 +194,8 @@ namespace J2N
         /// NOTE: This corresponds to BitConverter.SingleToInt64Bits in
         /// .NET (where implemented).
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
+        /// <param name="value">A floating-point number.</param>
+        /// <returns>The bits that represent the floating-point number.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static unsafe long SingleToInt64Bits(float value)
         {

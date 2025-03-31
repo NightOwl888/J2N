@@ -71,6 +71,7 @@
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_BIGINTEGER_CTOR_READONLYSPAN</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_BITCONVERTER_INT32BITS</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_CHARUNICODEINFO_GETUNICODECATEGORY_CODEPOINT</DefineConstants>
 
