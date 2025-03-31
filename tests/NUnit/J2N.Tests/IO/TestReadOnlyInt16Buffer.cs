@@ -93,6 +93,31 @@ namespace J2N.IO
         }
 
         [Test]
+        public override void TestPutshortSpan() // J2N specific
+        {
+            Span<short> array = new short[1];
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ReadOnlyBufferException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Put((short[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        [Test]
         public override void TestPutshortArray()
         {
             short[] array = new short[1];

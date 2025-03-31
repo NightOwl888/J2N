@@ -16,6 +16,8 @@
  */
 #endregion
 
+using System;
+
 namespace J2N.IO
 {
     /// <summary>
@@ -76,6 +78,11 @@ namespace J2N.IO
         }
 
         public override ByteBuffer Put(byte[] source, int offset, int length)
+        {
+            throw new ReadOnlyBufferException();
+        }
+
+        public override ByteBuffer Put(ReadOnlySpan<byte> source) // J2N specific
         {
             throw new ReadOnlyBufferException();
         }

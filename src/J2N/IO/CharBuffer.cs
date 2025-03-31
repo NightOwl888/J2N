@@ -16,8 +16,10 @@
  */
 #endregion
 
+using J2N.Buffers;
 using J2N.Text;
 using System;
+using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -121,7 +123,7 @@ namespace J2N.IO
         {
             if (characterSequence is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringAdapter?
+            return new CharReadOnlyMemoryAdapter(characterSequence.AsMemory());
         }
 
         /// <summary>
@@ -159,7 +161,7 @@ namespace J2N.IO
             if (startIndex > characterSequence.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
+            return new CharReadOnlyMemoryAdapter(characterSequence.AsMemory())
             {
                 position = startIndex,
                 limit = startIndex + length
@@ -174,12 +176,19 @@ namespace J2N.IO
         /// </summary>
         /// <param name="characterSequence">The <see cref="StringBuilder"/> which the new buffer will be based on.</param>
         /// <returns>The created char buffer.</returns>
+        /// <remarks><see cref="StringBuilder"/>'s <see cref="StringBuilder.this[int]"/> property is known to perform
+        /// poorly and some operations on a raw <see cref="StringBuilder"/> will suffer as a result. It is generally
+        /// preferable to use <see cref="ArrayPool{T}"/> to allocate a temporary array and then use the
+        /// <see cref="StringBuilder.CopyTo(int, char[], int, int)"/> method to transfer the chars to the temporary array,
+        /// then use the array to call the <see cref="Wrap(char[], int, int)"/> overload for better performance.
+        /// Be sure to call <see cref="ArrayPool{Char}.Return(Char[], bool)"/> to return the array to the pool when you
+        /// are finished with the <see cref="CharBuffer"/> instance.</remarks>
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(StringBuilder characterSequence)
         {
             if (characterSequence is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()); // J2N TODO: Create StringBuilderAdapter?
+            return new StringBuilderAdapter(characterSequence);
         }
 
         /// <summary>
@@ -198,6 +207,13 @@ namespace J2N.IO
         /// <param name="length">The end index, must be no less than <paramref name="startIndex"/> and no
         /// greater than <c>characterSequence.Length</c>.</param>
         /// <returns>The created char buffer.</returns>
+        /// <remarks><see cref="StringBuilder"/>'s <see cref="StringBuilder.this[int]"/> property is known to perform
+        /// poorly and some operations on a raw <see cref="StringBuilder"/> will suffer as a result. It is generally
+        /// preferable to use <see cref="ArrayPool{T}"/> to allocate a temporary array and then use the
+        /// <see cref="StringBuilder.CopyTo(int, char[], int, int)"/> method to transfer the chars to the temporary array,
+        /// then use the array to call the <see cref="Wrap(char[], int, int)"/> overload for better performance.
+        /// Be sure to call <see cref="ArrayPool{Char}.Return(Char[], bool)"/> to return the array to the pool when you
+        /// are finished with the <see cref="CharBuffer"/> instance.</remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="startIndex"/> plus <paramref name="length"/> indicates a position not within this instance.
         /// <para/>
@@ -217,7 +233,7 @@ namespace J2N.IO
             if (startIndex > characterSequence.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            return new CharSequenceAdapter(characterSequence.AsCharSequence()) // J2N TODO: Create StringAdapter?
+            return new StringBuilderAdapter(characterSequence)
             {
                 position = startIndex,
                 limit = startIndex + length
@@ -237,8 +253,16 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence)
         {
-            if (characterSequence is null)
+            if (characterSequence is null || !characterSequence.HasValue)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
+
+            if (characterSequence is StringCharSequence str)
+                return new CharReadOnlyMemoryAdapter(str.Value!.AsMemory());
+            if (characterSequence is CharArrayCharSequence ca)
+                return new ReadOnlyCharArrayBuffer(ca.Length, ca.Value!, arrayOffset: 0);
+            if (characterSequence is StringBuilderCharSequence sb)
+                return new StringBuilderAdapter(sb.Value!);
+
             return new CharSequenceAdapter(characterSequence);
         }
 
@@ -268,7 +292,7 @@ namespace J2N.IO
         /// <exception cref="ArgumentNullException">If <paramref name="characterSequence"/> is <c>null</c>.</exception>
         public static CharBuffer Wrap(ICharSequence characterSequence, int startIndex, int length)
         {
-            if (characterSequence is null)
+            if (characterSequence is null || !characterSequence.HasValue)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.characterSequence);
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -276,6 +300,31 @@ namespace J2N.IO
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
             if (startIndex > characterSequence.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
+
+            if (characterSequence is StringCharSequence str)
+            {
+                return new CharReadOnlyMemoryAdapter(str.Value!.AsMemory())
+                {
+                    position = startIndex,
+                    limit = startIndex + length
+                };
+            }
+            if (characterSequence is CharArrayCharSequence ca)
+            {
+                return new ReadOnlyCharArrayBuffer(ca.Length, ca.Value!, arrayOffset: 0)
+                {
+                    position = startIndex,
+                    limit = startIndex + length
+                };
+            }
+            if (characterSequence is StringBuilderCharSequence sb)
+            {
+                return new StringBuilderAdapter(sb.Value!)
+                {
+                    position = startIndex,
+                    limit = startIndex + length
+                };
+            }
 
             return new CharSequenceAdapter(characterSequence)
             {
@@ -364,6 +413,8 @@ namespace J2N.IO
         /// <returns>A negative value if this is less than <paramref name="other"/>; 0 if
         /// this equals to <paramref name="other"/>; a positive valie if this is
         /// greater than <paramref name="other"/>.</returns>
+        /// <remarks>Note to inheritors: This implementation reads chars one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public virtual int CompareTo(CharBuffer? other)
         {
             if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
@@ -414,6 +465,8 @@ namespace J2N.IO
         /// </summary>
         /// <param name="other">The object to compare with this char buffer.</param>
         /// <returns><c>true</c> if this char buffer is equal to <paramref name="other"/>, <c>false</c> otherwise.</returns>
+        /// <remarks>Note to inheritors: This implementation reads chars one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public override bool Equals(object? other)
         {
             if (other is null || !(other is CharBuffer otherBuffer))
@@ -472,6 +525,8 @@ namespace J2N.IO
         /// <param name="length">The number of chars to read, must be no less than zero and no
         /// greater than <c>destination.Length - offset</c>.</param>
         /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation reads chars one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="offset"/> plus <paramref name="length"/> indicates a position not within this instance.
         /// <para/>
@@ -497,6 +552,33 @@ namespace J2N.IO
                 throw new BufferUnderflowException();
             }
             for (int i = offset; i < offset + length; i++)
+            {
+                destination[i] = Get();
+            }
+            return this;
+        }
+
+        /// <summary>
+        /// Reads chars from the current position into the specified span,
+        /// and increases the position by the number of chars read.
+        /// <para/>
+        /// The <see cref="Span{Char}.Length"/> property is used to determine
+        /// how many chars to read.
+        /// </summary>
+        /// <param name="destination">The target span, sliced to the proper position, if necessary.</param>
+        /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation reads chars one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
+        /// <exception cref="BufferUnderflowException">If <see cref="Span{Char}.Length"/> is greater than
+        /// <see cref="Buffer.Remaining"/>.</exception>
+        public virtual CharBuffer Get(Span<char> destination) // J2N specific
+        {
+            int length = destination.Length;
+            if (length > Remaining)
+            {
+                throw new BufferUnderflowException();
+            }
+            for (int i = 0; i < length; i++)
             {
                 destination[i] = Get();
             }
@@ -530,6 +612,8 @@ namespace J2N.IO
         /// position, limit, capacity and mark don't affect the hash code.
         /// </summary>
         /// <returns>The hash code calculated from the remaining chars.</returns>
+        /// <remarks>Note to inheritors: This implementation reads chars one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public override int GetHashCode()
         {
             int myPosition = position;
@@ -624,6 +708,8 @@ namespace J2N.IO
         /// <param name="length">The number of chars to write, must be no less than zero and no
         /// greater than <c>source.Length - offset</c>.</param>
         /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation writes chars one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <paramref name="length"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="offset"/> plus <paramref name="length"/> indicates a position not within this instance.
@@ -657,6 +743,32 @@ namespace J2N.IO
         }
 
         /// <summary>
+        /// Writes chars in the given span to the current position and increases the
+        /// position by the number of chars written.
+        /// <para/>
+        /// Calling this method has a similar effect as
+        /// <c>Put(source, 0, source.Length)</c>.
+        /// </summary>
+        /// <param name="source">The source span.</param>
+        /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation writes chars one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
+        /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <c>source.Length</c>.</exception>
+        /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
+        public virtual CharBuffer Put(ReadOnlySpan<char> source) // J2N specific
+        {
+            int length = source.Length;
+            if (length > Remaining)
+                throw new BufferOverflowException();
+
+            for (int i = 0; i < length; i++)
+            {
+                Put(source[i]);
+            }
+            return this;
+        }
+
+        /// <summary>
         /// Writes all the remaining chars of the <paramref name="source"/> char buffer to this
         /// buffer's current position, and increases both buffers' position by the
         /// number of chars copied.
@@ -678,10 +790,21 @@ namespace J2N.IO
             if (IsReadOnly)
                 throw new ReadOnlyBufferException(); // J2N: Harmony has a bug - it shouldn't read the source and change its position unless this buffer is writable
 
-            char[] contents = new char[source.Remaining];
-            source.Get(contents);
-            Put(contents);
-            return this;
+            int length = source.Remaining;
+            char[]? arrayToReturnToPool = null;
+            Span<char> contents = length * sizeof(char) > ByteStackBufferSize
+                ? (arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length)).AsSpan(0, length)
+                : stackalloc char[length];
+            try
+            {
+                source.Get(contents);
+                Put(contents);
+                return this;
+            }
+            finally
+            {
+                ArrayPool<char>.Shared.ReturnIfNotNull(arrayToReturnToPool);
+            }
         }
 
         /// <summary>

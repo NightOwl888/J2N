@@ -16,7 +16,9 @@
  */
 #endregion
 
+using J2N.Buffers;
 using System;
+using System.Buffers;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
@@ -301,6 +303,8 @@ namespace J2N.IO
         /// equals to <c>other</c>; a positive value if this is greater
         /// than <c>other</c>.
         /// </returns>
+        /// <remarks>Note to inheritors: This implementation reads bytes one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public virtual int CompareTo(ByteBuffer? other)
         {
             if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
@@ -354,6 +358,8 @@ namespace J2N.IO
         /// <c>true</c> if this byte buffer is equal to <paramref name="other"/>,
         /// <c>false</c> otherwise.
         /// </returns>
+        /// <remarks>Note to inheritors: This implementation reads bytes one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public override bool Equals(object? other)
         {
             if (other is null || !(other is ByteBuffer otherBuffer))
@@ -416,6 +422,8 @@ namespace J2N.IO
         /// greater than <c>destination.Length - offset</c>
         /// </param>
         /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation reads bytes one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="offset"/> plus <paramref name="length"/> indicates a position not within this instance.
         /// <para/>
@@ -448,8 +456,34 @@ namespace J2N.IO
         }
 
         /// <summary>
+        /// Reads bytes from the current position into the specified span,
+        /// and increases the position by the number of bytes read.
+        /// <para/>
+        /// The <see cref="Span{Byte}.Length"/> property is used to determine
+        /// how many bytes to read.
+        /// </summary>
+        /// <param name="destination">The target span, sliced to the proper position, if necessary.</param>
+        /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation reads bytes one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
+        /// <exception cref="BufferUnderflowException">If <see cref="Span{Byte}.Length"/> is greater than
+        /// <see cref="Buffer.Remaining"/>.</exception>
+        public virtual ByteBuffer Get(Span<byte> destination) // J2N specific
+        {
+            int length = destination.Length;
+            if (length > Remaining)
+            {
+                throw new BufferUnderflowException();
+            }
+            for (int i = 0; i < length; i++)
+            {
+                destination[i] = Get();
+            }
+            return this;
+        }
+
+        /// <summary>
         /// Returns the byte at the specified index and does not change the position.
-        /// 
         /// </summary>
         /// <param name="index">The index, must not be negative and less than limit.</param>
         /// <returns>The byte at the specified index.</returns>
@@ -617,6 +651,8 @@ namespace J2N.IO
         /// position, limit, capacity and mark don't affect the hash code.
         /// </summary>
         /// <returns>The hash code calculated from the remaining bytes.</returns>
+        /// <remarks>Note to inheritors: This implementation reads bytes one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         public override int GetHashCode()
         {
             int myPosition = position;
@@ -696,7 +732,7 @@ namespace J2N.IO
         /// </summary>
         /// <param name="source">The source byte array.</param>
         /// <returns>This buffer.</returns>
-        /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <c>src.Length</c>.</exception>
+        /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <c>source.Length</c>.</exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
         public ByteBuffer Put(byte[] source)
@@ -721,6 +757,8 @@ namespace J2N.IO
         /// greater than <c>source.Length - offset</c>.
         /// </param>
         /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation writes bytes one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <paramref name="length"/>.</exception>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="offset"/> plus <paramref name="length"/> indicates a position not within this instance.
@@ -752,6 +790,32 @@ namespace J2N.IO
         }
 
         /// <summary>
+        /// Writes bytes in the given span to the current position and increases the
+        /// position by the number of bytes written.
+        /// <para/>
+        /// Calling this method has a similar effect as
+        /// <c>Put(source, 0, source.Length)</c>.
+        /// </summary>
+        /// <param name="source">The source span.</param>
+        /// <returns>This buffer.</returns>
+        /// <remarks>Note to inheritors: This implementation writes bytes one at a time and it is highly
+        /// recommended to override to provide a more optimized implementation.</remarks>
+        /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <c>source.Length</c>.</exception>
+        /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
+        public virtual ByteBuffer Put(ReadOnlySpan<byte> source) // J2N specific
+        {
+            int length = source.Length;
+            if (length > Remaining)
+                throw new BufferOverflowException();
+
+            for (int i = 0; i < length; i++)
+            {
+                Put(source[i]);
+            }
+            return this;
+        }
+
+        /// <summary>
         /// Writes all the remaining bytes of the <paramref name="source"/> byte buffer to this
         /// buffer's current position, and increases both buffers' position by the
         /// number of bytes copied.
@@ -773,10 +837,21 @@ namespace J2N.IO
             if (IsReadOnly)
                 throw new ReadOnlyBufferException(); // J2N: Harmony has a bug - it shouldn't read the source and change its position unless this buffer is writable
 
-            byte[] contents = new byte[source.Remaining];
-            source.Get(contents);
-            Put(contents);
-            return this;
+            int length = source.Remaining;
+            byte[]? arrayToReturnToPool = null;
+            Span<byte> contents = length > ByteStackBufferSize
+                ? (arrayToReturnToPool = ArrayPool<byte>.Shared.Rent(length)).AsSpan(0, length)
+                : stackalloc byte[length];
+            try
+            {
+                source.Get(contents);
+                Put(contents);
+                return this;
+            }
+            finally
+            {
+                ArrayPool<byte>.Shared.ReturnIfNotNull(arrayToReturnToPool);
+            }
         }
 
         /// <summary>
@@ -989,5 +1064,4 @@ namespace J2N.IO
             return buf.ToString();
         }
     }
-
 }

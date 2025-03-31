@@ -18,7 +18,7 @@
 
 using J2N.Text;
 using System;
-
+using System.Text;
 
 namespace J2N.IO
 {
@@ -30,11 +30,11 @@ namespace J2N.IO
     ///     <item><description>Char sequence based buffer is always readonly.</description></item>
     /// </list>
     /// </summary>
-    internal sealed class CharSequenceAdapter : CharBuffer
+    internal sealed class StringBuilderAdapter : CharBuffer
     {
-        internal static CharSequenceAdapter Copy(CharSequenceAdapter other)
+        internal static StringBuilderAdapter Copy(StringBuilderAdapter other)
         {
-            return new CharSequenceAdapter(other.sequence)
+            return new StringBuilderAdapter(other.sequence)
             {
                 limit = other.limit,
                 position = other.position,
@@ -42,9 +42,9 @@ namespace J2N.IO
             };
         }
 
-        internal readonly ICharSequence sequence;
+        internal readonly StringBuilder sequence;
 
-        internal CharSequenceAdapter(ICharSequence chseq)
+        internal StringBuilderAdapter(StringBuilder chseq)
             : base(chseq.Length)
         {
             sequence = chseq;
@@ -90,8 +90,9 @@ namespace J2N.IO
             if (length > Remaining)
                 throw new BufferUnderflowException();
 
+
             int newPosition = position + length;
-            sequence.ToString().CopyTo(position, destination, offset, length); // J2N TODO: Create specialized adapter for StringBuilder as a separate class and then loop through the indexer here
+            sequence.CopyTo(position, destination, offset, length);
             position = newPosition;
             return this;
         }
@@ -103,7 +104,7 @@ namespace J2N.IO
                 throw new BufferUnderflowException();
 
             int newPosition = position + length;
-            sequence.ToString().AsSpan(position, length).CopyTo(destination); // J2N TODO: Create specialized adapter for StringBuilder as a separate class and then loop through the indexer here
+            sequence.CopyTo(position, destination, length);
             position = newPosition;
             return this;
         }
@@ -168,7 +169,12 @@ namespace J2N.IO
 
         public override CharBuffer Slice()
         {
-            return new CharSequenceAdapter(sequence.Subsequence(position, limit - position)); // J2N: Corrected 2nd parameter
+            int length = Remaining;
+            // J2N NOTE: If the caller slices again, this will be more efficient than using CharSequenceAdapter around a string
+            // and will also index faster if the StringBuilder has more than one chunk.
+            char[] chars = new char[length];
+            sequence.CopyTo(position, chars, 0, length);
+            return new ReadOnlyCharArrayBuffer(length, chars, arrayOffset: 0);
         }
 
         public override CharBuffer Subsequence(int startIndex, int length)
@@ -180,7 +186,7 @@ namespace J2N.IO
             if (startIndex > Remaining - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            CharSequenceAdapter result = Copy(this);
+            StringBuilderAdapter result = Copy(this);
             result.position = position + startIndex;
             result.limit = position + startIndex + length;
             return result;

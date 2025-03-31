@@ -79,12 +79,17 @@ namespace J2N.IO
             throw new ReadOnlyBufferException();
         }
 
-        public override sealed CharBuffer Put(char[] source, int offset, int length)
+        public override CharBuffer Put(char[] source, int offset, int length)
         {
             throw new ReadOnlyBufferException();
         }
 
-        public override sealed CharBuffer Put(CharBuffer src)
+        public override CharBuffer Put(ReadOnlySpan<char> source) // J2N specific
+        {
+            throw new ReadOnlyBufferException();
+        }
+
+        public override CharBuffer Put(CharBuffer src)
         {
             throw new ReadOnlyBufferException();
         }

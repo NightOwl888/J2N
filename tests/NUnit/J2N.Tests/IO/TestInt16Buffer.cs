@@ -270,6 +270,41 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for Int16Buffer Get(Span<short>)
+         */
+        public virtual void TestGetshortSpan() // J2N specific
+        {
+            Span<short> array = new short[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                Int16Buffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i));
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Get((short[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        /*
          * Class under test for java.nio.Int16Buffer get(short[])
          */
         public virtual void TestGetshortArray()
@@ -289,6 +324,15 @@ namespace J2N.IO
                 fail("Should throw Exception"); //$NON-NLS-1$
             }
             catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            try // J2N: Added check for guard clause
+            {
+                buf.Get((short[])null);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ArgumentNullException e)
             {
                 // expected
             }
@@ -465,6 +509,44 @@ namespace J2N.IO
             {
                 // expected
             }
+        }
+
+        /*
+         * Class under test for Int16Buffer Put(ReadOnlySpan<short>)
+         */
+        [Test]
+        public virtual void TestPutshortSpan() // J2N specific
+        {
+            Span<short> array = new short[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (short)i;
+                Int16Buffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (short)i);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Position = (buf.Limit);
+            //    buf.Put((short[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
         }
 
         /*

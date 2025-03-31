@@ -58,6 +58,15 @@ namespace J2N.IO
                 ck(b, (long)a[i + 7], (long)((float)Ic(i)));
         }
 
+        private static void bulkGetSpan(SingleBuffer b) // J2N specific
+        {
+            int n = b.Capacity;
+            Span<float> a = new float[n + 7];
+            b.Get(a.Slice(7, n));
+            for (int i = 0; i < n; i++)
+                ck(b, (long)a[i + 7], (long)((float)Ic(i)));
+        }
+
         private static void relPut(SingleBuffer b)
         {
             int n = b.Capacity;
@@ -85,6 +94,17 @@ namespace J2N.IO
             for (int i = 0; i < n; i++)
                 a[i + 7] = (float)Ic(i);
             b.Put(a, 7, n);
+            b.Flip();
+        }
+
+        private static void bulkPutSpan(SingleBuffer b) // J2N specific
+        {
+            int n = b.Capacity;
+            b.Clear();
+            Span<float> a = new float[n + 7];
+            for (int i = 0; i < n; i++)
+                a[i + 7] = (float)Ic(i);
+            b.Put(a.Slice(7, n));
             b.Flip();
         }
 
@@ -203,7 +223,20 @@ namespace J2N.IO
             absGet(b);
             bulkGet(b);
 
+            relPut(b); // J2N specific
+            relGet(b);
+            absGet(b);
+            bulkGetSpan(b);
+
+            absPut(b); // J2N specific
+            relGet(b);
+            absGet(b);
+            bulkGetSpan(b);
+
             bulkPutArray(b);
+            relGet(b);
+
+            bulkPutSpan(b); // J2N specific
             relGet(b);
 
             bulkPutBuffer(b);
@@ -419,6 +452,11 @@ namespace J2N.IO
             tryCatch(b, typeof(ReadOnlyBufferException), () =>
             {
                 bulkPutArray(rb);
+            });
+
+            tryCatch(b, typeof(ReadOnlyBufferException), () =>
+            {
+                bulkPutSpan(rb); // J2N specific
             });
 
             tryCatch(b, typeof(ReadOnlyBufferException), () =>

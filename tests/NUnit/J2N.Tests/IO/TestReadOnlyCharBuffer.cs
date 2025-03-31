@@ -94,6 +94,31 @@ namespace J2N.IO
         }
 
         [Test]
+        public override void TestPutcharSpan() // J2N specific
+        {
+            Span<char> array = new char[1];
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ReadOnlyBufferException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Put((char[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
+        }
+
+        [Test]
         public override void TestPutcharArray()
         {
             char[] array = new char[1];

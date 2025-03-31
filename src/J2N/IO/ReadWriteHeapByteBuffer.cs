@@ -119,10 +119,19 @@ namespace J2N.IO
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferOverflowException();
-            if (IsReadOnly)
-                throw new ReadOnlyBufferException();
 
             System.Array.Copy(source, offset, backingArray, base.offset + position, length);
+            position += length;
+            return this;
+        }
+
+        public override ByteBuffer Put(ReadOnlySpan<byte> source) // J2N specific
+        {
+            int length = source.Length;
+            if (length > Remaining)
+                throw new BufferOverflowException();
+
+            source.CopyTo(backingArray.AsSpan(offset + position, length));
             position += length;
             return this;
         }

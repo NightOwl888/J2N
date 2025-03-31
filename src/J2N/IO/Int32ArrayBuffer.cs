@@ -86,6 +86,17 @@ namespace J2N.IO
             return this;
         }
 
+        public override sealed Int32Buffer Get(Span<int> destination) // J2N specific
+        {
+            int length = destination.Length;
+            if (length > Remaining)
+                throw new BufferUnderflowException();
+
+            backingArray.AsSpan(offset + position, length).CopyTo(destination);
+            position += length;
+            return this;
+        }
+
         //public override sealed bool IsDirect => false;
 
         public override sealed ByteOrder Order => ByteOrder.NativeOrder;

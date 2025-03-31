@@ -68,6 +68,8 @@ namespace J2N.IO
     /// </summary>
     public abstract class Buffer
     {
+        internal const int ByteStackBufferSize = 128;
+
         /// <summary>
         /// <c>UnsetMark</c> means the mark has not been set.
         /// </summary>

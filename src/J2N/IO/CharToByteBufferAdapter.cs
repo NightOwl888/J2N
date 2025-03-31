@@ -161,6 +161,8 @@ namespace J2N.IO
             return byteBuffer.GetChar(index << 1);
         }
 
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) to chars and override Get(Span<char>)
+
         //public override bool IsDirect => byteBuffer.IsDirect;
 
         public override bool IsReadOnly => byteBuffer.IsReadOnly;
@@ -198,6 +200,8 @@ namespace J2N.IO
             byteBuffer.PutChar(index << 1, value);
             return this;
         }
+
+        // J2N TODO: Need a way to convert the bytes (in the specified endianness) from chars and override Put(ReadOnlySpan<char>)
 
         public override CharBuffer Slice()
         {

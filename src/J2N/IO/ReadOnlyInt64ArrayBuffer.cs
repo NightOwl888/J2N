@@ -16,6 +16,8 @@
  */
 #endregion
 
+using System;
+
 namespace J2N.IO
 {
     /// <summary>
@@ -81,7 +83,12 @@ namespace J2N.IO
             throw new ReadOnlyBufferException();
         }
 
-        public override sealed Int64Buffer Put(long[] source, int offset, int length)
+        public override Int64Buffer Put(long[] source, int offset, int length)
+        {
+            throw new ReadOnlyBufferException();
+        }
+
+        public override Int64Buffer Put(ReadOnlySpan<long> source) // J2N specific
         {
             throw new ReadOnlyBufferException();
         }

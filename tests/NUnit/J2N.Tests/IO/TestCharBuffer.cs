@@ -42,7 +42,10 @@ namespace J2N.IO
             string s = "A test string to test with.";
             char[] ca = s.ToCharArray();
             StringBuilder sb = new StringBuilder(s);
-            ICharSequence cs = s.AsCharSequence();
+            ICharSequence scs = s.AsCharSequence();
+            ICharSequence sbcs = sb.AsCharSequence();
+            ICharSequence cacs = ca.AsCharSequence();
+            ICharSequence customcs = new MockCharSequence(s.AsMemory());
 
             // Control - char[] was part of the original Java implementation
             // and used length rather than end index. So we will check that our conversion
@@ -57,9 +60,52 @@ namespace J2N.IO
             Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(sb).Limit);
             Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(sb, 6, 10).Limit);
 
-            // ICharSequence
-            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(cs).Limit);
-            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(cs, 6, 10).Limit);
+            // ICharSequence (string)
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(scs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(scs, 6, 10).Limit);
+
+            // ICharSequence (StringBuilder)
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(sbcs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(sbcs, 6, 10).Limit);
+
+            // ICharSequence (char[])
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(cacs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(cacs, 6, 10).Limit);
+
+            // ICharSequence (custom)
+            Assert.AreEqual(CharBuffer.Wrap(ca).Limit, CharBuffer.Wrap(customcs).Limit);
+            Assert.AreEqual(CharBuffer.Wrap(ca, 6, 10).Limit, CharBuffer.Wrap(customcs, 6, 10).Limit);
+        }
+
+        /// <summary>
+        /// A custom <see cref="ICharSequence"/> implementation used for testing unknown
+        /// implementations, since we generally optimize by using the underlying value of
+        /// <see cref="CharArrayCharSequence"/>, <see cref="StringCharSequence"/> or 
+        /// <see cref="StringBuilderCharSequence"/> rather than the interface itself.
+        /// </summary>
+        private sealed class MockCharSequence : ICharSequence
+        {
+            private readonly ReadOnlyMemory<char> value;
+            public MockCharSequence(ReadOnlyMemory<char> value)
+            {
+                this.value = value;
+            }
+
+            public char this[int index] => value.Span[index];
+
+            public bool HasValue => true;
+
+            public int Length => value.Length;
+
+            public ICharSequence Subsequence(int startIndex, int length)
+            {
+                return new MockCharSequence(value.Slice(startIndex, length));
+            }
+
+            public override string ToString()
+            {
+                return value.ToString();
+            }
         }
 
 
@@ -362,6 +408,32 @@ namespace J2N.IO
         }
 
         /*
+         * Class under test for CharBuffer Get(Span<char>)
+         */
+        [Test]
+        public virtual void TestGetcharSpan() // J2N specific
+        {
+            Span<char> array = new char[1];
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                CharBuffer ret = buf.Get(array);
+                assertEquals(array[0], buf.Get(i));
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Get(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+        }
+
+        /*
          * Class under test for java.nio.CharBuffer get(char[])
          */
         [Test]
@@ -382,6 +454,15 @@ namespace J2N.IO
                 fail("Should throw Exception"); //$NON-NLS-1$
             }
             catch (BufferUnderflowException e)
+            {
+                // expected
+            }
+            try // J2N: Added check for guard clause
+            {
+                buf.Get((char[])null);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (ArgumentNullException e)
             {
                 // expected
             }
@@ -548,6 +629,44 @@ namespace J2N.IO
             {
                 // expected
             }
+        }
+
+        /*
+         * Class under test for CharBuffer Put(ReadOnlySpan<char>)
+         */
+        [Test]
+        public virtual void TestPutcharSpan() // J2N specific
+        {
+            Span<char> array = new char[1];
+
+            buf.Clear();
+            for (int i = 0; i < buf.Capacity; i++)
+            {
+                assertEquals(buf.Position, i);
+                array[0] = (char)i;
+                CharBuffer ret = buf.Put(array);
+                assertEquals(buf.Get(i), (char)i);
+                assertSame(ret, buf);
+            }
+            try
+            {
+                buf.Put(array);
+                fail("Should throw Exception"); //$NON-NLS-1$
+            }
+            catch (BufferOverflowException e)
+            {
+                // expected
+            }
+            // J2N: Null converts to empty span, should not throw
+            //try
+            //{
+            //    buf.Put((char[])null);
+            //    fail("Should throw Exception"); //$NON-NLS-1$
+            //}
+            //catch (ArgumentNullException e)
+            //{
+            //    // expected
+            //}
         }
 
         /*

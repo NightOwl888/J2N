@@ -16,7 +16,7 @@
  */
 #endregion
 
-using System.Diagnostics.CodeAnalysis;
+using System;
 
 
 namespace J2N.IO
@@ -84,7 +84,12 @@ namespace J2N.IO
             throw new ReadOnlyBufferException();
         }
 
-        public override sealed Int32Buffer Put(int[] source, int offset, int length)
+        public override Int32Buffer Put(int[] source, int offset, int length)
+        {
+            throw new ReadOnlyBufferException();
+        }
+
+        public override Int32Buffer Put(ReadOnlySpan<int> source) // J2N specific
         {
             throw new ReadOnlyBufferException();
         }
