@@ -68,6 +68,14 @@ namespace J2N.IO
             return backingArray[offset + index];
         }
 
+        /// <inheritdoc/>
+        public override Int64Buffer Get(long[] destination)
+        {
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
+            return Get(destination.AsSpan());
+        }
+
         public override sealed Int64Buffer Get(long[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (destination is null)

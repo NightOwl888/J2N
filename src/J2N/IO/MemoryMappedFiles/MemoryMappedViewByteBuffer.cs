@@ -92,6 +92,14 @@ namespace J2N.IO.MemoryMappedFiles
             this.offset = offset;
         }
 
+        /// <inheritdoc/>
+        public override ByteBuffer Get(byte[] destination)
+        {
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
+            return Get(destination.AsSpan());
+        }
+
         /// <summary>
         /// Reads bytes from the current position into the specified byte array,
         /// starting at the specified offset, and increases the position by the

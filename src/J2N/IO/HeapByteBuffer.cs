@@ -59,6 +59,14 @@ namespace J2N.IO
             }
         }
 
+        /// <inheritdoc/>
+        public override ByteBuffer Get(byte[] destination)
+        {
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
+            return Get(destination.AsSpan());
+        }
+
         /*
          * Override ByteBuffer.get(byte[], int, int) to improve performance.
          * 

@@ -69,6 +69,14 @@ namespace J2N.IO
             return backingArray[offset + index];
         }
 
+        /// <inheritdoc/>
+        public override DoubleBuffer Get(double[] destination)
+        {
+            if (destination is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
+            return Get(destination.AsSpan());
+        }
+
         public override sealed DoubleBuffer Get(double[] destination, int offset, int length) // J2N TODO: API - rename startIndex instead of offset
         {
             if (destination is null)

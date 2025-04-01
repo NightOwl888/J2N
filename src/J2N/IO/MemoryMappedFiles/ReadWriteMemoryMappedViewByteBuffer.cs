@@ -105,6 +105,13 @@ namespace J2N.IO.MemoryMappedFiles
             return this;
         }
 
+        internal override ByteBuffer InternalPut(byte[] source)
+        {
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
+            return Put(source.AsSpan());
+        }
+
         /*
          * Override ByteBuffer.put(byte[], int, int) to improve performance.
          * 
