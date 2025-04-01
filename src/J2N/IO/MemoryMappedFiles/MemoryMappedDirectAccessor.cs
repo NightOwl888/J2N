@@ -48,8 +48,9 @@ namespace J2N.IO.MemoryMappedFiles
             bufferHandle = this.accessor.SafeMemoryMappedViewHandle;
             pointer = default;
             bufferHandle.AcquirePointer(ref pointer);
+            // Apply the offset once so future indexing is simpler
+            pointer += viewOffset;
         }
-
 
         /// <summary>
         /// Gets a byte at the provided <paramref name="index"/>.
@@ -74,7 +75,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// Creates a new <see cref="Span{Byte}"/> over the memory of this memory mapped view.
         /// </summary>
         /// <returns>The writable span representation of the view.</returns>
-        public readonly Span<byte> AsSpan() => new Span<byte>(pointer + viewOffset, (int)accessor.Capacity);
+        public readonly Span<byte> AsSpan() => new Span<byte>(pointer, (int)accessor.Capacity);
 
         /// <summary>
         /// Creates a new <see cref="Span{Byte}"/> over a portion of the memory of this view from a specified
@@ -83,7 +84,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <param name="start">The index at which to begin this slice.</param>
         /// <returns>The writable span representation of the view.</returns>
         /// <remarks>No bounds checking is performed on <paramref name="start"/>.</remarks>
-        public readonly Span<byte> AsSpan(int start) => new Span<byte>(pointer + (viewOffset + start), (int)accessor.Capacity - start);
+        public readonly Span<byte> AsSpan(int start) => new Span<byte>(pointer + start, (int)accessor.Capacity - start);
 
         /// <summary>
         /// Creates a new <see cref="Span{Byte}"/> over a portion of the memory of this view from a specified
@@ -93,7 +94,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <param name="length">The number of bytes in the span.</param>
         /// <returns>The writable span representation of the view.</returns>
         /// <remarks>No bounds checking is performed on <paramref name="start"/> or <paramref name="length"/>.</remarks>
-        public readonly Span<byte> AsSpan(int start, int length) => new Span<byte>(pointer + (viewOffset + start), length);
+        public readonly Span<byte> AsSpan(int start, int length) => new Span<byte>(pointer + start, length);
 
         /// <summary>
         /// Gets the number of bytes by which the starting position of this segment is offset from the beginning of the memory-mapped file.
