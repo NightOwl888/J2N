@@ -48,10 +48,10 @@ namespace J2N.IO.MemoryMappedFiles
         /// Initializes a new instance of <see cref="ReadOnlyMemoryMappedViewByteBuffer"/>
         /// with the specified <paramref name="accessor"/> and <paramref name="capacity"/>.
         /// </summary>
-        /// <param name="accessor">A <see cref="MemoryMappedViewAccessor"/>.</param>
+        /// <param name="accessor">A <see cref="MemoryMappedDirectAccessorReference"/>.</param>
         /// <param name="capacity">The capacity of the buffer.</param>
         /// <param name="offset">The offset of the buffer.</param>
-        internal ReadOnlyMemoryMappedViewByteBuffer(MemoryMappedViewAccessor accessor, int capacity, int offset)
+        internal ReadOnlyMemoryMappedViewByteBuffer(MemoryMappedDirectAccessorReference accessor, int capacity, int offset)
             : base(accessor, capacity, offset)
         { }
 

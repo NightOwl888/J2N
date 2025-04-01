@@ -16,12 +16,23 @@
  */
 #endregion
 
+using J2N.Buffers.Binary;
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IO.MemoryMappedFiles;
+using System.Reflection;
+using System.Runtime.InteropServices;
+using System.Security.AccessControl;
+
+#pragma warning disable CS9191 // The ref parameter is equivalent to in
 
 namespace J2N.IO.MemoryMappedFiles
 {
+    
+
+    
+
     /// <summary>
     /// A byte buffer whose content is a memory-mapped region of a file.
     /// 
@@ -41,35 +52,41 @@ namespace J2N.IO.MemoryMappedFiles
     public abstract class MemoryMappedViewByteBuffer : ByteBuffer, IDisposable
     {
         /// <summary>
-        /// The <see cref="MemoryMappedViewAccessor"/> from a <see cref="MemoryMappedFile"/>.
+        /// The <see cref="MemoryMappedDirectAccessorReference"/> from a <see cref="MemoryMappedFile"/>.
         /// </summary>
-        protected internal readonly MemoryMappedViewAccessor accessor;
+        internal readonly MemoryMappedDirectAccessorReference accessor;
 
         /// <summary>
         /// The current offset.
         /// </summary>
-        protected internal readonly int offset;
+        internal readonly int offset;
+
+        /// <summary>
+        /// Whether or not this is a clone. Only the main view will be able to dispose the accessor.
+        /// </summary>
+        internal bool isClone;
 
         /// <summary>
         /// Initializes a new instance of <see cref="MemoryMappedViewByteBuffer"/>
         /// with the specified <paramref name="accessor"/> and <paramref name="capacity"/>.
         /// </summary>
-        /// <param name="accessor">A <see cref="MemoryMappedViewAccessor"/>.</param>
+        /// <param name="accessor">A <see cref="MemoryMappedDirectAccessorReference"/>.</param>
         /// <param name="capacity">The capacity of the buffer.</param>
-        internal MemoryMappedViewByteBuffer(MemoryMappedViewAccessor accessor, int capacity)
+        internal MemoryMappedViewByteBuffer(MemoryMappedDirectAccessorReference accessor, int capacity)
             : base(capacity)
         {
             this.accessor = accessor;
+            this.isClone = false;
         }
 
         /// <summary>
         /// Initializes a new instance of <see cref="MemoryMappedViewByteBuffer"/>
         /// with the specified <paramref name="accessor"/> and <paramref name="capacity"/>.
         /// </summary>
-        /// <param name="accessor">A <see cref="MemoryMappedViewAccessor"/>.</param>
+        /// <param name="accessor">A <see cref="MemoryMappedDirectAccessorReference"/>.</param>
         /// <param name="capacity">The capacity of the buffer.</param>
         /// <param name="offset">The offset of the buffer.</param>
-        internal MemoryMappedViewByteBuffer(MemoryMappedViewAccessor accessor, int capacity, int offset)
+        internal MemoryMappedViewByteBuffer(MemoryMappedDirectAccessorReference accessor, int capacity, int offset)
             : this(accessor, capacity)
         {
             this.offset = offset;
@@ -112,14 +129,38 @@ namespace J2N.IO.MemoryMappedFiles
             if (length > Remaining)
                 throw new BufferUnderflowException();
 
-            // we need to check for 0-length reads, since 
-            // ReadArray will throw an ArgumentOutOfRange exception if position is at
-            // the end even when nothing is read
-            if (length > 0)
-            {
-                accessor.ReadArray(Ix(NextGetIndex(length)), destination, offset, length);
-            }
+            //// we need to check for 0-length reads, since 
+            //// ReadArray will throw an ArgumentOutOfRange exception if position is at
+            //// the end even when nothing is read
+            //if (length > 0)
+            //{
+            //    accessor.ReadArray(Ix(NextGetIndex(length)), destination, offset, length);
+            //}
 
+            accessor.AsSpan(this.offset + position, length).CopyTo(destination.AsSpan(offset, length));
+            position += length;
+            return this;
+        }
+
+        /// <summary>
+        /// Reads bytes from the current position into the specified span,
+        /// and increases the position by the number of bytes read.
+        /// <para/>
+        /// The <see cref="Span{Byte}.Length"/> property is used to determine
+        /// how many bytes to read.
+        /// </summary>
+        /// <param name="destination">The target span, sliced to the proper position, if necessary.</param>
+        /// <returns>This buffer.</returns>
+        /// <exception cref="BufferUnderflowException">If <see cref="Span{Byte}.Length"/> is greater than
+        /// <see cref="Buffer.Remaining"/>.</exception>
+        public override ByteBuffer Get(Span<byte> destination) // J2N specific
+        {
+            int length = destination.Length;
+            if (length > Remaining)
+                throw new BufferUnderflowException();
+
+            accessor.AsSpan(offset + position, length).CopyTo(destination);
+            position += length;
             return this;
         }
 
@@ -130,7 +171,11 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="BufferUnderflowException">If the position is equal or greater than limit.</exception>
         public override byte Get()
         {
-            return accessor.ReadByte(Ix(NextGetIndex()));
+            if (position == limit)
+            {
+                throw new BufferUnderflowException();
+            }
+            return accessor[offset + position++];
         }
 
         /// <summary>
@@ -141,7 +186,11 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="ArgumentOutOfRangeException">If index is invalid.</exception>
         public override byte Get(int index)
         {
-            return accessor.ReadByte(Ix(CheckIndex(index)));
+            if ((uint)index >= (uint)limit)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+            return accessor[offset + index];
         }
 
         /// <summary>
@@ -216,7 +265,15 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="BufferUnderflowException">If the position is greater than <c>limit - 4</c>.</exception>
         public override int GetInt32()
         {
-            return LoadInt32(NextGetIndex(4));
+            int newPosition = position + sizeof(int);
+            if (newPosition < 0)
+                throw new ArgumentOutOfRangeException(nameof(Position)); // J2N TODO: Change this to InvalidOperationException, since it is not an argument
+            if (newPosition > limit)
+                throw new BufferUnderflowException();
+
+            int result = LoadInt32(position);
+            position = newPosition;
+            return result;
         }
 
         /// <summary>
@@ -233,7 +290,12 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is invalid.</exception>
         public override int GetInt32(int index)
         {
-            return LoadInt32(CheckIndex(index, 4));
+            int newIndex = index + sizeof(int);
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index);
+            }
+            return LoadInt32(index);
         }
 
         /// <summary>
@@ -245,7 +307,15 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="ArgumentOutOfRangeException">If index is invalid.</exception>
         public override long GetInt64()
         {
-            return LoadInt64(NextGetIndex(8));
+            int newPosition = position + sizeof(long);
+            if (newPosition < 0) // J2N: Added check for overflowing integer
+                throw new ArgumentOutOfRangeException(nameof(Position)); // J2N TODO: Change this to InvalidOperationException, since it is not an argument
+            if (newPosition > limit)
+                throw new BufferUnderflowException();
+
+            long result = LoadInt64(position);
+            position = newPosition;
+            return result;
         }
 
         /// <summary>
@@ -262,7 +332,12 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is invalid.</exception>
         public override long GetInt64(int index)
         {
-            return LoadInt64(CheckIndex(index, 8));
+            int newIndex = index + sizeof(long);
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index);
+            }
+            return LoadInt64(index);
         }
 
         /// <summary>
@@ -277,7 +352,15 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="BufferUnderflowException">If the position is greater than <c>limit - 2</c>.</exception>
         public override short GetInt16()
         {
-            return LoadInt16(NextGetIndex(2));
+            int newPosition = position + sizeof(short);
+            if (newPosition < 0) // J2N: Added check for overflowing integer
+                throw new ArgumentOutOfRangeException(nameof(Position)); // J2N TODO: Change this to InvalidOperationException, since it is not an argument
+            if (newPosition > limit)
+                throw new BufferUnderflowException();
+
+            short result = LoadInt16(position);
+            position = newPosition;
+            return result;
         }
 
         /// <summary>
@@ -294,7 +377,12 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="index"/> is invalid.</exception>
         public override short GetInt16(int index)
         {
-            return LoadInt16(CheckIndex(index, 2));
+            int newIndex = index + sizeof(short);
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index);
+            }
+            return LoadInt16(index);
         }
 
         //public override bool IsDirect => false; // J2N: IsDirect Not supported
@@ -306,27 +394,13 @@ namespace J2N.IO.MemoryMappedFiles
         /// </summary>
         /// <param name="index">The index to begin reading bytes.</param>
         /// <returns>The <see cref="int"/> at the specified index.</returns>
-        [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
         protected int LoadInt32(int index)
         {
             int baseOffset = offset + index;
-            int bytes = 0;
+            int bytes = MemoryMarshal.Read<int>(accessor.AsSpan(baseOffset, sizeof(int)));
             if (order == Endianness.BigEndian)
             {
-                for (int i = 0; i < 4; i++)
-                {
-                    bytes = bytes << 8;
-                    bytes = bytes | (accessor.ReadByte(baseOffset + i) & 0xFF);
-                }
-            }
-            else
-            {
-                //for (int i = 3; i >= 0; i--)
-                //{
-                //    bytes = bytes << 8;
-                //    bytes = bytes | (accessor.ReadByte(baseOffset + i) & 0xFF);
-                //}
-                bytes = accessor.ReadInt32(baseOffset);
+                bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -338,27 +412,13 @@ namespace J2N.IO.MemoryMappedFiles
         /// </summary>
         /// <param name="index">The index to begin reading bytes.</param>
         /// <returns>The <see cref="long"/> at the specified index.</returns>
-        [SuppressMessage("Style", "IDE0054:Use compound assignment", Justification = "Aligning code style with Apache Harmony")]
         protected long LoadInt64(int index)
         {
             int baseOffset = offset + index;
-            long bytes = 0;
+            long bytes = MemoryMarshal.Read<long>(accessor.AsSpan(baseOffset, sizeof(long)));
             if (order == Endianness.BigEndian)
             {
-                for (int i = 0; i < 8; i++)
-                {
-                    bytes = bytes << 8;
-                    bytes = bytes | (uint)(accessor.ReadByte(baseOffset + i) & 0xFF);
-                }
-            }
-            else
-            {
-                //for (int i = 7; i >= 0; i--)
-                //{
-                //    bytes = bytes << 8;
-                //    bytes = bytes | (uint)(accessor.ReadByte(baseOffset + i) & 0xFF);
-                //}
-                bytes = accessor.ReadInt64(baseOffset);
+                bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -373,17 +433,10 @@ namespace J2N.IO.MemoryMappedFiles
         protected short LoadInt16(int index)
         {
             int baseOffset = offset + index;
-            short bytes; // J2N: Unnecessary variable assignment
+            short bytes = MemoryMarshal.Read<short>(accessor.AsSpan(baseOffset, sizeof(short)));
             if (order == Endianness.BigEndian)
             {
-                bytes = (short)(accessor.ReadByte(baseOffset) << 8);
-                bytes |= (short)(accessor.ReadByte(baseOffset + 1) & 0xFF);
-            }
-            else
-            {
-                //bytes = (short)(accessor.ReadByte(baseOffset + 1) << 8);
-                //bytes |= (short)(accessor.ReadByte(baseOffset) & 0xFF);
-                bytes = accessor.ReadInt16(baseOffset);
+                bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -401,21 +454,9 @@ namespace J2N.IO.MemoryMappedFiles
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                for (int i = 3; i >= 0; i--)
-                {
-                    accessor.Write(baseOffset + i, (byte)(value & 0xFF));
-                    value >>= 8;
-                }
+                value = BinaryPrimitive.ReverseEndianness(value);
             }
-            else
-            {
-                accessor.Write(baseOffset, value);
-                //for (int i = 0; i <= 3; i++)
-                //{
-                //    backingArray[baseOffset + i] = (byte)(value & 0xFF);
-                //    value >>= 8;
-                //}
-            }
+            MemoryMarshal.Write<int>(accessor.AsSpan(baseOffset, sizeof(int)), ref value);
         }
 
         /// <summary>
@@ -431,21 +472,9 @@ namespace J2N.IO.MemoryMappedFiles
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                for (int i = 7; i >= 0; i--)
-                {
-                    accessor.Write(baseOffset + i, (byte)(value & 0xFF));
-                    value >>= 8;
-                }
+                value = BinaryPrimitive.ReverseEndianness(value);
             }
-            else
-            {
-                accessor.Write(baseOffset, value);
-                //for (int i = 0; i <= 7; i++)
-                //{
-                //    backingArray[baseOffset + i] = (byte)(value & 0xFF);
-                //    value >>= 8;
-                //}
-            }
+            MemoryMarshal.Write<long>(accessor.AsSpan(baseOffset, sizeof(long)), ref value);
         }
 
         /// <summary>
@@ -461,13 +490,9 @@ namespace J2N.IO.MemoryMappedFiles
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                accessor.Write(baseOffset, (byte)((value >> 8) & 0xFF));
-                accessor.Write(baseOffset + 1, (byte)(value & 0xFF));
+                value = BinaryPrimitive.ReverseEndianness(value);
             }
-            else
-            {
-                accessor.Write(baseOffset, value);
-            }
+            MemoryMarshal.Write<short>(accessor.AsSpan(baseOffset, sizeof(short)), ref value);
         }
 
         /// <summary>
@@ -665,90 +690,5 @@ namespace J2N.IO.MemoryMappedFiles
                 accessor.Dispose();
             }
         }
-
-        #region Private Helper Methods
-
-        internal int Ix(int i)
-        {
-            return i + offset;
-        }
-
-        /// <summary>
-        /// Checks the current position against the limit, throwing a
-        /// <see cref="BufferUnderflowException"/> if it is not smaller than the limit, and then
-        /// increments the position.
-        /// </summary>
-        /// <returns>The current position value, before it is incremented</returns>
-        internal int NextGetIndex()
-        {
-            if (position >= limit)
-            {
-                throw new BufferUnderflowException();
-            }
-            return position++;
-        }
-
-        internal int NextGetIndex(int numberOfBytes)
-        {
-            if (limit - position < numberOfBytes)
-            {
-                throw new BufferUnderflowException();
-            }
-            int p = position;
-            position += numberOfBytes;
-            return p;
-        }
-
-        /// <summary>
-        /// Checks the current position against the limit, throwing a <see cref="BufferOverflowException"/>
-        /// if it is not smaller than the limit, and then
-        /// increments the position.
-        /// </summary>
-        /// <returns>The current position value, before it is incremented</returns>
-        internal int NextPutIndex()
-        {
-            if (position >= limit)
-            {
-                throw new BufferOverflowException();
-            }
-            return position++;
-        }
-
-        internal int NextPutIndex(int numberOfBytes)
-        {
-            if (limit - position < numberOfBytes)
-            {
-                throw new BufferOverflowException();
-            }
-            int p = position;
-            position += numberOfBytes;
-            return p;
-        }
-
-        /// <summary>
-        /// Checks the given index against the limit, throwing an <see cref="ArgumentOutOfRangeException"/> 
-        /// if it is not smaller than the limit or is smaller than zero.
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns></returns>
-        internal int CheckIndex(int index)
-        {
-            if ((uint)index >= (uint)limit)
-                throw new ArgumentOutOfRangeException(nameof(index));
-
-            return index;
-        }
-
-        internal int CheckIndex(int index, int numberOfBytes)
-        {
-            if (index < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
-            if (numberOfBytes > limit - index)
-                throw new ArgumentOutOfRangeException(nameof(numberOfBytes));
-
-            return index;
-        }
-
-        #endregion Private Helper Methods
     }
 }

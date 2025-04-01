@@ -17,7 +17,9 @@
 #endregion
 
 using System;
+using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
+using System.Threading;
 
 namespace J2N.IO.MemoryMappedFiles
 {
@@ -46,9 +48,9 @@ namespace J2N.IO.MemoryMappedFiles
         /// Initializes a new instance of <see cref="ReadWriteMemoryMappedViewByteBuffer"/>
         /// with the specified <paramref name="accessor"/> and <paramref name="capacity"/>.
         /// </summary>
-        /// <param name="accessor">A <see cref="MemoryMappedViewAccessor"/>.</param>
+        /// <param name="accessor">A <see cref="MemoryMappedDirectAccessorReference"/>.</param>
         /// <param name="capacity">The capacity of the buffer.</param>
-        internal ReadWriteMemoryMappedViewByteBuffer(MemoryMappedViewAccessor accessor, int capacity)
+        internal ReadWriteMemoryMappedViewByteBuffer(MemoryMappedDirectAccessorReference accessor, int capacity)
             : base(accessor, capacity)
         { }
 
@@ -56,10 +58,10 @@ namespace J2N.IO.MemoryMappedFiles
         /// Initializes a new instance of <see cref="ReadWriteMemoryMappedViewByteBuffer"/>
         /// with the specified <paramref name="accessor"/> and <paramref name="capacity"/>.
         /// </summary>
-        /// <param name="accessor">A <see cref="MemoryMappedViewAccessor"/>.</param>
+        /// <param name="accessor">A <see cref="MemoryMappedDirectAccessorReference"/>.</param>
         /// <param name="capacity">The capacity of the buffer.</param>
         /// <param name="offset">The offset of the buffer.</param>
-        internal ReadWriteMemoryMappedViewByteBuffer(MemoryMappedViewAccessor accessor, int capacity, int offset)
+        internal ReadWriteMemoryMappedViewByteBuffer(MemoryMappedDirectAccessorReference accessor, int capacity, int offset)
             : base(accessor, capacity, offset)
         { }
 
@@ -83,13 +85,23 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Put(byte value)
         {
-            accessor.Write(Ix(NextPutIndex()), value);
+            if (position == limit)
+            {
+                throw new BufferOverflowException();
+            }
+
+            accessor[offset + position++] = value;
             return this;
         }
 
         public override ByteBuffer Put(int index, byte value)
         {
-            accessor.Write(Ix(CheckIndex(index)), value);
+            if ((uint)index >= (uint)limit)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            accessor[offset + index] = value;
             return this;
         }
 
@@ -113,16 +125,20 @@ namespace J2N.IO.MemoryMappedFiles
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferOverflowException();
-            if (IsReadOnly)
-                throw new ReadOnlyBufferException();
 
-            // we need to check for 0-length writes, since 
-            // WriteArray will throw an ArgumentOutOfRange exception if position is at
-            // the end even when nothing is written
-            if (length > 0)
-            {
-                accessor.WriteArray(Ix(NextPutIndex(length)), source, offset, length);
-            }
+            source.AsSpan(offset, length).CopyTo(accessor.AsSpan(base.offset + position, length));
+            position += length;
+            return this;
+        }
+
+        public override ByteBuffer Put(ReadOnlySpan<byte> source) // J2N specific
+        {
+            int length = source.Length;
+            if (length > Remaining)
+                throw new BufferOverflowException();
+
+            source.CopyTo(accessor.AsSpan(offset + position, length));
+            position += length;
             return this;
         }
 
@@ -138,47 +154,74 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer PutSingle(float value)
         {
-            return PutInt32(BitConversion.SingleToInt32Bits(value));
+            return PutInt32(BitConversion.SingleToRawInt32Bits(value));
         }
 
         public override ByteBuffer PutSingle(int index, float value)
         {
-            return PutInt32(index, BitConversion.SingleToInt32Bits(value));
+            return PutInt32(index, BitConversion.SingleToRawInt32Bits(value));
         }
 
         public override ByteBuffer PutInt32(int value)
         {
-            Store(NextPutIndex(4), value);
+            int newPosition = position + sizeof(int);
+            if ((uint)newPosition > (uint)limit) // J2N: Added check for overflowing integer
+                throw new BufferOverflowException();
+
+            Store(position, value);
+            position = newPosition;
             return this;
         }
 
         public override ByteBuffer PutInt32(int index, int value)
         {
-            Store(CheckIndex(index, 4), value);
+            int newIndex = index + sizeof(int);
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            Store(index, value);
             return this;
         }
 
         public override ByteBuffer PutInt64(int index, long value)
         {
-            Store(CheckIndex(index, 8), value);
+            int newIndex = index + sizeof(long);
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            Store(index, value);
             return this;
         }
 
         public override ByteBuffer PutInt64(long value)
         {
-            Store(NextPutIndex(8), value);
+            int newPosition = position + sizeof(long);
+            if ((uint)newPosition > (uint)limit) // J2N: Added check for overflowing integer
+                throw new BufferOverflowException();
+
+            Store(position, value);
+            position = newPosition;
             return this;
         }
 
         public override ByteBuffer PutInt16(int index, short value)
         {
-            Store(CheckIndex(index, 2), value);
+            int newIndex = index + sizeof(short);
+            if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
+                throw new ArgumentOutOfRangeException(nameof(index));
+
+            Store(index, value);
             return this;
         }
 
         public override ByteBuffer PutInt16(short value)
         {
-            Store(NextPutIndex(2), value);
+            int newPosition = position + sizeof(short);
+            if ((uint)newPosition > (uint)limit) // J2N: Added check for overflowing integer
+                throw new BufferOverflowException();
+
+            Store(position, value);
+            position = newPosition;
             return this;
         }
 
