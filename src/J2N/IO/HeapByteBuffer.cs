@@ -20,6 +20,7 @@ using J2N.Buffers.Binary;
 using System;
 using System.Runtime.InteropServices;
 
+#pragma warning disable CS9191 // The ref parameter is equivalent to in
 
 namespace J2N.IO
 {
@@ -217,46 +218,16 @@ namespace J2N.IO
             {
                 bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
-
-            //int bytes = 0;
-            //if (order == Endianness.BigEndian)
-            //{
-            //    for (int i = 0; i < 4; i++)
-            //    {
-            //        bytes <<= 8;
-            //        bytes |= (backingArray[baseOffset + i] & 0xFF);
-            //    }
-            //}
-            //else
-            //{
-            //    for (int i = 3; i >= 0; i--)
-            //    {
-            //        bytes <<= 8;
-            //        bytes |= (backingArray[baseOffset + i] & 0xFF);
-            //    }
-            //}
             return bytes;
         }
 
         protected long LoadInt64(int index)
         {
             int baseOffset = offset + index;
-            long bytes = 0;
+            long bytes = MemoryMarshal.Read<long>(backingArray.AsSpan(baseOffset, sizeof(long)));
             if (order == Endianness.BigEndian)
             {
-                for (int i = 0; i < 8; i++)
-                {
-                    bytes <<= 8;
-                    bytes |= (uint)(backingArray[baseOffset + i] & 0xFF);
-                }
-            }
-            else
-            {
-                for (int i = 7; i >= 0; i--)
-                {
-                    bytes <<= 8;
-                    bytes |= (uint)(backingArray[baseOffset + i] & 0xFF);
-                }
+                bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -264,16 +235,10 @@ namespace J2N.IO
         protected short LoadInt16(int index)
         {
             int baseOffset = offset + index;
-            short bytes; // IDE0059: Unnecessary assignment of a value
+            short bytes = MemoryMarshal.Read<short>(backingArray.AsSpan(baseOffset, sizeof(short)));
             if (order == Endianness.BigEndian)
             {
-                bytes = (short)(backingArray[baseOffset] << 8);
-                bytes |= (short)(backingArray[baseOffset + 1] & 0xFF);
-            }
-            else
-            {
-                bytes = (short)(backingArray[baseOffset + 1] << 8);
-                bytes |= (short)(backingArray[baseOffset] & 0xFF);
+                bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -283,20 +248,9 @@ namespace J2N.IO
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                for (int i = 3; i >= 0; i--)
-                {
-                    backingArray[baseOffset + i] = (byte)(value & 0xFF);
-                    value >>= 8;
-                }
+                value = BinaryPrimitive.ReverseEndianness(value);
             }
-            else
-            {
-                for (int i = 0; i <= 3; i++)
-                {
-                    backingArray[baseOffset + i] = (byte)(value & 0xFF);
-                    value >>= 8;
-                }
-            }
+            MemoryMarshal.Write<int>(backingArray.AsSpan(baseOffset, sizeof(int)), ref value);
         }
 
         protected void Store(int index, long value)
@@ -304,20 +258,9 @@ namespace J2N.IO
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                for (int i = 7; i >= 0; i--)
-                {
-                    backingArray[baseOffset + i] = (byte)(value & 0xFF);
-                    value >>= 8;
-                }
+                value = BinaryPrimitive.ReverseEndianness(value);
             }
-            else
-            {
-                for (int i = 0; i <= 7; i++)
-                {
-                    backingArray[baseOffset + i] = (byte)(value & 0xFF);
-                    value >>= 8;
-                }
-            }
+            MemoryMarshal.Write<long>(backingArray.AsSpan(baseOffset, sizeof(long)), ref value);
         }
 
         protected void Store(int index, short value)
@@ -325,14 +268,9 @@ namespace J2N.IO
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                backingArray[baseOffset] = (byte)((value >> 8) & 0xFF);
-                backingArray[baseOffset + 1] = (byte)(value & 0xFF);
+                value = BinaryPrimitive.ReverseEndianness(value);
             }
-            else
-            {
-                backingArray[baseOffset + 1] = (byte)((value >> 8) & 0xFF);
-                backingArray[baseOffset] = (byte)(value & 0xFF);
-            }
+            MemoryMarshal.Write<short>(backingArray.AsSpan(baseOffset, sizeof(short)), ref value);
         }
 
         public override sealed CharBuffer AsCharBuffer()
