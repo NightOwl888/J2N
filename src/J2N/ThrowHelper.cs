@@ -1171,6 +1171,8 @@ namespace J2N
                     return "seq";
                 case ExceptionArgument.set:
                     return "set";
+                case ExceptionArgument.size:
+                    return "size";
                 case ExceptionArgument.source:
                     return "source";
                 case ExceptionArgument.sourceIndex:
@@ -1580,6 +1582,8 @@ namespace J2N
                     return SR.InvalidOperation_ViewFailedVersion;
                 case ExceptionResource.LurchTable_NeedLimitIntMaxValue:
                     return SR.LurchTable_NeedLimitIntMaxValue;
+                case ExceptionResource.ArgumentOutOfRange_SizeMustBeLessThanOrEqualToInt32MaxValue:
+                    return SR.ArgumentOutOfRange_SizeMustBeLessThanOrEqualToInt32MaxValue;
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1664,6 +1668,7 @@ namespace J2N
         s,
         seq,
         set,
+        size,
         source,
         sourceIndex,
         start,
@@ -1882,5 +1887,6 @@ namespace J2N
         ArgumentOutOfRange_LimitMustBeLessThanCapacity,
         InvalidOperation_ViewFailedVersion,
         LurchTable_NeedLimitIntMaxValue,
+        ArgumentOutOfRange_SizeMustBeLessThanOrEqualToInt32MaxValue,
     }
 }

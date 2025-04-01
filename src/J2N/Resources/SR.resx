@@ -468,4 +468,7 @@
   <data name="Arg_BufferTooSmall" xml:space="preserve">
     <value>Not enough space available in the buffer.</value>
   </data>
+  <data name="ArgumentOutOfRange_SizeMustBeLessThanOrEqualToInt32MaxValue" xml:space="preserve">
+    <value>Size must be less than or equal to int.MaxValue.</value>
+  </data>
 </root>

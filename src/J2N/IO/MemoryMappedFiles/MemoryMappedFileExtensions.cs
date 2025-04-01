@@ -1,4 +1,4 @@
-﻿#region Copyright 2019-2021 by Shad Storhaug, Licensed under the Apache License, Version 2.0
+﻿#region Copyright 2019-2025 by Shad Storhaug, Licensed under the Apache License, Version 2.0
 /*  Licensed to the Apache Software Foundation (ASF) under one or more
  *  contributor license agreements.  See the NOTICE file distributed with
  *  this work for additional information regarding copyright ownership.
@@ -59,9 +59,9 @@ namespace J2N.IO.MemoryMappedFiles
         /// </exception>
         /// <exception cref="UnauthorizedAccessException">Access to the memory-mapped file is unauthorized.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
-        public static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, long size)
+        public static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, int size)
         {
-            return CreateViewByteBuffer(memoryMappedFile, offset, size, MemoryMappedFileAccess.ReadWrite, 0, (int)size); // TODO: Make ByteBuffer use long?
+            return CreateViewByteBuffer(memoryMappedFile, offset, size, MemoryMappedFileAccess.ReadWrite, 0, size);
         }
 
         /// <summary>
@@ -81,11 +81,78 @@ namespace J2N.IO.MemoryMappedFiles
         /// -or-
         /// <para/>
         /// <paramref name="size"/> is greater than the logical address space.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="size"/> is greater than <see cref="int.MaxValue"/>.
         /// </exception>
         /// <exception cref="UnauthorizedAccessException"><paramref name="access"/> is invalid for the memory-mapped file.</exception>
         /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
-        public static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, long size, MemoryMappedFileAccess access)
+        public static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, int size, MemoryMappedFileAccess access)
         {
+            return CreateViewByteBuffer(memoryMappedFile, offset, size, access, 0, size);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="MemoryMappedViewByteBuffer"/> that maps to a view of the 
+        /// memory-mapped file, and that has the specified <paramref name="offset"/> and <paramref name="size"/>.
+        /// </summary>
+        /// <param name="memoryMappedFile">This <see cref="MemoryMappedFile"/>.</param>
+        /// <param name="offset">The byte at which to start the view.</param>
+        /// <param name="size">The size of the view. Specify <c>0</c> (zero) to create a view that
+        /// starts at <paramref name="offset"/> and ends approximately at the end of the memory-mapped file.</param>
+        /// <returns>A randomly accessible block of memory, as a <see cref="MemoryMappedViewByteBuffer"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="memoryMappedFile"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="offset"/> or <paramref name="size"/> is a negative value.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="size"/> is greater than the logical address space.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="size"/> is greater than <see cref="int.MaxValue"/>.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException">Access to the memory-mapped file is unauthorized.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        public static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, long size) // J2N TODO: API - deprecate this overload because supporting ByteBuffer larger than int.MaxValue is not possible with Span<T>
+        {
+            if (size > int.MaxValue)
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.size, ExceptionResource.ArgumentOutOfRange_SizeMustBeLessThanOrEqualToInt32MaxValue);
+
+            return CreateViewByteBuffer(memoryMappedFile, offset, size, MemoryMappedFileAccess.ReadWrite, 0, (int)size);
+        }
+
+        /// <summary>
+        /// Creates a <see cref="MemoryMappedViewByteBuffer"/> that maps to a view of the 
+        /// memory-mapped file, and that has the specified <paramref name="offset"/> and <paramref name="size"/>.
+        /// </summary>
+        /// <param name="memoryMappedFile">This <see cref="MemoryMappedFile"/>.</param>
+        /// <param name="offset">The byte at which to start the view.</param>
+        /// <param name="size">The size of the view. Specify <c>0</c> (zero) to create a view that
+        /// starts at <paramref name="offset"/> and ends approximately at the end of the memory-mapped file.</param>
+        /// <param name="access">One of the enumeration values that specifies the type of access allowed to the memory-mapped file. The default is <see cref="MemoryMappedFileAccess.ReadWrite"/>.</param>
+        /// <returns>A randomly accessible block of memory, as a <see cref="MemoryMappedViewByteBuffer"/>.</returns>
+        /// <exception cref="ArgumentNullException">If <paramref name="memoryMappedFile"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="offset"/> or <paramref name="size"/> is a negative value.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="size"/> is greater than the logical address space.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="size"/> is greater than <see cref="int.MaxValue"/>.
+        /// </exception>
+        /// <exception cref="UnauthorizedAccessException"><paramref name="access"/> is invalid for the memory-mapped file.</exception>
+        /// <exception cref="System.IO.IOException">An I/O error occurred.</exception>
+        public static MemoryMappedViewByteBuffer CreateViewByteBuffer(this MemoryMappedFile memoryMappedFile, long offset, long size, MemoryMappedFileAccess access) // J2N TODO: API - deprecate this overload because supporting ByteBuffer larger than int.MaxValue is not possible with Span<T>
+        {
+            if (size > int.MaxValue)
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.size, ExceptionResource.ArgumentOutOfRange_SizeMustBeLessThanOrEqualToInt32MaxValue);
+
             return CreateViewByteBuffer(memoryMappedFile, offset, size, access, 0, (int)size);
         }
 
@@ -98,12 +165,14 @@ namespace J2N.IO.MemoryMappedFiles
             {
                 case MemoryMappedFileAccess.Read:
                 case MemoryMappedFileAccess.ReadExecute:
-                    return new ReadOnlyMemoryMappedViewByteBuffer(memoryMappedFile.CreateViewAccessor(offset, size, access), bufferSize, bufferOffset);
+                    var readOnlyAccessor = new MemoryMappedDirectAccessorReference(new MemoryMappedDirectAccessor(memoryMappedFile.CreateViewAccessor(offset, size, access), offset));
+                    return new ReadOnlyMemoryMappedViewByteBuffer(readOnlyAccessor, bufferSize, bufferOffset);
                 case MemoryMappedFileAccess.ReadWrite:
                 case MemoryMappedFileAccess.ReadWriteExecute:
                 case MemoryMappedFileAccess.Write:
                 case MemoryMappedFileAccess.CopyOnWrite:
-                    return new ReadWriteMemoryMappedViewByteBuffer(memoryMappedFile.CreateViewAccessor(offset, size, access), bufferSize, bufferOffset);
+                    var readWriteAccessor = new MemoryMappedDirectAccessorReference(new MemoryMappedDirectAccessor(memoryMappedFile.CreateViewAccessor(offset, size, access), offset));
+                    return new ReadWriteMemoryMappedViewByteBuffer(readWriteAccessor, bufferSize, bufferOffset);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(access));
             }
