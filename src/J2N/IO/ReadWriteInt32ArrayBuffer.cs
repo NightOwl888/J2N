@@ -97,6 +97,13 @@ namespace J2N.IO
             return this;
         }
 
+        internal override Int32Buffer InternalPut(int[] source)
+        {
+            if (source is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
+            return Put(source.AsSpan());
+        }
+
         public override Int32Buffer Put(int[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
             if (source is null)

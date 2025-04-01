@@ -433,7 +433,9 @@ namespace J2N.IO
         /// <exception cref="BufferOverflowException">If <see cref="Buffer.Remaining"/> is less than <c>source.Length</c>.</exception>
         /// <exception cref="ReadOnlyBufferException">If no changes may be made to the contents of this buffer.</exception>
         /// <exception cref="ArgumentNullException">If <paramref name="source"/> is <c>null</c>.</exception>
-        public Int16Buffer Put(short[] source)
+        public Int16Buffer Put(short[] source) => InternalPut(source);
+
+        internal virtual Int16Buffer InternalPut(short[] source) // J2N: Hack so we can use span by default without affecting calling order
         {
             if (source is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
