@@ -148,18 +148,18 @@ namespace J2N.IO
 
         public override ByteBuffer PutSingle(float value)
         {
-            return PutInt32(BitConversion.SingleToInt32Bits(value));
+            return PutInt32(BitConversion.SingleToRawInt32Bits(value));
         }
 
         public override ByteBuffer PutSingle(int index, float value)
         {
-            return PutInt32(index, BitConversion.SingleToInt32Bits(value));
+            return PutInt32(index, BitConversion.SingleToRawInt32Bits(value));
         }
 
         public override ByteBuffer PutInt32(int value)
         {
-            int newPosition = position + 4;
-            if (newPosition < 0 || newPosition > limit) // J2N: Added check for overflowing integer
+            int newPosition = position + sizeof(int);
+            if ((uint)newPosition > (uint)limit) // J2N: Added check for overflowing integer
                 throw new BufferOverflowException();
 
             Store(position, value);
@@ -169,7 +169,7 @@ namespace J2N.IO
 
         public override ByteBuffer PutInt32(int index, int value)
         {
-            int newIndex = index + 4;
+            int newIndex = index + sizeof(int);
             if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
@@ -179,7 +179,7 @@ namespace J2N.IO
 
         public override ByteBuffer PutInt64(int index, long value)
         {
-            int newIndex = index + 8;
+            int newIndex = index + sizeof(long);
             if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
@@ -189,8 +189,8 @@ namespace J2N.IO
 
         public override ByteBuffer PutInt64(long value)
         {
-            int newPosition = position + 8;
-            if (newPosition < 0 || newPosition > limit) // J2N: Added check for overflowing integer
+            int newPosition = position + sizeof(long);
+            if ((uint)newPosition > (uint)limit) // J2N: Added check for overflowing integer
                 throw new BufferOverflowException();
 
             Store(position, value);
@@ -200,7 +200,7 @@ namespace J2N.IO
 
         public override ByteBuffer PutInt16(int index, short value)
         {
-            int newIndex = index + 2;
+            int newIndex = index + sizeof(short);
             if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
                 throw new ArgumentOutOfRangeException(nameof(index));
 
@@ -210,8 +210,8 @@ namespace J2N.IO
 
         public override ByteBuffer PutInt16(short value)
         {
-            int newPosition = position + 2;
-            if (newPosition < 0 || newPosition > limit) // J2N: Added check for overflowing integer
+            int newPosition = position + sizeof(short);
+            if ((uint)newPosition > (uint)limit) // J2N: Added check for overflowing integer
                 throw new BufferOverflowException();
 
             Store(position, value);

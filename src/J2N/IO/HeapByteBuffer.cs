@@ -138,9 +138,9 @@ namespace J2N.IO
 
         public override sealed int GetInt32()
         {
-            int newPosition = position + 4;
+            int newPosition = position + sizeof(int);
             if (newPosition < 0)
-                throw new ArgumentOutOfRangeException(nameof(Position));
+                throw new ArgumentOutOfRangeException(nameof(Position)); // J2N TODO: Change this to InvalidOperationException, since it is not an argument
             if (newPosition > limit)
                 throw new BufferUnderflowException();
 
@@ -151,19 +151,19 @@ namespace J2N.IO
 
         public override sealed int GetInt32(int index)
         {
-            int newIndex = index + 4;
+            int newIndex = index + sizeof(int);
             if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
             {
-                throw new ArgumentOutOfRangeException(nameof(index));
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index);
             }
             return LoadInt32(index);
         }
 
         public override sealed long GetInt64()
         {
-            int newPosition = position + 8;
+            int newPosition = position + sizeof(long);
             if (newPosition < 0) // J2N: Added check for overflowing integer
-                throw new ArgumentOutOfRangeException(nameof(Position));
+                throw new ArgumentOutOfRangeException(nameof(Position)); // J2N TODO: Change this to InvalidOperationException, since it is not an argument
             if (newPosition > limit)
                 throw new BufferUnderflowException();
 
@@ -174,19 +174,19 @@ namespace J2N.IO
 
         public override sealed long GetInt64(int index)
         {
-            int newIndex = index + 8;
+            int newIndex = index + sizeof(long);
             if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
             {
-                throw new ArgumentOutOfRangeException(nameof(index));
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index);
             }
             return LoadInt64(index);
         }
 
         public override sealed short GetInt16()
         {
-            int newPosition = position + 2;
+            int newPosition = position + sizeof(short);
             if (newPosition < 0) // J2N: Added check for overflowing integer
-                throw new ArgumentOutOfRangeException(nameof(Position));
+                throw new ArgumentOutOfRangeException(nameof(Position)); // J2N TODO: Change this to InvalidOperationException, since it is not an argument
             if (newPosition > limit)
                 throw new BufferUnderflowException();
 
@@ -197,10 +197,10 @@ namespace J2N.IO
 
         public override sealed short GetInt16(int index)
         {
-            int newIndex = index + 2;
+            int newIndex = index + sizeof(short);
             if (index < 0 || (uint)newIndex > (uint)limit) // J2N: Added check for overflowing integer
             {
-                throw new ArgumentOutOfRangeException(nameof(index));
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.index);
             }
             return LoadInt16(index);
         }
