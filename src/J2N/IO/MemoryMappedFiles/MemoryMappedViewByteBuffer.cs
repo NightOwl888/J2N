@@ -29,10 +29,6 @@ using System.Security.AccessControl;
 
 namespace J2N.IO.MemoryMappedFiles
 {
-    
-
-    
-
     /// <summary>
     /// A byte buffer whose content is a memory-mapped region of a file.
     /// 
