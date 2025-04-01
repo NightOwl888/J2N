@@ -205,7 +205,7 @@ namespace J2N.IO
         /// <param name="newLimit">The new limit value; must be non-negative and no larger than this buffer's capacity</param>
         /// <returns>This buffer</returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newLimit"/> is less than zero or greater than <see cref="Capacity"/>.</exception>
-        public Buffer SetLimit(int newLimit)
+        public Buffer SetLimit(int newLimit) // J2N TODO: API - change this to an extension method
         {
             if ((uint)newLimit > (uint)capacity)
                 ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.newLimit, ExceptionResource.ArgumentOutOfRange_LimitMustBeLessThanCapacity);
@@ -261,7 +261,7 @@ namespace J2N.IO
         /// <param name="newPosition">The new position, must be not negative and not greater than limit.</param>
         /// <returns>This buffer</returns>
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="newPosition"/> is less than zero or greater than <see cref="Limit"/>.</exception>
-        public Buffer SetPosition(int newPosition)
+        public Buffer SetPosition(int newPosition) // J2N TODO: API - change this to an extension method
         {
             if ((uint)newPosition > (uint)limit)
                 ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.newPosition, ExceptionResource.ArgumentOutOfRange_PositionMustBeLessThanLimit);
