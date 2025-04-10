@@ -34,6 +34,7 @@ namespace J2N.IO.MemoryMappedFiles
     {
         private /*readonly*/ MemoryMappedViewAccessor accessor;
         private /*readonly*/ SafeBuffer bufferHandle;
+        private /*readonly*/ byte* originalPointer;
         private /*readonly*/ byte* pointer;
         private /*readonly*/ long viewOffset;
         private /*readonly*/ int length;
@@ -46,10 +47,11 @@ namespace J2N.IO.MemoryMappedFiles
             this.viewOffset = viewOffset;
             this.length = (int)this.accessor.Capacity;
             bufferHandle = this.accessor.SafeMemoryMappedViewHandle;
+            originalPointer = default;
             pointer = default;
-            bufferHandle.AcquirePointer(ref pointer);
+            bufferHandle.AcquirePointer(ref originalPointer);
             // Apply the offset once so future indexing is simpler
-            pointer += viewOffset;
+            pointer = originalPointer + viewOffset;
         }
 
         /// <summary>
@@ -75,7 +77,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// Creates a new <see cref="Span{Byte}"/> over the memory of this memory mapped view.
         /// </summary>
         /// <returns>The writable span representation of the view.</returns>
-        public readonly Span<byte> AsSpan() => new Span<byte>(pointer, (int)accessor.Capacity);
+        public readonly Span<byte> AsSpan() => new Span<byte>(pointer, length);
 
         /// <summary>
         /// Creates a new <see cref="Span{Byte}"/> over a portion of the memory of this view from a specified
@@ -84,7 +86,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <param name="start">The index at which to begin this slice.</param>
         /// <returns>The writable span representation of the view.</returns>
         /// <remarks>No bounds checking is performed on <paramref name="start"/>.</remarks>
-        public readonly Span<byte> AsSpan(int start) => new Span<byte>(pointer + start, (int)accessor.Capacity - start);
+        public readonly Span<byte> AsSpan(int start) => new Span<byte>(pointer + start, length - start);
 
         /// <summary>
         /// Creates a new <see cref="Span{Byte}"/> over a portion of the memory of this view from a specified
@@ -116,10 +118,11 @@ namespace J2N.IO.MemoryMappedFiles
         /// </summary>
         public void Dispose()
         {
-            if (pointer is not null)
+            if (originalPointer is not null)
             {
                 bufferHandle.ReleasePointer();
                 pointer = default;
+                originalPointer = default;
             }
             accessor.Dispose();
         }
