@@ -60,7 +60,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <param name="index">The zero-based index of the byte to get.</param>
         /// <returns>The byte at the specified index</returns>
         /// <remarks>No bounds checking is performed.</remarks>
-        public byte this[int index] => pointer[viewOffset + index];
+        public byte this[int index] => pointer[index];
 
         /// <summary>
         /// Sets a byte at the provided <paramref name="index"/>.
@@ -70,7 +70,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <remarks>No bounds checking is performed.</remarks>
         public void SetByte(int index, byte value)
         {
-            pointer[viewOffset + index] = value;
+            pointer[index] = value;
         }
 
         /// <summary>
