@@ -222,7 +222,7 @@ namespace J2N.IO
         {
             int baseOffset = offset + index;
             int bytes = MemoryMarshal.Read<int>(backingArray.AsSpan(baseOffset, sizeof(int)));
-            if (!IsRequestedEndianness)
+            if (order == Endianness.BigEndian)
             {
                 bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
@@ -233,7 +233,7 @@ namespace J2N.IO
         {
             int baseOffset = offset + index;
             long bytes = MemoryMarshal.Read<long>(backingArray.AsSpan(baseOffset, sizeof(long)));
-            if (!IsRequestedEndianness)
+            if (order == Endianness.BigEndian)
             {
                 bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
@@ -244,7 +244,7 @@ namespace J2N.IO
         {
             int baseOffset = offset + index;
             short bytes = MemoryMarshal.Read<short>(backingArray.AsSpan(baseOffset, sizeof(short)));
-            if (!IsRequestedEndianness)
+            if (order == Endianness.BigEndian)
             {
                 bytes = BinaryPrimitive.ReverseEndianness(bytes);
             }
@@ -254,7 +254,7 @@ namespace J2N.IO
         protected void Store(int index, int value)
         {
             int baseOffset = offset + index;
-            if (!IsRequestedEndianness)
+            if (order == Endianness.BigEndian)
             {
                 value = BinaryPrimitive.ReverseEndianness(value);
             }
@@ -264,7 +264,7 @@ namespace J2N.IO
         protected void Store(int index, long value)
         {
             int baseOffset = offset + index;
-            if (!IsRequestedEndianness)
+            if (order == Endianness.BigEndian)
             {
                 value = BinaryPrimitive.ReverseEndianness(value);
             }
@@ -274,7 +274,7 @@ namespace J2N.IO
         protected void Store(int index, short value)
         {
             int baseOffset = offset + index;
-            if (!IsRequestedEndianness)
+            if (order == Endianness.BigEndian)
             {
                 value = BinaryPrimitive.ReverseEndianness(value);
             }
