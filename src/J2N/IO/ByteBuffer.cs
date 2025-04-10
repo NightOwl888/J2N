@@ -694,10 +694,6 @@ namespace J2N.IO
             return this;
         }
 
-        // Property to check if the byte order matches the requested order
-        internal bool IsRequestedEndianness =>
-            (order == Endianness.BigEndian) != BitConverter.IsLittleEndian;
-
         /// <summary>
         /// Child class implements this method to realize <see cref="Array"/>.
         /// </summary>
