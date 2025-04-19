@@ -16,8 +16,8 @@
  */
 #endregion
 
-using J2N.Buffers.Binary;
 using System;
+using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 
 #pragma warning disable CS9191 // The ref parameter is equivalent to in
@@ -224,7 +224,7 @@ namespace J2N.IO
             int bytes = MemoryMarshal.Read<int>(backingArray.AsSpan(baseOffset, sizeof(int)));
             if (order == Endianness.BigEndian)
             {
-                bytes = BinaryPrimitive.ReverseEndianness(bytes);
+                bytes = BinaryPrimitives.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -235,7 +235,7 @@ namespace J2N.IO
             long bytes = MemoryMarshal.Read<long>(backingArray.AsSpan(baseOffset, sizeof(long)));
             if (order == Endianness.BigEndian)
             {
-                bytes = BinaryPrimitive.ReverseEndianness(bytes);
+                bytes = BinaryPrimitives.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -246,7 +246,7 @@ namespace J2N.IO
             short bytes = MemoryMarshal.Read<short>(backingArray.AsSpan(baseOffset, sizeof(short)));
             if (order == Endianness.BigEndian)
             {
-                bytes = BinaryPrimitive.ReverseEndianness(bytes);
+                bytes = BinaryPrimitives.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -256,7 +256,7 @@ namespace J2N.IO
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                value = BinaryPrimitive.ReverseEndianness(value);
+                value = BinaryPrimitives.ReverseEndianness(value);
             }
             MemoryMarshal.Write<int>(backingArray.AsSpan(baseOffset, sizeof(int)), ref value);
         }
@@ -266,7 +266,7 @@ namespace J2N.IO
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                value = BinaryPrimitive.ReverseEndianness(value);
+                value = BinaryPrimitives.ReverseEndianness(value);
             }
             MemoryMarshal.Write<long>(backingArray.AsSpan(baseOffset, sizeof(long)), ref value);
         }
@@ -276,7 +276,7 @@ namespace J2N.IO
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                value = BinaryPrimitive.ReverseEndianness(value);
+                value = BinaryPrimitives.ReverseEndianness(value);
             }
             MemoryMarshal.Write<short>(backingArray.AsSpan(baseOffset, sizeof(short)), ref value);
         }

@@ -16,8 +16,8 @@
  */
 #endregion
 
-using J2N.Buffers.Binary;
 using System;
+using System.Buffers.Binary;
 using System.Runtime.CompilerServices;
 
 
@@ -386,9 +386,9 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="short"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
-        [Obsolete("Use BinaryPrimitive.ReverseEndianness(short) instead.")]
+        [Obsolete("Use BinaryPrimitives.ReverseEndianness(short) instead.")]
         public static short ReverseBytes(this short value)
-            => BinaryPrimitive.ReverseEndianness(value);
+            => BinaryPrimitives.ReverseEndianness(value);
 
         /// <summary>
         /// Returns the value obtained by reversing the order of the bytes in the
@@ -397,9 +397,9 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="int"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
-        [Obsolete("Use BinaryPrimitive.ReverseEndianness(int) instead.")]
+        [Obsolete("Use BinaryPrimitives.ReverseEndianness(int) instead.")]
         public static int ReverseBytes(this int value)
-            => BinaryPrimitive.ReverseEndianness(value);
+            => BinaryPrimitives.ReverseEndianness(value);
 
         /// <summary>
         /// Returns the value obtained by reversing the order of the bytes in the
@@ -408,9 +408,9 @@ namespace J2N.Numerics
         /// <param name="value">The <see cref="long"/> value for which to reverse the byte order.</param>
         /// <returns>The value obtained by reversing the bytes in the specified
         /// <paramref name="value"/>.</returns>
-        [Obsolete("Use BinaryPrimitive.ReverseEndianness(long) instead.")]
+        [Obsolete("Use BinaryPrimitives.ReverseEndianness(long) instead.")]
         public static long ReverseBytes(this long value)
-            => BinaryPrimitive.ReverseEndianness(value);
+            => BinaryPrimitives.ReverseEndianness(value);
 
         #endregion
 

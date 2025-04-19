@@ -16,10 +16,10 @@
  */
 #endregion
 
-using J2N.Buffers.Binary;
 using J2N.Globalization;
 using J2N.Text;
 using System;
+using System.Buffers.Binary;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -3352,7 +3352,7 @@ namespace J2N.Numerics
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal static int ReverseBytes(int value) // J2N: Only used as a proxy for testing purposes
         {
-            return BinaryPrimitive.ReverseEndianness(value);
+            return BinaryPrimitives.ReverseEndianness(value);
         }
 
         #endregion ReverseBytes
