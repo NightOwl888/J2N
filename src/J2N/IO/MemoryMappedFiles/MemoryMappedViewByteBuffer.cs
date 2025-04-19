@@ -16,14 +16,10 @@
  */
 #endregion
 
-using J2N.Buffers.Binary;
 using System;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Buffers.Binary;
 using System.IO.MemoryMappedFiles;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
 
 #pragma warning disable CS9191 // The ref parameter is equivalent to in
 
@@ -404,7 +400,7 @@ namespace J2N.IO.MemoryMappedFiles
             int bytes = MemoryMarshal.Read<int>(accessor.AsSpan(baseOffset, sizeof(int)));
             if (order == Endianness.BigEndian)
             {
-                bytes = BinaryPrimitive.ReverseEndianness(bytes);
+                bytes = BinaryPrimitives.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -422,7 +418,7 @@ namespace J2N.IO.MemoryMappedFiles
             long bytes = MemoryMarshal.Read<long>(accessor.AsSpan(baseOffset, sizeof(long)));
             if (order == Endianness.BigEndian)
             {
-                bytes = BinaryPrimitive.ReverseEndianness(bytes);
+                bytes = BinaryPrimitives.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -440,7 +436,7 @@ namespace J2N.IO.MemoryMappedFiles
             short bytes = MemoryMarshal.Read<short>(accessor.AsSpan(baseOffset, sizeof(short)));
             if (order == Endianness.BigEndian)
             {
-                bytes = BinaryPrimitive.ReverseEndianness(bytes);
+                bytes = BinaryPrimitives.ReverseEndianness(bytes);
             }
             return bytes;
         }
@@ -458,7 +454,7 @@ namespace J2N.IO.MemoryMappedFiles
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                value = BinaryPrimitive.ReverseEndianness(value);
+                value = BinaryPrimitives.ReverseEndianness(value);
             }
             MemoryMarshal.Write<int>(accessor.AsSpan(baseOffset, sizeof(int)), ref value);
         }
@@ -476,7 +472,7 @@ namespace J2N.IO.MemoryMappedFiles
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                value = BinaryPrimitive.ReverseEndianness(value);
+                value = BinaryPrimitives.ReverseEndianness(value);
             }
             MemoryMarshal.Write<long>(accessor.AsSpan(baseOffset, sizeof(long)), ref value);
         }
@@ -494,7 +490,7 @@ namespace J2N.IO.MemoryMappedFiles
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
-                value = BinaryPrimitive.ReverseEndianness(value);
+                value = BinaryPrimitives.ReverseEndianness(value);
             }
             MemoryMarshal.Write<short>(accessor.AsSpan(baseOffset, sizeof(short)), ref value);
         }
