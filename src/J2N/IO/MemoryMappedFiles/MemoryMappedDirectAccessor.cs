@@ -17,13 +17,9 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.MemoryMappedFiles;
-using System.Linq;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace J2N.IO.MemoryMappedFiles
 {
@@ -123,8 +119,8 @@ namespace J2N.IO.MemoryMappedFiles
                 bufferHandle.ReleasePointer();
                 pointer = default;
                 originalPointer = default;
+                accessor.Dispose();
             }
-            accessor.Dispose();
         }
     }
 }
