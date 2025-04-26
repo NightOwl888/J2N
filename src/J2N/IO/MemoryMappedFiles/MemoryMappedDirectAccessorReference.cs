@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+using System.Runtime.ConstrainedExecution;
+using System.Threading;
 
 namespace J2N.IO.MemoryMappedFiles
 {
@@ -24,14 +26,32 @@ namespace J2N.IO.MemoryMappedFiles
     /// Wrapper class to box the <see cref="MemoryMappedDirectAccessor"/>
     /// so we have the same reference in all clones.
     /// </summary>
-    internal sealed class MemoryMappedDirectAccessorReference : IDisposable
+    internal sealed class MemoryMappedDirectAccessorReference : CriticalFinalizerObject, IDisposable
     {
         private readonly MemoryMappedDirectAccessor accessor;
+
+        /// <summary>
+        /// 0 if not disposed, 1 if disposed.
+        /// </summary>
+        internal int disposed;
 
         public MemoryMappedDirectAccessorReference(MemoryMappedDirectAccessor accessor)
         {
             this.accessor = accessor;
         }
+
+        // We need to guarantee that we clean this up even if the referenceCount never reaches 0
+        // because we are dealing with unmanaged resources.
+        ~MemoryMappedDirectAccessorReference()
+        {
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether this accessor is still open. We use
+        /// this to ensure all clones are also considered disposed if the main view is disposed.
+        /// </summary>
+        public bool IsOpen => Interlocked.CompareExchange(ref this.disposed, 0, 0) == 0;
 
         /// <summary>
         /// Gets or sets a byte at the provided <paramref name="index"/>.
@@ -89,6 +109,18 @@ namespace J2N.IO.MemoryMappedFiles
         /// <summary>
         /// Releases virtual memory associated with the mapped file segment.
         /// </summary>
-        public void Dispose() => accessor.Dispose();
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // Ignore duplicate calls to Dispose()
+            if (0 != Interlocked.CompareExchange(ref this.disposed, 1, 0)) return;
+
+            accessor.Dispose(); // Ignore disposing flag because this deals with unmanaged resources.
+        }
     }
 }

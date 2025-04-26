@@ -40,7 +40,8 @@ namespace J2N.IO.MemoryMappedFiles
                 limit = other.Limit,
                 position = other.Position,
                 mark = markOfOther,
-                Order = other.Order
+                Order = other.Order,
+                isClone = true,
             };
         }
 
@@ -55,11 +56,19 @@ namespace J2N.IO.MemoryMappedFiles
             : base(accessor, capacity, offset)
         { }
 
-        public override ByteBuffer AsReadOnlyBuffer() => Copy(this, mark);
+        public override ByteBuffer AsReadOnlyBuffer()
+        {
+            EnsureOpen();
+            return Copy(this, mark);
+        }
 
         public override ByteBuffer Compact() => throw new ReadOnlyBufferException();
 
-        public override ByteBuffer Duplicate() => Copy(this, mark);
+        public override ByteBuffer Duplicate()
+        {
+            EnsureOpen();
+            return Copy(this, mark);
+        }
 
         public override bool IsReadOnly => true;
 
@@ -99,9 +108,11 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Slice()
         {
+            EnsureOpen();
             return new ReadOnlyMemoryMappedViewByteBuffer(accessor, Remaining, offset + position)
             {
-                order = this.order
+                order = this.order,
+                isClone = true,
             };
         }
     }

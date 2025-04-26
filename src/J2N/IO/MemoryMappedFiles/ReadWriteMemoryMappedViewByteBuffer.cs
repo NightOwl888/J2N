@@ -40,7 +40,8 @@ namespace J2N.IO.MemoryMappedFiles
                 limit = other.Limit,
                 position = other.Position,
                 mark = markOfOther,
-                Order = other.Order
+                Order = other.Order,
+                isClone = true,
             };
         }
 
@@ -67,12 +68,25 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer AsReadOnlyBuffer()
         {
+            EnsureOpen();
             return ReadOnlyMemoryMappedViewByteBuffer.Copy(this, mark);
         }
 
-        public override ByteBuffer Compact() => throw new NotSupportedException();
+        public override ByteBuffer Compact()
+        {
+            EnsureOpen();
+            accessor.AsSpan(position + offset, Remaining).CopyTo(accessor.AsSpan(offset, Remaining));
+            position = limit - position;
+            limit = capacity;
+            mark = UnsetMark;
+            return this;
+        }
 
-        public override ByteBuffer Duplicate() => Copy(this, mark);
+        public override ByteBuffer Duplicate()
+        {
+            EnsureOpen();
+            return Copy(this, mark);
+        }
 
         public override bool IsReadOnly => false;
 
@@ -85,6 +99,7 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Put(byte value)
         {
+            EnsureOpen();
             if (position == limit)
             {
                 throw new BufferOverflowException();
@@ -96,6 +111,7 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Put(int index, byte value)
         {
+            EnsureOpen();
             if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -122,6 +138,7 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Put(byte[] source, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
+            EnsureOpen();
             if (source is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.source);
             if (offset < 0)
@@ -140,6 +157,7 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Put(ReadOnlySpan<byte> source) // J2N specific
         {
+            EnsureOpen();
             int length = source.Length;
             if (length > Remaining)
                 throw new BufferOverflowException();
@@ -234,9 +252,11 @@ namespace J2N.IO.MemoryMappedFiles
 
         public override ByteBuffer Slice()
         {
+            EnsureOpen();
             return new ReadWriteMemoryMappedViewByteBuffer(accessor, Remaining, offset + position)
             {
-                order = this.order
+                order = this.order,
+                isClone = true,
             };
         }
     }

@@ -19,7 +19,9 @@
 using System;
 using System.Buffers.Binary;
 using System.IO.MemoryMappedFiles;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 #pragma warning disable CS9191 // The ref parameter is equivalent to in
 
@@ -57,6 +59,11 @@ namespace J2N.IO.MemoryMappedFiles
         /// Whether or not this is a clone. Only the main view will be able to dispose the accessor.
         /// </summary>
         internal bool isClone;
+
+        /// <summary>
+        /// 0 if not disposed, 1 if disposed.
+        /// </summary>
+        internal int disposed;
 
         /// <summary>
         /// Initializes a new instance of <see cref="MemoryMappedViewByteBuffer"/>
@@ -118,6 +125,7 @@ namespace J2N.IO.MemoryMappedFiles
         // Implementation provided by Vincent Van Den Berghe: http://git.net/ml/general/2017-02/msg31639.html
         public override ByteBuffer Get(byte[] destination, int offset, int length) // J2N TODO: API - Rename startIndex instead of offset
         {
+            EnsureOpen();
             if (destination is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.destination);
             if (offset < 0)
@@ -128,14 +136,6 @@ namespace J2N.IO.MemoryMappedFiles
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthArray(offset, ExceptionArgument.offset, length);
             if (length > Remaining)
                 throw new BufferUnderflowException();
-
-            //// we need to check for 0-length reads, since 
-            //// ReadArray will throw an ArgumentOutOfRange exception if position is at
-            //// the end even when nothing is read
-            //if (length > 0)
-            //{
-            //    accessor.ReadArray(Ix(NextGetIndex(length)), destination, offset, length);
-            //}
 
             accessor.AsSpan(this.offset + position, length).CopyTo(destination.AsSpan(offset, length));
             position += length;
@@ -155,6 +155,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <see cref="Buffer.Remaining"/>.</exception>
         public override ByteBuffer Get(Span<byte> destination) // J2N specific
         {
+            EnsureOpen();
             int length = destination.Length;
             if (length > Remaining)
                 throw new BufferUnderflowException();
@@ -171,6 +172,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="BufferUnderflowException">If the position is equal or greater than limit.</exception>
         public override byte Get()
         {
+            EnsureOpen();
             if (position == limit)
             {
                 throw new BufferUnderflowException();
@@ -186,6 +188,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <exception cref="ArgumentOutOfRangeException">If index is invalid.</exception>
         public override byte Get(int index)
         {
+            EnsureOpen();
             if ((uint)index >= (uint)limit)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
@@ -396,6 +399,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns>The <see cref="int"/> at the specified index.</returns>
         protected int LoadInt32(int index)
         {
+            EnsureOpen();
             int baseOffset = offset + index;
             int bytes = MemoryMarshal.Read<int>(accessor.AsSpan(baseOffset, sizeof(int)));
             if (order == Endianness.BigEndian)
@@ -414,6 +418,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns>The <see cref="long"/> at the specified index.</returns>
         protected long LoadInt64(int index)
         {
+            EnsureOpen();
             int baseOffset = offset + index;
             long bytes = MemoryMarshal.Read<long>(accessor.AsSpan(baseOffset, sizeof(long)));
             if (order == Endianness.BigEndian)
@@ -432,6 +437,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns>The <see cref="short"/> at the specified index.</returns>
         protected short LoadInt16(int index)
         {
+            EnsureOpen();
             int baseOffset = offset + index;
             short bytes = MemoryMarshal.Read<short>(accessor.AsSpan(baseOffset, sizeof(short)));
             if (order == Endianness.BigEndian)
@@ -451,6 +457,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns>The <see cref="int"/> at the specified index.</returns>
         protected void Store(int index, int value)
         {
+            EnsureOpen();
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
@@ -469,6 +476,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns>The <see cref="long"/> at the specified index.</returns>
         protected void Store(int index, long value)
         {
+            EnsureOpen();
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
@@ -487,6 +495,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// <returns>The <see cref="short"/> at the specified index.</returns>
         protected void Store(int index, short value)
         {
+            EnsureOpen();
             int baseOffset = offset + index;
             if (order == Endianness.BigEndian)
             {
@@ -668,6 +677,7 @@ namespace J2N.IO.MemoryMappedFiles
         /// </summary>
         public virtual void Flush()
         {
+            EnsureOpen();
             accessor.Flush();
         }
 
@@ -685,10 +695,63 @@ namespace J2N.IO.MemoryMappedFiles
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing)
+            // Ignore duplicate calls to Dispose()
+            if (0 != Interlocked.CompareExchange(ref this.disposed, 1, 0)) return;
+
+            if (!isClone)
             {
-                accessor.Dispose();
+                accessor.Dispose(); // Ignore disposing flag because this deals with unmanaged resources.
             }
+        }
+
+        internal bool IsOpen // Internal for testing
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                // If accessor is disposed, it overrides everything
+                if (!accessor.IsOpen)
+                    return false;
+
+                // For our main object, we are done
+                if (!isClone)
+                    return true;
+
+                // Allow clones to be disposed individually
+                return Interlocked.CompareExchange(ref this.disposed, 0, 0) == 0;
+            }
+        }
+
+        /// <summary>
+        /// Ensures the current <see cref="MemoryMappedViewByteBuffer"/> has not been disposed.
+        /// </summary>
+        protected void EnsureOpen()
+        {
+            if (!IsOpen)
+            {
+                ThrowHelper.ThrowObjectDisposedException(this);
+            }
+        }
+
+        /// <inheritdoc/>
+        public override int CompareTo(ByteBuffer? other)
+        {
+            EnsureOpen();
+            return base.CompareTo(other);
+        }
+
+        /// <inheritdoc/>
+        public override bool Equals(object? other)
+        {
+            EnsureOpen();
+            return base.Equals(other);
+        }
+
+        /// <inheritdoc/>
+        public override int GetHashCode()
+        {
+            EnsureOpen();
+            return base.GetHashCode();
         }
     }
 }
