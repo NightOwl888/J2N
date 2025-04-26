@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
+using System.Text;
 using System.Threading;
 
 namespace J2N.IO.MemoryMappedFiles
@@ -493,6 +494,249 @@ namespace J2N.IO.MemoryMappedFiles
 
                 DeleteFile(file);
             }
+        }
+
+        [Test] // J2N specific
+        public void TestDispose_Duplicate()
+        {
+            long fileSize = Random.Next(1024 * 1024);
+            int cut = Random.Next((int)fileSize);
+            var file = new FileInfo(Path.GetTempFileName());
+
+            using (FileStream stream = new FileStream(file.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, 2048, FileOptions.DeleteOnClose))
+            using (var memoryMappedFile = MemoryMappedFile.CreateFromFile(stream, null, fileSize, MemoryMappedFileAccess.ReadWrite,
+#if FEATURE_MEMORYMAPPEDFILESECURITY
+                    null,
+#endif
+                HandleInheritability.None, false))
+            {
+                MemoryMappedViewByteBuffer mbb = memoryMappedFile.CreateViewByteBuffer(cut, 0, MemoryMappedFileAccess.ReadWrite);
+
+                MemoryMappedViewByteBuffer clone1 = (MemoryMappedViewByteBuffer)mbb.Duplicate();
+                MemoryMappedViewByteBuffer clone2 = (MemoryMappedViewByteBuffer)mbb.Slice();
+                MemoryMappedViewByteBuffer clone3 = (MemoryMappedViewByteBuffer)clone1.Duplicate();
+
+
+                Assert.IsTrue(mbb.IsOpen);
+                Assert.IsTrue(clone1.IsOpen);
+                Assert.IsTrue(clone2.IsOpen);
+                Assert.IsTrue(clone3.IsOpen);
+
+                clone1.Dispose();
+
+                Assert.IsTrue(mbb.IsOpen);
+                Assert.IsFalse(clone1.IsOpen);
+                Assert.IsTrue(clone2.IsOpen);
+                Assert.IsTrue(clone3.IsOpen);
+
+                clone3.Dispose();
+
+                Assert.IsTrue(mbb.IsOpen);
+                Assert.IsFalse(clone1.IsOpen);
+                Assert.IsTrue(clone2.IsOpen);
+                Assert.IsFalse(clone3.IsOpen);
+
+
+                mbb.Dispose();
+
+                Assert.IsFalse(mbb.IsOpen);
+                Assert.IsFalse(clone1.IsOpen);
+                Assert.IsFalse(clone2.IsOpen);
+                Assert.IsFalse(clone3.IsOpen);
+
+                clone2.Dispose();
+
+                Assert.IsFalse(mbb.IsOpen);
+                Assert.IsFalse(clone1.IsOpen);
+                Assert.IsFalse(clone2.IsOpen);
+                Assert.IsFalse(clone3.IsOpen);
+            }
+        }
+
+        [TestCase(MemoryMappedFileAccess.ReadWrite)] // J2N specific
+        [TestCase(MemoryMappedFileAccess.Read)]
+        public void TestDispose_Exceptions(MemoryMappedFileAccess memoryMappedFileAccess)
+        {
+            long fileSize = Random.Next(1024 * 1024);
+            int cut = Random.Next((int)fileSize);
+            var file = new FileInfo(Path.GetTempFileName());
+
+            using (StreamWriter writer = new StreamWriter(file.FullName, true, Encoding.UTF8))
+            {
+                for (int i = 0; i < 2048; i++)
+                {
+                    writer.Write((byte)0);
+                }
+            }
+
+            using (FileStream stream = new FileStream(file.FullName, FileMode.Open, FileAccess.ReadWrite, FileShare.Read, 2048, FileOptions.DeleteOnClose))
+            using (var memoryMappedFile = MemoryMappedFile.CreateFromFile(stream, null, fileSize, MemoryMappedFileAccess.ReadWrite,
+#if FEATURE_MEMORYMAPPEDFILESECURITY
+                    null,
+#endif
+                HandleInheritability.None, false))
+            {
+                MemoryMappedViewByteBuffer mbb = memoryMappedFile.CreateViewByteBuffer(cut, 2048, memoryMappedFileAccess);
+
+                MemoryMappedViewByteBuffer duplicate = (MemoryMappedViewByteBuffer)mbb.Duplicate();
+                MemoryMappedViewByteBuffer slice = (MemoryMappedViewByteBuffer)mbb.Slice();
+                CharBuffer charBuffer = mbb.AsCharBuffer();
+                Int16Buffer int16Buffer = mbb.AsInt16Buffer();
+                Int32Buffer int32Buffer = mbb.AsInt32Buffer();
+                Int64Buffer int64Buffer = mbb.AsInt64Buffer();
+                SingleBuffer singleBuffer = mbb.AsSingleBuffer();
+                DoubleBuffer doubleBuffer = mbb.AsDoubleBuffer();
+
+                mbb.Dispose();
+                Assert.IsFalse(mbb.IsOpen);
+
+                CheckDisposedByteBuffer(mbb);
+                CheckDisposedByteBuffer(duplicate);
+                CheckDisposedByteBuffer(slice);
+
+                CheckDisposedCharBuffer(charBuffer);
+                CheckDisposedInt16Buffer(int16Buffer);
+                CheckDisposedInt32Buffer(int32Buffer);
+                CheckDisposedInt64Buffer(int64Buffer);
+                CheckDisposedSingleBuffer(singleBuffer);
+                CheckDisposedDoubleBuffer(doubleBuffer);
+            }
+        }
+
+
+        private static void CheckDisposedBuffer(Buffer buffer)
+        {
+            //Assert.Throws<ObjectDisposedException>(() => buffer.Clear());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Equals(buffer));
+            //Assert.Throws<ObjectDisposedException>(() => buffer.Flip());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetHashCode());
+            //Assert.Throws<ObjectDisposedException>(() => buffer.Mark());
+            //Assert.Throws<ObjectDisposedException>(() => buffer.Reset());
+            //Assert.Throws<ObjectDisposedException>(() => buffer.Rewind());
+        }
+
+
+        private static void CheckDisposedByteBuffer(MemoryMappedViewByteBuffer buffer)
+        {
+            CheckDisposedByteBuffer((ByteBuffer)buffer);
+            Assert.Throws<ObjectDisposedException>(() => buffer.Flush());
+        }
+
+
+        private static void CheckDisposedByteBuffer(ByteBuffer buffer)
+        {
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsCharBuffer());
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsDoubleBuffer());
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsInt16Buffer());
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsInt32Buffer());
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsInt64Buffer());
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsReadOnlyBuffer());
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsSingleBuffer());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.Compact());
+            Assert.Throws<ObjectDisposedException>(() => buffer.CompareTo(buffer));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Duplicate());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Get());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetChar());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetDouble());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetInt16());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetInt32());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetInt64());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetSingle());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.PutChar('\0'));
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.PutDouble(0D));
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.PutInt16(0));
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.PutInt32(0));
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.PutInt64(0L));
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.PutSingle(0F));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Slice());
+
+            CheckDisposedBuffer(buffer);
+        }
+
+
+
+        private static void CheckDisposedCharBuffer(CharBuffer buffer)
+        {
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsReadOnlyBuffer());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.Compact());
+            Assert.Throws<ObjectDisposedException>(() => buffer.CompareTo(buffer));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Duplicate());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Get());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetHashCode());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Slice());
+
+            CheckDisposedBuffer(buffer);
+        }
+
+        private static void CheckDisposedDoubleBuffer(DoubleBuffer buffer)
+        {
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsReadOnlyBuffer());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.Compact());
+            Assert.Throws<ObjectDisposedException>(() => buffer.CompareTo(buffer));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Duplicate());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Get());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetHashCode());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Slice());
+
+            CheckDisposedBuffer(buffer);
+        }
+
+        private static void CheckDisposedInt16Buffer(Int16Buffer buffer)
+        {
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsReadOnlyBuffer());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.Compact());
+            Assert.Throws<ObjectDisposedException>(() => buffer.CompareTo(buffer));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Duplicate());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Get());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetHashCode());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Slice());
+
+            CheckDisposedBuffer(buffer);
+        }
+
+        private static void CheckDisposedInt32Buffer(Int32Buffer buffer)
+        {
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsReadOnlyBuffer());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.Compact());
+            Assert.Throws<ObjectDisposedException>(() => buffer.CompareTo(buffer));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Duplicate());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Get());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetHashCode());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Slice());
+
+            CheckDisposedBuffer(buffer);
+        }
+
+        private static void CheckDisposedInt64Buffer(Int64Buffer buffer)
+        {
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsReadOnlyBuffer());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.Compact());
+            Assert.Throws<ObjectDisposedException>(() => buffer.CompareTo(buffer));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Duplicate());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Get());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetHashCode());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Slice());
+
+            CheckDisposedBuffer(buffer);
+        }
+
+        private static void CheckDisposedSingleBuffer(SingleBuffer buffer)
+        {
+            Assert.Throws<ObjectDisposedException>(() => buffer.AsReadOnlyBuffer());
+            AssertThrowsObjectDisposedOrNotSupportedException(() => buffer.Compact());
+            Assert.Throws<ObjectDisposedException>(() => buffer.CompareTo(buffer));
+            Assert.Throws<ObjectDisposedException>(() => buffer.Duplicate());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Get());
+            Assert.Throws<ObjectDisposedException>(() => buffer.GetHashCode());
+            Assert.Throws<ObjectDisposedException>(() => buffer.Slice());
+
+            CheckDisposedBuffer(buffer);
+        }
+
+        private static void AssertThrowsObjectDisposedOrNotSupportedException(TestDelegate code)
+        {
+            var ex = Assert.Catch<Exception>(code);
+            Assert.That(ex, Is.InstanceOf<ObjectDisposedException>().Or.InstanceOf<NotSupportedException>());
         }
     }
 }
