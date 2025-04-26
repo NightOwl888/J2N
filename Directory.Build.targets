@@ -135,6 +135,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_APPCONTEXT_BASEDIRECTORY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_ARRAYEMPTY</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_BUFFER_MEMORYCOPY</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_ENCODING_GETSTRING_BYTEPTR</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_GETBYTES_OFFSET_COUNT</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_APPEND_CHARPTR</DefineConstants>
 
