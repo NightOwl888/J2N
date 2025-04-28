@@ -76,6 +76,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_CONDITIONALWEAKTABLE_ADDORUPDATE</DefineConstants>-->
 
     <DefineConstants>$(DefineConstants);FEATURE_NUMBER_TRYFORMAT</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTBYTES_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOMNUMBERGENERATOR_FILL_SPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RUNTIMEHELPERS_ISREFERENCETYPEORCONTAINSREFERENCES</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STACK_TRYPOP</DefineConstants>

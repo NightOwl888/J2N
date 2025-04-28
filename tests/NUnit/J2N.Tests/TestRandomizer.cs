@@ -54,7 +54,7 @@ namespace J2N
          * @tests java.util.Random#nextBytes(byte[])
          */
         [Test]
-        public void Test_nextBytes_B()
+        public void Test_NextBytes_ByteArray()
         {
             // Test for method void java.util.Random.nextBytes(byte [])
             bool someDifferent = false;
@@ -67,6 +67,49 @@ namespace J2N
             assertTrue(
                     "nextBytes() returned an array of length 100 of the same byte",
                     someDifferent);
+        }
+
+        /**
+         * @tests java.util.Random#nextBytes(Span<byte>)
+         */
+        [Test]
+        public void Test_NextBytes_Span() // J2N specific
+        {
+            // Test for method void java.util.Random.nextBytes(byte [])
+            bool someDifferent = false;
+            Span<byte> randomBytes = stackalloc byte[100];
+            r.NextBytes(randomBytes);
+            byte firstByte = randomBytes[0];
+            for (int counter = 1; counter < randomBytes.Length; counter++)
+                if (randomBytes[counter] != firstByte)
+                    someDifferent = true;
+            assertTrue(
+                    "nextBytes() returned an array of length 100 of the same byte",
+                    someDifferent);
+        }
+
+        [Test]
+        public void Test_NextBytes_Repeatability() // J2N specific
+        {
+            var r1 = new Randomizer(42);
+            var r2 = new Randomizer(42);
+
+            for (int i = 0; i < 2; i++)
+            {
+                byte[] b1 = new byte[1000];
+                byte[] b2 = new byte[1000];
+                if (i == 0)
+                {
+                    r1.NextBytes(b1);
+                    r2.NextBytes(b2);
+                }
+                else
+                {
+                    r1.NextBytes((Span<byte>)b1);
+                    r2.NextBytes((Span<byte>)b2);
+                }
+                Assert.IsTrue(b1.AsSpan().SequenceEqual(b2));
+            }
         }
 
         /**
