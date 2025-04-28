@@ -163,6 +163,38 @@ namespace J2N
                     inRange);
         }
 
+        [Test]
+        public void Test_NextDouble_Against_JDK22() // J2N specific
+        {
+            ReadOnlySpan<long> expected = stackalloc long[]
+            {
+                (long)0x3FE74833A06FF457L, (long)0x3FE5DCF778622E01L, (long)0x3FD3C20F3F12BBB4L, (long)0x3FD1BBA76B52C856L,
+                (long)0x3FE54C2D50BB0864L, (long)0x3FECE86CF39C2CBEL, (long)0x3FD79A23A61B35C8L, (long)0x3FD1A5DB3B0BFBE2L,
+                (long)0x3FDDAC800C318574L, (long)0x3FE90D8807FC450FL, (long)0x3FED6B22193735E3L, (long)0x3FDBEF77D7096B88L,
+                (long)0x3FE7FF3B3F71EEC2L, (long)0x3FD8BD82FCC5C830L, (long)0x3FC6B45684D148F0L, (long)0x3FE304EA1AB4DACAL,
+                (long)0x3FCAD9A9E8056AE0L, (long)0x3FEA6E4FFAEBD9A3L, (long)0x3FC60B3CC513B2BCL, (long)0x3FE2CC3482318166L,
+                (long)0x3FE80A7D35262360L, (long)0x3FE245F668A46CF4L, (long)0x3FE28F9058B9AE4FL, (long)0x3FE8148FBE63914EL,
+                (long)0x3FA0160D28842350L, (long)0x3FD6E828F32F702AL, (long)0x3FEA2B647816A9F1L, (long)0x3FDABB648C500436L,
+                (long)0x3FEF2B4CE0A52E25L, (long)0x3FE6D4395C4399B5L, (long)0x3FDEC1BB9DF9A848L, (long)0x3FD2AA8003832CC4L,
+                (long)0x3FEE654114C45EBEL, (long)0x3FEA417811828D73L, (long)0x3FE45F64630705A3L, (long)0x3FD79FAFC22ECA88L,
+                (long)0x3FD70E6A76FB03CAL, (long)0x3FDBD17CBA617570L, (long)0x3FDD44AEEB22B096L, (long)0x3FDE4086EF37050AL,
+                (long)0x3FDE047708C86816L, (long)0x3FEA796CE04C8A07L, (long)0x3FC3550081AEBA34L, (long)0x3FEAAF083E4F151EL,
+                (long)0x3FDD75A8DC2E15B8L, (long)0x3FD1F4E43A1A21A8L, (long)0x3FC9155AEB08D580L, (long)0x3FC6F26E9ECCB144L,
+                (long)0x3FEBB3B4CBD9C27CL, (long)0x3FDF244D28C547AAL, (long)0x3FDAF1335021617AL, (long)0x3FE44078260FA33EL,
+                (long)0x3FE6653DF50C5D31L, (long)0x3FD42E57611FBFB0L, (long)0x3FE24AB6AABF6288L, (long)0x3FD7BEAA54A6C5F0L,
+                (long)0x3FEBE5E7B93B059EL, (long)0x3FE9C88C42037919L, (long)0x3FE3B805C3125C0EL, (long)0x3FD7F580F1D6A62AL,
+                (long)0x3FE64FDC912C8373L, (long)0x3FED135EE2552111L, (long)0x3FC91B58E57827C4L, (long)0x3FE9E459BA4748C8L
+            };
+
+            var target = new Randomizer(42L);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                double d = target.NextDouble();
+                long value = BitConversion.DoubleToRawInt64Bits(d);
+                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+            }
+        }
+
         /**
          * @tests java.util.Random#nextFloat()
          */
@@ -187,6 +219,38 @@ namespace J2N
                     someDifferent);
             assertTrue("Calling nextFloat resulted in a number out of range [0,1)",
                     inRange);
+        }
+
+        [Test]
+        public void Test_NextFloat_Against_JDK22()
+        {
+            ReadOnlySpan<int> expected = stackalloc int[]
+            {
+                (int)0x3F3A419D, (int)0x3D5FE8A0, (int)0x3F2EE7BB, (int)0x3D445C00,
+                (int)0x3E9E1078, (int)0x3F712BBB, (int)0x3E8DDD3A, (int)0x3F352C85,
+                (int)0x3F2A616A, (int)0x3DBB0860, (int)0x3F674367, (int)0x3EE70B2E,
+                (int)0x3EBCD11C, (int)0x3EC366B8, (int)0x3E8D2ED8, (int)0x3F30BFBE,
+                (int)0x3EED6400, (int)0x3F431857, (int)0x3F486C40, (int)0x3F7F88A1,
+                (int)0x3F6B5910, (int)0x3E1B9AF0, (int)0x3EDF7BBE, (int)0x3EE12D70,
+                (int)0x3F3FF9D9, (int)0x3F6E3DD8, (int)0x3EC5EC16, (int)0x3F4C5C83,
+                (int)0x3E35A2B4, (int)0x3E1A291C, (int)0x3F182750, (int)0x3EAD36B2,
+                (int)0x3E56CD4C, (int)0x3E8056AE, (int)0x3F53727F, (int)0x3EBAF668,
+                (int)0x3E3059E4, (int)0x3E227654, (int)0x3F1661A4, (int)0x3E8C6058,
+                (int)0x3F4053E9, (int)0x3F24C46C, (int)0x3F122FB3, (int)0x3DA46CF0,
+                (int)0x3F147C82, (int)0x3DB9AE48, (int)0x3F40A47D, (int)0x3F4C7229,
+                (int)0x3D00B060, (int)0x3EA2108C, (int)0x3EB74146, (int)0x3E4BDC08,
+                (int)0x3F515B23, (int)0x3C354F80, (int)0x3ED5DB24, (int)0x3F450043,
+                (int)0x3F795A67, (int)0x3DA52E20, (int)0x3F36A1CA, (int)0x3F087336,
+                (int)0x3EF60DDC, (int)0x3F5F9A84, (int)0x3E955400, (int)0x3E60CB30
+            };
+
+            var target = new Randomizer(42L);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                float f = target.NextSingle();
+                int value = BitConversion.SingleToRawInt32Bits(f);
+                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+            }
         }
 
         /**
