@@ -112,6 +112,30 @@ namespace J2N
             }
         }
 
+        [Test]
+        public void Test_NextBytes_Against_JDK22() // J2N specific
+        {
+            ReadOnlySpan<byte> expected = stackalloc byte[]
+            {
+                (byte)0x35, (byte)0x9D, (byte)0x41, (byte)0xBA, (byte)0xF7, (byte)0x8A, (byte)0xFE, (byte)0x0D,
+                (byte)0xE1, (byte)0xBB, (byte)0xE7, (byte)0xAE, (byte)0x28, (byte)0xC0, (byte)0x45, (byte)0x0C,
+                (byte)0xE4, (byte)0x3C, (byte)0x08, (byte)0x4F, (byte)0x4B, (byte)0xBB, (byte)0x2B, (byte)0xF1,
+                (byte)0x83, (byte)0x9D, (byte)0xEE, (byte)0x46, (byte)0x6D, (byte)0x85, (byte)0x2C, (byte)0xB5,
+                (byte)0xBE, (byte)0x6A, (byte)0x61, (byte)0xAA, (byte)0x9A, (byte)0x0C, (byte)0x61, (byte)0x17,
+                (byte)0xBD, (byte)0x67, (byte)0x43, (byte)0xE7, (byte)0xDC, (byte)0x97, (byte)0x85, (byte)0x73,
+                (byte)0x99, (byte)0x8E, (byte)0x68, (byte)0x5E, (byte)0x88, (byte)0x5C, (byte)0xB3, (byte)0x61,
+                (byte)0xF8, (byte)0x6C, (byte)0x97, (byte)0x46, (byte)0x20, (byte)0xBE, (byte)0xBF, (byte)0xB0
+            };
+
+            var target = new Randomizer(42L);
+            Span<byte> actual = stackalloc byte[64];
+            target.NextBytes(actual);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                Assert.That(expected[i], Is.EqualTo(actual[i]), $"Loop {i}");
+            }
+        }
+
         /**
          * @tests java.util.Random#nextDouble()
          */
@@ -214,7 +238,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_NextInt_Against_JDK8()
+        public void Test_NextInt_Against_JDK8() // J2N specific
         {
             ReadOnlySpan<int> expected = PopulateExpected(stackalloc int[64]);
 
@@ -289,7 +313,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_NextIntI_Against_JDK8()
+        public void Test_NextIntI_Against_JDK8() // J2N specific
         {
             ReadOnlySpan<int> expected = stackalloc int[64] {
                 130, 13, 248, 134, 220, 25, 5, 168,
@@ -342,7 +366,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_NextIntI_I_Against_JDK22()
+        public void Test_NextIntI_I_Against_JDK22() // J2N specific
         {
             ReadOnlySpan<int> expected = PopulateExpected(stackalloc int[64]);
 
@@ -409,7 +433,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_NextLong_Against_JDK8()
+        public void Test_NextLong_Against_JDK8() // J2N specific
         {
             ReadOnlySpan<long> expected = PopulateExpected(stackalloc long[64]);
 
@@ -455,7 +479,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_NextLongI_Against_JDK22()
+        public void Test_NextLongI_Against_JDK22() // J2N specific
         {
             ReadOnlySpan<long> expected = new long[]
             {
@@ -487,7 +511,7 @@ namespace J2N
 
 
         [Test]
-        public void Test_NextLongI_I_Against_JDK22()
+        public void Test_NextLongI_I_Against_JDK22() // J2N specific
         {
             ReadOnlySpan<long> expected = new long[]
             {
