@@ -54,6 +54,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(long value, ExceptionArgument argument)
+        {
+            throw GetArgumentOutOfRangeException(value, argument,
+                                                    ExceptionResource.ArgumentOutOfRange_Generic_MustBeNonNegativeNonZero);
+        }
+
+        [DoesNotReturn]
         internal static void ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument min, ExceptionArgument max) // J2N TODO: API - this should be ArgumentException rather than ArgumentOutOfRangeException.
         {
             string minName = GetArgumentName(min);

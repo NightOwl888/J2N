@@ -131,11 +131,12 @@ namespace J2N
         /// <seealso cref="NextInt64()"/>
         protected virtual int NextInt(int bits)
         {
+            long localSeed = 0;
             lock (syncRoot)
             {
-                internalSeed = (internalSeed * multiplier + 0xbL) & ((1L << 48) - 1);
-                return (int)(internalSeed >>> (48 - bits));
+                localSeed = internalSeed = (internalSeed * multiplier + 0xbL) & ((1L << 48) - 1);
             }
+            return (int)(localSeed >>> (48 - bits));
         }
 
         /// <summary>
@@ -303,17 +304,34 @@ namespace J2N
             if (minValue > maxValue)
                 ThrowHelper.ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument.minValue, ExceptionArgument.maxValue);
 
-            if ((maxValue & -maxValue) == maxValue)
+            int range = maxValue - minValue;
+
+            if (range <= 0)
             {
-                return (int)((maxValue * (long)NextInt(31)) >> 31);
+                int r;
+                do
+                {
+                    r = NextInt(32); // ← 32 bits full random int
+                } while (r < minValue || r >= maxValue);
+                return r;
             }
-            int bits, val;
-            do
+
+            int bits, result;
+            if ((range & (range - 1)) == 0) // Power of two
             {
-                bits = NextInt(31);
-                val = bits % maxValue;
-            } while (bits - val + (maxValue - 1) < 0 || val < minValue);
-            return val;
+                bits = NextInt(31) & (range - 1); // ← get 31 bits, mask
+            }
+            else
+            {
+                do
+                {
+                    bits = NextInt(31); // ← get 31 bits
+                    result = bits % range;
+                } while (bits - result + (range - 1) < 0);
+                bits = result;
+            }
+
+            return bits + minValue;
         }
 
         /// <summary>
@@ -336,6 +354,77 @@ namespace J2N
 #endif
         {
             return ((long)NextInt(32) << 32) + NextInt(32);
+        }
+
+        /// <summary>
+        /// Returns a new non-negative pseudo-random <see cref="long"/> value which is uniformly distributed
+        /// between 0 (inclusively) and the value of <paramref name="maxValue"/> (exclusively).
+        /// <para/>
+        /// NOTE: This was nextLong(long) in Java.
+        /// </summary>
+        /// <param name="maxValue">The exclusive upper bound of the range.</param>
+        /// <returns>A random <see cref="long"/>.</returns>
+#if FEATURE_RANDOM_NEXTINT64
+        public override long NextInt64(long maxValue)
+#else
+        public virtual long NextInt64(long maxValue)
+#endif
+        {
+            if (maxValue <= 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
+
+            return NextInt64(0, maxValue);
+        }
+
+        /// <summary>
+        /// Returns a new non-negative pseudo-random <see cref="long"/> value which is uniformly distributed
+        /// between <paramref name="minValue"/> (inclusively) and the value of <paramref name="maxValue"/> (exclusively).
+        /// </summary>
+        /// <param name="minValue">The inclusive lower bound of the range.</param>
+        /// <param name="maxValue">The exclusive upper bound of the range.</param>
+        /// <returns>A random <see cref="long"/>.</returns>
+#if FEATURE_RANDOM_NEXTINT64
+        public override long NextInt64(long minValue, long maxValue)
+#else
+        public virtual long NextInt64(long minValue, long maxValue)
+#endif
+        {
+            if (minValue >= maxValue)
+                ThrowHelper.ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument.minValue, ExceptionArgument.maxValue);
+
+            long range = maxValue - minValue;
+
+            if (range > 0)
+            {
+                long rangeMinusOne = range - 1;
+
+                // Power of two case (no rejection sampling)
+                if ((range & rangeMinusOne) == 0)
+                {
+                    // Efficiently mask off high bits after a single right shift
+                    return (NextInt64() >>> 1) & rangeMinusOne + minValue;
+                }
+                else
+                {
+                    long randomValue, tempValue;
+                    // Rejection sampling loop
+                    do
+                    {
+                        tempValue = NextInt64() >>> 1; // Logical right shift
+                        randomValue = tempValue % range;
+                    } while (tempValue - randomValue + rangeMinusOne < 0);
+                    return randomValue + minValue;
+                }
+            }
+            else
+            {
+                long result;
+                do
+                {
+                    result = NextInt64();
+                } while (result < minValue || result >= maxValue);
+                return result;
+            }
         }
 
         /// <summary>
