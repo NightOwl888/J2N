@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using System;
 using System.Threading;
 
 namespace J2N
@@ -344,6 +345,58 @@ namespace J2N
             assertEquals(target.NextBoolean(), clone.NextBoolean());
         }
 #endif
+
+        [Test]
+        [Description("Tests to ensure we aren't calling the non-repeatable BCL implementation of NextSingle().")]
+        public void TestSingleRepeatability()
+        {
+            long seed = new Randomizer().NextInt64();
+
+            var left = new Randomizer(seed);
+            float leftFloat = left.NextSingle();
+
+            var right = new Randomizer(seed);
+            float rightFloat = right.NextSingle();
+
+            Assert.IsTrue(BitConversion.SingleToRawInt32Bits(leftFloat) == BitConversion.SingleToRawInt32Bits(rightFloat));
+        }
+
+        [Test]
+        [Description("Tests to ensure we aren't calling the non-repeatable BCL implementation of NextInt64().")]
+        public void TestInt64Repeatability()
+        {
+            long seed = new Randomizer().NextInt64();
+
+            var left = new Randomizer(seed);
+            long leftLong = left.NextInt64();
+
+            var right = new Randomizer(seed);
+            long rightLong = right.NextInt64();
+
+            Assert.IsTrue(leftLong == rightLong);
+        }
+
+        [Test]
+        public void TestNextBytes_NullValue_ThrowsArgumentNullException()
+        {
+            var target = new Randomizer();
+            Assert.Throws<ArgumentNullException>(() => target.NextBytes(null));
+        }
+
+        [Test]
+        public void TestNext_NegativeValueOrZeroValue_ThrowsArgumentOutOfRangeException()
+        {
+            var target = new Randomizer();
+            Assert.Throws<ArgumentOutOfRangeException>(() => target.Next(0));
+            Assert.Throws<ArgumentOutOfRangeException>(() => target.Next(-1));
+        }
+
+        [Test]
+        public void TestNextII_MinValueGreaterThanMaxValue_ThrowsArgumentOutOfRangeException()
+        {
+            var target = new Randomizer();
+            Assert.Throws<ArgumentOutOfRangeException>(() => target.Next(2, 1));
+        }
 
 
         /**

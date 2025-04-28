@@ -8,6 +8,7 @@
     <WarningsAsErrors Label="Force all public members to have XML doc comments.">NU1605;1591</WarningsAsErrors>
 
     <Nullable>enable</Nullable>
+
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet Package Settings">
@@ -16,6 +17,16 @@
     <Description>J2N is a library that helps bridge the gap between .NET and Java. It provides components to assist with porting Java code to .NET, such as collections, adapters, and extensions. It contains some features from Java that also make it generally useful in any .NET application.</Description>
     <!--<PackageTags>$(PackageTags)</PackageTags>-->
   </PropertyGroup>
+
+  <PropertyGroup Label="Compilation Features">
+    <DefineConstants>$(DefineConstants);FEATURE_TIME_PUBLIC</DefineConstants>
+    <DefineConstants Condition="'$(TargetFramework)' != 'netstandard2.1'">$(DefineConstants);FEATURE_RANDOMIZER</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Use an external project for Randomizer in netstandard2.1, since there are overridable members in .NET 6 that need to be overridden when available -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.1'">
+    <ProjectReference Include="..\J2N.Randomizer\J2N.Randomizer.csproj" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Aigamo.ResXGenerator" Version="$(AigamoResXGeneratorPackageReferenceVersion)">
