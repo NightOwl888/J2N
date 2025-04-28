@@ -213,6 +213,52 @@ namespace J2N
                     someDifferent);
         }
 
+        [Test]
+        public void Test_NextInt_Against_JDK8()
+        {
+            ReadOnlySpan<int> expected = PopulateExpected(stackalloc int[64]);
+
+            var target = new Randomizer(42L);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                int value = target.Next();
+                Assert.AreEqual(expected[i], value, delta: 0);
+            }
+
+            static ReadOnlySpan<int> PopulateExpected(Span<int> buffer)
+            {
+                unchecked
+                {
+                    int[] tempValues = new int[]
+                    {
+                        (int)0xBA419D35, (int)0x0DFE8AF7, (int)0xAEE7BBE1, (int)0x0C45C028,
+                        (int)0x4F083CE4, (int)0xF12BBB4B, (int)0x46EE9D83, (int)0xB52C856D,
+                        (int)0xAA616ABE, (int)0x17610C9A, (int)0xE74367BD, (int)0x738597DC,
+                        (int)0x5E688E99, (int)0x61B35C88, (int)0x46976CF8, (int)0xB0BFBE20,
+                        (int)0x76B20011, (int)0xC3185754, (int)0xC86C400F, (int)0xFF88A1E3,
+                        (int)0xEB5910F1, (int)0x26E6BC6F, (int)0x6FBDDF55, (int)0x7096B883,
+                        (int)0xBFF9D9D6, (int)0xEE3DD852, (int)0x62F60BDC, (int)0xCC5C8305,
+                        (int)0x2D68AD16, (int)0x268A478C, (int)0x982750F4, (int)0x569B5949,
+                        (int)0x35B353DD, (int)0x402B571A, (int)0xD3727FF2, (int)0x5D7B347F,
+                        (int)0x2C167999, (int)0x289D95FA, (int)0x9661A432, (int)0x46302CD9,
+                        (int)0xC053E997, (int)0xA4C46C02, (int)0x922FB35E, (int)0x148D9E82,
+                        (int)0x947C82EE, (int)0x1735C9ED, (int)0xC0A47DEF, (int)0xCC7229CE,
+                        (int)0x080B069B, (int)0x510846B6, (int)0x5BA0A3F3, (int)0x32F702B1,
+                        (int)0xD15B23ED, (int)0x02D53E28, (int)0x6AED9211, (int)0xC5004375,
+                        (int)0xF95A6723, (int)0x14A5C4B6, (int)0xB6A1CACA, (int)0x887336A7,
+                        (int)0x7B06EE53, (int)0xDF9A8487, (int)0x4AAA0001, (int)0x3832CC52,
+                    };
+
+                    for (int i = 0; i < tempValues.Length; i++)
+                    {
+                        buffer[i] = tempValues[i];
+                    }
+
+                    return buffer;
+                }
+            }
+        }
+
         /**
          * @tests java.util.Random#nextInt(int)
          */
@@ -241,6 +287,29 @@ namespace J2N
                     inRange);
 
         }
+
+        [Test]
+        public void Test_NextIntI_Against_JDK8()
+        {
+            ReadOnlySpan<int> expected = stackalloc int[64] {
+                130, 13, 248, 134, 220, 25, 5, 168,
+                19, 93, 182, 2, 26, 42, 226, 32,
+                206, 170, 243, 209, 150, 113, 226, 163,
+                243, 241, 30, 208, 137, 246, 230, 6,
+                180, 85, 217, 227, 212, 93, 213, 164,
+                129, 65, 73, 237, 225, 34, 57, 185,
+                157, 193, 193, 190, 58, 6, 160, 160,
+                213, 59, 11, 3, 147, 69, 52, 101
+            };
+
+            var target = new Randomizer(42L);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                int value = target.Next(250);
+                Assert.AreEqual(expected[i], value, delta: 0);
+            }
+        }
+
 
         /**
          * @tests java.util.Random#nextInt(int)
@@ -291,6 +360,52 @@ namespace J2N
             }
             assertTrue("Calling nextLong 100 times resulted in same number",
                     someDifferent);
+        }
+
+        [Test]
+        public void Test_NextLong_Against_JDK8()
+        {
+            ReadOnlySpan<long> expected = PopulateExpected(stackalloc long[64]);
+
+            var target = new Randomizer(42L);
+            for (int i = 0; i < expected.Length; i++)
+            {
+                long value = target.NextInt64();
+                Assert.AreEqual(expected[i], value, delta: 0);
+            }
+
+            static ReadOnlySpan<long> PopulateExpected(Span<long> buffer)
+            {
+                unchecked
+                {
+                    long[] tempValues = new long[]
+                    {
+                        (long)0xBA419D350DFE8AF7, (long)0xAEE7BBE10C45C028, (long)0x4F083CE3F12BBB4B, (long)0x46EE9D82B52C856D,
+                        (long)0xAA616ABE17610C9A, (long)0xE74367BD738597DC, (long)0x5E688E9961B35C88, (long)0x46976CF7B0BFBE20,
+                        (long)0x76B20010C3185754, (long)0xC86C400EFF88A1E3, (long)0xEB5910F126E6BC6F, (long)0x6FBDDF557096B883,
+                        (long)0xBFF9D9D5EE3DD852, (long)0x62F60BDBCC5C8305, (long)0x2D68AD16268A478C, (long)0x982750F4569B5949,
+                        (long)0x35B353DD402B571A, (long)0xD3727FF25D7B347F, (long)0x2C167999289D95FA, (long)0x9661A43246302CD9,
+                        (long)0xC053E996A4C46C02, (long)0x922FB35E148D9E82, (long)0x947C82EE1735C9ED, (long)0xC0A47DEECC7229CE,
+                        (long)0x080B069B510846B6, (long)0x5BA0A3F332F702B1, (long)0xD15B23ED02D53E28, (long)0x6AED9210C5004375,
+                        (long)0xF95A672314A5C4B6, (long)0xB6A1CAC9887336A7, (long)0x7B06EE52DF9A8487, (long)0x4AAA00013832CC52,
+                        (long)0xF32A088B988BD7D5, (long)0xD20BC0BC3051AE6F, (long)0xA2FB233F60E0B477, (long)0x5E7EBF2C22ECA89B,
+                        (long)0x5C39A9DA6FB03CBB, (long)0x6F45F2E9A617570A, (long)0x7512BBB4B22B0979, (long)0x79021B82F37050BB,
+                        (long)0x7811DC308C868164, (long)0xD3CB6736099140ED, (long)0x26AA011E0D75D1A3, (long)0xD57841FAC9E2A3D1,
+                        (long)0x75D6A35CC2E15B9F, (long)0x47D390C6A1A21A80, (long)0x322AB5C65846AC1E, (long)0x2DE4DD0DF6658A2E,
+                        (long)0xDD9DA64B7B384F91, (long)0x7C9134888C547AA0, (long)0x6BC4CD5D021617A9, (long)0xA203C138C1F467DB,
+                        (long)0xB329EF8DA18BA62F, (long)0x50B95DAA11FBFB1D, (long)0x9255B57757EC5114, (long)0x5EFAA97C4A6C5F10,
+                        (long)0xDF2F3DDB2760B3C7, (long)0xCE44621F406F233D, (long)0x9DC02E0C624B81C6, (long)0x5FD603DD1D6A62BE,
+                        (long)0xB27EE48D25906E78, (long)0xE89AF71D4AA42237, (long)0x3236B1F82BC13E38, (long)0xCF22CDE548E91907
+                    };
+
+                    for (int i = 0; i < tempValues.Length; i++)
+                    {
+                        buffer[i] = tempValues[i];
+                    }
+
+                    return buffer;
+                }
+            }
         }
 
         /**
