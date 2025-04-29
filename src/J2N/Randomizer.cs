@@ -286,7 +286,20 @@ namespace J2N
         {
             if (maxValue <= 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
-            return Next(0, maxValue);
+
+            if ((maxValue & -maxValue) == maxValue) // Power of two
+            {
+                return (int)((maxValue * (long)NextInt(31)) >> 31);
+            }
+
+            int bits, candidate;
+            do
+            {
+                bits = NextInt(31);
+                candidate = bits % maxValue;
+            } while (bits - candidate + (maxValue - 1) < 0);
+
+            return candidate;
         }
 
         /// <summary>
@@ -312,7 +325,7 @@ namespace J2N
                 int r;
                 do
                 {
-                    r = NextInt(32); // ← 32 bits full random int
+                    r = NextInt(32); // 32 bits full random int
                 } while (r < minValue || r >= maxValue);
                 return r;
             }
@@ -320,13 +333,13 @@ namespace J2N
             int bits, result;
             if ((range & (range - 1)) == 0) // Power of two
             {
-                bits = NextInt(31) & (range - 1); // ← get 31 bits, mask
+                bits = NextInt(31) & (range - 1); // get 31 bits, mask
             }
             else
             {
                 do
                 {
-                    bits = NextInt(31); // ← get 31 bits
+                    bits = NextInt(31); // get 31 bits
                     result = bits % range;
                 } while (bits - result + (range - 1) < 0);
                 bits = result;
@@ -375,7 +388,28 @@ namespace J2N
             if (maxValue <= 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
 
-            return NextInt64(0, maxValue);
+            long randomValue = NextInt64();  // Simulates Java's nextLong()
+            long boundMinusOne = maxValue - 1;
+
+            // If the bound is a power of two, we can just mask the bits.
+            if ((maxValue & boundMinusOne) == 0L)
+            {
+                return randomValue & boundMinusOne;
+            }
+
+            // Convert to non-negative value by dropping the sign bit.
+            long unsignedRandom = randomValue >>> 1;
+
+            long candidate;
+            do
+            {
+                candidate = unsignedRandom % maxValue;
+
+                // Rejection sampling to eliminate modulo bias.
+                // If this condition fails, the result could be biased.
+            } while (unsignedRandom + boundMinusOne - candidate < 0L);
+
+            return candidate;
         }
 
         /// <summary>
