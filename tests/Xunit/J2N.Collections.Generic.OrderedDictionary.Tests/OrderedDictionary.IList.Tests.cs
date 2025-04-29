@@ -8,6 +8,7 @@ using System.Linq;
 using J2N.TestUtilities.Xunit;
 using Xunit;
 using JCG = J2N.Collections.Generic;
+using static J2N.Collections.Tests.KeyValuePairHelpers;
 
 namespace J2N.Collections.Tests
 {
@@ -89,7 +90,7 @@ namespace J2N.Collections.Tests
         public void Add_WrongType_ThrowsException()
         {
             IList list = NonGenericIListFactory();
-            list.Add(KeyValuePair.Create("key", "value"));
+            list.Add(KeyValuePairCreate("key", "value"));
             AssertExtensions.Throws<ArgumentException>("value", () => list.Add(new KeyValuePair<int, int>(42, 42)));
             AssertExtensions.Throws<ArgumentException>("value", () => list.Add(new KeyValuePair<string, int>("42", 42)));
             AssertExtensions.Throws<ArgumentException>("value", () => list.Add(42));
@@ -100,7 +101,7 @@ namespace J2N.Collections.Tests
         public void Insert_WrongType_ThrowsException()
         {
             IList list = NonGenericIListFactory();
-            list.Insert(0, KeyValuePair.Create("key", "value"));
+            list.Insert(0, KeyValuePairCreate("key", "value"));
             AssertExtensions.Throws<ArgumentException>("value", () => list.Insert(0, new KeyValuePair<int, int>(42, 42)));
             AssertExtensions.Throws<ArgumentException>("value", () => list.Insert(0, new KeyValuePair<string, int>("42", 42)));
             AssertExtensions.Throws<ArgumentException>("value", () => list.Insert(0, 42));

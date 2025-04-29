@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using J2N.TestUtilities.Xunit;
 using Xunit;
 using JCG = J2N.Collections.Generic;
+using static J2N.Collections.Tests.KeyValuePairHelpers;
 
 namespace J2N.Collections.Tests
 {
@@ -59,32 +60,32 @@ namespace J2N.Collections.Tests
             d.Add(3, 3);
             Assert.Equal(new[] { 1, 2, 3 }, d.Keys);
             Assert.Equal(new[] { 1, 2, 3 }, d.Values);
-            Assert.Equal(new[] { KeyValuePair.Create(1, 1), KeyValuePair.Create(2, 2), KeyValuePair.Create(3, 3) }, d);
+            Assert.Equal(new[] { KeyValuePairCreate(1, 1), KeyValuePairCreate(2, 2), KeyValuePairCreate(3, 3) }, d);
 
             d.Remove(2);
             Assert.Equal(new[] { 1, 3 }, d.Keys);
             Assert.Equal(new[] { 1, 3 }, d.Values);
-            Assert.Equal(new[] { KeyValuePair.Create(1, 1), KeyValuePair.Create(3, 3) }, d);
+            Assert.Equal(new[] { KeyValuePairCreate(1, 1), KeyValuePairCreate(3, 3) }, d);
 
             d.Add(4, 4);
             Assert.Equal(new[] { 1, 3, 4 }, d.Keys);
             Assert.Equal(new[] { 1, 3, 4 }, d.Values);
-            Assert.Equal(new[] { KeyValuePair.Create(1, 1), KeyValuePair.Create(3, 3), KeyValuePair.Create(4, 4) }, d);
+            Assert.Equal(new[] { KeyValuePairCreate(1, 1), KeyValuePairCreate(3, 3), KeyValuePairCreate(4, 4) }, d);
 
             d.Insert(0, 5, 5);
             Assert.Equal(new[] { 5, 1, 3, 4 }, d.Keys);
             Assert.Equal(new[] { 5, 1, 3, 4 }, d.Values);
-            Assert.Equal(new[] { KeyValuePair.Create(5, 5), KeyValuePair.Create(1, 1), KeyValuePair.Create(3, 3), KeyValuePair.Create(4, 4) }, d);
+            Assert.Equal(new[] { KeyValuePairCreate(5, 5), KeyValuePairCreate(1, 1), KeyValuePairCreate(3, 3), KeyValuePairCreate(4, 4) }, d);
 
             d.RemoveAt(2);
             Assert.Equal(new[] { 5, 1, 4 }, d.Keys);
             Assert.Equal(new[] { 5, 1, 4 }, d.Values);
-            Assert.Equal(new[] { KeyValuePair.Create(5, 5), KeyValuePair.Create(1, 1), KeyValuePair.Create(4, 4) }, d);
+            Assert.Equal(new[] { KeyValuePairCreate(5, 5), KeyValuePairCreate(1, 1), KeyValuePairCreate(4, 4) }, d);
 
             d.Add(6, 6);
             Assert.Equal(new[] { 5, 1, 4, 6 }, d.Keys);
             Assert.Equal(new[] { 5, 1, 4, 6 }, d.Values);
-            Assert.Equal(new[] { KeyValuePair.Create(5, 5), KeyValuePair.Create(1, 1), KeyValuePair.Create(4, 4), KeyValuePair.Create(6, 6) }, d);
+            Assert.Equal(new[] { KeyValuePairCreate(5, 5), KeyValuePairCreate(1, 1), KeyValuePairCreate(4, 4), KeyValuePairCreate(6, 6) }, d);
 
             d.Clear();
             Assert.Empty(d.Keys);
@@ -96,7 +97,7 @@ namespace J2N.Collections.Tests
             d.Add(8, 8);
             Assert.Equal(new[] { 7, 9, 8 }, d.Keys);
             Assert.Equal(new[] { 7, 9, 8 }, d.Values);
-            Assert.Equal(new[] { KeyValuePair.Create(7, 7), KeyValuePair.Create(9, 9), KeyValuePair.Create(8, 8) }, d);
+            Assert.Equal(new[] { KeyValuePairCreate(7, 7), KeyValuePairCreate(9, 9), KeyValuePairCreate(8, 8) }, d);
         }
 
         #endregion
@@ -116,7 +117,7 @@ namespace J2N.Collections.Tests
             IDictionary dictionary = new JCG.OrderedDictionary<string, string>();
             dictionary.Add("key", "value");
             Assert.Null(dictionary[42]);
-            Assert.Null(dictionary[KeyValuePair.Create("key", "value")]);
+            Assert.Null(dictionary[KeyValuePairCreate("key", "value")]);
         }
 
         [Fact]
