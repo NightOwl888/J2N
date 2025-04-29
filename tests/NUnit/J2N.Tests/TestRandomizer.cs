@@ -280,6 +280,58 @@ namespace J2N
                     someInsideStd);
         }
 
+        [Test]
+        public void Test_NextGaussian_Against_JDK22() // J2N specific
+        {
+            ReadOnlySpan<long> expected = PopulateExpected(stackalloc long[64]);
+
+            var target = new Randomizer(42L);
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                double d = target.NextGaussian();
+                long actualValue = BitConversion.DoubleToRawInt64Bits(d);
+                long expectedValue = expected[i];
+
+                // J2N: .NET is more precise than Java at calculating the values. So,
+                // we may be off by 1 ULP. This checks to ensure the calculation
+                // behavior is within one ULP, so at least we know we have a valid algorithm.
+                long ulpDifference = Math.Abs(actualValue - expectedValue);
+                Assert.That(ulpDifference, Is.LessThanOrEqualTo(1L),
+                    $"Loop {i} - actual: 0x{actualValue:X}, expected: 0x{expectedValue:X}, ULP diff: {ulpDifference}");
+            }
+
+
+            static ReadOnlySpan<long> PopulateExpected(Span<long> buffer)
+            {
+                unchecked
+                {
+                    ReadOnlySpan<long> tempValues = stackalloc long[64]
+                    {
+                        (long)0x3FF2453E82115D86L, (long)0x3FED6BCA38120847L, (long)0xBFEE654EB7A040C2L, (long)0xBFF1B63B72513280L,
+                        (long)0x3FD1FB89A19B83AFL, (long)0x3FE5E86E10AAD3BCL, (long)0xBFEA26AD824BCBC5L, (long)0xBFF658A6C0AAD25AL,
+                        (long)0xBFC870DEAB7EBA10L, (long)0x3FF7C787B1B31EF5L, (long)0x3FE9AC800B282266L, (long)0xBFBF1B78957AC777L,
+                        (long)0x3FF6916EF96A4B20L, (long)0xBFE47CC975ADE686L, (long)0xBFF35AB426047CE4L, (long)0x3FD6A3F753C46425L,
+                        (long)0xBFDF61E37EBA8C40L, (long)0x3FE19F82C682EB1EL, (long)0xBFF341BEB2082109L, (long)0x3FD48B8707F62409L,
+                        (long)0x3FF8D1802FC33C18L, (long)0x3FDC10E1556F284DL, (long)0x3FDED280AC43BD0BL, (long)0x3FF85068ADA272E1L,
+                        (long)0xBFD1B79C6DD6B33AL, (long)0xBFB57D065F7EBDECL, (long)0x3FF417E459919AA8L, (long)0xBFD4D144FAFBDF35L,
+                        (long)0xBFC62E60AC9AEB2BL, (long)0xBFFDBCC3C6CD48B0L, (long)0x3FF6C7E9CAB4F8AEL, (long)0xBFF5D1D26121B38AL,
+                        (long)0xBFFF6F45B81B5333L, (long)0xBFED6521039F1713L, (long)0xC004641F12DE3208L, (long)0xBFFA186A33E7E659L,
+                        (long)0xBFBF3BB474F2C2D4L, (long)0x3FF4A065434BABFDL, (long)0xBFD139922DC805D6L, (long)0x3FD07ABD3EA30A74L,
+                        (long)0xBFD4797A259D6BF9L, (long)0xBFFC4BC68227707EL, (long)0xBFDEF0D994BE2BE4L, (long)0xBFE051D78643D030L,
+                        (long)0x3FF1DDE4E72623A9L, (long)0xBFA4F70816C24779L, (long)0xBFF1B905C4BE1E86L, (long)0x3FFDCC118AF6F5FFL,
+                        (long)0x3FF254F4A8C24843L, (long)0xBFF0F05782409598L, (long)0x3FF1295DB59FD924L, (long)0xBFFEE86C8E534E82L,
+                        (long)0x3FD343FF449F2714L, (long)0x3FCFAED6BEE89589L, (long)0x3FF67F9E530923C3L, (long)0xBFF852D2F64A2725L,
+                        (long)0x3FD156E851C25E6AL, (long)0x3FE1F5C10F65B6C7L, (long)0xBFE0F45D28C3E5C2L, (long)0x3FE13FAB7789C867L,
+                        (long)0x4001B2DF6D1C2FA1L, (long)0xBFE440FDE64D7017L, (long)0xBFFE217D10B8CE19L, (long)0x3FD8BD7F423BFDDFL
+                    };
+
+                    tempValues.CopyTo(buffer);
+                    return buffer;
+                }
+            }
+        }
+
         /**
          * @tests java.util.Random#nextInt()
          */
