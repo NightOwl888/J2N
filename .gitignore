@@ -356,3 +356,6 @@ MigrationBackup/
 
 # BeyondCompare .orig files (when doing conflict resolution)
 *.orig
+
+# Rider files
+.idea/

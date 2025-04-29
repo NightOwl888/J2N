@@ -424,16 +424,18 @@ namespace J2N
             throw GetWrongValueTypeArgumentException((object?)value, targetType);
         }
 
-        private static ArgumentException GetAddingDuplicateWithKeyArgumentException(object? key)
+        private static ArgumentException GetAddingDuplicateWithKeyArgumentException(object? key, ExceptionArgument? argument)
         {
-            return new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key));
+            return argument.HasValue
+                ? new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key), GetArgumentName(argument.Value))
+                : new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key));
         }
 
         [DoesNotReturn]
-        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key)
+        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key, ExceptionArgument? argument = null)
         {
             // Generic key to move the boxing to the right hand side of throw
-            throw GetAddingDuplicateWithKeyArgumentException((object?)key);
+            throw GetAddingDuplicateWithKeyArgumentException((object?)key, argument);
         }
 
         [DoesNotReturn]
@@ -941,6 +943,30 @@ namespace J2N
                 ThrowArgumentNullException(argName);
         }
 
+        internal static void ThrowIfNegative(int value, ExceptionArgument argument)
+        {
+            if (value < 0)
+            {
+                ThrowArgumentOutOfRange_MustBeNonNegative(argument);
+            }
+        }
+
+        internal static void ThrowIfNull(object? value, ExceptionArgument argument)
+        {
+            if (value is null)
+            {
+                ThrowArgumentNullException(argument);
+            }
+        }
+
+        internal static void ThrowIfLessThan(int value, int min, ExceptionArgument argument)
+        {
+            if (value < min)
+            {
+                ThrowArgumentOutOfRangeException(argument);
+            }
+        }
+
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         //internal static void ThrowForUnsupportedSimdVectorBaseType<TVector, T>()
         //    where TVector : ISimdVector<TVector, T>
@@ -1081,6 +1107,8 @@ namespace J2N
                     return "encoding";
                 case ExceptionArgument.enumerator:
                     return "enumerator";
+                case ExceptionArgument.equals:
+                    return "equals";
                 case ExceptionArgument.fnCondition:
                     return "fnCondition";
                 case ExceptionArgument.fnCreate:
@@ -1207,10 +1235,10 @@ namespace J2N
 
                 //case ExceptionArgument.obj:
                 //    return "obj";
-                
 
-                
-                
+
+
+
                 //case ExceptionArgument.values:
                 //    return "values";
 
@@ -1229,37 +1257,37 @@ namespace J2N
                 //    return "chars";
                 //case ExceptionArgument.charIndex:
                 //    return "charIndex";
-                
-                
-                
+
+
+
                 //case ExceptionArgument.ownedMemory:
                 //    return "ownedMemory";
-                
 
-                
-                
-                
-                
-                
 
-                
-                
+
+
+
+
+
+
+
+
                 //case ExceptionArgument.exceptions:
                 //    return "exceptions";
                 //case ExceptionArgument.exception:
                 //    return "exception";
                 //case ExceptionArgument.pointer:
                 //    return "pointer";
-                
+
                 //case ExceptionArgument.format:
                 //    return "format";
                 //case ExceptionArgument.formats:
                 //    return "formats";
-                
-                
+
+
                 //case ExceptionArgument.comparable:
                 //    return "comparable";
-                
+
 
                 //case ExceptionArgument.comparisonType:
                 //    return "comparisonType";
@@ -1307,17 +1335,17 @@ namespace J2N
                 //    return "timeout";
                 //case ExceptionArgument.type:
                 //    return "type";
-                
+
                 //case ExceptionArgument.sourceArray:
                 //    return "sourceArray";
-                
+
                 //case ExceptionArgument.destinationArray:
                 //    return "destinationArray";
                 //case ExceptionArgument.pHandle:
                 //    return "pHandle";
                 //case ExceptionArgument.handle:
                 //    return "handle";
-                
+
                 //case ExceptionArgument.newSize:
                 //    return "newSize";
                 //case ExceptionArgument.lengths:
@@ -1328,25 +1356,25 @@ namespace J2N
                 //    return "keys";
                 //case ExceptionArgument.indices:
                 //    return "indices";
-                
+
                 //case ExceptionArgument.endIndex:
                 //    return "endIndex";
                 //case ExceptionArgument.elementType:
                 //    return "elementType";
-                
+
 
                 //case ExceptionArgument.codePoint:
                 //    return "codePoint";
-                
+
                 //case ExceptionArgument.options:
                 //    return "options";
-                
+
                 //case ExceptionArgument.suffix:
                 //    return "suffix";
-                
+
                 //case ExceptionArgument.buffers:
                 //    return "buffers";
-                
+
                 //case ExceptionArgument.stream:
                 //    return "stream";
                 //case ExceptionArgument.anyOf:
@@ -1361,7 +1389,7 @@ namespace J2N
                 //    return "divisor";
                 //case ExceptionArgument.factor:
                 //    return "factor";
-                
+
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionArgument Enum.");
                     return "";
@@ -1619,6 +1647,7 @@ namespace J2N
         dictionary,
         encoding,
         enumerator,
+        equals,
         fnCondition,
         fnCreate,
         fnUpdate,
@@ -1682,10 +1711,10 @@ namespace J2N
         year,
 
         //obj,
-        
 
-        
-        
+
+
+
         //values,
 
 
@@ -1696,20 +1725,20 @@ namespace J2N
         //ch,
         //chars,
         //charIndex,
-        
-        
-        
+
+
+
         //ownedMemory,
-        
 
-        
 
-        
-       
-        
 
-        
-        
+
+
+
+
+
+
+
         //exceptions,
         //exception,
         //pointer,
@@ -1717,9 +1746,9 @@ namespace J2N
         //format,
         //formats,
         //culture,
-        
+
         //comparable,
-        
+
 
         //comparisonType,
         //manager,
@@ -1746,29 +1775,29 @@ namespace J2N
         //type,
 
         //sourceArray,
-        
+
         //destinationArray,
         //pHandle,
         //handle,
-        
+
         //newSize,
         //lengths,
         //len,
         //keys,
         //indices,
-        
+
         //endIndex,
         //elementType,
-       
+
 
         //codePoint,
-        
+
         //options,
-        
+
         //suffix,
-        
+
         //buffers,
-        
+
         //stream,
         //anyOf,
         //overlapped,
@@ -1776,7 +1805,7 @@ namespace J2N
         //arrayType,
         //divisor,
         //factor,
-        
+
     }
 
     //

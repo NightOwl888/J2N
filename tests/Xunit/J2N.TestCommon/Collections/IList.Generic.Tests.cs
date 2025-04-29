@@ -358,7 +358,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void IList_Generic_IndexOf_ReturnsFirstMatchingValue(int count)
         {
-            if (!IsReadOnly && !AddRemoveClear_ThrowsNotSupported)
+            if (!IsReadOnly && !AddRemoveClear_ThrowsNotSupported && DuplicateValuesAllowed)
             {
                 SCG.IList<T> list = GenericIListFactory(count);
                 foreach (T duplicate in list.ToList()) // hard copies list to circumvent enumeration error
@@ -603,7 +603,7 @@ namespace J2N.Collections.Tests
                     while (enumerator.MoveNext()) ; // Go to end of enumerator
 
                     T current = default(T);
-                    if (Enumerator_Current_UndefinedOperation_Throws)
+                    if (count == 0 ? Enumerator_Empty_Current_UndefinedOperation_Throws : Enumerator_Current_UndefinedOperation_Throws)
                     {
                         Assert.Throws<InvalidOperationException>(() => enumerator.Current); // enumerator.Current should fail
                     }
@@ -619,7 +619,7 @@ namespace J2N.Collections.Tests
                     {
                         collection.Add(CreateT(seed++));
 
-                        if (Enumerator_Current_UndefinedOperation_Throws)
+                        if (count == 0 ? Enumerator_Empty_Current_UndefinedOperation_Throws : Enumerator_Current_UndefinedOperation_Throws)
                         {
                             Assert.Throws<InvalidOperationException>(() => enumerator.Current); // enumerator.Current should fail
                         }
