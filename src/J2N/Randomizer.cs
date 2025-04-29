@@ -281,6 +281,7 @@ namespace J2N
         /// </summary>
         /// <param name="maxValue">The exclusive upper bound of the range.</param>
         /// <returns>A random <see cref="int"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxValue"/> is less than 0.</exception>
         public override int Next(int maxValue)
         {
             if (maxValue <= 0)
@@ -364,6 +365,7 @@ namespace J2N
         /// </summary>
         /// <param name="maxValue">The exclusive upper bound of the range.</param>
         /// <returns>A random <see cref="long"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="maxValue"/> is less than 0.</exception>
 #if FEATURE_RANDOM_NEXTINT64
         public override long NextInt64(long maxValue)
 #else
@@ -379,10 +381,13 @@ namespace J2N
         /// <summary>
         /// Returns a new non-negative pseudo-random <see cref="long"/> value which is uniformly distributed
         /// between <paramref name="minValue"/> (inclusively) and the value of <paramref name="maxValue"/> (exclusively).
+        /// <para/>
+        /// NOTE: This was nextLong(long, long) in Java.
         /// </summary>
         /// <param name="minValue">The inclusive lower bound of the range.</param>
         /// <param name="maxValue">The exclusive upper bound of the range.</param>
         /// <returns>A random <see cref="long"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">If <paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
 #if FEATURE_RANDOM_NEXTINT64
         public override long NextInt64(long minValue, long maxValue)
 #else
