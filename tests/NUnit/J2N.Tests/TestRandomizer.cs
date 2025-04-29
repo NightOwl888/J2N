@@ -369,7 +369,7 @@ namespace J2N
             {
                 unchecked
                 {
-                    int[] tempValues = new int[]
+                    ReadOnlySpan<int> tempValues = stackalloc int[]
                     {
                         (int)0xBA419D35, (int)0x0DFE8AF7, (int)0xAEE7BBE1, (int)0x0C45C028,
                         (int)0x4F083CE4, (int)0xF12BBB4B, (int)0x46EE9D83, (int)0xB52C856D,
@@ -389,11 +389,7 @@ namespace J2N
                         (int)0x7B06EE53, (int)0xDF9A8487, (int)0x4AAA0001, (int)0x3832CC52,
                     };
 
-                    for (int i = 0; i < tempValues.Length; i++)
-                    {
-                        buffer[i] = tempValues[i];
-                    }
-
+                    tempValues.CopyTo(buffer);
                     return buffer;
                 }
             }
@@ -497,7 +493,7 @@ namespace J2N
             {
                 unchecked
                 {
-                    int[] tempValues = new int[]
+                    ReadOnlySpan<int> tempValues = stackalloc int[]
                     {
                         (int)0x0DFE8AF7, (int)0x0C45C028, (int)0x4F083CE4, (int)0x46EE9D83,
                         (int)0x17610C9A, (int)0x738597DC, (int)0x5E688E99, (int)0x61B35C88,
@@ -517,11 +513,7 @@ namespace J2N
                         (int)0x5EFAA97C, (int)0x4A6C5F10, (int)0x2760B3C7, (int)0x406F233D
                     };
 
-                    for (int i = 0; i < tempValues.Length; i++)
-                    {
-                        buffer[i] = tempValues[i];
-                    }
-
+                    tempValues.CopyTo(buffer);
                     return buffer;
                 }
             }
@@ -564,7 +556,7 @@ namespace J2N
             {
                 unchecked
                 {
-                    long[] tempValues = new long[]
+                    ReadOnlySpan<long> tempValues = stackalloc long[]
                     {
                         (long)0xBA419D350DFE8AF7, (long)0xAEE7BBE10C45C028, (long)0x4F083CE3F12BBB4B, (long)0x46EE9D82B52C856D,
                         (long)0xAA616ABE17610C9A, (long)0xE74367BD738597DC, (long)0x5E688E9961B35C88, (long)0x46976CF7B0BFBE20,
@@ -584,11 +576,7 @@ namespace J2N
                         (long)0xB27EE48D25906E78, (long)0xE89AF71D4AA42237, (long)0x3236B1F82BC13E38, (long)0xCF22CDE548E91907
                     };
 
-                    for (int i = 0; i < tempValues.Length; i++)
-                    {
-                        buffer[i] = tempValues[i];
-                    }
-
+                    tempValues.CopyTo(buffer);
                     return buffer;
                 }
             }
@@ -597,7 +585,7 @@ namespace J2N
         [Test]
         public void Test_NextLongI_Against_JDK22() // J2N specific
         {
-            ReadOnlySpan<long> expected = new long[]
+            ReadOnlySpan<long> expected = stackalloc long[]
             {
                 (long)0x000000000000036AL, (long)0x00000000000002C8L, (long)0x0000000000000245L, (long)0x0000000000000364L,
                 (long)0x00000000000002DCL, (long)0x000000000000027FL, (long)0x00000000000001D3L, (long)0x00000000000003DDL,
@@ -629,7 +617,7 @@ namespace J2N
         [Test]
         public void Test_NextLongI_I_Against_JDK22() // J2N specific
         {
-            ReadOnlySpan<long> expected = new long[]
+            ReadOnlySpan<long> expected = stackalloc long[]
             {
                 (long)0x4F083CE3F12BBB4BL, (long)0x46EE9D82B52C856DL, (long)0x5E688E9961B35C88L, (long)0x46976CF7B0BFBE20L,
                 (long)0x76B20010C3185754L, (long)0x6FBDDF557096B883L, (long)0x62F60BDBCC5C8305L, (long)0x2D68AD16268A478CL,
