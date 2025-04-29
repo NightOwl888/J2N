@@ -132,7 +132,7 @@ namespace J2N
             target.NextBytes(actual);
             for (int i = 0; i < expected.Length; i++)
             {
-                Assert.That(expected[i], Is.EqualTo(actual[i]), $"Loop {i}");
+                Assert.That(actual[i], Is.EqualTo(expected[i]), $"Loop {i}");
             }
         }
 
@@ -191,7 +191,7 @@ namespace J2N
             {
                 double d = target.NextDouble();
                 long value = BitConversion.DoubleToRawInt64Bits(d);
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
         }
 
@@ -222,7 +222,7 @@ namespace J2N
         }
 
         [Test]
-        public void Test_NextFloat_Against_JDK22()
+        public void Test_NextFloat_Against_JDK22() // J2N specific
         {
             ReadOnlySpan<int> expected = stackalloc int[]
             {
@@ -249,7 +249,7 @@ namespace J2N
             {
                 float f = target.NextSingle();
                 int value = BitConversion.SingleToRawInt32Bits(f);
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
         }
 
@@ -362,7 +362,7 @@ namespace J2N
             for (int i = 0; i < expected.Length; i++)
             {
                 int value = target.Next();
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
 
             static ReadOnlySpan<int> PopulateExpected(Span<int> buffer)
@@ -442,7 +442,7 @@ namespace J2N
             for (int i = 0; i < expected.Length; i++)
             {
                 int value = target.Next(250);
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
         }
 
@@ -486,7 +486,7 @@ namespace J2N
             for (int i = 0; i < expected.Length; i++)
             {
                 int value = target.Next(short.MinValue, int.MaxValue);
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
 
             static ReadOnlySpan<int> PopulateExpected(Span<int> buffer)
@@ -549,7 +549,7 @@ namespace J2N
             for (int i = 0; i < expected.Length; i++)
             {
                 long value = target.NextInt64();
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
 
             static ReadOnlySpan<long> PopulateExpected(Span<long> buffer)
@@ -609,7 +609,7 @@ namespace J2N
             for (int i = 0; i < expected.Length; i++)
             {
                 long value = target.NextInt64(999L);
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
         }
 
@@ -641,7 +641,7 @@ namespace J2N
             for (int i = 0; i < expected.Length; i++)
             {
                 long value = target.NextInt64(int.MinValue, long.MaxValue);
-                Assert.That(expected[i], Is.EqualTo(value), $"Loop {i}");
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
         }
 
@@ -699,7 +699,7 @@ namespace J2N
         }
 
         [Test]
-        public void TestSyncRoot()
+        public void TestSyncRoot() // J2N specific
         {
             Randomizer random = new Randomizer(0);
 
@@ -745,7 +745,7 @@ namespace J2N
 
         [Test]
         [Description("Tests to ensure we aren't calling the non-repeatable BCL implementation of NextSingle().")]
-        public void TestSingleRepeatability()
+        public void TestSingleRepeatability() // J2N specific
         {
             long seed = new Randomizer().NextInt64();
 
@@ -760,7 +760,7 @@ namespace J2N
 
         [Test]
         [Description("Tests to ensure we aren't calling the non-repeatable BCL implementation of NextInt64().")]
-        public void TestInt64Repeatability()
+        public void TestInt64Repeatability() // J2N specific
         {
             long seed = new Randomizer().NextInt64();
 
@@ -774,14 +774,14 @@ namespace J2N
         }
 
         [Test]
-        public void TestNextBytes_NullValue_ThrowsArgumentNullException()
+        public void TestNextBytes_NullValue_ThrowsArgumentNullException() // J2N specific
         {
             Random target = new Randomizer();
             Assert.Throws<ArgumentNullException>(() => target.NextBytes((byte[])null));
         }
 
         [Test]
-        public void TestNext_NegativeValueOrZeroValue_ThrowsArgumentOutOfRangeException()
+        public void TestNext_NegativeValueOrZeroValue_ThrowsArgumentOutOfRangeException() // J2N specific
         {
             var target = new Randomizer();
             Assert.Throws<ArgumentOutOfRangeException>(() => target.Next(0));
@@ -789,7 +789,7 @@ namespace J2N
         }
 
         [Test]
-        public void TestNextII_MinValueGreaterThanMaxValue_ThrowsArgumentOutOfRangeException()
+        public void TestNextII_MinValueGreaterThanMaxValue_ThrowsArgumentOutOfRangeException() // J2N specific
         {
             var target = new Randomizer();
             Assert.Throws<ArgumentOutOfRangeException>(() => target.Next(2, 1));
