@@ -776,8 +776,8 @@ namespace J2N
         [Test]
         public void TestNextBytes_NullValue_ThrowsArgumentNullException()
         {
-            var target = new Randomizer();
-            Assert.Throws<ArgumentNullException>(() => target.NextBytes(null));
+            Random target = new Randomizer();
+            Assert.Throws<ArgumentNullException>(() => target.NextBytes((byte[])null));
         }
 
         [Test]
