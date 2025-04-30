@@ -287,7 +287,8 @@ namespace J2N
             if (maxValue <= 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
 
-            if ((maxValue & -maxValue) == maxValue) // Power of two
+            // Power of two case (no rejection sampling)
+            if ((maxValue & -maxValue) == maxValue)
             {
                 return (int)((maxValue * (long)NextInt(31)) >> 31);
             }
@@ -322,29 +323,32 @@ namespace J2N
 
             if (range <= 0)
             {
-                int r;
+                int result;
                 do
                 {
-                    r = NextInt(32); // 32 bits full random int
-                } while ((uint)(r - minValue) >= (uint)(maxValue - minValue)); // Faster version of r < minValue || r >= maxValue
-                return r;
+                    result = NextInt(32); // 32 bits full random int
+                } while ((uint)(result - minValue) >= (uint)(maxValue - minValue)); // Faster version of result < minValue || result >= maxValue
+                return result;
             }
 
-            int bits, result;
-            if ((range & (range - 1)) == 0) // Power of two
+            int bits;
+            int rangeMinusOne = range - 1;
+
+            // Power of two case (no rejection sampling)
+            if ((range & rangeMinusOne) == 0)
             {
-                bits = NextInt(31) & (range - 1); // get 31 bits, mask
+                bits = NextInt(31) & rangeMinusOne; // get 31 bits, mask
             }
             else
             {
+                int tempValue;
+                // Rejection sampling loop
                 do
                 {
-                    bits = NextInt(31); // get 31 bits
-                    result = bits % range;
-                } while (bits - result + (range - 1) < 0);
-                bits = result;
+                    tempValue = NextInt(31); // get 31 bits
+                    bits = tempValue % range;
+                } while (tempValue - bits + rangeMinusOne < 0);
             }
-
             return bits + minValue;
         }
 
@@ -391,7 +395,7 @@ namespace J2N
             long randomValue = NextInt64();  // Simulates Java's nextLong()
             long boundMinusOne = maxValue - 1;
 
-            // If the bound is a power of two, we can just mask the bits.
+            // Power of two case (no rejection sampling)
             if ((maxValue & boundMinusOne) == 0L)
             {
                 return randomValue & boundMinusOne;
@@ -443,25 +447,26 @@ namespace J2N
                 return result;
             }
 
+            long bits;
             long rangeMinusOne = range - 1;
 
             // Power of two case (no rejection sampling)
             if ((range & rangeMinusOne) == 0)
             {
                 // Efficiently mask off high bits after a single right shift
-                return (NextInt64() >>> 1) & rangeMinusOne + minValue;
+                bits = (NextInt64() >>> 1) & rangeMinusOne;
             }
             else
             {
-                long randomValue, tempValue;
+                long tempValue;
                 // Rejection sampling loop
                 do
                 {
                     tempValue = NextInt64() >>> 1; // Logical right shift
-                    randomValue = tempValue % range;
-                } while (tempValue - randomValue + rangeMinusOne < 0);
-                return randomValue + minValue;
+                    bits = tempValue % range;
+                } while (tempValue - bits + rangeMinusOne < 0);
             }
+            return bits + minValue;
         }
 
         /// <summary>
