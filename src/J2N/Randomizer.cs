@@ -293,7 +293,7 @@ namespace J2N
                 return (int)((maxValue * (long)NextInt(31)) >> 31);
             }
 
-            long boundMinusOne = maxValue - 1;
+            int boundMinusOne = maxValue - 1;
             int bits, candidate;
             do
             {
