@@ -433,29 +433,7 @@ namespace J2N
 
             long range = maxValue - minValue;
 
-            if (range > 0)
-            {
-                long rangeMinusOne = range - 1;
-
-                // Power of two case (no rejection sampling)
-                if ((range & rangeMinusOne) == 0)
-                {
-                    // Efficiently mask off high bits after a single right shift
-                    return (NextInt64() >>> 1) & rangeMinusOne + minValue;
-                }
-                else
-                {
-                    long randomValue, tempValue;
-                    // Rejection sampling loop
-                    do
-                    {
-                        tempValue = NextInt64() >>> 1; // Logical right shift
-                        randomValue = tempValue % range;
-                    } while (tempValue - randomValue + rangeMinusOne < 0);
-                    return randomValue + minValue;
-                }
-            }
-            else
+            if (range <= 0)
             {
                 long result;
                 do
@@ -463,6 +441,26 @@ namespace J2N
                     result = NextInt64();
                 } while ((ulong)(result - minValue) >= (ulong)(maxValue - minValue)); // Faster version of result < minValue || result >= maxValue
                 return result;
+            }
+
+            long rangeMinusOne = range - 1;
+
+            // Power of two case (no rejection sampling)
+            if ((range & rangeMinusOne) == 0)
+            {
+                // Efficiently mask off high bits after a single right shift
+                return (NextInt64() >>> 1) & rangeMinusOne + minValue;
+            }
+            else
+            {
+                long randomValue, tempValue;
+                // Rejection sampling loop
+                do
+                {
+                    tempValue = NextInt64() >>> 1; // Logical right shift
+                    randomValue = tempValue % range;
+                } while (tempValue - randomValue + rangeMinusOne < 0);
+                return randomValue + minValue;
             }
         }
 
