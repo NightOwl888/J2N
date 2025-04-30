@@ -320,7 +320,7 @@ namespace J2N
         /// <exception cref="ArgumentOutOfRangeException">If <paramref name="minValue"/> is greater than <paramref name="maxValue"/>.</exception>
         public override int Next(int minValue, int maxValue)
         {
-            if (minValue > maxValue)
+            if (minValue >= maxValue)
                 ThrowHelper.ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument.minValue, ExceptionArgument.maxValue);
 
             int candidate;
