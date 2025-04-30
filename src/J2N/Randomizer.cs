@@ -293,12 +293,16 @@ namespace J2N
                 return (int)((maxValue * (long)NextInt(31)) >> 31);
             }
 
+            long boundMinusOne = maxValue - 1;
             int bits, candidate;
             do
             {
                 bits = NextInt(31);
                 candidate = bits % maxValue;
-            } while (bits - candidate + (maxValue - 1) < 0);
+
+                // Rejection sampling to eliminate modulo bias.
+                // If this condition fails, the result could be biased.
+            } while (bits + boundMinusOne - candidate < 0);
 
             return candidate;
         }
@@ -392,26 +396,23 @@ namespace J2N
             if (maxValue <= 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
 
-            long randomValue = NextInt64();  // Simulates Java's nextLong()
             long boundMinusOne = maxValue - 1;
 
             // Power of two case (no rejection sampling)
             if ((maxValue & boundMinusOne) == 0L)
             {
-                return randomValue & boundMinusOne;
+                return NextInt64() & boundMinusOne;
             }
 
-            // Convert to non-negative value by dropping the sign bit.
-            long unsignedRandom = randomValue >>> 1;
-
-            long candidate;
+            long bits, candidate;
             do
             {
-                candidate = unsignedRandom % maxValue;
+                bits = NextInt64() >>> 1; // Convert to non-negative value by dropping the sign bit.
+                candidate = bits % maxValue;
 
                 // Rejection sampling to eliminate modulo bias.
                 // If this condition fails, the result could be biased.
-            } while (unsignedRandom + boundMinusOne - candidate < 0L);
+            } while (bits + boundMinusOne - candidate < 0L);
 
             return candidate;
         }
