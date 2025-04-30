@@ -326,7 +326,7 @@ namespace J2N
                 do
                 {
                     r = NextInt(32); // 32 bits full random int
-                } while (r < minValue || r >= maxValue);
+                } while ((uint)(r - minValue) >= (uint)(maxValue - minValue)); // Faster version of r < minValue || r >= maxValue
                 return r;
             }
 
@@ -461,7 +461,7 @@ namespace J2N
                 do
                 {
                     result = NextInt64();
-                } while (result < minValue || result >= maxValue);
+                } while ((ulong)(result - minValue) >= (ulong)(maxValue - minValue)); // Faster version of result < minValue || result >= maxValue
                 return result;
             }
         }
