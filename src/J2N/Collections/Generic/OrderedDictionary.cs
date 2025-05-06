@@ -229,7 +229,7 @@ namespace J2N.Collections.Generic
         public int Capacity => _entries?.Length ?? 0;
 
         /// <summary>Gets the <see cref="IEqualityComparer{TKey}"/> that is used to determine equality of keys for the dictionary.</summary>
-        public IEqualityComparer<TKey> Comparer
+        public IEqualityComparer<TKey> EqualityComparer
         {
             get
             {

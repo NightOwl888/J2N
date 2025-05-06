@@ -41,28 +41,28 @@ namespace J2N.Collections.Tests
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
             Assert.Empty(instance.Values);
-            Assert.Same(JCG.EqualityComparer<TKey>.Default, instance.Comparer);
+            Assert.Same(JCG.EqualityComparer<TKey>.Default, instance.EqualityComparer);
             Assert.Equal(0, instance.Capacity);
 
             instance = new JCG.OrderedDictionary<TKey, TValue>(42);
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
             Assert.Empty(instance.Values);
-            Assert.Same(JCG.EqualityComparer<TKey>.Default, instance.Comparer);
+            Assert.Same(JCG.EqualityComparer<TKey>.Default, instance.EqualityComparer);
             Assert.InRange(instance.Capacity, 42, int.MaxValue);
 
             instance = new JCG.OrderedDictionary<TKey, TValue>(comparer);
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
             Assert.Empty(instance.Values);
-            Assert.Same(comparer, instance.Comparer);
+            Assert.Same(comparer, instance.EqualityComparer);
             Assert.Equal(0, instance.Capacity);
 
             instance = new JCG.OrderedDictionary<TKey, TValue>(42, comparer);
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
             Assert.Empty(instance.Values);
-            Assert.Same(comparer, instance.Comparer);
+            Assert.Same(comparer, instance.EqualityComparer);
             Assert.InRange(instance.Capacity, 42, int.MaxValue);
 
             IEqualityComparer<TKey> customComparer = EqualityComparerHelper<TKey>.Create(comparer.Equals, comparer.GetHashCode);
@@ -70,7 +70,7 @@ namespace J2N.Collections.Tests
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
             Assert.Empty(instance.Values);
-            Assert.Same(customComparer, instance.Comparer);
+            Assert.Same(customComparer, instance.EqualityComparer);
             Assert.InRange(instance.Capacity, 42, int.MaxValue);
         }
 
@@ -88,7 +88,7 @@ namespace J2N.Collections.Tests
 
             copied = new JCG.OrderedDictionary<TKey, TValue>(source, comparer);
             Assert.Equal(source, copied);
-            Assert.Same(comparer, copied.Comparer);
+            Assert.Same(comparer, copied.EqualityComparer);
         }
 
         [Theory]
@@ -109,7 +109,7 @@ namespace J2N.Collections.Tests
 
                 copied = new JCG.OrderedDictionary<TKey, TValue>(source, comparer);
                 Assert.Equal(source, copied);
-                Assert.Same(comparer, copied.Comparer);
+                Assert.Same(comparer, copied.EqualityComparer);
                 Assert.InRange(copied.Capacity, copied.Count, int.MaxValue);
             }
         }
