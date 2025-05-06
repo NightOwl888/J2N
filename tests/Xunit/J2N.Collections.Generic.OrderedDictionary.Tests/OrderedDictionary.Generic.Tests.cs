@@ -146,7 +146,7 @@ namespace J2N.Collections.Tests
 
         #region TryAdd
         [Fact]
-        public void TryAdd_NullKeyThrows()
+        public void TryAdd_NullKeyDoesNotThrow() // J2N: allow null keys, was TryAdd_NullKeyThrows
         {
             if (default(TKey) is not null)
             {
@@ -154,9 +154,10 @@ namespace J2N.Collections.Tests
             }
 
             var dictionary = new JCG.OrderedDictionary<TKey, TValue>();
-            AssertExtensions.Throws<ArgumentNullException>("key", () => dictionary.TryAdd(default(TKey), CreateTValue(0)));
+            // J2N: was: AssertExtensions.Throws<ArgumentNullException>("key", () => dictionary.TryAdd(default(TKey), CreateTValue(0)));
+            Assert.True(dictionary.TryAdd(default, CreateTValue(0)));
             Assert.True(dictionary.TryAdd(CreateTKey(0), default));
-            Assert.Equal(1, dictionary.Count);
+            Assert.Equal(2, dictionary.Count);
         }
 
         [Fact]
