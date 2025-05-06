@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using static J2N.ThrowHelper;
 
 namespace J2N.Collections.Generic
 {
@@ -46,7 +47,10 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentNullException">The <paramref name="equals"/> delegate was null.</exception>
         public static IEqualityComparer<T> Create(Func<T?, T?, bool> equals, Func<T, int>? getHashCode = null)
         {
-            ThrowHelper.ThrowIfNull(equals, ExceptionArgument.equals);
+            if (equals is null)
+            {
+                ThrowArgumentNullException(ExceptionArgument.equals);
+            }
 
             getHashCode ??= _ => throw new NotSupportedException();
 

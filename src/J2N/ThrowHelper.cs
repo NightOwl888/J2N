@@ -953,14 +953,6 @@ namespace J2N
                 ThrowArgumentNullException(argName);
         }
 
-        internal static void ThrowIfNull(object? value, ExceptionArgument argument)
-        {
-            if (value is null)
-            {
-                ThrowArgumentNullException(argument);
-            }
-        }
-
         internal static void ThrowIfLessThan(int value, int min, ExceptionArgument argument)
         {
             if (value < min)

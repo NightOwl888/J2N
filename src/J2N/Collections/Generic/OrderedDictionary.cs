@@ -168,7 +168,10 @@ namespace J2N.Collections.Generic
             // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract - J2N: so that the throw happens in the ctor body instead
             this(dictionary?.Count ?? 0, comparer)
         {
-            ThrowIfNull(dictionary, ExceptionArgument.dictionary);
+            if (dictionary is null)
+            {
+                ThrowArgumentNullException(ExceptionArgument.dictionary);
+            }
 
             AddRange(dictionary!); // [!]: thrown if null above
         }
@@ -202,7 +205,10 @@ namespace J2N.Collections.Generic
         public OrderedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer) :
             this((collection as ICollection<KeyValuePair<TKey, TValue>>)?.Count ?? 0, comparer)
         {
-            ThrowIfNull(collection, ExceptionArgument.collection);
+            if (collection is null)
+            {
+                ThrowArgumentNullException(ExceptionArgument.collection);
+            }
 
             AddRange(collection);
         }
@@ -297,7 +303,10 @@ namespace J2N.Collections.Generic
             get => GetAt(index);
             set
             {
-                ThrowIfNull(value, ExceptionArgument.value);
+                if (value is null)
+                {
+                    ThrowArgumentNullException(ExceptionArgument.value);
+                }
 
                 if (value is not KeyValuePair<TKey, TValue> tpair)
                 {
@@ -330,7 +339,10 @@ namespace J2N.Collections.Generic
                 //ThrowIfNull(key, ExceptionArgument.key);
                 if (default(TValue) is not null)
                 {
-                    ThrowIfNull(value, ExceptionArgument.value);
+                    if (value is null)
+                    {
+                        ThrowArgumentNullException(ExceptionArgument.value);
+                    }
                 }
 
                 if (key is not null and not TKey) // J2N: allow null keys
@@ -499,7 +511,8 @@ namespace J2N.Collections.Generic
         /// <returns>true if the key didn't exist and the key and value were added to the dictionary; otherwise, false.</returns>
         public bool TryAdd([AllowNull] TKey key, TValue value)
         {
-            ThrowIfNull(key, ExceptionArgument.key);
+            // J2N: allow null keys
+            //ThrowIfNull(key, ExceptionArgument.key);
 
             return TryInsert(index: -1, key, value, InsertionBehavior.None);
         }
@@ -1192,7 +1205,10 @@ namespace J2N.Collections.Generic
         /// <inheritdoc/>
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+            {
+                ThrowArgumentNullException(ExceptionArgument.array);
+            }
 
             if (arrayIndex < 0)
             {
@@ -1224,7 +1240,10 @@ namespace J2N.Collections.Generic
             //ThrowIfNull(key, ExceptionArgument.key);
             if (default(TValue) is not null)
             {
-                ThrowIfNull(value, ExceptionArgument.value);
+                if (value is null)
+                {
+                    ThrowArgumentNullException(ExceptionArgument.value);
+                }
             }
 
             if (key is not TKey and not null) // J2N: allow null keys
@@ -1234,7 +1253,10 @@ namespace J2N.Collections.Generic
 
             if (default(TValue) is not null)
             {
-                ThrowIfNull(value, ExceptionArgument.value);
+                if (value is null)
+                {
+                    throw new ArgumentNullException(nameof(value));
+                }
             }
 
             TValue tvalue = default!;
@@ -1275,7 +1297,10 @@ namespace J2N.Collections.Generic
         /// <inheritdoc/>
         void ICollection.CopyTo(Array array, int index)
         {
-            ThrowIfNull(array, ExceptionArgument.array);
+            if (array is null)
+            {
+                ThrowArgumentNullException(ExceptionArgument.array);
+            }
 
             if (array.Rank != 1)
             {
@@ -1503,7 +1528,10 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             public void CopyTo(TKey[] array, int arrayIndex)
             {
-                ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                {
+                    ThrowArgumentNullException(ExceptionArgument.array);
+                }
 
                 if (arrayIndex < 0)
                 {
@@ -1529,7 +1557,10 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             void ICollection.CopyTo(Array array, int index)
             {
-                ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                {
+                    ThrowArgumentNullException(ExceptionArgument.array);
+                }
 
                 if (array.Rank != 1)
                 {
@@ -1705,7 +1736,10 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             public void CopyTo(TValue[] array, int arrayIndex)
             {
-                ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                {
+                    ThrowArgumentNullException(ExceptionArgument.array);
+                }
 
                 if (arrayIndex < 0)
                 {
@@ -1853,7 +1887,10 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             void ICollection.CopyTo(Array array, int index)
             {
-                ThrowIfNull(array, ExceptionArgument.array);
+                if (array is null)
+                {
+                    ThrowArgumentNullException(ExceptionArgument.array);
+                }
 
                 if (array.Rank != 1)
                 {
