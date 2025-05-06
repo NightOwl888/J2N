@@ -953,14 +953,6 @@ namespace J2N
                 ThrowArgumentNullException(argName);
         }
 
-        internal static void ThrowIfLessThan(int value, int min, ExceptionArgument argument)
-        {
-            if (value < min)
-            {
-                ThrowArgumentOutOfRangeException(argument);
-            }
-        }
-
         //[MethodImpl(MethodImplOptions.AggressiveInlining)]
         //internal static void ThrowForUnsupportedSimdVectorBaseType<TVector, T>()
         //    where TVector : ISimdVector<TVector, T>

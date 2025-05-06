@@ -910,7 +910,10 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than <see cref="Count"/>.</exception>
         public void TrimExcess(int capacity)
         {
-            ThrowIfLessThan(capacity, Count, ExceptionArgument.capacity);
+            if (capacity < Count)
+            {
+                ThrowArgumentOutOfRangeException(ExceptionArgument.capacity);
+            }
 
             int currentCapacity = _entries?.Length ?? 0;
             capacity = HashHelpers.GetPrime(capacity);
