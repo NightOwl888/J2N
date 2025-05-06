@@ -90,6 +90,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowIndexArgumentOutOfRange()
+        {
+            // ReSharper disable once NotResolvedInText
+            throw new ArgumentOutOfRangeException("index");
+        }
+
+        [DoesNotReturn]
         internal static void ThrowArgumentException_DestinationTooShort()
         {
             throw new ArgumentException(SR.Argument_DestinationTooShort, "destination");

@@ -328,8 +328,7 @@ namespace J2N.Collections.Generic
                 // J2N: allow null keys
                 //ThrowIfNull(key, ExceptionArgument.key);
 
-                //if (key is TKey tkey && TryGetValue(tkey, out TValue? value))
-                if (key is TKey or null && TryGetValue((TKey?)key, out var value)) // J2N: allow null keys
+                if (IsCompatibleKey(key) && TryGetValue((TKey?)key, out var value)) // J2N: allow null keys
                 {
                     return value;
                 }
@@ -340,15 +339,10 @@ namespace J2N.Collections.Generic
             {
                 // J2N: allow null keys
                 //ThrowIfNull(key, ExceptionArgument.key);
-                if (default(TValue) is not null)
-                {
-                    if (value is null)
-                    {
-                        ThrowArgumentNullException(ExceptionArgument.value);
-                    }
-                }
 
-                if (key is not null and not TKey) // J2N: allow null keys
+                IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
+
+                if (!IsCompatibleKey(key)) // J2N: allow null keys
                 {
                     throw new ArgumentException(SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
                 }
@@ -388,11 +382,18 @@ namespace J2N.Collections.Generic
         /// <remarks>Setting the value of an existing key does not impact its order in the collection.</remarks>
         public TValue this[[AllowNull] TKey key]
         {
+            [return: MaybeNull]
             get
             {
                 if (!TryGetValue(key, out TValue? value))
                 {
-                    ThrowHelper.ThrowKeyNotFoundException(key);
+                    if (key is null)
+                    {
+                        ThrowKeyNotFoundException("(null)");
+                        return default;
+                    }
+
+                    ThrowKeyNotFoundException(key);
                 }
 
                 return value;
@@ -563,7 +564,7 @@ namespace J2N.Collections.Generic
         /// <summary>Determines whether the <see cref="OrderedDictionary{TKey, TValue}"/> contains a specific value.</summary>
         /// <param name="value">The value to locate in the <see cref="OrderedDictionary{TKey, TValue}"/>. The value can be null for reference types.</param>
         /// <returns>true if the <see cref="OrderedDictionary{TKey, TValue}"/> contains an element with the specified value; otherwise, false.</returns>
-        public bool ContainsValue(TValue value)
+        public bool ContainsValue([AllowNull] TValue value)
         {
             int count = _count;
 
@@ -606,7 +607,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index >= (uint)_count)
             {
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException();
+                ThrowIndexArgumentOutOfRange();
             }
 
             Debug.Assert(_entries is not null, "count must be positive, which means we must have entries");
@@ -737,7 +738,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index > (uint)_count)
             {
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException();
+                ThrowIndexArgumentOutOfRange();
             }
 
             // J2N: allow null keys
@@ -749,7 +750,29 @@ namespace J2N.Collections.Generic
         /// <summary>Removes the value with the specified key from the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
         /// <param name="key">The key of the element to remove.</param>
         /// <returns></returns>
-        public bool Remove([AllowNull] TKey key) => Remove(key, out _);
+        public bool Remove([AllowNull] TKey key)
+        {
+            // The overload Remove(TKey key, out TValue value) is a copy of this method with one additional
+            // statement to copy the value for entry being removed into the output parameter.
+            // Code has been intentionally duplicated for performance reasons.
+
+            // J2N: allow null keys
+            //ThrowIfNull(key, ExceptionArgument.key);
+
+            // Find the key.
+            int index = IndexOf(key);
+            if (index >= 0)
+            {
+                // It exists. Remove it.
+                Debug.Assert(_entries is not null);
+
+                RemoveAt(index);
+
+                return true;
+            }
+
+            return false;
+        }
 
         /// <summary>Removes the value with the specified key from the <see cref="OrderedDictionary{TKey, TValue}"/> and copies the element to the value parameter.</summary>
         /// <param name="key">The key of the element to remove.</param>
@@ -784,7 +807,7 @@ namespace J2N.Collections.Generic
             int count = _count;
             if ((uint)index >= (uint)count)
             {
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException();
+                ThrowIndexArgumentOutOfRange();
             }
 
             // Remove from the associated bucket chain the entry that lives at the specified index.
@@ -810,7 +833,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index >= (uint)_count)
             {
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException();
+                ThrowIndexArgumentOutOfRange();
             }
 
             Debug.Assert(_entries is not null);
@@ -827,7 +850,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index >= (uint)_count)
             {
-                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessException();
+                ThrowIndexArgumentOutOfRange();
             }
 
             // J2N: allow null keys
@@ -1240,19 +1263,14 @@ namespace J2N.Collections.Generic
             Remove(item.Key);
 
         /// <inheritdoc/>
-        void IDictionary.Add(object key, object? value)
+        void IDictionary.Add(object? key, object? value)
         {
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
-            if (default(TValue) is not null)
-            {
-                if (value is null)
-                {
-                    ThrowArgumentNullException(ExceptionArgument.value);
-                }
-            }
 
-            if (key is not TKey and not null) // J2N: allow null keys
+            IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
+
+            if (!IsCompatibleKey(key)) // J2N: allow null keys
             {
                 throw new ArgumentException(SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
             }
@@ -1280,21 +1298,21 @@ namespace J2N.Collections.Generic
         }
 
         /// <inheritdoc/>
-        bool IDictionary.Contains(object key)
+        bool IDictionary.Contains(object? key)
         {
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
 
-            return key is TKey or null && ContainsKey((TKey?)key);
+            return IsCompatibleKey(key) && ContainsKey((TKey?)key);
         }
 
         /// <inheritdoc/>
-        void IDictionary.Remove(object key)
+        void IDictionary.Remove(object? key)
         {
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
 
-            if (key is TKey or null) // J2N: allow null keys
+            if (IsCompatibleKey(key)) // J2N: allow null keys
             {
                 Remove((TKey?)key);
             }
@@ -1310,12 +1328,12 @@ namespace J2N.Collections.Generic
 
             if (array.Rank != 1)
             {
-                throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
             }
 
             if (array.GetLowerBound(0) != 0)
             {
-                throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+                ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
             }
 
             if (index < 0)
@@ -1336,9 +1354,10 @@ namespace J2N.Collections.Generic
             {
                 try
                 {
-                    if (array is not object[] objects)
+                    object[]? objects = array as object[];
+                    if (objects is null)
                     {
-                        throw new ArgumentException(SR.Argument_IncompatibleArrayType, nameof(array));
+                        ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
                     }
 
                     foreach (KeyValuePair<TKey, TValue> pair in this)
@@ -1348,7 +1367,7 @@ namespace J2N.Collections.Generic
                 }
                 catch (ArrayTypeMismatchException)
                 {
-                    throw new ArgumentException(SR.Argument_IncompatibleArrayType, nameof(array));
+                    ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
                 }
             }
         }
@@ -1402,6 +1421,8 @@ namespace J2N.Collections.Generic
             }
         }
 
+        #region Nested Structure: Entry
+
         /// <summary>Represents a key/value pair in the dictionary.</summary>
         private struct Entry
         {
@@ -1414,6 +1435,10 @@ namespace J2N.Collections.Generic
             /// <summary>The value associated with <see cref="Key"/>.</summary>
             public TValue Value;
         }
+
+        #endregion
+
+        #region Nested Structure: Enumerator
 
         /// <summary>Enumerates the elements of a <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
         [StructLayout(LayoutKind.Auto)]
@@ -1492,6 +1517,10 @@ namespace J2N.Collections.Generic
             readonly void IDisposable.Dispose() { }
         }
 
+        #endregion
+
+        #region Nested Class: KeyCollection
+
         /// <summary>Represents the collection of keys in a <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
         [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
         [DebuggerDisplay("Count = {Count}")]
@@ -1529,7 +1558,7 @@ namespace J2N.Collections.Generic
             public bool Contains([AllowNull] TKey key) => _dictionary.ContainsKey(key);
 
             /// <inheritdoc/>
-            bool IList.Contains(object? value) => value is TKey or null && Contains((TKey?)value);
+            bool IList.Contains(object? value) => IsCompatibleKey(value) && Contains((TKey?)value);
 
             /// <inheritdoc/>
             public void CopyTo(TKey[] array, int arrayIndex)
@@ -1669,7 +1698,7 @@ namespace J2N.Collections.Generic
             void IList.Clear() => throw new NotSupportedException();
 
             /// <inheritdoc/>
-            int IList.IndexOf(object? value) => value is TKey or null ? _dictionary.IndexOf((TKey?)value) : -1;
+            int IList.IndexOf(object? value) => IsCompatibleKey(value) ? _dictionary.IndexOf((TKey?)value) : -1;
 
             /// <inheritdoc/>
             void IList.Insert(int index, object? value) => throw new NotSupportedException();
@@ -1705,6 +1734,10 @@ namespace J2N.Collections.Generic
                 readonly void IDisposable.Dispose() { }
             }
         }
+
+        #endregion
+
+        #region Nested Class: ValueCollection
 
         /// <summary>Represents the collection of values in a <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
         [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
@@ -1969,7 +2002,9 @@ namespace J2N.Collections.Generic
             }
         }
 
-#region Structural Equality
+        #endregion
+
+        #region Structural Equality
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current dictionary
@@ -2015,9 +2050,9 @@ namespace J2N.Collections.Generic
         public override int GetHashCode()
             => GetHashCode(DictionaryEqualityComparer<TKey, TValue>.Default);
 
- #endregion Structural Equality
+        #endregion Structural Equality
 
- #region ToString
+        #region ToString
 
         /// <summary>
         /// Returns a string that represents the current dictionary using the specified
@@ -2077,7 +2112,14 @@ namespace J2N.Collections.Generic
         public virtual string ToString(string format)
             => ToString(format, StringFormatter.CurrentCulture);
 
- #endregion ToString
+        #endregion ToString
 
+        private static bool IsCompatibleKey(object? key)
+        {
+            if (key is null)
+                return default(TKey) == null;
+
+            return (key is TKey);
+        }
     }
 }
