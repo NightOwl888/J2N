@@ -953,14 +953,6 @@ namespace J2N
                 ThrowArgumentNullException(argName);
         }
 
-        internal static void ThrowIfNegative(int value, ExceptionArgument argument)
-        {
-            if (value < 0)
-            {
-                ThrowArgumentOutOfRange_MustBeNonNegative(argument);
-            }
-        }
-
         internal static void ThrowIfNull(object? value, ExceptionArgument argument)
         {
             if (value is null)

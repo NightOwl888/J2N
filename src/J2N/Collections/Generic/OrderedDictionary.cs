@@ -100,7 +100,10 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">capacity is less than 0.</exception>
         public OrderedDictionary(int capacity, IEqualityComparer<TKey>? comparer)
         {
-            ThrowIfNegative(capacity, ExceptionArgument.capacity);
+            if (capacity < 0)
+            {
+                ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            }
 
             if (capacity > 0)
             {
@@ -864,7 +867,10 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is negative.</exception>
         public int EnsureCapacity(int capacity)
         {
-            ThrowIfNegative(capacity, ExceptionArgument.capacity);
+            if (capacity < 0)
+            {
+                ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            }
 
             if (Capacity < capacity)
             {
@@ -1187,7 +1193,11 @@ namespace J2N.Collections.Generic
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
             ThrowIfNull(array, ExceptionArgument.array);
-            ThrowIfNegative(arrayIndex, ExceptionArgument.arrayIndex);
+
+            if (arrayIndex < 0)
+            {
+                ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
+            }
 
             if (array.Length - arrayIndex < _count)
             {
@@ -1277,7 +1287,10 @@ namespace J2N.Collections.Generic
                 throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
             }
 
-            ThrowIfNegative(index, ExceptionArgument.index);
+            if (index < 0)
+            {
+                ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+            }
 
             if (array.Length - index < _count)
             {
@@ -1491,7 +1504,11 @@ namespace J2N.Collections.Generic
             public void CopyTo(TKey[] array, int arrayIndex)
             {
                 ThrowIfNull(array, ExceptionArgument.array);
-                ThrowIfNegative(arrayIndex, ExceptionArgument.arrayIndex);
+
+                if (arrayIndex < 0)
+                {
+                    ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
+                }
 
                 OrderedDictionary<TKey, TValue> dictionary = _dictionary;
                 int count = dictionary._count;
@@ -1524,7 +1541,10 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
                 }
 
-                ThrowIfNegative(index, ExceptionArgument.index);
+                if (index < 0)
+                {
+                    ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+                }
 
                 if (array.Length - index < _dictionary.Count)
                 {
@@ -1686,7 +1706,11 @@ namespace J2N.Collections.Generic
             public void CopyTo(TValue[] array, int arrayIndex)
             {
                 ThrowIfNull(array, ExceptionArgument.array);
-                ThrowIfNegative(arrayIndex, ExceptionArgument.arrayIndex);
+
+                if (arrayIndex < 0)
+                {
+                    ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
+                }
 
                 OrderedDictionary<TKey, TValue> dictionary = _dictionary;
                 int count = dictionary._count;
@@ -1841,7 +1865,10 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
                 }
 
-                ThrowIfNegative(index, ExceptionArgument.index);
+                if (index < 0)
+                {
+                    ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
+                }
 
                 if (array.Length - index < _dictionary.Count)
                 {
