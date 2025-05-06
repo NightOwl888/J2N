@@ -424,15 +424,25 @@ namespace J2N
             throw GetWrongValueTypeArgumentException((object?)value, targetType);
         }
 
-        private static ArgumentException GetAddingDuplicateWithKeyArgumentException(object? key, ExceptionArgument? argument)
+        private static ArgumentException GetAddingDuplicateWithKeyArgumentException(object? key)
         {
-            return argument.HasValue
-                ? new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key), GetArgumentName(argument.Value))
-                : new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key));
+            return new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key));
+        }
+
+        private static ArgumentException GetAddingDuplicateWithKeyArgumentException(object? key, ExceptionArgument argument)
+        {
+            return new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key), GetArgumentName(argument));
         }
 
         [DoesNotReturn]
-        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key, ExceptionArgument? argument = null)
+        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key)
+        {
+            // Generic key to move the boxing to the right hand side of throw
+            throw GetAddingDuplicateWithKeyArgumentException((object?)key);
+        }
+
+        [DoesNotReturn]
+        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key, ExceptionArgument argument)
         {
             // Generic key to move the boxing to the right hand side of throw
             throw GetAddingDuplicateWithKeyArgumentException((object?)key, argument);
