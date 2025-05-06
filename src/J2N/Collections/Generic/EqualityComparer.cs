@@ -29,62 +29,6 @@ namespace J2N.Collections.Generic
     /// <typeparam name="T">The type of objects to compare.</typeparam>
     public static class EqualityComparer<T> //: IEqualityComparer<T>, IEqualityComparer //IComparer<T>
     {
-#region MIT License (.NET Foundation)
-        // Licensed to the .NET Foundation under one or more agreements.
-        // The .NET Foundation licenses this file to you under the MIT license.
-
-        /// <summary>
-        /// Creates an <see cref="IEqualityComparer{T}"/> by using the specified delegates as the implementation of the comparer's
-        /// <see cref="IEqualityComparer{T}.Equals(T,T)"/> and <see cref="IEqualityComparer{T}.GetHashCode(T)"/> methods.
-        /// </summary>
-        /// <param name="equals">The delegate to use to implement the <see cref="IEqualityComparer{T}.Equals(T,T)"/> method.</param>
-        /// <param name="getHashCode">
-        /// The delegate to use to implement the <see cref="IEqualityComparer{T}.GetHashCode(T)"/> method.
-        /// If no delegate is supplied, calls to the resulting comparer's <see cref="IEqualityComparer{T}.GetHashCode(T)"/>
-        /// will throw <see cref="NotSupportedException"/>.
-        /// </param>
-        /// <returns>The new comparer.</returns>
-        /// <exception cref="ArgumentNullException">The <paramref name="equals"/> delegate was null.</exception>
-        public static IEqualityComparer<T> Create(Func<T?, T?, bool> equals, Func<T, int>? getHashCode = null)
-        {
-            if (equals is null)
-            {
-                ThrowArgumentNullException(ExceptionArgument.equals);
-            }
-
-            getHashCode ??= _ => throw new NotSupportedException();
-
-            return new DelegateEqualityComparer(equals, getHashCode);
-        }
-
-        internal sealed class DelegateEqualityComparer : IEqualityComparer<T>
-        {
-            private readonly Func<T?, T?, bool> _equals;
-            private readonly Func<T, int> _getHashCode;
-
-            public DelegateEqualityComparer(Func<T?, T?, bool> equals, Func<T, int> getHashCode)
-            {
-                _equals = equals;
-                _getHashCode = getHashCode;
-            }
-
-            public bool Equals(T? x, T? y) =>
-                _equals(x, y);
-
-            public int GetHashCode(T obj) =>
-                _getHashCode(obj);
-
-            public override bool Equals(object? obj) =>
-                obj is DelegateEqualityComparer other &&
-                _equals == other._equals &&
-                _getHashCode == other._getHashCode;
-
-            public override int GetHashCode() =>
-                //HashCode.Combine(_equals.GetHashCode(), _getHashCode.GetHashCode());
-                _equals.GetHashCode() ^ _getHashCode.GetHashCode();
-        }
-#endregion
-
         /// <summary>
         /// Provides natural comparison rules similar to those in Java.
         /// <list type="bullet">

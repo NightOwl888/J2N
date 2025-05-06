@@ -65,7 +65,7 @@ namespace J2N.Collections.Tests
             Assert.Same(comparer, instance.Comparer);
             Assert.InRange(instance.Capacity, 42, int.MaxValue);
 
-            IEqualityComparer<TKey> customComparer = JCG.EqualityComparer<TKey>.Create(comparer.Equals, comparer.GetHashCode);
+            IEqualityComparer<TKey> customComparer = EqualityComparerHelper<TKey>.Create(comparer.Equals, comparer.GetHashCode);
             instance = new JCG.OrderedDictionary<TKey, TValue>(42, customComparer);
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
@@ -129,7 +129,7 @@ namespace J2N.Collections.Tests
         [Fact]
         public void OrderedDictionary_Generic_Constructor_AllKeysEqualComparer()
         {
-            var dictionary = new JCG.OrderedDictionary<TKey, TValue>(JCG.EqualityComparer<TKey>.Create((x, y) => true, x => 1));
+            var dictionary = new JCG.OrderedDictionary<TKey, TValue>(EqualityComparerHelper<TKey>.Create((x, y) => true, x => 1));
             Assert.Equal(0, dictionary.Count);
 
             Assert.True(dictionary.TryAdd(CreateTKey(0), CreateTValue(0)));
