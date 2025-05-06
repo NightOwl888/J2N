@@ -218,8 +218,8 @@ namespace J2N.Collections.Generic
 
         /// <summary>Initializes the <see cref="_buckets"/>/<see cref="_entries"/>.</summary>
         /// <param name="capacity"></param>
-        //[MemberNotNull(nameof(_buckets))]
-        //[MemberNotNull(nameof(_entries))]
+        [MemberNotNull(nameof(_buckets))]
+        [MemberNotNull(nameof(_entries))]
         private void EnsureBucketsAndEntriesInitialized(int capacity)
         {
             Resize(HashHelpers.GetPrime(capacity));
@@ -1082,8 +1082,8 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>Grow or shrink <see cref="_buckets"/> and <see cref="_entries"/> to the specified capacity.</summary>
-        //[MemberNotNull(nameof(_buckets))]
-        //[MemberNotNull(nameof(_entries))]
+        [MemberNotNull(nameof(_buckets))]
+        [MemberNotNull(nameof(_entries))]
         private void Resize(int newSize, bool forceNewHashCodes = false)
         {
             Debug.Assert(!forceNewHashCodes || !typeof(TKey).IsValueType, "Value types never rehash.");
