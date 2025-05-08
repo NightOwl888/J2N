@@ -23,7 +23,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-  
+
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.1' ">
     <PackageReference Include="Microsoft.CSharp" Version="$(MicrosoftCSharpPackageReferenceVersion)" />
     <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" />
@@ -49,7 +49,7 @@
   <PropertyGroup Label="RESX Code Generation Settings">
     <ResXGenerator_NullForgivingOperators>true</ResXGenerator_NullForgivingOperators>
   </PropertyGroup>
-  
+
   <ItemGroup>
     <EmbeddedResource Update="Resources\SR.resx">
       <CustomToolNamespace>J2N</CustomToolNamespace>
@@ -68,6 +68,7 @@
     <InternalsVisibleTo Include="J2N.Collections.Concurrent.LurchTable.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.Extensions.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.LinkedDictionary.Tests" />
+    <InternalsVisibleTo Include="J2N.Collections.Generic.OrderedDictionary.Tests" />
     <InternalsVisibleTo Include="J2N.Runtime.Tests" />
   </ItemGroup>
 
