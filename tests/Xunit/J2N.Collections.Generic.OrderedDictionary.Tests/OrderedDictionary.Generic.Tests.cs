@@ -24,6 +24,7 @@ namespace J2N.Collections.Tests
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
         protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert | ModifyOperation.Remove | ModifyOperation.Clear;
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Overwrite;
 
         protected override IDictionary<TKey, TValue> GenericIDictionaryFactory() => new JCG.OrderedDictionary<TKey, TValue>();
 
