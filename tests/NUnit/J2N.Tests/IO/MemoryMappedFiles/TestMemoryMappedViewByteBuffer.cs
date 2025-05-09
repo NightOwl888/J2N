@@ -510,7 +510,7 @@ namespace J2N.IO.MemoryMappedFiles
 #endif
                 HandleInheritability.None, false))
             {
-                MemoryMappedViewByteBuffer mbb = memoryMappedFile.CreateViewByteBuffer(cut, 0, MemoryMappedFileAccess.ReadWrite);
+                MemoryMappedViewByteBuffer mbb = memoryMappedFile.CreateViewByteBuffer(cut, 0, MemoryMappedFileAccess.ReadWrite); // size == 0: read the remainder of the file to the end
 
                 MemoryMappedViewByteBuffer clone1 = (MemoryMappedViewByteBuffer)mbb.Duplicate();
                 MemoryMappedViewByteBuffer clone2 = (MemoryMappedViewByteBuffer)mbb.Slice();
@@ -558,7 +558,6 @@ namespace J2N.IO.MemoryMappedFiles
         public void TestDispose_Exceptions(MemoryMappedFileAccess memoryMappedFileAccess)
         {
             long fileSize = Random.Next(1024 * 1024);
-            int cut = Random.Next((int)fileSize);
             var file = new FileInfo(Path.GetTempFileName());
 
             using (StreamWriter writer = new StreamWriter(file.FullName, true, Encoding.UTF8))
@@ -576,7 +575,7 @@ namespace J2N.IO.MemoryMappedFiles
 #endif
                 HandleInheritability.None, false))
             {
-                MemoryMappedViewByteBuffer mbb = memoryMappedFile.CreateViewByteBuffer(cut, 2048, memoryMappedFileAccess);
+                MemoryMappedViewByteBuffer mbb = memoryMappedFile.CreateViewByteBuffer(0, 2048, memoryMappedFileAccess);
 
                 MemoryMappedViewByteBuffer duplicate = (MemoryMappedViewByteBuffer)mbb.Duplicate();
                 MemoryMappedViewByteBuffer slice = (MemoryMappedViewByteBuffer)mbb.Slice();
