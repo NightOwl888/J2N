@@ -310,7 +310,8 @@ namespace J2N
         /// Returns a new non-negative pseudo-random <see cref="int"/> value which is uniformly distributed
         /// between <paramref name="minValue"/> (inclusively) and the value of <paramref name="maxValue"/> (exclusively).
         /// <para/>
-        /// NOTE: This was nextInt(int, int) in Java.
+        /// NOTE: This was nextInt(int, int) in Java. The behavior is binary compatibile with JDK 21+, which is
+        /// different than earlier implementations in JDK 17+.
         /// </summary>
         /// <param name="minValue">The inclusive lower bound of the range.</param>
         /// <param name="maxValue">The exclusive upper bound of the range. <paramref name="maxValue"/>
@@ -426,7 +427,8 @@ namespace J2N
         /// Returns a new non-negative pseudo-random <see cref="long"/> value which is uniformly distributed
         /// between <paramref name="minValue"/> (inclusively) and the value of <paramref name="maxValue"/> (exclusively).
         /// <para/>
-        /// NOTE: This was nextLong(long, long) in Java.
+        /// NOTE: This was nextLong(long, long) in Java. The behavior is binary compatibile with JDK 21+, which is
+        /// different than earlier implementations in JDK 17+.
         /// </summary>
         /// <param name="minValue">The inclusive lower bound of the range.</param>
         /// <param name="maxValue">The exclusive upper bound of the range.</param>
