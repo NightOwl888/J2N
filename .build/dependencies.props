@@ -2,6 +2,9 @@
   <PropertyGroup Label="NuGet Package Reference Versions">
     <AigamoResXGeneratorPackageReferenceVersion>4.2.0</AigamoResXGeneratorPackageReferenceVersion>
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
+    <LuceneNetPackageReferenceVersion>4.8.0-beta00017</LuceneNetPackageReferenceVersion>
+    <LuceneNetAnalysisCommonPackageReferenceVersion>$(LuceneNetPackageReferenceVersion)</LuceneNetAnalysisCommonPackageReferenceVersion>
+    <LuceneNetTestFrameworkPackageReferenceVersion>$(LuceneNetPackageReferenceVersion)</LuceneNetTestFrameworkPackageReferenceVersion>
     <MicrosoftCSharpPackageReferenceVersion>4.4.0</MicrosoftCSharpPackageReferenceVersion>
     <MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>1.0.3</MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>17.11.0</MicrosoftNETTestSdkPackageReferenceVersion>
@@ -10,7 +13,7 @@
     <NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>
     <NetFxSystemMemoryPackageReferenceVersion>4.0.0</NetFxSystemMemoryPackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
-    <NUnitPackageReferenceVersion>3.12.0</NUnitPackageReferenceVersion>
+    <NUnitPackageReferenceVersion>3.13.1</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>4.6.0</NUnit3TestAdapterPackageReferenceVersion>
     <RandomizedTestingGeneratorsPackageReferenceVersion>2.7.8</RandomizedTestingGeneratorsPackageReferenceVersion>
     <SystemBuffersPackageReferenceVersion>4.5.1</SystemBuffersPackageReferenceVersion>

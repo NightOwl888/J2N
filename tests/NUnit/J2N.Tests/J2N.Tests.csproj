@@ -15,6 +15,12 @@
 
   <Import Project="..\..\SystemMemoryReferenceOverride.targets" />
 
+  <ItemGroup Condition=" $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
+    <PackageReference Include="Lucene.Net" Version="$(LuceneNetPackageReferenceVersion)" />
+    <PackageReference Include="Lucene.Net.Analysis.Common" Version="$(LuceneNetAnalysisCommonPackageReferenceVersion)" />
+    <PackageReference Include="Lucene.Net.TestFramework" Version="$(LuceneNetTestFrameworkPackageReferenceVersion)" />
+  </ItemGroup>
+
   <ItemGroup Condition=" $(TargetFramework.StartsWith('netstandard')) Or $(TargetFramework.StartsWith('netcoreapp')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
     <PackageReference Include="System.Text.Encoding.CodePages" Version="$(SystemTextEncodingCodePagesPackageReferenceVersion)" />
   </ItemGroup>
