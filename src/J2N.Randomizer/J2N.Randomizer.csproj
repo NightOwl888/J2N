@@ -1,0 +1,56 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0;net8.0;net6.0;netstandard2.1</TargetFrameworks>
+    <RootNamespace>J2N</RootNamespace>
+
+    <WarningsAsErrors Label="Force all public members to have XML doc comments.">NU1605;1591</WarningsAsErrors>
+
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuGet Package Settings">
+    <IsPackable>true</IsPackable>
+    <AssemblyTitle>J2N.Randomizer</AssemblyTitle>
+    <Description>This package is not intended to be consumed directly. Instead, you should install the J2N package.</Description>
+    <PackageTags></PackageTags>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Compilation Features">
+    <DefineConstants>$(DefineConstants);FEATURE_RANDOMIZER</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aigamo.ResXGenerator" Version="$(AigamoResXGeneratorPackageReferenceVersion)">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\J2N\compatibility\StackTraceHiddenAttribute.cs" Link="compatibility\StackTraceHiddenAttribute.cs" />
+    <Compile Include="..\J2N\Resources\SR.Formatting.cs" Link="Resources\SR.Formatting.cs" />
+    <Compile Include="..\J2N\Randomizer.cs" Link="Randomizer.cs" />
+    <Compile Include="..\J2N\Time.cs" Link="Time.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="compatibility\" />
+  </ItemGroup>
+
+  <PropertyGroup Label="RESX Code Generation Settings">
+    <ResXGenerator_NullForgivingOperators>true</ResXGenerator_NullForgivingOperators>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\SR.resx">
+      <CustomToolNamespace>J2N</CustomToolNamespace>
+      <PartialClass>true</PartialClass>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+
+</Project>
