@@ -287,24 +287,23 @@ namespace J2N
             if (maxValue <= 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
 
-            // Power of two case (no rejection sampling)
             if ((maxValue & -maxValue) == maxValue)
             {
+                // Power of two
                 return (int)((maxValue * (long)NextInt(31)) >> 31);
             }
-
-            int boundMinusOne = maxValue - 1;
-            int bits, candidate;
-            do
+            else
             {
-                bits = NextInt(31);
-                candidate = bits % maxValue;
-
-                // Rejection sampling to eliminate modulo bias.
-                // If this condition fails, the result could be biased.
-            } while ((uint)(bits - candidate) + (uint)boundMinusOne > (uint)int.MaxValue);
-
-            return candidate;
+                // General case: use rejection sampling to avoid modulo bias
+                int bits, candidate;
+                int mask = maxValue - 1;
+                do
+                {
+                    bits = NextInt(31);
+                    candidate = bits % maxValue;
+                } while ((uint)(bits - candidate) + (uint)mask > (uint)int.MaxValue);
+                return candidate;
+            }
         }
 
         /// <summary>
@@ -339,13 +338,13 @@ namespace J2N
                 {
                     // General case: use rejection sampling to avoid modulo bias
                     int bits = candidate >>> 1; // ignore sign bit
-                    do
+                    while (true)
                     {
                         candidate = bits % range;
                         if (bits + mask - candidate >= 0)
                             break;
                         bits = Next() >>> 1; // ignore sign bit
-                    } while (true);
+                    }
 
                     candidate += minValue;
                 }
@@ -402,25 +401,25 @@ namespace J2N
             if (maxValue <= 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegativeNonZero(maxValue, ExceptionArgument.maxValue);
 
-            long boundMinusOne = maxValue - 1;
+            long mask = maxValue - 1;
 
-            // Power of two case (no rejection sampling)
-            if ((maxValue & boundMinusOne) == 0L)
+            if ((maxValue & mask) == 0L)
             {
-                return NextInt64() & boundMinusOne;
+                // Power of two: use bitmask
+                return NextInt64() & mask;
             }
-
-            long bits, candidate;
-            do
+            else
             {
-                bits = NextInt64() >>> 1; // Convert to non-negative value by dropping the sign bit.
-                candidate = bits % maxValue;
+                // General case: use rejection sampling to avoid modulo bias
+                long bits, candidate;
+                do
+                {
+                    bits = NextInt64() >>> 1; // Convert to non-negative value by dropping the sign bit.
+                    candidate = bits % maxValue;
+                } while ((ulong)(bits - candidate) + (ulong)mask > (ulong)long.MaxValue);
 
-                // Rejection sampling to eliminate modulo bias.
-                // If this condition fails, the result could be biased.
-            } while ((ulong)(bits - candidate) + (ulong)boundMinusOne > (ulong)long.MaxValue);
-
-            return candidate;
+                return candidate;
+            }
         }
 
         /// <summary>
@@ -458,13 +457,13 @@ namespace J2N
                 {
                     // General case: use rejection sampling to avoid modulo bias
                     long bits = candidate >>> 1; // ignore sign bit
-                    do
+                    while (true)
                     {
                         candidate = bits % range;
                         if (bits + mask - candidate >= 0L)
                             break;
                         bits = NextInt64() >>> 1; // ignore sign bit
-                    } while (true);
+                    }
 
                     candidate += minValue;
                 }
