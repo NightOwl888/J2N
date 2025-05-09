@@ -480,16 +480,43 @@ namespace J2N
         [Test]
         public void Test_NextIntI_I_Against_JDK22() // J2N specific
         {
-            ReadOnlySpan<int> expected = PopulateExpected(stackalloc int[64]);
+            Span<int> expected = stackalloc int[64];
+
+            // range <= 0 case
+            PopulateExpected_RangeLessThanOrEqualToZero(expected);
 
             var target = new Randomizer(42L);
+
             for (int i = 0; i < expected.Length; i++)
             {
                 int value = target.Next(short.MinValue, int.MaxValue);
                 Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
             }
 
-            static ReadOnlySpan<int> PopulateExpected(Span<int> buffer)
+            // range > 0 and power of two
+            PopulateExpected_RangePositive_PowerOfTwo(expected);
+
+            target = new Randomizer(42L);
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                int value = target.Next(100, 164);
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
+            }
+
+            // range > 0 and NOT power of two
+            PopulateExpected_RangePositive_NonPowerOfTwo(expected);
+
+            target = new Randomizer(42L);
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                int value = target.Next(100, 150);
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
+            }
+
+
+            static void PopulateExpected_RangeLessThanOrEqualToZero(Span<int> buffer)
             {
                 unchecked
                 {
@@ -514,7 +541,62 @@ namespace J2N
                     };
 
                     tempValues.CopyTo(buffer);
-                    return buffer;
+                }
+            }
+
+            static void PopulateExpected_RangePositive_PowerOfTwo(Span<int> buffer)
+            {
+                unchecked
+                {
+                    ReadOnlySpan<int> tempValues = stackalloc int[]
+                    {
+                        (int)0x00000099, (int)0x0000009B, (int)0x00000085, (int)0x0000008C,
+                        (int)0x00000088, (int)0x0000006F, (int)0x00000067, (int)0x00000091,
+                        (int)0x000000A2, (int)0x0000007E, (int)0x000000A1, (int)0x00000080,
+                        (int)0x0000007D, (int)0x0000006C, (int)0x0000009C, (int)0x00000084,
+                        (int)0x00000075, (int)0x00000078, (int)0x00000073, (int)0x00000087,
+                        (int)0x00000095, (int)0x00000093, (int)0x00000079, (int)0x00000067,
+                        (int)0x0000007A, (int)0x00000076, (int)0x00000080, (int)0x00000069,
+                        (int)0x0000007A, (int)0x00000070, (int)0x00000098, (int)0x0000006D,
+                        (int)0x00000081, (int)0x0000007E, (int)0x00000096, (int)0x000000A3,
+                        (int)0x0000007D, (int)0x0000009E, (int)0x00000096, (int)0x0000007D,
+                        (int)0x0000007B, (int)0x00000066, (int)0x00000082, (int)0x00000066,
+                        (int)0x00000092, (int)0x00000091, (int)0x00000093, (int)0x00000072,
+                        (int)0x0000007F, (int)0x0000009A, (int)0x00000097, (int)0x00000095,
+                        (int)0x00000091, (int)0x0000008C, (int)0x00000075, (int)0x00000099,
+                        (int)0x00000087, (int)0x0000009A, (int)0x0000006E, (int)0x0000008B,
+                        (int)0x00000077, (int)0x0000006B, (int)0x00000065, (int)0x00000076,
+                    };
+
+                    tempValues.CopyTo(buffer);
+                }
+            }
+
+            static void PopulateExpected_RangePositive_NonPowerOfTwo(Span<int> buffer)
+            {
+                unchecked
+                {
+                    ReadOnlySpan<int> tempValues = stackalloc int[]
+                    {
+                        (int)0x00000082, (int)0x00000071, (int)0x00000094, (int)0x00000086,
+                        (int)0x00000078, (int)0x0000007D, (int)0x00000069, (int)0x00000076,
+                        (int)0x00000077, (int)0x0000008F, (int)0x00000084, (int)0x00000066,
+                        (int)0x0000007E, (int)0x0000008E, (int)0x0000007E, (int)0x00000084,
+                        (int)0x0000006A, (int)0x00000078, (int)0x0000008F, (int)0x0000006D,
+                        (int)0x00000064, (int)0x00000071, (int)0x0000007E, (int)0x00000071,
+                        (int)0x0000008F, (int)0x0000008D, (int)0x00000082, (int)0x0000006C,
+                        (int)0x00000089, (int)0x00000092, (int)0x00000082, (int)0x0000006A,
+                        (int)0x00000082, (int)0x00000087, (int)0x00000075, (int)0x0000007F,
+                        (int)0x00000070, (int)0x0000008F, (int)0x00000071, (int)0x00000072,
+                        (int)0x00000081, (int)0x00000073, (int)0x0000007B, (int)0x00000089,
+                        (int)0x0000007D, (int)0x00000086, (int)0x0000006B, (int)0x00000087,
+                        (int)0x0000006B, (int)0x0000008F, (int)0x0000008F, (int)0x0000008C,
+                        (int)0x0000006C, (int)0x0000006A, (int)0x0000006E, (int)0x0000006E,
+                        (int)0x00000071, (int)0x0000006D, (int)0x0000006F, (int)0x00000067,
+                        (int)0x00000093, (int)0x00000077, (int)0x00000066, (int)0x00000065
+                    };
+
+                    tempValues.CopyTo(buffer);
                 }
             }
         }
@@ -617,31 +699,124 @@ namespace J2N
         [Test]
         public void Test_NextLongI_I_Against_JDK22() // J2N specific
         {
-            ReadOnlySpan<long> expected = stackalloc long[]
-            {
-                (long)0x4F083CE3F12BBB4BL, (long)0x46EE9D82B52C856DL, (long)0x5E688E9961B35C88L, (long)0x46976CF7B0BFBE20L,
-                (long)0x76B20010C3185754L, (long)0x6FBDDF557096B883L, (long)0x62F60BDBCC5C8305L, (long)0x2D68AD16268A478CL,
-                (long)0x35B353DD402B571AL, (long)0x2C167999289D95FAL, (long)0x080B069B510846B6L, (long)0x5BA0A3F332F702B1L,
-                (long)0x6AED9210C5004375L, (long)0x7B06EE52DF9A8487L, (long)0x4AAA00013832CC52L, (long)0x5E7EBF2C22ECA89BL,
-                (long)0x5C39A9DA6FB03CBBL, (long)0x6F45F2E9A617570AL, (long)0x7512BBB4B22B0979L, (long)0x79021B82F37050BBL,
-                (long)0x7811DC308C868164L, (long)0x26AA011E0D75D1A3L, (long)0x75D6A35CC2E15B9FL, (long)0x47D390C6A1A21A80L,
-                (long)0x322AB5C65846AC1EL, (long)0x2DE4DD0DF6658A2EL, (long)0x7C9134888C547AA0L, (long)0x6BC4CD5D021617A9L,
-                (long)0x50B95DAA11FBFB1DL, (long)0x5EFAA97C4A6C5F10L, (long)0x5FD603DD1D6A62BEL, (long)0x3236B1F82BC13E38L,
-                (long)0x76A1559FA83A59B9L, (long)0x4E3A6F7BFFB95478L, (long)0x20526EE717BAB863L, (long)0x7F50D0BACA6BEAA7L,
-                (long)0x06FE0FA1ABA9B4F6L, (long)0x09570CA077FADE46L, (long)0x7BDD30F57598E44AL, (long)0x6550F07D78C7BD66L,
-                (long)0x6275DB11D13F3576L, (long)0x13BBD9AC5C42F173L, (long)0x4760E5E7FA82B084L, (long)0x5FB3B9BCEBA6E693L,
-                (long)0x6E6A4D8947095549L, (long)0x55133401CD5132BCL, (long)0x50AD813CCBC247AAL, (long)0x715724A52018A4EFL,
-                (long)0x18B101ED65827193L, (long)0x2BBD76B7E9A40597L, (long)0x23C94034F05004D5L, (long)0x17CB5CCC4C1F9747L,
-                (long)0x06EB6DDAA918928FL, (long)0x483E25A367AC6CF9L, (long)0x580C9794BAC7BC0FL, (long)0x0399299D024AC139L,
-                (long)0x1DA1CCEF4F88F506L, (long)0x61F0D3CAB4C952E3L, (long)0x429C0CE701F1B23CL, (long)0x65C4EDE4D4421E7DL,
-                (long)0x421719BFF1BD7712L, (long)0x7CFA80D2352469E2L, (long)0x5C8956BA3359155EL, (long)0x56F9AA9C814AA5FAL
-            };
+            Span<long> expected = stackalloc long[64];
+
+            // range <= 0 case
+            PopulateExpected_RangeLessThanOrEqualToZero(expected);
 
             var target = new Randomizer(42L);
+
             for (int i = 0; i < expected.Length; i++)
             {
                 long value = target.NextInt64(int.MinValue, long.MaxValue);
                 Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
+            }
+
+            // range > 0 and power of two
+            PopulateExpected_RangePositive_PowerOfTwo(expected);
+
+            target = new Randomizer(42L);
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                long value = target.NextInt64(100, 164);
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
+            }
+
+            // range > 0 and NOT power of two
+            PopulateExpected_RangePositive_NonPowerOfTwo(expected);
+
+            target = new Randomizer(42L);
+
+            for (int i = 0; i < expected.Length; i++)
+            {
+                long value = target.NextInt64(100, 150);
+                Assert.That(value, Is.EqualTo(expected[i]), $"Loop {i}");
+            }
+
+
+            static void PopulateExpected_RangeLessThanOrEqualToZero(Span<long> buffer)
+            {
+                unchecked
+                {
+                    ReadOnlySpan<long> tempValues = stackalloc long[]
+                    {
+                        (long)0x4F083CE3F12BBB4B, (long)0x46EE9D82B52C856D, (long)0x5E688E9961B35C88, (long)0x46976CF7B0BFBE20,
+                        (long)0x76B20010C3185754, (long)0x6FBDDF557096B883, (long)0x62F60BDBCC5C8305, (long)0x2D68AD16268A478C,
+                        (long)0x35B353DD402B571A, (long)0x2C167999289D95FA, (long)0x080B069B510846B6, (long)0x5BA0A3F332F702B1,
+                        (long)0x6AED9210C5004375, (long)0x7B06EE52DF9A8487, (long)0x4AAA00013832CC52, (long)0x5E7EBF2C22ECA89B,
+                        (long)0x5C39A9DA6FB03CBB, (long)0x6F45F2E9A617570A, (long)0x7512BBB4B22B0979, (long)0x79021B82F37050BB,
+                        (long)0x7811DC308C868164, (long)0x26AA011E0D75D1A3, (long)0x75D6A35CC2E15B9F, (long)0x47D390C6A1A21A80,
+                        (long)0x322AB5C65846AC1E, (long)0x2DE4DD0DF6658A2E, (long)0x7C9134888C547AA0, (long)0x6BC4CD5D021617A9,
+                        (long)0x50B95DAA11FBFB1D, (long)0x5EFAA97C4A6C5F10, (long)0x5FD603DD1D6A62BE, (long)0x3236B1F82BC13E38,
+                        (long)0x76A1559FA83A59B9, (long)0x4E3A6F7BFFB95478, (long)0x20526EE717BAB863, (long)0x7F50D0BACA6BEAA7,
+                        (long)0x06FE0FA1ABA9B4F6, (long)0x09570CA077FADE46, (long)0x7BDD30F57598E44A, (long)0x6550F07D78C7BD66,
+                        (long)0x6275DB11D13F3576, (long)0x13BBD9AC5C42F173, (long)0x4760E5E7FA82B084, (long)0x5FB3B9BCEBA6E693,
+                        (long)0x6E6A4D8947095549, (long)0x55133401CD5132BC, (long)0x50AD813CCBC247AA, (long)0x715724A52018A4EF,
+                        (long)0x18B101ED65827193, (long)0x2BBD76B7E9A40597, (long)0x23C94034F05004D5, (long)0x17CB5CCC4C1F9747,
+                        (long)0x06EB6DDAA918928F, (long)0x483E25A367AC6CF9, (long)0x580C9794BAC7BC0F, (long)0x0399299D024AC139,
+                        (long)0x1DA1CCEF4F88F506, (long)0x61F0D3CAB4C952E3, (long)0x429C0CE701F1B23C, (long)0x65C4EDE4D4421E7D,
+                        (long)0x421719BFF1BD7712, (long)0x7CFA80D2352469E2, (long)0x5C8956BA3359155E, (long)0x56F9AA9C814AA5FA,
+                    };
+
+                    tempValues.CopyTo(buffer);
+                }
+            }
+
+            static void PopulateExpected_RangePositive_PowerOfTwo(Span<long> buffer)
+            {
+                unchecked
+                {
+                    ReadOnlySpan<long> tempValues = stackalloc long[]
+                    {
+                        (long)0x000000000000009B, (long)0x000000000000008C, (long)0x000000000000006F, (long)0x0000000000000091,
+                        (long)0x000000000000007E, (long)0x0000000000000080, (long)0x000000000000006C, (long)0x0000000000000084,
+                        (long)0x0000000000000078, (long)0x0000000000000087, (long)0x0000000000000093, (long)0x0000000000000067,
+                        (long)0x0000000000000076, (long)0x0000000000000069, (long)0x0000000000000070, (long)0x000000000000006D,
+                        (long)0x000000000000007E, (long)0x00000000000000A3, (long)0x000000000000009E, (long)0x000000000000007D,
+                        (long)0x0000000000000066, (long)0x0000000000000066, (long)0x0000000000000091, (long)0x0000000000000072,
+                        (long)0x000000000000009A, (long)0x0000000000000095, (long)0x000000000000008C, (long)0x0000000000000099,
+                        (long)0x000000000000009A, (long)0x000000000000008B, (long)0x000000000000006B, (long)0x0000000000000076,
+                        (long)0x0000000000000079, (long)0x0000000000000093, (long)0x000000000000009B, (long)0x000000000000007F,
+                        (long)0x000000000000009F, (long)0x000000000000006E, (long)0x000000000000009D, (long)0x000000000000009F,
+                        (long)0x0000000000000088, (long)0x0000000000000091, (long)0x0000000000000087, (long)0x0000000000000075,
+                        (long)0x0000000000000083, (long)0x0000000000000064, (long)0x0000000000000082, (long)0x0000000000000092,
+                        (long)0x0000000000000075, (long)0x0000000000000084, (long)0x000000000000008D, (long)0x000000000000007F,
+                        (long)0x0000000000000093, (long)0x0000000000000081, (long)0x0000000000000078, (long)0x0000000000000074,
+                        (long)0x000000000000006B, (long)0x00000000000000A1, (long)0x000000000000006A, (long)0x00000000000000A2,
+                        (long)0x000000000000009C, (long)0x000000000000009B, (long)0x000000000000009C, (long)0x000000000000006B,
+                    };
+
+                    tempValues.CopyTo(buffer);
+                }
+            }
+
+            static void PopulateExpected_RangePositive_NonPowerOfTwo(Span<long> buffer)
+            {
+                unchecked
+                {
+                    ReadOnlySpan<long> tempValues = stackalloc long[]
+                    {
+                        (long)0x000000000000008D, (long)0x000000000000008C, (long)0x0000000000000093, (long)0x0000000000000094,
+                        (long)0x0000000000000075, (long)0x000000000000007A, (long)0x0000000000000088, (long)0x0000000000000082,
+                        (long)0x0000000000000092, (long)0x0000000000000089, (long)0x000000000000006F, (long)0x000000000000006B,
+                        (long)0x0000000000000079, (long)0x000000000000008C, (long)0x0000000000000094, (long)0x0000000000000088,
+                        (long)0x0000000000000071, (long)0x000000000000006D, (long)0x000000000000008F, (long)0x0000000000000070,
+                        (long)0x0000000000000095, (long)0x0000000000000091, (long)0x0000000000000086, (long)0x000000000000006B,
+                        (long)0x0000000000000071, (long)0x0000000000000074, (long)0x000000000000007A, (long)0x0000000000000078,
+                        (long)0x0000000000000069, (long)0x000000000000006F, (long)0x0000000000000083, (long)0x000000000000008D,
+                        (long)0x0000000000000078, (long)0x000000000000007F, (long)0x0000000000000093, (long)0x000000000000008D,
+                        (long)0x0000000000000075, (long)0x000000000000008F, (long)0x0000000000000074, (long)0x000000000000008F,
+                        (long)0x0000000000000090, (long)0x0000000000000082, (long)0x0000000000000073, (long)0x000000000000006C,
+                        (long)0x0000000000000089, (long)0x000000000000006C, (long)0x0000000000000067, (long)0x000000000000008B,
+                        (long)0x000000000000006C, (long)0x000000000000007C, (long)0x000000000000006C, (long)0x0000000000000065,
+                        (long)0x0000000000000083, (long)0x000000000000006E, (long)0x0000000000000078, (long)0x0000000000000078,
+                        (long)0x000000000000006F, (long)0x0000000000000090, (long)0x0000000000000079, (long)0x0000000000000067,
+                        (long)0x000000000000008E, (long)0x000000000000008B, (long)0x000000000000007C, (long)0x0000000000000085,
+                    };
+
+                    tempValues.CopyTo(buffer);
+                }
             }
         }
 

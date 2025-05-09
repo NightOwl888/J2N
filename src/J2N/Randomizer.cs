@@ -323,36 +323,43 @@ namespace J2N
             if (minValue >= maxValue)
                 ThrowHelper.ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument.minValue, ExceptionArgument.maxValue);
 
-            int candidate;
+            int candidate = Next();
+
             int range = maxValue - minValue;
-
-            if (range <= 0)
+            if (range > 0)
             {
-                do
+                int mask = range - 1;
+
+                if ((range & mask) == 0)
                 {
-                    candidate = NextInt(32); // 32 bits full random int
-                } while ((uint)(candidate - minValue) >= (uint)(maxValue - minValue)); // Faster version of candidate < minValue || candidate >= maxValue
-                return candidate;
-            }
+                    // Range size is a power of two: use bitmask
+                    candidate = (candidate & mask) + minValue;
+                }
+                else
+                {
+                    // General case: use rejection sampling to avoid modulo bias
+                    int bits = candidate >>> 1; // ignore sign bit
+                    do
+                    {
+                        candidate = bits % range;
+                        if (bits + mask - candidate >= 0)
+                            break;
+                        bits = Next() >>> 1; // ignore sign bit
+                    } while (true);
 
-            int rangeMinusOne = range - 1;
-
-            // Power of two case (no rejection sampling)
-            if ((range & rangeMinusOne) == 0)
-            {
-                candidate = NextInt(31) & rangeMinusOne; // get 31 bits, mask
+                    candidate += minValue;
+                }
             }
             else
             {
-                int bits;
-                // Rejection sampling loop
-                do
+                // This handles very rare edge cases where range overflows (maxValue - minValue < 0)
+                while ((uint)(candidate - minValue) >= (uint)(maxValue - minValue))
                 {
-                    bits = NextInt(31); // get 31 bits
-                    candidate = bits % range;
-                } while ((uint)(bits - candidate) + (uint)rangeMinusOne > (uint)int.MaxValue);
+                    candidate = Next();
+                }
             }
-            return candidate + minValue;
+
+            return candidate;
         }
 
         /// <summary>
@@ -435,37 +442,43 @@ namespace J2N
             if (minValue >= maxValue)
                 ThrowHelper.ThrowArgumentOutOfRangeException_Argument_MinMaxValue(ExceptionArgument.minValue, ExceptionArgument.maxValue);
 
-            long candidate;
+            long candidate = NextInt64();
+
             long range = maxValue - minValue;
-
-            if (range <= 0)
+            if (range > 0)
             {
-                do
+                long mask = range - 1;
+
+                if ((range & mask) == 0L)
                 {
-                    candidate = NextInt64();
-                } while ((ulong)(candidate - minValue) >= (ulong)(maxValue - minValue)); // Faster version of candidate < minValue || candidate >= maxValue
-                return candidate;
-            }
+                    // Range size is a power of two: use bitmask
+                    candidate = (candidate & mask) + minValue;
+                }
+                else
+                {
+                    // General case: use rejection sampling to avoid modulo bias
+                    long bits = candidate >>> 1; // ignore sign bit
+                    do
+                    {
+                        candidate = bits % range;
+                        if (bits + mask - candidate >= 0L)
+                            break;
+                        bits = NextInt64() >>> 1; // ignore sign bit
+                    } while (true);
 
-            long rangeMinusOne = range - 1;
-
-            // Power of two case (no rejection sampling)
-            if ((range & rangeMinusOne) == 0)
-            {
-                // Efficiently mask off high bits after a single right shift
-                candidate = (NextInt64() >>> 1) & rangeMinusOne;
+                    candidate += minValue;
+                }
             }
             else
             {
-                long bits;
-                // Rejection sampling loop
-                do
+                // This handles very rare edge cases where range overflows (maxValue - minValue < 0)
+                while ((ulong)(candidate - minValue) >= (ulong)(maxValue - minValue))
                 {
-                    bits = NextInt64() >>> 1; // Logical right shift
-                    candidate = bits % range;
-                } while ((ulong)(bits - candidate) + (ulong)rangeMinusOne > (ulong)long.MaxValue);
+                    candidate = NextInt64();
+                }
             }
-            return candidate + minValue;
+
+            return candidate;
         }
 
         /// <summary>
