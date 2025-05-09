@@ -155,12 +155,12 @@ namespace J2N.IO
 
         public override ByteBuffer PutSingle(float value)
         {
-            return PutInt32(BitConversion.SingleToInt32Bits(value));
+            return PutInt32(BitConversion.SingleToRawInt32Bits(value));
         }
 
         public override ByteBuffer PutSingle(int index, float value)
         {
-            return PutInt32(index, BitConversion.SingleToInt32Bits(value));
+            return PutInt32(index, BitConversion.SingleToRawInt32Bits(value));
         }
 
         public override ByteBuffer PutInt32(int value)
