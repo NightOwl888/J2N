@@ -47,7 +47,7 @@ namespace J2N.Collections.Tests
         [Fact]
         public void LinkedDictionary_Generic_ValueCollection_Constructor_NullDictionary()
         {
-            Assert.Throws<ArgumentNullException>(() => new LinkedDictionary<string, string>.ValueCollection(null));
+            Assert.Throws<ArgumentNullException>(() => new LinkedDictionary<string, string>.ValueCollection(null!));
         }
 
         [Theory]
@@ -115,4 +115,3 @@ namespace J2N.Collections.Tests
         }
     }
 }
-

@@ -66,7 +66,7 @@ namespace J2N.Collections.Tests
             Assert.Same(comparer, instance.EqualityComparer);
             Assert.InRange(instance.Capacity, 42, int.MaxValue);
 
-            IEqualityComparer<TKey> customComparer = EqualityComparerHelper<TKey>.Create(comparer.Equals, comparer.GetHashCode);
+            IEqualityComparer<TKey> customComparer = EqualityComparerHelper<TKey>.Create(comparer.Equals, comparer.GetHashCode!);
             instance = new JCG.OrderedDictionary<TKey, TValue>(42, customComparer);
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
@@ -118,13 +118,13 @@ namespace J2N.Collections.Tests
         [Fact]
         public void OrderedDictionary_Generic_Constructor_NullIDictionary_ThrowsArgumentNullException()
         {
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new JCG.OrderedDictionary<TKey, TValue>((IDictionary<TKey, TValue>)null));
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new JCG.OrderedDictionary<TKey, TValue>((IDictionary<TKey, TValue>)null, null));
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new JCG.OrderedDictionary<TKey, TValue>((IDictionary<TKey, TValue>)null, JCG.EqualityComparer<TKey>.Default));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new JCG.OrderedDictionary<TKey, TValue>((IDictionary<TKey, TValue>)null!));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new JCG.OrderedDictionary<TKey, TValue>((IDictionary<TKey, TValue>)null!, null));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new JCG.OrderedDictionary<TKey, TValue>((IDictionary<TKey, TValue>)null!, JCG.EqualityComparer<TKey>.Default));
 
-            AssertExtensions.Throws<ArgumentNullException>("collection", () => new JCG.OrderedDictionary<TKey, TValue>((IEnumerable<KeyValuePair<TKey, TValue>>)null));
-            AssertExtensions.Throws<ArgumentNullException>("collection", () => new JCG.OrderedDictionary<TKey, TValue>((IEnumerable<KeyValuePair<TKey, TValue>>)null, null));
-            AssertExtensions.Throws<ArgumentNullException>("collection", () => new JCG.OrderedDictionary<TKey, TValue>((IEnumerable<KeyValuePair<TKey, TValue>>)null, JCG.EqualityComparer<TKey>.Default));
+            AssertExtensions.Throws<ArgumentNullException>("collection", () => new JCG.OrderedDictionary<TKey, TValue>((IEnumerable<KeyValuePair<TKey, TValue>>)null!));
+            AssertExtensions.Throws<ArgumentNullException>("collection", () => new JCG.OrderedDictionary<TKey, TValue>((IEnumerable<KeyValuePair<TKey, TValue>>)null!, null));
+            AssertExtensions.Throws<ArgumentNullException>("collection", () => new JCG.OrderedDictionary<TKey, TValue>((IEnumerable<KeyValuePair<TKey, TValue>>)null!, JCG.EqualityComparer<TKey>.Default));
         }
 
         [Fact]
@@ -157,7 +157,7 @@ namespace J2N.Collections.Tests
             var dictionary = new JCG.OrderedDictionary<TKey, TValue>();
             // J2N: was: AssertExtensions.Throws<ArgumentNullException>("key", () => dictionary.TryAdd(default(TKey), CreateTValue(0)));
             Assert.True(dictionary.TryAdd(default, CreateTValue(0)));
-            Assert.True(dictionary.TryAdd(CreateTKey(0), default));
+            Assert.True(dictionary.TryAdd(CreateTKey(0), default!));
             Assert.Equal(2, dictionary.Count);
         }
 
@@ -250,7 +250,7 @@ namespace J2N.Collections.Tests
                 notPresent = CreateTKey(seed++);
             }
 
-            dictionary.Add(notPresent, default(TValue));
+            dictionary.Add(notPresent, default(TValue)!);
             Assert.True(dictionary.ContainsValue(default(TValue)));
         }
 
@@ -352,7 +352,7 @@ namespace J2N.Collections.Tests
             while (dictionary.Count > 0)
             {
                 pair = dictionary.GetAt(0);
-                Assert.True(dictionary.Remove(pair.Key, out TValue value));
+                Assert.True(dictionary.Remove(pair.Key, out TValue? value));
                 Assert.Equal(pair.Value, value);
             }
 

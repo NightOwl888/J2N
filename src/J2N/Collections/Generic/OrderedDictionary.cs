@@ -10,6 +10,13 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using J2N.Runtime.CompilerServices;
 using J2N.Text;
+
+#if FEATURE_STATIC_EXCEPTION_HELPERS
+using static System.ArgumentNullException;
+using static System.ArgumentOutOfRangeException;
+#else
+using static J2N.StaticThrowHelper;
+#endif
 using static J2N.ThrowHelper;
 
 namespace J2N.Collections.Generic
@@ -103,10 +110,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">capacity is less than 0.</exception>
         public OrderedDictionary(int capacity, IEqualityComparer<TKey>? comparer)
         {
-            if (capacity < 0)
-            {
-                ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
-            }
+            ThrowIfNegative(capacity);
 
             if (capacity > 0)
             {
@@ -171,10 +175,7 @@ namespace J2N.Collections.Generic
             // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract - J2N: so that the throw happens in the ctor body instead
             this(dictionary?.Count ?? 0, comparer)
         {
-            if (dictionary is null)
-            {
-                ThrowArgumentNullException(ExceptionArgument.dictionary);
-            }
+            ThrowIfNull(dictionary);
 
             AddRange(dictionary!); // [!]: thrown if null above
         }
@@ -208,10 +209,7 @@ namespace J2N.Collections.Generic
         public OrderedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer) :
             this((collection as ICollection<KeyValuePair<TKey, TValue>>)?.Count ?? 0, comparer)
         {
-            if (collection is null)
-            {
-                ThrowArgumentNullException(ExceptionArgument.collection);
-            }
+            ThrowIfNull(collection);
 
             AddRange(collection);
         }
@@ -306,10 +304,7 @@ namespace J2N.Collections.Generic
             get => GetAt(index);
             set
             {
-                if (value is null)
-                {
-                    ThrowArgumentNullException(ExceptionArgument.value);
-                }
+                ThrowIfNull(value);
 
                 if (value is not KeyValuePair<TKey, TValue> tpair)
                 {
@@ -906,10 +901,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is negative.</exception>
         public int EnsureCapacity(int capacity)
         {
-            if (capacity < 0)
-            {
-                ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
-            }
+            ThrowIfNegative(capacity);
 
             if (Capacity < capacity)
             {
@@ -936,10 +928,7 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than <see cref="Count"/>.</exception>
         public void TrimExcess(int capacity)
         {
-            if (capacity < Count)
-            {
-                ThrowArgumentOutOfRangeException(ExceptionArgument.capacity);
-            }
+            ThrowIfLessThan(capacity, Count);
 
             int currentCapacity = _entries?.Length ?? 0;
             capacity = HashHelpers.GetPrime(capacity);
@@ -1234,15 +1223,8 @@ namespace J2N.Collections.Generic
         /// <inheritdoc/>
         void ICollection<KeyValuePair<TKey, TValue>>.CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex)
         {
-            if (array is null)
-            {
-                ThrowArgumentNullException(ExceptionArgument.array);
-            }
-
-            if (arrayIndex < 0)
-            {
-                ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
-            }
+            ThrowIfNull(array);
+            ThrowIfNegative(arrayIndex);
 
             if (array.Length - arrayIndex < _count)
             {
@@ -1321,25 +1303,14 @@ namespace J2N.Collections.Generic
         /// <inheritdoc/>
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array is null)
-            {
-                ThrowArgumentNullException(ExceptionArgument.array);
-            }
-
-            if (array.Rank != 1)
-            {
-                ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
-            }
+            ThrowIfNull(array);
 
             if (array.GetLowerBound(0) != 0)
             {
                 ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
             }
 
-            if (index < 0)
-            {
-                ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
-            }
+            ThrowIfNegative(index);
 
             if (array.Length - index < _count)
             {
@@ -1563,15 +1534,8 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             public void CopyTo(TKey[] array, int arrayIndex)
             {
-                if (array is null)
-                {
-                    ThrowArgumentNullException(ExceptionArgument.array);
-                }
-
-                if (arrayIndex < 0)
-                {
-                    ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
-                }
+                ThrowIfNull(array);
+                ThrowIfNegative(arrayIndex);
 
                 OrderedDictionary<TKey, TValue> dictionary = _dictionary;
                 int count = dictionary._count;
@@ -1592,10 +1556,7 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array is null)
-                {
-                    ThrowArgumentNullException(ExceptionArgument.array);
-                }
+                ThrowIfNull(array);
 
                 if (array.Rank != 1)
                 {
@@ -1607,10 +1568,7 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
                 }
 
-                if (index < 0)
-                {
-                    ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
-                }
+                ThrowIfNegative(index);
 
                 if (array.Length - index < _dictionary.Count)
                 {
@@ -1775,15 +1733,8 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             public void CopyTo(TValue[] array, int arrayIndex)
             {
-                if (array is null)
-                {
-                    ThrowArgumentNullException(ExceptionArgument.array);
-                }
-
-                if (arrayIndex < 0)
-                {
-                    ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
-                }
+                ThrowIfNull(array);
+                ThrowIfNegative(arrayIndex);
 
                 OrderedDictionary<TKey, TValue> dictionary = _dictionary;
                 int count = dictionary._count;
@@ -1926,10 +1877,7 @@ namespace J2N.Collections.Generic
             /// <inheritdoc/>
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array is null)
-                {
-                    ThrowArgumentNullException(ExceptionArgument.array);
-                }
+                ThrowIfNull(array);
 
                 if (array.Rank != 1)
                 {
@@ -1941,10 +1889,7 @@ namespace J2N.Collections.Generic
                     throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
                 }
 
-                if (index < 0)
-                {
-                    ThrowArgumentOutOfRange_MustBeNonNegative(index, ExceptionArgument.index);
-                }
+                ThrowIfNegative(index);
 
                 if (array.Length - index < _dictionary.Count)
                 {

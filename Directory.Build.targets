@@ -1,7 +1,7 @@
 ﻿<Project>
 
   <Import Project="$(MSBuildThisFileDirectory)/.build/dependencies.props" Condition="Exists('$(MSBuildThisFileDirectory)/.build/dependencies.props')" />
-  
+
   <PropertyGroup Label="Warnings to be Disabled in Solution">
     <!-- .NET Framework doesn't support range or index operators -->
     <NoWarn Label="Use index operator">$(NoWarn);IDE0056</NoWarn>
@@ -33,7 +33,8 @@
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 6.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
-    
+    <DefineConstants>$(DefineConstants);FEATURE_STATIC_EXCEPTION_HELPERS</DefineConstants>
+
   </PropertyGroup>
 
   <!-- Features in .NET 6.x, .NET 8.x and .NET 9.x only -->
@@ -92,14 +93,14 @@
     <DefineConstants>$(DefineConstants);FEATURE_UNSAFE_NULLREF</DefineConstants>
 
   </PropertyGroup>
-  
+
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, .NET 6.x, .NET 8.x, and .NET 9.x -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
-    
+
     <!-- NOTE: Microsoft's recommendation is not to use the ICloneable interface.
         To add it to the build, just add /p:IncludeICloneable to the command line. -->
     <DefineConstants Condition=" '$(IncludeICloneable)' == 'true' ">$(DefineConstants);FEATURE_CLONEABLE</DefineConstants>
-    
+
   </PropertyGroup>
 
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, .NET 6.x, .NET 8.x (No .NET 9+ support) -->
@@ -108,9 +109,9 @@
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE</DefineConstants>
     <!-- serializable exeptions were added back in .NET Core 2.0.4: https://docs.microsoft.com/en-us/dotnet/standard/serialization/binary-serialization#net-core -->
     <DefineConstants>$(DefineConstants);FEATURE_SERIALIZABLE_EXCEPTIONS</DefineConstants>
-    
+
   </PropertyGroup>
-  
+
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, .NET Core 3.x, .NET 5.x, and .NET 6.x (No .NET 8+ support) -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net4')) Or $(TargetFramework.StartsWith('netstandard2.')) Or $(TargetFramework.StartsWith('netcoreapp2.')) Or $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) ">
 
@@ -119,7 +120,7 @@
          constitute a breaking API change, so there is no way to normalize this behavior until a major J2N version bump. Ideally, we would
          remove this superclass and provide our own implementation that doesn't drift across .NET versions. -->
     <DefineConstants>$(DefineConstants);FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW</DefineConstants>
-    
+
   </PropertyGroup>
 
   <!-- Features in .NET Framework 4+, .NET Standard 2.x, .NET Core 2.x, and .NET Core 3.x (No .NET 5+ support) -->
@@ -170,7 +171,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <!-- NuGet.org only supports portable debug symbol format: 
+    <!-- NuGet.org only supports portable debug symbol format:
          https://docs.microsoft.com/en-us/nuget/create-packages/symbol-packages-snupkg#nugetorg-symbol-package-constraints -->
     <DebugType Condition=" '$(PortableDebugTypeOnly)' == 'true' ">portable</DebugType>
   </PropertyGroup>
