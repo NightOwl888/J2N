@@ -133,7 +133,8 @@ namespace J2N.Collections.Generic
                 _comparer = comparer ?? EqualityComparer<TKey>.Default;
 
                 if (typeof(TKey) == typeof(string) &&
-                    NonRandomizedStringEqualityComparer.GetStringComparer(_comparer) is { } stringComparer)
+                    // ReSharper disable once ConvertTypeCheckPatternToNullCheck
+                    NonRandomizedStringEqualityComparer.GetStringComparer(_comparer) is IEqualityComparer<string> stringComparer)
                 {
                     _comparer = (IEqualityComparer<TKey>)stringComparer;
                 }
@@ -994,6 +995,17 @@ namespace J2N.Collections.Generic
                 // If the entry was at the head of its bucket list, to remove it from the list we
                 // simply need to update the next entry in the list to be the new head.
                 bucket = entry.Next + 1;
+
+                // J2N: clear out the entry key/value to allow for garbage collection.
+                if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                {
+                    entry.Key = default!;
+                }
+
+                if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                {
+                    entry.Value = default!;
+                }
             }
             else
             {
@@ -1007,6 +1019,18 @@ namespace J2N.Collections.Generic
                     if (e.Next == entryIndex)
                     {
                         e.Next = entry.Next;
+
+                        // J2N: clear out the entry key/value to allow for garbage collection.
+                        if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                        {
+                            entry.Key = default!;
+                        }
+
+                        if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                        {
+                            entry.Value = default!;
+                        }
+
                         return;
                     }
 
@@ -1046,6 +1070,20 @@ namespace J2N.Collections.Generic
                 // If the entry was at the head of its bucket list, the only thing that needs to be updated
                 // is the bucket head value itself, since no other entries' Next will be referencing this node.
                 bucket += shiftAmount;
+
+                if (shiftAmount == -1)
+                {
+                    // J2N: clear out the entry key/value to allow for garbage collection.
+                    if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                    {
+                        entry.Key = default!;
+                    }
+
+                    if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                    {
+                        entry.Value = default!;
+                    }
+                }
             }
             else
             {
@@ -1059,6 +1097,21 @@ namespace J2N.Collections.Generic
                     if (e.Next == entryIndex)
                     {
                         e.Next += shiftAmount;
+
+                        if (shiftAmount == -1)
+                        {
+                            // J2N: clear out the entry key/value to allow for garbage collection.
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TKey>())
+                            {
+                                entry.Key = default!;
+                            }
+
+                            if (RuntimeHelper.IsReferenceOrContainsReferences<TValue>())
+                            {
+                                entry.Value = default!;
+                            }
+                        }
+
                         return;
                     }
 
