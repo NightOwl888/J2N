@@ -25,7 +25,12 @@ namespace J2N
     /// <summary>
     /// Utilities for timing.
     /// </summary>
-    public static class Time
+#if FEATURE_TIME_PUBLIC
+    public
+#else
+    internal
+#endif
+        static class Time
     {
         /// <summary>
         /// The number of milliseconds in one nanosecond.
