@@ -23,6 +23,35 @@ namespace J2N.Collections.Generic
 {
     /// <summary>
     /// Represents a collection of key/value pairs that are accessible by the key or index.
+    /// <see cref="OrderedDictionary{TKey, TValue}"/> adds the following features to <c>System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;</c>
+    /// (in addition to making it available on older platforms):
+    /// <list type="bullet">
+    ///     <item><description>
+    ///         If <typeparamref name="TKey"/> is <see cref="Nullable{T}"/> or a reference type, the key can be
+    ///         <c>null</c> without throwing an exception.
+    ///     </description></item>
+    ///     <item><description>
+    ///         Overrides the <see cref="Equals(object)"/> and <see cref="GetHashCode()"/> methods to compare collections
+    ///         using structural equality by default. Also, <see cref="IStructuralEquatable"/> is implemented so the
+    ///         default behavior can be overridden.
+    ///     </description></item>
+    ///     <item><description>
+    ///         Overrides the <see cref="ToString()"/> method to list the contents of the set
+    ///         by default. Also, <see cref="IFormatProvider"/> is implemented so the
+    ///         default behavior can be overridden.
+    ///     </description></item>
+    ///     <item><description>
+    ///         Uses <see cref="EqualityComparer{T}.Default"/> by default, which provides some specialized equality comparisons
+    ///         for specific types to match the behavior of Java.
+    ///     </description></item>
+    /// </list>
+    /// <para/>
+    /// Usage Note: This class is designed to be a direct replacement for Java's LinkedHashMap, except that
+    /// it doesn't contain a constructor overload with an order parameter to turn it into an LRU cache.
+    /// <para/>
+    /// Note that the <see cref="ToString()"/> method uses the current culture by default to behave like other
+    /// components in .NET. To exactly match Java's culture-neutral behavior,
+    /// call <c>ToString(StringFormatter.InvariantCulture)</c>.
     /// </summary>
     /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
     /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
@@ -480,7 +509,7 @@ namespace J2N.Collections.Generic
             // Store the new key/value pair.
             ref Entry entry = ref entries![index]; // [!]: asserted above
             entry.HashCode = hashCode;
-            entry.Key = key;
+            entry.Key = key!; // [!]: allow null keys
             entry.Value = value;
             PushEntryIntoBucket(ref entry, index);
             _count++;
@@ -574,7 +603,7 @@ namespace J2N.Collections.Generic
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (EqualityComparer<TValue>.Default.Equals(value, entries[i].Value))
+                    if (EqualityComparer<TValue>.Default.Equals(value!, entries[i].Value)) // [!]: allow null values
                     {
                         return true;
                     }
@@ -585,7 +614,7 @@ namespace J2N.Collections.Generic
                 IEqualityComparer<TValue> comparer = EqualityComparer<TValue>.Default;
                 for (int i = 0; i < count; i++)
                 {
-                    if (comparer.Equals(value, entries[i].Value))
+                    if (comparer.Equals(value!, entries[i].Value)) // [!]: allow null values
                     {
                         return true;
                     }
@@ -692,7 +721,7 @@ namespace J2N.Collections.Generic
                     }
 
                     entry = ref entries[i];
-                    if (entry.HashCode == hashCode && comparer!.Equals(entry.Key, key)) // [!]: asserted above
+                    if (entry.HashCode == hashCode && comparer!.Equals(entry.Key, key!)) // [!]: asserted above, allow null keys
                     {
                         goto Return;
                     }
@@ -858,7 +887,7 @@ namespace J2N.Collections.Generic
             // If the key matches the one that's already in that slot, just update the value.
             if (typeof(TKey).IsValueType && _comparer is null)
             {
-                if (EqualityComparer<TKey>.Default.Equals(key, e.Key))
+                if (EqualityComparer<TKey>.Default.Equals(key!, e.Key)) // [!]: allow null keys
                 {
                     e.Value = value;
                     return;
@@ -867,7 +896,7 @@ namespace J2N.Collections.Generic
             else
             {
                 Debug.Assert(_comparer is not null);
-                if (_comparer!.Equals(key, e.Key)) // [!]: asserted above
+                if (_comparer!.Equals(key!, e.Key)) // [!]: asserted above, allow null keys
                 {
                     e.Value = value;
                     return;
@@ -887,7 +916,7 @@ namespace J2N.Collections.Generic
             // be low for a match, so it's not worth it).
             RemoveEntryFromBucket(index);
             e.HashCode = hashCode;
-            e.Key = key;
+            e.Key = key!; // [!]: allow null keys
             e.Value = value;
             PushEntryIntoBucket(ref e, index);
 
@@ -946,7 +975,11 @@ namespace J2N.Collections.Generic
         /// otherwise, the default value for the type of the value parameter.
         /// </param>
         /// <returns>true if the <see cref="OrderedDictionary{TKey, TValue}"/> contains an element with the specified key; otherwise, false.</returns>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
         public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+#pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
@@ -1445,7 +1478,11 @@ namespace J2N.Collections.Generic
             readonly DictionaryEntry IDictionaryEnumerator.Entry => new(Current.Key!, Current.Value); // [!]: allow null keys
 
             /// <inheritdoc/>
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
             readonly object? IDictionaryEnumerator.Key => Current.Key;
+#pragma warning restore CS8616, CS8768 // Nullability of reference types in return type doesn't match implemented member (possibly because of nullability attributes).
+#pragma warning restore IDE0079 // Remove unnecessary suppression
 
             /// <inheritdoc/>
             readonly object? IDictionaryEnumerator.Value => Current.Value;
