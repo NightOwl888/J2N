@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using J2N.Collections.ObjectModel;
 using J2N.Runtime.CompilerServices;
 using J2N.Text;
 
@@ -243,6 +244,24 @@ namespace J2N.Collections.Generic
 
             AddRange(collection);
         }
+
+        #region AsReadOnly
+
+        /// <summary>
+        /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
+        /// </summary>
+        /// <returns>An object that acts as a read-only wrapper around the current <see cref="Dictionary{TKey, TValue}"/>.</returns>
+        /// <remarks>
+        /// To prevent any modifications to the <see cref="Dictionary{TKey, TValue}"/> object, expose it only through this wrapper.
+        /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> object does not expose methods that modify the collection. However,
+        /// if changes are made to the underlying <see cref="Dictionary{TKey, TValue}"/> object, the read-only collection reflects those changes.
+        /// <para/>
+        /// This method is an O(1) operation.
+        /// </remarks>
+        public ReadOnlyDictionary<TKey, TValue> AsReadOnly()
+            => new ReadOnlyDictionary<TKey, TValue>(this);
+
+        #endregion AsReadOnly
 
         /// <summary>Initializes the <see cref="_buckets"/>/<see cref="_entries"/>.</summary>
         /// <param name="capacity"></param>
