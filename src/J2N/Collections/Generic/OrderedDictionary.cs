@@ -363,8 +363,7 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: allow null keys
-                //ThrowIfNull(key, ExceptionArgument.key);
-
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
                 ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 if (!IsCompatibleKey(key)) // J2N: allow null keys
