@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using static J2N.ThrowHelper;
 
 namespace J2N.Collections.Generic
 {
