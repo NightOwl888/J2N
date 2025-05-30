@@ -445,23 +445,26 @@ namespace J2N.Collections.Generic
             {
                 //ThrowIfNull(key, ExceptionArgument.key);
 
-                bool modified = TryInsert(index: -1, key, value, InsertionBehavior.OverwriteExisting);
+                bool modified = TryInsert(index: -1, key, value, InsertionBehavior.OverwriteExisting, out _);
                 Debug.Assert(modified);
             }
         }
 
+        // Contains changes from an unreleased future version (at time of writing) of .NET:
+        // https://github.com/dotnet/runtime/blob/251ef76584bd6568439b5cbb3eb19bd13e42b93e/src/libraries/System.Collections/src/System/Collections/Generic/OrderedDictionary.cs#L385-L478
         /// <summary>Insert the key/value pair at the specified index.</summary>
         /// <param name="index">The index at which to insert the pair, or -1 to append.</param>
         /// <param name="key">The key to insert.</param>
         /// <param name="value">The value to insert.</param>
         /// <param name="behavior">
         /// The behavior controlling insertion behavior with respect to key duplication:
-        /// - IgnoreInsertion: Immediately ends the operation, returning false, if the key already exists, e.g. TryAdd(key, value)
+        /// - None: Immediately ends the operation, returning false, if the key already exists, e.g. TryAdd(key, value)
         /// - OverwriteExisting: If the key already exists, overwrites its value with the specified value, e.g. this[key] = value
         /// - ThrowOnExisting: If the key already exists, throws an exception, e.g. Add(key, value)
         /// </param>
+        /// <param name="keyIndex">The index of the added or existing key. This is always a valid index into the dictionary.</param>
         /// <returns>true if the collection was updated; otherwise, false.</returns>
-        private bool TryInsert(int index, [AllowNull] TKey key, TValue value, InsertionBehavior behavior)
+        private bool TryInsert(int index, [AllowNull] TKey key, TValue value, InsertionBehavior behavior, out int keyIndex)
         {
             // Search for the key in the dictionary.
             uint hashCode = 0, collisionCount = 0;
@@ -470,6 +473,9 @@ namespace J2N.Collections.Generic
             // Handle the case where the key already exists, based on the requested behavior.
             if (i >= 0)
             {
+                keyIndex = i;
+                Debug.Assert(0 <= keyIndex && keyIndex < _count);
+
                 Debug.Assert(_entries is not null);
 
                 switch (behavior)
@@ -535,6 +541,9 @@ namespace J2N.Collections.Generic
 
             RehashIfNecessary(collisionCount, entries);
 
+            keyIndex = index;
+            Debug.Assert(0 <= keyIndex && keyIndex < _count);
+
             return true;
         }
 
@@ -548,7 +557,7 @@ namespace J2N.Collections.Generic
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
 
-            TryInsert(index: -1, key, value, InsertionBehavior.ThrowOnExisting);
+            TryInsert(index: -1, key, value, InsertionBehavior.ThrowOnExisting, out _);
         }
 
         /// <summary>Adds the specified key and value to the dictionary if the key doesn't already exist.</summary>
@@ -556,12 +565,22 @@ namespace J2N.Collections.Generic
         /// <param name="value">The value of the element to add. The value can be null for reference types.</param>
         /// <exception cref="ArgumentNullException">key is null.</exception>
         /// <returns>true if the key didn't exist and the key and value were added to the dictionary; otherwise, false.</returns>
-        public bool TryAdd([AllowNull] TKey key, TValue value)
+        public bool TryAdd([AllowNull] TKey key, TValue value) => TryAdd(key, value, out _);
+
+        // Currently unreleased in .NET, but will be available in a future version.
+        // https://github.com/dotnet/runtime/blob/251ef76584bd6568439b5cbb3eb19bd13e42b93e/src/libraries/System.Collections/src/System/Collections/Generic/OrderedDictionary.cs#L499-L510
+        /// <summary>Adds the specified key and value to the dictionary if the key doesn't already exist.</summary>
+        /// <param name="key">The key of the element to add.</param>
+        /// <param name="value">The value of the element to add. The value can be null for reference types.</param>
+        /// <param name="index">The index of the added or existing <paramref name="key"/>. This is always a valid index into the dictionary.</param>
+        /// <exception cref="ArgumentNullException">key is null.</exception>
+        /// <returns>true if the key didn't exist and the key and value were added to the dictionary; otherwise, false.</returns>
+        public bool TryAdd([AllowNull] TKey key, TValue value, out int index)
         {
             // J2N: allow null keys
-            //ThrowIfNull(key, ExceptionArgument.key);
+            // ThrowIfNull(key);
 
-            return TryInsert(index: -1, key, value, InsertionBehavior.None);
+            return TryInsert(index: -1, key, value, InsertionBehavior.None, out index);
         }
 
         /// <summary>Adds each element of the enumerable to the dictionary.</summary>
@@ -787,7 +806,7 @@ namespace J2N.Collections.Generic
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
 
-            TryInsert(index, key, value, InsertionBehavior.ThrowOnExisting);
+            TryInsert(index, key, value, InsertionBehavior.ThrowOnExisting, out _);
         }
 
         /// <summary>Removes the value with the specified key from the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
