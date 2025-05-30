@@ -636,6 +636,16 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
+            if (value is null)
+            {
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries[i].Value is null)
+                    {
+                        return true;
+                    }
+                }
+            }
             if (typeof(TValue).IsValueType)
             {
                 for (int i = 0; i < count; i++)
@@ -652,6 +662,47 @@ namespace J2N.Collections.Generic
                 for (int i = 0; i < count; i++)
                 {
                     if (comparer.Equals(value!, entries[i].Value)) // [!]: allow null values
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>Determines whether the <see cref="OrderedDictionary{TKey, TValue}"/> contains a specific value.</summary>
+        /// <param name="value">The value to locate in the <see cref="OrderedDictionary{TKey, TValue}"/>. The value can be null for reference types.</param>
+        /// <param name="valueComparer">The <see cref="IEqualityComparer{TValue}"/> to use
+        /// to test each value for equality.</param>
+        /// <returns>true if the <see cref="OrderedDictionary{TKey, TValue}"/> contains an element with the specified value; otherwise, false.</returns>
+        public bool ContainsValue([AllowNull] TValue value, IEqualityComparer<TValue>? valueComparer)
+        {
+            valueComparer ??= EqualityComparer<TValue>.Default;
+
+            int count = _count;
+
+            Entry[]? entries = _entries;
+            if (entries is null)
+            {
+                return false;
+            }
+
+            if (value is null)
+            {
+                for (int i = 0; i < _count; i++)
+                {
+                    if (entries[i].Value is null)
+                    {
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    if (valueComparer.Equals(value!, entries[i].Value)) // [!]: allow null values
                     {
                         return true;
                     }
@@ -720,25 +771,50 @@ namespace J2N.Collections.Generic
 
                 hashCode = key is null ? 0 : (uint)key.GetHashCode();
                 i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-                do
+
+                // J2N: optimize for null case below to avoid comparer call
+                if (key is not null)
                 {
-                    // Test in if to drop range check for following array access
-                    if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                    do
                     {
-                        goto ReturnNotFound;
-                    }
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
 
-                    entry = ref entries[i];
-                    if (entry.HashCode == hashCode && EqualityComparer<TKey>.Default.Equals(entry.Key!, key!))
-                    {
-                        goto Return;
-                    }
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && EqualityComparer<TKey>.Default.Equals(entry.Key!, key!))
+                        {
+                            goto Return;
+                        }
 
-                    i = entry.Next;
+                        i = entry.Next;
 
-                    collisionCount++;
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
                 }
-                while (collisionCount <= (uint)entries.Length);
+                else
+                {
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && entry.Key is null)
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+                }
 
                 // The chain of entries forms a loop; which means a concurrent update has happened.
                 // Break out of the loop and throw, rather than looping forever.
@@ -749,25 +825,51 @@ namespace J2N.Collections.Generic
                 Debug.Assert(comparer is not null);
                 hashCode = key is null ? 0 : (uint)comparer!.GetHashCode(key); // [!]: asserted above
                 i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-                do
+
+                // J2N: optimize for null case below to avoid comparer call
+                if (key is not null)
                 {
-                    // Test in if to drop range check for following array access
-                    if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                    do
                     {
-                        goto ReturnNotFound;
-                    }
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
 
-                    entry = ref entries[i];
-                    if (entry.HashCode == hashCode && comparer!.Equals(entry.Key, key!)) // [!]: asserted above, allow null keys
-                    {
-                        goto Return;
-                    }
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode &&
+                            comparer!.Equals(entry.Key, key!)) // [!]: asserted above, allow null keys
+                        {
+                            goto Return;
+                        }
 
-                    i = entry.Next;
+                        i = entry.Next;
 
-                    collisionCount++;
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
                 }
-                while (collisionCount <= (uint)entries.Length);
+                else
+                {
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && entry.Key is null)
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+                }
 
                 // The chain of entries forms a loop; which means a concurrent update has happened.
                 // Break out of the loop and throw, rather than looping forever.
