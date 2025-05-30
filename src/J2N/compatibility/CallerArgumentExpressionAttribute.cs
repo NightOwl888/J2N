@@ -1,6 +1,8 @@
 #if !FEATURE_CALLERARGUMENTEXPRESSIONATTRIBUTE
 
-namespace System.Runtime.CompilerServices
+using System;
+
+namespace J2N
 {
     [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
     internal sealed class CallerArgumentExpressionAttribute : Attribute
