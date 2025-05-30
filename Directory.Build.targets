@@ -33,7 +33,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 6.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_STATIC_EXCEPTION_HELPERS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_EXCEPTION_STATIC_GUARDCLAUSES</DefineConstants>
 
   </PropertyGroup>
 

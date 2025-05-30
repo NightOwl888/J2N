@@ -11,13 +11,12 @@ using System.Runtime.InteropServices;
 using J2N.Runtime.CompilerServices;
 using J2N.Text;
 
-#if FEATURE_STATIC_EXCEPTION_HELPERS
+#if FEATURE_EXCEPTION_STATIC_GUARDCLAUSES
 using static System.ArgumentNullException;
 using static System.ArgumentOutOfRangeException;
 #else
-using static J2N.StaticThrowHelper;
+using static J2N.Collections.StaticThrowHelper;
 #endif
-using static J2N.ThrowHelper;
 
 namespace J2N.Collections.Generic
 {
@@ -365,7 +364,7 @@ namespace J2N.Collections.Generic
                 // J2N: allow null keys
                 //ThrowIfNull(key, ExceptionArgument.key);
 
-                IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
+                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 if (!IsCompatibleKey(key)) // J2N: allow null keys
                 {
@@ -414,11 +413,11 @@ namespace J2N.Collections.Generic
                 {
                     if (key is null)
                     {
-                        ThrowKeyNotFoundException("(null)");
+                        ThrowHelper.ThrowKeyNotFoundException("(null)");
                         return default;
                     }
 
-                    ThrowKeyNotFoundException(key);
+                    ThrowHelper.ThrowKeyNotFoundException(key);
                 }
 
                 return value;
@@ -632,7 +631,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index >= (uint)_count)
             {
-                ThrowIndexArgumentOutOfRange();
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
             }
 
             Debug.Assert(_entries is not null, "count must be positive, which means we must have entries");
@@ -763,7 +762,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index > (uint)_count)
             {
-                ThrowIndexArgumentOutOfRange();
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
             }
 
             // J2N: allow null keys
@@ -832,7 +831,7 @@ namespace J2N.Collections.Generic
             int count = _count;
             if ((uint)index >= (uint)count)
             {
-                ThrowIndexArgumentOutOfRange();
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
             }
 
             // Remove from the associated bucket chain the entry that lives at the specified index.
@@ -858,7 +857,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index >= (uint)_count)
             {
-                ThrowIndexArgumentOutOfRange();
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
             }
 
             Debug.Assert(_entries is not null);
@@ -875,7 +874,7 @@ namespace J2N.Collections.Generic
         {
             if ((uint)index >= (uint)_count)
             {
-                ThrowIndexArgumentOutOfRange();
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
             }
 
             // J2N: allow null keys
@@ -1262,7 +1261,7 @@ namespace J2N.Collections.Generic
 
             if (array.Length - arrayIndex < _count)
             {
-                ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
             }
 
             for (int i = 0; i < _count; i++)
@@ -1284,7 +1283,7 @@ namespace J2N.Collections.Generic
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
 
-            IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
+            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
             if (!IsCompatibleKey(key)) // J2N: allow null keys
             {
@@ -1341,14 +1340,14 @@ namespace J2N.Collections.Generic
 
             if (array.GetLowerBound(0) != 0)
             {
-                ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
             }
 
             ThrowIfNegative(index);
 
             if (array.Length - index < _count)
             {
-                ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
             }
 
             if (array is KeyValuePair<TKey, TValue>[] tarray)
@@ -1362,7 +1361,7 @@ namespace J2N.Collections.Generic
                     object[]? objects = array as object[];
                     if (objects is null)
                     {
-                        ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
                     }
 
                     foreach (KeyValuePair<TKey, TValue> pair in this)
@@ -1372,7 +1371,7 @@ namespace J2N.Collections.Generic
                 }
                 catch (ArrayTypeMismatchException)
                 {
-                    ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
+                    ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
                 }
             }
         }
@@ -1580,7 +1579,7 @@ namespace J2N.Collections.Generic
 
                 if (array.Length - arrayIndex < count)
                 {
-                    ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall, ExceptionArgument.array);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall, ExceptionArgument.array);
                 }
 
                 Entry[]? entries = dictionary._entries;
@@ -1610,7 +1609,7 @@ namespace J2N.Collections.Generic
 
                 if (array.Length - index < _dictionary.Count)
                 {
-                    ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 }
 
                 if (array is TKey[] keys)
@@ -1779,7 +1778,7 @@ namespace J2N.Collections.Generic
 
                 if (array.Length - arrayIndex < count)
                 {
-                    ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall, ExceptionArgument.array);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall, ExceptionArgument.array);
                 }
 
                 Entry[]? entries = dictionary._entries;
@@ -1931,7 +1930,7 @@ namespace J2N.Collections.Generic
 
                 if (array.Length - index < _dictionary.Count)
                 {
-                    ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 }
 
                 if (array is TValue[] values)
