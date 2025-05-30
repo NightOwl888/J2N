@@ -436,23 +436,11 @@ namespace J2N
             return new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key));
         }
 
-        private static ArgumentException GetAddingDuplicateWithKeyArgumentException(object? key, ExceptionArgument argument)
-        {
-            return new ArgumentException(SR.Format(SR.Argument_AddingDuplicateWithKey, key), GetArgumentName(argument));
-        }
-
         [DoesNotReturn]
         internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key)
         {
             // Generic key to move the boxing to the right hand side of throw
             throw GetAddingDuplicateWithKeyArgumentException((object?)key);
-        }
-
-        [DoesNotReturn]
-        internal static void ThrowAddingDuplicateWithKeyArgumentException<T>([AllowNull] T key, ExceptionArgument argument)
-        {
-            // Generic key to move the boxing to the right hand side of throw
-            throw GetAddingDuplicateWithKeyArgumentException((object?)key, argument);
         }
 
         [DoesNotReturn]

@@ -462,7 +462,7 @@ namespace J2N.Collections.Generic
                         return true;
 
                     case InsertionBehavior.ThrowOnExisting:
-                        ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(key, ExceptionArgument.key);
+                        ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(key);
                         break;
 
                     default:
@@ -907,7 +907,7 @@ namespace J2N.Collections.Generic
             uint hashCode = 0, collisionCount = 0;
             if (IndexOf(key, ref hashCode, ref collisionCount) >= 0)
             {
-                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(key, ExceptionArgument.key);
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(key);
             }
 
             // The key doesn't exist in the collection. Update the key and value, but also update
