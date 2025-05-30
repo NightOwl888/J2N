@@ -14,7 +14,7 @@ namespace J2N.Collections.Tests
         /// <typeparam name="TKey">The type of the key.</typeparam>
         /// <typeparam name="TValue">The type of the value.</typeparam>
         /// <returns>Returns a new <see cref="KeyValuePair{TKey,TValue}"/>.</returns>
-        public static KeyValuePair<TKey, TValue> KeyValuePairCreate<TKey, TValue>(TKey key, TValue value)
+        public static KeyValuePair<TKey, TValue> Create<TKey, TValue>(TKey key, TValue value)
             => new(key, value);
     }
 }
