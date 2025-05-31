@@ -48,7 +48,7 @@ stages:
 
   - job: Build
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'windows-latest'
 
     steps:
     # Nerdbank.GitVersioning requires a deep clone. See: https://github.com/dotnet/Nerdbank.GitVersioning/blob/main/doc/cloudbuild.md#azure-pipelines
