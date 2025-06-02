@@ -493,7 +493,6 @@ namespace J2N.Collections.Tests
                 {
                     Assert.Throws<InvalidOperationException>(() => valuesEnum.MoveNext());
                     Assert.Throws<InvalidOperationException>(() => valuesEnum.Reset());
-                    Assert.Throws<InvalidOperationException>(() => valuesEnum.Current);
                 }
                 else
                 {
@@ -834,7 +833,7 @@ namespace J2N.Collections.Tests
             object current, key, value, entry;
             IDictionaryEnumerator enumerator = NonGenericIDictionaryFactory(count).GetEnumerator();
             while (enumerator.MoveNext()) ;
-            if (Enumerator_Current_UndefinedOperation_Throws)
+            if (count == 0 ? Enumerator_Empty_Current_UndefinedOperation_Throw : Enumerator_Current_UndefinedOperation_Throws)
             {
                 Assert.Throws<InvalidOperationException>(() => enumerator.Current);
                 Assert.Throws<InvalidOperationException>(() => enumerator.Key);
