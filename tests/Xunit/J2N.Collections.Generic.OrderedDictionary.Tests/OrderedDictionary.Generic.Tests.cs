@@ -66,7 +66,7 @@ namespace J2N.Collections.Tests
             Assert.Same(comparer, instance.EqualityComparer);
             Assert.InRange(instance.Capacity, 42, int.MaxValue);
 
-            IEqualityComparer<TKey> customComparer = EqualityComparerHelper<TKey>.Create(comparer.Equals, comparer.GetHashCode!);
+            IEqualityComparer<TKey> customComparer = EqualityComparerHelper<TKey>.Create(comparer.Equals!, comparer.GetHashCode!);
             instance = new JCG.OrderedDictionary<TKey, TValue>(42, customComparer);
             Assert.Empty(instance);
             Assert.Empty(instance.Keys);
