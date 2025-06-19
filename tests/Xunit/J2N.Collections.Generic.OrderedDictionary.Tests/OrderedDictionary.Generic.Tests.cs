@@ -18,11 +18,11 @@ namespace J2N.Collections.Tests
     {
         #region IDictionary<TKey, TValue> Helper Methods
 
-        protected override bool DefaultValueAllowed => true;
-        protected override bool DefaultValueWhenNotAllowed_Throws => false;
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
+        protected override bool DefaultValueAllowed => true;
+        protected override bool DefaultValueWhenNotAllowed_Throws => true;
         protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert | ModifyOperation.Remove | ModifyOperation.Clear;
         protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Overwrite;
 

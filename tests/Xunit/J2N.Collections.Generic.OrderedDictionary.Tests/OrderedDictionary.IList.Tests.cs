@@ -15,7 +15,7 @@ namespace J2N.Collections.Tests
     {
         protected override bool DefaultValueAllowed => true;
         protected override bool DuplicateValuesAllowed => false;
-        protected override bool DefaultValueWhenNotAllowed_Throws => false;
+        protected override bool DefaultValueWhenNotAllowed_Throws => true;
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
@@ -112,7 +112,7 @@ namespace J2N.Collections.Tests
     {
         protected override bool DefaultValueAllowed => true;
         protected override bool DuplicateValuesAllowed => false;
-        protected override bool DefaultValueWhenNotAllowed_Throws => false;
+        protected override bool DefaultValueWhenNotAllowed_Throws => true;
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
