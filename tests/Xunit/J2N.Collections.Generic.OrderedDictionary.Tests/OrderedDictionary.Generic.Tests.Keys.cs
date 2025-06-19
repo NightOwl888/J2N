@@ -14,7 +14,7 @@ namespace J2N.Collections.Tests
     {
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
-        protected override bool DefaultValueAllowed => false;
+        protected override bool DefaultValueAllowed => true;
         protected override bool DuplicateValuesAllowed => false;
         protected override bool IsReadOnly => true;
         protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations)=> new List<ModifyEnumerable>();

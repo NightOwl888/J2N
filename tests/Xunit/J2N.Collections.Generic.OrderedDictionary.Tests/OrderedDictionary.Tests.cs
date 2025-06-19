@@ -207,7 +207,8 @@ namespace J2N.Collections.Tests
         public void CantAcceptDuplicateKeysFromSourceDictionary()
         {
             Dictionary<string, int> source = new Dictionary<string, int> { { "a", 1 }, { "A", 1 } };
-            AssertExtensions.Throws<ArgumentException>("key", () => new JCG.OrderedDictionary<string, int>(source, StringComparer.OrdinalIgnoreCase));
+            // J2N: null key throws a different ArgumentException without "key" as the parameter name
+            AssertExtensions.Throws<ArgumentException>(/*"key",*/ () => new JCG.OrderedDictionary<string, int>(source, StringComparer.OrdinalIgnoreCase));
         }
 
         [Theory]

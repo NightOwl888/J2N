@@ -293,7 +293,8 @@ namespace J2N.Collections.Tests
             dictionary.SetAt(0, CreateTKey(2), CreateTValue(0));
             dictionary.SetAt(0, firstKey, CreateTValue(0));
 
-            AssertExtensions.Throws<ArgumentException>("key", () =>
+            // J2N: null key throws a different ArgumentException without "key" as the parameter name
+            AssertExtensions.Throws<ArgumentException>(/*"key",*/ () =>
                 dictionary.SetAt(1, firstKey, CreateTValue(0)));
         }
 

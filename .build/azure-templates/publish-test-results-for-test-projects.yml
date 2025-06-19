@@ -135,6 +135,16 @@ steps:
 
 - template: publish-test-results.yml
   parameters:
+    testProjectName: 'J2N.Collections.Generic.OrderedDictionary.Tests'
+    framework: '${{ parameters.framework }}'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results.yml
+  parameters:
     testProjectName: 'J2N.Collections.Generic.SortedDictionary.Tests'
     framework: '${{ parameters.framework }}'
     osName: '${{ parameters.osName }}'
