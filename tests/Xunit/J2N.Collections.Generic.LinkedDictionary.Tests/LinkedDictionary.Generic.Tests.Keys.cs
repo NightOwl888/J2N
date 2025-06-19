@@ -46,7 +46,7 @@ namespace J2N.Collections.Tests
         [Fact]
         public void LinkedDictionary_Generic_KeyCollection_Constructor_NullDictionary()
         {
-            Assert.Throws<ArgumentNullException>(() => new LinkedDictionary<string, string>.KeyCollection(null));
+            Assert.Throws<ArgumentNullException>(() => new LinkedDictionary<string, string>.KeyCollection(null!));
         }
 
         [Theory]

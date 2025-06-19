@@ -35,7 +35,6 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-
 namespace J2N.Collections.Generic
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -1046,7 +1045,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current list. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
