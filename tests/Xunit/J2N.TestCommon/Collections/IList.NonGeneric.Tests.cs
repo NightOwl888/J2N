@@ -134,17 +134,6 @@ namespace J2N.Collections.Tests
                     }
                     return false;
                 };
-
-                yield return (IEnumerable enumerable) =>
-                {
-                    IList casted = ((IList)enumerable);
-                    if (casted.Count > 0 && !casted.IsReadOnly)
-                    {
-                        casted[0] = CreateT(12);
-                        return true;
-                    }
-                    return false;
-                };
             }
             if ((operations & ModifyOperation.Remove) == ModifyOperation.Remove)
             {
@@ -164,6 +153,19 @@ namespace J2N.Collections.Tests
                     if (casted.Count > 0 && !casted.IsFixedSize && !casted.IsReadOnly)
                     {
                         casted.RemoveAt(0);
+                        return true;
+                    }
+                    return false;
+                };
+            }
+            if ((operations & ModifyOperation.Overwrite) == ModifyOperation.Overwrite)
+            {
+                yield return (IEnumerable enumerable) =>
+                {
+                    IList casted = ((IList)enumerable);
+                    if (casted.Count > 0 && !casted.IsReadOnly)
+                    {
+                        casted[0] = CreateT(12);
                         return true;
                     }
                     return false;
@@ -1101,7 +1103,7 @@ namespace J2N.Collections.Tests
                 }
                 else
                 {
-                    var current = enumerator.Current; // Enumerator.Current should not fail
+                    _ = enumerator.Current; // Enumerator.Current should not fail
                 }
 
                 // Test after add
@@ -1116,7 +1118,7 @@ namespace J2N.Collections.Tests
                     }
                     else
                     {
-                        var current = enumerator.Current; // Enumerator.Current should not fail
+                        _ = enumerator.Current; // Enumerator.Current should not fail
                     }
                 }
             }
