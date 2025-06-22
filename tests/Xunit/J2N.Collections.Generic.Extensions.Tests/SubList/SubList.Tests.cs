@@ -93,6 +93,8 @@ namespace J2N.Collections.Tests
 
     public abstract class SubList_Tests<T> : IList_Generic_Tests<T>
     {
+        protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert | ModifyOperation.Remove | ModifyOperation.Clear;
+
         private SCG.List<T> OriginalList { get; set; }
 
         #region IList<T> Helper Methods
