@@ -161,6 +161,8 @@ namespace J2N.Collections.Tests
         protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => Enumerable.Empty<ModifyEnumerable>();
         protected override bool IsReadOnly => true;
 
+        protected override Type ICollection_NonGeneric_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
+
         protected override object CreateT(int seed) =>
             CreateString(seed);
 
@@ -240,6 +242,8 @@ namespace J2N.Collections.Tests
         protected override Type ICollection_NonGeneric_CopyTo_ArrayOfEnumType_ThrowType => typeof(ArgumentException);
         protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => Enumerable.Empty<ModifyEnumerable>();
         protected override bool IsReadOnly => true;
+
+        protected override Type ICollection_NonGeneric_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
 
         protected override object CreateT(int seed) =>
             CreateString(seed);

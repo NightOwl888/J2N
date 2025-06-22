@@ -41,6 +41,8 @@ namespace J2N.Collections.Tests
             return Convert.ToBase64String(bytes);
         }
 
+        protected override Type ICollection_Generic_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void OrderedDictionary_Generic_KeyCollection_GetEnumerator(int count)
@@ -67,6 +69,8 @@ namespace J2N.Collections.Tests
         protected override ICollection NonGenericICollectionFactory() => new JCG.OrderedDictionary<string, string>().Keys;
         protected override bool SupportsSerialization => false;
         protected override Type ICollection_NonGeneric_CopyTo_ArrayOfEnumType_ThrowType => typeof(ArgumentException);
+
+        protected override Type ICollection_NonGeneric_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
 
         protected override ICollection NonGenericICollectionFactory(int count)
         {

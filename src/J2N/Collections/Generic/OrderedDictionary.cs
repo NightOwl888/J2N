@@ -1724,6 +1724,12 @@ namespace J2N.Collections.Generic
                 ThrowIfNull(array);
                 ThrowIfNegative(arrayIndex);
 
+                // J2N: throw ArgumentOutOfRangeException for consistency
+                if ((uint)arrayIndex > (uint)array.Length)
+                {
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(arrayIndex);
+                }
+
                 OrderedDictionary<TKey, TValue> dictionary = _dictionary;
                 int count = dictionary._count;
 
@@ -1756,6 +1762,12 @@ namespace J2N.Collections.Generic
                 }
 
                 ThrowIfNegative(index);
+
+                // J2N: throw ArgumentOutOfRangeException for consistency
+                if ((uint)index > (uint)array.Length)
+                {
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
+                }
 
                 if (array.Length - index < _dictionary.Count)
                 {
@@ -2077,6 +2089,12 @@ namespace J2N.Collections.Generic
                 }
 
                 ThrowIfNegative(index);
+
+                // J2N: throw ArgumentOutOfRangeException for consistency
+                if ((uint)index > (uint)array.Length)
+                {
+                    ThrowHelper.ThrowIndexArgumentOutOfRange_NeedNonNegNumException(index);
+                }
 
                 if (array.Length - index < _dictionary.Count)
                 {
