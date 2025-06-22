@@ -385,12 +385,19 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: allow null keys
+                // J2N: allow null keys
                 ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
                 ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
-                if (!IsCompatibleKey(key)) // J2N: allow null keys
+                TKey tkey = default!;
+                if (key is not null)
                 {
-                    throw new ArgumentException(SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
+                    if (key is not TKey temp)
+                    {
+                        throw new ArgumentException(SR.Format(SR.Arg_WrongType, value, typeof(TKey)), nameof(key));
+                    }
+
+                    tkey = temp;
                 }
 
                 TValue tvalue = default!;
@@ -404,7 +411,7 @@ namespace J2N.Collections.Generic
                     tvalue = temp;
                 }
 
-                this[(TKey?)key] = tvalue;
+                this[tkey] = tvalue;
             }
         }
 
