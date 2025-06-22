@@ -155,10 +155,20 @@ namespace J2N.Collections.Tests
             }
 
             var dictionary = new JCG.OrderedDictionary<TKey, TValue>();
+            int index;
+
             // J2N: was: AssertExtensions.Throws<ArgumentNullException>("key", () => dictionary.TryAdd(default(TKey), CreateTValue(0)));
+            // J2N: was: AssertExtensions.Throws<ArgumentNullException>("key", () => dictionary.TryAdd(default(TKey), CreateTValue(0), out index));
+
             Assert.True(dictionary.TryAdd(default, CreateTValue(0)));
             Assert.True(dictionary.TryAdd(CreateTKey(0), default!));
             Assert.Equal(2, dictionary.Count);
+
+            Assert.False(dictionary.TryAdd(default, CreateTValue(0), out index));
+            Assert.Equal(0, index);
+            Assert.True(dictionary.TryAdd(CreateTKey(1), default, out index));
+            Assert.Equal(2, index);
+            Assert.Equal(3, dictionary.Count);
         }
 
         [Fact]
