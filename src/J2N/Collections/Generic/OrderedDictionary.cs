@@ -206,7 +206,8 @@ namespace J2N.Collections.Generic
             // ReSharper disable once ConditionalAccessQualifierIsNonNullableAccordingToAPIContract - J2N: so that the throw happens in the ctor body instead
             this(dictionary?.Count ?? 0, comparer)
         {
-            ThrowIfNull(dictionary);
+            if (dictionary is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
 
             AddRange(dictionary!); // [!]: thrown if null above
         }
@@ -240,7 +241,9 @@ namespace J2N.Collections.Generic
         public OrderedDictionary(IEnumerable<KeyValuePair<TKey, TValue>> collection, IEqualityComparer<TKey>? comparer) :
             this((collection as ICollection<KeyValuePair<TKey, TValue>>)?.Count ?? 0, comparer)
         {
-            ThrowIfNull(collection);
+            // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
+            if (collection is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
             AddRange(collection);
         }
