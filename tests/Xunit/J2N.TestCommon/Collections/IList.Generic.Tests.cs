@@ -56,6 +56,19 @@ namespace J2N.Collections.Tests
                     return false;
                 };
             }
+            if (!AddRemoveClear_ThrowsNotSupported && (operations & ModifyOperation.Overwrite) == ModifyOperation.Overwrite)
+            {
+                yield return (SCG.IEnumerable<T> enumerable) =>
+                {
+                    SCG.IList<T> casted = ((SCG.IList<T>)enumerable);
+                    if (casted.Count > 0)
+                    {
+                        casted[0] = CreateT(12);
+                        return true;
+                    }
+                    return false;
+                };
+            }
             if (!AddRemoveClear_ThrowsNotSupported && (operations & ModifyOperation.Remove) == ModifyOperation.Remove)
             {
                 yield return (SCG.IEnumerable<T> enumerable) =>
@@ -92,8 +105,15 @@ namespace J2N.Collections.Tests
         public void IList_Generic_ItemGet_NegativeIndex_ThrowsException(int count)
         {
             SCG.IList<T> list = GenericIListFactory(count);
+
             Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => list[-1]);
             Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => list[int.MinValue]);
+
+            if (list is SCG.IReadOnlyList<T> rol)
+            {
+                Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => rol[-1]);
+                Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => rol[int.MinValue]);
+            }
         }
 
         [Theory]
@@ -101,8 +121,15 @@ namespace J2N.Collections.Tests
         public void IList_Generic_ItemGet_IndexGreaterThanListCount_ThrowsException(int count)
         {
             SCG.IList<T> list = GenericIListFactory(count);
+
             Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => list[count]);
             Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => list[count + 1]);
+
+            if (list is SCG.IReadOnlyList<T> rol)
+            {
+                Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => rol[count]);
+                Assert.Throws(IList_Generic_Item_InvalidIndex_ThrowType, () => rol[count + 1]);
+            }
         }
 
         [Theory]
@@ -111,7 +138,15 @@ namespace J2N.Collections.Tests
         {
             SCG.IList<T> list = GenericIListFactory(count);
             T result;
+
             Assert.All(Enumerable.Range(0, count), index => result = list[index]);
+            Assert.All(Enumerable.Range(0, count), index => Assert.Equal(list[index], list[index]));
+
+            if (list is SCG.IReadOnlyList<T> rol)
+            {
+                Assert.All(Enumerable.Range(0, count), index => result = rol[index]);
+                Assert.All(Enumerable.Range(0, count), index => Assert.Equal(rol[index], rol[index]));
+            }
         }
 
         #endregion
@@ -358,7 +393,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void IList_Generic_IndexOf_ReturnsFirstMatchingValue(int count)
         {
-            if (!IsReadOnly && !AddRemoveClear_ThrowsNotSupported)
+            if (!IsReadOnly && !AddRemoveClear_ThrowsNotSupported && DuplicateValuesAllowed)
             {
                 SCG.IList<T> list = GenericIListFactory(count);
                 foreach (T duplicate in list.ToList()) // hard copies list to circumvent enumeration error
@@ -603,7 +638,7 @@ namespace J2N.Collections.Tests
                     while (enumerator.MoveNext()) ; // Go to end of enumerator
 
                     T current = default(T);
-                    if (Enumerator_Current_UndefinedOperation_Throws)
+                    if (count == 0 ? Enumerator_Empty_Current_UndefinedOperation_Throws : Enumerator_Current_UndefinedOperation_Throws)
                     {
                         Assert.Throws<InvalidOperationException>(() => enumerator.Current); // enumerator.Current should fail
                     }
@@ -619,7 +654,7 @@ namespace J2N.Collections.Tests
                     {
                         collection.Add(CreateT(seed++));
 
-                        if (Enumerator_Current_UndefinedOperation_Throws)
+                        if (count == 0 ? Enumerator_Empty_Current_UndefinedOperation_Throws : Enumerator_Current_UndefinedOperation_Throws)
                         {
                             Assert.Throws<InvalidOperationException>(() => enumerator.Current); // enumerator.Current should fail
                         }

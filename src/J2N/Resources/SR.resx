@@ -465,4 +465,7 @@
   <data name="Argument_AddingDuplicateWithKey" xml:space="preserve">
     <value>An item with the same key has already been added. Key: {0}</value>
   </data>
+  <data name="ArgumentOutOfRange_Generic_MustBeGreaterOrEqual" xml:space="preserve">
+    <value>'{0}' must be greater than or equal to '{1}'.</value>
+  </data>
 </root>

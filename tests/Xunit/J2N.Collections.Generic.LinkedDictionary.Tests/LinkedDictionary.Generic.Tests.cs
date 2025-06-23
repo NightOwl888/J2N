@@ -115,7 +115,7 @@ namespace J2N.Collections.Tests
         public void LinkedDictionary_Generic_ContainsValue_DefaultValueNotPresent(int count)
         {
             LinkedDictionary<TKey, TValue> dictionary = (LinkedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            Assert.False(dictionary.ContainsValue(default(TValue)));
+            Assert.False(dictionary.ContainsValue(default(TValue)!));
         }
 
         [Theory]
@@ -128,7 +128,7 @@ namespace J2N.Collections.Tests
             while (dictionary.ContainsKey(notPresent))
                 notPresent = CreateTKey(seed++);
             dictionary.Add(notPresent, default(TValue));
-            Assert.True(dictionary.ContainsValue(default(TValue)));
+            Assert.True(dictionary.ContainsValue(default(TValue)!));
         }
 
         #endregion
@@ -166,7 +166,7 @@ namespace J2N.Collections.Tests
         public void LinkedDictionary_Generic_RemoveKey_ValidKeyNotContainedInDictionary(int count)
         {
             LinkedDictionary<TKey, TValue> dictionary = (LinkedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TValue value;
+            TValue? value;
             TKey missingKey = GetNewKey(dictionary);
 
             Assert.False(dictionary.Remove(missingKey, out value));
@@ -180,7 +180,7 @@ namespace J2N.Collections.Tests
         {
             LinkedDictionary<TKey, TValue> dictionary = (LinkedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
             TKey missingKey = GetNewKey(dictionary);
-            TValue outValue;
+            TValue? outValue;
             TValue inValue = CreateTValue(count);
 
             dictionary.Add(missingKey, inValue);
@@ -195,11 +195,11 @@ namespace J2N.Collections.Tests
         public void LinkedDictionary_Generic_RemoveKey_DefaultKeyNotContainedInDictionary(int count)
         {
             LinkedDictionary<TKey, TValue> dictionary = (LinkedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TValue outValue;
+            TValue? outValue;
 
             if (DefaultValueAllowed)
             {
-                TKey missingKey = default(TKey);
+                TKey? missingKey = default(TKey);
                 while (dictionary.ContainsKey(missingKey))
                     dictionary.Remove(missingKey);
                 Assert.False(dictionary.Remove(missingKey, out outValue));
@@ -221,8 +221,8 @@ namespace J2N.Collections.Tests
             if (DefaultValueAllowed)
             {
                 LinkedDictionary<TKey, TValue> dictionary = (LinkedDictionary<TKey, TValue>)(GenericIDictionaryFactory(count));
-                TKey missingKey = default(TKey);
-                TValue value;
+                TKey? missingKey = default(TKey);
+                TValue? value;
 
                 dictionary.TryAdd(missingKey, default(TValue));
                 Assert.True(dictionary.Remove(missingKey, out value));
@@ -270,7 +270,7 @@ namespace J2N.Collections.Tests
             if (ModifyEnumeratorAllowed.HasFlag(ModifyOperation.Remove))
             {
                 LinkedDictionary<TKey, TValue> dict = (LinkedDictionary<TKey, TValue>)GenericIDictionaryFactory(3);
-                TKey key = default;
+                TKey? key = default;
                 using (var enumerator = dict.GetEnumerator())
                 {
                     while (enumerator.MoveNext())
