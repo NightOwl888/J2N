@@ -119,6 +119,8 @@ namespace J2N.Collections.Tests
         protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => Enumerable.Empty<ModifyEnumerable>();
         protected override bool IsReadOnly => true;
 
+        protected override Type ICollection_Generic_CopyTo_IndexLargerThanArrayCount_ThrowType => typeof(ArgumentOutOfRangeException);
+
         protected override string CreateT(int seed) => CreateString(seed);
 
         protected override IList<string> GenericIListFactory() => new JCG.OrderedDictionary<string, string>().Keys;
