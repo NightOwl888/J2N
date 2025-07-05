@@ -439,8 +439,9 @@ namespace J2N.Collections.Generic
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AddWithResize(T item)
         {
+            Debug.Assert(_size == _items.Length);
             int size = _size;
-            EnsureCapacityCore(size + 1);
+            Grow(size + 1);
             _size = size + 1;
             _items[size] = item;
         }
@@ -890,7 +891,7 @@ namespace J2N.Collections.Generic
 
             if (_items.Length < capacity)
             {
-                EnsureCapacityCore(capacity);
+                Grow(capacity);
                 _version++;
             }
 
@@ -898,25 +899,24 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Increase the capacity of this list to at least the specified <paramref name="capacity"/> by continuously twice current capacity.
+        /// Increase the capacity of this list to at least the specified <paramref name="capacity"/>.
         /// </summary>
         /// <param name="capacity">The minimum capacity to ensure.</param>
-        private void EnsureCapacityCore(int capacity)
+        private void Grow(int capacity)
         {
-            Debug.Assert(capacity >= 0);
+            Debug.Assert(_items.Length < capacity);
 
-            if (_items.Length < capacity)
-            {
-                int newcapacity = _items.Length == 0 ? DefaultCapacity : 2 * _items.Length;
+            int newcapacity = _items.Length == 0 ? DefaultCapacity : 2 * _items.Length;
 
-                if ((uint)newcapacity > MaxArrayLength) newcapacity = MaxArrayLength;
+            // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
+            // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
+            if ((uint)newcapacity > MaxArrayLength) newcapacity = MaxArrayLength;
 
-                // If the computed capacity is still less than specified, set to the original argument.
-                // Capacities exceeding MaxArrayLength will be surfaced as OutOfMemoryException by Array.Resize.
-                if (newcapacity < capacity) newcapacity = capacity;
+            // If the computed capacity is still less than specified, set to the original argument.
+            // Capacities exceeding MaxArrayLength will be surfaced as OutOfMemoryException by Array.Resize.
+            if (newcapacity < capacity) newcapacity = capacity;
 
-                Capacity = newcapacity;
-            }
+            Capacity = newcapacity;
         }
 
         /// <summary>
@@ -1580,7 +1580,7 @@ namespace J2N.Collections.Generic
             {
                 ThrowHelper.ThrowArgumentOutOfRangeException(index, ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_ListInsert);
             }
-            if (_size == _items.Length) EnsureCapacityCore(_size + 1);
+            if (_size == _items.Length) Grow(_size + 1);
             if (index < _size)
             {
                 Array.Copy(_items, index, _items, index + 1, _size - index);
@@ -1654,7 +1654,10 @@ namespace J2N.Collections.Generic
                     int offset = Offset + subList.Offset;
                     int subListIndex = index - offset;
 
-                    EnsureCapacityCore(_size + count);
+                    if (_items.Length - _size < count)
+                    {
+                        Grow(_size + count);
+                    }
 
                     // We need to fixup our sublist reference if it is broken by EnsureCapacity
                     if (subList._items != _items)
