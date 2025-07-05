@@ -1848,7 +1848,8 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="List{T}"/>.
+        /// Removes the first occurrence of the given element, if found.
+        /// The size of the list is decreased by one if successful.
         /// </summary>
         /// <param name="item">The object to remove from the <see cref="List{T}"/>. The value can be
         /// <c>null</c> for reference types.</param>
