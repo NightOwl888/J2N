@@ -1437,6 +1437,20 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
+        /// Creates a shallow copy of a range of elements in the source <see cref="List{T}" />.
+        /// </summary>
+        /// <param name="start">The zero-based <see cref="List{T}" /> index at which the range starts.</param>
+        /// <param name="length">The length of the range.</param>
+        /// <returns>A shallow copy of a range of elements in the source <see cref="List{T}" />.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="start" /> is less than 0.
+        /// -or-
+        /// <paramref name="length" /> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="start" /> and <paramref name="length" /> do not denote a valid range of elements in the <see cref="List{T}" />.</exception>
+        public List<T> Slice(int start, int length) => GetRange(start, length);
+
+        /// <summary>
         /// Searches for the specified object and returns the zero-based index of the first occurrence within
         /// the entire <see cref="List{T}"/>.
         /// </summary>
