@@ -440,7 +440,7 @@ namespace J2N.Collections.Generic
         private void AddWithResize(T item)
         {
             int size = _size;
-            EnsureCapacity(size + 1);
+            EnsureCapacityCore(size + 1);
             _size = size + 1;
             _items[size] = item;
         }
@@ -884,34 +884,39 @@ namespace J2N.Collections.Generic
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
+            {
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            }
+
             if (_items.Length < capacity)
             {
-                Grow(capacity);
+                EnsureCapacityCore(capacity);
+                _version++;
             }
 
             return _items.Length;
         }
 
         /// <summary>
-        /// Increase the capacity of this list to at least the specified <paramref name="capacity"/>.
+        /// Increase the capacity of this list to at least the specified <paramref name="capacity"/> by continuously twice current capacity.
         /// </summary>
         /// <param name="capacity">The minimum capacity to ensure.</param>
-        internal void Grow(int capacity)
+        private void EnsureCapacityCore(int capacity)
         {
-            Debug.Assert(_items.Length < capacity);
+            Debug.Assert(capacity >= 0);
 
-            int newCapacity = _items.Length == 0 ? DefaultCapacity : 2 * _items.Length;
+            if (_items.Length < capacity)
+            {
+                int newcapacity = _items.Length == 0 ? DefaultCapacity : 2 * _items.Length;
 
-            // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
-            // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
-            if ((uint)newCapacity > MaxArrayLength) newCapacity = MaxArrayLength;
+                if ((uint)newcapacity > MaxArrayLength) newcapacity = MaxArrayLength;
 
-            // If the computed capacity is still less than specified, set to the original argument.
-            // Capacities exceeding Array.MaxLength will be surfaced as OutOfMemoryException by Array.Resize.
-            if (newCapacity < capacity) newCapacity = capacity;
+                // If the computed capacity is still less than specified, set to the original argument.
+                // Capacities exceeding MaxArrayLength will be surfaced as OutOfMemoryException by Array.Resize.
+                if (newcapacity < capacity) newcapacity = capacity;
 
-            Capacity = newCapacity;
+                Capacity = newcapacity;
+            }
         }
 
         /// <summary>
@@ -1575,7 +1580,7 @@ namespace J2N.Collections.Generic
             {
                 ThrowHelper.ThrowArgumentOutOfRangeException(index, ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_ListInsert);
             }
-            if (_size == _items.Length) EnsureCapacity(_size + 1);
+            if (_size == _items.Length) EnsureCapacityCore(_size + 1);
             if (index < _size)
             {
                 Array.Copy(_items, index, _items, index + 1, _size - index);
@@ -1649,7 +1654,7 @@ namespace J2N.Collections.Generic
                     int offset = Offset + subList.Offset;
                     int subListIndex = index - offset;
 
-                    EnsureCapacity(_size + count);
+                    EnsureCapacityCore(_size + count);
 
                     // We need to fixup our sublist reference if it is broken by EnsureCapacity
                     if (subList._items != _items)
@@ -2490,7 +2495,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, ListEqualityComparer<T>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current list. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
