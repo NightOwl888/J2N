@@ -25,6 +25,22 @@ namespace J2N
     /// </summary>
     public static class ArrayExtensions
     {
+        /// <summary>Gets the maximum number of elements that may be contained in an array.</summary>
+        /// <returns>The maximum count of elements allowed in any array.</returns>
+        /// <remarks>
+        /// This property represents a runtime limitation, the maximum number of elements (not bytes)
+        /// the runtime will allow in an array. There is no guarantee that an allocation under this length
+        /// will succeed, but all attempts to allocate a larger array will fail.
+        /// </remarks>
+        // J2N: from .NET's src/libraries/System.Private.CoreLib/src/System/Array.cs
+        internal static int MaxLength =>
+#if FEATURE_ARRAY_MAXLENGTH
+            Array.MaxLength;
+#else
+            // Keep in sync with `inline SIZE_T MaxArrayLength()` from gchelpers and HashHelpers.MaxPrimeArrayLength.
+            0X7FFFFFC7;
+#endif
+
         /// <summary>
         /// Assigns the specified value to each element of the specified array.
         /// </summary>

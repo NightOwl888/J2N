@@ -52,7 +52,6 @@ namespace J2N.Collections.Generic
         , System.Runtime.Serialization.ISerializable, System.Runtime.Serialization.IDeserializationCallback
 #endif
     {
-        private const int MaxArrayLength = 0X7FEFFFFF;
         private const int DefaultCapacity = 4;
 
 #if FEATURE_SERIALIZABLE
@@ -910,10 +909,10 @@ namespace J2N.Collections.Generic
 
             // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
             // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
-            if ((uint)newcapacity > MaxArrayLength) newcapacity = MaxArrayLength;
+            if ((uint)newcapacity > ArrayExtensions.MaxLength) newcapacity = ArrayExtensions.MaxLength;
 
             // If the computed capacity is still less than specified, set to the original argument.
-            // Capacities exceeding MaxArrayLength will be surfaced as OutOfMemoryException by Array.Resize.
+            // Capacities exceeding ArrayExtensions.MaxLength will be surfaced as OutOfMemoryException by Array.Resize.
             if (newcapacity < capacity) newcapacity = capacity;
 
             Capacity = newcapacity;
