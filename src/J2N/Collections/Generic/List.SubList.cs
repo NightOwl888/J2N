@@ -99,6 +99,38 @@ namespace J2N.Collections.Generic
                 _size = parent._size;
             }
 
+            internal override void DoAddRange(IEnumerable<T> collection)
+            {
+                CoModificationCheck();
+                if (collection is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+
+                int originalParentSize = parent._size;
+                try
+                {
+                    // NOTE: It seems like we should be calling parent.DoAddRange here, but we need to insert at the end of the sublist,
+                    // which is at parentOffset + size, not at the end of the parent.
+                    int added = parent.DoInsertRange(parentOffset + size, collection);
+                    _version = parent._version;
+                    if (_items != parent._items)
+                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
+                    size += added;
+                    _size = parent._size;
+                }
+                catch
+                {
+                    // Rare: When appending using the enumerator, we might get an InvalidOperationException. But we still need to
+                    // update our state to match the parent.
+                    int added = parent._size - originalParentSize;
+                    _version = parent._version;
+                    if (_items != parent._items)
+                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
+                    size += added;
+                    _size = parent._size;
+                    throw;
+                }
+            }
+
             internal override int DoInsertRange(int index, IEnumerable<T> collection)
             {
                 CoModificationCheck();

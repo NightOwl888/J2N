@@ -482,7 +482,78 @@ namespace J2N.Collections.Generic
         /// where <c>n</c> is the number of elements to be added and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
         public void AddRange(IEnumerable<T> collection)
-            => InsertRange(Size, collection);
+            => DoAddRange(collection); // Hack so we can override
+
+        internal virtual void DoAddRange(IEnumerable<T> collection)
+        {
+            if (collection == null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+            }
+
+            // J2N: A sublist that is a descendant of this list
+            if (collection is List<T>.SubList subList && subList._items == _items)
+            {
+                int count = subList.Count;
+                if (count > 0)
+                {
+                    int offset = Offset + subList.Offset;
+                    int subListIndex = Size - offset;
+
+                    if (_items.Length - _size < count)
+                    {
+                        Grow(_size + count);
+                    }
+
+                    // We need to fixup our sublist reference if it is broken by EnsureCapacity
+                    if (subList._items != _items)
+                    {
+                        subList._items = _items;
+                    }
+
+                    if (Size < _size)
+                    {
+                        Array.Copy(_items, Size, _items, Size + count, _size - Size);
+                    }
+
+                    // We're inserting a SubList which is a descendant into this list,
+                    // so we already have the elements in the local array.
+
+                    // Copy first part of _items to insert location
+                    Array.Copy(_items, offset, _items, Size, subListIndex);
+                    // Copy last part of _items back to inserted location
+                    Array.Copy(_items, Size + count, _items, subListIndex * 2, count - subListIndex);
+
+                    _size += count;
+                    _version++;
+                }
+            }
+            else if (collection is ICollection<T> c)
+            {
+                int count = c.Count;
+                if (count > 0)
+                {
+                    if (_items.Length - _size < count)
+                    {
+                        Grow(_size + count);
+                    }
+
+                    c.CopyTo(_items, _size);
+                    _size += count;
+                    _version++;
+                }
+            }
+            else
+            {
+                using (IEnumerator<T> en = collection.GetEnumerator())
+                {
+                    while (en.MoveNext())
+                    {
+                        Add(en.Current);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Returns a read-only <see cref="ReadOnlyList{T}"/> wrapper for the current collection.
@@ -1658,7 +1729,7 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
 
             int count = 0;
-            // A sublist that is a descendant of this list
+            // J2N: A sublist that is a descendant of this list
             if (collection is List<T>.SubList subList && subList._items == _items)
             {
                 count = subList.Count;
@@ -1699,7 +1770,10 @@ namespace J2N.Collections.Generic
                 count = c.Count;
                 if (count > 0)
                 {
-                    EnsureCapacity(_size + count);
+                    if (_items.Length - _size < count)
+                    {
+                        Grow(_size + count);
+                    }
                     if (index < _size)
                     {
                         Array.Copy(_items, index, _items, index + count, _size - index);
