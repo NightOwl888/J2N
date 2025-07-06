@@ -370,7 +370,11 @@ namespace J2N.Collections.Tests
             {
                 d => d,
                 d => new DictionarySubclass<T, T>(d),
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
                 d => new ReadOnlyDictionary<T, T>(d)
+#pragma warning restore CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             };
 
             var sizes = new int[] { 0, 1, 2, 3 };
@@ -396,7 +400,11 @@ namespace J2N.Collections.Tests
 
         private static IDictionary<T, T> CreateDictionary<T>(int size, Func<int, T> keyValueSelector, IEqualityComparer<T>? comparer = null)
         {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
             SCG.Dictionary<T, T> temp = Enumerable.Range(0, size + 1).ToDictionary(keyValueSelector, keyValueSelector, comparer);
+#pragma warning restore CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             LinkedDictionary<T, T> dict = new LinkedDictionary<T, T>(temp, comparer);
             // Remove first item to reduce Count to size and alter the contiguity of the dictionary
             dict.Remove(keyValueSelector(0));
