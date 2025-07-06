@@ -474,7 +474,7 @@ namespace J2N.Collections.Generic
         /// </param>
         /// <param name="keyIndex">The index of the added or existing key. This is always a valid index into the dictionary.</param>
         /// <returns>true if the collection was updated; otherwise, false.</returns>
-        private bool TryInsert(int index, [AllowNull] TKey key, TValue value, InsertionBehavior behavior, out int keyIndex)
+        private bool TryInsert(int index, [AllowNull] TKey key, [AllowNull] TValue value, InsertionBehavior behavior, out int keyIndex)
         {
             // Search for the key in the dictionary.
             uint hashCode = 0, collisionCount = 0;
@@ -492,7 +492,7 @@ namespace J2N.Collections.Generic
                 {
                     case InsertionBehavior.OverwriteExisting:
                         Debug.Assert(index < 0, "Expected index to be unspecied when overwriting an existing key.");
-                        _entries![i].Value = value; // [!]: asserted above
+                        _entries![i].Value = value;
                         return true;
 
                     case InsertionBehavior.ThrowOnExisting:
@@ -543,8 +543,8 @@ namespace J2N.Collections.Generic
             // Store the new key/value pair.
             ref Entry entry = ref entries![index]; // [!]: asserted above
             entry.HashCode = hashCode;
-            entry.Key = key!; // [!]: allow null keys
-            entry.Value = value;
+            entry.Key = key; // allow null keys
+            entry.Value = value; // allow null values
             PushEntryIntoBucket(ref entry, index);
             _count++;
             _version++;
@@ -562,7 +562,7 @@ namespace J2N.Collections.Generic
         /// <param name="value">The value of the element to add. The value can be null for reference types.</param>
         /// <exception cref="ArgumentNullException">key is null.</exception>
         /// <exception cref="ArgumentException">An element with the same key already exists in the <see cref="OrderedDictionary{TKey, TValue}"/>.</exception>
-        public void Add([AllowNull] TKey key, TValue value)
+        public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
@@ -575,7 +575,7 @@ namespace J2N.Collections.Generic
         /// <param name="value">The value of the element to add. The value can be null for reference types.</param>
         /// <exception cref="ArgumentNullException">key is null.</exception>
         /// <returns>true if the key didn't exist and the key and value were added to the dictionary; otherwise, false.</returns>
-        public bool TryAdd([AllowNull] TKey key, TValue value) => TryAdd(key, value, out _);
+        public bool TryAdd([AllowNull] TKey key, [AllowNull] TValue value) => TryAdd(key, value, out _);
 
         // Currently unreleased in .NET, but will be available in a future version.
         // https://github.com/dotnet/runtime/blob/251ef76584bd6568439b5cbb3eb19bd13e42b93e/src/libraries/System.Collections/src/System/Collections/Generic/OrderedDictionary.cs#L499-L510
@@ -585,7 +585,7 @@ namespace J2N.Collections.Generic
         /// <param name="index">The index of the added or existing <paramref name="key"/>. This is always a valid index into the dictionary.</param>
         /// <exception cref="ArgumentNullException">key is null.</exception>
         /// <returns>true if the key didn't exist and the key and value were added to the dictionary; otherwise, false.</returns>
-        public bool TryAdd([AllowNull] TKey key, TValue value, out int index)
+        public bool TryAdd([AllowNull] TKey key, [AllowNull] TValue value, out int index)
         {
             // J2N: allow null keys
             // ThrowIfNull(key);
@@ -660,7 +660,7 @@ namespace J2N.Collections.Generic
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (EqualityComparer<TValue>.Default.Equals(value!, entries[i].Value)) // [!]: allow null values
+                    if (EqualityComparer<TValue>.Default.Equals(value!, entries[i].Value!)) // [!]: allow null values
                     {
                         return true;
                     }
@@ -671,7 +671,7 @@ namespace J2N.Collections.Generic
                 IEqualityComparer<TValue> comparer = EqualityComparer<TValue>.Default;
                 for (int i = 0; i < count; i++)
                 {
-                    if (comparer.Equals(value!, entries[i].Value)) // [!]: allow null values
+                    if (comparer.Equals(value!, entries[i].Value!)) // [!]: allow null values
                     {
                         return true;
                     }
@@ -712,7 +712,7 @@ namespace J2N.Collections.Generic
             {
                 for (int i = 0; i < count; i++)
                 {
-                    if (valueComparer.Equals(value!, entries[i].Value)) // [!]: allow null values
+                    if (valueComparer.Equals(value!, entries[i].Value!)) // [!]: allow null values
                     {
                         return true;
                     }
@@ -964,7 +964,7 @@ namespace J2N.Collections.Generic
                 // It exists. Remove it.
                 Debug.Assert(_entries is not null);
 
-                value = _entries![index].Value; // [!]: asserted above
+                value = _entries![index].Value!; // [!]: asserted above
                 RemoveAt(index);
 
                 return true;
@@ -1003,7 +1003,7 @@ namespace J2N.Collections.Generic
         /// <summary>Sets the value for the key at the specified index.</summary>
         /// <param name="index">The zero-based index of the element to get or set.</param>
         /// <param name="value">The value to store at the specified index.</param>
-        public void SetAt(int index, TValue value)
+        public void SetAt(int index, [AllowNull] TValue value)
         {
             if ((uint)index >= (uint)_count)
             {
@@ -1020,7 +1020,7 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key to store at the specified index.</param>
         /// <param name="value">The value to store at the specified index.</param>
         /// <exception cref="ArgumentException"></exception>
-        public void SetAt(int index, [AllowNull] TKey key, TValue value)
+        public void SetAt(int index, [AllowNull] TKey key, [AllowNull] TValue value)
         {
             if ((uint)index >= (uint)_count)
             {
@@ -1034,7 +1034,15 @@ namespace J2N.Collections.Generic
             ref Entry e = ref _entries![index]; // [!]: asserted above
 
             // If the key matches the one that's already in that slot, just update the value.
-            if (typeof(TKey).IsValueType && _comparer is null)
+            if (key is null)
+            {
+                if (e.Key is null)
+                {
+                    e.Value = value;
+                    return;
+                }
+            }
+            else if (typeof(TKey).IsValueType && _comparer is null)
             {
                 if (EqualityComparer<TKey>.Default.Equals(key!, e.Key)) // [!]: allow null keys
                 {
@@ -1065,7 +1073,7 @@ namespace J2N.Collections.Generic
             // be low for a match, so it's not worth it).
             RemoveEntryFromBucket(index);
             e.HashCode = hashCode;
-            e.Key = key!; // [!]: allow null keys
+            e.Key = key;
             e.Value = value;
             PushEntryIntoBucket(ref e, index);
 
@@ -1139,7 +1147,7 @@ namespace J2N.Collections.Generic
             {
                 // It exists. Return its value.
                 Debug.Assert(_entries is not null);
-                value = _entries![index].Value; // [!]: asserted above
+                value = _entries![index].Value!; // [!]: asserted above
                 return true;
             }
 
@@ -1377,7 +1385,7 @@ namespace J2N.Collections.Generic
             if (index >= 0)
             {
                 Debug.Assert(_entries is not null);
-                if (EqualityComparer<TValue>.Default.Equals(item.Value, _entries![index].Value)) // [!]: asserted above
+                if (EqualityComparer<TValue>.Default.Equals(item.Value, _entries![index].Value!)) // [!]: asserted above
                 {
                     return index;
                 }
@@ -1585,8 +1593,10 @@ namespace J2N.Collections.Generic
             /// <summary>Cached hash code of <see cref="Key"/>.</summary>
             public uint HashCode;
             /// <summary>The key.</summary>
+            [AllowNull, MaybeNull]
             public TKey Key;
             /// <summary>The value associated with <see cref="Key"/>.</summary>
+            [AllowNull, MaybeNull]
             public TValue Value;
         }
 
@@ -1742,7 +1752,7 @@ namespace J2N.Collections.Generic
                 for (int i = 0; i < count; i++)
                 {
                     Debug.Assert(entries is not null);
-                    array[arrayIndex++] = entries![i].Key; // [!]: asserted above
+                    array[arrayIndex++] = entries![i].Key!; // [!]: asserted above
                 }
             }
 
@@ -1947,7 +1957,7 @@ namespace J2N.Collections.Generic
                 for (int i = 0; i < count; i++)
                 {
                     Debug.Assert(entries is not null);
-                    array[arrayIndex++] = entries![i].Value; // [!]: asserted above
+                    array[arrayIndex++] = entries![i].Value!; // [!]: asserted above
                 }
             }
 
@@ -1992,11 +2002,24 @@ namespace J2N.Collections.Generic
                 if (entries is not null)
                 {
                     int count = _dictionary._count;
-                    for (int i = 0; i < count; i++)
+                    if (item is not null)
                     {
-                        if (EqualityComparer<TValue>.Default.Equals(item, entries[i].Value))
+                        for (int i = 0; i < count; i++)
                         {
-                            return i;
+                            if (EqualityComparer<TValue>.Default.Equals(item, entries[i].Value!))
+                            {
+                                return i;
+                            }
+                        }
+                    }
+                    else // J2N: Factored out EqualityComparer for null check
+                    {
+                        for (int i = 0; i < count; i++)
+                        {
+                            if (entries[i].Value is null)
+                            {
+                                return i;
+                            }
                         }
                     }
                 }
@@ -2053,7 +2076,7 @@ namespace J2N.Collections.Generic
                     {
                         for (int i = 0; i < count; i++)
                         {
-                            if (EqualityComparer<TValue>.Default.Equals(tvalue, entries[i].Value))
+                            if (EqualityComparer<TValue>.Default.Equals(tvalue, entries[i].Value!))
                             {
                                 return i;
                             }
