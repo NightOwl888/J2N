@@ -435,6 +435,7 @@ namespace J2N.Collections.Tests
 
         #endregion
 
+#if FEATURE_IREADONLYCOLLECTIONS
         #region IReadOnlyDictionary<TKey, TValue>.Keys
 
         [Theory]
@@ -458,5 +459,6 @@ namespace J2N.Collections.Tests
         }
 
         #endregion
+#endif
     }
 }
