@@ -1830,14 +1830,14 @@ namespace J2N.Collections.Generic
             TKey IList<TKey>.this[int index]
             {
                 get => _dictionary.GetAt(index).Key;
-                set => throw new NotSupportedException();
+                set => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
             /// <inheritdoc/>
             object? IList.this[int index]
             {
                 get => _dictionary.GetAt(index).Key;
-                set => throw new NotSupportedException();
+                set => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
             }
 
 #if FEATURE_IREADONLYCOLLECTIONS
@@ -1861,37 +1861,53 @@ namespace J2N.Collections.Generic
             int IList<TKey>.IndexOf(TKey item) => _dictionary.IndexOf(item);
 
             /// <inheritdoc/>
-            void ICollection<TKey>.Add(TKey item) => throw new NotSupportedException();
+            void ICollection<TKey>.Add(TKey item)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <inheritdoc/>
-            void ICollection<TKey>.Clear() => throw new NotSupportedException();
+            void ICollection<TKey>.Clear()
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <inheritdoc/>
-            void IList<TKey>.Insert(int index, TKey item) => throw new NotSupportedException();
+            void IList<TKey>.Insert(int index, TKey item)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <inheritdoc/>
-            bool ICollection<TKey>.Remove(TKey item) => throw new NotSupportedException();
+            bool ICollection<TKey>.Remove(TKey item)
+            {
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
+                return false;
+            }
 
             /// <inheritdoc/>
-            void IList<TKey>.RemoveAt(int index) => throw new NotSupportedException();
+            void IList<TKey>.RemoveAt(int index)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <inheritdoc/>
-            int IList.Add(object? value) => throw new NotSupportedException();
+            int IList.Add(object? value)
+            {
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
+                return Count - 1;
+            }
 
             /// <inheritdoc/>
-            void IList.Clear() => throw new NotSupportedException();
+            void IList.Clear()
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <inheritdoc/>
             int IList.IndexOf(object? value) => IsCompatibleKey(value) ? _dictionary.IndexOf((TKey?)value) : -1;
 
             /// <inheritdoc/>
-            void IList.Insert(int index, object? value) => throw new NotSupportedException();
+            void IList.Insert(int index, object? value)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <inheritdoc/>
-            void IList.Remove(object? value) => throw new NotSupportedException();
+            void IList.Remove(object? value)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <inheritdoc/>
-            void IList.RemoveAt(int index) => throw new NotSupportedException();
+            void IList.RemoveAt(int index)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_KeyCollectionSet);
 
             /// <summary>Enumerates the elements of a <see cref="OrderedDictionary{TKey, TValue}.KeyCollection"/>.</summary>
             public struct Enumerator : IEnumerator<TKey>
@@ -1986,7 +2002,7 @@ namespace J2N.Collections.Generic
             TValue IList<TValue>.this[int index]
             {
                 get => _dictionary.GetAt(index).Value;
-                set => throw new NotSupportedException();
+                set => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
 #if FEATURE_IREADONLYCOLLECTIONS
@@ -1998,7 +2014,7 @@ namespace J2N.Collections.Generic
             object? IList.this[int index]
             {
                 get => _dictionary.GetAt(index).Value;
-                set => throw new NotSupportedException();
+                set => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
             }
 
             /// <inheritdoc/>
@@ -2045,25 +2061,38 @@ namespace J2N.Collections.Generic
             }
 
             /// <inheritdoc/>
-            void ICollection<TValue>.Add(TValue item) => throw new NotSupportedException();
+            void ICollection<TValue>.Add(TValue item)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
-            void ICollection<TValue>.Clear() => throw new NotSupportedException();
+            void ICollection<TValue>.Clear()
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
-            void IList<TValue>.Insert(int index, TValue item) => throw new NotSupportedException();
+            void IList<TValue>.Insert(int index, TValue item)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
-            bool ICollection<TValue>.Remove(TValue item) => throw new NotSupportedException();
+            bool ICollection<TValue>.Remove(TValue item)
+            {
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
+                return false;
+            }
 
             /// <inheritdoc/>
-            void IList<TValue>.RemoveAt(int index) => throw new NotSupportedException();
+            void IList<TValue>.RemoveAt(int index)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
-            int IList.Add(object? value) => throw new NotSupportedException();
+            int IList.Add(object? value)
+            {
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
+                return Count - 1;
+            }
 
             /// <inheritdoc/>
-            void IList.Clear() => throw new NotSupportedException();
+            void IList.Clear()
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
             bool IList.Contains(object? value) =>
@@ -2105,13 +2134,16 @@ namespace J2N.Collections.Generic
             }
 
             /// <inheritdoc/>
-            void IList.Insert(int index, object? value) => throw new NotSupportedException();
+            void IList.Insert(int index, object? value)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
-            void IList.Remove(object? value) => throw new NotSupportedException();
+            void IList.Remove(object? value)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
-            void IList.RemoveAt(int index) => throw new NotSupportedException();
+            void IList.RemoveAt(int index)
+                => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_ValueCollectionSet);
 
             /// <inheritdoc/>
             void ICollection.CopyTo(Array array, int index)
