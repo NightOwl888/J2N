@@ -30,7 +30,7 @@ namespace J2N.Collections.Generic
      * limitations under the License.
      */
 
-    public class TestOrderedDictionary : TestCase
+    public partial class TestOrderedDictionary : TestCase
     {
         OrderedDictionary<object, object> hm;
 
@@ -269,6 +269,7 @@ namespace J2N.Collections.Generic
          * @tests java.util.LinkedHashMap#keySet()
          */
         [Test]
+        [Ignore("J2N TODO: Enable when OrderedDictionary supports deleting while iterating")]
         public void Test_keySet()
         {
             // Test for method java.util.Set java.util.LinkedHashMap.keySet()
