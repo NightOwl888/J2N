@@ -360,7 +360,8 @@ namespace J2N.Collections.Generic
 
                 if (value is not KeyValuePair<TKey, TValue> tpair)
                 {
-                    throw new ArgumentException(SR.Format(SR.Arg_WrongType, value, typeof(KeyValuePair<TKey, TValue>)), nameof(value));
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(KeyValuePair<TKey, TValue>));
+                    return;
                 }
 
                 SetAt(index, tpair.Key, tpair.Value);
@@ -385,19 +386,21 @@ namespace J2N.Collections.Generic
             set
             {
                 // J2N: allow null keys
-                // J2N: allow null keys
-                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TKey>(key, ExceptionArgument.key);
-                ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 TKey tkey = default!;
                 if (key is not null)
                 {
                     if (key is not TKey temp)
                     {
-                        throw new ArgumentException(SR.Format(SR.Arg_WrongType, value, typeof(TKey)), nameof(key));
+                        ThrowHelper.ThrowWrongKeyTypeArgumentException(value, typeof(TKey));
+                        return;
                     }
 
                     tkey = temp;
+                }
+                else if (default(TKey) is not null)
+                {
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
                 }
 
                 TValue tvalue = default!;
@@ -405,10 +408,15 @@ namespace J2N.Collections.Generic
                 {
                     if (value is not TValue temp)
                     {
-                        throw new ArgumentException(SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                        ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
+                        return;
                     }
 
                     tvalue = temp;
+                }
+                else if (default(TValue) is not null)
+                {
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
                 }
 
                 this[tkey] = tvalue;
@@ -1441,19 +1449,20 @@ namespace J2N.Collections.Generic
             // J2N: allow null keys
             //ThrowIfNull(key, ExceptionArgument.key);
 
-            ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
-
-            if (!IsCompatibleKey(key)) // J2N: allow null keys
+            TKey tkey = default!;
+            if (key is not null)
             {
-                throw new ArgumentException(SR.Format(SR.Arg_WrongType, key, typeof(TKey)), nameof(key));
-            }
-
-            if (default(TValue) is not null)
-            {
-                if (value is null)
+                if (key is not TKey temp)
                 {
-                    throw new ArgumentNullException(nameof(value));
+                    ThrowHelper.ThrowWrongKeyTypeArgumentException(key, typeof(TKey));
+                    return;
                 }
+
+                tkey = temp;
+            }
+            else if (default(TKey) is not null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
             }
 
             TValue tvalue = default!;
@@ -1461,13 +1470,18 @@ namespace J2N.Collections.Generic
             {
                 if (value is not TValue temp)
                 {
-                    throw new ArgumentException(SR.Format(SR.Arg_WrongType, value, typeof(TValue)), nameof(value));
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(TValue));
+                    return;
                 }
 
                 tvalue = temp;
             }
+            else if (default(TValue) is not null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
+            }
 
-            Add((TKey?)key, tvalue);
+            Add(tkey, tvalue);
         }
 
         /// <inheritdoc/>
@@ -1539,7 +1553,8 @@ namespace J2N.Collections.Generic
         {
             if (value is not KeyValuePair<TKey, TValue> pair)
             {
-                throw new ArgumentException(SR.Format(SR.Arg_WrongType, value, typeof(KeyValuePair<TKey, TValue>)), nameof(value));
+                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(KeyValuePair<TKey, TValue>));
+                return Count - 1;
             }
 
             Add(pair.Key, pair.Value);
@@ -1568,7 +1583,8 @@ namespace J2N.Collections.Generic
         {
             if (value is not KeyValuePair<TKey, TValue> pair)
             {
-                throw new ArgumentException(SR.Format(SR.Arg_WrongType, value, typeof(KeyValuePair<TKey, TValue>)), nameof(value));
+                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(KeyValuePair<TKey, TValue>));
+                return;
             }
 
             Insert(index, pair.Key, pair.Value);
@@ -1763,12 +1779,12 @@ namespace J2N.Collections.Generic
 
                 if (array.Rank != 1)
                 {
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 }
 
                 if (array.GetLowerBound(0) != 0)
                 {
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 }
 
                 ThrowIfNegative(index);
@@ -1794,17 +1810,18 @@ namespace J2N.Collections.Generic
                     {
                         if (array is not object?[] objects)
                         {
-                            throw new ArgumentException(SR.Argument_IncompatibleArrayType, nameof(array));
+                            ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
+                            return;
                         }
 
                         foreach (TKey key in this)
                         {
-                            objects[index++] = key;
+                            objects[index++] = key!;
                         }
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_IncompatibleArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
@@ -2103,12 +2120,12 @@ namespace J2N.Collections.Generic
 
                 if (array.Rank != 1)
                 {
-                    throw new ArgumentException(SR.Arg_RankMultiDimNotSupported, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_RankMultiDimNotSupported);
                 }
 
                 if (array.GetLowerBound(0) != 0)
                 {
-                    throw new ArgumentException(SR.Arg_NonZeroLowerBound, nameof(array));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_NonZeroLowerBound);
                 }
 
                 ThrowIfNegative(index);
@@ -2134,17 +2151,18 @@ namespace J2N.Collections.Generic
                     {
                         if (array is not object?[] objects)
                         {
-                            throw new ArgumentException(SR.Argument_IncompatibleArrayType, nameof(array));
+                            ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
+                            return;
                         }
 
                         foreach (TValue value in this)
                         {
-                            objects[index++] = value;
+                            objects[index++] = value!;
                         }
                     }
                     catch (ArrayTypeMismatchException)
                     {
-                        throw new ArgumentException(SR.Argument_IncompatibleArrayType, nameof(array));
+                        ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType();
                     }
                 }
             }
