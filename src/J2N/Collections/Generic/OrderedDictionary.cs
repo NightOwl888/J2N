@@ -23,8 +23,8 @@ using static J2N.Collections.StaticThrowHelper;
 namespace J2N.Collections.Generic
 {
     /// <summary>
-    /// Represents a collection of key/value pairs that are accessible by the key or index.
-    /// <see cref="OrderedDictionary{TKey, TValue}"/> adds the following features to <c>System.Collections.Generic.Dictionary&lt;TKey, TValue&gt;</c>
+    /// Represents a collection of key/value pairs that are sorted based on insertion order.
+    /// <see cref="OrderedDictionary{TKey, TValue}"/> adds the following features to <c>System.Collections.Generic.OrderedDictionary&lt;TKey, TValue&gt;</c>
     /// (in addition to making it available on older platforms):
     /// <list type="bullet">
     ///     <item><description>
