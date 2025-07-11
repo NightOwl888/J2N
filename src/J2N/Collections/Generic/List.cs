@@ -2763,8 +2763,6 @@ namespace J2N.Collections.Generic
 #endif
         public struct Enumerator : IEnumerator<T>, IEnumerator
         {
-            // internal static IEnumerator<T>? s_emptyEnumerator; // J2N: unused currently
-
             private readonly List<T> list;
             private int index;
             private readonly int version;
