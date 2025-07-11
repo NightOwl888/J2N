@@ -131,6 +131,36 @@ namespace J2N.Collections.Generic
                 }
             }
 
+            internal override void DoAddRange(ReadOnlySpan<T> source)
+            {
+                CoModificationCheck();
+
+                int originalParentSize = parent._size;
+                try
+                {
+                    // NOTE: It seems like we should be calling parent.DoAddRange here, but we need to insert at the end of the sublist,
+                    // which is at parentOffset + size, not at the end of the parent.
+                    int added = parent.DoInsertRange(parentOffset + size, source);
+                    _version = parent._version;
+                    if (_items != parent._items)
+                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
+                    size += added;
+                    _size = parent._size;
+                }
+                catch
+                {
+                    // Rare: When appending using the enumerator, we might get an InvalidOperationException. But we still need to
+                    // update our state to match the parent.
+                    int added = parent._size - originalParentSize;
+                    _version = parent._version;
+                    if (_items != parent._items)
+                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
+                    size += added;
+                    _size = parent._size;
+                    throw;
+                }
+            }
+
             internal override int DoInsertRange(int index, IEnumerable<T> collection)
             {
                 CoModificationCheck();
@@ -144,6 +174,38 @@ namespace J2N.Collections.Generic
                 try
                 {
                     int added = parent.DoInsertRange(index + parentOffset, collection);
+                    _version = parent._version;
+                    if (_items != parent._items)
+                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
+                    size += added;
+                    _size = parent._size;
+                    return added;
+                }
+                catch
+                {
+                    // Rare: When appending using the enumerator, we might get an InvalidOperationException. But we still need to
+                    // update our state to match the parent.
+                    int added = parent._size - originalParentSize;
+                    _version = parent._version;
+                    if (_items != parent._items)
+                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
+                    size += added;
+                    _size = parent._size;
+                    throw;
+                }
+            }
+
+            internal override int DoInsertRange(int index, ReadOnlySpan<T> source)
+            {
+                CoModificationCheck();
+                // Note that insertions at the end are legal.
+                if ((uint)index > (uint)size)
+                    ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
+
+                int originalParentSize = parent._size;
+                try
+                {
+                    int added = parent.DoInsertRange(index + parentOffset, source);
                     _version = parent._version;
                     if (_items != parent._items)
                         _items = parent._items; // Our items changed to a new array, we need to update the reference.

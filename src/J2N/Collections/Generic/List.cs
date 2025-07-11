@@ -555,6 +555,21 @@ namespace J2N.Collections.Generic
             }
         }
 
+        internal virtual void DoAddRange(ReadOnlySpan<T> source)
+        {
+            if (!source.IsEmpty)
+            {
+                if (_items.Length - _size < source.Length)
+                {
+                    Grow(_size + source.Length);
+                }
+
+                source.CopyTo(_items.AsSpan(_size));
+                _size += source.Length;
+                _version++;
+            }
+        }
+
         /// <summary>
         /// Returns a read-only <see cref="ReadOnlyList{T}"/> wrapper for the current collection.
         /// </summary>
@@ -945,6 +960,14 @@ namespace J2N.Collections.Generic
             Array.Copy(_items, Offset, array, arrayIndex, Size);
         }
 
+        // Doesn't need to be overridden since Offset and Size are virtual. Optimized version for Span called by ListExtensions.CopyTo.
+        internal void DoCopyTo(Span<T> destination)
+        {
+            CoModificationCheck();
+            // Delegate rest of error checking to Span.CopyTo.
+            _items.AsSpan(Offset, Size).CopyTo(destination);
+        }
+
         /// <summary>
         /// Ensures that the capacity of this list is at least the specified <paramref name="capacity"/>.
         /// If the current capacity of the list is less than specified <paramref name="capacity"/>,
@@ -972,7 +995,7 @@ namespace J2N.Collections.Generic
         /// Increase the capacity of this list to at least the specified <paramref name="capacity"/>.
         /// </summary>
         /// <param name="capacity">The minimum capacity to ensure.</param>
-        private void Grow(int capacity)
+        internal void Grow(int capacity)
         {
             Debug.Assert(_items.Length < capacity);
 
@@ -1807,6 +1830,30 @@ namespace J2N.Collections.Generic
             }
             _version++;
             return count;
+        }
+
+        internal virtual int DoInsertRange(int index, ReadOnlySpan<T> source)
+        {
+            if ((uint)index > (uint)_size)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
+
+            if (!source.IsEmpty)
+            {
+                if (_items.Length - _size < source.Length)
+                {
+                    Grow(_size + source.Length);
+                }
+                if (index < _size)
+                {
+                    Array.Copy(_items, index, _items, index + source.Length, _size - index);
+                }
+
+                source.CopyTo(_items.AsSpan(index));
+                _size += source.Length;
+                _version++;
+            }
+
+            return source.Length;
         }
 
         /// <summary>
