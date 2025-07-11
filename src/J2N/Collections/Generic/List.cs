@@ -1437,8 +1437,12 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an enumerator that iterates through the <see cref="List{T}"/>.
         /// </summary>
-        /// <returns>A <see cref="IEnumerator{T}"/> for the <see cref="List{T}"/>.</returns>
+        /// <returns>An <see cref="Enumerator"/> for the <see cref="List{T}"/>.</returns>
         /// <remarks>
+        /// This method returns an enumerator struct instead of <see cref="IEnumerable{T}"/> to help
+        /// avoid allocations when used directly. The rest of these remarks refer to <see cref="IEnumerable{T}"/>
+        /// as the contract, and can be considered to apply to the enumerator struct as well.
+        /// <para/>
         /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
         /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
         /// <para/>
@@ -1474,14 +1478,18 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public IEnumerator<T> GetEnumerator()
+        public Enumerator GetEnumerator()
         {
             CoModificationCheck();
             return new Enumerator(this);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
+            // J2N: we need to support modification during enumeration, so we cannot return a static empty enumerator.
+            // Count == 0 ? SZGenericArrayEnumerator<T>.Empty :
+                GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
 
         /// <summary>
         /// Creates a shallow copy of a range of elements in the source <see cref="List{T}"/>.
@@ -2706,11 +2714,16 @@ namespace J2N.Collections.Generic
 
         #region Nested Structure: Enumerator
 
+        /// <summary>
+        /// An enumerator for the <see cref="List{T}"/> class.
+        /// </summary>
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal struct Enumerator : IEnumerator<T>, IEnumerator
+        public struct Enumerator : IEnumerator<T>, IEnumerator
         {
+            // internal static IEnumerator<T>? s_emptyEnumerator; // J2N: unused currently
+
             private readonly List<T> list;
             private int index;
             private readonly int version;
@@ -2724,10 +2737,19 @@ namespace J2N.Collections.Generic
                 current = default!;
             }
 
+            /// <summary>
+            /// Disposes the enumerator, releasing any resources it holds.
+            /// </summary>
             public void Dispose()
             {
             }
 
+            /// <summary>
+            /// Advances the enumerator to the next element of the <see cref="List{T}"/>.
+            /// </summary>
+            /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
+            /// otherwise, <c>false</c>. When the enumerator has passed the end of the collection,
+            /// <c>false</c> is returned.</returns>
             public bool MoveNext()
             {
                 List<T> localList = list;
@@ -2754,6 +2776,9 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
+            /// <summary>
+            /// Gets the element in the <see cref="List{T}"/> at the current position of the enumerator.
+            /// </summary>
             public T Current => current;
 
             object? IEnumerator.Current
