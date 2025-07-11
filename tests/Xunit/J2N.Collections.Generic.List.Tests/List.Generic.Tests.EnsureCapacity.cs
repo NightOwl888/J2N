@@ -15,6 +15,8 @@ namespace J2N.Collections.Tests
     /// </summary>
     public abstract partial class List_Generic_Tests<T> : IList_Generic_Tests<T>
     {
+        // J2N: Unlike .NET, we consider reallocating the array a "modification" to the list to ensure sublists use the same array reference.
+        // This method was changed in .NET to be "_DoesNotInvalidateEnumeration" but we want to retain this original assertion.
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void EnsureCapacity_RequestingLargerCapacity_DoesInvalidateEnumeration(int count)
@@ -26,6 +28,7 @@ namespace J2N.Collections.Tests
 
             list.EnsureCapacity(capacity + 1);
 
+            // J2N: see comment for method above
             Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
         }
 
