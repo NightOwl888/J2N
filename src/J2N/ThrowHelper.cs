@@ -90,6 +90,13 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowIndexArgumentOutOfRange()
+        {
+            // ReSharper disable once NotResolvedInText
+            throw new ArgumentOutOfRangeException("index");
+        }
+
+        [DoesNotReturn]
         internal static void ThrowArgumentException_DestinationTooShort()
         {
             throw new ArgumentException(SR.Argument_DestinationTooShort, "destination");
@@ -1081,6 +1088,8 @@ namespace J2N
                     return "encoding";
                 case ExceptionArgument.enumerator:
                     return "enumerator";
+                case ExceptionArgument.equals:
+                    return "equals";
                 case ExceptionArgument.fnCondition:
                     return "fnCondition";
                 case ExceptionArgument.fnCreate:
@@ -1207,10 +1216,10 @@ namespace J2N
 
                 //case ExceptionArgument.obj:
                 //    return "obj";
-                
 
-                
-                
+
+
+
                 //case ExceptionArgument.values:
                 //    return "values";
 
@@ -1229,37 +1238,37 @@ namespace J2N
                 //    return "chars";
                 //case ExceptionArgument.charIndex:
                 //    return "charIndex";
-                
-                
-                
+
+
+
                 //case ExceptionArgument.ownedMemory:
                 //    return "ownedMemory";
-                
 
-                
-                
-                
-                
-                
 
-                
-                
+
+
+
+
+
+
+
+
                 //case ExceptionArgument.exceptions:
                 //    return "exceptions";
                 //case ExceptionArgument.exception:
                 //    return "exception";
                 //case ExceptionArgument.pointer:
                 //    return "pointer";
-                
+
                 //case ExceptionArgument.format:
                 //    return "format";
                 //case ExceptionArgument.formats:
                 //    return "formats";
-                
-                
+
+
                 //case ExceptionArgument.comparable:
                 //    return "comparable";
-                
+
 
                 //case ExceptionArgument.comparisonType:
                 //    return "comparisonType";
@@ -1307,17 +1316,17 @@ namespace J2N
                 //    return "timeout";
                 //case ExceptionArgument.type:
                 //    return "type";
-                
+
                 //case ExceptionArgument.sourceArray:
                 //    return "sourceArray";
-                
+
                 //case ExceptionArgument.destinationArray:
                 //    return "destinationArray";
                 //case ExceptionArgument.pHandle:
                 //    return "pHandle";
                 //case ExceptionArgument.handle:
                 //    return "handle";
-                
+
                 //case ExceptionArgument.newSize:
                 //    return "newSize";
                 //case ExceptionArgument.lengths:
@@ -1328,25 +1337,25 @@ namespace J2N
                 //    return "keys";
                 //case ExceptionArgument.indices:
                 //    return "indices";
-                
+
                 //case ExceptionArgument.endIndex:
                 //    return "endIndex";
                 //case ExceptionArgument.elementType:
                 //    return "elementType";
-                
+
 
                 //case ExceptionArgument.codePoint:
                 //    return "codePoint";
-                
+
                 //case ExceptionArgument.options:
                 //    return "options";
-                
+
                 //case ExceptionArgument.suffix:
                 //    return "suffix";
-                
+
                 //case ExceptionArgument.buffers:
                 //    return "buffers";
-                
+
                 //case ExceptionArgument.stream:
                 //    return "stream";
                 //case ExceptionArgument.anyOf:
@@ -1361,7 +1370,7 @@ namespace J2N
                 //    return "divisor";
                 //case ExceptionArgument.factor:
                 //    return "factor";
-                
+
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionArgument Enum.");
                     return "";
@@ -1619,6 +1628,7 @@ namespace J2N
         dictionary,
         encoding,
         enumerator,
+        equals,
         fnCondition,
         fnCreate,
         fnUpdate,
@@ -1682,10 +1692,10 @@ namespace J2N
         year,
 
         //obj,
-        
 
-        
-        
+
+
+
         //values,
 
 
@@ -1696,20 +1706,20 @@ namespace J2N
         //ch,
         //chars,
         //charIndex,
-        
-        
-        
+
+
+
         //ownedMemory,
-        
 
-        
 
-        
-       
-        
 
-        
-        
+
+
+
+
+
+
+
         //exceptions,
         //exception,
         //pointer,
@@ -1717,9 +1727,9 @@ namespace J2N
         //format,
         //formats,
         //culture,
-        
+
         //comparable,
-        
+
 
         //comparisonType,
         //manager,
@@ -1746,29 +1756,29 @@ namespace J2N
         //type,
 
         //sourceArray,
-        
+
         //destinationArray,
         //pHandle,
         //handle,
-        
+
         //newSize,
         //lengths,
         //len,
         //keys,
         //indices,
-        
+
         //endIndex,
         //elementType,
-       
+
 
         //codePoint,
-        
+
         //options,
-        
+
         //suffix,
-        
+
         //buffers,
-        
+
         //stream,
         //anyOf,
         //overlapped,
@@ -1776,7 +1786,7 @@ namespace J2N
         //arrayType,
         //divisor,
         //factor,
-        
+
     }
 
     //

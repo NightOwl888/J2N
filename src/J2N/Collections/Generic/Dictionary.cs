@@ -2099,7 +2099,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current dictionary. The hash code is calculated 
+        /// Gets the hash code for the current dictionary. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
@@ -2962,7 +2962,7 @@ namespace J2N.Collections.Generic
             /// <value>The element in the <see cref="Dictionary{TKey, TValue}"/> at the current position of the enumerator.</value>
             public KeyValuePair<TKey, TValue> Current => current;
 
-            object? IEnumerator.Current
+            object IEnumerator.Current
             {
                 get
                 {
@@ -3212,7 +3212,7 @@ namespace J2N.Collections.Generic
                     }
                     else
                     {
-                        
+
                         while (true)
                         {
                             // Should be a while loop https://github.com/dotnet/runtime/issues/9422

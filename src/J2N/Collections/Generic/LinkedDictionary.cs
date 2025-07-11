@@ -35,14 +35,14 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
-
 namespace J2N.Collections.Generic
 {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
     /// <summary>
     /// Represents a collection of key/value pairs that are sorted based on insertion order.
     /// <para/>
-    /// <see cref="Dictionary{TKey, TValue}"/> adds the following features to <see cref="System.Collections.Generic.Dictionary{TKey, TValue}"/>:
+    /// <see cref="Dictionary{TKey, TValue}"/> adds the following features to <c>System.Collections.Generic.OrderedDictionary&lt;TKey, TValue&gt;</c>
+    /// (in addition to making it available on older platforms):
     /// <list type="bullet">
     ///     <item><description>
     ///         If <typeparamref name="TKey"/> is <see cref="Nullable{T}"/> or a reference type, the key can be
@@ -64,7 +64,9 @@ namespace J2N.Collections.Generic
     ///     </description></item>
     /// </list>
     /// <para/>
-    /// Usage Note: This class is designed to be a direct replacement for Java's LinkedHashMap, except that
+    /// Usage Note: This class is discouraged, since we now have an <see cref="OrderedDictionary{TKey, TValue}"/> type that is
+    /// better optimized and will perform better under most circumstances. This class exists primarily as a transition mechanism
+    /// for older code. It was originally designed to be a direct replacement for Java's LinkedHashMap, except that
     /// it doesn't contain a constructor overload with an order parameter to turn it into an LRU cache.
     /// <para/>
     /// Note that the <see cref="ToString()"/> method uses the current culture by default to behave like other
@@ -1046,7 +1048,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, DictionaryEqualityComparer<TKey, TValue>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current list. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>

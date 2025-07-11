@@ -170,9 +170,9 @@ namespace J2N.Collections.Tests
         [Fact]
         public void CopyConstructorExceptions()
         {
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new LinkedDictionary<int, int>((IDictionary<int, int>)null));
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new LinkedDictionary<int, int>((IDictionary<int, int>)null, null));
-            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new LinkedDictionary<int, int>((IDictionary<int, int>)null, J2N.Collections.Generic.EqualityComparer<int>.Default));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new LinkedDictionary<int, int>((IDictionary<int, int>)null!));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new LinkedDictionary<int, int>((IDictionary<int, int>)null!, null));
+            AssertExtensions.Throws<ArgumentNullException>("dictionary", () => new LinkedDictionary<int, int>((IDictionary<int, int>)null!, J2N.Collections.Generic.EqualityComparer<int>.Default));
 
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new LinkedDictionary<int, int>(new NegativeCountDictionary<int, int>()));
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new LinkedDictionary<int, int>(new NegativeCountDictionary<int, int>(), null));
@@ -318,7 +318,7 @@ namespace J2N.Collections.Tests
             {
                 var comparers = new IEqualityComparer<int>[]
                 {
-                    null,
+                    null!,
                     J2N.Collections.Generic.EqualityComparer<int>.Default
                 };
 
@@ -346,7 +346,7 @@ namespace J2N.Collections.Tests
             {
                 var comparers = new IEqualityComparer<string>[]
                 {
-                    null,
+                    null!,
                     J2N.Collections.Generic.EqualityComparer<string>.Default,
                     StringComparer.Ordinal,
                     StringComparer.OrdinalIgnoreCase
@@ -364,13 +364,17 @@ namespace J2N.Collections.Tests
             Assert.Equal(expected, new LinkedDictionary<T, T>(input, comparer));
         }
 
-        private static IEnumerable<object[]> GetCopyConstructorData<T>(Func<int, T> keyValueSelector, IEqualityComparer<T>[] comparers = null)
+        private static IEnumerable<object[]> GetCopyConstructorData<T>(Func<int, T> keyValueSelector, IEqualityComparer<T>[]? comparers = null)
         {
             var dictionarySelectors = new Func<IDictionary<T, T>, IDictionary<T, T>>[]
             {
                 d => d,
                 d => new DictionarySubclass<T, T>(d),
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
                 d => new ReadOnlyDictionary<T, T>(d)
+#pragma warning restore CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             };
 
             var sizes = new int[] { 0, 1, 2, 3 };
@@ -394,9 +398,13 @@ namespace J2N.Collections.Tests
             }
         }
 
-        private static IDictionary<T, T> CreateDictionary<T>(int size, Func<int, T> keyValueSelector, IEqualityComparer<T> comparer = null)
+        private static IDictionary<T, T> CreateDictionary<T>(int size, Func<int, T> keyValueSelector, IEqualityComparer<T>? comparer = null)
         {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
             SCG.Dictionary<T, T> temp = Enumerable.Range(0, size + 1).ToDictionary(keyValueSelector, keyValueSelector, comparer);
+#pragma warning restore CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             LinkedDictionary<T, T> dict = new LinkedDictionary<T, T>(temp, comparer);
             // Remove first item to reduce Count to size and alter the contiguity of the dictionary
             dict.Remove(keyValueSelector(0));
@@ -425,7 +433,7 @@ namespace J2N.Collections.Tests
             TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<object>.Default);
         }
 
-        private static void TestComparerSerialization<T>(IEqualityComparer<T> equalityComparer, string internalTypeName = null)
+        private static void TestComparerSerialization<T>(IEqualityComparer<T> equalityComparer, string? internalTypeName = null)
         {
             var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
             var s = new MemoryStream();
