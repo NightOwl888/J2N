@@ -4,6 +4,7 @@
 
 using J2N.Collections.Generic;
 using System;
+using System.Collections;
 using System.Linq;
 using J2N.Collections.Generic.Extensions;
 using J2N.TestUtilities.Xunit;
@@ -102,6 +103,29 @@ namespace J2N.Collections.Tests
             Assert.Equal(5, list.Count);
             Assert.Throws<InvalidOperationException>(() => list.AddRange(list.Where(_ => true)));
             Assert.Equal(6, list.Count);
+        }
+
+        [Fact]
+        public void AddRange_CollectionWithLargeCount_ThrowsOverflowException()
+        {
+            List<T> list = GenericListFactory(count: 1);
+            SCG.ICollection<T> collection = new CollectionWithLargeCount();
+
+            Assert.Throws<OverflowException>(() => list.AddRange(collection));
+        }
+
+        private class CollectionWithLargeCount : SCG.ICollection<T>
+        {
+            public int Count => int.MaxValue;
+
+            public bool IsReadOnly => throw new NotImplementedException();
+            public void Add(T item) => throw new NotImplementedException();
+            public void Clear() => throw new NotImplementedException();
+            public bool Contains(T item) => throw new NotImplementedException();
+            public void CopyTo(T[] array, int arrayIndex) => throw new NotImplementedException();
+            public SCG.IEnumerator<T> GetEnumerator() => throw new NotImplementedException();
+            public bool Remove(T item) => throw new NotImplementedException();
+            IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
         }
     }
 }

@@ -6,6 +6,7 @@ using J2N.Collections.Generic;
 using J2N.Collections.Generic.Extensions;
 using J2N.TestUtilities.Xunit;
 using Xunit;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -48,6 +49,15 @@ namespace J2N.Collections.Tests
             list.InsertRange(3, (ReadOnlySpan<int>)new int[] { 100, 99, 98 });
             Assert.Equal(12, list.Count);
             Assert.Equal(new[] { 6, 5, 4, 100, 99, 98, 3, 2, 1, 0, -1, -2 }, list);
+        }
+
+        [Fact]
+        public void InsertRange_CollectionWithLargeCount_ThrowsOverflowException()
+        {
+            List<T> list = GenericListFactory(count: 1);
+            SCG.ICollection<T> collection = new CollectionWithLargeCount();
+
+            Assert.Throws<OverflowException>(() => list.InsertRange(0, collection));
         }
     }
 }

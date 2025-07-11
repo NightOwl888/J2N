@@ -502,7 +502,7 @@ namespace J2N.Collections.Generic
 
                     if (_items.Length - _size < count)
                     {
-                        Grow(_size + count);
+                        Grow(checked(_size + count));
                     }
 
                     // We need to fixup our sublist reference if it is broken by EnsureCapacity
@@ -535,7 +535,7 @@ namespace J2N.Collections.Generic
                 {
                     if (_items.Length - _size < count)
                     {
-                        Grow(_size + count);
+                        Grow(checked(_size + count));
                     }
 
                     c.CopyTo(_items, _size);
@@ -561,7 +561,7 @@ namespace J2N.Collections.Generic
             {
                 if (_items.Length - _size < source.Length)
                 {
-                    Grow(_size + source.Length);
+                    Grow(checked(_size + source.Length));
                 }
 
                 source.CopyTo(_items.AsSpan(_size));
@@ -1763,7 +1763,7 @@ namespace J2N.Collections.Generic
 
                     if (_items.Length - _size < count)
                     {
-                        Grow(_size + count);
+                        Grow(checked(_size + count));
                     }
 
                     // We need to fixup our sublist reference if it is broken by EnsureCapacity
@@ -1795,7 +1795,7 @@ namespace J2N.Collections.Generic
                 {
                     if (_items.Length - _size < count)
                     {
-                        Grow(_size + count);
+                        Grow(checked(_size + count));
                     }
                     if (index < _size)
                     {
@@ -1841,7 +1841,7 @@ namespace J2N.Collections.Generic
             {
                 if (_items.Length - _size < source.Length)
                 {
-                    Grow(_size + source.Length);
+                    Grow(checked(_size + source.Length));
                 }
                 if (index < _size)
                 {
