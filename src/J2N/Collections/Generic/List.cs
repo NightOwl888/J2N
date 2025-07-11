@@ -2834,7 +2834,10 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            void IEnumerator.Reset()
+            /// <summary>
+            /// Resets the enumerator to its initial position, which is before the first element in the <see cref="List{T}"/>.
+            /// </summary>
+            public void Reset()
             {
                 list.CoModificationCheck();
                 if (version != list._version)
