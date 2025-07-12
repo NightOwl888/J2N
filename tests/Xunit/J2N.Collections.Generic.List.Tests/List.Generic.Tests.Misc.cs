@@ -248,7 +248,7 @@ namespace J2N.Collections.Tests
             public void EnsureRangeIsReference(T[] items, T item, int index, int count, bool useSlice)
             {
                 List<T> list = new List<T>(items);
-                List<T> range = useSlice ? list[index..(index + count)] : list.GetRange(index, count);
+                List<T> range = useSlice ? list.Slice(index, count) : list.GetRange(index, count); // J2N: middle part was `list[index..(index + count)]` but this doesn't work on .NET Framework
                 T tempItem = list[index];
                 range[0] = item;
                 Assert.Equal(list[index], tempItem); //String.Format("Err_707811hapba Expected item: {0} at: {1} actual: {2}", tempItem, index, list[index])
@@ -257,7 +257,7 @@ namespace J2N.Collections.Tests
             public void EnsureThrowsAfterModification(T[] items, T item, int index, int count, bool useSlice)
             {
                 List<T> list = new List<T>(items);
-                List<T> range = useSlice ? list[index..(index + count)] : list.GetRange(index, count);
+                List<T> range = useSlice ? list.Slice(index, count) : list.GetRange(index, count); // J2N: middle part was `list[index..(index + count)]` but this doesn't work on .NET Framework
                 T tempItem = list[index];
                 list[index] = item;
 
