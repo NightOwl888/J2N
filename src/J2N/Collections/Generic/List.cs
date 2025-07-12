@@ -52,7 +52,6 @@ namespace J2N.Collections.Generic
         , System.Runtime.Serialization.ISerializable, System.Runtime.Serialization.IDeserializationCallback
 #endif
     {
-        private const int MaxArrayLength = 0X7FEFFFFF;
         private const int DefaultCapacity = 4;
 
 #if FEATURE_SERIALIZABLE
@@ -439,8 +438,9 @@ namespace J2N.Collections.Generic
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AddWithResize(T item)
         {
+            Debug.Assert(_size == _items.Length);
             int size = _size;
-            EnsureCapacity(size + 1);
+            Grow(size + 1);
             _size = size + 1;
             _items[size] = item;
         }
@@ -482,7 +482,90 @@ namespace J2N.Collections.Generic
         /// where <c>n</c> is the number of elements to be added and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
         public void AddRange(IEnumerable<T> collection)
-            => InsertRange(Size, collection);
+            => DoAddRange(collection); // Hack so we can override
+
+        internal virtual void DoAddRange(IEnumerable<T> collection)
+        {
+            if (collection == null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+            }
+
+            // J2N: A sublist that is a descendant of this list
+            if (collection is List<T>.SubList subList && subList._items == _items)
+            {
+                int count = subList.Count;
+                if (count > 0)
+                {
+                    int offset = Offset + subList.Offset;
+                    int subListIndex = Size - offset;
+
+                    if (_items.Length - _size < count)
+                    {
+                        Grow(checked(_size + count));
+                    }
+
+                    // We need to fixup our sublist reference if it is broken by Grow
+                    subList._items = _items;
+
+                    if (Size < _size)
+                    {
+                        Array.Copy(_items, Size, _items, Size + count, _size - Size);
+                    }
+
+                    // We're inserting a SubList which is a descendant into this list,
+                    // so we already have the elements in the local array.
+
+                    // Copy first part of _items to insert location
+                    Array.Copy(_items, offset, _items, Size, subListIndex);
+                    // Copy last part of _items back to inserted location
+                    Array.Copy(_items, Size + count, _items, subListIndex * 2, count - subListIndex);
+
+                    _size += count;
+                    _version++;
+                }
+            }
+            else if (collection is ICollection<T> c)
+            {
+                int count = c.Count;
+                if (count > 0)
+                {
+                    if (_items.Length - _size < count)
+                    {
+                        Grow(checked(_size + count));
+                    }
+
+                    c.CopyTo(_items, _size);
+                    _size += count;
+                    _version++;
+                }
+            }
+            else
+            {
+                using (IEnumerator<T> en = collection.GetEnumerator())
+                {
+                    while (en.MoveNext())
+                    {
+                        Add(en.Current);
+                    }
+                }
+            }
+        }
+
+        internal virtual void DoAddRange(ReadOnlySpan<T> source)
+        {
+            if (!source.IsEmpty)
+            {
+                if (_items.Length - _size < source.Length)
+                {
+                    Grow(checked(_size + source.Length));
+                }
+
+                source.CopyTo(_items.AsSpan(_size));
+                _size += source.Length;
+                _version++;
+            }
+        }
 
         /// <summary>
         /// Returns a read-only <see cref="ReadOnlyList{T}"/> wrapper for the current collection.
@@ -711,7 +794,7 @@ namespace J2N.Collections.Generic
             // via EqualityComparer<T>.Default.Equals, we
             // only make one virtual call to EqualityComparer.IndexOf.
 
-            return _size != 0 && IndexOf(item) != -1;
+            return _size != 0 && IndexOf(item) >= 0;
         }
 
         bool IList.Contains(object? item)
@@ -874,17 +957,28 @@ namespace J2N.Collections.Generic
             Array.Copy(_items, Offset, array, arrayIndex, Size);
         }
 
+        // Doesn't need to be overridden since Offset and Size are virtual. Optimized version for Span called by ListExtensions.CopyTo.
+        internal void DoCopyTo(Span<T> destination)
+        {
+            CoModificationCheck();
+            // Delegate rest of error checking to Span.CopyTo.
+            _items.AsSpan(Offset, Size).CopyTo(destination);
+        }
+
         /// <summary>
         /// Ensures that the capacity of this list is at least the specified <paramref name="capacity"/>.
         /// If the current capacity of the list is less than specified <paramref name="capacity"/>,
-        /// the capacity is increased by continuously twice current capacity until it is at least the specified <paramref name="capacity"/>.
+        /// the capacity is increased to at least <paramref name="capacity"/>.
         /// </summary>
         /// <param name="capacity">The minimum capacity to ensure.</param>
         /// <returns>The new capacity of this list.</returns>
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
+            {
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            }
+
             if (_items.Length < capacity)
             {
                 Grow(capacity);
@@ -899,19 +993,56 @@ namespace J2N.Collections.Generic
         /// <param name="capacity">The minimum capacity to ensure.</param>
         internal void Grow(int capacity)
         {
+            Capacity = GetNewCapacity(capacity);
+        }
+
+        /// <summary>
+        /// Enlarge this list so it may contain at least <paramref name="insertionCount"/> more elements
+        /// And copy data to their after-insertion positions.
+        /// This method is specifically for insertion, as it avoids 1 extra array copy.
+        /// You should only call this method when Count + insertionCount > Capacity.
+        /// </summary>
+        /// <param name="indexToInsert">Index of the first insertion.</param>
+        /// <param name="insertionCount">How many elements will be inserted.</param>
+        internal void GrowForInsertion(int indexToInsert, int insertionCount = 1)
+        {
+            Debug.Assert(insertionCount > 0);
+
+            int requiredCapacity = checked(_size + insertionCount);
+            int newCapacity = GetNewCapacity(requiredCapacity);
+
+            // Inline and adapt logic from set_Capacity
+
+            T[] newItems = new T[newCapacity];
+            if (indexToInsert != 0)
+            {
+                Array.Copy(_items, newItems, length: indexToInsert);
+            }
+
+            if (_size != indexToInsert)
+            {
+                Array.Copy(_items, indexToInsert, newItems, indexToInsert + insertionCount, _size - indexToInsert);
+            }
+
+            _items = newItems;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private int GetNewCapacity(int capacity)
+        {
             Debug.Assert(_items.Length < capacity);
 
             int newCapacity = _items.Length == 0 ? DefaultCapacity : 2 * _items.Length;
 
             // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
             // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
-            if ((uint)newCapacity > MaxArrayLength) newCapacity = MaxArrayLength;
+            if ((uint)newCapacity > ArrayExtensions.MaxLength) newCapacity = ArrayExtensions.MaxLength;
 
             // If the computed capacity is still less than specified, set to the original argument.
-            // Capacities exceeding Array.MaxLength will be surfaced as OutOfMemoryException by Array.Resize.
+            // Capacities exceeding ArrayExtensions.MaxLength will be surfaced as OutOfMemoryException by Array.Resize.
             if (newCapacity < capacity) newCapacity = capacity;
 
-            Capacity = newCapacity;
+            return newCapacity;
         }
 
         /// <summary>
@@ -1340,8 +1471,12 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an enumerator that iterates through the <see cref="List{T}"/>.
         /// </summary>
-        /// <returns>A <see cref="IEnumerator{T}"/> for the <see cref="List{T}"/>.</returns>
+        /// <returns>An <see cref="Enumerator"/> for the <see cref="List{T}"/>.</returns>
         /// <remarks>
+        /// This method returns an enumerator struct instead of <see cref="IEnumerable{T}"/> to help
+        /// avoid allocations when used directly. The rest of these remarks refer to <see cref="IEnumerable{T}"/>
+        /// as the contract, and can be considered to apply to the enumerator struct as well.
+        /// <para/>
         /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
         /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
         /// <para/>
@@ -1377,14 +1512,18 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public IEnumerator<T> GetEnumerator()
+        public Enumerator GetEnumerator()
         {
             CoModificationCheck();
             return new Enumerator(this);
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-            => GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
+            // J2N: we need to support modification during enumeration, so we cannot return a static empty enumerator.
+            // Count == 0 ? SZGenericArrayEnumerator<T>.Empty :
+                GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
 
         /// <summary>
         /// Creates a shallow copy of a range of elements in the source <see cref="List{T}"/>.
@@ -1431,6 +1570,20 @@ namespace J2N.Collections.Generic
             list._size = count;
             return list;
         }
+
+        /// <summary>
+        /// Creates a shallow copy of a range of elements in the source <see cref="List{T}" />.
+        /// </summary>
+        /// <param name="start">The zero-based <see cref="List{T}" /> index at which the range starts.</param>
+        /// <param name="length">The length of the range.</param>
+        /// <returns>A shallow copy of a range of elements in the source <see cref="List{T}" />.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="start" /> is less than 0.
+        /// -or-
+        /// <paramref name="length" /> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException"><paramref name="start" /> and <paramref name="length" /> do not denote a valid range of elements in the <see cref="List{T}" />.</exception>
+        public List<T> Slice(int start, int length) => GetRange(start, length);
 
         /// <summary>
         /// Searches for the specified object and returns the zero-based index of the first occurrence within
@@ -1575,8 +1728,12 @@ namespace J2N.Collections.Generic
             {
                 ThrowHelper.ThrowArgumentOutOfRangeException(index, ExceptionArgument.index, ExceptionResource.ArgumentOutOfRange_ListInsert);
             }
-            if (_size == _items.Length) EnsureCapacity(_size + 1);
-            if (index < _size)
+
+            if (_size == _items.Length)
+            {
+                GrowForInsertion(index, 1);
+            }
+            else if (index < _size)
             {
                 Array.Copy(_items, index, _items, index + 1, _size - index);
             }
@@ -1640,7 +1797,7 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
 
             int count = 0;
-            // A sublist that is a descendant of this list
+            // J2N: A sublist that is a descendant of this list
             if (collection is List<T>.SubList subList && subList._items == _items)
             {
                 count = subList.Count;
@@ -1649,13 +1806,13 @@ namespace J2N.Collections.Generic
                     int offset = Offset + subList.Offset;
                     int subListIndex = index - offset;
 
-                    EnsureCapacity(_size + count);
-
-                    // We need to fixup our sublist reference if it is broken by EnsureCapacity
-                    if (subList._items != _items)
+                    if (_items.Length - _size < count)
                     {
-                        subList._items = _items;
+                        Grow(checked(_size + count)); // J2N NOTE: we can't use GrowForInsertion here because SubList logic is different
                     }
+
+                    // We need to fixup our sublist reference if it is broken by Grow
+                    subList._items = _items;
 
                     if (index < _size)
                     {
@@ -1678,8 +1835,11 @@ namespace J2N.Collections.Generic
                 count = c.Count;
                 if (count > 0)
                 {
-                    EnsureCapacity(_size + count);
-                    if (index < _size)
+                    if (_items.Length - _size < count)
+                    {
+                        GrowForInsertion(index, count);
+                    }
+                    else if (index < _size)
                     {
                         Array.Copy(_items, index, _items, index + count, _size - index);
                     }
@@ -1712,6 +1872,30 @@ namespace J2N.Collections.Generic
             }
             _version++;
             return count;
+        }
+
+        internal virtual int DoInsertRange(int index, ReadOnlySpan<T> source)
+        {
+            if ((uint)index > (uint)_size)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
+
+            if (!source.IsEmpty)
+            {
+                if (_items.Length - _size < source.Length)
+                {
+                    Grow(checked(_size + source.Length));
+                }
+                if (index < _size)
+                {
+                    Array.Copy(_items, index, _items, index + source.Length, _size - index);
+                }
+
+                source.CopyTo(_items.AsSpan(index));
+                _size += source.Length;
+                _version++;
+            }
+
+            return source.Length;
         }
 
         /// <summary>
@@ -1827,7 +2011,8 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Removes the first occurrence of a specific object from the <see cref="List{T}"/>.
+        /// Removes the first occurrence of the given element, if found.
+        /// The size of the list is decreased by one if successful.
         /// </summary>
         /// <param name="item">The object to remove from the <see cref="List{T}"/>. The value can be
         /// <c>null</c> for reference types.</param>
@@ -2490,7 +2675,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, ListEqualityComparer<T>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current list. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
@@ -2564,10 +2749,13 @@ namespace J2N.Collections.Generic
 
         #region Nested Structure: Enumerator
 
+        /// <summary>
+        /// An enumerator for the <see cref="List{T}"/> class.
+        /// </summary>
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal struct Enumerator : IEnumerator<T>, IEnumerator
+        public struct Enumerator : IEnumerator<T>, IEnumerator
         {
             private readonly List<T> list;
             private int index;
@@ -2582,10 +2770,19 @@ namespace J2N.Collections.Generic
                 current = default!;
             }
 
+            /// <summary>
+            /// Disposes the enumerator, releasing any resources it holds.
+            /// </summary>
             public void Dispose()
             {
             }
 
+            /// <summary>
+            /// Advances the enumerator to the next element of the <see cref="List{T}"/>.
+            /// </summary>
+            /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
+            /// otherwise, <c>false</c>. When the enumerator has passed the end of the collection,
+            /// <c>false</c> is returned.</returns>
             public bool MoveNext()
             {
                 List<T> localList = list;
@@ -2612,6 +2809,9 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
+            /// <summary>
+            /// Gets the element in the <see cref="List{T}"/> at the current position of the enumerator.
+            /// </summary>
             public T Current => current;
 
             object? IEnumerator.Current
@@ -2628,7 +2828,10 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            void IEnumerator.Reset()
+            /// <summary>
+            /// Resets the enumerator to its initial position, which is before the first element in the <see cref="List{T}"/>.
+            /// </summary>
+            public void Reset()
             {
                 list.CoModificationCheck();
                 if (version != list._version)

@@ -102,7 +102,7 @@ namespace J2N.Runtime.InteropServices
 
             if (count > list.Capacity)
             {
-                list.Grow(count);
+                list.EnsureCapacity(count);
             }
             else if (count < list._size && RuntimeHelper.IsReferenceOrContainsReferences<T>())
             {

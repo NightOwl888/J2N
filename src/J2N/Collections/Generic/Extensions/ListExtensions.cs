@@ -25,9 +25,9 @@ using SCG = System.Collections.Generic;
 namespace J2N.Collections.Generic.Extensions
 {
     /// <summary>
-    /// Extensions to the <see cref="IList{T}"/> interface.
+    /// Extensions to the <see cref="IList{T}"/> interface and <see cref="List{T}"/> class.
     /// </summary>
-    public static class ListExtensions
+    public static partial class ListExtensions
     {
         #region AsReadOnly
 

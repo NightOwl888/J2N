@@ -29,6 +29,10 @@ namespace J2N.Collections
     {
         IDictionary<string, string> map;
 
+        public Support_MapTest2()
+        {
+        }
+
         public Support_MapTest2(IDictionary<string, string> m)
         {
             map = m;

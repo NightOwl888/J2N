@@ -12,7 +12,7 @@ namespace J2N.Collections
         // must be a collection containing the Integers 0 to 99 (which will iterate
         // in order)
 
-        public Support_UnmodifiableCollectionTest(String p1)
+        public Support_UnmodifiableCollectionTest(/*String p1*/)
         //: base(p1)
         {
         }
