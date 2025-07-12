@@ -505,11 +505,8 @@ namespace J2N.Collections.Generic
                         Grow(checked(_size + count));
                     }
 
-                    // We need to fixup our sublist reference if it is broken by EnsureCapacity
-                    if (subList._items != _items)
-                    {
-                        subList._items = _items;
-                    }
+                    // We need to fixup our sublist reference if it is broken by Grow
+                    subList._items = _items;
 
                     if (Size < _size)
                     {
@@ -1811,14 +1808,11 @@ namespace J2N.Collections.Generic
 
                     if (_items.Length - _size < count)
                     {
-                        GrowForInsertion(index, count);
+                        Grow(checked(_size + count)); // J2N NOTE: we can't use GrowForInsertion here because SubList logic is different
                     }
 
-                    // We need to fixup our sublist reference if it is broken by EnsureCapacity
-                    if (subList._items != _items)
-                    {
-                        subList._items = _items;
-                    }
+                    // We need to fixup our sublist reference if it is broken by Grow
+                    subList._items = _items;
 
                     if (index < _size)
                     {

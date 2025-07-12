@@ -12,7 +12,7 @@ namespace J2N.Collections
     {
         readonly ICollection<Integer> col; // must contain the Integers 0 to 99
 
-        public Support_CollectionTest(String p1)
+        public Support_CollectionTest(/*String p1*/)
             //: base(p1)
         {
         }
