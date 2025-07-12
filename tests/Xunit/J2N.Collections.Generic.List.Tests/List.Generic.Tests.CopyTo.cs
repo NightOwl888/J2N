@@ -45,7 +45,8 @@ namespace J2N.Collections.Tests
             list = new List<int>() { 1, 2, 3 };
             sublist = list.GetView(1, 2);
             destination = new int[4];
-            sublist.CopyTo(destination[1..]);
+            // ReSharper disable once ReplaceSliceWithRangeIndexer
+            sublist.CopyTo(destination.Slice(1));
             Assert.Equal(new[] { 0, 2, 3, 0 }, destination.ToArray());
         }
 

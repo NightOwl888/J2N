@@ -230,7 +230,7 @@ namespace J2N.Collections.Tests
             public void BasicSliceSyntax(T[] items, int index, int count)
             {
                 List<T> list = new List<T>(items);
-                List<T> range = list[index..(index + count)];
+                List<T> range = list.Slice(index, count); // J2N: was `list[index..(index + count)]`, but .NET Framework does not support this
 
                 //ensure range is good
                 for (int i = 0; i < count; i++)
