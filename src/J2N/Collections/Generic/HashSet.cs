@@ -130,10 +130,27 @@ namespace J2N.Collections.Generic
                 _comparer = comparer;
             }
 
-            if (typeof(T) == typeof(string) && _comparer == null)
+            // Special-case EqualityComparer<string>.Default, StringComparer.Ordinal, and StringComparer.OrdinalIgnoreCase.
+            // We use a non-randomized comparer for improved perf, falling back to a randomized comparer if the
+            // hash buckets become unbalanced.
+
+            if (typeof(T) == typeof(string))
             {
-                // To start, move off default comparer for string which is randomized.
-                _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundDefaultComparer;
+                if (_comparer is null)
+                {
+                    _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundDefaultComparer;
+                }
+                else if (ReferenceEquals(_comparer, StringComparer.Ordinal))
+                {
+                    _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundStringComparerOrdinal;
+                }
+                // J2N: This is too difficult to implement due to all of the APIs needed in .NET being internal, and it
+                // ending up calling native globalization code. We'll need to fall back to the randomized comparer
+                // in this case.
+                // else if (ReferenceEquals(_comparer, StringComparer.OrdinalIgnoreCase))
+                // {
+                //     _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundStringComparerOrdinalIgnoreCase;
+                // }
             }
         }
 
@@ -638,7 +655,7 @@ namespace J2N.Collections.Generic
             }
 
             info.AddValue(VersionName, _version); // need to serialize version to avoid problems with serializing while enumerating
-            info.AddValue(EqualityComparerName, _comparer ?? EqualityComparer<T>.Default, typeof(IEqualityComparer<T>));
+            info.AddValue(EqualityComparerName, EqualityComparer, typeof(IEqualityComparer<T>));
             info.AddValue(CapacityName, _buckets == null ? 0 : _buckets.Length);
 
             if (_buckets != null)
@@ -1395,10 +1412,20 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// Retrieving the value of this property is an O(1) operation.
         /// </remarks>
-        public IEqualityComparer<T> EqualityComparer =>
-            (_comparer == null || _comparer is NonRandomizedStringEqualityComparer) ?
-                EqualityComparer<T>.Default :
-                _comparer;
+        public IEqualityComparer<T> EqualityComparer
+        {
+            get
+            {
+                if (typeof(T) == typeof(string))
+                {
+                    return (IEqualityComparer<T>)InternalStringEqualityComparer.GetUnderlyingEqualityComparer((IEqualityComparer<string?>?)_comparer);
+                }
+                else
+                {
+                    return _comparer ?? EqualityComparer<T>.Default;
+                }
+            }
+        }
 
         /// <summary>
         /// Ensures that this hash set can hold the specified number of elements without growing.
@@ -1445,14 +1472,21 @@ namespace J2N.Collections.Generic
 
             if (!typeof(T).IsValueType && forceNewHashCodes)
             {
+                Debug.Assert(_comparer is NonRandomizedStringEqualityComparer);
+                _comparer = (IEqualityComparer<T>)((NonRandomizedStringEqualityComparer)_comparer).GetRandomizedEqualityComparer();
+
                 for (int i = 0; i < count; i++)
                 {
                     ref Entry entry = ref entries[i];
                     if (entry.Next >= -1)
                     {
-                        Debug.Assert(_comparer == null);
-                        entry.HashCode = entry.Value != null ? entry.Value!.GetHashCode() : 0;
+                        entry.HashCode = entry.Value != null ? _comparer!.GetHashCode(entry.Value) : 0;
                     }
+                }
+
+                if (ReferenceEquals(_comparer, EqualityComparer<T>.Default))
+                {
+                    _comparer = null;
                 }
             }
 
@@ -1691,7 +1725,6 @@ namespace J2N.Collections.Generic
             {
                 // If we hit the collision threshold we'll need to switch to the comparer which is using randomized string hashing
                 // i.e. EqualityComparer<string>.Default.
-                _comparer = null;
                 Resize(entries.Length, forceNewHashCodes: true);
                 location = FindItemIndex(value);
                 Debug.Assert(location >= 0);
