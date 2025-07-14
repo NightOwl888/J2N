@@ -63,6 +63,14 @@ namespace J2N.Collections.Generic
     {
         // This uses the same array-based implementation as Dictionary<TKey, TValue>.
 
+#if FEATURE_SERIALIZABLE
+        // constants for serialization
+        private const string CapacityName = "Capacity"; // Do not rename (binary serialization)
+        private const string ElementsName = "Elements"; // Do not rename (binary serialization)
+        private const string EqualityComparerName = "EqualityComparer"; // Do not rename (binary serialization)
+        private const string VersionName = "Version"; // Do not rename (binary serialization)
+#endif
+
         /// <summary>Cutoff point for stackallocs. This corresponds to the number of ints.</summary>
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Following Microsoft's code style")]
         [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0051 doesn't fire on all target frameworks")]
@@ -86,16 +94,6 @@ namespace J2N.Collections.Generic
         private int _freeCount;
         private int _version;
         private IEqualityComparer<T>? _comparer;
-
-#if FEATURE_SERIALIZABLE
-        private System.Runtime.Serialization.SerializationInfo? _siInfo; // temporary variable needed during deserialization
-
-        // constants for serialization
-        private const string CapacityName = "Capacity"; // Do not rename (binary serialization)
-        private const string ElementsName = "Elements"; // Do not rename (binary serialization)
-        private const string EqualityComparerName = "EqualityComparer"; // Do not rename (binary serialization)
-        private const string VersionName = "Version"; // Do not rename (binary serialization)
-#endif
 
         #region Constructors
 
@@ -274,7 +272,7 @@ namespace J2N.Collections.Generic
             // deserialized and we have a reasonable estimate that GetHashCode is not going to
             // fail.  For the time being, we'll just cache this.  The graph is not valid until
             // OnDeserialization has been called.
-            _siInfo = info;
+            HashHelpers.SerializationInfoTable.Add(this, info);
         }
 #endif
 
@@ -688,7 +686,9 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual void OnDeserialization(object? sender)
         {
-            if (_siInfo == null)
+            HashHelpers.SerializationInfoTable.TryGetValue(this, out System.Runtime.Serialization.SerializationInfo? siInfo);
+
+            if (siInfo == null)
             {
                 // It might be necessary to call OnDeserialization from a container if the
                 // container object also implements OnDeserialization. We can return immediately
@@ -696,8 +696,8 @@ namespace J2N.Collections.Generic
                 return;
             }
 
-            int capacity = _siInfo.GetInt32(CapacityName);
-            _comparer = (IEqualityComparer<T>)_siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<T>))!;
+            int capacity = siInfo.GetInt32(CapacityName);
+            _comparer = (IEqualityComparer<T>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<T>))!;
             _freeList = -1;
             _freeCount = 0;
 
@@ -705,11 +705,9 @@ namespace J2N.Collections.Generic
             {
                 _buckets = new int[capacity];
                 _entries = new Entry[capacity];
-#if TARGET_64BIT
                 _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)capacity);
-#endif
 
-                T[]? array = (T[]?)_siInfo.GetValue(ElementsName, typeof(T[]));
+                T[]? array = (T[]?)siInfo.GetValue(ElementsName, typeof(T[]));
                 if (array == null)
                 {
                     ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
@@ -726,8 +724,8 @@ namespace J2N.Collections.Generic
                 _buckets = null;
             }
 
-            _version = _siInfo.GetInt32(VersionName);
-            _siInfo = null;
+            _version = siInfo.GetInt32(VersionName);
+            HashHelpers.SerializationInfoTable.Remove(this);
         }
 
 #endif
