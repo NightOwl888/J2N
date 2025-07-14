@@ -123,7 +123,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public HashSet(IEqualityComparer<T>? comparer)
         {
-            if (comparer != null && comparer != EqualityComparer<T>.Default) // first check for null to avoid forcing default comparer instantiation unnecessarily
+            if (comparer is not null && comparer != EqualityComparer<T>.Default) // first check for null to avoid forcing default comparer instantiation unnecessarily
             {
                 _comparer = comparer;
             }
@@ -134,21 +134,12 @@ namespace J2N.Collections.Generic
 
             if (typeof(T) == typeof(string))
             {
-                if (_comparer is null)
+                IEqualityComparer<string>? stringComparer = NonRandomizedStringEqualityComparer.GetStringComparer(_comparer);
+
+                if (stringComparer is not null)
                 {
-                    _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundDefaultComparer;
+                    _comparer = (IEqualityComparer<T>?)stringComparer;
                 }
-                else if (ReferenceEquals(_comparer, StringComparer.Ordinal))
-                {
-                    _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundStringComparerOrdinal;
-                }
-                // J2N: This is too difficult to implement due to all of the APIs needed in .NET being internal, and it
-                // ending up calling native globalization code. We'll need to fall back to the randomized comparer
-                // in this case.
-                // else if (ReferenceEquals(_comparer, StringComparer.OrdinalIgnoreCase))
-                // {
-                //     _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundStringComparerOrdinalIgnoreCase;
-                // }
             }
         }
 
