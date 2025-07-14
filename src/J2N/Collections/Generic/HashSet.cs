@@ -354,11 +354,15 @@ namespace J2N.Collections.Generic
                 Debug.Assert(_buckets != null, "_buckets should be non-null");
                 Debug.Assert(_entries != null, "_entries should be non-null");
 
-                Array.Clear(_buckets, 0, _buckets.Length);
+#if FEATURE_ARRAY_CLEAR_ARRAY
+                Array.Clear(_buckets);
+#else
+                Array.Clear(_buckets!, 0, _buckets!.Length);
+#endif
                 _count = 0;
                 _freeList = -1;
                 _freeCount = 0;
-                Array.Clear(_entries, 0, count);
+                Array.Clear(_entries!, 0, count);
             }
         }
 
