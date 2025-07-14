@@ -123,23 +123,30 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public HashSet(IEqualityComparer<T>? comparer)
         {
-            if (comparer is not null && comparer != EqualityComparer<T>.Default) // first check for null to avoid forcing default comparer instantiation unnecessarily
+            // For reference types, we always want to store a comparer instance, either
+            // the one provided, or if one wasn't provided, the default (accessing
+            // EqualityComparer<TKey>.Default with shared generics on every dictionary
+            // access can add measurable overhead).  For value types, if no comparer is
+            // provided, or if the default is provided, we'd prefer to use
+            // EqualityComparer<TKey>.Default.Equals on every use, enabling the JIT to
+            // devirtualize and possibly inline the operation.
+            if (!typeof(T).IsValueType)
+            {
+                _comparer = comparer ?? EqualityComparer<T>.Default;
+
+                // Special-case EqualityComparer<string>.Default, StringComparer.Ordinal, and StringComparer.OrdinalIgnoreCase.
+                // We use a non-randomized comparer for improved perf, falling back to a randomized comparer if the
+                // hash buckets become unbalanced.
+                if (typeof(T) == typeof(string) &&
+                    NonRandomizedStringEqualityComparer.GetStringComparer(_comparer!) is IEqualityComparer<string> stringComparer)
+                {
+                    _comparer = (IEqualityComparer<T>)stringComparer;
+                }
+            }
+            else if (comparer is not null && // first check for null to avoid forcing default comparer instantiation unnecessarily
+                     comparer != EqualityComparer<T>.Default)
             {
                 _comparer = comparer;
-            }
-
-            // Special-case EqualityComparer<string>.Default, StringComparer.Ordinal, and StringComparer.OrdinalIgnoreCase.
-            // We use a non-randomized comparer for improved perf, falling back to a randomized comparer if the
-            // hash buckets become unbalanced.
-
-            if (typeof(T) == typeof(string))
-            {
-                IEqualityComparer<string>? stringComparer = NonRandomizedStringEqualityComparer.GetStringComparer(_comparer);
-
-                if (stringComparer is not null)
-                {
-                    _comparer = (IEqualityComparer<T>?)stringComparer;
-                }
             }
         }
 
@@ -389,62 +396,38 @@ namespace J2N.Collections.Generic
                 uint collisionCount = 0;
                 IEqualityComparer<T>? comparer = _comparer;
 
-                if (comparer == null)
+                if (typeof(T).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                    comparer == null)
                 {
-                    int hashCode = item != null ? item.GetHashCode() : 0;
-                    if (typeof(T).IsValueType)
+                    // ValueType: Devirtualize with EqualityComparer<TValue>.Default intrinsic
+                    int hashCode = item!.GetHashCode();
+                    int i = GetBucketRef(hashCode) - 1; // Value in _buckets is 1-based
+                    while (i >= 0)
                     {
-                        // ValueType: Devirtualize with EqualityComparer<TValue>.Default intrinsic
-                        int i = GetBucketRef(hashCode) - 1; // Value in _buckets is 1-based
-                        while (i >= 0)
+                        ref Entry entry = ref entries![i];
+                        if (entry.HashCode == hashCode && EqualityComparer<T>.Default.Equals(entry.Value, item))
                         {
-                            ref Entry entry = ref entries[i];
-                            if (entry.HashCode == hashCode && EqualityComparer<T>.Default.Equals(entry.Value, item))
-                            {
-                                return i;
-                            }
-                            i = entry.Next;
-
-                            collisionCount++;
-                            if (collisionCount > (uint)entries.Length)
-                            {
-                                // The chain of entries forms a loop, which means a concurrent update has happened.
-                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                            }
+                            return i;
                         }
-                    }
-                    else
-                    {
-                        // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize (https://github.com/dotnet/runtime/issues/10050),
-                        // so cache in a local rather than get EqualityComparer per loop iteration.
-                        IEqualityComparer<T> defaultComparer = EqualityComparer<T>.Default;
-                        int i = GetBucketRef(hashCode) - 1; // Value in _buckets is 1-based
-                        while (i >= 0)
-                        {
-                            ref Entry entry = ref entries[i];
-                            if (entry.HashCode == hashCode && defaultComparer.Equals(entry.Value, item))
-                            {
-                                return i;
-                            }
-                            i = entry.Next;
+                        i = entry.Next;
 
-                            collisionCount++;
-                            if (collisionCount > (uint)entries.Length)
-                            {
-                                // The chain of entries forms a loop, which means a concurrent update has happened.
-                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                            }
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop, which means a concurrent update has happened.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
                 else
                 {
-                    int hashCode = item != null ? comparer.GetHashCode(item) : 0;
+                    Debug.Assert(comparer is not null);
+                    int hashCode = item != null ? comparer!.GetHashCode(item) : 0;
                     int i = GetBucketRef(hashCode) - 1; // Value in _buckets is 1-based
                     while (i >= 0)
                     {
-                        ref Entry entry = ref entries[i];
-                        if (entry.HashCode == hashCode && comparer.Equals(entry.Value, item))
+                        ref Entry entry = ref entries![i];
+                        if (entry.HashCode == hashCode && comparer!.Equals(entry.Value, item))
                         {
                             return i;
                         }
@@ -493,16 +476,22 @@ namespace J2N.Collections.Generic
 
                 uint collisionCount = 0;
                 int last = -1;
-                int hashCode = item != null ? (_comparer?.GetHashCode(item) ?? item.GetHashCode()) : 0;
+
+                IEqualityComparer<T>? comparer = _comparer;
+                Debug.Assert(typeof(T).IsValueType || comparer is not null);
+                int hashCode =
+                    typeof(T).IsValueType && comparer == null ? item!.GetHashCode() :
+                    item is not null ? comparer!.GetHashCode(item) :
+                    0;
 
                 ref int bucket = ref GetBucketRef(hashCode);
                 int i = bucket - 1; // Value in buckets is 1-based
 
                 while (i >= 0)
                 {
-                    ref Entry entry = ref entries[i];
+                    ref Entry entry = ref entries![i];
 
-                    if (entry.HashCode == hashCode && (_comparer?.Equals(entry.Value, item) ?? EqualityComparer<T>.Default.Equals(entry.Value, item)))
+                    if (entry.HashCode == hashCode && (comparer?.Equals(entry.Value, item) ?? EqualityComparer<T>.Default.Equals(entry.Value, item)))
                     {
                         if (last < 0)
                         {
@@ -1411,7 +1400,8 @@ namespace J2N.Collections.Generic
             {
                 if (typeof(T) == typeof(string))
                 {
-                    return (IEqualityComparer<T>)InternalStringEqualityComparer.GetUnderlyingEqualityComparer((IEqualityComparer<string?>?)_comparer);
+                    Debug.Assert(_comparer is not null, "The comparer should never be null for a reference type.");
+                    return (IEqualityComparer<T>)InternalStringEqualityComparer.GetUnderlyingEqualityComparer((IEqualityComparer<string?>)_comparer!);
                 }
                 else
                 {
@@ -1456,7 +1446,7 @@ namespace J2N.Collections.Generic
             // Value types never rehash
             Debug.Assert(!forceNewHashCodes || !typeof(T).IsValueType);
             Debug.Assert(_entries != null, "_entries should be non-null");
-            Debug.Assert(newSize >= _entries.Length);
+            Debug.Assert(newSize >= _entries!.Length);
 
             var entries = new Entry[newSize];
 
@@ -1466,20 +1456,15 @@ namespace J2N.Collections.Generic
             if (!typeof(T).IsValueType && forceNewHashCodes)
             {
                 Debug.Assert(_comparer is NonRandomizedStringEqualityComparer);
-                _comparer = (IEqualityComparer<T>)((NonRandomizedStringEqualityComparer)_comparer).GetRandomizedEqualityComparer();
+                IEqualityComparer<T> comparer = _comparer = (IEqualityComparer<T>)((NonRandomizedStringEqualityComparer)_comparer!).GetRandomizedEqualityComparer();
 
                 for (int i = 0; i < count; i++)
                 {
                     ref Entry entry = ref entries[i];
                     if (entry.Next >= -1)
                     {
-                        entry.HashCode = entry.Value != null ? _comparer!.GetHashCode(entry.Value) : 0;
+                        entry.HashCode = entry.Value != null ? comparer.GetHashCode(entry.Value) : 0;
                     }
-                }
-
-                if (ReferenceEquals(_comparer, EqualityComparer<T>.Default))
-                {
-                    _comparer = null;
                 }
             }
 
@@ -1608,65 +1593,42 @@ namespace J2N.Collections.Generic
             uint collisionCount = 0;
             ref int bucket = ref UnsafeHelpers.NullRef<int>();
 
-            if (comparer == null)
+            if (typeof(T).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                comparer == null)
             {
-                hashCode = value != null ? value.GetHashCode() : 0;
+                hashCode = value!.GetHashCode();
                 bucket = ref GetBucketRef(hashCode);
                 int i = bucket - 1; // Value in _buckets is 1-based
-                if (typeof(T).IsValueType)
-                {
-                    // ValueType: Devirtualize with EqualityComparer<TValue>.Default intrinsic
-                    while (i >= 0)
-                    {
-                        ref Entry entry = ref entries[i];
-                        if (entry.HashCode == hashCode && EqualityComparer<T>.Default.Equals(entry.Value, value))
-                        {
-                            location = i;
-                            return false;
-                        }
-                        i = entry.Next;
 
-                        collisionCount++;
-                        if (collisionCount > (uint)entries.Length)
-                        {
-                            // The chain of entries forms a loop, which means a concurrent update has happened.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                        }
+                // ValueType: Devirtualize with EqualityComparer<TValue>.Default intrinsic
+                while (i >= 0)
+                {
+                    ref Entry entry = ref entries![i];
+                    if (entry.HashCode == hashCode && EqualityComparer<T>.Default.Equals(entry.Value, value))
+                    {
+                        location = i;
+                        return false;
                     }
-                }
-                else
-                {
-                    // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize (https://github.com/dotnet/runtime/issues/10050),
-                    // so cache in a local rather than get EqualityComparer per loop iteration.
-                    IEqualityComparer<T> defaultComparer = EqualityComparer<T>.Default;
-                    while (i >= 0)
-                    {
-                        ref Entry entry = ref entries[i];
-                        if (entry.HashCode == hashCode && defaultComparer.Equals(entry.Value, value))
-                        {
-                            location = i;
-                            return false;
-                        }
-                        i = entry.Next;
+                    i = entry.Next;
 
-                        collisionCount++;
-                        if (collisionCount > (uint)entries.Length)
-                        {
-                            // The chain of entries forms a loop, which means a concurrent update has happened.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                        }
+                    collisionCount++;
+                    if (collisionCount > (uint)entries.Length)
+                    {
+                        // The chain of entries forms a loop, which means a concurrent update has happened.
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
                 }
             }
             else
             {
-                hashCode = value != null ? comparer.GetHashCode(value) : 0;
+                Debug.Assert(comparer is not null);
+                hashCode = value != null ? comparer!.GetHashCode(value) : 0;
                 bucket = ref GetBucketRef(hashCode);
                 int i = bucket - 1; // Value in _buckets is 1-based
                 while (i >= 0)
                 {
-                    ref Entry entry = ref entries[i];
-                    if (entry.HashCode == hashCode && comparer.Equals(entry.Value, value))
+                    ref Entry entry = ref entries![i];
+                    if (entry.HashCode == hashCode && comparer!.Equals(entry.Value, value))
                     {
                         location = i;
                         return false;
@@ -1693,7 +1655,7 @@ namespace J2N.Collections.Generic
             else
             {
                 int count = _count;
-                if (count == entries.Length)
+                if (count == entries!.Length)
                 {
                     Resize();
                     bucket = ref GetBucketRef(hashCode);

@@ -22,13 +22,9 @@ namespace J2N.Collections.Generic
         /// Unwraps the internal equality comparer, if proxied.
         /// Otherwise returns the equality comparer itself or its default equivalent.
         /// </summary>
-        internal static IEqualityComparer<string?> GetUnderlyingEqualityComparer(IEqualityComparer<string?>? outerComparer)
+        internal static IEqualityComparer<string?> GetUnderlyingEqualityComparer(IEqualityComparer<string?> outerComparer)
         {
-            if (outerComparer is null)
-            {
-                return EqualityComparer<string?>.Default;
-            }
-            else if (outerComparer is IInternalStringEqualityComparer internalComparer)
+            if (outerComparer is IInternalStringEqualityComparer internalComparer)
             {
                 return internalComparer.GetUnderlyingEqualityComparer();
             }
