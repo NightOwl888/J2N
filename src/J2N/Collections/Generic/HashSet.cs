@@ -61,26 +61,31 @@ namespace J2N.Collections.Generic
         , System.Runtime.Serialization.IDeserializationCallback, System.Runtime.Serialization.ISerializable
 #endif
     {
-        // store lower 31 bits of hash code
-        private const int Lower31BitMask = 0x7FFFFFFF;
-        // cutoff point, above which we won't do stackallocs. This corresponds to 100 integers.
+        // This uses the same array-based implementation as Dictionary<TKey, TValue>.
+
+        /// <summary>Cutoff point for stackallocs. This corresponds to the number of ints.</summary>
         [SuppressMessage("CodeQuality", "IDE0051:Remove unused private members", Justification = "Following Microsoft's code style")]
         [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0051 doesn't fire on all target frameworks")]
         private const int StackAllocThreshold = 100;
-        // when constructing a hashset from an existing collection, it may contain duplicates,
-        // so this is used as the max acceptable excess ratio of capacity to count. Note that
-        // this is only used on the ctor and not to automatically shrink if the hashset has, e.g,
-        // a lot of adds followed by removes. Users must explicitly shrink by calling TrimExcess.
-        // This is set to 3 because capacity is acceptable as 2x rounded up to nearest prime.
+
+        /// <summary>
+        /// When constructing a hashset from an existing collection, it may contain duplicates,
+        /// so this is used as the max acceptable excess ratio of capacity to count. Note that
+        /// this is only used on the ctor and not to automatically shrink if the hashset has, e.g,
+        /// a lot of adds followed by removes. Users must explicitly shrink by calling TrimExcess.
+        /// This is set to 3 because capacity is acceptable as 2x rounded up to nearest prime.
+        /// </summary>
         private const int ShrinkThreshold = 3;
+        private const int StartOfFreeList = -3;
 
         private int[]? _buckets;
-        private Slot[] _slots = default!; // TODO-NULLABLE: This should be Slot[]?, but the resulting annotations causes GenPartialFacadeSource to blow up: error : Unable to cast object of type 'Microsoft.CodeAnalysis.CSharp.Syntax.CompilationUnitSyntax' to type 'Microsoft.CodeAnalysis.CSharp.Syntax.BaseTypeDeclarationSyntax'
+        private Entry[]? _entries;
+        private ulong _fastModMultiplier;
         private int _count;
-        private int _lastIndex;
         private int _freeList;
-        private IEqualityComparer<T>? _comparer;
+        private int _freeCount;
         private int _version;
+        private IEqualityComparer<T>? _comparer;
 
 #if FEATURE_SERIALIZABLE
         private System.Runtime.Serialization.SerializationInfo? _siInfo; // temporary variable needed during deserialization
@@ -120,16 +125,16 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public HashSet(IEqualityComparer<T>? comparer)
         {
-            if (comparer == EqualityComparer<T>.Default)
+            if (comparer != null && comparer != EqualityComparer<T>.Default) // first check for null to avoid forcing default comparer instantiation unnecessarily
             {
-                comparer = null;
+                _comparer = comparer;
             }
 
-            _comparer = comparer;
-            _lastIndex = 0;
-            _count = 0;
-            _freeList = -1;
-            _version = 0;
+            if (typeof(T) == typeof(string) && _comparer == null)
+            {
+                // To start, move off default comparer for string which is randomized.
+                _comparer = (IEqualityComparer<T>)NonRandomizedStringEqualityComparer.WrappedAroundDefaultComparer;
+            }
         }
 
         /// <summary>
@@ -181,75 +186,35 @@ namespace J2N.Collections.Generic
         public HashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
             : this(comparer)
         {
-            if (collection is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
-
-            var otherAsHashSet = collection as HashSet<T>;
-            if (otherAsHashSet != null && AreEqualityComparersEqual(this, otherAsHashSet))
+            if (collection == null)
             {
-                CopyFrom(otherAsHashSet);
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
+            }
+
+            if (collection is HashSet<T> otherAsHashSet && EqualityComparersAreEqual(this, otherAsHashSet))
+            {
+                ConstructFrom(otherAsHashSet);
             }
             else
             {
-                // to avoid excess resizes, first set size based on collection's count. Collection
-                // may contain duplicates, so call TrimExcess if resulting hashset is larger than
-                // threshold
-                ICollection<T>? coll = collection as ICollection<T>;
-                int suggestedCapacity = coll == null ? 0 : coll.Count;
-                Initialize(suggestedCapacity);
+                // To avoid excess resizes, first set size based on collection's count. The collection may
+                // contain duplicates, so call TrimExcess if resulting HashSet is larger than the threshold.
+                if (collection is ICollection<T> coll)
+                {
+                    int count = coll.Count;
+                    if (count > 0)
+                    {
+                        Initialize(count);
+                    }
+                }
 
                 UnionWith(collection);
 
-                if (_count > 0 && _slots.Length / _count > ShrinkThreshold)
+                if (_count > 0 && _entries!.Length / _count > ShrinkThreshold)
                 {
                     TrimExcess();
                 }
             }
-        }
-
-        // Initializes the HashSet from another HashSet with the same element type and
-        // equality comparer.
-        private void CopyFrom(HashSet<T> source)
-        {
-            int count = source._count;
-            if (count == 0)
-            {
-                // As well as short-circuiting on the rest of the work done,
-                // this avoids errors from trying to access otherAsHashSet._buckets
-                // or otherAsHashSet._slots when they aren't initialized.
-                return;
-            }
-
-            int capacity = source._buckets!.Length;
-            int threshold = HashHelpers.ExpandPrime(count + 1);
-
-            if (threshold >= capacity)
-            {
-                _buckets = (int[])source._buckets.Clone();
-                _slots = (Slot[])source._slots.Clone();
-
-                _lastIndex = source._lastIndex;
-                _freeList = source._freeList;
-            }
-            else
-            {
-                int lastIndex = source._lastIndex;
-                Slot[] slots = source._slots;
-                Initialize(count);
-                int index = 0;
-                for (int i = 0; i < lastIndex; ++i)
-                {
-                    int hashCode = slots[i].hashCode;
-                    if (hashCode >= 0)
-                    {
-                        AddValue(index, hashCode, slots[i].value);
-                        ++index;
-                    }
-                }
-                Debug.Assert(index == count);
-                _lastIndex = index;
-            }
-            _count = count;
         }
 
         /// <summary>
@@ -265,7 +230,9 @@ namespace J2N.Collections.Generic
             : this(comparer)
         {
             if (capacity < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.capacity);
+            }
 
             if (capacity > 0)
             {
@@ -294,6 +261,47 @@ namespace J2N.Collections.Generic
         }
 #endif
 
+        /// <summary>Initializes the HashSet from another HashSet with the same element type and equality comparer.</summary>
+        private void ConstructFrom(HashSet<T> source)
+        {
+            if (source.Count == 0)
+            {
+                // As well as short-circuiting on the rest of the work done,
+                // this avoids errors from trying to access source._buckets
+                // or source._entries when they aren't initialized.
+                return;
+            }
+
+            int capacity = source._buckets!.Length;
+            int threshold = HashHelpers.ExpandPrime(source.Count + 1);
+
+            if (threshold >= capacity)
+            {
+                _buckets = (int[])source._buckets.Clone();
+                _entries = (Entry[])source._entries!.Clone();
+                _freeList = source._freeList;
+                _freeCount = source._freeCount;
+                _count = source._count;
+                _fastModMultiplier = source._fastModMultiplier;
+            }
+            else
+            {
+                Initialize(source.Count);
+
+                Entry[]? entries = source._entries;
+                for (int i = 0; i < source._count; i++)
+                {
+                    ref Entry entry = ref entries![i];
+                    if (entry.Next >= -1)
+                    {
+                        AddIfNotPresent(entry.Value, out _);
+                    }
+                }
+            }
+
+            Debug.Assert(Count == source.Count);
+        }
+
         #endregion
 
         #region AsReadOnly
@@ -321,10 +329,7 @@ namespace J2N.Collections.Generic
         /// interface. The other Add method returns bool indicating whether item was added.
         /// </summary>
         /// <param name="item">item to add</param>
-        void ICollection<T>.Add(T item)
-        {
-            AddIfNotPresent(item);
-        }
+        void ICollection<T>.Add(T item) => AddIfNotPresent(item, out _);
 
         /// <summary>
         /// Removes all elements from a <see cref="HashSet{T}"/> object.
@@ -337,19 +342,18 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void Clear()
         {
-            if (_lastIndex > 0)
+            int count = _count;
+            if (count > 0)
             {
-                Debug.Assert(_buckets != null, "_buckets was null but _lastIndex > 0");
+                Debug.Assert(_buckets != null, "_buckets should be non-null");
+                Debug.Assert(_entries != null, "_entries should be non-null");
 
-                // clear the elements so that the gc can reclaim the references.
-                // clear only up to _lastIndex for _slots
-                Array.Clear(_slots, 0, _lastIndex);
-                Array.Clear(_buckets, 0, _buckets!.Length);
-                _lastIndex = 0;
+                Array.Clear(_buckets, 0, _buckets.Length);
                 _count = 0;
                 _freeList = -1;
+                _freeCount = 0;
+                Array.Clear(_entries, 0, count);
             }
-            _version++;
         }
 
         /// <summary>
@@ -361,108 +365,100 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This method is an O(1) operation.
         /// </remarks>
-        public bool Contains(T item)
+        public bool Contains(T item) => FindItemIndex(item) >= 0;
+
+        /// <summary>Gets the index of the item in <see cref="_entries"/>, or -1 if it's not in the set.</summary>
+        private int FindItemIndex(T item)
         {
             int[]? buckets = _buckets;
-
             if (buckets != null)
             {
-                int collisionCount = 0;
-                Slot[] slots = _slots;
+                Entry[]? entries = _entries;
+                Debug.Assert(entries != null, "Expected _entries to be initialized");
+
+                uint collisionCount = 0;
                 IEqualityComparer<T>? comparer = _comparer;
 
                 if (comparer == null)
                 {
-                    int hashCode = item == null ? 0 : InternalGetHashCode(item.GetHashCode());
-
-                    if (default(T)! != null) // TODO-NULLABLE: default(T) == null warning (https://github.com/dotnet/roslyn/issues/34757)
+                    int hashCode = item != null ? item.GetHashCode() : 0;
+                    if (typeof(T).IsValueType)
                     {
-                        // see note at "HashSet" level describing why "- 1" appears in for loop
-                        for (int i = buckets[hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
+                        // ValueType: Devirtualize with EqualityComparer<TValue>.Default intrinsic
+                        int i = GetBucketRef(hashCode) - 1; // Value in _buckets is 1-based
+                        while (i >= 0)
                         {
-                            if (slots[i].hashCode == hashCode && EqualityComparer<T>.Default.Equals(slots[i].value, item))
+                            ref Entry entry = ref entries[i];
+                            if (entry.HashCode == hashCode && EqualityComparer<T>.Default.Equals(entry.Value, item))
                             {
-                                return true;
+                                return i;
                             }
+                            i = entry.Next;
 
-                            if (collisionCount >= slots.Length)
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
                                 ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
-                            collisionCount++;
                         }
                     }
                     else
                     {
-                        // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize
-                        // https://github.com/dotnet/coreclr/issues/17273
-                        // So cache in a local rather than get EqualityComparer per loop iteration
+                        // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize (https://github.com/dotnet/runtime/issues/10050),
+                        // so cache in a local rather than get EqualityComparer per loop iteration.
                         IEqualityComparer<T> defaultComparer = EqualityComparer<T>.Default;
-
-                        // see note at "HashSet" level describing why "- 1" appears in for loop
-                        for (int i = buckets[hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
+                        int i = GetBucketRef(hashCode) - 1; // Value in _buckets is 1-based
+                        while (i >= 0)
                         {
-                            if (slots[i].hashCode == hashCode && defaultComparer.Equals(slots[i].value, item))
+                            ref Entry entry = ref entries[i];
+                            if (entry.HashCode == hashCode && defaultComparer.Equals(entry.Value, item))
                             {
-                                return true;
+                                return i;
                             }
+                            i = entry.Next;
 
-                            if (collisionCount >= slots.Length)
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
                             {
                                 // The chain of entries forms a loop, which means a concurrent update has happened.
                                 ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
-                            collisionCount++;
                         }
                     }
                 }
                 else
                 {
-                    int hashCode = item == null ? 0 : InternalGetHashCode(comparer.GetHashCode(item));
-
-                    // see note at "HashSet" level describing why "- 1" appears in for loop
-                    for (int i = buckets[hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
+                    int hashCode = item != null ? comparer.GetHashCode(item) : 0;
+                    int i = GetBucketRef(hashCode) - 1; // Value in _buckets is 1-based
+                    while (i >= 0)
                     {
-                        if (slots[i].hashCode == hashCode && comparer.Equals(slots[i].value, item))
+                        ref Entry entry = ref entries[i];
+                        if (entry.HashCode == hashCode && comparer.Equals(entry.Value, item))
                         {
-                            return true;
+                            return i;
                         }
+                        i = entry.Next;
 
-                        if (collisionCount >= slots.Length)
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
                             ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
-                        collisionCount++;
                     }
                 }
             }
 
-            // either _buckets is null or wasn't found
-            return false;
+            return -1;
         }
 
-        /// <summary>
-        /// Copies the elements of a <see cref="HashSet{T}"/> collection to an array.
-        /// </summary>
-        /// <param name="array">The one-dimensional array that is the destination of
-        /// the elements copied from the <see cref="HashSet{T}"/> object.
-        /// The array must have zero-based indexing.</param>
-        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">
-        /// <paramref name="arrayIndex"/> is less than 0.
-        /// </exception>
-        /// <exception cref="ArgumentException">
-        /// <paramref name="arrayIndex"/> is greater than the length of the destination <paramref name="array"/>.
-        /// </exception>
-        /// <remarks>
-        /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
-        /// </remarks>
-        public void CopyTo(T[] array, int arrayIndex)
+        /// <summary>Gets a reference to the specified hashcode's bucket, containing an index into <see cref="_entries"/>.</summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private ref int GetBucketRef(int hashCode)
         {
-            CopyTo(array, arrayIndex, _count);
+            int[] buckets = _buckets!;
+            return ref buckets[HashHelpers.FastMod((uint)hashCode, (uint)buckets.Length, _fastModMultiplier)];
         }
 
         /// <summary>
@@ -480,117 +476,60 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool Remove(T item)
         {
-            int hashCode;
-            int bucket;
-            int last = -1;
-            int collisionCount = 0;
-            int i;
-            Slot[] slots;
-            IEqualityComparer<T>? comparer = _comparer;
-
             if (_buckets != null)
             {
-                slots = _slots;
+                Entry[]? entries = _entries;
+                Debug.Assert(entries != null, "entries should be non-null");
 
-                if (comparer == null)
+                uint collisionCount = 0;
+                int last = -1;
+                int hashCode = item != null ? (_comparer?.GetHashCode(item) ?? item.GetHashCode()) : 0;
+
+                ref int bucket = ref GetBucketRef(hashCode);
+                int i = bucket - 1; // Value in buckets is 1-based
+
+                while (i >= 0)
                 {
-                    hashCode = item == null ? 0 : InternalGetHashCode(item.GetHashCode());
-                    bucket = hashCode % _buckets!.Length;
+                    ref Entry entry = ref entries[i];
 
-                    if (default(T)! != null) // TODO-NULLABLE: default(T) == null warning (https://github.com/dotnet/roslyn/issues/34757)
+                    if (entry.HashCode == hashCode && (_comparer?.Equals(entry.Value, item) ?? EqualityComparer<T>.Default.Equals(entry.Value, item)))
                     {
-                        for (i = _buckets[bucket] - 1; i >= 0; last = i, i = slots[i].next)
+                        if (last < 0)
                         {
-                            if (slots[i].hashCode == hashCode && EqualityComparer<T>.Default.Equals(slots[i].value, item))
-                            {
-                                goto ReturnFound;
-                            }
-
-                            if (collisionCount >= slots.Length)
-                            {
-                                // The chain of entries forms a loop, which means a concurrent update has happened.
-                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                            }
-                            collisionCount++;
+                            bucket = entry.Next + 1; // Value in buckets is 1-based
                         }
+                        else
+                        {
+                            entries[last].Next = entry.Next;
+                        }
+
+                        Debug.Assert((StartOfFreeList - _freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
+                        entry.Next = StartOfFreeList - _freeList;
+
+                        if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
+                        {
+                            entry.Value = default!;
+                        }
+
+                        _freeList = i;
+                        _freeCount++;
+                        return true;
                     }
-                    else
+
+                    last = i;
+                    i = entry.Next;
+
+                    collisionCount++;
+                    if (collisionCount > (uint)entries.Length)
                     {
-                        // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize
-                        // https://github.com/dotnet/coreclr/issues/17273
-                        // So cache in a local rather than get EqualityComparer per loop iteration
-                        IEqualityComparer<T> defaultComparer = EqualityComparer<T>.Default;
-
-                        for (i = _buckets[bucket] - 1; i >= 0; last = i, i = slots[i].next)
-                        {
-                            if (slots[i].hashCode == hashCode && defaultComparer.Equals(slots[i].value, item))
-                            {
-                                goto ReturnFound;
-                            }
-
-                            if (collisionCount >= slots.Length)
-                            {
-                                // The chain of entries forms a loop, which means a concurrent update has happened.
-                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                            }
-                            collisionCount++;
-                        }
-                    }
-                }
-                else
-                {
-                    hashCode = item == null ? 0 : InternalGetHashCode(comparer.GetHashCode(item));
-                    bucket = hashCode % _buckets!.Length;
-
-                    for (i = _buckets[bucket] - 1; i >= 0; last = i, i = slots[i].next)
-                    {
-                        if (slots[i].hashCode == hashCode && comparer.Equals(slots[i].value, item))
-                        {
-                            goto ReturnFound;
-                        }
-
-                        if (collisionCount >= slots.Length)
-                        {
-                            // The chain of entries forms a loop, which means a concurrent update has happened.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                        }
-                        collisionCount++;
+                        // The chain of entries forms a loop; which means a concurrent update has happened.
+                        // Break out of the loop and throw, rather than looping forever.
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
                 }
             }
-            // either _buckets is null or wasn't found
+
             return false;
-
-        ReturnFound:
-            if (last < 0)
-            {
-                // first iteration; update buckets
-                _buckets[bucket] = slots[i].next + 1;
-            }
-            else
-            {
-                // subsequent iterations; update 'next' pointers
-                slots[last].next = slots[i].next;
-            }
-            slots[i].hashCode = -1;
-            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
-            {
-                slots[i].value = default!;
-            }
-            slots[i].next = _freeList;
-
-            _count--;
-            _version++;
-            if (_count == 0)
-            {
-                _lastIndex = 0;
-                _freeList = -1;
-            }
-            else
-            {
-                _freeList = i;
-            }
-            return true;
         }
 
         /// <summary>
@@ -606,7 +545,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Retrieving the value of this property is an O(1) operation.
         /// </remarks>
-        public int Count => _count;
+        public int Count => _count - _freeCount;
 
         /// <summary>
         /// Gets a value indicating whether a collection is read-only.
@@ -623,7 +562,7 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an enumerator that iterates through a <see cref="HashSet{T}"/> object.
         /// </summary>
-        /// <returns>An <see cref="IEnumerator{T}"/> object for the <see cref="HashSet{T}"/> object.</returns>
+        /// <returns>An <see cref="Enumerator"/> object for the <see cref="HashSet{T}"/> object.</returns>
         /// <remarks>
         /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
         /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
@@ -660,20 +599,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public IEnumerator<T> GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
+        public Enumerator GetEnumerator() => new Enumerator(this);
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion
 
@@ -702,8 +632,10 @@ namespace J2N.Collections.Generic
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
-            if (info is null)
+            if (info == null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
+            }
 
             info.AddValue(VersionName, _version); // need to serialize version to avoid problems with serializing while enumerating
             info.AddValue(EqualityComparerName, _comparer ?? EqualityComparer<T>.Default, typeof(IEqualityComparer<T>));
@@ -711,7 +643,7 @@ namespace J2N.Collections.Generic
 
             if (_buckets != null)
             {
-                T[] array = new T[_count];
+                var array = new T[Count];
                 CopyTo(array);
                 info.AddValue(ElementsName, array, typeof(T[]));
             }
@@ -750,23 +682,26 @@ namespace J2N.Collections.Generic
             int capacity = _siInfo.GetInt32(CapacityName);
             _comparer = (IEqualityComparer<T>)_siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<T>))!;
             _freeList = -1;
+            _freeCount = 0;
 
             if (capacity != 0)
             {
                 _buckets = new int[capacity];
-                _slots = new Slot[capacity];
+                _entries = new Entry[capacity];
+#if TARGET_64BIT
+                _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)capacity);
+#endif
 
                 T[]? array = (T[]?)_siInfo.GetValue(ElementsName, typeof(T[]));
-
                 if (array == null)
                 {
                     ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
                 }
 
-                // there are no resizes here because we already set capacity above
+                // There are no resizes here because we already set capacity above.
                 for (int i = 0; i < array.Length; i++)
                 {
-                    AddIfNotPresent(array[i]);
+                    AddIfNotPresent(array[i], out _);
                 }
             }
             else
@@ -798,10 +733,7 @@ namespace J2N.Collections.Generic
         /// O(1) operation. If the <see cref="HashSet{T}"/> object must be resized, this method
         /// becomes an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public bool Add(T item)
-        {
-            return AddIfNotPresent(item);
-        }
+        public bool Add(T item) => AddIfNotPresent(item, out _);
 
         /// <summary>
         /// Searches the set for a given value and returns the equal value it finds, if any.
@@ -820,14 +752,15 @@ namespace J2N.Collections.Generic
         {
             if (_buckets != null)
             {
-                int i = InternalIndexOf(equalValue);
-                if (i >= 0)
+                int index = FindItemIndex(equalValue);
+                if (index >= 0)
                 {
-                    actualValue = _slots[i].value;
+                    actualValue = _entries![index].Value;
                     return true;
                 }
             }
-            actualValue = default!;
+
+            actualValue = default;
             return false;
         }
 
@@ -844,11 +777,13 @@ namespace J2N.Collections.Generic
         public void UnionWith(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
             foreach (T item in other)
             {
-                AddIfNotPresent(item);
+                AddIfNotPresent(item, out _);
             }
         }
 
@@ -868,24 +803,19 @@ namespace J2N.Collections.Generic
         public void IntersectWith(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            // intersection of anything with empty set is empty set, so return if count is 0
-            if (_count == 0)
+            // Intersection of anything with empty set is empty set, so return if count is 0.
+            // Same if the set intersecting with itself is the same set.
+            if (Count == 0 || other == this)
             {
                 return;
             }
 
-            // set intersecting with itself is the same set
-            if (other == this)
-            {
-                return;
-            }
-
-            // if other is empty, intersection is empty set; remove all elements and we're done
-            // can only figure this out if implements ICollection<T>. (IEnumerable<T> has no count)
-            ICollection<T>? otherAsCollection = other as ICollection<T>;
-            if (otherAsCollection != null)
+            // If other is known to be empty, intersection is empty set; remove all elements, and we're done.
+            if (other is ICollection<T> otherAsCollection)
             {
                 if (otherAsCollection.Count == 0)
                 {
@@ -893,11 +823,11 @@ namespace J2N.Collections.Generic
                     return;
                 }
 
-                // faster if other is a hashset using same equality comparer; so check
+                // Faster if other is a hashset using same equality comparer; so check
                 // that other is a hashset using the same equality comparer.
-                if (AreEqualityComparersEqual(this, otherAsCollection))
+                if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
                 {
-                    IntersectWithHashSetWithSameEC(otherAsCollection);
+                    IntersectWithHashSetWithSameEC(otherAsSet);
                     return;
                 }
             }
@@ -918,22 +848,24 @@ namespace J2N.Collections.Generic
         public void ExceptWith(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            // this is already the empty set; return
-            if (_count == 0)
+            // This is already the empty set; return.
+            if (Count == 0)
             {
                 return;
             }
 
-            // special case if other is this; a set minus itself is the empty set
+            // Special case if other is this; a set minus itself is the empty set.
             if (other == this)
             {
                 Clear();
                 return;
             }
 
-            // remove every element in other from this
+            // Remove every element in other from this.
             foreach (T element in other)
             {
                 Remove(element);
@@ -956,16 +888,18 @@ namespace J2N.Collections.Generic
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            // if set is empty, then symmetric difference is other
-            if (_count == 0)
+            // If set is empty, then symmetric difference is other.
+            if (Count == 0)
             {
                 UnionWith(other);
                 return;
             }
 
-            // special case this; the symmetric difference of a set with itself is the empty set
+            // Special-case this; the symmetric difference of a set with itself is the empty set.
             if (other == this)
             {
                 Clear();
@@ -976,10 +910,10 @@ namespace J2N.Collections.Generic
             // but if they're using different equality comparers, then assumption of uniqueness
             // will fail. So first check if other is a hashset using the same equality comparer;
             // symmetric except is a lot faster and avoids bit array allocations if we can assume
-            // uniqueness
-            if (AreEqualityComparersEqual(this, other))
+            // uniqueness.
+            if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
             {
-                SymmetricExceptWithUniqueHashSet(other);
+                SymmetricExceptWithUniqueHashSet(otherAsSet);
             }
             else
             {
@@ -1011,40 +945,34 @@ namespace J2N.Collections.Generic
         public bool IsSubsetOf(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
-
-            // The empty set is a subset of any set
-            if (_count == 0)
-            {
-                return true;
             }
 
+            // The empty set is a subset of any set, and a set is a subset of itself.
             // Set is always a subset of itself
-            if (other == this)
+            if (Count == 0 || other == this)
             {
                 return true;
             }
 
-            ICollection<T>? otherAsCollection = other as ICollection<T>;
-            // faster if other has unique elements according to this equality comparer; so check
+            // Faster if other has unique elements according to this equality comparer; so check
             // that other is a hashset using the same equality comparer.
-            if (otherAsCollection != null && AreEqualityComparersEqual(this, otherAsCollection))
+            if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
             {
                 // if this has more elements then it can't be a subset
-                if (_count > otherAsCollection.Count)
+                if (Count > otherAsSet.Count)
                 {
                     return false;
                 }
 
                 // already checked that we're using same equality comparer. simply check that
                 // each element in this is contained in other.
-                return IsSubsetOfHashSetWithSameEC(otherAsCollection);
+                return IsSubsetOfHashSetWithSameEC(otherAsSet);
             }
-            else
-            {
-                ElementCount result = CheckUniqueAndUnfoundElements(other, false);
-                return (result.uniqueCount == _count && result.unfoundCount >= 0);
-            }
+
+            ElementCount result = CheckUniqueAndUnfoundElements(other, returnIfUnfound: false);
+            return result.uniqueCount == Count && result.unfoundCount >= 0;
         }
 
         /// <summary>
@@ -1071,43 +999,46 @@ namespace J2N.Collections.Generic
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            // no set is a proper subset of itself.
+            // No set is a proper subset of itself.
             if (other == this)
             {
                 return false;
             }
 
-            ICollection<T>? otherAsCollection = other as ICollection<T>;
-            if (otherAsCollection != null)
+            if (other is ICollection<T> otherAsCollection)
             {
-                // no set is a proper subset of an empty set
+                // No set is a proper subset of an empty set.
                 if (otherAsCollection.Count == 0)
                 {
                     return false;
                 }
 
-                // the empty set is a proper subset of anything but the empty set
-                if (_count == 0)
+                // The empty set is a proper subset of anything but the empty set.
+                if (Count == 0)
                 {
                     return otherAsCollection.Count > 0;
                 }
-                // faster if other is a hashset (and we're using same equality comparer)
-                if (AreEqualityComparersEqual(this, otherAsCollection))
+
+                // Faster if other is a hashset (and we're using same equality comparer).
+                if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
                 {
-                    if (_count >= otherAsCollection.Count)
+                    if (Count >= otherAsSet.Count)
                     {
                         return false;
                     }
-                    // this has strictly less than number of items in other, so the following
+
+                    // This has strictly less than number of items in other, so the following
                     // check suffices for proper subset.
-                    return IsSubsetOfHashSetWithSameEC(otherAsCollection);
+                    return IsSubsetOfHashSetWithSameEC(otherAsSet);
                 }
             }
 
-            ElementCount result = CheckUniqueAndUnfoundElements(other, false);
-            return (result.uniqueCount == _count && result.unfoundCount > 0);
+            ElementCount result = CheckUniqueAndUnfoundElements(other, returnIfUnfound: false);
+            return result.uniqueCount == Count && result.unfoundCount > 0;
         }
 
         /// <summary>
@@ -1133,32 +1064,31 @@ namespace J2N.Collections.Generic
         public bool IsSupersetOf(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            // a set is always a superset of itself
+            // A set is always a superset of itself.
             if (other == this)
             {
                 return true;
             }
 
-            // try to fall out early based on counts
-            ICollection<T>? otherAsCollection = other as ICollection<T>;
-            if (otherAsCollection != null)
+            // Try to fall out early based on counts.
+            if (other is ICollection<T> otherAsCollection)
             {
-                // if other is the empty set then this is a superset
+                // If other is the empty set then this is a superset.
                 if (otherAsCollection.Count == 0)
                 {
                     return true;
                 }
 
-                // try to compare based on counts alone if other is a hashset with
-                // same equality comparer
-                if (AreEqualityComparersEqual(this, otherAsCollection))
+                // Try to compare based on counts alone if other is a hashset with same equality comparer.
+                if (other is HashSet<T> otherAsSet &&
+                    EqualityComparersAreEqual(this, otherAsSet) &&
+                    otherAsSet.Count > Count)
                 {
-                    if (otherAsCollection.Count > _count)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
             }
 
@@ -1186,43 +1116,41 @@ namespace J2N.Collections.Generic
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            // the empty set isn't a proper superset of any set.
-            if (_count == 0)
+            // The empty set isn't a proper superset of any set, and a set is never a strict superset of itself.
+            if (Count == 0 || other == this)
             {
                 return false;
             }
 
-            // a set is never a strict superset of itself
-            if (other == this)
+            if (other is ICollection<T> otherAsCollection)
             {
-                return false;
-            }
-
-            ICollection<T>? otherAsCollection = other as ICollection<T>;
-            if (otherAsCollection != null)
-            {
-                // if other is the empty set then this is a superset
+                // If other is the empty set then this is a superset.
                 if (otherAsCollection.Count == 0)
                 {
-                    // note that this has at least one element, based on above check
+                    // Note that this has at least one element, based on above check.
                     return true;
                 }
-                // faster if other is a hashset with the same equality comparer
-                if (AreEqualityComparersEqual(this, otherAsCollection))
+
+                // Faster if other is a hashset with the same equality comparer
+                if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
                 {
-                    if (otherAsCollection.Count >= _count)
+                    if (otherAsSet.Count >= Count)
                     {
                         return false;
                     }
-                    // now perform element check
-                    return ContainsAllElements(otherAsCollection);
+
+                    // Now perform element check.
+                    return ContainsAllElements(otherAsSet);
                 }
             }
-            // couldn't fall out in the above cases; do it the long way
-            ElementCount result = CheckUniqueAndUnfoundElements(other, true);
-            return (result.uniqueCount < _count && result.unfoundCount == 0);
+
+            // Couldn't fall out in the above cases; do it the long way
+            ElementCount result = CheckUniqueAndUnfoundElements(other, returnIfUnfound: true);
+            return result.uniqueCount < Count && result.unfoundCount == 0;
         }
 
         /// <summary>
@@ -1239,14 +1167,16 @@ namespace J2N.Collections.Generic
         public bool Overlaps(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            if (_count == 0)
+            if (Count == 0)
             {
                 return false;
             }
 
-            // set overlaps itself
+            // Set overlaps itself
             if (other == this)
             {
                 return true;
@@ -1259,6 +1189,7 @@ namespace J2N.Collections.Generic
                     return true;
                 }
             }
+
             return false;
         }
 
@@ -1282,41 +1213,42 @@ namespace J2N.Collections.Generic
         public bool SetEquals(IEnumerable<T> other)
         {
             if (other is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+            }
 
-            // a set is equal to itself
+            // A set is equal to itself.
             if (other == this)
             {
                 return true;
             }
 
-            ICollection<T>? otherAsCollection = other as ICollection<T>;
-            // faster if other is a hashset and we're using same equality comparer
-            if (otherAsCollection != null && AreEqualityComparersEqual(this, otherAsCollection))
+            // Faster if other is a hashset and we're using same equality comparer.
+            if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
             {
-                // attempt to return early: since both contain unique elements, if they have
-                // different counts, then they can't be equal
-                if (_count != otherAsCollection.Count)
+                // Attempt to return early: since both contain unique elements, if they have
+                // different counts, then they can't be equal.
+                if (Count != otherAsSet.Count)
                 {
                     return false;
                 }
 
-                // already confirmed that the sets have the same number of distinct elements, so if
-                // one is a superset of the other then they must be equal
-                return ContainsAllElements(otherAsCollection);
+                // Already confirmed that the sets have the same number of distinct elements, so if
+                // one is a superset of the other then they must be equal.
+                return ContainsAllElements(otherAsSet);
             }
             else
             {
-                if (otherAsCollection != null)
+                // If this count is 0 but other contains at least one element, they can't be equal.
+                if (Count == 0 &&
+                    other is ICollection<T> otherAsCollection &&
+                    otherAsCollection.Count > 0)
                 {
-                    // if this count is 0 but other contains at least one element, they can't be equal
-                    if (_count == 0 && otherAsCollection.Count > 0)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
-                ElementCount result = CheckUniqueAndUnfoundElements(other, true);
-                return (result.uniqueCount == _count && result.unfoundCount == 0);
+
+                ElementCount result = CheckUniqueAndUnfoundElements(other, returnIfUnfound: true);
+                return result.uniqueCount == Count && result.unfoundCount == 0;
             }
         }
 
@@ -1330,10 +1262,26 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public void CopyTo(T[] array)
-        {
-            CopyTo(array, 0, _count);
-        }
+        public void CopyTo(T[] array) => CopyTo(array, 0, Count);
+
+        /// <summary>
+        /// Copies the elements of a <see cref="HashSet{T}"/> collection to an array.
+        /// </summary>
+        /// <param name="array">The one-dimensional array that is the destination of
+        /// the elements copied from the <see cref="HashSet{T}"/> object.
+        /// The array must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="arrayIndex"/> is less than 0.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="arrayIndex"/> is greater than the length of the destination <paramref name="array"/>.
+        /// </exception>
+        /// <remarks>
+        /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
+        public void CopyTo(T[] array, int arrayIndex) => CopyTo(array, arrayIndex, Count);
 
         /// <summary>
         /// Copies the specified number of elements of a <see cref="HashSet{T}"/>
@@ -1366,29 +1314,38 @@ namespace J2N.Collections.Generic
         public void CopyTo(T[] array, int arrayIndex, int count)
         {
             if (array is null)
+            {
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            }
 
-            // check array index valid index into array
+            // Check array index valid index into array.
             if (arrayIndex < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(arrayIndex, ExceptionArgument.arrayIndex);
+            {
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
+            }
 
-            // also throw if count less than 0
+            // Also throw if count less than 0.
             if (count < 0)
-                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
+            {
+                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
+            }
 
-            // will array, starting at arrayIndex, be able to hold elements? Note: not
+            // Will the array, starting at arrayIndex, be able to hold elements? Note: not
             // checking arrayIndex >= array.Length (consistency with list of allowing
             // count of 0; subsequent check takes care of the rest)
             if (arrayIndex > array.Length || count > array.Length - arrayIndex)
-                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
-
-            int numCopied = 0;
-            for (int i = 0; i < _lastIndex && numCopied < count; i++)
             {
-                if (_slots[i].hashCode >= 0)
+                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
+            }
+
+            Entry[]? entries = _entries;
+            for (int i = 0; i < _count && count != 0; i++)
+            {
+                ref Entry entry = ref entries![i];
+                if (entry.Next >= -1)
                 {
-                    array[arrayIndex + numCopied] = _slots[i].value;
-                    numCopied++;
+                    array[arrayIndex++] = entry.Value;
+                    count--;
                 }
             }
         }
@@ -1404,18 +1361,22 @@ namespace J2N.Collections.Generic
         public int RemoveWhere(Predicate<T> match)
         {
             if (match is null)
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);
-
-            int numRemoved = 0;
-            for (int i = 0; i < _lastIndex; i++)
             {
-                if (_slots[i].hashCode >= 0)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);
+            }
+
+            Entry[]? entries = _entries;
+            int numRemoved = 0;
+            for (int i = 0; i < _count; i++)
+            {
+                ref Entry entry = ref entries![i];
+                if (entry.Next >= -1)
                 {
-                    // cache value in case delegate removes it
-                    T value = _slots[i].value;
+                    // Cache value in case delegate removes it
+                    T value = entry.Value;
                     if (match(value))
                     {
-                        // check again that remove actually removed it
+                        // Check again that remove actually removed it.
                         if (Remove(value))
                         {
                             numRemoved++;
@@ -1423,6 +1384,7 @@ namespace J2N.Collections.Generic
                     }
                 }
             }
+
             return numRemoved;
         }
 
@@ -1433,7 +1395,10 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// Retrieving the value of this property is an O(1) operation.
         /// </remarks>
-        public IEqualityComparer<T> EqualityComparer => _comparer ?? EqualityComparer<T>.Default;
+        public IEqualityComparer<T> EqualityComparer =>
+            (_comparer == null || _comparer is NonRandomizedStringEqualityComparer) ?
+                EqualityComparer<T>.Default :
+                _comparer;
 
         /// <summary>
         /// Ensures that this hash set can hold the specified number of elements without growing.
@@ -1444,16 +1409,68 @@ namespace J2N.Collections.Generic
         public int EnsureCapacity(int capacity)
         {
             if (capacity < 0)
+            {
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
-            int currentCapacity = _slots == null ? 0 : _slots.Length;
+            }
+
+            int currentCapacity = _entries == null ? 0 : _entries.Length;
             if (currentCapacity >= capacity)
+            {
                 return currentCapacity;
+            }
+
             if (_buckets == null)
+            {
                 return Initialize(capacity);
+            }
 
             int newSize = HashHelpers.GetPrime(capacity);
-            SetCapacity(newSize);
+            Resize(newSize, forceNewHashCodes: false);
             return newSize;
+        }
+
+        private void Resize() => Resize(HashHelpers.ExpandPrime(_count), forceNewHashCodes: false);
+
+        private void Resize(int newSize, bool forceNewHashCodes)
+        {
+            // Value types never rehash
+            Debug.Assert(!forceNewHashCodes || !typeof(T).IsValueType);
+            Debug.Assert(_entries != null, "_entries should be non-null");
+            Debug.Assert(newSize >= _entries.Length);
+
+            var entries = new Entry[newSize];
+
+            int count = _count;
+            Array.Copy(_entries, entries, count);
+
+            if (!typeof(T).IsValueType && forceNewHashCodes)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    ref Entry entry = ref entries[i];
+                    if (entry.Next >= -1)
+                    {
+                        Debug.Assert(_comparer == null);
+                        entry.HashCode = entry.Value != null ? entry.Value!.GetHashCode() : 0;
+                    }
+                }
+            }
+
+            // Assign member variables after both arrays allocated to guard against corruption from OOM if second fails
+            _buckets = new int[newSize];
+            _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)newSize);
+            for (int i = 0; i < count; i++)
+            {
+                ref Entry entry = ref entries[i];
+                if (entry.Next >= -1)
+                {
+                    ref int bucket = ref GetBucketRef(entry.HashCode);
+                    entry.Next = bucket - 1; // Value in _buckets is 1-based
+                    bucket = i + 1;
+                }
+            }
+
+            _entries = entries;
         }
 
         /// <summary>
@@ -1470,50 +1487,37 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public void TrimExcess()
         {
-            Debug.Assert(_count >= 0, "_count is negative");
+            int capacity = Count;
 
-            if (_count == 0)
+            int newSize = HashHelpers.GetPrime(capacity);
+            Entry[]? oldEntries = _entries;
+            int currentCapacity = oldEntries == null ? 0 : oldEntries.Length;
+            if (newSize >= currentCapacity)
             {
-                // if count is zero, clear references
-                _buckets = null;
-                _slots = null!;
-                _version++;
+                return;
             }
-            else
+
+            int oldCount = _count;
+            _version++;
+            Initialize(newSize);
+            Entry[]? entries = _entries;
+            int count = 0;
+            for (int i = 0; i < oldCount; i++)
             {
-                Debug.Assert(_buckets != null, "_buckets was null but _count > 0");
-
-                // similar to IncreaseCapacity but moves down elements in case add/remove/etc
-                // caused fragmentation
-                int newSize = HashHelpers.GetPrime(_count);
-                Slot[] newSlots = new Slot[newSize];
-                int[] newBuckets = new int[newSize];
-
-                // move down slots and rehash at the same time. newIndex keeps track of current
-                // position in newSlots array
-                int newIndex = 0;
-                for (int i = 0; i < _lastIndex; i++)
+                int hashCode = oldEntries![i].HashCode; // At this point, we know we have entries.
+                if (oldEntries[i].Next >= -1)
                 {
-                    if (_slots[i].hashCode >= 0)
-                    {
-                        newSlots[newIndex] = _slots[i];
-
-                        // rehash
-                        int bucket = newSlots[newIndex].hashCode % newSize;
-                        newSlots[newIndex].next = newBuckets[bucket] - 1;
-                        newBuckets[bucket] = newIndex + 1;
-
-                        newIndex++;
-                    }
+                    ref Entry entry = ref entries![count];
+                    entry = oldEntries[i];
+                    ref int bucket = ref GetBucketRef(hashCode);
+                    entry.Next = bucket - 1; // Value in _buckets is 1-based
+                    bucket = count + 1;
+                    count++;
                 }
-
-                Debug.Assert(newSlots.Length <= _slots.Length, "capacity increased after TrimExcess");
-
-                _lastIndex = newIndex;
-                _slots = newSlots;
-                _buckets = newBuckets;
-                _freeList = -1;
             }
+
+            _count = capacity;
+            _freeCount = 0;
         }
 
         #endregion
@@ -1534,10 +1538,7 @@ namespace J2N.Collections.Generic
         /// The <see cref="IEqualityComparer"/> object checks for equality for multiple levels.
         /// Nested reference types that implement <see cref="IStructuralEquatable"/> are also compared.
         /// </remarks>
-        public static IEqualityComparer<ISet<T>> CreateSetComparer()
-        {
-            return SetEqualityComparer<T>.Default;
-        }
+        public static IEqualityComparer<HashSet<T>> CreateSetComparer() => new HashSetEqualityComparer<T>();
 
         /// <summary>
         /// Initializes buckets and slots arrays. Uses suggested capacity by finding next prime
@@ -1546,200 +1547,157 @@ namespace J2N.Collections.Generic
         /// <param name="capacity"></param>
         private int Initialize(int capacity)
         {
-            Debug.Assert(_buckets == null, "Initialize was called but _buckets was non-null");
-
             int size = HashHelpers.GetPrime(capacity);
+            var buckets = new int[size];
+            var entries = new Entry[size];
 
-            _buckets = new int[size];
-            _slots = new Slot[size];
+            // Assign member variables after both arrays are allocated to guard against corruption from OOM if second fails.
+            _freeList = -1;
+            _buckets = buckets;
+            _entries = entries;
+            _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)size);
+
             return size;
         }
 
-        /// <summary>
-        /// Expand to new capacity. New capacity is next prime greater than or equal to suggested
-        /// size. This is called when the underlying array is filled. This performs no
-        /// defragmentation, allowing faster execution; note that this is reasonable since
-        /// AddIfNotPresent attempts to insert new elements in re-opened spots.
-        /// </summary>
-        private void IncreaseCapacity()
-        {
-            Debug.Assert(_buckets != null, "IncreaseCapacity called on a set with no elements");
-
-            int newSize = HashHelpers.ExpandPrime(_count);
-            if (newSize <= _count)
-            {
-                ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_HSCapacityOverflow);
-            }
-
-            // Able to increase capacity; copy elements to larger array and rehash
-            SetCapacity(newSize);
-        }
-
-        /// <summary>
-        /// Set the underlying buckets array to size newSize and rehash.  Note that newSize
-        /// *must* be a prime.  It is very likely that you want to call IncreaseCapacity()
-        /// instead of this method.
-        /// </summary>
-        private void SetCapacity(int newSize)
-        {
-            Debug.Assert(HashHelpers.IsPrime(newSize), "New size is not prime!");
-            Debug.Assert(_buckets != null, "SetCapacity called on a set with no elements");
-
-            Slot[] newSlots = new Slot[newSize];
-            if (_slots != null)
-            {
-                Array.Copy(_slots, newSlots, _lastIndex);
-            }
-
-            int[] newBuckets = new int[newSize];
-            for (int i = 0; i < _lastIndex; i++)
-            {
-                int hashCode = newSlots[i].hashCode;
-                if (hashCode >= 0)
-                {
-                    int bucket = hashCode % newSize;
-                    newSlots[i].next = newBuckets[bucket] - 1;
-                    newBuckets[bucket] = i + 1;
-                }
-            }
-            _slots = newSlots;
-            _buckets = newBuckets;
-        }
-
-        /// <summary>
-        /// Adds value to HashSet if not contained already
-        /// Returns true if added and false if already present
-        /// </summary>
-        /// <param name="value">value to find</param>
-        /// <returns></returns>
-        private bool AddIfNotPresent(T value)
+        /// <summary>Adds the specified element to the set if it's not already contained.</summary>
+        /// <param name="value">The element to add to the set.</param>
+        /// <param name="location">The index into <see cref="_entries"/> of the element.</param>
+        /// <returns>true if the element is added to the <see cref="HashSet{T}"/> object; false if the element is already present.</returns>
+        private bool AddIfNotPresent(T value, out int location)
         {
             if (_buckets == null)
             {
                 Initialize(0);
             }
+            Debug.Assert(_buckets != null);
 
-            int hashCode;
-            int bucket;
-            int collisionCount = 0;
-            Slot[] slots = _slots;
+            Entry[]? entries = _entries;
+            Debug.Assert(entries != null, "expected entries to be non-null");
 
             IEqualityComparer<T>? comparer = _comparer;
+            int hashCode;
+
+            uint collisionCount = 0;
+            ref int bucket = ref UnsafeHelpers.NullRef<int>();
 
             if (comparer == null)
             {
-                hashCode = value == null ? 0 : InternalGetHashCode(value.GetHashCode());
-                bucket = hashCode % _buckets!.Length;
-
-                if (default(T)! != null) // TODO-NULLABLE: default(T) == null warning (https://github.com/dotnet/roslyn/issues/34757)
+                hashCode = value != null ? value.GetHashCode() : 0;
+                bucket = ref GetBucketRef(hashCode);
+                int i = bucket - 1; // Value in _buckets is 1-based
+                if (typeof(T).IsValueType)
                 {
-                    for (int i = _buckets[bucket] - 1; i >= 0; i = slots[i].next)
+                    // ValueType: Devirtualize with EqualityComparer<TValue>.Default intrinsic
+                    while (i >= 0)
                     {
-                        if (slots[i].hashCode == hashCode && EqualityComparer<T>.Default.Equals(slots[i].value, value))
+                        ref Entry entry = ref entries[i];
+                        if (entry.HashCode == hashCode && EqualityComparer<T>.Default.Equals(entry.Value, value))
                         {
+                            location = i;
                             return false;
                         }
+                        i = entry.Next;
 
-                        if (collisionCount >= slots.Length)
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
                             ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
-                        collisionCount++;
                     }
                 }
                 else
                 {
-                    // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize
-                    // https://github.com/dotnet/coreclr/issues/17273
-                    // So cache in a local rather than get EqualityComparer per loop iteration
+                    // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize (https://github.com/dotnet/runtime/issues/10050),
+                    // so cache in a local rather than get EqualityComparer per loop iteration.
                     IEqualityComparer<T> defaultComparer = EqualityComparer<T>.Default;
-
-                    for (int i = _buckets[bucket] - 1; i >= 0; i = slots[i].next)
+                    while (i >= 0)
                     {
-                        if (slots[i].hashCode == hashCode && defaultComparer.Equals(slots[i].value, value))
+                        ref Entry entry = ref entries[i];
+                        if (entry.HashCode == hashCode && defaultComparer.Equals(entry.Value, value))
                         {
+                            location = i;
                             return false;
                         }
+                        i = entry.Next;
 
-                        if (collisionCount >= slots.Length)
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
                         {
                             // The chain of entries forms a loop, which means a concurrent update has happened.
                             ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
-                        collisionCount++;
                     }
                 }
             }
             else
             {
-                hashCode = value == null ? 0 : InternalGetHashCode(comparer.GetHashCode(value));
-                bucket = hashCode % _buckets!.Length;
-
-                for (int i = _buckets[bucket] - 1; i >= 0; i = slots[i].next)
+                hashCode = value != null ? comparer.GetHashCode(value) : 0;
+                bucket = ref GetBucketRef(hashCode);
+                int i = bucket - 1; // Value in _buckets is 1-based
+                while (i >= 0)
                 {
-                    if (slots[i].hashCode == hashCode && comparer.Equals(slots[i].value, value))
+                    ref Entry entry = ref entries[i];
+                    if (entry.HashCode == hashCode && comparer.Equals(entry.Value, value))
                     {
+                        location = i;
                         return false;
                     }
+                    i = entry.Next;
 
-                    if (collisionCount >= slots.Length)
+                    collisionCount++;
+                    if (collisionCount > (uint)entries.Length)
                     {
                         // The chain of entries forms a loop, which means a concurrent update has happened.
                         ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
-                    collisionCount++;
                 }
             }
 
             int index;
-            if (_freeList >= 0)
+            if (_freeCount > 0)
             {
                 index = _freeList;
-                _freeList = slots[index].next;
+                _freeCount--;
+                Debug.Assert((StartOfFreeList - entries![_freeList].Next) >= -1, "shouldn't overflow because `next` cannot underflow");
+                _freeList = StartOfFreeList - entries[_freeList].Next;
             }
             else
             {
-                if (_lastIndex == slots.Length)
+                int count = _count;
+                if (count == entries.Length)
                 {
-                    IncreaseCapacity();
-                    // this will change during resize
-                    slots = _slots;
-                    bucket = hashCode % _buckets.Length;
+                    Resize();
+                    bucket = ref GetBucketRef(hashCode);
                 }
-                index = _lastIndex;
-                _lastIndex++;
+                index = count;
+                _count = count + 1;
+                entries = _entries;
             }
-            slots[index].hashCode = hashCode;
-            slots[index].value = value;
-            slots[index].next = _buckets[bucket] - 1;
-            _buckets[bucket] = index + 1;
-            _count++;
-            _version++;
+
+            {
+                ref Entry entry = ref entries![index];
+                entry.HashCode = hashCode;
+                entry.Next = bucket - 1; // Value in _buckets is 1-based
+                entry.Value = value;
+                bucket = index + 1;
+                _version++;
+                location = index;
+            }
+
+            // Value types never rehash
+            if (!typeof(T).IsValueType && collisionCount > HashHelpers.HashCollisionThreshold && comparer is NonRandomizedStringEqualityComparer)
+            {
+                // If we hit the collision threshold we'll need to switch to the comparer which is using randomized string hashing
+                // i.e. EqualityComparer<string>.Default.
+                _comparer = null;
+                Resize(entries.Length, forceNewHashCodes: true);
+                location = FindItemIndex(value);
+                Debug.Assert(location >= 0);
+            }
 
             return true;
-        }
-
-        // Add value at known index with known hash code. Used only
-        // when constructing from another HashSet.
-        private void AddValue(int index, int hashCode, T value)
-        {
-            int bucket = hashCode % _buckets!.Length;
-
-#if DEBUG
-            IEqualityComparer<T> comparer = _comparer ?? EqualityComparer<T>.Default;
-            Debug.Assert(InternalGetHashCode(value, comparer) == hashCode);
-            for (int i = _buckets[bucket] - 1; i >= 0; i = _slots[i].next)
-            {
-                Debug.Assert(!comparer.Equals(_slots[i].value, value));
-            }
-#endif
-
-            Debug.Assert(_freeList == -1);
-            _slots[index].hashCode = hashCode;
-            _slots[index].value = value;
-            _slots[index].next = _buckets[bucket] - 1;
-            _buckets[bucket] = index + 1;
         }
 
         /// <summary>
@@ -1774,7 +1732,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        private bool IsSubsetOfHashSetWithSameEC(ICollection<T> other)
+        internal bool IsSubsetOfHashSetWithSameEC(ICollection<T> other)
         {
             foreach (T item in this)
             {
@@ -1793,11 +1751,13 @@ namespace J2N.Collections.Generic
         /// <param name="other"></param>
         private void IntersectWithHashSetWithSameEC(ICollection<T> other)
         {
-            for (int i = 0; i < _lastIndex; i++)
+            Entry[]? entries = _entries;
+            for (int i = 0; i < _count; i++)
             {
-                if (_slots[i].hashCode >= 0)
+                ref Entry entry = ref entries![i];
+                if (entry.Next >= -1)
                 {
-                    T item = _slots[i].value;
+                    T item = entry.Value;
                     if (!other.Contains(item))
                     {
                         Remove(item);
@@ -1817,120 +1777,36 @@ namespace J2N.Collections.Generic
         {
             Debug.Assert(_buckets != null, "_buckets shouldn't be null; callers should check first");
 
-            // keep track of current last index; don't want to move past the end of our bit array
-            // (could happen if another thread is modifying the collection)
-            int originalLastIndex = _lastIndex;
-            int intArrayLength = BitHelper.ToIntArrayLength(originalLastIndex);
+            // Keep track of current last index; don't want to move past the end of our bit array
+            // (could happen if another thread is modifying the collection).
+            int originalCount = _count;
+            int intArrayLength = BitHelper.ToIntArrayLength(originalCount);
 
             Span<int> span = stackalloc int[StackAllocThreshold];
             BitHelper bitHelper = intArrayLength <= StackAllocThreshold ?
                 new BitHelper(span.Slice(0, intArrayLength), clear: true) :
                 new BitHelper(new int[intArrayLength], clear: false);
 
-            // mark if contains: find index of in slots array and mark corresponding element in bit array
+            // Mark if contains: find index of in slots array and mark corresponding element in bit array.
             foreach (T item in other)
             {
-                int index = InternalIndexOf(item);
+                int index = FindItemIndex(item);
                 if (index >= 0)
                 {
                     bitHelper.MarkBit(index);
                 }
             }
 
-            // if anything unmarked, remove it. Perf can be optimized here if BitHelper had a
+            // If anything unmarked, remove it. Perf can be optimized here if BitHelper had a
             // FindFirstUnmarked method.
-            for (int i = 0; i < originalLastIndex; i++)
+            for (int i = 0; i < originalCount; i++)
             {
-                if (_slots[i].hashCode >= 0 && !bitHelper.IsMarked(i))
+                ref Entry entry = ref _entries![i];
+                if (entry.Next >= -1 && !bitHelper.IsMarked(i))
                 {
-                    Remove(_slots[i].value);
+                    Remove(entry.Value);
                 }
             }
-        }
-
-        /// <summary>
-        /// Used internally by set operations which have to rely on bit array marking. This is like
-        /// Contains but returns index in slots array.
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        private int InternalIndexOf(T item)
-        {
-            Debug.Assert(_buckets != null, "_buckets was null; callers should check first");
-
-            int[]? buckets = _buckets;
-            int collisionCount = 0;
-            Slot[] slots = _slots;
-            IEqualityComparer<T>? comparer = _comparer;
-
-            if (comparer == null)
-            {
-                int hashCode = item == null ? 0 : InternalGetHashCode(item.GetHashCode());
-
-                if (default(T)! != null) // TODO-NULLABLE: default(T) == null warning (https://github.com/dotnet/roslyn/issues/34757)
-                {
-                    // see note at "HashSet" level describing why "- 1" appears in for loop
-                    for (int i = buckets![hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
-                    {
-                        if (slots[i].hashCode == hashCode && EqualityComparer<T>.Default.Equals(slots[i].value, item))
-                        {
-                            return i;
-                        }
-
-                        if (collisionCount >= slots.Length)
-                        {
-                            // The chain of entries forms a loop, which means a concurrent update has happened.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                        }
-                        collisionCount++;
-                    }
-                }
-                else
-                {
-                    // Object type: Shared Generic, EqualityComparer<TValue>.Default won't devirtualize
-                    // https://github.com/dotnet/coreclr/issues/17273
-                    // So cache in a local rather than get EqualityComparer per loop iteration
-                    IEqualityComparer<T> defaultComparer = EqualityComparer<T>.Default;
-
-                    // see note at "HashSet" level describing why "- 1" appears in for loop
-                    for (int i = buckets![hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
-                    {
-                        if (slots[i].hashCode == hashCode && defaultComparer.Equals(slots[i].value, item))
-                        {
-                            return i;
-                        }
-
-                        if (collisionCount >= slots.Length)
-                        {
-                            // The chain of entries forms a loop, which means a concurrent update has happened.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                        }
-                        collisionCount++;
-                    }
-                }
-            }
-            else
-            {
-                int hashCode = item == null ? 0 : InternalGetHashCode(comparer.GetHashCode(item));
-
-                // see note at "HashSet" level describing why "- 1" appears in for loop
-                for (int i = buckets![hashCode % buckets.Length] - 1; i >= 0; i = slots[i].next)
-                {
-                    if (slots[i].hashCode == hashCode && comparer.Equals(slots[i].value, item))
-                    {
-                        return i;
-                    }
-
-                    if (collisionCount >= slots.Length)
-                    {
-                        // The chain of entries forms a loop, which means a concurrent update has happened.
-                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                    }
-                    collisionCount++;
-                }
-            }
-            // wasn't found
-            return -1;
         }
 
         /// <summary>
@@ -1947,7 +1823,7 @@ namespace J2N.Collections.Generic
             {
                 if (!Remove(item))
                 {
-                    AddIfNotPresent(item);
+                    AddIfNotPresent(item, out _);
                 }
             }
         }
@@ -1971,8 +1847,8 @@ namespace J2N.Collections.Generic
         /// <param name="other"></param>
         private unsafe void SymmetricExceptWithEnumerable(IEnumerable<T> other)
         {
-            int originalLastIndex = _lastIndex;
-            int intArrayLength = BitHelper.ToIntArrayLength(originalLastIndex);
+            int originalCount = _count;
+            int intArrayLength = BitHelper.ToIntArrayLength(originalCount);
 
             Span<int> itemsToRemoveSpan = stackalloc int[StackAllocThreshold / 2];
             BitHelper itemsToRemove = intArrayLength <= StackAllocThreshold / 2 ?
@@ -1986,9 +1862,8 @@ namespace J2N.Collections.Generic
 
             foreach (T item in other)
             {
-                int location = 0;
-                bool added = AddOrGetLocation(item, out location);
-                if (added)
+                int location;
+                if (AddIfNotPresent(item, out location))
                 {
                     // wasn't already present in collection; flag it as something not to remove
                     // *NOTE* if location is out of range, we should ignore. BitHelper will
@@ -2001,9 +1876,9 @@ namespace J2N.Collections.Generic
                 {
                     // already there...if not added from other, mark for remove.
                     // *NOTE* Even though BitHelper will check that location is in range, we want
-                    // to check here. There's no point in checking items beyond originalLastIndex
+                    // to check here. There's no point in checking items beyond originalCount
                     // because they could not have been in the original collection
-                    if (location < originalLastIndex && !itemsAddedFromOther.IsMarked(location))
+                    if (location < originalCount && !itemsAddedFromOther.IsMarked(location))
                     {
                         itemsToRemove.MarkBit(location);
                     }
@@ -2011,75 +1886,13 @@ namespace J2N.Collections.Generic
             }
 
             // if anything marked, remove it
-            for (int i = 0; i < originalLastIndex; i++)
+            for (int i = 0; i < originalCount; i++)
             {
                 if (itemsToRemove.IsMarked(i))
                 {
-                    Remove(_slots[i].value);
+                    Remove(_entries![i].Value);
                 }
             }
-        }
-
-        /// <summary>
-        /// Add if not already in hashset. Returns an out param indicating index where added. This
-        /// is used by SymmetricExcept because it needs to know the following things:
-        /// - whether the item was already present in the collection or added from other
-        /// - where it's located (if already present, it will get marked for removal, otherwise
-        /// marked for keeping)
-        /// </summary>
-        /// <param name="value"></param>
-        /// <param name="location"></param>
-        /// <returns></returns>
-        private bool AddOrGetLocation(T value, out int location)
-        {
-            Debug.Assert(_buckets != null, "_buckets is null, callers should have checked");
-
-            IEqualityComparer<T>? comparer = _comparer;
-            int hashCode = InternalGetHashCode(value, comparer);
-            int bucket = hashCode % _buckets!.Length;
-            int collisionCount = 0;
-            Slot[] slots = _slots;
-            for (int i = _buckets[bucket] - 1; i >= 0; i = slots[i].next)
-            {
-                if (slots[i].hashCode == hashCode && (comparer?.Equals(slots[i].value, value) ?? EqualityComparer<T>.Default.Equals(slots[i].value, value)))
-                {
-                    location = i;
-                    return false; //already present
-                }
-
-                if (collisionCount >= slots.Length)
-                {
-                    // The chain of entries forms a loop, which means a concurrent update has happened.
-                    ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                }
-                collisionCount++;
-            }
-            int index;
-            if (_freeList >= 0)
-            {
-                index = _freeList;
-                _freeList = slots[index].next;
-            }
-            else
-            {
-                if (_lastIndex == slots.Length)
-                {
-                    IncreaseCapacity();
-                    // this will change during resize
-                    slots = _slots;
-                    bucket = hashCode % _buckets.Length;
-                }
-                index = _lastIndex;
-                _lastIndex++;
-            }
-            slots[index].hashCode = hashCode;
-            slots[index].value = value;
-            slots[index].next = _buckets[bucket] - 1;
-            _buckets[bucket] = index + 1;
-            _count++;
-            _version++;
-            location = index;
-            return true;
         }
 
         /// <summary>
@@ -2110,16 +1923,16 @@ namespace J2N.Collections.Generic
         {
             ElementCount result;
 
-            // need special case in case this has no elements.
+            // Need special case in case this has no elements.
             if (_count == 0)
             {
                 int numElementsInOther = 0;
                 foreach (T item in other)
                 {
                     numElementsInOther++;
-                    // break right away, all we want to know is whether other has 0 or 1 elements
-                    break;
+                    break; // break right away, all we want to know is whether other has 0 or 1 elements
                 }
+
                 result.uniqueCount = 0;
                 result.unfoundCount = numElementsInOther;
                 return result;
@@ -2127,27 +1940,25 @@ namespace J2N.Collections.Generic
 
             Debug.Assert((_buckets != null) && (_count > 0), "_buckets was null but count greater than 0");
 
-            int originalLastIndex = _lastIndex;
-            int intArrayLength = BitHelper.ToIntArrayLength(originalLastIndex);
+            int originalCount = _count;
+            int intArrayLength = BitHelper.ToIntArrayLength(originalCount);
 
             Span<int> span = stackalloc int[StackAllocThreshold];
             BitHelper bitHelper = intArrayLength <= StackAllocThreshold ?
                 new BitHelper(span.Slice(0, intArrayLength), clear: true) :
                 new BitHelper(new int[intArrayLength], clear: false);
 
-            // count of items in other not found in this
-            int unfoundCount = 0;
-            // count of unique items in other found in this
-            int uniqueFoundCount = 0;
+            int unfoundCount = 0; // count of items in other not found in this
+            int uniqueFoundCount = 0; // count of unique items in other found in this
 
             foreach (T item in other)
             {
-                int index = InternalIndexOf(item);
+                int index = FindItemIndex(item);
                 if (index >= 0)
                 {
                     if (!bitHelper.IsMarked(index))
                     {
-                        // item hasn't been seen yet
+                        // Item hasn't been seen yet.
                         bitHelper.MarkBit(index);
                         uniqueFoundCount++;
                     }
@@ -2167,70 +1978,6 @@ namespace J2N.Collections.Generic
             return result;
         }
 
-
-        /// <summary>
-        /// Internal method used for HashSetEqualityComparer. Compares set1 and set2 according
-        /// to specified comparer.
-        ///
-        /// Because items are hashed according to a specific equality comparer, we have to resort
-        /// to n^2 search if they're using different equality comparers.
-        /// </summary>
-        /// <param name="set1"></param>
-        /// <param name="set2"></param>
-        /// <param name="comparer"></param>
-        /// <returns></returns>
-        internal static bool HashSetEquals(HashSet<T>? set1, HashSet<T>? set2, IEqualityComparer<T> comparer)
-        {
-            // handle null cases first
-            if (set1 == null)
-            {
-                return (set2 == null);
-            }
-            else if (set2 == null)
-            {
-                // set1 != null
-                return false;
-            }
-
-            // all comparers are the same; this is faster
-            if (AreEqualityComparersEqual(set1, set2))
-            {
-                if (set1.Count != set2.Count)
-                {
-                    return false;
-                }
-                // suffices to check subset
-                foreach (T item in set2)
-                {
-                    if (!set1.Contains(item))
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            else
-            {  // n^2 search because items are hashed according to their respective ECs
-                foreach (T set2Item in set2)
-                {
-                    bool found = false;
-                    foreach (T set1Item in set1)
-                    {
-                        if (comparer.Equals(set2Item, set1Item))
-                        {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found)
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        }
-
         /// <summary>
         /// Checks if equality comparers are equal. This is used for algorithms that can
         /// speed up if it knows the other item has unique elements. I.e. if they're using
@@ -2239,7 +1986,7 @@ namespace J2N.Collections.Generic
         /// <param name="set1"></param>
         /// <param name="set2"></param>
         /// <returns></returns>
-        private static bool AreEqualityComparersEqual(HashSet<T> set1, IEnumerable<T> set2)
+        private static bool EqualityComparersAreEqual(HashSet<T> set1, IEnumerable<T> set2)
         {
             if (set2 is HashSet<T> hashSet)
                 return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
@@ -2255,37 +2002,7 @@ namespace J2N.Collections.Generic
         /// speed up if it knows the other item has unique elements. I.e. if they're using
         /// different equality comparers, then uniqueness assumption between sets break.
         /// </summary>
-        /// <param name="set1"></param>
-        /// <param name="set2"></param>
-        /// <returns></returns>
-        private static bool AreEqualityComparersEqual(HashSet<T> set1, HashSet<T> set2)
-        {
-            return set1.EqualityComparer.Equals(set2.EqualityComparer);
-        }
-
-        /// <summary>
-        /// Workaround Comparers that throw ArgumentNullException for GetHashCode(null).
-        /// </summary>
-        /// <param name="item"></param>
-        /// <param name="comparer"></param>
-        /// <returns>hash code</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int InternalGetHashCode(T item, IEqualityComparer<T>? comparer)
-        {
-            if (item == null)
-            {
-                return 0;
-            }
-
-            int hashCode = comparer?.GetHashCode(item) ?? item.GetHashCode();
-            return hashCode & Lower31BitMask;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static int InternalGetHashCode(int hashCode)
-        {
-            return hashCode & Lower31BitMask;
-        }
+        internal static bool EqualityComparersAreEqual(HashSet<T> set1, HashSet<T> set2) => set1.EqualityComparer.Equals(set2.EqualityComparer);
 
         #endregion
 
@@ -2327,7 +2044,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, SetEqualityComparer<T>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current set. The hash code is calculated 
+        /// Gets the hash code for the current set. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
@@ -2405,77 +2122,98 @@ namespace J2N.Collections.Generic
             internal int unfoundCount;
         }
 
-        internal struct Slot
+        private struct Entry
         {
-            internal int hashCode;      // Lower 31 bits of hash code, -1 if unused
-            internal int next;          // Index of next entry, -1 if last
-            internal T value;
+            public int HashCode;
+            /// <summary>
+            /// 0-based index of next entry in chain: -1 means end of chain
+            /// also encodes whether this entry _itself_ is part of the free list by changing sign and subtracting 3,
+            /// so -2 means end of free list, -3 means index 0 but on free list, -4 means index 1 but on free list, etc.
+            /// </summary>
+            public int Next;
+            public T Value;
         }
 
-        internal struct Enumerator : IEnumerator<T>, IEnumerator
+        /// <summary>
+        /// An enumerator for the <see cref="HashSet{T}"/> class.
+        /// </summary>
+        public struct Enumerator : IEnumerator<T>, IEnumerator
         {
-            private readonly HashSet<T> _set;
-            private int _index;
+            private readonly HashSet<T> _hashSet;
             private readonly int _version;
-            [AllowNull] private T _current;
+            private int _index;
+            private T _current;
 
-            internal Enumerator(HashSet<T> set)
+            internal Enumerator(HashSet<T> hashSet)
             {
-                _set = set;
+                _hashSet = hashSet;
+                _version = hashSet._version;
                 _index = 0;
-                _version = set._version;
-                _current = default;
+                _current = default!;
             }
 
+            /// <summary>
+            /// Releases all resources used by the <see cref="Enumerator"/>.
+            /// </summary>
             public void Dispose()
             {
             }
 
+            /// <summary>
+            /// Advances the enumerator to the next element of the <see cref="HashSet{T}"/>.
+            /// </summary>
+            /// <returns>>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the collection.</returns>
             public bool MoveNext()
             {
-                if (_version != _set._version)
+                if (_version != _hashSet._version)
                 {
                     ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
-                while (_index < _set._lastIndex)
+                // Use unsigned comparison since we set index to dictionary.count+1 when the enumeration ends.
+                // dictionary.count+1 could be negative if dictionary.count is int.MaxValue
+                while ((uint)_index < (uint)_hashSet._count)
                 {
-                    if (_set._slots[_index].hashCode >= 0)
+                    ref Entry entry = ref _hashSet._entries![_index++];
+                    if (entry.Next >= -1)
                     {
-                        _current = _set._slots[_index].value;
-                        _index++;
+                        _current = entry.Value;
                         return true;
                     }
-                    _index++;
                 }
-                _index = _set._lastIndex + 1;
-                _current = default;
+
+                _index = _hashSet._count + 1;
+                _current = default!;
                 return false;
             }
 
+            /// <summary>
+            /// Gets the element in the <see cref="HashSet{T}"/> at the current position of the enumerator.
+            /// </summary>
             public T Current => _current;
 
             object? IEnumerator.Current
             {
                 get
                 {
-                    if (_index == 0 || _index == _set._lastIndex + 1)
+                    if (_index == 0 || (_index == _hashSet._count + 1))
                     {
                         ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
-                    return Current;
+
+                    return _current;
                 }
             }
 
             void IEnumerator.Reset()
             {
-                if (_version != _set._version)
+                if (_version != _hashSet._version)
                 {
                     ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumFailedVersion();
                 }
 
                 _index = 0;
-                _current = default;
+                _current = default!;
             }
         }
 
