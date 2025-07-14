@@ -8,8 +8,14 @@ using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using J2N.TestUtilities;
 using Xunit;
 using SCG = System.Collections.Generic;
+
+#if FEATURE_SERIALIZABLE
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+#endif
 
 namespace J2N.Collections.Tests
 {
@@ -21,6 +27,10 @@ namespace J2N.Collections.Tests
         #region ISet<T> Helper Methods
 
         protected override bool ResetImplemented => true;
+
+        protected override ModifyOperation ModifyEnumeratorThrows => PlatformDetection.IsNetFramework ? base.ModifyEnumeratorThrows : (base.ModifyEnumeratorAllowed & ~(ModifyOperation.Remove | ModifyOperation.Clear));
+
+        protected override ModifyOperation ModifyEnumeratorAllowed => PlatformDetection.IsNetFramework ? base.ModifyEnumeratorAllowed : ModifyOperation.Overwrite | ModifyOperation.Remove | ModifyOperation.Clear;
 
         protected override SCG.ISet<T> GenericISetFactory()
         {
@@ -658,6 +668,59 @@ namespace J2N.Collections.Tests
             Assert.InRange(c.GetHashCodeCalls, 1, int.MaxValue);
         }
 
+        #endregion
+
+        #region Serialization
+
+    #if FEATURE_SERIALIZABLE
+        [Fact]
+        public void ComparerSerialization()
+        {
+            // Strings switch between randomized and non-randomized comparers,
+            // however this should never be observable externally.
+            TestComparerSerialization(EqualityComparer<string>.Default);
+
+            // OrdinalCaseSensitiveComparer is internal and (de)serializes as OrdinalComparer
+            TestComparerSerialization(StringComparer.Ordinal, "System.OrdinalComparer");
+
+            // OrdinalIgnoreCaseComparer is internal and (de)serializes as OrdinalComparer
+            TestComparerSerialization(StringComparer.OrdinalIgnoreCase, "System.OrdinalComparer");
+            TestComparerSerialization(StringComparer.CurrentCulture);
+            TestComparerSerialization(StringComparer.CurrentCultureIgnoreCase);
+            TestComparerSerialization(StringComparer.InvariantCulture);
+            TestComparerSerialization(StringComparer.InvariantCultureIgnoreCase);
+
+            // Check other types while here, IEquatable valuetype, nullable valuetype, and non IEquatable object
+            TestComparerSerialization(EqualityComparer<int>.Default);
+            TestComparerSerialization(EqualityComparer<int?>.Default);
+            TestComparerSerialization(EqualityComparer<object>.Default);
+
+            static void TestComparerSerialization<TCompared>(SCG.IEqualityComparer<TCompared> equalityComparer, string internalTypeName = null)
+            {
+                var bf = new BinaryFormatter();
+                var s = new MemoryStream();
+
+                var dict = new HashSet<TCompared>(equalityComparer);
+
+                Assert.Same(equalityComparer, dict.EqualityComparer);
+
+                bf.Serialize(s, dict);
+                s.Position = 0;
+                dict = (HashSet<TCompared>)bf.Deserialize(s);
+
+                if (internalTypeName == null)
+                {
+                    Assert.IsType(equalityComparer.GetType(), dict.EqualityComparer);
+                }
+                else
+                {
+                    Assert.Equal(internalTypeName, dict.EqualityComparer.GetType().ToString());
+                }
+
+                Assert.True(equalityComparer.Equals(dict.EqualityComparer));
+            }
+        }
+#endif
         #endregion
     }
 }
