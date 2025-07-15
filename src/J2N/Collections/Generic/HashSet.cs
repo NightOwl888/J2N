@@ -1091,7 +1091,15 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            return ContainsAllElements(other);
+            foreach (T element in other)
+            {
+                if (!Contains(element))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -1143,7 +1151,7 @@ namespace J2N.Collections.Generic
                     }
 
                     // Now perform element check.
-                    return ContainsAllElements(otherAsSet);
+                    return otherAsSet.IsSubsetOfHashSetWithSameEC(this);
                 }
             }
 
@@ -1233,8 +1241,8 @@ namespace J2N.Collections.Generic
                 }
 
                 // Already confirmed that the sets have the same number of distinct elements, so if
-                // one is a superset of the other then they must be equal.
-                return ContainsAllElements(otherAsSet);
+                // one is a subset of the other then they must be equal.
+                return IsSubsetOfHashSetWithSameEC(otherAsSet);
             }
             else
             {
@@ -1689,25 +1697,6 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Checks if this contains of other's elements. Iterates over other's elements and
-        /// returns false as soon as it finds an element in other that's not in this.
-        /// Used by SupersetOf, ProperSupersetOf, and SetEquals.
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        private bool ContainsAllElements(IEnumerable<T> other)
-        {
-            foreach (T element in other)
-            {
-                if (!Contains(element))
-                {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
         /// Implementation Notes:
         /// If other is a hashset and is using same equality comparer, then checking subset is
         /// faster. Simply check that each element in this is in other.
@@ -1907,7 +1896,7 @@ namespace J2N.Collections.Generic
         /// <param name="returnIfUnfound">Allows us to finish faster for equals and proper superset
         /// because unfoundCount must be 0.</param>
         /// <returns></returns>
-        private unsafe ElementCount CheckUniqueAndUnfoundElements(IEnumerable<T> other, bool returnIfUnfound)
+        private ElementCount CheckUniqueAndUnfoundElements(IEnumerable<T> other, bool returnIfUnfound)
         {
             ElementCount result;
 
