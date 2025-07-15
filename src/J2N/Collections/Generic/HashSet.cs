@@ -7,11 +7,20 @@ using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using SCG = System.Collections.Generic;
+
+#if FEATURE_SERIALIZABLE
+using System.ComponentModel;
+#endif
+
+#if FEATURE_EXCEPTION_STATIC_GUARDCLAUSES
+using static System.ArgumentOutOfRangeException;
+#else
+using static J2N.Collections.StaticThrowHelper;
+#endif
 
 namespace J2N.Collections.Generic
 {
@@ -1325,17 +1334,8 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
             }
 
-            // Check array index valid index into array.
-            if (arrayIndex < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(arrayIndex), arrayIndex, SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
-
-            // Also throw if count less than 0.
-            if (count < 0)
-            {
-                throw new ArgumentOutOfRangeException(nameof(count), count, SR.ArgumentOutOfRange_NeedNonNegNum);
-            }
+            ThrowIfNegative(arrayIndex);
+            ThrowIfNegative(count);
 
             // Will the array, starting at arrayIndex, be able to hold elements? Note: not
             // checking arrayIndex >= array.Length (consistency with list of allowing
