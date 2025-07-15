@@ -774,24 +774,24 @@ namespace J2N.Collections.Tests
                 var bf = new BinaryFormatter();
                 var s = new MemoryStream();
 
-                var dict = new HashSet<TCompared>(equalityComparer);
+                var set = new HashSet<TCompared>(equalityComparer);
 
-                Assert.Same(equalityComparer, dict.EqualityComparer);
+                Assert.Same(equalityComparer, set.EqualityComparer);
 
-                bf.Serialize(s, dict);
+                bf.Serialize(s, set);
                 s.Position = 0;
-                dict = (HashSet<TCompared>)bf.Deserialize(s);
+                set = (HashSet<TCompared>)bf.Deserialize(s);
 
                 if (internalTypeName == null)
                 {
-                    Assert.IsType(equalityComparer.GetType(), dict.EqualityComparer);
+                    Assert.IsType(equalityComparer.GetType(), set.EqualityComparer);
                 }
                 else
                 {
-                    Assert.Equal(internalTypeName, dict.EqualityComparer.GetType().ToString());
+                    Assert.Equal(internalTypeName, set.EqualityComparer.GetType().ToString());
                 }
 
-                Assert.True(equalityComparer.Equals(dict.EqualityComparer));
+                Assert.True(equalityComparer.Equals(set.EqualityComparer));
             }
         }
 #endif
