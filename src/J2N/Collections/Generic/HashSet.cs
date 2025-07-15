@@ -556,6 +556,11 @@ namespace J2N.Collections.Generic
         public int Count => _count - _freeCount;
 
         /// <summary>
+        /// Gets the total numbers of elements the internal data structure can hold without resizing.
+        /// </summary>
+        public int Capacity => _entries?.Length ?? 0;
+
+        /// <summary>
         /// Gets a value indicating whether a collection is read-only.
         /// </summary>
         /// <remarks>
@@ -1507,10 +1512,24 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public void TrimExcess()
-        {
-            int capacity = Count;
+        public void TrimExcess() => SetCapacity(Count);
 
+        /// <summary>
+        /// Sets the capacity of a <see cref="HashSet{T}"/> object to the specified number of entries,
+        /// rounded up to a nearby, implementation-specific value.
+        /// </summary>
+        /// <param name="capacity">The new capacity.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Passed capacity is lower than entries count.</exception>
+        public void TrimExcess(int capacity)
+        {
+            ThrowIfLessThan(capacity, Count);
+
+            SetCapacity(capacity);
+        }
+
+        private void SetCapacity(int capacity)
+        {
+            Debug.Assert(capacity >= Count);
             int newSize = HashHelpers.GetPrime(capacity);
             Entry[]? oldEntries = _entries;
             int currentCapacity = oldEntries == null ? 0 : oldEntries.Length;
