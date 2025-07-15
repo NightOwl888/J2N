@@ -21,6 +21,7 @@ namespace J2N.Collections.Tests
             return set;
         }
 
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
 
 #if FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION
