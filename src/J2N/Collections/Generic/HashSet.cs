@@ -147,7 +147,7 @@ namespace J2N.Collections.Generic
                 // We use a non-randomized comparer for improved perf, falling back to a randomized comparer if the
                 // hash buckets become unbalanced.
                 if (typeof(T) == typeof(string) &&
-                    NonRandomizedStringEqualityComparer.GetStringComparer(_comparer!) is IEqualityComparer<string> stringComparer)
+                    NonRandomizedStringEqualityComparer.GetStringComparer(_comparer) is IEqualityComparer<string> stringComparer)
                 {
                     _comparer = (IEqualityComparer<T>)stringComparer;
                 }
@@ -213,7 +213,7 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
             }
 
-            if (collection is HashSet<T> otherAsHashSet && EqualityComparersAreEqual(this, otherAsHashSet))
+            if (collection is HashSet<T> otherAsHashSet && EffectiveEqualityComparersAreEqual(this, otherAsHashSet))
             {
                 ConstructFrom(otherAsHashSet);
             }
@@ -286,6 +286,8 @@ namespace J2N.Collections.Generic
         /// <summary>Initializes the HashSet from another HashSet with the same element type and equality comparer.</summary>
         private void ConstructFrom(HashSet<T> source)
         {
+            Debug.Assert(EffectiveEqualityComparersAreEqual(this, source), "must use identical effective comparers.");
+
             if (source.Count == 0)
             {
                 // As well as short-circuiting on the rest of the work done,
@@ -1743,6 +1745,11 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
+        /// Similar to <see cref="Comparer"/> but surfaces the actual comparer being used to hash entries.
+        /// </summary>
+        internal IEqualityComparer<T> EffectiveComparer => _comparer ?? EqualityComparer<T>.Default;
+
+        /// <summary>
         /// Ensures that this hash set can hold the specified number of elements without growing.
         /// </summary>
         /// <param name="capacity">The minimum capacity to ensure.</param>
@@ -2312,6 +2319,12 @@ namespace J2N.Collections.Generic
         /// different equality comparers, then uniqueness assumption between sets break.
         /// </summary>
         internal static bool EqualityComparersAreEqual(HashSet<T> set1, HashSet<T> set2) => set1.EqualityComparer.Equals(set2.EqualityComparer);
+
+        /// <summary>
+        /// Checks if effective equality comparers are equal. This is used for algorithms that
+        /// require that both collections use identical hashing implementations for their entries.
+        /// </summary>
+        internal static bool EffectiveEqualityComparersAreEqual(HashSet<T> set1, HashSet<T> set2) => set1.EffectiveComparer.Equals(set2.EffectiveComparer);
 
         #endregion
 
