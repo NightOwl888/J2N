@@ -3,13 +3,12 @@
 
 using J2N.Numerics;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
-using J2N.Globalization;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
@@ -29,7 +28,7 @@ namespace J2N.Collections.Generic
         // that was passed in to the ctor. The caller chooses one of these singletons so that the
         // GetUnderlyingEqualityComparer method can return the correct value.
 
-        private static readonly NonRandomizedStringEqualityComparer WrappedAroundDefaultComparer = new OrdinalComparer(EqualityComparer<string?>.Default);
+        //private static readonly NonRandomizedStringEqualityComparer WrappedAroundDefaultComparer = new DefaultComparer(EqualityComparer<string?>.Default);
 
         private static readonly NonRandomizedStringEqualityComparer WrappedAroundStringComparerOrdinal = new OrdinalComparer(StringComparer.Ordinal);
 
@@ -91,10 +90,15 @@ namespace J2N.Collections.Generic
             info.SetType(typeof(EqualityComparer<string>));
         }
 
-        private sealed class OrdinalComparer : NonRandomizedStringEqualityComparer
+        // TODO https://github.com/dotnet/runtime/issues/102906:
+        // This custom class exists because EqualityComparer<string>.Default doesn't implement IAlternateEqualityComparer<ROS<char>, string>.
+        // If OrdinalComparer were used, then a dictionary created with a null/Default comparer would be using a comparer that does
+        // implement IAlternateEqualityComparer<ROS<char>, string>, but only until it hits a collision and switches to the randomized comparer.
+        // Once EqualityComparer<string>.Default implements IAlternateEqualityComparer<ROS<char>, string>, we can remove this class, and change
+        // WrappedAroundDefaultComparer to be an instance of OrdinalComparer.
+        private sealed class DefaultComparer : NonRandomizedStringEqualityComparer
         {
-            internal OrdinalComparer(IEqualityComparer<string?> wrappedComparer)
-                : base(wrappedComparer)
+            internal DefaultComparer(IEqualityComparer<string?> wrappedComparer) : base(wrappedComparer)
             {
             }
 
@@ -108,8 +112,48 @@ namespace J2N.Collections.Generic
             }
         }
 
+        private sealed class OrdinalComparer : NonRandomizedStringEqualityComparer
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
+#endif
+        {
+            internal OrdinalComparer(IEqualityComparer<string?> wrappedComparer) : base(wrappedComparer)
+            {
+            }
+
+            public override bool Equals(string? x, string? y) => string.Equals(x, y);
+
+            public override int GetHashCode(string? obj)
+            {
+                Debug.Assert(obj != null, "This implementation is only called from first-party collection types that guarantee non-null parameters.");
+                return GetNonRandomizedHashCode(obj);
+            }
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> span) =>
+                GetNonRandomizedHashCode(span);
+
+            bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> span, string? target)
+            {
+                // See explanation in StringEqualityComparer.Equals.
+                if (span.IsEmpty && target is null)
+                {
+                    return false;
+                }
+
+                return span.SequenceEqual(target);
+            }
+
+            string IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
+#endif
+        }
+
         // J2N: This might be too difficult to implement. It ends up calling native globalization code.
         // private sealed class OrdinalIgnoreCaseComparer : NonRandomizedStringEqualityComparer
+        // #if FEATURE_IALTERNATEEQUALITYCOMPARER
+        //    , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
+        // #endif
         // {
         //     internal OrdinalIgnoreCaseComparer(IEqualityComparer<string?> wrappedComparer)
         //         : base(wrappedComparer)
@@ -123,6 +167,24 @@ namespace J2N.Collections.Generic
         //         Debug.Assert(obj != null, "This implementation is only called from first-party collection types that guarantee non-null parameters.");
         //         return GetNonRandomizedHashCodeOrdinalIgnoreCase(obj);
         //     }
+        // #if FEATURE_IALTERNATEEQUALITYCOMPARER
+        //     int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> span) =>
+        //         string.GetNonRandomizedHashCodeOrdinalIgnoreCase(span);
+        //
+        //     bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> span, string? target)
+        //     {
+        //         // See explanation in StringEqualityComparer.Equals.
+        //         if (span.IsEmpty && target is null)
+        //         {
+        //             return false;
+        //         }
+        //
+        //         return span.EqualsOrdinalIgnoreCase(target);
+        //     }
+        //
+        //     string IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
+        //         span.ToString();
+        // #endif
         //
         //     internal override RandomizedStringEqualityComparer GetRandomizedEqualityComparer()
         //     {
@@ -246,10 +308,11 @@ namespace J2N.Collections.Generic
             // We use a non-randomized comparer for improved perf, falling back to a randomized comparer if the
             // hash buckets become unbalanced.
 
-            if (ReferenceEquals(comparer, EqualityComparer<string>.Default))
-            {
-                return WrappedAroundDefaultComparer;
-            }
+            // J2N: EqualityComparer<string>.Default returns StringComparer.Ordinal, so we don't need to handle it separately.
+            // if (ReferenceEquals(comparer, EqualityComparer<string>.Default))
+            // {
+            //     return WrappedAroundDefaultComparer;
+            // }
 
             if (ReferenceEquals(comparer, StringComparer.Ordinal))
             {
@@ -267,7 +330,7 @@ namespace J2N.Collections.Generic
 
         // Use this if and only if 'Denial of Service' attacks are not a concern (i.e. never used for free-form user input),
         // or are otherwise mitigated
-        internal unsafe int GetNonRandomizedHashCode(string value) // From String class
+        private static unsafe int GetNonRandomizedHashCode(string value) // From String class
         {
             fixed (char* src = value)
             {
@@ -297,6 +360,63 @@ namespace J2N.Collections.Generic
 
                 return (int)(hash1 + (hash2 * 1566083941));
             }
+        }
+
+        private static unsafe int GetNonRandomizedHashCode(ReadOnlySpan<char> span)
+        {
+            uint hash1 = (5381 << 16) + 5381;
+            uint hash2 = hash1;
+
+            int length = span.Length;
+            fixed (char* src = &MemoryMarshal.GetReference(span))
+            {
+                uint* ptr = (uint*)src;
+
+                LengthSwitch:
+                switch (length)
+                {
+                    default:
+                        do
+                        {
+                            length -= 4;
+                            hash1 = BitOperation.RotateLeft(hash1, 5) + hash1 ^ Unsafe.ReadUnaligned<uint>(ptr);
+                            hash2 = BitOperation.RotateLeft(hash2, 5) + hash2 ^ Unsafe.ReadUnaligned<uint>(ptr + 1);
+                            ptr += 2;
+                        }
+                        while (length >= 4);
+                        goto LengthSwitch;
+
+                    case 3:
+                        hash1 = BitOperation.RotateLeft(hash1, 5) + hash1 ^ Unsafe.ReadUnaligned<uint>(ptr);
+                        uint p1 = *(char*)(ptr + 1);
+                        if (!BitConverter.IsLittleEndian)
+                        {
+                            p1 <<= 16;
+                        }
+
+                        hash2 = BitOperation.RotateLeft(hash2, 5) + hash2 ^ p1;
+                        break;
+
+                    case 2:
+                        hash2 = BitOperation.RotateLeft(hash2, 5) + hash2 ^ Unsafe.ReadUnaligned<uint>(ptr);
+                        break;
+
+                    case 1:
+                        uint p0 = *(char*)ptr;
+                        if (!BitConverter.IsLittleEndian)
+                        {
+                            p0 <<= 16;
+                        }
+
+                        hash2 = BitOperation.RotateLeft(hash2, 5) + hash2 ^ p0;
+                        break;
+
+                    case 0:
+                        break;
+                }
+            }
+
+            return (int)(hash1 + (hash2 * 1_566_083_941));
         }
     }
 }
