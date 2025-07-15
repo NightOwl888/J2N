@@ -5,6 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using J2N.TestUtilities;
 using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
@@ -20,11 +21,13 @@ namespace J2N.Collections.Tests
             return set;
         }
 
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
 
 #if FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION
-        protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert;
-        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Remove | ModifyOperation.Clear;
+        protected override ModifyOperation ModifyEnumeratorThrows => PlatformDetection.IsNetFramework ? base.ModifyEnumeratorThrows : (base.ModifyEnumeratorAllowed & ~ModifyOperation.Remove);
+
+        protected override ModifyOperation ModifyEnumeratorAllowed => PlatformDetection.IsNetFramework ? base.ModifyEnumeratorAllowed : ModifyOperation.Overwrite | ModifyOperation.Remove;
 #endif
 
         /// <summary>
