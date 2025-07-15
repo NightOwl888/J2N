@@ -1579,8 +1579,8 @@ namespace J2N
                 //    return SR.Format_ExpectedAsciiDigit;
                 //case ExceptionResource.Argument_HasToBeArrayClass:
                 //    return SR.Argument_HasToBeArrayClass;
-                //case ExceptionResource.InvalidOperation_IncompatibleComparer:
-                //    return SR.InvalidOperation_IncompatibleComparer;
+                case ExceptionResource.InvalidOperation_IncompatibleComparer:
+                    return SR.InvalidOperation_IncompatibleComparer;
                 case ExceptionResource.ArgumentOutOfRange_PositionMustBeLessThanLimit:
                     return SR.ArgumentOutOfRange_PositionMustBeLessThanLimit;
                 case ExceptionResource.ArgumentOutOfRange_LimitMustBeLessThanCapacity:
@@ -1887,7 +1887,7 @@ namespace J2N
         //Format_UnclosedFormatItem,
         //Format_ExpectedAsciiDigit,
         //Argument_HasToBeArrayClass,
-        //InvalidOperation_IncompatibleComparer,
+        InvalidOperation_IncompatibleComparer,
         ArgumentOutOfRange_PositionMustBeLessThanLimit,
         ArgumentOutOfRange_LimitMustBeLessThanCapacity,
         InvalidOperation_ViewFailedVersion,
