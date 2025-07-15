@@ -1512,7 +1512,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public void TrimExcess() => SetCapacity(Count);
+        public void TrimExcess() => TrimExcess(Count);
 
         /// <summary>
         /// Sets the capacity of a <see cref="HashSet{T}"/> object to the specified number of entries,
@@ -1524,12 +1524,6 @@ namespace J2N.Collections.Generic
         {
             ThrowIfLessThan(capacity, Count);
 
-            SetCapacity(capacity);
-        }
-
-        private void SetCapacity(int capacity)
-        {
-            Debug.Assert(capacity >= Count);
             int newSize = HashHelpers.GetPrime(capacity);
             Entry[]? oldEntries = _entries;
             int currentCapacity = oldEntries == null ? 0 : oldEntries.Length;
@@ -1557,7 +1551,7 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            _count = capacity;
+            _count = count;
             _freeCount = 0;
         }
 
