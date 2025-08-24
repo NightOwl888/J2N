@@ -10,7 +10,8 @@ namespace J2N.Collections.Tests
 {
     public class List_Generic_Tests_string : List_Generic_Tests<string>
     {
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
+        // With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override string CreateT(int seed)
         {
             int stringLength = seed % 10 + 5;
@@ -23,7 +24,8 @@ namespace J2N.Collections.Tests
 
     public class List_Generic_Tests_int : List_Generic_Tests<int>
     {
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
+        // With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override int CreateT(int seed)
         {
             Random rand = new Random(seed);
@@ -42,10 +44,9 @@ namespace J2N.Collections.Tests
             return Convert.ToBase64String(bytes);
         }
 
-        // J2N: See the comment in the root Directory.Build.targets file
-#if FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
-#endif
+        // J2N: With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
+        // regardless of the FEATURE_READONLYCOLLECTION flag
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
 
         protected override bool IsReadOnly => true;
 
@@ -70,10 +71,9 @@ namespace J2N.Collections.Tests
             return rand.Next();
         }
 
-        // J2N: See the comment in the root Directory.Build.targets file
-#if FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
-#endif
+        // J2N: With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
+        // regardless of the FEATURE_READONLYCOLLECTION flag
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool IsReadOnly => true;
 
         protected override IList<int> GenericIListFactory(int setLength)

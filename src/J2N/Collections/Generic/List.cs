@@ -1514,10 +1514,16 @@ namespace J2N.Collections.Generic
             return new Enumerator(this);
         }
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
-            // J2N: we need to support modification during enumeration, so we cannot return a static empty enumerator.
-            // Count == 0 ? SZGenericArrayEnumerator<T>.Empty :
-                GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator()
+        {
+            if (Count == 0)
+            {
+                CoModificationCheck();
+                return SZGenericArrayEnumerator<T>.Empty;
+            }
+
+            return GetEnumerator();
+        }
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
 
