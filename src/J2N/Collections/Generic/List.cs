@@ -1471,12 +1471,8 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an enumerator that iterates through the <see cref="List{T}"/>.
         /// </summary>
-        /// <returns>An <see cref="Enumerator"/> for the <see cref="List{T}"/>.</returns>
+        /// <returns>An <see cref="IEnumerator{T}"/> for the <see cref="List{T}"/>.</returns>
         /// <remarks>
-        /// This method returns an enumerator struct instead of <see cref="IEnumerable{T}"/> to help
-        /// avoid allocations when used directly. The rest of these remarks refer to <see cref="IEnumerable{T}"/>
-        /// as the contract, and can be considered to apply to the enumerator struct as well.
-        /// <para/>
         /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
         /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
         /// <para/>
@@ -1512,7 +1508,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public Enumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             CoModificationCheck();
             return new Enumerator(this);
