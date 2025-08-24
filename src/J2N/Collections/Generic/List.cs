@@ -1813,16 +1813,15 @@ namespace J2N.Collections.Generic
 
                     if (_items.Length - _size < count)
                     {
-                        Grow(checked(_size + count)); // J2N NOTE: we can't use GrowForInsertion here because SubList logic is different
+                        GrowForInsertion(index, count);
                     }
-
-                    // We need to fixup our sublist reference if it is broken by Grow
-                    subList._items = _items;
-
-                    if (index < _size)
+                    else if (index < _size)
                     {
                         Array.Copy(_items, index, _items, index + count, _size - index);
                     }
+
+                    // We need to fixup our sublist reference if it is broken by GrowForInsertion
+                    subList._items = _items;
 
                     // We're inserting a SubList which is a descendant into this list,
                     // so we already have the elements in the local array.
@@ -1888,9 +1887,9 @@ namespace J2N.Collections.Generic
             {
                 if (_items.Length - _size < source.Length)
                 {
-                    Grow(checked(_size + source.Length));
+                    GrowForInsertion(index, source.Length);
                 }
-                if (index < _size)
+                else if (index < _size)
                 {
                     Array.Copy(_items, index, _items, index + source.Length, _size - index);
                 }
