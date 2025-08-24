@@ -2752,11 +2752,43 @@ namespace J2N.Collections.Generic
         #region Nested Structure: Enumerator
 
         /// <summary>
-        /// An enumerator for the <see cref="List{T}"/> class.
+        /// Enumerates the elements of a <see cref="List{T}"/>.
         /// </summary>
+        /// <remarks>
+        /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
+        /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended, instead of directly
+        /// manipulating the enumerator.
+        /// <para/>
+        /// Enumerators can be used to read the data in the collection, but they cannot be used to modify the underlying collection.
+        /// <para/>
+        /// Initially, the enumerator is positioned before the first element in the collection. At this position,
+        /// <see cref="Current"/> is undefined. Therefore, you must call <see cref="MoveNext()"/> to advance the enumerator
+        /// to the first element of the collection before reading the value of <see cref="Current"/>.
+        /// <para/>
+        /// <see cref="Current"/> returns the same object until <see cref="MoveNext()"/> is called. <see cref="MoveNext()"/>
+        /// sets <see cref="Current"/> to the next element.
+        /// <para/>
+        /// If <see cref="MoveNext()"/> passes the end of the collection, the enumerator is positioned after the last element
+        /// in the collection and <see cref="MoveNext()"/> returns <c>false</c>. When the enumerator is at this position,
+        /// subsequent calls to <see cref="MoveNext()"/> also return <c>false</c>. If the last call to <see cref="MoveNext()"/>
+        /// returned <c>false</c>, <see cref="Current"/> is undefined. You cannot set <see cref="Current"/> to the first
+        /// element of the collection again; you must create a new enumerator instance instead.
+        /// <para/>
+        /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the collection,
+        /// such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated and its behavior is undefined.
+        /// <para/>
+        /// The enumerator does not have exclusive access to the collection; therefore, enumerating through a collection is
+        /// intrinsically not a thread-safe procedure. To guarantee thread safety during enumeration, you can lock the
+        /// collection during the entire enumeration. To allow the collection to be accessed by multiple threads for
+        /// reading and writing, you must implement your own synchronization.
+        /// <para/>
+        /// Default implementations of collections in the <see cref="J2N.Collections.Generic"/> namespace are not synchronized.
+        /// </remarks>
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
+        [SuppressMessage("Microsoft.Performance", "CA1815:OverrideEqualsAndOperatorEqualsOnValueTypes", Justification = "not an expected scenario")]
+        [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
         public struct Enumerator : IEnumerator<T>, IEnumerator
         {
             private readonly List<T> list;
@@ -2773,7 +2805,7 @@ namespace J2N.Collections.Generic
             }
 
             /// <summary>
-            /// Disposes the enumerator, releasing any resources it holds.
+            /// Releases all resources used by the <see cref="Enumerator"/>.
             /// </summary>
             public void Dispose()
             {
@@ -2783,8 +2815,22 @@ namespace J2N.Collections.Generic
             /// Advances the enumerator to the next element of the <see cref="List{T}"/>.
             /// </summary>
             /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
-            /// otherwise, <c>false</c>. When the enumerator has passed the end of the collection,
-            /// <c>false</c> is returned.</returns>
+            /// <c>false</c> if the enumerator has passed the end of the collection.</returns>
+            /// <exception cref="InvalidOperationException">The collection was modified after the enumerator was created.</exception>
+            /// <remarks>
+            /// After an enumerator is created, the enumerator is positioned before the first element in the collection,
+            /// and the first call to the <see cref="MoveNext()"/> method advances the enumerator to the first element
+            /// of the collection.
+            /// <para/>
+            /// If MoveNext passes the end of the collection, the enumerator is positioned after the last element in the
+            /// collection and <see cref="MoveNext()"/> returns <c>false</c>. When the enumerator is at this position,
+            /// subsequent calls to <see cref="MoveNext()"/> also return <c>false</c>.
+            /// <para/>
+            /// An enumerator remains valid as long as the collection remains unchanged. If changes are made to the
+            /// collection, such as adding, modifying, or deleting elements, the enumerator is irrecoverably invalidated
+            /// and the next call to <see cref="MoveNext()"/> or <see cref="IEnumerator.Reset()"/> throws an
+            /// <see cref="InvalidOperationException"/>.
+            /// </remarks>
             public bool MoveNext()
             {
                 List<T> localList = list;
@@ -2812,8 +2858,28 @@ namespace J2N.Collections.Generic
             }
 
             /// <summary>
-            /// Gets the element in the <see cref="List{T}"/> at the current position of the enumerator.
+            /// Gets the element at the current position of the enumerator.
             /// </summary>
+            /// <remarks>
+            /// <see cref="Current"/> is undefined under any of the following conditions:
+            /// <list type="bullet">
+            ///     <item><description>
+            ///         The enumerator is positioned before the first element of the collection. That happens after an
+            ///         enumerator is created or after the <see cref="IEnumerator.Reset()"/> method is called. The <see cref="MoveNext()"/>
+            ///         method must be called to advance the enumerator to the first element of the collection before reading the value of
+            ///         the <see cref="Current"/> property.
+            ///     </description></item>
+            ///     <item><description>
+            ///         The last call to <see cref="MoveNext()"/> returned <c>false</c>, which indicates the end of the collection and that the
+            ///         enumerator is positioned after the last element of the collection.
+            ///     </description></item>
+            ///     <item><description>
+            ///         The enumerator is invalidated due to changes made in the collection, such as adding, modifying, or deleting elements.
+            ///     </description></item>
+            /// </list>
+            /// <see cref="Current"/> returns the same element until <see cref="MoveNext()"/> is called. <see cref="MoveNext()"/>
+            /// sets <see cref="Current"/> to the next element.
+            /// </remarks>
             public T Current => current;
 
             object? IEnumerator.Current
@@ -2830,10 +2896,7 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            /// <summary>
-            /// Resets the enumerator to its initial position, which is before the first element in the <see cref="List{T}"/>.
-            /// </summary>
-            public void Reset()
+            void IEnumerator.Reset()
             {
                 list.CoModificationCheck();
                 if (version != list._version)
