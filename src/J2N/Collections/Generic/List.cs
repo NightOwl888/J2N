@@ -1001,10 +1001,13 @@ namespace J2N.Collections.Generic
         /// And copy data to their after-insertion positions.
         /// This method is specifically for insertion, as it avoids 1 extra array copy.
         /// You should only call this method when Count + insertionCount > Capacity.
+        /// <see cref="GrowForInsertion"/>, much like <see cref="DoSetCapacity"/> must be overridden in SubList because there is a danger
+        /// that it can be called and produce a new array without updating the array of the SubList to point to
+        /// the same memory location.
         /// </summary>
         /// <param name="indexToInsert">Index of the first insertion.</param>
         /// <param name="insertionCount">How many elements will be inserted.</param>
-        internal void GrowForInsertion(int indexToInsert, int insertionCount = 1)
+        internal virtual void GrowForInsertion(int indexToInsert, int insertionCount = 1)
         {
             Debug.Assert(insertionCount > 0);
 
