@@ -106,28 +106,27 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
                 int originalParentSize = parent._size;
+                int added = 0;
                 try
                 {
                     // NOTE: It seems like we should be calling parent.DoAddRange here, but we need to insert at the end of the sublist,
                     // which is at parentOffset + size, not at the end of the parent.
-                    int added = parent.DoInsertRange(parentOffset + size, collection);
-                    _version = parent._version;
-                    if (_items != parent._items)
-                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
-                    size += added;
-                    _size = parent._size;
+                    added = parent.DoInsertRange(parentOffset + size, collection);
                 }
                 catch
                 {
                     // Rare: When appending using the enumerator, we might get an InvalidOperationException. But we still need to
                     // update our state to match the parent.
-                    int added = parent._size - originalParentSize;
+                    added = parent._size - originalParentSize;
+                    throw;
+                }
+                finally
+                {
                     _version = parent._version;
                     if (_items != parent._items)
                         _items = parent._items; // Our items changed to a new array, we need to update the reference.
                     size += added;
                     _size = parent._size;
-                    throw;
                 }
             }
 
@@ -136,28 +135,27 @@ namespace J2N.Collections.Generic
                 CoModificationCheck();
 
                 int originalParentSize = parent._size;
+                int added = 0;
                 try
                 {
                     // NOTE: It seems like we should be calling parent.DoAddRange here, but we need to insert at the end of the sublist,
                     // which is at parentOffset + size, not at the end of the parent.
-                    int added = parent.DoInsertRange(parentOffset + size, source);
-                    _version = parent._version;
-                    if (_items != parent._items)
-                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
-                    size += added;
-                    _size = parent._size;
+                    added = parent.DoInsertRange(parentOffset + size, source);
                 }
                 catch
                 {
                     // Rare: When appending using the enumerator, we might get an InvalidOperationException. But we still need to
                     // update our state to match the parent.
-                    int added = parent._size - originalParentSize;
+                    added = parent._size - originalParentSize;
+                    throw;
+                }
+                finally
+                {
                     _version = parent._version;
                     if (_items != parent._items)
                         _items = parent._items; // Our items changed to a new array, we need to update the reference.
                     size += added;
                     _size = parent._size;
-                    throw;
                 }
             }
 
@@ -171,28 +169,27 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
 
                 int originalParentSize = parent._size;
+                int added = 0;
                 try
                 {
-                    int added = parent.DoInsertRange(index + parentOffset, collection);
-                    _version = parent._version;
-                    if (_items != parent._items)
-                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
-                    size += added;
-                    _size = parent._size;
-                    return added;
+                    added = parent.DoInsertRange(index + parentOffset, collection);
                 }
                 catch
                 {
                     // Rare: When appending using the enumerator, we might get an InvalidOperationException. But we still need to
                     // update our state to match the parent.
-                    int added = parent._size - originalParentSize;
+                    added = parent._size - originalParentSize;
+                    throw;
+                }
+                finally
+                {
                     _version = parent._version;
                     if (_items != parent._items)
                         _items = parent._items; // Our items changed to a new array, we need to update the reference.
                     size += added;
                     _size = parent._size;
-                    throw;
                 }
+                return added;
             }
 
             internal override int DoInsertRange(int index, ReadOnlySpan<T> source)
@@ -203,28 +200,27 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
 
                 int originalParentSize = parent._size;
+                int added = 0;
                 try
                 {
-                    int added = parent.DoInsertRange(index + parentOffset, source);
-                    _version = parent._version;
-                    if (_items != parent._items)
-                        _items = parent._items; // Our items changed to a new array, we need to update the reference.
-                    size += added;
-                    _size = parent._size;
-                    return added;
+                    added = parent.DoInsertRange(index + parentOffset, source);
                 }
                 catch
                 {
                     // Rare: When appending using the enumerator, we might get an InvalidOperationException. But we still need to
                     // update our state to match the parent.
-                    int added = parent._size - originalParentSize;
+                    added = parent._size - originalParentSize;
+                    throw;
+                }
+                finally
+                {
                     _version = parent._version;
                     if (_items != parent._items)
                         _items = parent._items; // Our items changed to a new array, we need to update the reference.
                     size += added;
                     _size = parent._size;
-                    throw;
                 }
+                return added;
             }
 
             internal override bool DoRemove(T item)
