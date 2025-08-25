@@ -182,9 +182,11 @@ namespace J2N.Collections.Generic
             {"Sort(Comparison)",                            (list) => list.Sort((x, y) => x - y)},
             {"Shuffle",                                     (list) => list.Shuffle()},
             {"Swap",                                        (list) => list.Swap(4, 6)},
+            {"EnsureCapacity",                              (list) => list.EnsureCapacity(20)},
         };
 
         private static readonly int[] ListTestBuffer = new int[15];
+        private static readonly int[] ListTestSpanBuffer = new int[15];
 
         private static readonly TupleList<string, Action<List<int>>> ListActions = new TupleList<string, Action<List<int>>>
         {
@@ -197,6 +199,7 @@ namespace J2N.Collections.Generic
             { "CopyTo(T[])",                                (list) => list.CopyTo(ListTestBuffer)},
             { "CopyTo(T[], int)",                           (list) => list.CopyTo(ListTestBuffer, 0)},
             { "CopyTo(int, T[], int, int)",                 (list) => list.CopyTo(0, ListTestBuffer, 0, 1)},
+            { "CopyTo(Span<T>)",                            (list) => list.CopyTo(ListTestSpanBuffer.AsSpan(0, list.Count))},
             { "Equals(object)",                             (list) => list.Equals(list)},
             { "Equals(object, IEqualityComparer<T>)",       (list) => list.Equals(list, ListEqualityComparer<int>.Default)},
             { "Exists",                                     (list) => list.Exists((value) => value == 6)},
@@ -220,6 +223,7 @@ namespace J2N.Collections.Generic
             { "LastIndexOf(int)",                           (list) => list.LastIndexOf(6)},
             { "LastIndexOf(int, int)",                      (list) => list.LastIndexOf(6, list.Count - 1)},
             { "LastIndexOf(int, int, int)",                 (list) => list.LastIndexOf(6, list.Count - 1, 5)},
+            { "Slice",                                      (list) => list.Slice(1, 2)},
             { "ToArray",                                    (list) => list.ToArray()},
             { "ToString()",                                 (list) => list.ToString()},
             { "ToString(string)",                           (list) => list.ToString("J")},
