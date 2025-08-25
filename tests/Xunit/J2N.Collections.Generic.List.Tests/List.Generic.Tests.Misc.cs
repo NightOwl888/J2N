@@ -251,7 +251,18 @@ namespace J2N.Collections.Tests
                 List<T> range = useSlice ? list.Slice(index, count) : list.GetRange(index, count); // J2N: middle part was `list[index..(index + count)]` but this doesn't work on .NET Framework
                 T tempItem = list[index];
                 range[0] = item;
-                Assert.Equal(list[index], tempItem); //String.Format("Err_707811hapba Expected item: {0} at: {1} actual: {2}", tempItem, index, list[index])
+
+                // J2N: Slice returns a view (affects original), GetRange returns a copy (doesn't affect original)
+                if (useSlice)
+                {
+                    // Slice is a view, so modifying it should affect the original list
+                    Assert.Equal(list[index], item); //String.Format("Err_707811hapba_slice Expected item: {0} at: {1} actual: {2}", item, index, list[index])
+                }
+                else
+                {
+                    // GetRange is a copy, so modifying it should NOT affect the original list
+                    Assert.Equal(list[index], tempItem); //String.Format("Err_707811hapba Expected item: {0} at: {1} actual: {2}", tempItem, index, list[index])
+                }
             }
 
             public void EnsureThrowsAfterModification(T[] items, T item, int index, int count, bool useSlice)
@@ -261,7 +272,17 @@ namespace J2N.Collections.Tests
                 T tempItem = list[index];
                 list[index] = item;
 
-                Assert.Equal(range[0], tempItem); //String.Format("Err_1221589ajpa Expected item: {0} at: {1} actual: {2}", tempItem, 0, range[0])
+                // J2N: Slice throws on access after parent modification, GetRange doesn't (it's a copy)
+                if (useSlice)
+                {
+                    // Slice should throw InvalidOperationException when accessed after parent modification
+                    Assert.Throws<InvalidOperationException>(() => range[0]);
+                }
+                else
+                {
+                    // GetRange is a copy, so it should still have the old value
+                    Assert.Equal(range[0], tempItem); //String.Format("Err_1221589ajpa Expected item: {0} at: {1} actual: {2}", tempItem, 0, range[0])
+                }
             }
 
             public void GetRangeValidations(T[] items, bool useSlice)

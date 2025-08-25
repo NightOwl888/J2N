@@ -1588,7 +1588,7 @@ namespace J2N.Collections.Generic
         /// <paramref name="length" /> is less than 0.
         /// </exception>
         /// <exception cref="ArgumentException"><paramref name="start" /> and <paramref name="length" /> do not denote a valid range of elements in the <see cref="List{T}" />.</exception>
-        public List<T> Slice(int start, int length) => GetRange(start, length);
+        public List<T> Slice(int start, int length) => GetView(start, length);
 
         /// <summary>
         /// Searches for the specified object and returns the zero-based index of the first occurrence within
