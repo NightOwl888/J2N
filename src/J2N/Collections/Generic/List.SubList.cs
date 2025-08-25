@@ -336,7 +336,9 @@ namespace J2N.Collections.Generic
             internal override void CoModificationCheck()
             {
                 if (AncestralVersion != _version)
+                {
                     ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_ViewFailedVersion);
+                }
             }
         }
     }

@@ -287,7 +287,6 @@ namespace J2N.Collections.Generic
                 {
                     _items = s_emptyArray;
                 }
-                _version++; // J2N: Unlike .NET, we consider reallocating the array a "modification" to the list to ensure sublists use the same array reference
                 return true;
             }
             return false;

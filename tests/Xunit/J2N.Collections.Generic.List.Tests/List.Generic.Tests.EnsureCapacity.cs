@@ -15,11 +15,9 @@ namespace J2N.Collections.Tests
     /// </summary>
     public abstract partial class List_Generic_Tests<T> : IList_Generic_Tests<T>
     {
-        // J2N: Unlike .NET, we consider reallocating the array a "modification" to the list to ensure sublists use the same array reference.
-        // This method was changed in .NET to be "_DoesNotInvalidateEnumeration" but we want to retain this original assertion.
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void EnsureCapacity_RequestingLargerCapacity_DoesInvalidateEnumeration(int count)
+        public void EnsureCapacity_RequestingLargerCapacity_DoesNotInvalidateEnumeration(int count)
         {
             JCG.List<T> list = GenericListFactory(count);
             IEnumerator<T> copiedListEnumerator = new JCG.List<T>(list).GetEnumerator();
@@ -28,8 +26,7 @@ namespace J2N.Collections.Tests
 
             list.EnsureCapacity(capacity + 1);
 
-            // J2N: see comment for method above
-            Assert.Throws<InvalidOperationException>(() => enumerator.MoveNext());
+            enumerator.MoveNext(); // Should not throw
         }
 
         [Fact]
@@ -105,16 +102,15 @@ namespace J2N.Collections.Tests
             Assert.InRange(newCapacity, requestCapacity, int.MaxValue);
         }
 
-        // J2N NOTE: Per comment in DoSetCapacity, "we consider reallocating the array a "modification" to the list to ensure sublists use the same array reference"
-        // [Theory]
-        // [MemberData(nameof(ValidCollectionSizes))]
-        // public void EnsureCapacity_RequestingLargerCapacity_DoesNotImpactListContent(int count)
-        // {
-        //     JCG.List<T> list = GenericListFactory(count);
-        //     var copiedList = new JCG.List<T>(list);
-        //
-        //     list.EnsureCapacity(list.Capacity + 1);
-        //     Assert.Equal(copiedList, list);
-        // }
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void EnsureCapacity_RequestingLargerCapacity_DoesNotImpactListContent(int count)
+        {
+            JCG.List<T> list = GenericListFactory(count);
+            var copiedList = new JCG.List<T>(list);
+
+            list.EnsureCapacity(list.Capacity + 1);
+            Assert.Equal(copiedList, list);
+        }
     }
 }
