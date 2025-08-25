@@ -82,13 +82,13 @@ namespace J2N.Collections.Generic
 
             subList.AddRange(subList);
 
-            var expectedList = new List<int> { 
+            var expectedList = new List<int> {
                 // Head of parent items
                 1, 2,
-                
+
                 // SubList items
                 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-            
+
                 // Inserted items
                 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
 
@@ -108,16 +108,16 @@ namespace J2N.Collections.Generic
 
             grandchildList.AddRange(grandchildList);
 
-            var expectedList = new List<int> { 
+            var expectedList = new List<int> {
                 // Head of grandparent items
                 1, 2,
-                
+
                 // Head of parent items
                 3,
 
                 // SubList items
                 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-            
+
                 // Inserted items
                 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
 
@@ -182,7 +182,6 @@ namespace J2N.Collections.Generic
             {"Sort(Comparison)",                            (list) => list.Sort((x, y) => x - y)},
             {"Shuffle",                                     (list) => list.Shuffle()},
             {"Swap",                                        (list) => list.Swap(4, 6)},
-            {"EnsureCapacity",                              (list) => list.EnsureCapacity(20)},
         };
 
         private static readonly int[] ListTestBuffer = new int[15];
@@ -230,6 +229,7 @@ namespace J2N.Collections.Generic
             { "ToString(IFormatProvider)",                  (list) => list.ToString(J2N.Text.StringFormatter.InvariantCulture)},
             { "ToString(string, IFormatProvider)",          (list) => list.ToString("J", J2N.Text.StringFormatter.InvariantCulture)},
             { "TrueForAll",                                 (list) => list.TrueForAll((value) => value == 6)},
+            { "EnsureCapacity",                              (list) => list.EnsureCapacity(20)},
         };
 
         public static IEnumerable<TestCaseData> SubList_CoModification_Data
@@ -1496,22 +1496,14 @@ namespace J2N.Collections.Generic
                             [i] == objArray[i]);
                 //var v = new List<string>();
                 //v.Add("a");
-                List<string> al = new List<string>(capacity: 16); // J2N: We need to call the constructor that allows us to set the capacity greater than the size of the items for the exception to occur.
+                // J2N: .NET doesn't throw in this case, because TrimExcess (like EnsureCapacity) is not
+                // considered to be a structural modification of the collection state.
+                List<string> al = new List<string>(capacity: 16);
                 al.Add("a");
                 var it = al.GetEnumerator();
                 al.TrimExcess();
-                try
-                {
-                    it.MoveNext();
-                    fail("should throw a ConcurrentModificationException");
-                }
-                catch (InvalidOperationException ioobe)
-                {
-                    // expected
-                }
-                //// J2N: .NET doesn't throw in this case, because TrimExcess is not considered to be an edit of
-                //// the collection state.
-                //assertTrue(it.MoveNext());
+                // Should not throw - capacity changes don't invalidate enumerators
+                assertTrue(it.MoveNext());
             }
 
             /**
