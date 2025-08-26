@@ -480,5 +480,31 @@ namespace J2N.Collections.Generic
             // SubList remains valid after parent structural modifications
             Assert.AreEqual(4, subList.Count);
         }
+
+        [Test]
+        public void TestSubList_GreatGrandchild_UpdateOnGrandparent_SetCapacity()
+        {
+            List<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            List<int> subList = list.GetView(2, 12);
+            List<int> grandchildList = subList.GetView(1, 8);
+            List<int> greatgrandchildList = grandchildList.GetView(1, 6);
+
+            subList.Capacity = 100;
+            // Note that now the list and subList reference a different array than grandchildList and greatgrandchildList,
+            // so it is expected that calling any method on greatgrandchildList will throw an InvalidOperationException.
+            Assert.Throws<InvalidOperationException>(() => greatgrandchildList.IndexOf(8));
+        }
+
+        [Test]
+        public void TestSubList_GreatGrandchild_UpdateOnGrandparent_Add()
+        {
+            List<int> list = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            List<int> subList = list.GetView(2, 12);
+            List<int> grandchildList = subList.GetView(1, 8);
+            List<int> greatgrandchildList = grandchildList.GetView(1, 6);
+
+            subList.Add(100);
+            Assert.Throws<InvalidOperationException>(() => greatgrandchildList.IndexOf(8));
+        }
     }
 }
