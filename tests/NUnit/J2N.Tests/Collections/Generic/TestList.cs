@@ -20,11 +20,10 @@ using J2N.Collections.Generic.Extensions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using Integer = J2N.Numerics.Int32;
 using SCG = System.Collections.Generic;
 
@@ -154,16 +153,46 @@ namespace J2N.Collections.Generic
             return new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
         }
 
+        private static List<int> InitilizeList(int capacity)
+        {
+            return new List<int>(capacity) { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+        }
+
         // See: https://stackoverflow.com/a/8002466
         public class TupleList<T1, T2> : List<Tuple<T1, T2>>
         {
+            public TupleList() { }
+
+            public TupleList(IEnumerable<Tuple<T1, T2>> collection)
+                : base(collection) { }
+
             public void Add(T1 item, T2 item2)
             {
                 Add(new Tuple<T1, T2>(item, item2));
             }
+
+            public TupleList<T1, T2> ConcatWith(IEnumerable<Tuple<T1, T2>> other)
+            {
+                return new TupleList<T1, T2>(this.Concat(other));
+            }
         }
 
-        private static readonly TupleList<string, Action<List<int>>> ListEditActions = new TupleList<string, Action<List<int>>>
+        internal static class SentinelArray
+        {
+            private class Dummy { }
+
+            public static T[] CreateFor<T>(int length)
+            {
+                // Make an array of a completely incompatible type.
+                // Actual use will throw InvalidCastException.
+                var dummy = new Dummy[length];
+
+                // Bypass type system – treat Dummy[] reference as T[]
+                return Unsafe.As<Dummy[], T[]>(ref dummy);
+            }
+        }
+
+        private static readonly TupleList<string, Action<List<int>>> ListEditActions = new()
         {
             {"Add",                                         (list) => list.Add(123)},
             {"AddRange",                                    (list) => list.AddRange(new int[] { 44, 45, 46, 47 })},
@@ -172,10 +201,11 @@ namespace J2N.Collections.Generic
             {"Insert",                                      (list) => list.Insert(1, 999)},
             {"InsertRange",                                 (list) => list.InsertRange(3, new int[] { 44, 45, 46, 47 })},
             {"Remove",                                      (list) => list.Remove(6)},
-            {"RemoveAt",                                    (list) => list.RemoveAt(3)},
             {"RemoveAll",                                   (list) => list.RemoveAll((value) => value == 4 || value == 6)},
+            {"RemoveAt",                                    (list) => list.RemoveAt(3)},
             {"RemoveRange",                                 (list) => list.RemoveRange(4, 2)},
-            {"Reverse",                                     (list) => list.Reverse(4, 2)},
+            {"Reverse",                                     (list) => list.Reverse()},
+            {"Reverse(int, int)",                           (list) => list.Reverse(4, 2)},
             {"Sort()",                                      (list) => list.Sort()},
             {"Sort(IComparer<T>)",                          (list) => list.Sort(Comparer<int>.Default)},
             {"Sort(int, int, IComparer<T>)",                (list) => list.Sort(4, 2, Comparer<int>.Default)},
@@ -187,7 +217,7 @@ namespace J2N.Collections.Generic
         private static readonly int[] ListTestBuffer = new int[15];
         private static readonly int[] ListTestSpanBuffer = new int[15];
 
-        private static readonly TupleList<string, Action<List<int>>> ListActions = new TupleList<string, Action<List<int>>>
+        private static readonly TupleList<string, Action<List<int>>> ListQueryActions = new()
         {
             { "this (getter)",                              (list) => _ = list[0] },
             { "AsReadOnly",                                 (list) => list.AsReadOnly()},
@@ -195,6 +225,7 @@ namespace J2N.Collections.Generic
             { "BinarySearch(int, IComparer<T>)",            (list) => list.BinarySearch(6, Comparer<int>.Default)},
             { "BinarySearch(int, int, int, IComparer<T>)",  (list) => list.BinarySearch(0, list.Count, 6, Comparer<int>.Default)},
             { "Contains",                                   (list) => list.Contains(6)},
+            { "ConvertAll",                                 (list) => list.ConvertAll(x => x.ToString())},
             { "CopyTo(T[])",                                (list) => list.CopyTo(ListTestBuffer)},
             { "CopyTo(T[], int)",                           (list) => list.CopyTo(ListTestBuffer, 0)},
             { "CopyTo(int, T[], int, int)",                 (list) => list.CopyTo(0, ListTestBuffer, 0, 1)},
@@ -214,6 +245,7 @@ namespace J2N.Collections.Generic
             { "ForEach",                                    (list) => list.ForEach((value) => Console.WriteLine(value))},
             { "GetEnumerator",                              (list) => list.GetEnumerator()},
             { "GetHashCode",                                (list) => list.GetHashCode()},
+            { "GetHashCode(IEqualityComparer)",             (list) => list.GetHashCode(ListEqualityComparer<int>.Default)},
             { "GetRange",                                   (list) => list.GetRange(0, list.Count)},
             { "GetView",                                    (list) => list.GetView(2, 2)},
             { "IndexOf(int)",                               (list) => list.IndexOf(6)},
@@ -229,8 +261,25 @@ namespace J2N.Collections.Generic
             { "ToString(IFormatProvider)",                  (list) => list.ToString(J2N.Text.StringFormatter.InvariantCulture)},
             { "ToString(string, IFormatProvider)",          (list) => list.ToString("J", J2N.Text.StringFormatter.InvariantCulture)},
             { "TrueForAll",                                 (list) => list.TrueForAll((value) => value == 6)},
-            { "EnsureCapacity",                              (list) => list.EnsureCapacity(20)},
         };
+
+        private static readonly TupleList<string, Action<List<int>>> ListCapacityChangeActions = new()
+        {
+            { "Capacity (setter)",                          (list) => list.Capacity = 100 },
+            { "EnsureCapacity",                             (list) => list.EnsureCapacity(100) },
+            { "TrimExcess",                                 (list) => list.TrimExcess() },
+        };
+
+        private static readonly TupleList<string, Action<List<int>>> ListArrayAccessActions =
+            ListEditActions
+                .ConcatWith(ListQueryActions)
+                .ConcatWith(ListCapacityChangeActions)
+                .ConcatWith(new TupleList<string, Action<List<int>>>
+                {
+                    // This one is an oddball because calling it will never throw on an invalid sublist
+                    { "Capacity (getter)",                  (list) => _ = list.Capacity },
+                });
+
 
         public static IEnumerable<TestCaseData> SubList_CoModification_Data
         {
@@ -238,7 +287,7 @@ namespace J2N.Collections.Generic
             {
                 foreach (var edit in ListEditActions)
                 {
-                    foreach (var action in ListActions.Union(ListEditActions))
+                    foreach (var action in ListQueryActions.Union(ListEditActions))
                     {
                         yield return new TestCaseData($"edit: '{edit.Item1}', action: '{action.Item1}'", edit.Item2, action.Item2);
                     }
@@ -257,12 +306,60 @@ namespace J2N.Collections.Generic
             }
         }
 
+        public static IEnumerable<TestCaseData> SubList_ArrayAccess_Data
+        {
+            get
+            {
+                foreach (var action in ListArrayAccessActions)
+                {
+                    yield return new TestCaseData($"action: '{action.Item1}'", action.Item2);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies changing the array through setting Capacity, calling EnsureCapacity(int)
+        /// or calling TrimExcess() on an ancestor doesn't illegally access a subList array
+        /// without setting its _items field to the original list's _items.
+        /// </summary>
+        [TestCaseSource(nameof(SubList_ArrayAccess_Data))]
+        public void TestSubList_ArrayAccess_Integrity(string title, Action<List<int>> test)
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 10);
+
+            // Inject an array with an invalid type into the sublist to make sure it always
+            // replaces it (or avoids it) instead of using it.
+            subList._items = SentinelArray.CreateFor<int>(subList._items.Length);
+            list.Capacity = 100;
+            Assert.DoesNotThrow(() => test(subList), $"Executing test on SubList after set Capacity. {title}");
+
+            // Reset
+            list = InitilizeList();
+            subList = list.GetView(2, 10);
+
+            // Inject an array with an invalid type into the sublist to make sure it always
+            // replaces it (or avoids it) instead of using it.
+            subList._items = SentinelArray.CreateFor<int>(subList._items.Length);
+            list.EnsureCapacity(100);
+            Assert.DoesNotThrow(() => test(subList), $"Executing test on SubList after EnsureCapacity(). {title}");
+
+            // Reset
+            list = InitilizeList(100);
+            subList = list.GetView(2, 10);
+
+            // Inject an array with an invalid type into the sublist to make sure it always
+            // replaces it (or avoids it) instead of using it.
+            subList._items = SentinelArray.CreateFor<int>(subList._items.Length);
+            list.TrimExcess();
+            Assert.DoesNotThrow(() => test(subList), $"Executing test on SubList after TrimExcess(). {title}");
+        }
 
         /// <summary>
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a sublist.
         /// </summary>
-        [TestCaseSource("SubList_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_CoModification_Data))]
         public void TestSubList_CoModification_Version(string combination, Action<List<int>> edit, Action<List<int>> test)
         {
             List<int> list = InitilizeList();
@@ -289,7 +386,7 @@ namespace J2N.Collections.Generic
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a sublist.
         /// </summary>
-        [TestCaseSource("SubList_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_CoModification_Data))]
         public void TestSubList_Grandchild_CoModification_Version(string combination, Action<List<int>> edit, Action<List<int>> test)
         {
             List<int> list = InitilizeList();
@@ -328,7 +425,7 @@ namespace J2N.Collections.Generic
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a sublist's enumerator
         /// </summary>
-        [TestCaseSource("SubList_Enumerator_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_Enumerator_CoModification_Data))]
         public void TestSubList_Enumerator_CoModification_Version(string combination, Action<List<int>> edit)
         {
             List<int> list = InitilizeList();
@@ -352,7 +449,7 @@ namespace J2N.Collections.Generic
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a grandchild sublist's enumerator
         /// </summary>
-        [TestCaseSource("SubList_Enumerator_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_Enumerator_CoModification_Data))]
         public void TestSubList_Grandchild_Enumerator_CoModification_Version(string combination, Action<List<int>> edit)
         {
             List<int> list = InitilizeList();
