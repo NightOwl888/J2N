@@ -1616,10 +1616,13 @@ namespace J2N.Collections.Generic
         /// <returns>A shallow copy of a range of elements in the source <see cref="List{T}" />.</returns>
         /// <exception cref="ArgumentOutOfRangeException">
         /// <paramref name="start" /> is less than 0.
+        /// <para/>
         /// -or-
+        /// <para/>
         /// <paramref name="length" /> is less than 0.
         /// </exception>
-        /// <exception cref="ArgumentException"><paramref name="start" /> and <paramref name="length" /> do not denote a valid range of elements in the <see cref="List{T}" />.</exception>
+        /// <exception cref="ArgumentException"><paramref name="start" /> and <paramref name="length" />
+        /// do not denote a valid range of elements in the <see cref="List{T}" />.</exception>
         public List<T> Slice(int start, int length) => GetView(start, length);
 
         /// <summary>
