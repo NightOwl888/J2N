@@ -12,7 +12,11 @@ namespace J2N.Collections
         public const uint HashCollisionThreshold = 100;
 
         // This is the maximum prime smaller than Array.MaxLength
+#if NETSTANDARD2_0_OR_GREATER
+        public static readonly int MaxPrimeArrayLength = Arrays.MaxPrimeArrayLength;
+#else
         public const int MaxPrimeArrayLength = Arrays.MaxPrimeArrayLength;
+#endif
 
         public const int HashPrime = 101;
 

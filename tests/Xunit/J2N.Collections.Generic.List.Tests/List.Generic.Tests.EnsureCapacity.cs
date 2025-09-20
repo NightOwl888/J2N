@@ -46,14 +46,12 @@ namespace J2N.Collections.Tests
 
         public static IEnumerable<object[]> EnsureCapacity_LargeCapacity_Throws_MemberData()
         {
-            // J2N NOTE: This does not throw OutOfMemoryException in all platforms, and is not really a useful test in practice.
-            // yield return new object[] { 5, ArrayExtensions.MaxLength + 1 };
+            yield return new object[] { 5, Arrays.MaxArrayLength + 1 };
             yield return new object[] { 1, int.MaxValue };
         }
 
         [Theory]
         [MemberData(nameof(EnsureCapacity_LargeCapacity_Throws_MemberData))]
-        [InlineData(1, int.MaxValue)]
         //[ActiveIssue("https://github.com/dotnet/runtime/issues/51411", TestRuntimes.Mono)]
         public void EnsureCapacity_LargeCapacity_Throws(int count, int requestCapacity)
         {
