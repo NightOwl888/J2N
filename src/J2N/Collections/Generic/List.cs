@@ -991,16 +991,13 @@ namespace J2N.Collections.Generic
         /// <returns>The new capacity of this list.</returns>
         public int EnsureCapacity(int capacity)
         {
+            CoModificationCheck();
             if (capacity < 0)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
             }
 
-            // J2N: Ensure we have the correct _items instance if we are a sublist
-            if (_items != Origin._items)
-            {
-                _items = Origin._items;
-            }
+            Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
 
             if (_items.Length < capacity)
             {
@@ -1057,12 +1054,7 @@ namespace J2N.Collections.Generic
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int GetNewCapacity(int capacity)
         {
-            // J2N: Ensure we have the correct _items instance if we are a sublist
-            if (_items != Origin._items)
-            {
-                _items = Origin._items;
-            }
-
+            Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             Debug.Assert(_items.Length < capacity);
 
             int newCapacity = _items.Length == 0 ? DefaultCapacity : 2 * _items.Length;

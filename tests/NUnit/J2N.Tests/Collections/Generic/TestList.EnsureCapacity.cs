@@ -385,8 +385,9 @@ namespace J2N.Collections.Generic
             Assert.AreEqual(5, subList2.Count); // unchanged
             Assert.AreEqual(8, subList1.Count);
             Assert.AreEqual(12, list.Count);
-
-            subList2.EnsureCapacity(25);
+            
+            // Editing sublist1 breaks sublist2
+            Assert.Throws<InvalidOperationException>(() => subList2.EnsureCapacity(25));
             list.Add(300);
             Assert.AreEqual(5, subList2.Count); // unchanged
             Assert.AreEqual(8, subList1.Count); // unchanged
