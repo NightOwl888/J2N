@@ -41,7 +41,6 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_ARRAY_CLEAR_ARRAY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_ARRAY_MAXLENGTH</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTINT64</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTSINGLE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_READONLYSET</DefineConstants>

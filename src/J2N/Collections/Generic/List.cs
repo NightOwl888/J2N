@@ -1061,10 +1061,10 @@ namespace J2N.Collections.Generic
 
             // Allow the list to grow to maximum possible capacity (~2G elements) before encountering overflow.
             // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
-            if ((uint)newCapacity > ArrayExtensions.MaxLength) newCapacity = ArrayExtensions.MaxLength;
+            if ((uint)newCapacity > Arrays.MaxArrayLength) newCapacity = Arrays.MaxArrayLength;
 
             // If the computed capacity is still less than specified, set to the original argument.
-            // Capacities exceeding ArrayExtensions.MaxLength will be surfaced as OutOfMemoryException by Array.Resize.
+            // Capacities exceeding Arrays.MaxArrayLength will be surfaced as OutOfMemoryException by Array.Resize.
             if (newCapacity < capacity) newCapacity = capacity;
 
             return newCapacity;

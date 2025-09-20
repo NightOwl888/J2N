@@ -37,6 +37,28 @@ namespace J2N.Collections
     // extension methods of single-dimensional arrays (in ArrayExtensions).
     internal static class Arrays
     {
+        /// <summary>Gets the maximum number of elements that may be contained in an array.</summary>
+        /// <returns>The maximum count of elements allowed in any array.</returns>
+        /// <remarks>
+        /// This property represents a runtime limitation, the maximum number of elements (not bytes)
+        /// the runtime will allow in an array. There is no guarantee that an allocation under this length
+        /// will succeed, but all attempts to allocate a larger array will fail.
+        /// </remarks>
+        // J2N: from .NET's src/libraries/System.Private.CoreLib/src/System/Array.cs
+        // Keep in sync with `inline SIZE_T MaxArrayLength()` from gchelpers and HashHelpers.MaxPrimeArrayLength.
+#if NET6_0_OR_GREATER
+        internal const int MaxArrayLength = 0X7FFFFFC7; // 2147483591
+#else
+        internal const int MaxArrayLength = 0x7FEFFFFF; // 2146435071
+#endif
+
+        // This is the maximum prime smaller than Array.MaxLength (MaxArrayLength)
+#if NET6_0_OR_GREATER
+        internal const int MaxPrimeArrayLength = 0x7FFFFFC3; // 2147483587
+#else
+        internal const int MaxPrimeArrayLength = 0x7FEFFFFD; // 2146435069
+#endif
+
         /// <summary>
         /// Returns <c>true</c> if the two given arrays are deeply equal to one another.
         /// Unlike the method <see cref="Equals{T}(T[], T[])"/>, this method

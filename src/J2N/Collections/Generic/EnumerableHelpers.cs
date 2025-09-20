@@ -70,12 +70,12 @@ namespace J2N.Collections.Generic
                                 // If the array is currently empty, we make it a default size.  Otherwise, we attempt to
                                 // double the size of the array.  Doubling will overflow once the size of the array reaches
                                 // 2^30, since doubling to 2^31 is 1 larger than Int32.MaxValue.  In that case, we instead
-                                // constrain the length to be ArrayExtensions.MaxLength (this overflow check works because of the
+                                // constrain the length to be Arrays.MaxArrayLength (this overflow check works because of the
                                 // cast to uint).
                                 int newLength = count << 1;
-                                if ((uint)newLength > ArrayExtensions.MaxLength)
+                                if ((uint)newLength > Arrays.MaxArrayLength)
                                 {
-                                    newLength = ArrayExtensions.MaxLength <= count ? count + 1 : ArrayExtensions.MaxLength;
+                                    newLength = Arrays.MaxArrayLength <= count ? count + 1 : Arrays.MaxArrayLength;
                                 }
 
                                 Array.Resize(ref arr, newLength);
