@@ -15,7 +15,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="list">The list to which the elements should be added.</param>
         /// <param name="source">The span whose elements should be added to the end of the <see cref="List{T}"/>.</param>
         /// <exception cref="ArgumentNullException">The <paramref name="list"/> is null.</exception>
-        internal static void AddRange<T>(this List<T> list, ReadOnlySpan<T> source)
+        public static void AddRange<T>(this List<T> list, ReadOnlySpan<T> source)
         {
             if (list is null)
             {
@@ -33,7 +33,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="source">The span whose elements should be added to the <see cref="List{T}"/>.</param>
         /// <exception cref="ArgumentNullException">The <paramref name="list"/> is null.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0 or greater than <paramref name="list"/>'s <see cref="List{T}.Count"/>.</exception>
-        internal static void InsertRange<T>(this List<T> list, int index, ReadOnlySpan<T> source)
+        public static void InsertRange<T>(this List<T> list, int index, ReadOnlySpan<T> source)
         {
             if (list is null)
             {
@@ -50,7 +50,7 @@ namespace J2N.Collections.Generic.Extensions
         /// <param name="destination">The span that is the destination of the elements copied from <paramref name="list"/>.</param>
         /// <exception cref="ArgumentNullException">The <paramref name="list"/> is null.</exception>
         /// <exception cref="ArgumentException">The number of elements in the source <see cref="List{T}"/> is greater than the number of elements that the destination span can contain.</exception>
-        internal static void CopyTo<T>(this List<T> list, Span<T> destination)
+        public static void CopyTo<T>(this List<T> list, Span<T> destination)
         {
             if (list is null)
             {
