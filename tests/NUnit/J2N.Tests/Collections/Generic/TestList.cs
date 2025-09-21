@@ -99,6 +99,56 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
+        public void TestSubList_SelfAddRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(4, 6);
+
+            subList.AddRange(subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2, 3, 4,
+
+                // SubList items
+                5, 6, 7, 8, 9, 10,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10,
+
+                // Tail of parent items
+                11, 12, 13, 14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_SelfAddRange_LargeCapacity()
+        {
+            List<int> list = InitilizeList(64);
+            List<int> subList = list.GetView(4, 6);
+
+            subList.AddRange(subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2, 3, 4,
+
+                // SubList items
+                5, 6, 7, 8, 9, 10,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10,
+
+                // Tail of parent items
+                11, 12, 13, 14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
         public void TestSubList_SelfInsertRange()
         {
             List<int> list = InitilizeList();
@@ -156,6 +206,34 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
+        public void TestSubList_SelfInsertRange_LargeCapacity()
+        {
+            List<int> list = InitilizeList(64);
+            List<int> subList = list.GetView(2, 11);
+
+            subList.InsertRange(subList.Count - 4, subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2,
+
+                // SubList items (head)
+                3, 4, 5, 6, 7, 8, 9,
+
+                // Inserted items
+                3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+
+                // SubList items (tail)
+                10, 11, 12, 13,
+
+                // Tail of parent items
+                14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
         public void TestSubList_Grandchild_SelfAddRange()
         {
             List<int> list = InitilizeList();
@@ -179,6 +257,38 @@ namespace J2N.Collections.Generic
 
                 // Tail of parent items
                 14,
+
+                // Tail of grandparent items
+                15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfAddRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(3, 11);
+            List<int> grandchildList = subList.GetView(1, 8);
+
+            grandchildList.AddRange(grandchildList);
+
+            var expectedList = new List<int> {
+                // Head of grandparent items
+                1, 2, 3,
+
+                // Head of parent items
+                4,
+
+                // SubList items
+                5, 6, 7, 8, 9, 10, 11, 12,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10, 11, 12,
+
+                // Tail of parent items
+                13, 14,
 
                 // Tail of grandparent items
                 15

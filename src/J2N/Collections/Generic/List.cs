@@ -499,43 +499,10 @@ namespace J2N.Collections.Generic
 
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
 
-            // J2N: A sublist that is a descendant of this list
-            if (collection is List<T>.SubList subList && subList.Origin == this)
-            {
-                int count = subList.Count;
-                if (count > 0)
-                {
-                    int offset = Offset + subList.Offset;
-                    int subListIndex = Size - offset;
+            // J2N: A sublist that is a descendant of this list will always call DoInsertRange()
+            // so we don't need to have a special case here.
 
-                    if (_items.Length - _size < count)
-                    {
-                        Grow(checked(_size + count));
-                    }
-
-                    // We need to fixup our sublist reference if it is broken by Grow
-                    // or if it was broken when passed into this method.
-                    if (subList._items != _items)
-                        subList._items = _items;
-
-                    if (Size < _size)
-                    {
-                        Array.Copy(_items, Size, _items, Size + count, _size - Size);
-                    }
-
-                    // We're inserting a SubList which is a descendant into this list,
-                    // so we already have the elements in the local array.
-
-                    // Copy first part of _items to insert location
-                    Array.Copy(_items, offset, _items, Size, subListIndex);
-                    // Copy last part of _items back to inserted location
-                    Array.Copy(_items, Size + count, _items, subListIndex * 2, count - subListIndex);
-
-                    _size += count;
-                    _version++;
-                }
-            }
-            else if (collection is ICollection<T> c)
+            if (collection is ICollection<T> c)
             {
                 int count = c.Count;
                 if (count > 0)
