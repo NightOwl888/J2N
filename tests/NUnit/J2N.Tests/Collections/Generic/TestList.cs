@@ -74,7 +74,7 @@ namespace J2N.Collections.Generic
 #endif
 
         [Test]
-        public void TestSubList_SelfInsert()
+        public void TestSubList_SelfAddRange()
         {
             List<int> list = InitilizeList();
             List<int> subList = list.GetView(2, 10);
@@ -99,7 +99,64 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
-        public void TestSubList_Grandchild_SelfInsert()
+        public void TestSubList_SelfInsertRange()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 10);
+
+            subList.InsertRange(subList.Count - 3, subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2,
+
+                // SubList items (head)
+                3, 4, 5, 6, 7, 8, 9,
+
+                // Inserted items
+                3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+
+                // SubList items (tail)
+                10, 11, 12,
+
+                // Tail of parent items
+                13, 14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+
+        [Test]
+        public void TestSubList_SelfInsertRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 11);
+
+            subList.InsertRange(subList.Count - 4, subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2,
+
+                // SubList items (head)
+                3, 4, 5, 6, 7, 8, 9,
+
+                // Inserted items
+                3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+
+                // SubList items (tail)
+                10, 11, 12, 13,
+
+                // Tail of parent items
+                14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfAddRange()
         {
             List<int> list = InitilizeList();
             List<int> subList = list.GetView(2, 12);
@@ -122,6 +179,76 @@ namespace J2N.Collections.Generic
 
                 // Tail of parent items
                 14,
+
+                // Tail of grandparent items
+                15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfInsertRange()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 12);
+            List<int> grandchildList = subList.GetView(1, 10);
+
+            grandchildList.InsertRange(grandchildList.Count - 3, grandchildList);
+
+            var expectedList = new List<int> {
+                // Head of grandparent items
+                1, 2,
+
+                // Head of parent items
+                3,
+
+                // SubList items (head)
+                4, 5, 6, 7, 8, 9, 10,
+
+                // Inserted items
+                4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+
+                // SubList items (tail)
+                11, 12, 13,
+
+                // Tail of parent items
+                14,
+
+                // Tail of grandparent items
+                15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfInsertRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(3, 11);
+            List<int> grandchildList = subList.GetView(1, 8);
+
+            grandchildList.InsertRange(grandchildList.Count - 3, grandchildList);
+
+            var expectedList = new List<int> {
+                // Head of grandparent items
+                1, 2, 3,
+
+                // Head of parent items
+                4,
+
+                // SubList items (head)
+                5, 6, 7, 8, 9,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10, 11, 12,
+
+                // SubList items (tail)
+                10, 11, 12,
+
+                // Tail of parent items
+                13, 14,
 
                 // Tail of grandparent items
                 15

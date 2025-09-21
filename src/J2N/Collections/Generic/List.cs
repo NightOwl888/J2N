@@ -1873,7 +1873,7 @@ namespace J2N.Collections.Generic
                     // Copy first part of _items to insert location
                     Array.Copy(_items, offset, _items, index, subListIndex);
                     // Copy last part of _items back to inserted location
-                    Array.Copy(_items, index + count, _items, subListIndex * 2, count - subListIndex);
+                    Array.Copy(_items, index + count, _items, index + subListIndex, count - subListIndex);
 
                     _size += count;
                 }
