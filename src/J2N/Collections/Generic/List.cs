@@ -994,7 +994,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="indexToInsert">Index of the first insertion.</param>
         /// <param name="insertionCount">How many elements will be inserted.</param>
-        internal virtual void GrowForInsertion(int indexToInsert, int insertionCount = 1)
+        private void GrowForInsertion(int indexToInsert, int insertionCount = 1)
         {
             Debug.Assert(insertionCount > 0);
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance

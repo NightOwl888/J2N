@@ -77,16 +77,6 @@ namespace J2N.Collections.Generic
                 return reallocated;
             }
 
-            internal override void GrowForInsertion(int indexToInsert, int insertionCount = 1)
-            {
-                CoModificationCheck();
-                // Adjust the index to be relative to the parent list
-                parent.GrowForInsertion(indexToInsert + parentOffset, insertionCount);
-                // Update our reference to the parent's items array after growth
-                _items = origin._items;
-                _version = parent._version;
-            }
-
             internal override void DoClear()
             {
                 CoModificationCheck();
