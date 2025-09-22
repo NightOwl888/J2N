@@ -171,9 +171,27 @@ namespace J2N.Threading.Atomic
         /// Implicitly converts an <see cref="AtomicBoolean"/> to an <see cref="bool"/>.
         /// </summary>
         /// <param name="atomicBoolean">The <see cref="AtomicBoolean"/> to convert.</param>
-        public static implicit operator bool(AtomicBoolean atomicBoolean)
+        /// <returns>The value of the <see cref="AtomicBoolean"/>.</returns>
+        public static implicit operator bool(AtomicBoolean? atomicBoolean)
         {
-            return atomicBoolean.Value;
+            var value = atomicBoolean?.Value;
+
+            if (value == null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionResource.ArgumentNull_NullOrNullValue);
+            }
+
+            return value.Value;
+        }
+
+        /// <summary>
+        /// Implicitly converts an <see cref="AtomicBoolean"/> to a nullable <see cref="bool"/>.
+        /// </summary>
+        /// <param name="atomicBoolean">The <see cref="AtomicBoolean"/> to convert.</param>
+        /// <returns>The value of the <see cref="AtomicBoolean"/>, or <c>null</c> if <paramref name="atomicBoolean"/> is <c>null</c>.</returns>
+        public static implicit operator bool?(AtomicBoolean? atomicBoolean)
+        {
+            return atomicBoolean?.Value;
         }
 
         /// <summary>
@@ -182,9 +200,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first value.</param>
         /// <param name="a2">The second value.</param>
         /// <returns><c>true</c> if the given values are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicBoolean a1, AtomicBoolean a2)
+        public static bool operator ==(AtomicBoolean? a1, AtomicBoolean? a2)
         {
-            return a1.Value == a2.Value;
+            return ReferenceEquals(a1, a2) || a1?.Value == a2?.Value;
         }
 
         /// <summary>
@@ -193,7 +211,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first value.</param>
         /// <param name="a2">The second value.</param>
         /// <returns><c>true</c> if the given values are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicBoolean a1, AtomicBoolean a2)
+        public static bool operator !=(AtomicBoolean? a1, AtomicBoolean? a2)
         {
             return !(a1 == a2);
         }
@@ -204,9 +222,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first value.</param>
         /// <param name="a2">The second value.</param>
         /// <returns><c>true</c> if the given values are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicBoolean a1, bool a2)
+        public static bool operator ==(AtomicBoolean? a1, bool a2)
         {
-            return a1.Value == a2;
+            return a1?.Value == a2;
         }
 
         /// <summary>
@@ -215,7 +233,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first value.</param>
         /// <param name="a2">The second value.</param>
         /// <returns><c>true</c> if the given values are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicBoolean a1, bool a2)
+        public static bool operator !=(AtomicBoolean? a1, bool a2)
         {
             return !(a1 == a2);
         }
@@ -226,9 +244,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first value.</param>
         /// <param name="a2">The second value.</param>
         /// <returns><c>true</c> if the given values are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(bool a1, AtomicBoolean a2)
+        public static bool operator ==(bool a1, AtomicBoolean? a2)
         {
-            return a1 == a2.Value;
+            return a1 == a2?.Value;
         }
 
         /// <summary>
@@ -237,7 +255,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(bool a1, AtomicBoolean a2)
+        public static bool operator !=(bool a1, AtomicBoolean? a2)
         {
             return !(a1 == a2);
         }
@@ -248,9 +266,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicBoolean a1, bool? a2)
+        public static bool operator ==(AtomicBoolean? a1, bool? a2)
         {
-            return a1.Value == a2.GetValueOrDefault();
+            return a1?.Value == a2;
         }
 
         /// <summary>
@@ -259,7 +277,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicBoolean a1, bool? a2)
+        public static bool operator !=(AtomicBoolean? a1, bool? a2)
         {
             return !(a1 == a2);
         }
@@ -270,9 +288,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(bool? a1, AtomicBoolean a2)
+        public static bool operator ==(bool? a1, AtomicBoolean? a2)
         {
-            return a1.GetValueOrDefault() == a2.Value;
+            return a1 == a2?.Value;
         }
 
         /// <summary>
@@ -281,7 +299,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(bool? a1, AtomicBoolean a2)
+        public static bool operator !=(bool? a1, AtomicBoolean? a2)
         {
             return !(a1 == a2);
         }
