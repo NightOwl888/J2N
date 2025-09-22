@@ -1091,8 +1091,8 @@ namespace J2N.Collections.Generic
 
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             int offset = Offset;
-            int limit = Size + offset;
-            for (int i = offset; i < limit; i++)
+            // J2N: Important that Size is read in each loop in case it changes
+            for (int i = offset; (uint)i < (uint)Size + (uint)offset; i++)
             {
                 if (match(_items[i]))
                 {
@@ -1128,8 +1128,8 @@ namespace J2N.Collections.Generic
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             List<T> list = new List<T>();
             int offset = Offset;
-            int limit = Size + offset;
-            for (int i = Offset; i < limit; i++)
+            // J2N: Important that Size is read in each loop in case it changes
+            for (int i = offset; (uint)i < (uint)Size + (uint)offset; i++)
             {
                 if (match(_items[i]))
                 {
