@@ -2568,8 +2568,9 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.match);
 
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
-            int size = Size;
-            for (int i = Offset; i < size; i++)
+            int offset = Offset;
+            // J2N: Important that Size is read in each loop in case it changes
+            for (int i = offset; (uint)i < (uint)Size + (uint)offset; i++)
             {
                 if (!match(_items[i]))
                 {
