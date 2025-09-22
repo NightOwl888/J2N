@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using J2N.Collections.Generic.Extensions;
 using System;
 using System.Collections.Generic;
 
@@ -10,8 +9,6 @@ namespace J2N.Collections.Tests
 {
     public class List_Generic_Tests_string : List_Generic_Tests<string>
     {
-        // With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override string CreateT(int seed)
         {
             int stringLength = seed % 10 + 5;
@@ -24,8 +21,6 @@ namespace J2N.Collections.Tests
 
     public class List_Generic_Tests_int : List_Generic_Tests<int>
     {
-        // With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override int CreateT(int seed)
         {
             Random rand = new Random(seed);
@@ -44,10 +39,6 @@ namespace J2N.Collections.Tests
             return Convert.ToBase64String(bytes);
         }
 
-        // J2N: With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        // regardless of the FEATURE_READONLYCOLLECTION flag
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
-
         protected override bool IsReadOnly => true;
 
         protected override IList<string> GenericIListFactory(int setLength)
@@ -61,6 +52,8 @@ namespace J2N.Collections.Tests
         }
 
         protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
     }
 
     public class List_Generic_Tests_int_ReadOnly : List_Generic_Tests<int>
@@ -71,9 +64,6 @@ namespace J2N.Collections.Tests
             return rand.Next();
         }
 
-        // J2N: With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        // regardless of the FEATURE_READONLYCOLLECTION flag
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool IsReadOnly => true;
 
         protected override IList<int> GenericIListFactory(int setLength)
@@ -87,5 +77,7 @@ namespace J2N.Collections.Tests
         }
 
         protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
     }
 }
