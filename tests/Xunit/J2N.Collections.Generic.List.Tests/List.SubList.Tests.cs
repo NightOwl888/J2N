@@ -7,8 +7,6 @@ namespace J2N.Collections.Tests
 {
     public class List_SubList_Tests_int : List_SubList_Tests<int>
     {
-        // With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool DefaultValueAllowed => true;
 
         protected override int CreateT(int seed)
@@ -20,8 +18,6 @@ namespace J2N.Collections.Tests
 
     public class List_SubList_Tests_string : List_SubList_Tests<string>
     {
-        // With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override string CreateT(int seed)
         {
             int stringLength = seed % 10 + 5;
@@ -43,9 +39,6 @@ namespace J2N.Collections.Tests
             return Convert.ToBase64String(bytes);
         }
 
-        // J2N: With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        // regardless of the FEATURE_READONLYCOLLECTION flag
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool IsReadOnly => true;
 
         protected override SCG.IList<string> GenericIListFactory(int setLength)
@@ -59,6 +52,8 @@ namespace J2N.Collections.Tests
         }
 
         protected override SCG.IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
     }
 
     public class List_SubList_Tests_int_ReadOnly : List_SubList_Tests<int>
@@ -69,9 +64,6 @@ namespace J2N.Collections.Tests
             return rand.Next();
         }
 
-        // J2N: With SZGenericArrayEnumerator<T>.Empty, Current always throws when empty
-        // regardless of the FEATURE_READONLYCOLLECTION flag
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool IsReadOnly => true;
 
         protected override SCG.IList<int> GenericIListFactory(int setLength)
@@ -85,6 +77,8 @@ namespace J2N.Collections.Tests
         }
 
         protected override SCG.IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>().GetView(0, 0);
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
     }
 
     public abstract class List_SubList_Tests<T> : List_Generic_Tests<T>
