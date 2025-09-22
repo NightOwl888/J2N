@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-#if FEATURE_SERIALIZABLE
-using System.Runtime.Serialization;
-#endif
 
 namespace J2N.Collections.Generic
 {
