@@ -241,7 +241,7 @@ namespace J2N.Threading.Atomic
                 ai.Value = i;
                 assertEquals(answer, ai.ToString(CultureInfo.InvariantCulture));
 
-                assertTrue(i.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+                assertTrue(ai.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
                 string actual = buffer.Slice(0, charsWritten).ToString();
                 assertEquals($"Incorrect String representation want {answer}, got ({actual})", answer, actual);
             }
