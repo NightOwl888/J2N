@@ -96,7 +96,7 @@ namespace J2N.Threading.Atomic
 
         //    /**
         //     * repeated weakCompareAndSet succeeds in changing value when equal
-        //     * to expected 
+        //     * to expected
         //     */
         //[Test]
         //    public void TestWeakCompareAndSet()
@@ -237,13 +237,19 @@ namespace J2N.Threading.Atomic
 
             for (int i = -12; i < 6; ++i)
             {
-                string answer = i.ToString(CultureInfo.InvariantCulture);
+                string answer = i.ToString(CultureInfo.CurrentCulture);
+                string answerInvariant = i.ToString(CultureInfo.InvariantCulture);
                 ai.Value = i;
-                assertEquals(answer, ai.ToString(CultureInfo.InvariantCulture));
+                assertEquals(answer, ai.ToString(CultureInfo.CurrentCulture));
+                assertEquals(answerInvariant, ai.ToString(CultureInfo.InvariantCulture));
 
-                assertTrue(ai.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+                assertTrue(ai.TryFormat(buffer, out int charsWritten, ReadOnlySpan<char>.Empty, CultureInfo.CurrentCulture));
                 string actual = buffer.Slice(0, charsWritten).ToString();
                 assertEquals($"Incorrect String representation want {answer}, got ({actual})", answer, actual);
+
+                assertTrue(ai.TryFormat(buffer, out int charsWrittenInvariant, ReadOnlySpan<char>.Empty, CultureInfo.InvariantCulture));
+                string actualInvariant = buffer.Slice(0, charsWrittenInvariant).ToString();
+                assertEquals($"Incorrect String representation want {answerInvariant}, got ({actualInvariant})", answerInvariant, actualInvariant);
             }
         }
 
