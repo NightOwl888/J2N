@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace System.Collections
+namespace J2N.Collections
 {
     internal static partial class HashHelpers
     {

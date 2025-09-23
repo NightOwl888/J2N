@@ -38,6 +38,63 @@ namespace J2N.Collections
     internal static class Arrays
     {
         /// <summary>
+        /// This const represents a runtime limitation, the maximum number of elements (not bytes)
+        /// the runtime will allow in an array. There is no guarantee that an allocation under this length
+        /// will succeed, but all attempts to allocate a larger array will fail
+        /// </summary>
+        // J2N: from .NET's src/libraries/System.Private.CoreLib/src/System/Array.cs
+        // Keep in sync with `inline SIZE_T MaxArrayLength()` from gchelpers and HashHelpers.MaxPrimeArrayLength.
+        private const int MaxArrayLength_1 = 0x7FEFFFFF; // 2146435071
+        private const int MaxArrayLength_2 = 0X7FFFFFC7; // 2147483591
+
+        // This is the maximum prime smaller than Array.MaxLength (MaxArrayLength)
+        private const int MaxPrimeArrayLength_1 = 0x7FEFFFFD; // 2146435069
+        private const int MaxPrimeArrayLength_2 = 0x7FFFFFC3; // 2147483587
+
+#if NETSTANDARD2_0_OR_GREATER
+        // This will detect if the property exists, and check the value to see if we should be using
+        // the larger size that was added in .NET 6+.
+        private static readonly bool UseMaxArrayLength_2 = LoadUseMaxArrayLength_2();
+
+        private static bool LoadUseMaxArrayLength_2()
+        {
+            try
+            {
+                var prop = typeof(Array).GetProperty("MaxLength");
+                if (prop != null && prop.GetMethod != null)
+                {
+                    object? value = prop.GetValue(null, null);
+                    if (value is int intValue && intValue >= MaxArrayLength_2)
+                        return true;
+                }
+            }
+            catch
+            {
+                // Ignore and fall back to conservative value
+            }
+            return false;
+        }
+#endif
+
+        // Keep in sync with `inline SIZE_T MaxArrayLength()` from gchelpers and HashHelpers.MaxPrimeArrayLength.
+#if NET6_0_OR_GREATER
+        internal const int MaxArrayLength = MaxArrayLength_2;
+#elif NETSTANDARD2_0_OR_GREATER
+        internal static readonly int MaxArrayLength = UseMaxArrayLength_2 ? MaxArrayLength_2 : MaxArrayLength_1;
+#else
+        internal const int MaxArrayLength = MaxArrayLength_1;
+#endif
+
+        // This is the maximum prime smaller than Array.MaxLength (MaxArrayLength)
+#if NET6_0_OR_GREATER
+        internal const int MaxPrimeArrayLength = MaxPrimeArrayLength_2;
+#elif NETSTANDARD2_0_OR_GREATER
+        internal static readonly int MaxPrimeArrayLength = UseMaxArrayLength_2 ? MaxPrimeArrayLength_2 : MaxPrimeArrayLength_1;
+#else
+        internal const int MaxPrimeArrayLength = MaxPrimeArrayLength_1;
+#endif
+
+        /// <summary>
         /// Returns <c>true</c> if the two given arrays are deeply equal to one another.
         /// Unlike the method <see cref="Equals{T}(T[], T[])"/>, this method
         /// is appropriate for use for nested arrays of arbitrary depth.

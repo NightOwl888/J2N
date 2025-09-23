@@ -12,6 +12,10 @@
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net471' Or '$(TargetFramework)' == 'net472' Or '$(TargetFramework)' == 'net48' ">
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
+
+    <!-- These are transitive dependencies of System.Memory, we are just bringing them in to pin the versions because in .NET Framework, they do not resolve. -->
+    <PackageReference Include="System.Buffers" Version="$(SystemBuffersPackageReferenceVersion)" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" />
   </ItemGroup>
 
   <Import Project="..\..\SystemMemoryReferenceOverride.targets" />

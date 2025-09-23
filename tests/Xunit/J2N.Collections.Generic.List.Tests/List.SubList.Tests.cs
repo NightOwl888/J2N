@@ -7,7 +7,6 @@ namespace J2N.Collections.Tests
 {
     public class List_SubList_Tests_int : List_SubList_Tests<int>
     {
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
         protected override bool DefaultValueAllowed => true;
 
         protected override int CreateT(int seed)
@@ -19,7 +18,6 @@ namespace J2N.Collections.Tests
 
     public class List_SubList_Tests_string : List_SubList_Tests<string>
     {
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
         protected override string CreateT(int seed)
         {
             int stringLength = seed % 10 + 5;
@@ -41,10 +39,6 @@ namespace J2N.Collections.Tests
             return Convert.ToBase64String(bytes);
         }
 
-        // J2N: See the comment in the root Directory.Build.targets file
-#if FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
-#endif
         protected override bool IsReadOnly => true;
 
         protected override SCG.IList<string> GenericIListFactory(int setLength)
@@ -58,6 +52,8 @@ namespace J2N.Collections.Tests
         }
 
         protected override SCG.IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>();
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
     }
 
     public class List_SubList_Tests_int_ReadOnly : List_SubList_Tests<int>
@@ -68,10 +64,6 @@ namespace J2N.Collections.Tests
             return rand.Next();
         }
 
-        // J2N: See the comment in the root Directory.Build.targets file
-#if FEATURE_READONLYCOLLECTION_ENUMERATOR_EMPTY_CURRENT_UNDEFINEDOPERATION_DOESNOTTHROW
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => false;
-#endif
         protected override bool IsReadOnly => true;
 
         protected override SCG.IList<int> GenericIListFactory(int setLength)
@@ -85,6 +77,8 @@ namespace J2N.Collections.Tests
         }
 
         protected override SCG.IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations) => new List<ModifyEnumerable>().GetView(0, 0);
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
     }
 
     public abstract class List_SubList_Tests<T> : List_Generic_Tests<T>

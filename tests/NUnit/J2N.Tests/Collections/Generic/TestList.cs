@@ -20,11 +20,10 @@ using J2N.Collections.Generic.Extensions;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
+using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using Integer = J2N.Numerics.Int32;
 using SCG = System.Collections.Generic;
 
@@ -75,20 +74,20 @@ namespace J2N.Collections.Generic
 #endif
 
         [Test]
-        public void TestSubList_SelfInsert()
+        public void TestSubList_SelfAddRange()
         {
             List<int> list = InitilizeList();
             List<int> subList = list.GetView(2, 10);
 
             subList.AddRange(subList);
 
-            var expectedList = new List<int> { 
+            var expectedList = new List<int> {
                 // Head of parent items
                 1, 2,
-                
+
                 // SubList items
                 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
-            
+
                 // Inserted items
                 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
 
@@ -100,7 +99,142 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
-        public void TestSubList_Grandchild_SelfInsert()
+        public void TestSubList_SelfAddRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(4, 6);
+
+            subList.AddRange(subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2, 3, 4,
+
+                // SubList items
+                5, 6, 7, 8, 9, 10,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10,
+
+                // Tail of parent items
+                11, 12, 13, 14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_SelfAddRange_LargeCapacity()
+        {
+            List<int> list = InitilizeList(64);
+            List<int> subList = list.GetView(4, 6);
+
+            subList.AddRange(subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2, 3, 4,
+
+                // SubList items
+                5, 6, 7, 8, 9, 10,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10,
+
+                // Tail of parent items
+                11, 12, 13, 14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_SelfInsertRange()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 10);
+
+            subList.InsertRange(subList.Count - 3, subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2,
+
+                // SubList items (head)
+                3, 4, 5, 6, 7, 8, 9,
+
+                // Inserted items
+                3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+
+                // SubList items (tail)
+                10, 11, 12,
+
+                // Tail of parent items
+                13, 14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+
+        [Test]
+        public void TestSubList_SelfInsertRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 11);
+
+            subList.InsertRange(subList.Count - 4, subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2,
+
+                // SubList items (head)
+                3, 4, 5, 6, 7, 8, 9,
+
+                // Inserted items
+                3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+
+                // SubList items (tail)
+                10, 11, 12, 13,
+
+                // Tail of parent items
+                14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_SelfInsertRange_LargeCapacity()
+        {
+            List<int> list = InitilizeList(64);
+            List<int> subList = list.GetView(2, 11);
+
+            subList.InsertRange(subList.Count - 4, subList);
+
+            var expectedList = new List<int> {
+                // Head of parent items
+                1, 2,
+
+                // SubList items (head)
+                3, 4, 5, 6, 7, 8, 9,
+
+                // Inserted items
+                3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+
+                // SubList items (tail)
+                10, 11, 12, 13,
+
+                // Tail of parent items
+                14, 15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfAddRange()
         {
             List<int> list = InitilizeList();
             List<int> subList = list.GetView(2, 12);
@@ -108,21 +242,123 @@ namespace J2N.Collections.Generic
 
             grandchildList.AddRange(grandchildList);
 
-            var expectedList = new List<int> { 
+            var expectedList = new List<int> {
                 // Head of grandparent items
                 1, 2,
-                
+
                 // Head of parent items
                 3,
 
                 // SubList items
                 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
-            
+
                 // Inserted items
                 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
 
                 // Tail of parent items
                 14,
+
+                // Tail of grandparent items
+                15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfAddRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(3, 11);
+            List<int> grandchildList = subList.GetView(1, 8);
+
+            grandchildList.AddRange(grandchildList);
+
+            var expectedList = new List<int> {
+                // Head of grandparent items
+                1, 2, 3,
+
+                // Head of parent items
+                4,
+
+                // SubList items
+                5, 6, 7, 8, 9, 10, 11, 12,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10, 11, 12,
+
+                // Tail of parent items
+                13, 14,
+
+                // Tail of grandparent items
+                15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfInsertRange()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 12);
+            List<int> grandchildList = subList.GetView(1, 10);
+
+            grandchildList.InsertRange(grandchildList.Count - 3, grandchildList);
+
+            var expectedList = new List<int> {
+                // Head of grandparent items
+                1, 2,
+
+                // Head of parent items
+                3,
+
+                // SubList items (head)
+                4, 5, 6, 7, 8, 9, 10,
+
+                // Inserted items
+                4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+
+                // SubList items (tail)
+                11, 12, 13,
+
+                // Tail of parent items
+                14,
+
+                // Tail of grandparent items
+                15
+            };
+
+            assertEquals(expectedList, list);
+        }
+
+        [Test]
+        public void TestSubList_Grandchild_SelfInsertRange2()
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(3, 11);
+            List<int> grandchildList = subList.GetView(1, 8);
+
+            grandchildList.InsertRange(grandchildList.Count - 3, grandchildList);
+
+            var expectedList = new List<int> {
+                // Head of grandparent items
+                1, 2, 3,
+
+                // Head of parent items
+                4,
+
+                // SubList items (head)
+                5, 6, 7, 8, 9,
+
+                // Inserted items
+                5, 6, 7, 8, 9, 10, 11, 12,
+
+                // SubList items (tail)
+                10, 11, 12,
+
+                // Tail of parent items
+                13, 14,
 
                 // Tail of grandparent items
                 15
@@ -154,16 +390,46 @@ namespace J2N.Collections.Generic
             return new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
         }
 
+        private static List<int> InitilizeList(int capacity)
+        {
+            return new List<int>(capacity) { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+        }
+
         // See: https://stackoverflow.com/a/8002466
         public class TupleList<T1, T2> : List<Tuple<T1, T2>>
         {
+            public TupleList() { }
+
+            public TupleList(IEnumerable<Tuple<T1, T2>> collection)
+                : base(collection) { }
+
             public void Add(T1 item, T2 item2)
             {
                 Add(new Tuple<T1, T2>(item, item2));
             }
+
+            public TupleList<T1, T2> ConcatWith(IEnumerable<Tuple<T1, T2>> other)
+            {
+                return new TupleList<T1, T2>(this.Concat(other));
+            }
         }
 
-        private static readonly TupleList<string, Action<List<int>>> ListEditActions = new TupleList<string, Action<List<int>>>
+        internal static class SentinelArray
+        {
+            private class Dummy { }
+
+            public static T[] CreateFor<T>(int length)
+            {
+                // Make an array of a completely incompatible type.
+                // Actual use will throw InvalidCastException.
+                var dummy = new Dummy[length];
+
+                // Bypass type system – treat Dummy[] reference as T[]
+                return Unsafe.As<Dummy[], T[]>(ref dummy);
+            }
+        }
+
+        private static readonly TupleList<string, Action<List<int>>> ListEditActions = new()
         {
             {"Add",                                         (list) => list.Add(123)},
             {"AddRange",                                    (list) => list.AddRange(new int[] { 44, 45, 46, 47 })},
@@ -172,10 +438,11 @@ namespace J2N.Collections.Generic
             {"Insert",                                      (list) => list.Insert(1, 999)},
             {"InsertRange",                                 (list) => list.InsertRange(3, new int[] { 44, 45, 46, 47 })},
             {"Remove",                                      (list) => list.Remove(6)},
-            {"RemoveAt",                                    (list) => list.RemoveAt(3)},
             {"RemoveAll",                                   (list) => list.RemoveAll((value) => value == 4 || value == 6)},
+            {"RemoveAt",                                    (list) => list.RemoveAt(3)},
             {"RemoveRange",                                 (list) => list.RemoveRange(4, 2)},
-            {"Reverse",                                     (list) => list.Reverse(4, 2)},
+            {"Reverse",                                     (list) => list.Reverse()},
+            {"Reverse(int, int)",                           (list) => list.Reverse(4, 2)},
             {"Sort()",                                      (list) => list.Sort()},
             {"Sort(IComparer<T>)",                          (list) => list.Sort(Comparer<int>.Default)},
             {"Sort(int, int, IComparer<T>)",                (list) => list.Sort(4, 2, Comparer<int>.Default)},
@@ -185,8 +452,9 @@ namespace J2N.Collections.Generic
         };
 
         private static readonly int[] ListTestBuffer = new int[15];
+        private static readonly int[] ListTestSpanBuffer = new int[15];
 
-        private static readonly TupleList<string, Action<List<int>>> ListActions = new TupleList<string, Action<List<int>>>
+        private static readonly TupleList<string, Action<List<int>>> ListQueryActions = new()
         {
             { "this (getter)",                              (list) => _ = list[0] },
             { "AsReadOnly",                                 (list) => list.AsReadOnly()},
@@ -194,9 +462,11 @@ namespace J2N.Collections.Generic
             { "BinarySearch(int, IComparer<T>)",            (list) => list.BinarySearch(6, Comparer<int>.Default)},
             { "BinarySearch(int, int, int, IComparer<T>)",  (list) => list.BinarySearch(0, list.Count, 6, Comparer<int>.Default)},
             { "Contains",                                   (list) => list.Contains(6)},
+            { "ConvertAll",                                 (list) => list.ConvertAll(x => x.ToString())},
             { "CopyTo(T[])",                                (list) => list.CopyTo(ListTestBuffer)},
             { "CopyTo(T[], int)",                           (list) => list.CopyTo(ListTestBuffer, 0)},
             { "CopyTo(int, T[], int, int)",                 (list) => list.CopyTo(0, ListTestBuffer, 0, 1)},
+            { "CopyTo(Span<T>)",                            (list) => list.CopyTo(ListTestSpanBuffer.AsSpan(0, list.Count))},
             { "Equals(object)",                             (list) => list.Equals(list)},
             { "Equals(object, IEqualityComparer<T>)",       (list) => list.Equals(list, ListEqualityComparer<int>.Default)},
             { "Exists",                                     (list) => list.Exists((value) => value == 6)},
@@ -212,6 +482,7 @@ namespace J2N.Collections.Generic
             { "ForEach",                                    (list) => list.ForEach((value) => Console.WriteLine(value))},
             { "GetEnumerator",                              (list) => list.GetEnumerator()},
             { "GetHashCode",                                (list) => list.GetHashCode()},
+            { "GetHashCode(IEqualityComparer)",             (list) => list.GetHashCode(ListEqualityComparer<int>.Default)},
             { "GetRange",                                   (list) => list.GetRange(0, list.Count)},
             { "GetView",                                    (list) => list.GetView(2, 2)},
             { "IndexOf(int)",                               (list) => list.IndexOf(6)},
@@ -220,6 +491,7 @@ namespace J2N.Collections.Generic
             { "LastIndexOf(int)",                           (list) => list.LastIndexOf(6)},
             { "LastIndexOf(int, int)",                      (list) => list.LastIndexOf(6, list.Count - 1)},
             { "LastIndexOf(int, int, int)",                 (list) => list.LastIndexOf(6, list.Count - 1, 5)},
+            { "Slice",                                      (list) => list.Slice(1, 2)},
             { "ToArray",                                    (list) => list.ToArray()},
             { "ToString()",                                 (list) => list.ToString()},
             { "ToString(string)",                           (list) => list.ToString("J")},
@@ -228,13 +500,31 @@ namespace J2N.Collections.Generic
             { "TrueForAll",                                 (list) => list.TrueForAll((value) => value == 6)},
         };
 
+        private static readonly TupleList<string, Action<List<int>>> ListCapacityChangeActions = new()
+        {
+            { "Capacity (setter)",                          (list) => list.Capacity = 100 },
+            { "EnsureCapacity",                             (list) => list.EnsureCapacity(100) },
+            { "TrimExcess",                                 (list) => list.TrimExcess() },
+        };
+
+        private static readonly TupleList<string, Action<List<int>>> ListArrayAccessActions =
+            ListEditActions
+                .ConcatWith(ListQueryActions)
+                .ConcatWith(ListCapacityChangeActions)
+                .ConcatWith(new TupleList<string, Action<List<int>>>
+                {
+                    // This one is an oddball because calling it will never throw on an invalid sublist
+                    { "Capacity (getter)",                  (list) => _ = list.Capacity },
+                });
+
+
         public static IEnumerable<TestCaseData> SubList_CoModification_Data
         {
             get
             {
                 foreach (var edit in ListEditActions)
                 {
-                    foreach (var action in ListActions.Union(ListEditActions))
+                    foreach (var action in ListQueryActions.Union(ListEditActions))
                     {
                         yield return new TestCaseData($"edit: '{edit.Item1}', action: '{action.Item1}'", edit.Item2, action.Item2);
                     }
@@ -253,12 +543,60 @@ namespace J2N.Collections.Generic
             }
         }
 
+        public static IEnumerable<TestCaseData> SubList_ArrayAccess_Data
+        {
+            get
+            {
+                foreach (var action in ListArrayAccessActions)
+                {
+                    yield return new TestCaseData($"action: '{action.Item1}'", action.Item2);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Verifies changing the array through setting Capacity, calling EnsureCapacity(int)
+        /// or calling TrimExcess() on an ancestor doesn't illegally access a subList array
+        /// without setting its _items field to the original list's _items.
+        /// </summary>
+        [TestCaseSource(nameof(SubList_ArrayAccess_Data))]
+        public void TestSubList_ArrayAccess_Integrity(string title, Action<List<int>> test)
+        {
+            List<int> list = InitilizeList();
+            List<int> subList = list.GetView(2, 10);
+
+            // Inject an array with an invalid type into the sublist to make sure it always
+            // replaces it (or avoids it) instead of using it.
+            subList._items = SentinelArray.CreateFor<int>(subList._items.Length);
+            list.Capacity = 100;
+            Assert.DoesNotThrow(() => test(subList), $"Executing test on SubList after set Capacity. {title}");
+
+            // Reset
+            list = InitilizeList();
+            subList = list.GetView(2, 10);
+
+            // Inject an array with an invalid type into the sublist to make sure it always
+            // replaces it (or avoids it) instead of using it.
+            subList._items = SentinelArray.CreateFor<int>(subList._items.Length);
+            list.EnsureCapacity(100);
+            Assert.DoesNotThrow(() => test(subList), $"Executing test on SubList after EnsureCapacity(). {title}");
+
+            // Reset
+            list = InitilizeList(100);
+            subList = list.GetView(2, 10);
+
+            // Inject an array with an invalid type into the sublist to make sure it always
+            // replaces it (or avoids it) instead of using it.
+            subList._items = SentinelArray.CreateFor<int>(subList._items.Length);
+            list.TrimExcess();
+            Assert.DoesNotThrow(() => test(subList), $"Executing test on SubList after TrimExcess(). {title}");
+        }
 
         /// <summary>
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a sublist.
         /// </summary>
-        [TestCaseSource("SubList_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_CoModification_Data))]
         public void TestSubList_CoModification_Version(string combination, Action<List<int>> edit, Action<List<int>> test)
         {
             List<int> list = InitilizeList();
@@ -285,7 +623,7 @@ namespace J2N.Collections.Generic
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a sublist.
         /// </summary>
-        [TestCaseSource("SubList_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_CoModification_Data))]
         public void TestSubList_Grandchild_CoModification_Version(string combination, Action<List<int>> edit, Action<List<int>> test)
         {
             List<int> list = InitilizeList();
@@ -324,7 +662,7 @@ namespace J2N.Collections.Generic
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a sublist's enumerator
         /// </summary>
-        [TestCaseSource("SubList_Enumerator_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_Enumerator_CoModification_Data))]
         public void TestSubList_Enumerator_CoModification_Version(string combination, Action<List<int>> edit)
         {
             List<int> list = InitilizeList();
@@ -348,7 +686,7 @@ namespace J2N.Collections.Generic
         /// Verifies any modification to the List's array through the parent API will
         /// invalidate a grandchild sublist's enumerator
         /// </summary>
-        [TestCaseSource("SubList_Enumerator_CoModification_Data")]
+        [TestCaseSource(nameof(SubList_Enumerator_CoModification_Data))]
         public void TestSubList_Grandchild_Enumerator_CoModification_Version(string combination, Action<List<int>> edit)
         {
             List<int> list = InitilizeList();
@@ -1492,22 +1830,14 @@ namespace J2N.Collections.Generic
                             [i] == objArray[i]);
                 //var v = new List<string>();
                 //v.Add("a");
-                List<string> al = new List<string>(capacity: 16); // J2N: We need to call the constructor that allows us to set the capacity greater than the size of the items for the exception to occur.
+                // J2N: .NET doesn't throw in this case, because TrimExcess (like EnsureCapacity) is not
+                // considered to be a structural modification of the collection state.
+                List<string> al = new List<string>(capacity: 16);
                 al.Add("a");
                 var it = al.GetEnumerator();
                 al.TrimExcess();
-                try
-                {
-                    it.MoveNext();
-                    fail("should throw a ConcurrentModificationException");
-                }
-                catch (InvalidOperationException ioobe)
-                {
-                    // expected
-                }
-                //// J2N: .NET doesn't throw in this case, because TrimExcess is not considered to be an edit of
-                //// the collection state.
-                //assertTrue(it.MoveNext());
+                // Should not throw - capacity changes don't invalidate enumerators
+                assertTrue(it.MoveNext());
             }
 
             /**

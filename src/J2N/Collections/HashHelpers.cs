@@ -1,21 +1,22 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using J2N;
+using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-#if !FEATURE_METHODIMPLOPTIONS_AGRESSIVEINLINING
-using MethodImplOptions = J2N.MethodImplOptions;
-#endif
 
-namespace System.Collections
+namespace J2N.Collections
 {
     internal static partial class HashHelpers
     {
         public const uint HashCollisionThreshold = 100;
 
-        // This is the maximum prime smaller than Array.MaxArrayLength
-        public const int MaxPrimeArrayLength = 0x7FEFFFFD;
+        // This is the maximum prime smaller than Array.MaxLength
+#if NETSTANDARD2_0_OR_GREATER
+        public static readonly int MaxPrimeArrayLength = Arrays.MaxPrimeArrayLength;
+#else
+        public const int MaxPrimeArrayLength = Arrays.MaxPrimeArrayLength;
+#endif
 
         public const int HashPrime = 101;
 
