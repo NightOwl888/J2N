@@ -37,7 +37,7 @@ namespace J2N.Collections.Generic
     /// must be synchronized by an external mechanism.
     /// </summary>
     /// <remarks>
-    /// This implementation uses <see cref="SCG.HashSet{T}"/> as a backing set. It calls
+    /// This implementation uses an internal variation of <see cref="SCG.HashSet{T}"/> as a backing set. It calls
     /// <see cref="SCG.HashSet{T}.TrimExcess()"/> when needed to ensure insertion order.
     /// This is done by tracking whether an operation has removed items from <see cref="LinkedHashSet{T}"/>. If so,
     /// the next operation that adds items to the <see cref="LinkedHashSet{T}"/> will call <see cref="TrimExcess()"/>
@@ -67,7 +67,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private readonly HashSet<T> hashSet;
+        private readonly Net5HashSet<T> hashSet;
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
@@ -130,7 +130,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public LinkedHashSet(IEqualityComparer<T>? comparer)
         {
-            hashSet = new HashSet<T>(comparer ?? EqualityComparer<T>.Default);
+            hashSet = new Net5HashSet<T>(comparer ?? EqualityComparer<T>.Default);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace J2N.Collections.Generic
         /// by setting the initial capacity based on the value of the <paramref name="capacity"/>.</remarks>
         public LinkedHashSet(int capacity, IEqualityComparer<T>? comparer)
         {
-            hashSet = new HashSet<T>(capacity, comparer);
+            hashSet = new Net5HashSet<T>(capacity, comparer);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public LinkedHashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
         {
-            hashSet = new HashSet<T>(collection, comparer);
+            hashSet = new Net5HashSet<T>(collection, comparer);
         }
 
 #if FEATURE_SERIALIZABLE
@@ -210,7 +210,7 @@ namespace J2N.Collections.Generic
 
 #if FEATURE_SERIALIZABLE
         [Serializable]
-        private class HashSetWrapper : HashSet<T>
+        private class HashSetWrapper : Net5HashSet<T>
         {
             [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
             public HashSetWrapper(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
@@ -906,7 +906,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, SetEqualityComparer<T>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current list. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
