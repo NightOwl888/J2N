@@ -1,9 +1,6 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
-using J2N.Collections.ObjectModel;
-using J2N.Runtime.CompilerServices;
-using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,9 +8,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using J2N.Collections.ObjectModel;
+using J2N.Runtime.CompilerServices;
+using J2N.Text;
 using SCG = System.Collections.Generic;
 
-namespace J2N.Collections.Generic
+namespace J2N.Collections.Generic.Net5
 {
     /// <summary>
     /// The previous version of <c>HashSet&lt;T&gt;</c> from J2N 2.1 and earlier, used by
@@ -28,7 +28,7 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    internal class Net5HashSet<T> : ISet<T>, ICollection<T>,
+    internal class HashSet<T> : ISet<T>, ICollection<T>,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyCollection<T>,
 #endif
@@ -74,30 +74,30 @@ namespace J2N.Collections.Generic
         #region Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Net5HashSet{T}"/> class that is empty
+        /// Initializes a new instance of the <see cref="HashSet{T}"/> class that is empty
         /// and uses <see cref="EqualityComparer{T}.Default"/> for the set type.
         /// </summary>
         /// <remarks>
-        /// The capacity of a <see cref="Net5HashSet{T}"/> object is the number of elements that the object can hold.
-        /// A <see cref="Net5HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
+        /// The capacity of a <see cref="HashSet{T}"/> object is the number of elements that the object can hold.
+        /// A <see cref="HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        public Net5HashSet() : this((IEqualityComparer<T>?)null) { }
+        public HashSet() : this((IEqualityComparer<T>?)null) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Net5HashSet{T}"/> class that is empty and uses the
+        /// Initializes a new instance of the <see cref="HashSet{T}"/> class that is empty and uses the
         /// specified equality comparer for the set type.
         /// </summary>
         /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> implementation to use when comparing values in the
         /// set, or <c>null</c> to use <see cref="EqualityComparer{T}.Default"/> for the set type.</param>
         /// <remarks>
-        /// The capacity of a <see cref="Net5HashSet{T}"/> object is the number of elements that the object can hold.
-        /// A <see cref="Net5HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
+        /// The capacity of a <see cref="HashSet{T}"/> object is the number of elements that the object can hold.
+        /// A <see cref="HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
         /// <para/>
         /// This constructor is an O(1) operation.
         /// </remarks>
-        public Net5HashSet(IEqualityComparer<T>? comparer)
+        public HashSet(IEqualityComparer<T>? comparer)
         {
             if (comparer == EqualityComparer<T>.Default)
             {
@@ -112,36 +112,36 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Net5HashSet{T}"/> class that is empty, but has reserved
+        /// Initializes a new instance of the <see cref="HashSet{T}"/> class that is empty, but has reserved
         /// space for <paramref name="capacity"/> items and uses <see cref="EqualityComparer{T}.Default"/> for the set type.
         /// </summary>
-        /// <param name="capacity">The initial size of the <see cref="Net5HashSet{T}"/>.</param>
+        /// <param name="capacity">The initial size of the <see cref="HashSet{T}"/>.</param>
         /// <remarks>
         /// Since resizes are relatively expensive (require rehashing), this attempts to minimize the need
         /// to resize by setting the initial capacity based on the value of the <paramref name="capacity"/>.
         /// </remarks>
-        public Net5HashSet(int capacity) : this(capacity, null) { }
+        public HashSet(int capacity) : this(capacity, null) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Net5HashSet{T}"/> class that uses <see cref="EqualityComparer{T}.Default"/>
+        /// Initializes a new instance of the <see cref="HashSet{T}"/> class that uses <see cref="EqualityComparer{T}.Default"/>
         /// for the set type, contains elements copied from the specified collection, and has sufficient capacity
         /// to accommodate the number of elements copied.
         /// </summary>
         /// <param name="collection">The collection whose elements are copied to the new set.</param>
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// The capacity of a <see cref="Net5HashSet{T}"/> object is the number of elements that the object can hold.
-        /// A <see cref="Net5HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
+        /// The capacity of a <see cref="HashSet{T}"/> object is the number of elements that the object can hold.
+        /// A <see cref="HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
         /// <para/>
         /// If <paramref name="collection"/> contains duplicates, the set will contain one of each unique element.No exception will
         /// be thrown. Therefore, the size of the resulting set is not identical to the size of <paramref name="collection"/>.
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in the <paramref name="collection"/> parameter.
         /// </remarks>
-        public Net5HashSet(IEnumerable<T> collection) : this(collection, null) { }
+        public HashSet(IEnumerable<T> collection) : this(collection, null) { }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Net5HashSet{T}"/> class that uses the specified equality comparer for the set type,
+        /// Initializes a new instance of the <see cref="HashSet{T}"/> class that uses the specified equality comparer for the set type,
         /// contains elements copied from the specified collection, and has sufficient capacity to accommodate the number of elements copied.
         /// </summary>
         /// <param name="collection">The collection whose elements are copied to the new set.</param>
@@ -149,7 +149,7 @@ namespace J2N.Collections.Generic
         /// set, or <c>null</c> to use <see cref="EqualityComparer{T}.Default"/> for the set type.</param>
         /// <exception cref="ArgumentNullException"><paramref name="collection"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// The capacity of a <see cref="Net5HashSet{T}"/> object is the number of elements that the object can hold. A <see cref="Net5HashSet{T}"/>
+        /// The capacity of a <see cref="HashSet{T}"/> object is the number of elements that the object can hold. A <see cref="HashSet{T}"/>
         /// object's capacity automatically increases as elements are added to the object.
         /// <para/>
         /// If <paramref name="collection"/> contains duplicates, the set will contain one of each unique element. No exception will be thrown. Therefore,
@@ -157,13 +157,13 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This constructor is an O(n) operation, where n is the number of elements in the <paramref name="collection"/> parameter.
         /// </remarks>
-        public Net5HashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
+        public HashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
             : this(comparer)
         {
             if (collection is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
-            var otherAsHashSet = collection as Net5HashSet<T>;
+            var otherAsHashSet = collection as HashSet<T>;
             if (otherAsHashSet != null && AreEqualityComparersEqual(this, otherAsHashSet))
             {
                 CopyFrom(otherAsHashSet);
@@ -188,7 +188,7 @@ namespace J2N.Collections.Generic
 
         // Initializes the HashSet from another HashSet with the same element type and
         // equality comparer.
-        private void CopyFrom(Net5HashSet<T> source)
+        private void CopyFrom(HashSet<T> source)
         {
             int count = source._count;
             if (count == 0)
@@ -232,15 +232,15 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Net5HashSet{T}"/> class that uses the specified equality comparer
+        /// Initializes a new instance of the <see cref="HashSet{T}"/> class that uses the specified equality comparer
         /// for the set type, and has sufficient capacity to accommodate <paramref name="capacity"/> elements.
         /// </summary>
-        /// <param name="capacity">The initial size of the <see cref="Net5HashSet{T}"/>.</param>
+        /// <param name="capacity">The initial size of the <see cref="HashSet{T}"/>.</param>
         /// <param name="comparer">The <see cref="IEqualityComparer{T}"/> implementation to use when comparing values in the
         /// set, or <c>null</c> to use <see cref="EqualityComparer{T}.Default"/> for the set type.</param>
         /// <remarks>Since resizes are relatively expensive (require rehashing), this attempts to minimize the need to resize
         /// by setting the initial capacity based on the value of the <paramref name="capacity"/>.</remarks>
-        public Net5HashSet(int capacity, IEqualityComparer<T>? comparer)
+        public HashSet(int capacity, IEqualityComparer<T>? comparer)
             : this(comparer)
         {
             if (capacity < 0)
@@ -255,15 +255,15 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Net5HashSet{T}"/> class with serialized data.
+        /// Initializes a new instance of the <see cref="HashSet{T}"/> class with serialized data.
         /// </summary>
         /// <param name="info">A <see cref="System.Runtime.Serialization.SerializationInfo"/> object that contains
-        /// the information required to serialize the <see cref="Net5HashSet{T}"/> object.</param>
+        /// the information required to serialize the <see cref="HashSet{T}"/> object.</param>
         /// <param name="context">A <see cref="System.Runtime.Serialization.StreamingContext"/> structure that contains
-        /// the source and destination of the serialized stream associated with the <see cref="Net5HashSet{T}"/> object.</param>
+        /// the source and destination of the serialized stream associated with the <see cref="HashSet{T}"/> object.</param>
         [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        protected Net5HashSet(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        protected HashSet(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             // We can't do anything with the keys and values until the entire graph has been
             // deserialized and we have a reasonable estimate that GetHashCode is not going to
@@ -280,11 +280,11 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns a read-only <see cref="ReadOnlySet{T}"/> wrapper for the current collection.
         /// </summary>
-        /// <returns>An object that acts as a read-only wrapper around the current <see cref="Net5HashSet{T}"/>.</returns>
+        /// <returns>An object that acts as a read-only wrapper around the current <see cref="HashSet{T}"/>.</returns>
         /// <remarks>
-        /// To prevent any modifications to the <see cref="Net5HashSet{T}"/> object, expose it only through this wrapper.
+        /// To prevent any modifications to the <see cref="HashSet{T}"/> object, expose it only through this wrapper.
         /// A <see cref="ReadOnlySet{T}"/> object does not expose methods that modify the collection. However,
-        /// if changes are made to the underlying <see cref="Net5HashSet{T}"/> object, the read-only collection reflects those changes.
+        /// if changes are made to the underlying <see cref="HashSet{T}"/> object, the read-only collection reflects those changes.
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
@@ -306,7 +306,7 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Removes all elements from a <see cref="Net5HashSet{T}"/> object.
+        /// Removes all elements from a <see cref="HashSet{T}"/> object.
         /// </summary>
         /// <remarks>
         /// <see cref="Count"/> is set to zero and references to other objects from elements of the
@@ -332,10 +332,10 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="Net5HashSet{T}"/> object contains the specified element.
+        /// Determines whether a <see cref="HashSet{T}"/> object contains the specified element.
         /// </summary>
-        /// <param name="item">The element to locate in the <see cref="Net5HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="Net5HashSet{T}"/> object contains the specified element;
+        /// <param name="item">The element to locate in the <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object contains the specified element;
         /// otherwise, <c>false</c>.</returns>
         /// <remarks>
         /// This method is an O(1) operation.
@@ -423,10 +423,10 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Copies the elements of a <see cref="Net5HashSet{T}"/> collection to an array.
+        /// Copies the elements of a <see cref="HashSet{T}"/> collection to an array.
         /// </summary>
         /// <param name="array">The one-dimensional array that is the destination of
-        /// the elements copied from the <see cref="Net5HashSet{T}"/> object.
+        /// the elements copied from the <see cref="HashSet{T}"/> object.
         /// The array must have zero-based indexing.</param>
         /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
@@ -445,14 +445,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Removes the specified element from a <see cref="Net5HashSet{T}"/> object.
+        /// Removes the specified element from a <see cref="HashSet{T}"/> object.
         /// </summary>
         /// <param name="item">The element to remove.</param>
         /// <returns><c>true</c> if the element is successfully found and removed;
         /// otherwise, <c>false</c>. This method returns <c>false</c> if item is not
-        /// found in the <see cref="Net5HashSet{T}"/> object.</returns>
+        /// found in the <see cref="HashSet{T}"/> object.</returns>
         /// <remarks>
-        /// If the <see cref="Net5HashSet{T}"/> object does not contain the specified
+        /// If the <see cref="HashSet{T}"/> object does not contain the specified
         /// element, the object remains unchanged. No exception is thrown.
         /// <para/>
         /// This method is an O(1) operation.
@@ -576,8 +576,8 @@ namespace J2N.Collections.Generic
         /// Gets the number of elements that are contained in a set.
         /// </summary>
         /// <remarks>
-        /// The capacity of a <see cref="Net5HashSet{T}"/> object is the number of elements that the object can hold.
-        /// A <see cref="Net5HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
+        /// The capacity of a <see cref="HashSet{T}"/> object is the number of elements that the object can hold.
+        /// A <see cref="HashSet{T}"/> object's capacity automatically increases as elements are added to the object.
         /// <para/>
         /// The capacity is always greater than or equal to <see cref="Count"/>. If <see cref="Count"/> exceeds the
         /// capacity while adding elements, the capacity is set to the first prime number that is greater than
@@ -600,9 +600,9 @@ namespace J2N.Collections.Generic
         #region IEnumerable methods
 
         /// <summary>
-        /// Returns an enumerator that iterates through a <see cref="Net5HashSet{T}"/> object.
+        /// Returns an enumerator that iterates through a <see cref="HashSet{T}"/> object.
         /// </summary>
-        /// <returns>An <see cref="IEnumerator{T}"/> object for the <see cref="Net5HashSet{T}"/> object.</returns>
+        /// <returns>An <see cref="IEnumerator{T}"/> object for the <see cref="HashSet{T}"/> object.</returns>
         /// <remarks>
         /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
         /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
@@ -662,12 +662,12 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Implements the <see cref="System.Runtime.Serialization.ISerializable"/> interface and returns the data
-        /// needed to serialize a <see cref="Net5HashSet{T}"/> object.
+        /// needed to serialize a <see cref="HashSet{T}"/> object.
         /// </summary>
         /// <param name="info">A <see cref="System.Runtime.Serialization.SerializationInfo"/> object that contains
-        /// the information required to serialize the <see cref="Net5HashSet{T}"/> object.</param>
+        /// the information required to serialize the <see cref="HashSet{T}"/> object.</param>
         /// <param name="context">A <see cref="System.Runtime.Serialization.StreamingContext"/> structure that
-        /// contains the source and destination of the serialized stream associated with the <see cref="Net5HashSet{T}"/> object.</param>
+        /// contains the source and destination of the serialized stream associated with the <see cref="HashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="info"/> is <c>null</c>.</exception>
         /// <remarks>
         /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
@@ -711,7 +711,7 @@ namespace J2N.Collections.Generic
         /// <param name="sender">The source of the deserialization event.</param>
         /// <exception cref="System.Runtime.Serialization.SerializationException">
         /// The <see cref="System.Runtime.Serialization.SerializationInfo"/> object associated with the
-        /// current <see cref="Net5HashSet{T}"/> object is invalid.
+        /// current <see cref="HashSet{T}"/> object is invalid.
         /// </exception>
         /// <remarks>
         /// Calling this method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
@@ -767,14 +767,14 @@ namespace J2N.Collections.Generic
         /// Adds the specified element to a set.
         /// </summary>
         /// <param name="item">The element to add to the set.</param>
-        /// <returns><c>true</c> if the element is added to the <see cref="Net5HashSet{T}"/> object;
+        /// <returns><c>true</c> if the element is added to the <see cref="HashSet{T}"/> object;
         /// <c>false</c> if the element is already present.</returns>
         /// <remarks>
-        /// If <see cref="Count"/> already equals the capacity of the <see cref="Net5HashSet{T}"/> object,
+        /// If <see cref="Count"/> already equals the capacity of the <see cref="HashSet{T}"/> object,
         /// the capacity is automatically adjusted to accommodate the new item.
         /// <para/>
         /// If <see cref="Count"/> is less than the capacity of the internal array, this method is an
-        /// O(1) operation. If the <see cref="Net5HashSet{T}"/> object must be resized, this method
+        /// O(1) operation. If the <see cref="HashSet{T}"/> object must be resized, this method
         /// becomes an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
         public bool Add(T item)
@@ -811,10 +811,10 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Modifies the current <see cref="Net5HashSet{T}"/> object to contain all elements that are present
+        /// Modifies the current <see cref="HashSet{T}"/> object to contain all elements that are present
         /// in itself, the specified collection, or both.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is the number of elements in the
@@ -832,14 +832,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Modifies the current <see cref="Net5HashSet{T}"/> object to contain only elements that are
+        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are
         /// present in that object and in the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// If the collection represented by the other parameter is a <see cref="Net5HashSet{T}"/> collection with
-        /// the same equality comparer as the current <see cref="Net5HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by the other parameter is a <see cref="HashSet{T}"/> collection with
+        /// the same equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in <paramref name="other"/>.
         /// </remarks>
@@ -885,9 +885,9 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Removes all elements in the specified collection from the current <see cref="Net5HashSet{T}"/> object.
+        /// Removes all elements in the specified collection from the current <see cref="HashSet{T}"/> object.
         /// </summary>
-        /// <param name="other">The collection of items to remove from the <see cref="Net5HashSet{T}"/> object.</param>
+        /// <param name="other">The collection of items to remove from the <see cref="HashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// The <see cref="ExceptWith(IEnumerable{T})"/> method is the equivalent of mathematical set subtraction.
@@ -920,14 +920,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Modifies the current <see cref="Net5HashSet{T}"/> object to contain only elements that are present either
+        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are present either
         /// in that object or in the specified collection, but not both.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// If the other parameter is a <see cref="Net5HashSet{T}"/> collection with the same equality comparer as
-        /// the current <see cref="Net5HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the other parameter is a <see cref="HashSet{T}"/> collection with the same equality comparer as
+        /// the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where n is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -967,22 +967,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="Net5HashSet{T}"/> object is a subset of the specified collection.
+        /// Determines whether a <see cref="HashSet{T}"/> object is a subset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="Net5HashSet{T}"/> object is a subset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a subset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a subset of any other collection, including an empty set; therefore, this method returns
-        /// <c>true</c> if the collection represented by the current <see cref="Net5HashSet{T}"/> object is empty,
+        /// <c>true</c> if the collection represented by the current <see cref="HashSet{T}"/> object is empty,
         /// even if the <paramref name="other"/> parameter is an empty set.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is greater than the number of
         /// elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="Net5HashSet{T}"/> collection with the same
-        /// equality comparer as the current <see cref="Net5HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in other.
         /// </remarks>
@@ -1027,22 +1027,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="Net5HashSet{T}"/> object is a proper subset of the specified collection.
+        /// Determines whether a <see cref="HashSet{T}"/> object is a proper subset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="Net5HashSet{T}"/> object is a proper subset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper subset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a proper subset of any other collection. Therefore, this method returns <c>true</c> if the
-        /// collection represented by the current <see cref="Net5HashSet{T}"/> object is empty unless the other
+        /// collection represented by the current <see cref="HashSet{T}"/> object is empty unless the other
         /// parameter is also an empty set.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is greater than or equal to the number of
         /// elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="Net5HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="Net5HashSet{T}"/> object, then this method is an O(n) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="HashSet{T}"/> object, then this method is an O(n) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c> is the
         /// number of elements in other.
         /// </remarks>
@@ -1090,22 +1090,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="Net5HashSet{T}"/> object is a superset of the specified collection.
+        /// Determines whether a <see cref="HashSet{T}"/> object is a superset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="Net5HashSet{T}"/> object is a superset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a superset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// All collections, including the empty set, are supersets of the empty set. Therefore, this method returns
         /// <c>true</c> if the collection represented by the other parameter is empty, even if the current
-        /// <see cref="Net5HashSet{T}"/> object is empty.
+        /// <see cref="HashSet{T}"/> object is empty.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than the number of elements
         /// in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="Net5HashSet{T}"/> collection with the same
-        /// equality comparer as the current <see cref="Net5HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other
         /// and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -1145,19 +1145,19 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="Net5HashSet{T}"/> object is a proper superset of the specified collection.
+        /// Determines whether a <see cref="HashSet{T}"/> object is a proper superset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="Net5HashSet{T}"/> object is a proper superset of other; otherwise, <c>false</c>.</returns>
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper superset of other; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a proper superset of any other collection. Therefore, this method returns <c>true</c> if the
-        /// collection represented by the other parameter is empty unless the current <see cref="Net5HashSet{T}"/> collection is also empty.
+        /// collection represented by the other parameter is empty unless the current <see cref="HashSet{T}"/> collection is also empty.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than or equal to the number of elements in other.
         /// <para/>
-        /// If the collection represented by other is a <see cref="Net5HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="Net5HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and <c>m</c>
         /// is <see cref="Count"/>.
         /// </remarks>
@@ -1205,11 +1205,11 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether the current <see cref="Net5HashSet{T}"/> object and a specified collection
+        /// Determines whether the current <see cref="HashSet{T}"/> object and a specified collection
         /// share common elements.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="Net5HashSet{T}"/> object and <paramref name="other"/> share
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object and <paramref name="other"/> share
         /// at least one common element; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
@@ -1242,18 +1242,18 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="Net5HashSet{T}"/> object and the specified collection contain the same elements.
+        /// Determines whether a <see cref="HashSet{T}"/> object and the specified collection contain the same elements.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="Net5HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="Net5HashSet{T}"/> object is equal to <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is equal to <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// The <see cref="SetEquals(IEnumerable{T})"/> method ignores duplicate entries and the order of elements in the
         /// <paramref name="other"/> parameter.
         /// <para/>
-        /// If the collection represented by other is a <see cref="Net5HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="Net5HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -1300,10 +1300,10 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Copies the elements of a <see cref="Net5HashSet{T}"/> object to an array.
+        /// Copies the elements of a <see cref="HashSet{T}"/> object to an array.
         /// </summary>
         /// <param name="array">The one-dimensional array that is the destination of
-        /// the elements copied from the <see cref="Net5HashSet{T}"/> object.
+        /// the elements copied from the <see cref="HashSet{T}"/> object.
         /// The array must have zero-based indexing.</param>
         /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
         /// <remarks>
@@ -1315,11 +1315,11 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Copies the specified number of elements of a <see cref="Net5HashSet{T}"/>
+        /// Copies the specified number of elements of a <see cref="HashSet{T}"/>
         /// object to an array, starting at the specified array index.
         /// </summary>
         /// <param name="array">The one-dimensional array that is the destination of
-        /// the elements copied from the <see cref="Net5HashSet{T}"/> object.
+        /// the elements copied from the <see cref="HashSet{T}"/> object.
         /// The array must have zero-based indexing.</param>
         /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
         /// <param name="count">The number of elements to copy to <paramref name="array"/>.</param>
@@ -1374,12 +1374,12 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Removes all elements that match the conditions defined by the specified
-        /// predicate from a <see cref="Net5HashSet{T}"/> collection.
+        /// predicate from a <see cref="HashSet{T}"/> collection.
         /// </summary>
         /// <param name="match">The <see cref="Predicate{T}"/> delegate that defines
         /// the conditions of the elements to remove.</param>
         /// <returns>The number of elements that were removed from the
-        /// <see cref="Net5HashSet{T}"/> collection.</returns>
+        /// <see cref="HashSet{T}"/> collection.</returns>
         public int RemoveWhere(Predicate<T> match)
         {
             if (match is null)
@@ -1436,13 +1436,13 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Sets the capacity of a <see cref="Net5HashSet{T}"/> object to the actual
+        /// Sets the capacity of a <see cref="HashSet{T}"/> object to the actual
         /// number of elements it contains, rounded up to a nearby, implementation-specific value.
         /// </summary>
         /// <remarks>
-        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="Net5HashSet{T}"/>
+        /// You can use the <see cref="TrimExcess()"/> method to minimize a <see cref="HashSet{T}"/>
         /// object's memory overhead once it is known that no new elements will be added. To completely
-        /// clear a <see cref="Net5HashSet{T}"/> object and release all memory referenced by it,
+        /// clear a <see cref="HashSet{T}"/> object and release all memory referenced by it,
         /// call this method after calling the <see cref="Clear()"/> method.
         /// <para/>
         /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
@@ -1501,14 +1501,14 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Returns an <see cref="IEqualityComparer"/> object that can be used
-        /// for equality testing of a <see cref="Net5HashSet{T}"/> object
+        /// for equality testing of a <see cref="HashSet{T}"/> object
         /// as well as any nested objects that implement <see cref="IStructuralEquatable"/>.
         /// <para/>
         /// Usage Note: This is exactly the same as <see cref="SetEqualityComparer{T}.Default"/>.
-        /// It is included here to cover the <see cref="SCG.Net5HashSet{T}"/> API.
+        /// It is included here to cover the <see cref="SCG.HashSet{T}"/> API.
         /// </summary>
         /// <returns>An <see cref="IEqualityComparer"/> object that can be used for deep
-        /// equality testing of the <see cref="Net5HashSet{T}"/> object.</returns>
+        /// equality testing of the <see cref="HashSet{T}"/> object.</returns>
         /// <remarks>
         /// The <see cref="IEqualityComparer"/> object checks for equality for multiple levels.
         /// Nested reference types that implement <see cref="IStructuralEquatable"/> are also compared.
@@ -2158,7 +2158,7 @@ namespace J2N.Collections.Generic
         /// <param name="set2"></param>
         /// <param name="comparer"></param>
         /// <returns></returns>
-        internal static bool HashSetEquals(Net5HashSet<T>? set1, Net5HashSet<T>? set2, IEqualityComparer<T> comparer)
+        internal static bool HashSetEquals(HashSet<T>? set1, HashSet<T>? set2, IEqualityComparer<T> comparer)
         {
             // handle null cases first
             if (set1 == null)
@@ -2218,11 +2218,11 @@ namespace J2N.Collections.Generic
         /// <param name="set1"></param>
         /// <param name="set2"></param>
         /// <returns></returns>
-        private static bool AreEqualityComparersEqual(Net5HashSet<T> set1, IEnumerable<T> set2)
+        private static bool AreEqualityComparersEqual(HashSet<T> set1, IEnumerable<T> set2)
         {
-            if (set2 is Net5HashSet<T> hashSet)
+            if (set2 is HashSet<T> hashSet)
                 return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
-            else if (set2 is HashSet<T> hashSet2)
+            else if (set2 is Generic.HashSet<T> hashSet2)
                 return set1.EqualityComparer.Equals(hashSet2.EqualityComparer);
             else if (set2 is LinkedHashSet<T> linkedHashSet)
                 return set1.EqualityComparer.Equals(linkedHashSet.EqualityComparer);
@@ -2239,7 +2239,7 @@ namespace J2N.Collections.Generic
         /// <param name="set1"></param>
         /// <param name="set2"></param>
         /// <returns></returns>
-        private static bool AreEqualityComparersEqual(Net5HashSet<T> set1, Net5HashSet<T> set2)
+        private static bool AreEqualityComparersEqual(HashSet<T> set1, HashSet<T> set2)
         {
             return set1.EqualityComparer.Equals(set2.EqualityComparer);
         }
@@ -2395,12 +2395,12 @@ namespace J2N.Collections.Generic
 
         internal struct Enumerator : IEnumerator<T>, IEnumerator
         {
-            private readonly Net5HashSet<T> _set;
+            private readonly HashSet<T> _set;
             private int _index;
             private readonly int _version;
             [AllowNull] private T _current;
 
-            internal Enumerator(Net5HashSet<T> set)
+            internal Enumerator(HashSet<T> set)
             {
                 _set = set;
                 _index = 0;
