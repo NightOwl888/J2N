@@ -225,7 +225,7 @@ namespace J2N.Collections.Tests
         /// to it until it is full. It will begin by adding the desired number of matching,
         /// followed by random (deterministic) elements until the desired count is reached.
         /// </summary>
-        protected IEnumerable<T> CreateHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
+        protected virtual IEnumerable<T> CreateHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
             JCG.HashSet<T> set = new JCG.HashSet<T>(GetIEqualityComparer());
             int seed = 528;
@@ -256,6 +256,22 @@ namespace J2N.Collections.Tests
                 foreach (T lookingFor in match)
                     actualMatchingCount += set.Contains(lookingFor) ? 1 : 0;
                 Assert.Equal(numberOfMatchingElements, actualMatchingCount);
+            }
+
+            return set;
+        }
+
+        /// <summary>
+        /// Create a HashSet with a specific initial capacity and fill it with a specific number of elements.
+        /// </summary>
+        protected JCG.HashSet<T> CreateHashSetWithCapacity(int count, int capacity)
+        {
+            var set = new JCG.HashSet<T>(capacity, GetIEqualityComparer());
+            int seed = 528;
+
+            for (int i = 0; i < count; i++)
+            {
+                while (!set.Add(CreateT(seed++)));
             }
 
             return set;
