@@ -67,7 +67,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
-        private readonly Net5HashSet<T> hashSet;
+        private readonly Net5.HashSet<T> hashSet;
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
 #endif
@@ -130,7 +130,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public LinkedHashSet(IEqualityComparer<T>? comparer)
         {
-            hashSet = new Net5HashSet<T>(comparer ?? EqualityComparer<T>.Default);
+            hashSet = new Net5.HashSet<T>(comparer ?? EqualityComparer<T>.Default);
         }
 
         /// <summary>
@@ -144,7 +144,7 @@ namespace J2N.Collections.Generic
         /// by setting the initial capacity based on the value of the <paramref name="capacity"/>.</remarks>
         public LinkedHashSet(int capacity, IEqualityComparer<T>? comparer)
         {
-            hashSet = new Net5HashSet<T>(capacity, comparer);
+            hashSet = new Net5.HashSet<T>(capacity, comparer);
         }
 
         /// <summary>
@@ -166,7 +166,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public LinkedHashSet(IEnumerable<T> collection, IEqualityComparer<T>? comparer)
         {
-            hashSet = new Net5HashSet<T>(collection, comparer);
+            hashSet = new Net5.HashSet<T>(collection, comparer);
         }
 
 #if FEATURE_SERIALIZABLE
@@ -210,7 +210,7 @@ namespace J2N.Collections.Generic
 
 #if FEATURE_SERIALIZABLE
         [Serializable]
-        private class HashSetWrapper : Net5HashSet<T>
+        private class HashSetWrapper : Net5.HashSet<T>
         {
             [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
             public HashSetWrapper(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context) : base(info, context) { }
