@@ -225,7 +225,7 @@ namespace J2N.Collections.Tests
         /// to it until it is full. It will begin by adding the desired number of matching,
         /// followed by random (deterministic) elements until the desired count is reached.
         /// </summary>
-        protected IEnumerable<T> CreateHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
+        protected virtual IEnumerable<T> CreateHashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
             JCG.HashSet<T> set = new JCG.HashSet<T>(GetIEqualityComparer());
             int seed = 528;
