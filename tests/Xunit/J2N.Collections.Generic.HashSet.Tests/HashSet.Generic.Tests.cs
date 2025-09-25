@@ -872,7 +872,7 @@ namespace J2N.Collections.Tests
         {
             // Strings switch between randomized and non-randomized comparers,
             // however this should never be observable externally.
-            TestComparerSerialization(EqualityComparer<string>.Default);
+            TestComparerSerialization(EqualityComparer<string>.Default, "System.OrdinalComparer");
 
             // OrdinalCaseSensitiveComparer is internal and (de)serializes as OrdinalComparer
             TestComparerSerialization(StringComparer.Ordinal, "System.OrdinalComparer");
