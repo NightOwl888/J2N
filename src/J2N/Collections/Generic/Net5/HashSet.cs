@@ -25,6 +25,7 @@ namespace J2N.Collections.Generic.Net5
     [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Following Microsoft's code style")]
 #if FEATURE_SERIALIZABLE
     [Serializable]
+    [TypeForwardedFrom("J2N, Version=2.0.0.0, Culture=neutral, PublicKeyToken=f39447d697a969af")]
 #endif
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
