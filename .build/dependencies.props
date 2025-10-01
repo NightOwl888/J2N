@@ -20,7 +20,8 @@
     <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion Condition=" '$(TargetFramework)' == 'net45' ">4.7.1</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
     <SystemTextRegularExpressionsPackageReferenceVersion>4.3.1</SystemTextRegularExpressionsPackageReferenceVersion>
-    <XunitPackageReferenceVersion>2.4.1</XunitPackageReferenceVersion>
-    <XunitRunnerVisualStudioPackageReferenceVersion>$(XunitPackageReferenceVersion)</XunitRunnerVisualStudioPackageReferenceVersion>
+    <XunitPackageReferenceVersion>2.9.3</XunitPackageReferenceVersion>
+    <XunitRunnerVisualStudioPackageReferenceVersion>3.1.5</XunitRunnerVisualStudioPackageReferenceVersion>
+    <XunitRunnerVisualStudioPackageReferenceVersion Condition=" '$(TargetFramework)' == 'net47' Or '$(TargetFramework)' == 'net471' Or '$(TargetFramework)' == 'net6.0' ">2.8.2</XunitRunnerVisualStudioPackageReferenceVersion>
   </PropertyGroup>
 </Project>

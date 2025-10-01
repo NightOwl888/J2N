@@ -202,7 +202,7 @@ namespace J2N.Collections.Tests
             Exception exception = Record.Exception(testCode);
             if (exception == null)
             {
-                throw new AssertActualExpectedException(
+                throw EqualException.ForMismatchedValues(
                     exceptionTypes,
                     null,
                     "Expected an exception but got null.");
@@ -210,7 +210,7 @@ namespace J2N.Collections.Tests
             Type exceptionType = exception.GetType();
             if (!exceptionTypes.Contains(exceptionType))
             {
-                throw new AssertActualExpectedException(
+                throw EqualException.ForMismatchedValues(
                     exceptionTypes,
                     exceptionType,
                     "Caught wrong exception.");

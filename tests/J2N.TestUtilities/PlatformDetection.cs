@@ -116,5 +116,7 @@ namespace J2N.TestUtilities
 
             return Environment.GetEnvironmentVariable(variableName) is "true";
         }
+
+        public static bool IsRiscV64Process => (int)RuntimeInformation.ProcessArchitecture == 9; // Architecture.RiscV64;
     }
 }

@@ -3,6 +3,7 @@
   <PropertyGroup>
     <Description>Extensions to Xunit for supporting test projects.</Description>
 
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 
@@ -24,6 +25,7 @@
     <ProjectReference Include="..\..\..\src\J2N\J2N.csproj">
       <SetTargetFramework>$(SetTargetFramework)</SetTargetFramework>
     </ProjectReference>
+    <ProjectReference Include="..\..\J2N.TestUtilities\J2N.TestUtilities.csproj" />
   </ItemGroup>
 
 </Project>
