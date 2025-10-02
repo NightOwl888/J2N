@@ -56,7 +56,7 @@ namespace J2N.TestUtilities.Xunit
             Assert.Contains(expectedMessageContent, Assert.Throws<T>(action).Message);
         }
 
-        public static T Throws<T>(string netCoreParamName, string netFxParamName, Action action)
+        public static T Throws<T>(string? netCoreParamName, string? netFxParamName, Action action)
             where T : ArgumentException
         {
             T exception = Assert.Throws<T>(action);
@@ -145,7 +145,7 @@ namespace J2N.TestUtilities.Xunit
             }
         }
 
-        public static T Throws<T>(string expectedParamName, Func<object> testCode)
+        public static T Throws<T>(string? expectedParamName, Func<object> testCode)
             where T : ArgumentException
         {
             T exception = Assert.Throws<T>(testCode);
