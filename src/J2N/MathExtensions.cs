@@ -39,6 +39,11 @@ namespace J2N
         private const long DoubleSignBitMask = unchecked((long)0x8000000000000000L);
 
         /// <summary>
+        /// The precomputed value of <see cref="Math.Log(double)"/> with a value of 2.
+        /// </summary>
+        private const double LogOf2 = 0.693147180559945309417232121458176568; // precomputed log(2)
+
+        /// <summary>
         /// Returns the signum function of the specified <see cref="int"/> value. (The
         /// return value is <c>-1</c> if the specified value is negative; <c>0</c> if the
         /// specified value is zero; and <c>1</c> if the specified value is positive.)
@@ -142,6 +147,22 @@ namespace J2N
         public static double ToDegrees(this int radians)
         {
             return ((double)radians) * 180 / Math.PI;
+        }
+
+        /// <summary>
+        /// Returns the base 2 logarithm of a specified number.
+        /// </summary>
+        /// <param name="value">A number whose logarithm is to be found.</param>
+        /// <returns></returns>
+        //[Intrinsic]
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static double Log2(this double value)
+        {
+#if FEATURE_MATH_LOG2
+            return Math.Log2(value); // Hardware accelerated
+#else
+            return Math.Log(value) / LogOf2;
+#endif
         }
 
         /// <summary>

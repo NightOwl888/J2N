@@ -73,6 +73,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_CALLERARGUMENTEXPRESSIONATTRIBUTE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_MATH_LOG2</DefineConstants>
 
   </PropertyGroup>
 
