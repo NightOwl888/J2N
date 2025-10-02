@@ -117,6 +117,9 @@ namespace J2N.TestUtilities
             return Environment.GetEnvironmentVariable(variableName) is "true";
         }
 
+        public static bool Is32BitProcess => IntPtr.Size == 4;
+        public static bool Is64BitProcess => IntPtr.Size == 8;
+
         public static bool IsRiscV64Process => (int)RuntimeInformation.ProcessArchitecture == 9; // Architecture.RiscV64;
     }
 }

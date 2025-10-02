@@ -27,14 +27,22 @@
 
     <DebugType>portable</DebugType>
   </PropertyGroup>
+  
+  <!-- Features in .NET 10.x+ only -->
+  <PropertyGroup Condition=" $(TargetFramework.StartsWith('net10.')) ">
+
+    <DefineConstants>$(DefineConstants);FEATURE_BITOPERATIONS_ROUNDUPTOPOWEROF2</DefineConstants>
+    
+  </PropertyGroup>
 
   <!-- Features in .NET 8.x and .NET 9.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
-    <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_BITOPERATIONS_UINTPTR</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_EXCEPTION_STATIC_GUARDCLAUSES</DefineConstants>
     <!-- J2N NOTE: This is technically supported in .NET 6.0, but we don't have a target for it so we are testing .NET Standard 2.1, which doesn't support it -->
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_GETCHUNKS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_EXCEPTION_STATIC_GUARDCLAUSES</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x9FFF</DefineConstants>
 
   </PropertyGroup>
 
@@ -62,9 +70,9 @@
   <!-- Features in .NET Core 3.x, .NET 5.x, .NET 6.x, .NET 8.x, and .NET 9.x only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('netcoreapp3.')) Or $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
+    <DefineConstants>$(DefineConstants);FEATURE_CALLERARGUMENTEXPRESSIONATTRIBUTE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_NUMERICBITOPERATIONS</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_CALLERARGUMENTEXPRESSIONATTRIBUTE</DefineConstants>
 
   </PropertyGroup>
 
