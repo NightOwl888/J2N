@@ -1,11 +1,15 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+﻿// Source: https://github.com/dotnet/runtime/blob/v10.0.0-rc.1.25451.107/src/libraries/Common/tests/TestUtilities/System/AssertExtensions.cs
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
+#nullable enable
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Sdk;
@@ -14,15 +18,34 @@ namespace J2N.TestUtilities.Xunit
 {
     public static class AssertExtensions
     {
-        private static bool IsFullFramework =>
+        private static bool IsNetFramework =>
 #if FEATURE_RUNTIMEINFORMATION
             RuntimeInformation.FrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
 #else
             true;
 #endif
 
+        /// <summary>
+        /// Helper for AOT tests that verifies that the compile succeeds, or throws PlatformNotSupported
+        /// when AOT is enabled.
+        /// </summary>
+        public static void ThrowsOnAot<T>(Action action)
+            where T : Exception
+        {
+#if NET // Dynamic code is always supported on .NET Framework
+            if (!RuntimeFeature.IsDynamicCodeSupported)
+            {
+                Assert.Throws<T>(action);
+            }
+            else
+#endif
+            {
+                action();
+            }
+        }
+
         public static void Throws<T>(Action action, string expectedMessage)
-              where T : Exception
+            where T : Exception
         {
             Assert.Equal(expectedMessage, Assert.Throws<T>(action).Message);
         }
@@ -33,22 +56,23 @@ namespace J2N.TestUtilities.Xunit
             Assert.Contains(expectedMessageContent, Assert.Throws<T>(action).Message);
         }
 
-        public static void Throws<T>(string netCoreParamName, string netFxParamName, Action action)
+        public static T Throws<T>(string? netCoreParamName, string? netFxParamName, Action action)
             where T : ArgumentException
         {
             T exception = Assert.Throws<T>(action);
 
-            if (netFxParamName == null && (IsFullFramework))
+            if (netFxParamName == null && IsNetFramework)
             {
-                // Param name varies between NETFX versions -- skip checking it
-                return;
+                // Param name varies between .NET Framework versions -- skip checking it
+                return exception;
             }
 
-            string expectedParamName =
-                (IsFullFramework) ?
+            string? expectedParamName =
+                IsNetFramework ?
                 netFxParamName : netCoreParamName;
 
             Assert.Equal(expectedParamName, exception.ParamName);
+            return exception;
         }
 
         public static void Throws<T>(string netCoreParamName, string netFxParamName, Func<object> testCode)
@@ -56,20 +80,20 @@ namespace J2N.TestUtilities.Xunit
         {
             T exception = Assert.Throws<T>(testCode);
 
-            if (netFxParamName == null && (IsFullFramework))
+            if (netFxParamName == null && IsNetFramework)
             {
-                // Param name varies between NETFX versions -- skip checking it
+                // Param name varies between .NET Framework versions -- skip checking it
                 return;
             }
 
-            string expectedParamName =
-                (IsFullFramework) ?
+            string? expectedParamName =
+                IsNetFramework ?
                 netFxParamName : netCoreParamName;
 
             Assert.Equal(expectedParamName, exception.ParamName);
         }
 
-        public static T Throws<T>(string expectedParamName, Action action)
+        public static T Throws<T>(string? expectedParamName, Action action)
             where T : ArgumentException
         {
             T exception = Assert.Throws<T>(action);
@@ -90,7 +114,7 @@ namespace J2N.TestUtilities.Xunit
         public static TException Throws<TException, TResult>(Func<TResult> func)
             where TException : Exception
         {
-            object result = null;
+            object? result = null;
             bool returned = false;
             try
             {
@@ -103,7 +127,7 @@ namespace J2N.TestUtilities.Xunit
             }
             catch (Exception ex) when (returned)
             {
-                string resultStr;
+                string? resultStr;
                 if (result == null)
                 {
                     resultStr = "(null)";
@@ -121,7 +145,7 @@ namespace J2N.TestUtilities.Xunit
             }
         }
 
-        public static T Throws<T>(string expectedParamName, Func<object> testCode)
+        public static T Throws<T>(string? expectedParamName, Func<object> testCode)
             where T : ArgumentException
         {
             T exception = Assert.Throws<T>(testCode);
@@ -145,11 +169,11 @@ namespace J2N.TestUtilities.Xunit
             where TNetCoreExceptionType : ArgumentException
             where TNetFxExceptionType : Exception
         {
-            if (IsFullFramework)
+            if (IsNetFramework)
             {
                 // Support cases where the .NET Core exception derives from ArgumentException
                 // but the .NET Framework exception is not.
-                if (typeof(ArgumentException).GetTypeInfo().IsAssignableFrom(typeof(TNetFxExceptionType)))
+                if (typeof(ArgumentException).IsAssignableFrom(typeof(TNetFxExceptionType)))
                 {
                     Exception exception = Assert.Throws(typeof(TNetFxExceptionType), action);
                     Assert.Equal(expectedParamName, ((ArgumentException)exception).ParamName);
@@ -174,7 +198,7 @@ namespace J2N.TestUtilities.Xunit
 
         public static Exception Throws(Type netCoreExceptionType, Type netFxExceptionType, Action action)
         {
-            if (IsFullFramework)
+            if (IsNetFramework)
             {
                 return Assert.Throws(netFxExceptionType, action);
             }
@@ -188,7 +212,7 @@ namespace J2N.TestUtilities.Xunit
             where TNetCoreExceptionType : ArgumentException
             where TNetFxExceptionType : ArgumentException
         {
-            if (IsFullFramework)
+            if (IsNetFramework)
             {
                 Throws<TNetFxExceptionType>(netFxParamName, action);
             }
@@ -215,7 +239,7 @@ namespace J2N.TestUtilities.Xunit
                 if (exceptionTypes.Any(t => t.Equals(exceptionType)))
                     return;
 
-                throw new XunitException($"Expected one of: ({string.Join<Type>(", ", exceptionTypes)}) -> Actual: ({e.GetType()})");
+                throw new XunitException($"Expected one of: ({string.Join<Type>(", ", exceptionTypes)}) -> Actual: ({exceptionType}): {e}"); // Log message and callstack to help diagnosis
             }
 
             throw new XunitException($"Expected one of: ({string.Join<Type>(", ", exceptionTypes)}) -> Actual: No exception thrown");
@@ -249,7 +273,31 @@ namespace J2N.TestUtilities.Xunit
             }
         }
 
-        private static string AddOptionalUserMessage(string message, string userMessage)
+        public static void Canceled(CancellationToken cancellationToken, Action testCode)
+        {
+            OperationCanceledException oce = Assert.ThrowsAny<OperationCanceledException>(testCode);
+            if (cancellationToken.CanBeCanceled)
+            {
+                Assert.Equal(cancellationToken, oce.CancellationToken);
+            }
+        }
+
+        public static Task CanceledAsync(CancellationToken cancellationToken, Task task)
+        {
+            Assert.NotNull(task);
+            return CanceledAsync(cancellationToken, () => task);
+        }
+
+        public static async Task CanceledAsync(CancellationToken cancellationToken, Func<Task> testCode)
+        {
+            OperationCanceledException oce = await Assert.ThrowsAnyAsync<OperationCanceledException>(testCode);
+            if (cancellationToken.CanBeCanceled)
+            {
+                Assert.Equal(cancellationToken, oce.CancellationToken);
+            }
+        }
+
+        private static string AddOptionalUserMessage(string message, string? userMessage)
         {
             if (userMessage == null)
                 return message;
@@ -280,8 +328,7 @@ namespace J2N.TestUtilities.Xunit
         /// </summary>
         /// <param name="actual">The value that should be greater than <paramref name="greaterThan"/>.</param>
         /// <param name="greaterThan">The value that <paramref name="actual"/> should be greater than.</param>
-        /// <param name="userMessage"></param>
-        public static void GreaterThan<T>(T actual, T greaterThan, string userMessage = null) where T : IComparable
+        public static void GreaterThan<T>(T actual, T greaterThan, string? userMessage = null) where T : IComparable
         {
             if (actual == null)
                 throw new XunitException(
@@ -298,8 +345,7 @@ namespace J2N.TestUtilities.Xunit
         /// </summary>
         /// <param name="actual">The value that should be less than <paramref name="lessThan"/>.</param>
         /// <param name="lessThan">The value that <paramref name="actual"/> should be less than.</param>
-        /// <param name="userMessage"></param>
-        public static void LessThan<T>(T actual, T lessThan, string userMessage = null) where T : IComparable
+        public static void LessThan<T>(T actual, T lessThan, string? userMessage = null) where T : IComparable
         {
             if (actual == null)
             {
@@ -323,8 +369,7 @@ namespace J2N.TestUtilities.Xunit
         /// </summary>
         /// <param name="actual">The value that should be less than or equal to <paramref name="lessThanOrEqualTo"/></param>
         /// <param name="lessThanOrEqualTo">The value that <paramref name="actual"/> should be less than or equal to.</param>
-        /// <param name="userMessage"></param>
-        public static void LessThanOrEqualTo<T>(T actual, T lessThanOrEqualTo, string userMessage = null) where T : IComparable
+        public static void LessThanOrEqualTo<T>(T actual, T lessThanOrEqualTo, string? userMessage = null) where T : IComparable
         {
             // null, by definition is always less than or equal to
             if (actual == null)
@@ -339,8 +384,7 @@ namespace J2N.TestUtilities.Xunit
         /// </summary>
         /// <param name="actual">The value that should be greater than or equal to <paramref name="greaterThanOrEqualTo"/></param>
         /// <param name="greaterThanOrEqualTo">The value that <paramref name="actual"/> should be greater than or equal to.</param>
-        /// <param name="userMessage"></param>
-        public static void GreaterThanOrEqualTo<T>(T actual, T greaterThanOrEqualTo, string userMessage = null) where T : IComparable
+        public static void GreaterThanOrEqualTo<T>(T actual, T greaterThanOrEqualTo, string? userMessage = null) where T : IComparable
         {
             // null, by definition is always less than or equal to
             if (actual == null)
@@ -362,6 +406,47 @@ namespace J2N.TestUtilities.Xunit
         }
 
         /// <summary>
+        /// Validate that a given enum value has the expected flag set.
+        /// </summary>
+        /// <typeparam name="T">The enum type.</typeparam>
+        /// <param name="expected">The flag which should be present in <paramref name="actual"/>.</param>
+        /// <param name="actual">The value which should contain the flag <paramref name="expected"/>.</param>
+        public static void HasFlag<T>(T expected, T actual, string? userMessage = null) where T : Enum
+        {
+            if (!actual.HasFlag(expected))
+            {
+                throw new XunitException(AddOptionalUserMessage($"Expected: Value {actual} (of enum type {typeof(T).FullName}) to have the flag {expected} set.", userMessage));
+            }
+        }
+
+        /// <summary>
+        /// Validates that the actual span is the same as the expected span.
+        /// </summary>
+        /// <param name="expected">The expected span.</param>
+        /// <param name="actual">The actual span.</param>
+        public static void Same<T>(ReadOnlySpan<T> expected, ReadOnlySpan<T> actual)
+        {
+            if (expected.Length != actual.Length)
+            {
+                throw new XunitException($"Expected length: {expected.Length}{Environment.NewLine}Actual length: {actual.Length}");
+            }
+
+            if (expected.Length == 0 && actual.Length == 0)
+            {
+                nint byteOffset = Unsafe.ByteOffset(
+                    ref MemoryMarshal.GetReference(expected),
+                    ref MemoryMarshal.GetReference(actual));
+                AssertExtensions.TrueExpression(byteOffset == 0);
+            }
+            else
+            {
+                AssertExtensions.TrueExpression(expected.Overlaps(actual, out int offset) && offset == 0);
+            }
+        }
+
+        // NOTE: Consider using SequenceEqual below instead, as it will give more useful information about what
+        // the actual differences are, especially for large arrays/spans.
+        /// <summary>
         /// Validates that the actual array is equal to the expected array. XUnit only displays the first 5 values
         /// of each collection if the test fails. This doesn't display at what point or how the equality assertion failed.
         /// </summary>
@@ -375,12 +460,21 @@ namespace J2N.TestUtilities.Xunit
             {
                 string expectedString = string.Join(", ", expected);
                 string actualString = string.Join(", ", actual);
-                throw new AssertActualExpectedException(expectedString, actualString, null);
+                throw EqualException.ForMismatchedValues(expectedString, actualString);
             }
         }
 
         /// <summary>Validates that the two sets contains the same elements. XUnit doesn't display the full collections.</summary>
         public static void Equal<T>(HashSet<T> expected, HashSet<T> actual)
+        {
+            if (!actual.SetEquals(expected))
+            {
+                throw new XunitException($"Expected: {string.Join(", ", expected)}{Environment.NewLine}Actual: {string.Join(", ", actual)}");
+            }
+        }
+
+        /// <summary>Validates that the two sets contains the same elements. XUnit doesn't display the full collections.</summary>
+        public static void Equal<T>(ISet<T> expected, ISet<T> actual)
         {
             if (!actual.SetEquals(expected))
             {
@@ -398,11 +492,15 @@ namespace J2N.TestUtilities.Xunit
         /// <param name="comparer">The comparer used to compare the items in two collections</param>
         public static void CollectionEqual<T>(IEnumerable<T> expected, IEnumerable<T> actual, IEqualityComparer<T> comparer)
         {
+#pragma warning disable IDE0079 // Remove unnecessary suppression
+#pragma warning disable CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
             var actualItemCountMapping = new Dictionary<T, ItemCount>(comparer);
+#pragma warning restore CS8714 // Nullability of type argument doesn't match 'notnull' constraint.
+#pragma warning restore IDE0079 // Remove unnecessary suppression
             int actualCount = 0;
             foreach (T actualItem in actual)
             {
-                if (actualItemCountMapping.TryGetValue(actualItem, out ItemCount countInfo))
+                if (actualItemCountMapping.TryGetValue(actualItem, out ItemCount? countInfo))
                 {
                     countInfo.Original++;
                     countInfo.Remain++;
@@ -426,7 +524,7 @@ namespace J2N.TestUtilities.Xunit
             for (int i = 0; i < expectedCount; i++)
             {
                 T currentExpectedItem = expectedArray[i];
-                if (!actualItemCountMapping.TryGetValue(currentExpectedItem, out ItemCount countInfo))
+                if (!actualItemCountMapping.TryGetValue(currentExpectedItem, out ItemCount? countInfo))
                 {
                     throw new XunitException($"Expected: {currentExpectedItem} but not found");
                 }
@@ -437,6 +535,23 @@ namespace J2N.TestUtilities.Xunit
                 }
 
                 countInfo.Remain--;
+            }
+        }
+
+        /// <summary>
+        /// Validates that the actual span is not equal to the expected span.
+        /// </summary>
+        /// <param name="expected">The sequence that <paramref name="actual"/> should be not be equal to.</param>
+        /// <param name="actual">The actual sequence.</param>
+        public static void SequenceNotEqual<T>(ReadOnlySpan<T> expected, ReadOnlySpan<T> actual) where T : IEquatable<T>
+        {
+#if NET5_0_OR_GREATER
+            if (expected.SequenceEqual(actual))
+#else
+            if (!SequenceEqualHack(expected, actual))
+#endif
+            {
+                throw new XunitException($"Expected: Contents of expected to differ from actual but were the same.");
             }
         }
 
@@ -523,13 +638,13 @@ namespace J2N.TestUtilities.Xunit
 
         public static void FilledWith<T>(T expected, ReadOnlySpan<T> actual)
         {
-            EqualityComparer<T> comparer = EqualityComparer<T>.Default; // J2N TODO: Do we need to use JCG EqualityComparer here?
+            EqualityComparer<T> comparer = EqualityComparer<T>.Default;
 
             for (int i = 0; i < actual.Length; i++)
             {
                 if (!comparer.Equals(expected, actual[i]))
                 {
-                    throw new XunitException($"Expected {expected?.ToString() ?? "null"} at position {i}; actual {actual[i]?.ToString() ?? "null"}");
+                    throw new XunitException($"Expected {expected?.ToString() ?? "null"} at position {i}{Environment.NewLine}Actual {actual[i]?.ToString() ?? "null"}");
                 }
             }
         }
@@ -538,7 +653,6 @@ namespace J2N.TestUtilities.Xunit
 
         public static void SequenceEqual<T>(T[] expected, T[] actual) where T : IEquatable<T> => SequenceEqual(expected.AsSpan(), actual.AsSpan());
 
-
         public static void AtLeastOneEquals<T>(T expected1, T expected2, T value)
         {
             EqualityComparer<T> comparer = EqualityComparer<T>.Default;
@@ -546,14 +660,37 @@ namespace J2N.TestUtilities.Xunit
                 throw new XunitException($"Expected: {expected1} || {expected2}{Environment.NewLine}Actual: {value}");
         }
 
+        /// <summary>
+        /// Compares two strings, logs entire content if they are not equal.
+        /// </summary>
+        public static void Equal(string expected, string actual)
+        {
+            try
+            {
+                Assert.Equal(expected, actual);
+            }
+            catch (Exception e)
+            {
+                throw new XunitException(
+                    e.Message + Environment.NewLine +
+                    Environment.NewLine +
+                    "Expected:" + Environment.NewLine +
+                    expected + Environment.NewLine +
+                    Environment.NewLine +
+                    "Actual:" + Environment.NewLine +
+                    actual + Environment.NewLine +
+                    Environment.NewLine);
+            }
+        }
+
         public delegate void AssertThrowsActionReadOnly<T>(ReadOnlySpan<T> span);
 
         public delegate void AssertThrowsAction<T>(Span<T> span);
 
         // Cannot use standard Assert.Throws() when testing Span - Span and closures don't get along.
-        public static void AssertThrows<E, T>(ReadOnlySpan<T> span, AssertThrowsActionReadOnly<T> action) where E : Exception
+        public static E AssertThrows<E, T>(ReadOnlySpan<T> span, AssertThrowsActionReadOnly<T> action) where E : Exception
         {
-            Exception exception;
+            Exception? exception;
 
             try
             {
@@ -565,20 +702,20 @@ namespace J2N.TestUtilities.Xunit
                 exception = ex;
             }
 
-            if (exception == null)
+            switch (exception)
             {
-                throw new ThrowsException(typeof(E));
-            }
-
-            if (exception.GetType() != typeof(E))
-            {
-                throw new ThrowsException(typeof(E), exception);
+                case null:
+                    throw ThrowsException.ForNoException(typeof(E));
+                case E ex when (ex.GetType() == typeof(E)):
+                    return ex;
+                default:
+                    throw ThrowsException.ForIncorrectExceptionType(typeof(E), exception);
             }
         }
 
-        public static void AssertThrows<E, T>(Span<T> span, AssertThrowsAction<T> action) where E : Exception
+        public static E AssertThrows<E, T>(Span<T> span, AssertThrowsAction<T> action) where E : Exception
         {
-            Exception exception;
+            Exception? exception;
 
             try
             {
@@ -590,15 +727,41 @@ namespace J2N.TestUtilities.Xunit
                 exception = ex;
             }
 
-            if (exception == null)
+            switch (exception)
             {
-                throw new ThrowsException(typeof(E));
+                case null:
+                    throw ThrowsException.ForNoException(typeof(E));
+                case E ex when (ex.GetType() == typeof(E)):
+                    return ex;
+                default:
+                    throw ThrowsException.ForIncorrectExceptionType(typeof(E), exception);
             }
+        }
 
-            if (exception.GetType() != typeof(E))
-            {
-                throw new ThrowsException(typeof(E), exception);
-            }
+        public static E Throws<E, T>(string expectedParamName, ReadOnlySpan<T> span, AssertThrowsActionReadOnly<T> action)
+            where E : ArgumentException
+        {
+            E exception = AssertThrows<E, T>(span, action);
+            Assert.Equal(expectedParamName, exception.ParamName);
+            return exception;
+        }
+
+        public static E Throws<E, T>(string expectedParamName, Span<T> span, AssertThrowsAction<T> action)
+            where E : ArgumentException
+        {
+            E exception = AssertThrows<E, T>(span, action);
+            Assert.Equal(expectedParamName, exception.ParamName);
+            return exception;
+        }
+
+        public static void FalseExpression(bool expr, [CallerArgumentExpression(nameof(expr))] string? exprString = null)
+        {
+            Assert.False(expr, $"Expected \"false\" from the expression: \"{exprString}\".");
+        }
+
+        public static void TrueExpression(bool expr, [CallerArgumentExpression(nameof(expr))] string? exprString = null)
+        {
+            Assert.True(expr, $"Expected \"true\" from the expression: \"{exprString}\".");
         }
 
         private class ItemCount
@@ -612,5 +775,543 @@ namespace J2N.TestUtilities.Xunit
                 Remain = remain;
             }
         }
+
+        static unsafe bool IsNegativeZero(float value)
+        {
+            return (*(uint*)(&value)) == 0x80000000;
+        }
+
+        static unsafe bool IsPositiveZero(float value)
+        {
+            return (*(uint*)(&value)) == 0x00000000;
+        }
+
+        static unsafe bool IsNegativeZero(double value)
+        {
+            return (*(ulong*)(&value)) == 0x8000000000000000;
+        }
+
+        static unsafe bool IsPositiveZero(double value)
+        {
+            return (*(ulong*)(&value)) == 0x0000000000000000;
+        }
+
+#if NET
+        static unsafe bool IsNegativeZero(Half value)
+        {
+            return (*(ushort*)(&value)) == 0x8000;
+        }
+
+        static unsafe bool IsPositiveZero(Half value)
+        {
+            return (*(ushort*)(&value)) == 0x0000;
+        }
+#endif
+
+        // We have a custom ToString here to ensure that edge cases (specifically +-0.0,
+        // but also NaN and +-infinity) are correctly and consistently represented.
+        static string ToStringPadded(float value)
+        {
+            if (float.IsNaN(value))
+            {
+                return "NaN".PadLeft(10);
+            }
+            else if (float.IsPositiveInfinity(value))
+            {
+                return "+\u221E".PadLeft(10);
+            }
+            else if (float.IsNegativeInfinity(value))
+            {
+                return "-\u221E".PadLeft(10);
+            }
+            else if (IsNegativeZero(value))
+            {
+                return "-0.0".PadLeft(10);
+            }
+            else if (IsPositiveZero(value))
+            {
+                return "+0.0".PadLeft(10);
+            }
+            else
+            {
+                return $"{value,10:G9}";
+            }
+        }
+
+        static string ToStringPadded(double value)
+        {
+            if (double.IsNaN(value))
+            {
+                return "NaN".PadLeft(20);
+            }
+            else if (double.IsPositiveInfinity(value))
+            {
+                return "+\u221E".PadLeft(20);
+            }
+            else if (double.IsNegativeInfinity(value))
+            {
+                return "-\u221E".PadLeft(20);
+            }
+            else if (IsNegativeZero(value))
+            {
+                return "-0.0".PadLeft(20);
+            }
+            else if (IsPositiveZero(value))
+            {
+                return "+0.0".PadLeft(20);
+            }
+            else
+            {
+                return $"{value,20:G17}";
+            }
+        }
+
+#if NET
+        static string ToStringPadded(Half value)
+        {
+            if (Half.IsNaN(value))
+            {
+                return "NaN".PadLeft(5);
+            }
+            else if (Half.IsPositiveInfinity(value))
+            {
+                return "+\u221E".PadLeft(5);
+            }
+            else if (Half.IsNegativeInfinity(value))
+            {
+                return "-\u221E".PadLeft(5);
+            }
+            else if (IsNegativeZero(value))
+            {
+                return "-0.0".PadLeft(5);
+            }
+            else if (IsPositiveZero(value))
+            {
+                return "+0.0".PadLeft(5);
+            }
+            else
+            {
+                return $"{value,5:G5}";
+            }
+        }
+#endif
+
+        /// <summary>Verifies that two <see cref="double"/> values are equal, within the <paramref name="allowedVariance"/>.</summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The value to be compared against</param>
+        /// <param name="variance">The total variance allowed between the expected and actual results.</param>
+        /// <param name="banner">The banner to show; if <c>null</c>, then the standard
+        /// banner of "Values differ" will be used</param>
+        /// <exception cref="EqualException">Thrown when the values are not equal</exception>
+        public static void Equal(double expected, double actual, double variance, string? banner = null)
+        {
+            if (double.IsNaN(expected))
+            {
+                if (double.IsNaN(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (double.IsNaN(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (double.IsNegativeInfinity(expected))
+            {
+                if (double.IsNegativeInfinity(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (double.IsNegativeInfinity(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (double.IsPositiveInfinity(expected))
+            {
+                if (double.IsPositiveInfinity(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (double.IsPositiveInfinity(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (IsNegativeZero(expected))
+            {
+                if (IsNegativeZero(actual))
+                {
+                    return;
+                }
+
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly -0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+            else if (IsNegativeZero(actual))
+            {
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly -0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+
+            if (IsPositiveZero(expected))
+            {
+                if (IsPositiveZero(actual))
+                {
+                    return;
+                }
+
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly +0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+            else if (IsPositiveZero(actual))
+            {
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly +0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+
+            double delta = Math.Abs(actual - expected);
+
+            if (delta > variance)
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+        }
+
+        /// <summary>Verifies that two <see cref="float"/> values are equal, within the <paramref name="variance"/>.</summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The value to be compared against</param>
+        /// <param name="variance">The total variance allowed between the expected and actual results.</param>
+        /// <param name="banner">The banner to show; if <c>null</c>, then the standard
+        /// banner of "Values differ" will be used</param>
+        /// <exception cref="EqualException">Thrown when the values are not equal</exception>
+        public static void Equal(float expected, float actual, float variance, string? banner = null)
+        {
+            if (float.IsNaN(expected))
+            {
+                if (float.IsNaN(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (float.IsNaN(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (float.IsNegativeInfinity(expected))
+            {
+                if (float.IsNegativeInfinity(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (float.IsNegativeInfinity(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (float.IsPositiveInfinity(expected))
+            {
+                if (float.IsPositiveInfinity(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (float.IsPositiveInfinity(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (IsNegativeZero(expected))
+            {
+                if (IsNegativeZero(actual))
+                {
+                    return;
+                }
+
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly -0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+            else if (IsNegativeZero(actual))
+            {
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly -0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+
+            if (IsPositiveZero(expected))
+            {
+                if (IsPositiveZero(actual))
+                {
+                    return;
+                }
+
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly +0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+            else if (IsPositiveZero(actual))
+            {
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly +0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+
+            float delta = Math.Abs(actual - expected);
+
+            if (delta > variance)
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+        }
+
+#if NET
+        /// <summary>Verifies that two <see cref="Half"/> values are equal, within the <paramref name="variance"/>.</summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The value to be compared against</param>
+        /// <param name="variance">The total variance allowed between the expected and actual results.</param>
+        /// <param name="banner">The banner to show; if <c>null</c>, then the standard
+        /// banner of "Values differ" will be used</param>
+        /// <exception cref="EqualException">Thrown when the values are not equal</exception>
+        public static void Equal(Half expected, Half actual, Half variance, string? banner = null)
+        {
+            if (Half.IsNaN(expected))
+            {
+                if (Half.IsNaN(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (Half.IsNaN(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (Half.IsNegativeInfinity(expected))
+            {
+                if (Half.IsNegativeInfinity(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (Half.IsNegativeInfinity(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (Half.IsPositiveInfinity(expected))
+            {
+                if (Half.IsPositiveInfinity(actual))
+                {
+                    return;
+                }
+
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+            else if (Half.IsPositiveInfinity(actual))
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+
+            if (IsNegativeZero(expected))
+            {
+                if (IsNegativeZero(actual))
+                {
+                    return;
+                }
+
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly -0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+            else if (IsNegativeZero(actual))
+            {
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly -0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+
+            if (IsPositiveZero(expected))
+            {
+                if (IsPositiveZero(actual))
+                {
+                    return;
+                }
+
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly +0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+            else if (IsPositiveZero(actual))
+            {
+                if (IsPositiveZero(variance) || IsNegativeZero(variance))
+                {
+                    throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+                }
+
+                // When the variance is not +-0.0, then we are handling a case where
+                // the actual result is expected to not be exactly +0.0 on some platforms
+                // and we should fallback to checking if it is within the allowed variance instead.
+            }
+
+            Half delta = (Half)Math.Abs((float)actual - (float)expected);
+
+            if (delta > variance)
+            {
+                throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual), banner);
+            }
+        }
+#endif
+
+        /// <summary>
+        /// Verifies that two <see cref="double"/> values's binary representations are identical.
+        /// <para/>
+        /// J2N NOTE: This uses .NET comparison logic, not Java. NaN values are not considered equal.
+        /// </summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The value to be compared against</param>
+        /// <exception cref="EqualException">Thrown when the representations are not identical</exception>
+        public static void Equal(double expected, double actual)
+        {
+            if (BitConverter.DoubleToInt64Bits(expected) == BitConverter.DoubleToInt64Bits(actual))
+            {
+                return;
+            }
+
+            if (PlatformDetection.IsRiscV64Process && double.IsNaN(expected) && double.IsNaN(actual))
+            {
+                // RISC-V does not preserve payload
+                return;
+            }
+
+            throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual));
+        }
+
+        /// <summary>Verifies that two <see cref="float"/> values's binary representations are identical.</summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The value to be compared against</param>
+        /// <exception cref="EqualException">Thrown when the representations are not identical</exception>
+        public static void Equal(float expected, float actual)
+        {
+            static unsafe int SingleToInt32Bits(float value)
+            {
+                return *(int*)&value;
+            }
+
+            if (SingleToInt32Bits(expected) == SingleToInt32Bits(actual))
+            {
+                return;
+            }
+
+            if (PlatformDetection.IsRiscV64Process && float.IsNaN(expected) && float.IsNaN(actual))
+            {
+                // RISC-V does not preserve payload
+                return;
+            }
+
+            throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual));
+        }
+
+#if NET
+        /// <summary>Verifies that two <see cref="Half"/> values's binary representations are identical.</summary>
+        /// <param name="expected">The expected value</param>
+        /// <param name="actual">The value to be compared against</param>
+        /// <exception cref="EqualException">Thrown when the representations are not identical</exception>
+        public static void Equal(Half expected, Half actual)
+        {
+            if (BitConverter.HalfToInt16Bits(expected) == BitConverter.HalfToInt16Bits(actual))
+            {
+                return;
+            }
+
+            if (PlatformDetection.IsRiscV64Process && Half.IsNaN(expected) && Half.IsNaN(actual))
+            {
+                // RISC-V does not preserve payload
+                return;
+            }
+
+            throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual));
+        }
+#endif
     }
 }
