@@ -5,6 +5,7 @@
 using J2N.Collections.Generic;
 using J2N.Collections.Tests;
 using J2N.Diagnostics;
+using J2N.TestUtilities;
 using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections;
@@ -21,7 +22,7 @@ namespace J2N.Collections.Concurrent.Tests
 {
     public class LurchTable_Tests_Concurrent // From ConcurrentDictionaryTests
     {
-        [Fact]
+        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsThreadingSupported))]
         public void TestBasicScenarios()
         {
             LurchTable<int, int> cd = new LurchTable<int, int>();
@@ -510,7 +511,7 @@ namespace J2N.Collections.Concurrent.Tests
             Assert.True(dict.TryRemove(new KeyValuePair<string, string>("KEY", "value")));
         }
 
-        [Fact]
+        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsThreadingSupported))]
         public void TestGetOrAdd()
         {
             TestGetOrAddOrUpdate(1, 1, 1, 10000, true);
@@ -523,7 +524,7 @@ namespace J2N.Collections.Concurrent.Tests
             TestGetOrAddOrUpdate(5, 5, 5, 25000, true);
         }
 
-        [Fact]
+        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsThreadingSupported))]
         public void TestAddOrUpdate()
         {
             TestGetOrAddOrUpdate(1, 1, 1, 10000, false);
@@ -979,7 +980,7 @@ namespace J2N.Collections.Concurrent.Tests
             Assert.True(dictionary.IsEmpty, "TestClear: FAILED.  IsEmpty returned false after Clear");
         }
 
-        [Fact]
+        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsThreadingSupported))]
         public void TestTryUpdate()
         {
             var dictionary = new LurchTable<string, int>();
