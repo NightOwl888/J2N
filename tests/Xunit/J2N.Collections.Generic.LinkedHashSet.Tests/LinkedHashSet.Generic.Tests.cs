@@ -438,7 +438,9 @@ namespace J2N.Collections.Tests
             Assert.Equal(value, actualValue);
             if (!typeof(T).GetTypeInfo().IsValueType)
             {
+#pragma warning disable xUnit2005 // Do not use identity check on value type
                 Assert.Same((object)value, (object)actualValue);
+#pragma warning restore xUnit2005 // Do not use identity check on value type
             }
         }
 
@@ -453,7 +455,9 @@ namespace J2N.Collections.Tests
             Assert.Equal(value, actualValue);
             if (!typeof(T).GetTypeInfo().IsValueType)
             {
+#pragma warning disable xUnit2005 // Do not use identity check on value type
                 Assert.Same((object)value, (object)actualValue);
+#pragma warning restore xUnit2005 // Do not use identity check on value type
             }
         }
 
