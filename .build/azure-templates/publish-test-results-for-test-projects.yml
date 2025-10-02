@@ -182,3 +182,13 @@ steps:
     testResultsFormat: '${{ parameters.testResultsFormat }}'
     testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
     testResultsFileName: '${{ parameters.testResultsFileName }}'
+
+- template: publish-test-results.yml
+  parameters:
+    testProjectName: 'J2N.TestUtilities.Xunit.Tests'
+    framework: '${{ parameters.framework }}'
+    osName: '${{ parameters.osName }}'
+    testPlatform: '${{ parameters.testPlatform }}'
+    testResultsFormat: '${{ parameters.testResultsFormat }}'
+    testResultsArtifactName: '${{ parameters.testResultsArtifactName }}'
+    testResultsFileName: '${{ parameters.testResultsFileName }}'
