@@ -1,7 +1,6 @@
 ﻿// Source: https://github.com/dotnet/runtime/blob/v10.0.0-rc.1.25451.107/src/libraries/Common/tests/TestUtilities/System/AssertExtensions.cs
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-#nullable enable
 
 using System;
 using System.Collections.Generic;
@@ -155,7 +154,7 @@ namespace J2N.TestUtilities.Xunit
             return exception;
         }
 
-        public static async Task<T> ThrowsAsync<T>(string expectedParamName, Func<Task> testCode)
+        public static async Task<T> ThrowsAsync<T>(string? expectedParamName, Func<Task> testCode)
             where T : ArgumentException
         {
             T exception = await Assert.ThrowsAsync<T>(testCode);
@@ -165,7 +164,7 @@ namespace J2N.TestUtilities.Xunit
             return exception;
         }
 
-        public static void Throws<TNetCoreExceptionType, TNetFxExceptionType>(string expectedParamName, Action action)
+        public static void Throws<TNetCoreExceptionType, TNetFxExceptionType>(string? expectedParamName, Action action)
             where TNetCoreExceptionType : ArgumentException
             where TNetFxExceptionType : Exception
         {

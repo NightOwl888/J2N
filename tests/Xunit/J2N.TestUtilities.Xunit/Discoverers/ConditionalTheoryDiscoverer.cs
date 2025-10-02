@@ -1,6 +1,4 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit.Abstractions;
@@ -8,51 +6,51 @@ using Xunit.Sdk;
 
 namespace J2N.TestUtilities.Xunit
 {
+    /// <summary>
+    /// This works with the stock build of xunit 2.x. It does not align directly
+    /// with the upstream Arcade code at https://github.com/dotnet/arcade/tree/release/9.0/src/Microsoft.DotNet.XUnitExtensions.
+    /// </summary>
     public class ConditionalTheoryDiscoverer : TheoryDiscoverer
     {
-        private readonly Dictionary<IMethodInfo, string> _conditionCache;
+        public ConditionalTheoryDiscoverer(IMessageSink diagnosticMessageSink)
+            : base(diagnosticMessageSink) { }
 
-        public ConditionalTheoryDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink)
+        public override IEnumerable<IXunitTestCase> Discover(
+            ITestFrameworkDiscoveryOptions discoveryOptions,
+            ITestMethod testMethod,
+            IAttributeInfo theoryAttribute)
         {
-            _conditionCache = new Dictionary<IMethodInfo, string>();
-        }
+            // Extract constructor args
+            var ctorArgs = theoryAttribute.GetConstructorArguments().ToArray();
+            Type? calleeType = null;
+            string[] conditionMemberNames = [];
 
-        protected override IEnumerable<IXunitTestCase> CreateTestCasesForTheory(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo theoryAttribute)
-        {
-            if (ConditionalTestDiscoverer.TryEvaluateSkipConditions(discoveryOptions, DiagnosticMessageSink, testMethod, theoryAttribute.GetConstructorArguments().ToArray(), out string skipReason, out ExecutionErrorTestCase errorTestCase))
+            if (ctorArgs.Length > 0)
             {
-                return skipReason != null
-                   ? new[] { new SkippedTestCase(skipReason, DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod) }
-                   : new IXunitTestCase[] { new SkippedTheoryTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod) }; // Theory skippable at runtime.
-            }
-
-            return new IXunitTestCase[] { errorTestCase };
-        }
-
-        protected override IEnumerable<IXunitTestCase> CreateTestCasesForDataRow(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo theoryAttribute, object[] dataRow)
-        {
-            IMethodInfo methodInfo = testMethod.Method;
-            List<IXunitTestCase> skippedTestCase = new List<IXunitTestCase>();
-
-            if (!_conditionCache.TryGetValue(methodInfo, out string skipReason))
-            {
-                if (!ConditionalTestDiscoverer.TryEvaluateSkipConditions(discoveryOptions, DiagnosticMessageSink, testMethod, theoryAttribute.GetConstructorArguments().ToArray(), out skipReason, out ExecutionErrorTestCase errorTestCase))
+                if (ctorArgs[0] is Type t)
                 {
-                    return new IXunitTestCase[] { errorTestCase };
+                    calleeType = t;
+                    if (ctorArgs.Length > 1 && ctorArgs[1] is string[] arr)
+                        conditionMemberNames = arr;
                 }
-
-                _conditionCache.Add(methodInfo, skipReason);
-
-                if (skipReason != null)
+                else if (ctorArgs[0] is string[] arrOnly)
                 {
-                    // If this is the first time we evalute the condition we return a SkippedTestCase to avoid printing a skip for every inline-data.
-                    skippedTestCase.Add(new SkippedTestCase(skipReason, DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod));
+                    conditionMemberNames = arrOnly;
                 }
             }
 
-            return skipReason != null ?
-                        (IEnumerable<IXunitTestCase>)skippedTestCase
-                        : new[] { new SkippedFactTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod, dataRow) }; // Test case skippable at runtime.
+            // Ask the base class to generate the normal theory test cases
+            foreach (var rowCase in base.Discover(discoveryOptions, testMethod, theoryAttribute))
+            {
+                yield return new ConditionalTheoryTestCase(
+                    DiagnosticMessageSink,
+                    discoveryOptions.MethodDisplayOrDefault(),
+                    discoveryOptions.MethodDisplayOptionsOrDefault(),
+                    testMethod,
+                    rowCase.TestMethodArguments,
+                    calleeType,
+                    conditionMemberNames);
+            }
         }
     }
 }

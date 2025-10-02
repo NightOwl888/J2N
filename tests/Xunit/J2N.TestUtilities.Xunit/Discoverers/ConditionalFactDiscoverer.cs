@@ -1,28 +1,36 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace J2N.TestUtilities.Xunit
 {
+    /// <summary>
+    /// This works with the stock build of xunit 2.x. It does not align directly
+    /// with the upstream Arcade code at https://github.com/dotnet/arcade/tree/release/9.0/src/Microsoft.DotNet.XUnitExtensions,
+    /// but provides similar functionality without having to somehow dredge up Microsoft's custom fork of xunit.
+    /// </summary>
     public class ConditionalFactDiscoverer : FactDiscoverer
     {
-        public ConditionalFactDiscoverer(IMessageSink diagnosticMessageSink) : base(diagnosticMessageSink) { }
+        public ConditionalFactDiscoverer(IMessageSink diagnosticMessageSink)
+            : base(diagnosticMessageSink)
+        { }
 
-        protected override IXunitTestCase CreateTestCase(ITestFrameworkDiscoveryOptions discoveryOptions, ITestMethod testMethod, IAttributeInfo factAttribute)
+        // Called during discovery; we construct a custom test case so it can evaluate at runtime
+        protected override IXunitTestCase CreateTestCase(
+            ITestFrameworkDiscoveryOptions discoveryOptions,
+            ITestMethod testMethod,
+            IAttributeInfo factAttribute)
         {
-            if (ConditionalTestDiscoverer.TryEvaluateSkipConditions(discoveryOptions, DiagnosticMessageSink, testMethod, factAttribute.GetConstructorArguments().ToArray(), out string skipReason, out ExecutionErrorTestCase errorTestCase))
-            {
-                return skipReason != null
-                    ? (IXunitTestCase)new SkippedTestCase(skipReason, DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod)
-                    : new SkippedFactTestCase(DiagnosticMessageSink, discoveryOptions.MethodDisplayOrDefault(), discoveryOptions.MethodDisplayOptionsOrDefault(), testMethod); // Test case skippable at runtime.
-            }
+            // Keep the original constructor arguments so the test case can re-evaluate at runtime
+            var ctorArgs = factAttribute.GetConstructorArguments().ToArray();
 
-            return errorTestCase;
+            return new ConditionalFactTestCase(
+                DiagnosticMessageSink,
+                discoveryOptions.MethodDisplayOrDefault(),
+                discoveryOptions.MethodDisplayOptionsOrDefault(),
+                testMethod,
+                ctorArgs);
         }
     }
 }

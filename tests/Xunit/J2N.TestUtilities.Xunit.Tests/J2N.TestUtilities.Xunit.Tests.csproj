@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\TestProject.Common.References.targets" />
+  <Import Project="..\..\SystemMemoryReferenceOverride.targets" />
+  
+  <ItemGroup>
+    <ProjectReference Include="..\J2N.TestUtilities.Xunit\J2N.TestUtilities.Xunit.csproj" />
+  </ItemGroup>
+
+</Project>
