@@ -4,6 +4,7 @@
     <Description>Extensions to Xunit for supporting test projects.</Description>
 
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <Nullable>enable</Nullable>
     <IsTestProject>false</IsTestProject>
   </PropertyGroup>
 

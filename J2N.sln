@@ -111,6 +111,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "J2N.Runtime.Tests", "tests\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.Collections.Generic.OrderedDictionary.Tests", "tests\Xunit\J2N.Collections.Generic.OrderedDictionary.Tests\J2N.Collections.Generic.OrderedDictionary.Tests.csproj", "{0B33B8AE-24A0-4025-81C7-F834EDF93D73}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "J2N.TestUtilities.Xunit.Tests", "tests\Xunit\J2N.TestUtilities.Xunit.Tests\J2N.TestUtilities.Xunit.Tests.csproj", "{9086D0A8-BE79-E669-3E44-1503094C8352}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -193,6 +195,10 @@ Global
 		{0B33B8AE-24A0-4025-81C7-F834EDF93D73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0B33B8AE-24A0-4025-81C7-F834EDF93D73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0B33B8AE-24A0-4025-81C7-F834EDF93D73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9086D0A8-BE79-E669-3E44-1503094C8352}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9086D0A8-BE79-E669-3E44-1503094C8352}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9086D0A8-BE79-E669-3E44-1503094C8352}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9086D0A8-BE79-E669-3E44-1503094C8352}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -220,6 +226,7 @@ Global
 		{A101FA42-5184-4D92-9B9C-E0AE5E98664C} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{6B1280F0-7B29-4A86-B404-6E04641B4C0D} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 		{0B33B8AE-24A0-4025-81C7-F834EDF93D73} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
+		{9086D0A8-BE79-E669-3E44-1503094C8352} = {CBB1C2AF-96F3-43FD-B4C5-F67511FF4966}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B477AD9F-26BF-44CF-B94C-50D89AC24836}

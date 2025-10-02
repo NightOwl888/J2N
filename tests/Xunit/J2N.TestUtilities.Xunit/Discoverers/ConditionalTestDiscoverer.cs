@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using Xunit.Abstractions;
@@ -17,18 +18,18 @@ namespace J2N.TestUtilities.Xunit
         // This helper method evaluates the given condition member names for a given set of test cases.
         // If any condition member evaluates to 'false', the test cases are marked to be skipped.
         // The skip reason is the collection of all the condition members that evaluated to 'false'.
-        internal static string EvaluateSkipConditions(ITestMethod testMethod, object[] conditionArguments)
+        internal static string? EvaluateSkipConditions(ITestMethod testMethod, object?[]? conditionArguments)
         {
-            Type calleeType = null;
-            string[] conditionMemberNames = null;
+            Type? calleeType = null;
+            string[]? conditionMemberNames = null;
 
             if (CheckInputToSkipExecution(conditionArguments, ref calleeType, ref conditionMemberNames, testMethod)) return null;
 
             MethodInfo testMethodInfo = testMethod.Method.ToRuntimeMethod();
-            Type testMethodDeclaringType = testMethodInfo.DeclaringType;
-            List<string> falseConditions = new List<string>(conditionMemberNames.Count());
+            Type? testMethodDeclaringType = testMethodInfo.DeclaringType;
+            List<string> falseConditions = new List<string>(conditionMemberNames!.Count());
 
-            foreach (string entry in conditionMemberNames)
+            foreach (string entry in conditionMemberNames!)
             {
                 string conditionMemberName = entry;
 
@@ -38,7 +39,7 @@ namespace J2N.TestUtilities.Xunit
                     continue;
                 }
 
-                Type declaringType;
+                Type? declaringType;
 
                 if (calleeType != null)
                 {
@@ -52,7 +53,7 @@ namespace J2N.TestUtilities.Xunit
                     if (symbols.Length == 2)
                     {
                         conditionMemberName = symbols[1];
-                        ITypeInfo type = testMethod.TestClass.Class.Assembly.GetTypes(false).Where(t => t.Name.Contains(symbols[0])).FirstOrDefault();
+                        ITypeInfo? type = testMethod.TestClass.Class.Assembly.GetTypes(false).Where(t => t.Name.Contains(symbols[0])).FirstOrDefault();
                         if (type != null)
                         {
                             declaringType = type.ToRuntimeType();
@@ -60,7 +61,7 @@ namespace J2N.TestUtilities.Xunit
                     }
                 }
 
-                Func<bool> conditionFunc;
+                Func<bool>? conditionFunc;
                 if ((conditionFunc = LookupConditionalMember(declaringType, conditionMemberName)) == null)
                 {
                     throw new ConditionalDiscovererException(GetFailedLookupString(conditionMemberName, declaringType));
@@ -91,13 +92,13 @@ namespace J2N.TestUtilities.Xunit
             return null;
         }
 
-        internal static bool TryEvaluateSkipConditions(ITestFrameworkDiscoveryOptions discoveryOptions, IMessageSink diagnosticMessageSink, ITestMethod testMethod, object[] conditionArguments, out string skipReason, out ExecutionErrorTestCase errorTestCase)
+        internal static bool TryEvaluateSkipConditions(ITestFrameworkDiscoveryOptions discoveryOptions, IMessageSink diagnosticMessageSink, ITestMethod testMethod, object[] conditionArguments, [MaybeNullWhen(false)] out string skipReason, [MaybeNullWhen(true)] out ExecutionErrorTestCase errorTestCase)
         {
             skipReason = null;
             errorTestCase = null;
             try
             {
-                skipReason = EvaluateSkipConditions(testMethod, conditionArguments);
+                skipReason = EvaluateSkipConditions(testMethod, conditionArguments)!;
                 return true;
             }
             catch (ConditionalDiscovererException e)
@@ -112,7 +113,7 @@ namespace J2N.TestUtilities.Xunit
             }
         }
 
-        internal static string GetFailedLookupString(string name, Type type)
+        internal static string GetFailedLookupString(string name, Type? type)
         {
             return
                 $"An appropriate member '{name}' could not be found. " +
@@ -120,29 +121,29 @@ namespace J2N.TestUtilities.Xunit
                 "of any visibility, accepting zero arguments, and having a return type of Boolean.";
         }
 
-        internal static Func<bool> LookupConditionalMember(Type t, string name)
+        internal static Func<bool>? LookupConditionalMember(Type? t, string? name)
         {
             if (t == null || name == null)
                 return null;
 
             TypeInfo ti = t.GetTypeInfo();
 
-            MethodInfo mi = ti.GetDeclaredMethod(name);
+            MethodInfo? mi = ti.GetDeclaredMethod(name);
             if (mi != null && mi.IsStatic && mi.GetParameters().Length == 0 && mi.ReturnType == typeof(bool))
-                return () => (bool)mi.Invoke(null, null);
+                return () => (bool)mi.Invoke(null, null)!;
 
-            PropertyInfo pi = ti.GetDeclaredProperty(name);
+            PropertyInfo? pi = ti.GetDeclaredProperty(name);
             if (pi != null && pi.PropertyType == typeof(bool) && pi.GetMethod != null && pi.GetMethod.IsStatic && pi.GetMethod.GetParameters().Length == 0)
-                return () => (bool)pi.GetValue(null);
+                return () => (bool)pi.GetValue(null)!;
 
-            FieldInfo fi = ti.GetDeclaredField(name);
+            FieldInfo? fi = ti.GetDeclaredField(name);
             if (fi != null && fi.FieldType == typeof(bool) && fi.IsStatic)
-                return () => (bool)fi.GetValue(null);
+                return () => (bool)fi.GetValue(null)!;
 
             return LookupConditionalMember(ti.BaseType, name);
         }
 
-        internal static bool CheckInputToSkipExecution(object[] conditionArguments, ref Type calleeType, ref string[] conditionMemberNames, ITestMethod testMethod = null)
+        internal static bool CheckInputToSkipExecution(object?[]? conditionArguments, ref Type? calleeType, ref string[]? conditionMemberNames, ITestMethod? testMethod = null)
         {
             // A null or empty list of conditionArguments is treated as "no conditions".
             // and the test cases will be executed.
