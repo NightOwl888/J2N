@@ -113,11 +113,6 @@ namespace J2N.Numerics.Tests
         [InlineData(int.MinValue, false)]
         public static void BitOps_IsPow2_nint_32(int n, bool expected)
         {
-            //if (PlatformDetection.Is32BitProcess)
-            //{
-            //    throw new Xunit.Sdk.SkipException("Condition not met, skipping test.");
-            //}
-
             bool actual = BitOperation.IsPow2((nint)n);
             Assert.Equal(expected, actual);
         }
@@ -312,7 +307,7 @@ namespace J2N.Numerics.Tests
         [InlineData(int.MaxValue << 5, 5)]
         [InlineData(3 << 27, 27)]
         [InlineData(int.MaxValue, 0)]
-        public static void BitOps_TrailingZeroCount_int(int n, int expected)
+        public static void BitOps_TrailingZeroCount_int(int n, int expected) // J2N specific covering int overload
         {
             int actual = BitOperation.TrailingZeroCount(n);
             Assert.Equal(expected, actual);
@@ -358,7 +353,7 @@ namespace J2N.Numerics.Tests
         [InlineData(3L << 59, 59)]
         [InlineData(5L << 63, 63)]
         [InlineData(long.MaxValue, 0)]
-        public static void BitOps_TrailingZeroCount_long(long n, int expected)
+        public static void BitOps_TrailingZeroCount_long(long n, int expected) // J2N specific covering long overload
         {
             int actual = BitOperation.TrailingZeroCount(n);
             Assert.Equal(expected, actual);
