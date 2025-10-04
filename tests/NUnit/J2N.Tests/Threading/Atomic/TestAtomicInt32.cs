@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading.Atomic
 {
@@ -323,6 +324,255 @@ namespace J2N.Threading.Atomic
             assertTrue(ai < 7);
             assertFalse(ai < 6);
             assertTrue(ai <= 6);
+        }
+
+        [Test]
+        public void TestImplicitOperatorInt_Null()
+        {
+            AtomicInt32? ai = null;
+            Assert.Throws<ArgumentNullException>(() =>
+            {
+                int x = ai;
+                Assert.Fail("Should throw exception");
+            });
+        }
+
+        [Test]
+        public void TestImplicitOperatorInt_Value()
+        {
+            AtomicInt32 ai = new AtomicInt32(42);
+            int x = ai;
+            Assert.AreEqual(42, x);
+        }
+
+        [Test]
+        public void TestImplicitOperatorNullableInt_Null()
+        {
+            AtomicInt32? ai = null;
+            int? x = ai;
+            Assert.False(x.HasValue);
+        }
+
+        [Test]
+        public void TestImplicitOperatorNullableInt_Value()
+        {
+            AtomicInt32 ai = new AtomicInt32(42);
+            int? x = ai;
+            Assert.AreEqual(42, x);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt32_AtomicInt32_BothNull()
+        {
+            AtomicInt32? ai1 = null;
+            AtomicInt32? ai2 = null;
+            Assert.IsTrue(ai1 == ai2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt32_AtomicInt32_OneNull()
+        {
+            AtomicInt32? ai1 = null;
+            AtomicInt32 ai2 = new AtomicInt32(42);
+            Assert.IsFalse(ai1 == ai2);
+            Assert.IsFalse(ai2 == ai1);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt32_AtomicInt32_BothNonNull()
+        {
+            AtomicInt32 ai1 = new AtomicInt32(42);
+            AtomicInt32 ai2 = new AtomicInt32(42);
+            AtomicInt32 ai3 = new AtomicInt32(7);
+            Assert.IsTrue(ai1 == ai2);
+            Assert.IsFalse(ai1 == ai3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt32_AtomicInt32_BothNull()
+        {
+            AtomicInt32? ai1 = null;
+            AtomicInt32? ai2 = null;
+            Assert.IsFalse(ai1 != ai2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt32_AtomicInt32_OneNull()
+        {
+            AtomicInt32? ai1 = null;
+            AtomicInt32 ai2 = new AtomicInt32(42);
+            Assert.IsTrue(ai1 != ai2);
+            Assert.IsTrue(ai2 != ai1);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt32_AtomicInt32_BothNonNull()
+        {
+            AtomicInt32 ai1 = new AtomicInt32(42);
+            AtomicInt32 ai2 = new AtomicInt32(42);
+            AtomicInt32 ai3 = new AtomicInt32(7);
+            Assert.IsFalse(ai1 != ai2);
+            Assert.IsTrue(ai1 != ai3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt32_Int_LeftNull()
+        {
+            AtomicInt32? ai1 = null;
+            const int i2 = 42;
+            Assert.IsFalse(ai1 == i2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt32_Int_LeftValue()
+        {
+            AtomicInt32 ai1 = new AtomicInt32(42);
+            const int i2 = 42;
+            const int i3 = 7;
+            Assert.IsTrue(ai1 == i2);
+            Assert.IsFalse(ai1 == i3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt32_Int_LeftNull()
+        {
+            AtomicInt32? ai1 = null;
+            const int i2 = 42;
+            Assert.IsTrue(ai1 != i2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt32_Int_LeftValue()
+        {
+            AtomicInt32 ai1 = new AtomicInt32(42);
+            const int i2 = 42;
+            const int i3 = 7;
+            Assert.IsFalse(ai1 != i2);
+            Assert.IsTrue(ai1 != i3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_Int_AtomicInt32_RightNull()
+        {
+            const int i1 = 42;
+            AtomicInt32? ai2 = null;
+            Assert.IsFalse(i1 == ai2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_Int_AtomicInt32_RightValue()
+        {
+            const int i1 = 42;
+            const int i3 = 7;
+            AtomicInt32 ai2 = new AtomicInt32(42);
+            Assert.IsTrue(i1 == ai2);
+            Assert.IsFalse(i3 == ai2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_Int_AtomicInt32_RightNull()
+        {
+            const int i1 = 42;
+            AtomicInt32? ai2 = null;
+            Assert.IsTrue(i1 != ai2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_Int_AtomicInt32_RightValue()
+        {
+            const int i1 = 42;
+            const int i3 = 7;
+            AtomicInt32 ai2 = new AtomicInt32(42);
+            Assert.IsFalse(i1 != ai2);
+            Assert.IsTrue(i3 != ai2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt32_NullableInt_LeftNull()
+        {
+            AtomicInt32? ai1 = null;
+            int? i2 = null;
+            int? i3 = 42;
+            Assert.IsTrue(ai1 == i2);
+            Assert.IsFalse(ai1 == i3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt32_NullableInt_LeftValue()
+        {
+            AtomicInt32 ai1 = new AtomicInt32(42);
+            int? i2 = null;
+            int? i3 = 42;
+            int? i4 = 7;
+            Assert.IsFalse(ai1 == i2);
+            Assert.IsTrue(ai1 == i3);
+            Assert.IsFalse(ai1 == i4);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt32_NullableInt_LeftNull()
+        {
+            AtomicInt32? ai1 = null;
+            int? i2 = null;
+            int? i3 = 42;
+            Assert.IsFalse(ai1 != i2);
+            Assert.IsTrue(ai1 != i3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt32_NullableInt_LeftValue()
+        {
+            AtomicInt32 ai1 = new AtomicInt32(42);
+            int? i2 = null;
+            int? i3 = 42;
+            int? i4 = 7;
+            Assert.IsTrue(ai1 != i2);
+            Assert.IsFalse(ai1 != i3);
+            Assert.IsTrue(ai1 != i4);
+        }
+
+        [Test]
+        public void TestOperatorEquals_NullableInt_AtomicInt32_RightNull()
+        {
+            int? i1 = null;
+            AtomicInt32? ai2 = null;
+            AtomicInt32 ai3 = new AtomicInt32(42);
+            Assert.IsTrue(i1 == ai2);
+            Assert.IsFalse(i1 == ai3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_NullableInt_AtomicInt32_RightValue()
+        {
+            int? i1 = 42;
+            int? i2 = 7;
+            AtomicInt32? ai3 = null;
+            AtomicInt32 ai4 = new AtomicInt32(42);
+            Assert.IsFalse(i1 == ai3);
+            Assert.IsTrue(i1 == ai4);
+            Assert.IsFalse(i2 == ai4);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_NullableInt_AtomicInt32_RightNull()
+        {
+            int? i1 = null;
+            AtomicInt32? ai2 = null;
+            AtomicInt32 ai3 = new AtomicInt32(42);
+            Assert.IsFalse(i1 != ai2);
+            Assert.IsTrue(i1 != ai3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_NullableInt_AtomicInt32_RightValue()
+        {
+            int? i1 = 42;
+            int? i2 = 7;
+            AtomicInt32? ai3 = null;
+            AtomicInt32 ai4 = new AtomicInt32(42);
+            Assert.IsTrue(i1 != ai3);
+            Assert.IsFalse(i1 != ai4);
+            Assert.IsTrue(i2 != ai4);
         }
     }
 }
