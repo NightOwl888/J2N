@@ -328,7 +328,7 @@ namespace J2N.Collections.Generic
             Debug.Assert(Count == source.Count);
         }
 
-        #endregion
+        #endregion Constructors
 
         #region AsReadOnly
 
@@ -579,7 +579,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         bool ICollection<T>.IsReadOnly => false;
 
-        #endregion
+        #endregion ICollection<T> methods
 
         #region AlternateLookup
 
@@ -895,7 +895,7 @@ namespace J2N.Collections.Generic
         }
 #endif
 
-        #endregion
+        #endregion AlternateLookup
 
         #region IEnumerable methods
 
@@ -947,7 +947,7 @@ namespace J2N.Collections.Generic
 
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
 
-        #endregion
+        #endregion IEnumerable methods
 
         #region ISerializable methods
 
@@ -993,7 +993,7 @@ namespace J2N.Collections.Generic
 
 #endif
 
-        #endregion
+        #endregion ISerializable methods
 
         #region IDeserializationCallback methods
 
@@ -1057,7 +1057,7 @@ namespace J2N.Collections.Generic
 
 #endif
 
-        #endregion
+        #endregion IDeserializationCallback methods
 
         #region HashSet methods
 
@@ -1888,7 +1888,7 @@ namespace J2N.Collections.Generic
             _freeCount = 0;
         }
 
-        #endregion
+        #endregion HashSet methods
 
         #region Helper methods
 
@@ -2335,7 +2335,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         internal static bool EffectiveEqualityComparersAreEqual(HashSet<T> set1, HashSet<T> set2) => set1.EffectiveComparer.Equals(set2.EffectiveComparer);
 
-        #endregion
+        #endregion Helper methods
 
         #region Structural Equality
 
@@ -2383,7 +2383,7 @@ namespace J2N.Collections.Generic
         public override int GetHashCode()
             => GetHashCode(SetEqualityComparer<T>.Default);
 
-        #endregion
+        #endregion Structural Equality
 
         #region ToString
 
@@ -2442,7 +2442,7 @@ namespace J2N.Collections.Generic
         public virtual string ToString(string format)
             => ToString(format, StringFormatter.CurrentCulture);
 
-        #endregion
+        #endregion ToString
 
         #region Nested Structures
 
@@ -2548,6 +2548,6 @@ namespace J2N.Collections.Generic
             }
         }
 
-        #endregion
+        #endregion Nested Structures
     }
 }
