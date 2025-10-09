@@ -1921,7 +1921,10 @@ namespace J2N.Collections.Generic
             _freeList = -1;
             _buckets = buckets;
             _entries = entries;
-            _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)size);
+            if (IntPtr.Size == 8) // 64-bit process
+            {
+                _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)size);
+            }
 
             return size;
         }
