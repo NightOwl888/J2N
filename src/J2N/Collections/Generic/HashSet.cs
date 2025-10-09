@@ -2143,7 +2143,7 @@ namespace J2N.Collections.Generic
         /// same equality comparer.
         /// </summary>
         /// <param name="other"></param>
-        private void SymmetricExceptWithUniqueHashSet(IEnumerable<T> other)
+        private void SymmetricExceptWithUniqueHashSet(HashSet<T> other)
         {
             foreach (T item in other)
             {
