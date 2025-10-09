@@ -968,7 +968,6 @@ namespace J2N.Collections.Generic
         /// for providing serialization services. Security action: <see cref="System.Security.Permissions.SecurityAction.LinkDemand"/>.
         /// Associated enumeration: <see cref="System.Security.Permissions.SecurityPermissionFlag.SerializationFormatter"/>
         /// </permission>
-        [System.Security.SecurityCritical]
         [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
@@ -1143,7 +1142,6 @@ namespace J2N.Collections.Generic
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in <paramref name="other"/>.
         /// </remarks>
-        [System.Security.SecurityCritical]
         public void IntersectWith(IEnumerable<T> other)
         {
             if (other is null)
@@ -1228,7 +1226,6 @@ namespace J2N.Collections.Generic
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where n is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
-        [System.Security.SecurityCritical]
         public void SymmetricExceptWith(IEnumerable<T> other)
         {
             if (other is null)
@@ -1285,7 +1282,6 @@ namespace J2N.Collections.Generic
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in other.
         /// </remarks>
-        [System.Security.SecurityCritical]
         public bool IsSubsetOf(IEnumerable<T> other)
         {
             if (other is null)
@@ -1340,7 +1336,6 @@ namespace J2N.Collections.Generic
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c> is the
         /// number of elements in other.
         /// </remarks>
-        [System.Security.SecurityCritical]
         public bool IsProperSubsetOf(IEnumerable<T> other)
         {
             if (other is null)
@@ -1460,7 +1455,6 @@ namespace J2N.Collections.Generic
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and <c>m</c>
         /// is <see cref="Count"/>.
         /// </remarks>
-        [System.Security.SecurityCritical]
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
             if (other is null)
@@ -1557,7 +1551,6 @@ namespace J2N.Collections.Generic
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
-        [System.Security.SecurityCritical]
         public bool SetEquals(IEnumerable<T> other)
         {
             if (other is null)
