@@ -902,7 +902,8 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns an enumerator that iterates through a <see cref="HashSet{T}"/> object.
         /// </summary>
-        /// <returns>An <see cref="Enumerator"/> object for the <see cref="HashSet{T}"/> object.</returns>
+        /// <returns>An <see cref="Enumerator"/> object (boxed as <see cref="IEnumerator{T}"/>) for the
+        /// <see cref="HashSet{T}"/> object.</returns>
         /// <remarks>
         /// The <c>foreach</c> statement of the C# language (<c>for each</c> in C++, <c>For Each</c> in Visual Basic)
         /// hides the complexity of enumerators. Therefore, using <c>foreach</c> is recommended instead of directly manipulating the enumerator.
@@ -939,13 +940,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public Enumerator GetEnumerator() => new Enumerator(this);
-
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
+        public IEnumerator<T> GetEnumerator() =>
             Count == 0 ? SZGenericArrayEnumerator<T>.Empty :
-            GetEnumerator();
+            new Enumerator(this);
 
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         #endregion IEnumerable methods
 
