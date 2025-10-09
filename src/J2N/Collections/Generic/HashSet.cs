@@ -464,7 +464,14 @@ namespace J2N.Collections.Generic
         private ref int GetBucketRef(int hashCode)
         {
             int[] buckets = _buckets!;
-            return ref buckets[HashHelpers.FastMod((uint)hashCode, (uint)buckets.Length, _fastModMultiplier)];
+            if (IntPtr.Size == 8) // 64-bit process
+            {
+                return ref buckets[HashHelpers.FastMod((uint)hashCode, (uint)buckets.Length, _fastModMultiplier)];
+            }
+            else
+            {
+                return ref buckets[(uint)hashCode % (uint)buckets.Length];
+            }
         }
 
         /// <summary>
