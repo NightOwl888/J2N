@@ -126,7 +126,7 @@ namespace J2N.Collections.Generic
             public override int GetHashCode(string? obj)
             {
                 Debug.Assert(obj != null, "This implementation is only called from first-party collection types that guarantee non-null parameters.");
-                return GetNonRandomizedHashCode(obj);
+                return GetNonRandomizedHashCode(obj!);
             }
 
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
