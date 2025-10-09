@@ -2485,13 +2485,6 @@ namespace J2N.Collections.Generic
             }
 
             /// <summary>
-            /// Releases all resources used by the <see cref="Enumerator"/>.
-            /// </summary>
-            public void Dispose()
-            {
-            }
-
-            /// <summary>
             /// Advances the enumerator to the next element of the <see cref="HashSet{T}"/>.
             /// </summary>
             /// <returns>>true if the enumerator was successfully advanced to the next element; false if the enumerator has passed the end of the collection.</returns>
@@ -2523,6 +2516,13 @@ namespace J2N.Collections.Generic
             /// Gets the element in the <see cref="HashSet{T}"/> at the current position of the enumerator.
             /// </summary>
             public T Current => _current;
+
+            /// <summary>
+            /// Releases all resources used by the <see cref="Enumerator"/>.
+            /// </summary>
+            public void Dispose()
+            {
+            }
 
             object? IEnumerator.Current
             {
