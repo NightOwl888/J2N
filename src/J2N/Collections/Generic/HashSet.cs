@@ -2058,7 +2058,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        internal bool IsSubsetOfHashSetWithSameEC(ICollection<T> other)
+        internal bool IsSubsetOfHashSetWithSameEC(HashSet<T> other)
         {
             foreach (T item in this)
             {
