@@ -362,7 +362,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        private static unsafe int GetNonRandomizedHashCode(ReadOnlySpan<char> span)
+        private static unsafe int GetNonRandomizedHashCode(ReadOnlySpan<char> span) // From String class
         {
             uint hash1 = (5381 << 16) + 5381;
             uint hash2 = hash1;
