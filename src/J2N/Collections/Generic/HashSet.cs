@@ -1813,7 +1813,10 @@ namespace J2N.Collections.Generic
 
             // Assign member variables after both arrays allocated to guard against corruption from OOM if second fails
             _buckets = new int[newSize];
-            _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)newSize);
+            if (IntPtr.Size == 8) // 64-bit process
+            {
+                _fastModMultiplier = HashHelpers.GetFastModMultiplier((uint)newSize);
+            }
             for (int i = 0; i < count; i++)
             {
                 ref Entry entry = ref entries[i];
