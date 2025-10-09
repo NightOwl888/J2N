@@ -866,6 +866,7 @@ namespace J2N.Collections.Tests
 
         #region Serialization
 
+#if FEATURE_SERIALIZABLE
         [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsBinaryFormatterSupported))]
         public void ComparerSerialization()
         {
@@ -913,6 +914,7 @@ namespace J2N.Collections.Tests
                 Assert.True(equalityComparer.Equals(set.EqualityComparer));
             }
         }
+#endif
         #endregion Serialization
     }
 }
