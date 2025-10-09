@@ -67,7 +67,12 @@ namespace J2N.TestUtilities
             true;
 #endif
 
-        public static bool IsBinaryFormatterSupported => IsNotMobile && !IsNativeAot;
+        public static bool IsBinaryFormatterSupported =>
+#if FEATURE_SERIALIZABLE
+            IsNotMobile && !IsNativeAot;
+#else
+            false;
+#endif
 
         public static bool IsPreciseGcSupported => !IsMonoRuntime;
 
