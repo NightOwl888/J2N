@@ -584,7 +584,7 @@ namespace J2N.Collections.Generic
         #region AlternateLookup
 
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
-                /// <summary>
+        /// <summary>
         /// Gets an instance of a type that may be used to perform operations on the current <see cref="HashSet{T}"/>
         /// using a <typeparamref name="TAlternate"/> instead of a <typeparamref name="T"/>.
         /// </summary>
