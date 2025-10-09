@@ -2075,7 +2075,7 @@ namespace J2N.Collections.Generic
         /// because we can use other's Contains
         /// </summary>
         /// <param name="other"></param>
-        private void IntersectWithHashSetWithSameEC(ICollection<T> other)
+        private void IntersectWithHashSetWithSameEC(HashSet<T> other)
         {
             Entry[]? entries = _entries;
             for (int i = 0; i < _count; i++)
