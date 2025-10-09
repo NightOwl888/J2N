@@ -39,7 +39,7 @@ namespace J2N.Collections.Tests
             return new HashSet<T>();
         }
 
-        #endregion
+        #endregion ISet<T> Helper Methods
 
         #region Constructors
 
@@ -145,7 +145,7 @@ namespace J2N.Collections.Tests
             Assert.True(capacity <= hashSet.Capacity);
         }
 
-        #endregion
+        #endregion Constructors
 
         #region Properties
 
@@ -163,7 +163,7 @@ namespace J2N.Collections.Tests
             Assert.True(afterCapacity > initialCapacity);
         }
 
-        #endregion
+        #endregion Properties
 
         #region RemoveWhere
 
@@ -208,7 +208,7 @@ namespace J2N.Collections.Tests
             Assert.Throws<ArgumentNullException>(() => set.RemoveWhere(null));
         }
 
-        #endregion
+        #endregion RemoveWhere
 
         #region TrimExcess
 
@@ -332,7 +332,7 @@ namespace J2N.Collections.Tests
             }
         }
 
-        #endregion
+        #endregion TrimExcess
 
         #region CopyTo
 
@@ -358,7 +358,7 @@ namespace J2N.Collections.Tests
             Assert.True(arr1.SequenceEqual(arr2));
         }
 
-        #endregion
+        #endregion CopyTo
 
         #region CreateSetComparer
 
@@ -424,7 +424,7 @@ namespace J2N.Collections.Tests
             Assert.True(comparerSet.SequenceEqual(set)); // Unlike the .NET HashSet, ours is structurally equatable by default
         }
 
-        #endregion
+        #endregion CreateSetComparer
 
         #region GetAlternateLookup
 
@@ -543,7 +543,7 @@ namespace J2N.Collections.Tests
         }
 #endif
 
-        #endregion
+        #endregion GetAlternateLookup
 
 
         [Fact]
@@ -687,7 +687,7 @@ namespace J2N.Collections.Tests
             Assert.Equal(default(T), actualValue);
         }
 
-        #endregion
+        #endregion TryGetValue
 
         #region EnsureCapacity
 
@@ -838,7 +838,7 @@ namespace J2N.Collections.Tests
             Assert.True(newCapacity > currentCapacity);
         }
 
-        #endregion
+        #endregion EnsureCapacity
 
         #region Remove
 
@@ -862,12 +862,11 @@ namespace J2N.Collections.Tests
             Assert.InRange(c.GetHashCodeCalls, 1, int.MaxValue);
         }
 
-        #endregion
+        #endregion Remove
 
         #region Serialization
 
-    #if FEATURE_SERIALIZABLE
-        [Fact]
+        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsBinaryFormatterSupported))]
         public void ComparerSerialization()
         {
             // Strings switch between randomized and non-randomized comparers,
@@ -914,7 +913,6 @@ namespace J2N.Collections.Tests
                 Assert.True(equalityComparer.Equals(set.EqualityComparer));
             }
         }
-#endif
-        #endregion
+        #endregion Serialization
     }
 }
