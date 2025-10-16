@@ -902,6 +902,14 @@ namespace J2N.Collections.Tests
                 s.Position = 0;
                 set = (HashSet<TCompared>)bf.Deserialize(s);
 
+                // J2N: this assertion fails on .NET <= 8, due to different internal implementations. Skipping it for now.
+                // if (equalityComparer.Equals(EqualityComparer<string>.Default))
+                // {
+                //     // EqualityComparer<string>.Default is mapped to StringEqualityComparer, but serialized as GenericEqualityComparer<string>
+                //     Assert.Equal("System.Collections.Generic.GenericEqualityComparer`1[System.String]", set.Comparer.GetType().ToString());
+                //     return;
+                // }
+
                 if (internalTypeName == null)
                 {
                     Assert.IsType(equalityComparer.GetType(), set.EqualityComparer);
