@@ -88,7 +88,6 @@ namespace J2N.Text
             m_Chars[index] = high;
             if (count == 2)
                 m_Chars[index + 1] = low;
-            m_Position += count;
 
             return this;
         }
