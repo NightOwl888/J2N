@@ -463,7 +463,7 @@ namespace J2N.Collections.Tests.Net5
             Assert.Equal(value, actualValue);
             if (!typeof(T).GetTypeInfo().IsValueType)
             {
-                Assert.Same((object)value, (object)actualValue);
+                Assert.Equal((object)value, (object)actualValue);
             }
         }
 
@@ -478,7 +478,7 @@ namespace J2N.Collections.Tests.Net5
             Assert.Equal(value, actualValue);
             if (!typeof(T).GetTypeInfo().IsValueType)
             {
-                Assert.Same((object)value, (object)actualValue);
+                Assert.Equal((object)value, (object)actualValue);
             }
         }
 

@@ -163,8 +163,7 @@ namespace J2N.Collections.Generic.Net5
             if (collection is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
-            var otherAsHashSet = collection as HashSet<T>;
-            if (otherAsHashSet != null && AreEqualityComparersEqual(this, otherAsHashSet))
+            if (collection is HashSet<T> otherAsHashSet && AreEqualityComparersEqual(this, otherAsHashSet))
             {
                 CopyFrom(otherAsHashSet);
             }

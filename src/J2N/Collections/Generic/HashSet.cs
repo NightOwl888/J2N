@@ -1167,7 +1167,7 @@ namespace J2N.Collections.Generic
 
                 // Faster if other is a hashset using same equality comparer; so check
                 // that other is a hashset using the same equality comparer.
-                if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
+                if (other is ISet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet)) // J2N: Use ISet<T> to support other implementations
                 {
                     IntersectWithHashSetWithSameEC(otherAsSet);
                     return;
@@ -1252,7 +1252,7 @@ namespace J2N.Collections.Generic
             // will fail. So first check if other is a hashset using the same equality comparer;
             // symmetric except is a lot faster and avoids bit array allocations if we can assume
             // uniqueness.
-            if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
+            if (other is ISet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet)) // J2N: Use ISet<T> to support other implementations
             {
                 SymmetricExceptWithUniqueHashSet(otherAsSet);
             }
@@ -1306,7 +1306,7 @@ namespace J2N.Collections.Generic
 
                 // Faster if other has unique elements according to this equality comparer; so check
                 // that other is a hashset using the same equality comparer.
-                if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
+                if (other is ISet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet)) // J2N: Use ISet<T> to support other implementations
                 {
                     return IsSubsetOfHashSetWithSameEC(otherAsSet);
                 }
@@ -1364,7 +1364,7 @@ namespace J2N.Collections.Generic
                 }
 
                 // Faster if other is a hashset (and we're using same equality comparer).
-                if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
+                if (other is ISet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet)) // J2N: Use ISet<T> to support other implementations
                 {
                     // This has strictly less than number of items in other, so the following
                     // check suffices for proper subset.
@@ -1419,9 +1419,9 @@ namespace J2N.Collections.Generic
                 }
 
                 // Try to compare based on counts alone if other is a hashset with same equality comparer.
-                if (other is HashSet<T> otherAsSet &&
+                if (other is ISet<T> otherAsSet &&
                     EqualityComparersAreEqual(this, otherAsSet) &&
-                    otherAsSet.Count > Count)
+                    otherAsSet.Count > Count) // J2N: Use ISet<T> to support other implementations
                 {
                     return false;
                 }
@@ -1478,6 +1478,8 @@ namespace J2N.Collections.Generic
                 }
 
                 // Faster if other is a hashset with the same equality comparer
+                // J2N: JCG.HashSet must be used here, as IsSubsetOfHashSetWithSameEC either
+                // does not exist on the other types or is not public
                 if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
                 {
                     if (otherAsSet.Count >= Count)
@@ -1573,7 +1575,7 @@ namespace J2N.Collections.Generic
                 }
 
                 // Faster if other is a hashset and we're using same equality comparer.
-                if (other is HashSet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet))
+                if (other is ISet<T> otherAsSet && EqualityComparersAreEqual(this, otherAsSet)) // J2N: Use ISet<T> to support other implementations
                 {
                     // Attempt to return early: since both contain unique elements, if they have
                     // different counts, then they can't be equal.
@@ -2058,7 +2060,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>
-        internal bool IsSubsetOfHashSetWithSameEC(HashSet<T> other)
+        internal bool IsSubsetOfHashSetWithSameEC(ISet<T> other) // J2N: parameter was HashSet<T>
         {
             foreach (T item in this)
             {
@@ -2075,7 +2077,7 @@ namespace J2N.Collections.Generic
         /// because we can use other's Contains
         /// </summary>
         /// <param name="other"></param>
-        private void IntersectWithHashSetWithSameEC(HashSet<T> other)
+        private void IntersectWithHashSetWithSameEC(ISet<T> other) // J2N: parameter was HashSet<T>
         {
             Entry[]? entries = _entries;
             for (int i = 0; i < _count; i++)
@@ -2143,7 +2145,7 @@ namespace J2N.Collections.Generic
         /// same equality comparer.
         /// </summary>
         /// <param name="other"></param>
-        private void SymmetricExceptWithUniqueHashSet(HashSet<T> other)
+        private void SymmetricExceptWithUniqueHashSet(ISet<T> other) // J2N: parameter was HashSet<T>
         {
             foreach (T item in other)
             {
@@ -2320,6 +2322,8 @@ namespace J2N.Collections.Generic
                 return set1.EqualityComparer.Equals(linkedHashSet.EqualityComparer);
             else if (set2 is SCG.HashSet<T> scgHashSet)
                 return set1.EqualityComparer.Equals(scgHashSet.Comparer);
+            else if (set2 is Net5.HashSet<T> net5HashSet)
+                return set1.EqualityComparer.Equals(net5HashSet.EqualityComparer);
             return false;
         }
 
