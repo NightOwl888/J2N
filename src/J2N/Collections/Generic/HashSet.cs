@@ -940,11 +940,13 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
-        public IEnumerator<T> GetEnumerator() =>
-            Count == 0 ? SZGenericArrayEnumerator<T>.Empty :
-            new Enumerator(this);
+        public IEnumerator<T> GetEnumerator() => new Enumerator(this);
 
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() =>
+            Count == 0 ? SZGenericArrayEnumerator<T>.Empty :
+            GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
 
         #endregion IEnumerable methods
 
