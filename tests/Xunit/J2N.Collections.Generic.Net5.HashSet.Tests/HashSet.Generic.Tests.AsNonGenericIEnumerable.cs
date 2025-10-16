@@ -7,7 +7,7 @@ using System.Collections;
 using System.Collections.Generic;
 using JCG = J2N.Collections.Generic.Net5;
 
-namespace J2N.Collections.Tests.Net5
+namespace J2N.Collections.Tests
 {
     public class Net5_HashSet_IEnumerable_NonGeneric_Tests : IEnumerable_NonGeneric_Tests
     {

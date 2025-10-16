@@ -12,7 +12,7 @@ using System.Reflection;
 using Xunit;
 using SCG = System.Collections.Generic;
 
-namespace J2N.Collections.Tests.Net5
+namespace J2N.Collections.Tests
 {
     /// <summary>
     /// Contains tests that ensure the correctness of the HashSet class.

@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using Xunit;
 
-namespace J2N.Collections.Tests.Net5
+namespace J2N.Collections.Tests
 {
     public class Net5_HashSet_Generic_Tests_string : HashSet_Generic_Tests<string>
     {
