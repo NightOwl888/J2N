@@ -7,7 +7,6 @@ using System.Diagnostics;
 using System.Linq;
 using Xunit;
 using JCG = J2N.Collections.Generic;
-using Net5 = J2N.Collections.Generic.Net5;
 
 namespace J2N.Collections.Tests
 {
@@ -273,7 +272,7 @@ namespace J2N.Collections.Tests
         /// </summary>
         protected virtual IEnumerable<T> CreateNet5HashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
         {
-            Net5.HashSet<T> set = new Net5.HashSet<T>(GetIEqualityComparer());
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(GetIEqualityComparer());
             int seed = 528;
             JCG.List<T> match = null;
 

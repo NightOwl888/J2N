@@ -4,7 +4,7 @@
 
 using System;
 using System.Collections.Generic;
-using Xunit;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -51,7 +51,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<int> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<int>(new WrapStructural_Int());
+            return new JCG.Net5.HashSet<int>(new WrapStructural_Int());
         }
     }
 
@@ -75,7 +75,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<SimpleInt> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<SimpleInt>(new WrapStructural_SimpleInt());
+            return new JCG.Net5.HashSet<SimpleInt>(new WrapStructural_SimpleInt());
         }
     }
 
@@ -90,7 +90,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<EquatableBackwardsOrder> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<EquatableBackwardsOrder>();
+            return new JCG.Net5.HashSet<EquatableBackwardsOrder>();
         }
     }
 
@@ -110,7 +110,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<int> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<int>(new Comparer_SameAsDefaultComparer());
+            return new JCG.Net5.HashSet<int>(new Comparer_SameAsDefaultComparer());
         }
     }
 
@@ -130,7 +130,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<int> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<int>(new Comparer_HashCodeAlwaysReturnsZero());
+            return new JCG.Net5.HashSet<int>(new Comparer_HashCodeAlwaysReturnsZero());
         }
     }
 
@@ -155,7 +155,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<int> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<int>(new Comparer_ModOfInt(15000));
+            return new JCG.Net5.HashSet<int>(new Comparer_ModOfInt(15000));
         }
     }
 
@@ -175,7 +175,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<int> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<int>(new Comparer_AbsOfInt());
+            return new JCG.Net5.HashSet<int>(new Comparer_AbsOfInt());
         }
     }
 
@@ -195,7 +195,7 @@ namespace J2N.Collections.Tests
 
         protected override ISet<int> GenericISetFactory()
         {
-            return new J2N.Collections.Generic.Net5.HashSet<int>(new BadIntEqualityComparer());
+            return new JCG.Net5.HashSet<int>(new BadIntEqualityComparer());
         }
     }
 }

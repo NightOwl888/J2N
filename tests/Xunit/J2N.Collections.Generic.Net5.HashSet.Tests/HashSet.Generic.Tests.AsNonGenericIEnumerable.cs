@@ -5,7 +5,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JCG = J2N.Collections.Generic.Net5;
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -13,7 +13,7 @@ namespace J2N.Collections.Tests
     {
         protected override IEnumerable NonGenericIEnumerableFactory(int count)
         {
-            var set = new JCG.HashSet<string>();
+            var set = new JCG.Net5.HashSet<string>();
             int seed = 12354;
             while (set.Count < count)
                 set.Add(CreateT(set, seed++));
@@ -36,7 +36,7 @@ namespace J2N.Collections.Tests
             {
                 yield return (IEnumerable enumerable) =>
                 {
-                    JCG.HashSet<string> casted = ((JCG.HashSet<string>)enumerable);
+                    JCG.Net5.HashSet<string> casted = ((JCG.Net5.HashSet<string>)enumerable);
                     if (casted.Count > 0)
                     {
                         casted.Clear();
@@ -47,7 +47,7 @@ namespace J2N.Collections.Tests
             }
         }
 
-        private string CreateT(JCG.HashSet<string> set, int seed) // J2N: make private due to HashSet<T> being internal
+        private string CreateT(JCG.Net5.HashSet<string> set, int seed) // J2N: make private due to HashSet<T> being internal
         {
             int stringLength = seed % 10 + 5;
             Random rand = new Random(seed);
