@@ -120,7 +120,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_Constructor_HashSet_SparselyFilled(int count)
         {
-            J2N.Collections.Generic.Net5.HashSet<T> source = (J2N.Collections.Generic.Net5.HashSet<T>)CreateEnumerable(EnumerableType.HashSet, null, count, 0, 0);
+            J2N.Collections.Generic.Net5.HashSet<T> source = (J2N.Collections.Generic.Net5.HashSet<T>)CreateEnumerable(EnumerableType.Net5HashSet, null, count, 0, 0);
             List<T> sourceElements = source.ToList();
             foreach (int i in NonSquares(count))
                 source.Remove(sourceElements[i]);// Unevenly spaced survivors increases chance of catching any spacing-related bugs.
