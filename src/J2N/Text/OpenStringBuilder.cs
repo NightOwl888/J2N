@@ -2579,7 +2579,7 @@ namespace J2N.Text
                 int diff = end - startIndex - stringLength;
                 if (diff > 0)
                 { // replacing with fewer characters
-                    RemoveCore(startIndex, diff, zeroBeyondPosition: true);
+                    RemoveCore(startIndex, diff, zeroBeyondPosition: false);
                 }
                 else if (diff < 0)
                 {
@@ -2587,7 +2587,9 @@ namespace J2N.Text
                     MakeRoom(startIndex, -diff);
                 }
                 // copy the chars based on the new length
-                newValue.CopyTo(m_Chars.AsSpan(startIndex, stringLength));
+                //newValue.CopyTo(m_Chars.AsSpan(startIndex, stringLength));
+                int index = startIndex; // Need a copy in case it is modified so it doesn't affect the below insert.
+                ReplaceInPlace(ref index, ref MemoryMarshal.GetReference(newValue), stringLength);
             }
             if (startIndex == end)
             {
