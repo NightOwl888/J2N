@@ -47,7 +47,7 @@ namespace J2N.Collections.Tests.Net5
             }
         }
 
-        private string CreateT(JCG.HashSet<string> set, int seed)
+        private string CreateT(JCG.HashSet<string> set, int seed) // J2N: make private due to HashSet<T> being internal
         {
             int stringLength = seed % 10 + 5;
             Random rand = new Random(seed);
