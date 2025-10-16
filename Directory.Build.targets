@@ -68,7 +68,6 @@
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net5.')) Or $(TargetFramework.StartsWith('net6.')) Or $(TargetFramework.StartsWith('net8.')) Or $(TargetFramework.StartsWith('net9.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_CULTUREINFO_PREDEFINEDONLY</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_HASHSET_MODIFY_CONTINUEENUMERATION</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_MEMORYMARSHAL_GETARRAYDATAREFERENCE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_UNICODE_DEFINED_0x30000</DefineConstants>
 
