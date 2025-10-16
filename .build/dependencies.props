@@ -3,6 +3,7 @@
     <AigamoResXGeneratorPackageReferenceVersion>4.2.0</AigamoResXGeneratorPackageReferenceVersion>
     <ICU4NPackageReferenceVersion>60.1.0-alpha.354</ICU4NPackageReferenceVersion>
     <IndexRangePackageReferenceVersion>1.0.3</IndexRangePackageReferenceVersion>
+    <MicrosoftBclHashCodePackageReferenceVersion>6.0.0</MicrosoftBclHashCodePackageReferenceVersion>
     <MicrosoftBclMemoryPackageReferenceVersion>10.0.7</MicrosoftBclMemoryPackageReferenceVersion>
     <MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>1.0.3</MicrosoftNETFrameworkReferenceAssembliesPackageReferenceVersion>
     <MicrosoftNETTestSdkPackageReferenceVersion>17.11.0</MicrosoftNETTestSdkPackageReferenceVersion>
