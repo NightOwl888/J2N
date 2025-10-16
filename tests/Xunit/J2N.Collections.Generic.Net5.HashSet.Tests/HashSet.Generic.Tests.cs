@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
 // Removed using alias - using fully qualified names instead
@@ -27,30 +26,6 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<T> GenericISetFactory()
         {
             return new JCG.Net5.HashSet<T>();
-        }
-
-        protected override SCG.IEnumerable<T> CreateHashSet(SCG.IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
-        {
-            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(GetIEqualityComparer());
-            int seed = 528;
-            List<T> match = null;
-
-            if (enumerableToMatchTo != null)
-            {
-                match = enumerableToMatchTo.ToList();
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                T item = CreateT(seed++);
-                while (set.Contains(item))
-                    item = CreateT(seed++);
-                set.Add(item);
-                if (i < numberOfMatchingElements && match != null)
-                    match[i] = item;
-            }
-
-            return set;
         }
 
         #endregion
