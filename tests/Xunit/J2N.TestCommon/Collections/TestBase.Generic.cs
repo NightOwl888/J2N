@@ -119,7 +119,7 @@ namespace J2N.Collections.Tests
                     Debug.Assert(numberOfDuplicateElements == 0, "Can not create a LinkedHashSet with duplicate elements - numberOfDuplicateElements must be zero");
                     return CreateLinkedHashSet(enumerableToMatchTo, count, numberOfMatchingElements);
                 default:
-                    Debug.Assert(false, "Check that the 'EnumerableType' Enum returns only types that are special-cased in the CreateEnumerable function within the Iset_Generic_Tests class");
+                    Debug.Fail("Check that the 'EnumerableType' Enum returns only types that are special-cased in the CreateEnumerable function within the Iset_Generic_Tests class");
                     return null;
             }
         }
