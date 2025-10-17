@@ -1753,7 +1753,7 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Similar to <see cref="Comparer"/> but surfaces the actual comparer being used to hash entries.
+        /// Similar to <see cref="EqualityComparer"/> but surfaces the actual comparer being used to hash entries.
         /// </summary>
         internal IEqualityComparer<T> EffectiveComparer => _comparer ?? EqualityComparer<T>.Default;
 
