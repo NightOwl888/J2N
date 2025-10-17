@@ -3,6 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+#if FEATURE_SERIALIZABLE
+using System.Runtime.Serialization.Formatters.Binary;
+#endif
 
 namespace J2N.Collections.Generic
 {
@@ -19,6 +22,90 @@ namespace J2N.Collections.Generic
                 objArray[i] = new int?(i);
             return objArray;
         }
+
+
+#if FEATURE_SERIALIZABLE
+        /// <summary>
+        /// Tests that LinkedHashSet instances serialized with J2N 2.1.0 can be deserialized
+        /// correctly. This ensures backward compatibility with binary serialization.
+        /// </summary>
+        [Test]
+        public void TestDeserializeLegacy_Int32()
+        {
+            LinkedHashSet<int> intSet;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("linkedhashset-int32-v2-1-0.bin"))
+            {
+                intSet = (LinkedHashSet<int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, intSet.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { 42, 17, 99, -5, 0 };
+            var actualValues = intSet.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String()
+        {
+            LinkedHashSet<string> stringSet;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("linkedhashset-string-v2-1-0.bin"))
+            {
+                stringSet = (LinkedHashSet<string>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, stringSet.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { "hello", "world", null, "J2N", "HashSet" };
+            var actualValues = stringSet.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_Empty()
+        {
+            LinkedHashSet<int> emptySet;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("linkedhashset-int32-empty-v2-1-0.bin"))
+            {
+                emptySet = (LinkedHashSet<int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(0, emptySet.Count);
+            assertTrue(emptySet.Count == 0);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_CustomComparer()
+        {
+            LinkedHashSet<string> customSet;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("linkedhashset-string-customcomparer-v2-1-0.bin"))
+            {
+                customSet = (LinkedHashSet<string>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(3, customSet.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { "Test", "ANOTHER", "Value" };
+            var actualValues = customSet.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            // Verify the comparer still works (case-insensitive)
+            assertTrue(customSet.Contains("test")); // Should find "Test" due to case-insensitive comparer
+            assertTrue(customSet.Contains("ANOTHER"));
+            assertTrue(customSet.Contains("another")); // Should find "ANOTHER" due to case-insensitive comparer
+        }
+#endif
 
         /**
          * @tests java.util.LinkedHashSet#LinkedHashSet()
@@ -502,7 +589,5 @@ namespace J2N.Collections.Generic
                 }
             }
         }
-
     }
-
 }

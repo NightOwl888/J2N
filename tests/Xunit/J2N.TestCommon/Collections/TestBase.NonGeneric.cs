@@ -29,6 +29,7 @@ namespace J2N.Collections.Tests
         public enum EnumerableType
         {
             HashSet,
+            Net5HashSet,
             SortedSet,
             LinkedHashSet,
             List,

@@ -103,6 +103,9 @@ namespace J2N.Collections.Tests
                 case EnumerableType.HashSet:
                     Debug.Assert(numberOfDuplicateElements == 0, "Can not create a HashSet with duplicate elements - numberOfDuplicateElements must be zero");
                     return CreateHashSet(enumerableToMatchTo, count, numberOfMatchingElements);
+                case EnumerableType.Net5HashSet:
+                    Debug.Assert(numberOfDuplicateElements == 0, "Can not create a Net5.HashSet with duplicate elements - numberOfDuplicateElements must be zero");
+                    return CreateNet5HashSet(enumerableToMatchTo, count, numberOfMatchingElements);
                 case EnumerableType.List:
                     return CreateList(enumerableToMatchTo, count, numberOfMatchingElements, numberOfDuplicateElements);
                 case EnumerableType.SortedSet:
@@ -116,7 +119,7 @@ namespace J2N.Collections.Tests
                     Debug.Assert(numberOfDuplicateElements == 0, "Can not create a LinkedHashSet with duplicate elements - numberOfDuplicateElements must be zero");
                     return CreateLinkedHashSet(enumerableToMatchTo, count, numberOfMatchingElements);
                 default:
-                    Debug.Assert(false, "Check that the 'EnumerableType' Enum returns only types that are special-cased in the CreateEnumerable function within the Iset_Generic_Tests class");
+                    Debug.Fail("Check that the 'EnumerableType' Enum returns only types that are special-cased in the CreateEnumerable function within the Iset_Generic_Tests class");
                     return null;
             }
         }
@@ -256,6 +259,64 @@ namespace J2N.Collections.Tests
                 foreach (T lookingFor in match)
                     actualMatchingCount += set.Contains(lookingFor) ? 1 : 0;
                 Assert.Equal(numberOfMatchingElements, actualMatchingCount);
+            }
+
+            return set;
+        }
+
+        /// <summary>
+        /// Helper function to create a (Net5) HashSet fulfilling the given specific parameters. The function will
+        /// create an HashSet using the Comparer constructor and then add values
+        /// to it until it is full. It will begin by adding the desired number of matching,
+        /// followed by random (deterministic) elements until the desired count is reached.
+        /// </summary>
+        protected IEnumerable<T> CreateNet5HashSet(IEnumerable<T> enumerableToMatchTo, int count, int numberOfMatchingElements)
+        {
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(GetIEqualityComparer());
+            int seed = 528;
+            JCG.List<T> match = null;
+
+            // Add Matching elements
+            if (enumerableToMatchTo != null)
+            {
+                match = enumerableToMatchTo.ToList();
+                for (int i = 0; i < numberOfMatchingElements; i++)
+                    set.Add(match[i]);
+            }
+
+            // Add elements to reach the desired count
+            while (set.Count < count)
+            {
+                T toAdd = CreateT(seed++);
+                while (set.Contains(toAdd) || (match != null && match.Contains(toAdd, GetIEqualityComparer()))) // Don't want any unexpectedly duplicate values
+                    toAdd = CreateT(seed++);
+                set.Add(toAdd);
+            }
+
+            // Validate that the Enumerable fits the guidelines as expected
+            Debug.Assert(set.Count == count);
+            if (match != null)
+            {
+                int actualMatchingCount = 0;
+                foreach (T lookingFor in match)
+                    actualMatchingCount += set.Contains(lookingFor) ? 1 : 0;
+                Assert.Equal(numberOfMatchingElements, actualMatchingCount);
+            }
+
+            return set;
+        }
+
+        /// <summary>
+        /// Create a HashSet with a specific initial capacity and fill it with a specific number of elements.
+        /// </summary>
+        protected JCG.HashSet<T> CreateHashSetWithCapacity(int count, int capacity)
+        {
+            var set = new JCG.HashSet<T>(capacity, GetIEqualityComparer());
+            int seed = 528;
+
+            for (int i = 0; i < count; i++)
+            {
+                while (!set.Add(CreateT(seed++)));
             }
 
             return set;

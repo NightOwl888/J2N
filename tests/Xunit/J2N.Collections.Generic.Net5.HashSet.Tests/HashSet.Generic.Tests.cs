@@ -1,21 +1,16 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
+// Removed using alias - using fully qualified names instead
 using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
-using J2N.TestUtilities;
 using Xunit;
 using SCG = System.Collections.Generic;
-
-#if FEATURE_SERIALIZABLE
-using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
-#endif
+using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
@@ -25,23 +20,15 @@ namespace J2N.Collections.Tests
     public abstract class HashSet_Generic_Tests<T> : ISet_Generic_Tests<T>
     {
         #region ISet<T> Helper Methods
-        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
-        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
 
         protected override bool ResetImplemented => true;
 
-        // J2N: Removed .NET Framework-specific options because we use the same implementation on all target frameworks.
-        protected override ModifyOperation ModifyEnumeratorThrows => (base.ModifyEnumeratorAllowed & ~(ModifyOperation.Remove | ModifyOperation.Clear));
-
-        // J2N: Removed .NET Framework-specific options because we use the same implementation on all target frameworks.
-        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Overwrite | ModifyOperation.Remove | ModifyOperation.Clear;
-
         protected override SCG.ISet<T> GenericISetFactory()
         {
-            return new HashSet<T>();
+            return new JCG.Net5.HashSet<T>();
         }
 
-        #endregion ISet<T> Helper Methods
+        #endregion
 
         #region Constructors
 
@@ -58,7 +45,7 @@ namespace J2N.Collections.Tests
         [Fact]
         public void HashSet_Generic_Constructor()
         {
-            HashSet<T> set = new HashSet<T>();
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>();
             Assert.Empty(set);
         }
 
@@ -66,7 +53,7 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_Constructor_IEqualityComparer()
         {
             SCG.IEqualityComparer<T> comparer = GetIEqualityComparer();
-            HashSet<T> set = new HashSet<T>(comparer);
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(comparer);
             if (comparer == null)
                 Assert.Equal(EqualityComparer<T>.Default, set.EqualityComparer);
             else
@@ -77,7 +64,7 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_Constructor_NullIEqualityComparer()
         {
             SCG.IEqualityComparer<T> comparer = null;
-            HashSet<T> set = new HashSet<T>(comparer);
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(comparer);
             if (comparer == null)
                 Assert.Equal(EqualityComparer<T>.Default, set.EqualityComparer);
             else
@@ -91,7 +78,7 @@ namespace J2N.Collections.Tests
             _ = setLength;
             _ = numberOfMatchingElements;
             SCG.IEnumerable<T> enumerable = CreateEnumerable(enumerableType, null, enumerableLength, 0, numberOfDuplicateElements);
-            HashSet<T> set = new HashSet<T>(enumerable);
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(enumerable);
             Assert.True(set.SetEquals(enumerable));
         }
 
@@ -100,8 +87,8 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_Constructor_IEnumerable_WithManyDuplicates(int count)
         {
             SCG.IEnumerable<T> items = CreateEnumerable(EnumerableType.List, null, count, 0, 0);
-            HashSet<T> hashSetFromDuplicates = new HashSet<T>(Enumerable.Range(0, 40).SelectMany(i => items).ToArray());
-            HashSet<T> hashSetFromNoDuplicates = new HashSet<T>(items);
+            JCG.Net5.HashSet<T> hashSetFromDuplicates = new JCG.Net5.HashSet<T>(Enumerable.Range(0, 40).SelectMany(i => items).ToArray());
+            JCG.Net5.HashSet<T> hashSetFromNoDuplicates = new JCG.Net5.HashSet<T>(items);
             Assert.True(hashSetFromNoDuplicates.SetEquals(hashSetFromDuplicates));
         }
 
@@ -109,21 +96,21 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_Constructor_HashSet_SparselyFilled(int count)
         {
-            HashSet<T> source = (HashSet<T>)CreateEnumerable(EnumerableType.HashSet, null, count, 0, 0);
+            JCG.Net5.HashSet<T> source = (JCG.Net5.HashSet<T>)CreateEnumerable(EnumerableType.Net5HashSet, null, count, 0, 0);
             List<T> sourceElements = source.ToList();
             foreach (int i in NonSquares(count))
                 source.Remove(sourceElements[i]);// Unevenly spaced survivors increases chance of catching any spacing-related bugs.
 
 
-            HashSet<T> set = new HashSet<T>(source, GetIEqualityComparer());
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(source, GetIEqualityComparer());
             Assert.True(set.SetEquals(source));
         }
 
         [Fact]
         public void HashSet_Generic_Constructor_IEnumerable_Null()
         {
-            Assert.Throws<ArgumentNullException>(() => new HashSet<T>((SCG.IEnumerable<T>)null));
-            Assert.Throws<ArgumentNullException>(() => new HashSet<T>((SCG.IEnumerable<T>)null, EqualityComparer<T>.Default));
+            Assert.Throws<ArgumentNullException>(() => new JCG.Net5.HashSet<T>((SCG.IEnumerable<T>)null));
+            Assert.Throws<ArgumentNullException>(() => new JCG.Net5.HashSet<T>((SCG.IEnumerable<T>)null, EqualityComparer<T>.Default));
         }
 
         [Theory]
@@ -134,38 +121,11 @@ namespace J2N.Collections.Tests
             _ = numberOfMatchingElements;
             _ = numberOfDuplicateElements;
             SCG.IEnumerable<T> enumerable = CreateEnumerable(enumerableType, null, enumerableLength, 0, 0);
-            HashSet<T> set = new HashSet<T>(enumerable, GetIEqualityComparer());
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(enumerable, GetIEqualityComparer());
             Assert.True(set.SetEquals(enumerable));
         }
 
-        [Theory]
-        [InlineData(1)]
-        [InlineData(100)]
-        public void HashSet_CreateWithCapacity_CapacityAtLeastPassedValue(int capacity)
-        {
-            var hashSet = new HashSet<T>(capacity);
-            Assert.True(capacity <= hashSet.Capacity);
-        }
-
-        #endregion Constructors
-
-        #region Properties
-
-        [Fact]
-        public void HashSetResized_CapacityChanged()
-        {
-            var hashSet = (HashSet<T>)GenericISetFactory(3);
-            int initialCapacity = hashSet.Capacity;
-
-            int seed = 85877;
-            hashSet.Add(CreateT(seed++));
-
-            int afterCapacity = hashSet.Capacity;
-
-            Assert.True(afterCapacity > initialCapacity);
-        }
-
-        #endregion Properties
+        #endregion
 
         #region RemoveWhere
 
@@ -173,7 +133,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_RemoveWhere_AllElements(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             int removedCount = set.RemoveWhere((value) => { return true; });
             Assert.Equal(setLength, removedCount);
         }
@@ -182,7 +142,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_RemoveWhere_NoElements(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             int removedCount = set.RemoveWhere((value) => { return false; });
             Assert.Equal(0, removedCount);
             Assert.Equal(setLength, set.Count);
@@ -193,7 +153,7 @@ namespace J2N.Collections.Tests
         {
             object[] array = new object[2];
             object obj = new object();
-            HashSet<object> set = new HashSet<object>();
+            JCG.Net5.HashSet<object> set = new JCG.Net5.HashSet<object>();
 
             set.Add(obj);
             set.Remove(obj);
@@ -206,64 +166,19 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_RemoveWhere_NullMatchPredicate(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             Assert.Throws<ArgumentNullException>(() => set.RemoveWhere(null));
         }
 
-        #endregion RemoveWhere
+        #endregion
 
         #region TrimExcess
-
-        [Theory]
-        [InlineData(1, -1)]
-        [InlineData(2, 1)]
-        public void HashSet_TrimAccessWithInvalidArg_ThrowOutOfRange(int size, int newCapacity)
-        {
-            HashSet<T> hashSet = (HashSet<T>)GenericISetFactory(size);
-
-            AssertExtensions.Throws<ArgumentOutOfRangeException>(() => hashSet.TrimExcess(newCapacity));
-        }
-
-        [Theory]
-        [InlineData(0, 20, 7)]
-        [InlineData(10, 20, 10)]
-        [InlineData(10, 20, 13)]
-        public void HashHet_Generic_TrimExcess_LargePopulatedHashSet_TrimReducesSize(int initialCount, int initialCapacity, int trimCapacity)
-        {
-            HashSet<T> set = CreateHashSetWithCapacity(initialCount, initialCapacity);
-            HashSet<T> clone = new(set, set.EqualityComparer);
-
-            Assert.True(set.Capacity >= initialCapacity);
-            Assert.Equal(initialCount, set.Count);
-
-            set.TrimExcess(trimCapacity);
-
-            Assert.True(trimCapacity <= set.Capacity && set.Capacity < initialCapacity);
-            Assert.Equal(initialCount, set.Count);
-            Assert.Equal(clone, set);
-        }
-
-        [Theory]
-        [InlineData(10, 20, 0)]
-        [InlineData(10, 20, 7)]
-        public void HashHet_Generic_TrimExcess_LargePopulatedHashSet_TrimCapacityIsLessThanCount_ThrowsArgumentOutOfRangeException(int initialCount, int initialCapacity, int trimCapacity)
-        {
-            HashSet<T> set = CreateHashSetWithCapacity(initialCount, initialCapacity);
-
-            Assert.True(set.Capacity >= initialCapacity);
-            Assert.Equal(initialCount, set.Count);
-
-            Assert.Throws<ArgumentOutOfRangeException>(() => set.TrimExcess(trimCapacity));
-
-            Assert.True(set.Capacity >= initialCapacity);
-            Assert.Equal(initialCount, set.Count);
-        }
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_TrimExcess_OnValidSetThatHasntBeenRemovedFrom(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             set.TrimExcess();
         }
 
@@ -271,7 +186,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_TrimExcess_Repeatedly(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             List<T> expected = set.ToList();
             set.TrimExcess();
             set.TrimExcess();
@@ -285,7 +200,7 @@ namespace J2N.Collections.Tests
         {
             if (setLength > 0)
             {
-                HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+                JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
                 List<T> expected = set.ToList();
                 T elementToRemove = set.ElementAt(0);
 
@@ -304,7 +219,7 @@ namespace J2N.Collections.Tests
         {
             if (setLength > 0)
             {
-                HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+                JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
                 set.TrimExcess();
                 set.Clear();
                 set.TrimExcess();
@@ -322,7 +237,7 @@ namespace J2N.Collections.Tests
         {
             if (setLength > 0)
             {
-                HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+                JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
                 set.TrimExcess();
                 set.Clear();
                 set.TrimExcess();
@@ -334,7 +249,7 @@ namespace J2N.Collections.Tests
             }
         }
 
-        #endregion TrimExcess
+        #endregion
 
         #region CopyTo
 
@@ -342,7 +257,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_CopyTo_NegativeCount_ThrowsArgumentOutOfRangeException(int count)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(count);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(count);
             T[] arr = new T[count];
             Assert.Throws<ArgumentOutOfRangeException>(() => set.CopyTo(arr, 0, -1));
             Assert.Throws<ArgumentOutOfRangeException>(() => set.CopyTo(arr, 0, int.MinValue));
@@ -352,7 +267,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_CopyTo_NoIndexDefaultsToZero(int count)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(count);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(count);
             T[] arr1 = new T[count];
             T[] arr2 = new T[count];
             set.CopyTo(arr1);
@@ -360,7 +275,7 @@ namespace J2N.Collections.Tests
             Assert.True(arr1.SequenceEqual(arr2));
         }
 
-        #endregion CopyTo
+        #endregion
 
         #region CreateSetComparer
 
@@ -369,28 +284,28 @@ namespace J2N.Collections.Tests
         {
             SCG.List<T> objects = new SCG.List<T>() { CreateT(1), CreateT(2), CreateT(3), CreateT(4), CreateT(5), CreateT(6) };
 
-            var set = new HashSet<HashSet<T>>()
+            var set = new JCG.Net5.HashSet<JCG.Net5.HashSet<T>>()
             {
-                new HashSet<T> { objects[0], objects[1], objects[2] },
-                new HashSet<T> { objects[3], objects[4], objects[5] }
+                new JCG.Net5.HashSet<T> { objects[0], objects[1], objects[2] },
+                new JCG.Net5.HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var noComparerSet = new HashSet<HashSet<T>>()
+            var noComparerSet = new JCG.Net5.HashSet<JCG.Net5.HashSet<T>>()
             {
-                new HashSet<T> { objects[0], objects[1], objects[2] },
-                new HashSet<T> { objects[3], objects[4], objects[5] }
+                new JCG.Net5.HashSet<T> { objects[0], objects[1], objects[2] },
+                new JCG.Net5.HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var comparerSet1 = new HashSet<HashSet<T>>(HashSet<T>.CreateSetComparer())
+            var comparerSet1 = new JCG.Net5.HashSet<JCG.Net5.HashSet<T>>(JCG.Net5.HashSet<T>.CreateSetComparer())
             {
-                new HashSet<T> { objects[0], objects[1], objects[2] },
-                new HashSet<T> { objects[3], objects[4], objects[5] }
+                new JCG.Net5.HashSet<T> { objects[0], objects[1], objects[2] },
+                new JCG.Net5.HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var comparerSet2 = new HashSet<HashSet<T>>(HashSet<T>.CreateSetComparer())
+            var comparerSet2 = new JCG.Net5.HashSet<JCG.Net5.HashSet<T>>(JCG.Net5.HashSet<T>.CreateSetComparer())
             {
-                new HashSet<T> { objects[3], objects[4], objects[5] },
-                new HashSet<T> { objects[0], objects[1], objects[2] }
+                new JCG.Net5.HashSet<T> { objects[3], objects[4], objects[5] },
+                new JCG.Net5.HashSet<T> { objects[0], objects[1], objects[2] }
             };
 
             Assert.True(noComparerSet.SetEquals(set)); // Unlike the .NET HashSet, our implementation is structurally equatable by default
@@ -403,155 +318,35 @@ namespace J2N.Collections.Tests
         {
             SCG.List<T> objects = new SCG.List<T>() { CreateT(1), CreateT(2), CreateT(3), CreateT(4), CreateT(5), CreateT(6) };
 
-            var set = new HashSet<HashSet<T>>()
+            var set = new JCG.Net5.HashSet<JCG.Net5.HashSet<T>>()
             {
-                new HashSet<T> { objects[0], objects[1], objects[2] },
-                new HashSet<T> { objects[3], objects[4], objects[5] }
+                new JCG.Net5.HashSet<T> { objects[0], objects[1], objects[2] },
+                new JCG.Net5.HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var noComparerSet = new HashSet<HashSet<T>>()
+            var noComparerSet = new JCG.Net5.HashSet<JCG.Net5.HashSet<T>>()
             {
-                new HashSet<T> { objects[0], objects[1], objects[2] },
-                new HashSet<T> { objects[3], objects[4], objects[5] }
+                new JCG.Net5.HashSet<T> { objects[0], objects[1], objects[2] },
+                new JCG.Net5.HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
-            var comparerSet = new HashSet<HashSet<T>>(HashSet<T>.CreateSetComparer())
+            var comparerSet = new JCG.Net5.HashSet<JCG.Net5.HashSet<T>>(JCG.Net5.HashSet<T>.CreateSetComparer())
             {
-                new HashSet<T> { objects[0], objects[1], objects[2] },
-                new HashSet<T> { objects[3], objects[4], objects[5] }
+                new JCG.Net5.HashSet<T> { objects[0], objects[1], objects[2] },
+                new JCG.Net5.HashSet<T> { objects[3], objects[4], objects[5] }
             };
 
             Assert.True(noComparerSet.SequenceEqual(set)); // Unlike the .NET HashSet, ours is structurally equatable by default
-            Assert.True(noComparerSet.SequenceEqual(set, HashSet<T>.CreateSetComparer()));
+            Assert.True(noComparerSet.SequenceEqual(set, JCG.Net5.HashSet<T>.CreateSetComparer()));
             Assert.True(comparerSet.SequenceEqual(set)); // Unlike the .NET HashSet, ours is structurally equatable by default
         }
 
-        #endregion CreateSetComparer
-
-        #region GetAlternateLookup
-
-#if FEATURE_IALTERNATEEQUALITYCOMPARER
-        [Fact]
-        public void GetAlternateLookup_FailsWhenIncompatible()
-        {
-            var hashSet = new HashSet<string>(StringComparer.Ordinal);
-
-            hashSet.GetAlternateLookup<ReadOnlySpan<char>>();
-            Assert.True(hashSet.TryGetAlternateLookup<ReadOnlySpan<char>>(out _));
-
-            Assert.Throws<InvalidOperationException>(() => hashSet.GetAlternateLookup<ReadOnlySpan<byte>>());
-            Assert.Throws<InvalidOperationException>(() => hashSet.GetAlternateLookup<string>());
-            Assert.Throws<InvalidOperationException>(() => hashSet.GetAlternateLookup<int>());
-
-            Assert.False(hashSet.TryGetAlternateLookup<ReadOnlySpan<byte>>(out _));
-            Assert.False(hashSet.TryGetAlternateLookup<string>(out _));
-            Assert.False(hashSet.TryGetAlternateLookup<int>(out _));
-        }
-
-        [Theory]
-        [InlineData(0)]
-        [InlineData(1)]
-        [InlineData(2)]
-        [InlineData(3)]
-        [InlineData(4)]
-        [InlineData(5)]
-        public void HashSet_GetAlternateLookup_OperationsMatchUnderlyingSet(int mode)
-        {
-            // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying set
-            HashSet<string> set = new(mode switch
-            {
-                0 => StringComparer.Ordinal,
-                1 => StringComparer.OrdinalIgnoreCase,
-                2 => StringComparer.InvariantCulture,
-                3 => StringComparer.InvariantCultureIgnoreCase,
-                4 => StringComparer.CurrentCulture,
-                5 => StringComparer.CurrentCultureIgnoreCase,
-                _ => throw new ArgumentOutOfRangeException(nameof(mode))
-            });
-            HashSet<string>.AlternateLookup<ReadOnlySpan<char>> lookup = set.GetAlternateLookup<ReadOnlySpan<char>>();
-            Assert.Same(set, lookup.Set);
-            Assert.Same(lookup.Set, lookup.Set);
-
-            // Add to the set and validate that the lookup reflects the changes
-            Assert.True(set.Add("123"));
-            Assert.True(lookup.Contains("123".AsSpan()));
-            Assert.False(lookup.Add("123".AsSpan()));
-            Assert.True(lookup.Remove("123".AsSpan()));
-            Assert.False(set.Contains("123"));
-
-            // Add via the lookup and validate that the set reflects the changes
-            Assert.True(lookup.Add("123".AsSpan()));
-            Assert.True(set.Contains("123"));
-            lookup.TryGetValue("123".AsSpan(), out string value);
-            Assert.Equal("123", value);
-            Assert.False(lookup.Remove("321".AsSpan()));
-            Assert.True(lookup.Remove("123".AsSpan()));
-
-            // Ensure that case-sensitivity of the comparer is respected
-            Assert.True(lookup.Add("a"));
-            if (set.EqualityComparer.Equals(StringComparer.Ordinal) ||
-                set.EqualityComparer.Equals(StringComparer.InvariantCulture) ||
-                set.EqualityComparer.Equals(StringComparer.CurrentCulture))
-            {
-                Assert.True(lookup.Add("A".AsSpan()));
-                Assert.True(lookup.Remove("a".AsSpan()));
-                Assert.False(lookup.Remove("a".AsSpan()));
-                Assert.True(lookup.Remove("A".AsSpan()));
-            }
-            else
-            {
-                Assert.False(lookup.Add("A".AsSpan()));
-                Assert.True(lookup.Remove("A".AsSpan()));
-                Assert.False(lookup.Remove("a".AsSpan()));
-                Assert.False(lookup.Remove("A".AsSpan()));
-            }
-
-            // Test the behavior of null vs "" in the set and lookup
-            Assert.True(set.Add(null));
-            Assert.True(set.Add(string.Empty));
-            Assert.True(set.Contains(null));
-            Assert.True(set.Contains(""));
-            Assert.True(lookup.Contains("".AsSpan()));
-            Assert.True(lookup.Remove("".AsSpan()));
-            Assert.Equal(1, set.Count);
-            Assert.False(lookup.Remove("".AsSpan()));
-            Assert.True(set.Remove(null));
-            Assert.Equal(0, set.Count);
-
-            // Test adding multiple entries via the lookup
-            for (int i = 0; i < 10; i++)
-            {
-                Assert.Equal(i, set.Count);
-                Assert.True(lookup.Add(i.ToString().AsSpan()));
-                Assert.False(lookup.Add(i.ToString().AsSpan()));
-            }
-
-            Assert.Equal(10, set.Count);
-
-            // Test that the lookup and the set agree on what's in and not in
-            for (int i = -1; i <= 10; i++)
-            {
-                Assert.Equal(set.TryGetValue(i.ToString(), out string dv), lookup.TryGetValue(i.ToString().AsSpan(), out string lv));
-                Assert.Equal(dv, lv);
-            }
-
-            // Test removing multiple entries via the lookup
-            for (int i = 9; i >= 0; i--)
-            {
-                Assert.True(lookup.Remove(i.ToString().AsSpan()));
-                Assert.False(lookup.Remove(i.ToString().AsSpan()));
-                Assert.Equal(i, set.Count);
-            }
-        }
-#endif
-
-        #endregion GetAlternateLookup
-
+        #endregion
 
         [Fact]
         public void CanBeCastedToISet()
         {
-            HashSet<T> set = new HashSet<T>();
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>();
             SCG.ISet<T> iset = (set as SCG.ISet<T>);
             Assert.NotNull(iset);
         }
@@ -560,7 +355,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_Constructor_int(int capacity)
         {
-            HashSet<T> set = new HashSet<T>(capacity);
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(capacity);
             Assert.Equal(0, set.Count);
         }
 
@@ -568,7 +363,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void HashSet_Generic_Constructor_int_AddUpToAndBeyondCapacity(int capacity)
         {
-            HashSet<T> set = new HashSet<T>(capacity);
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(capacity);
 
             AddToCollection(set, capacity);
             Assert.Equal(capacity, set.Count);
@@ -582,7 +377,7 @@ namespace J2N.Collections.Tests
         {
             // Highest pre-computed number + 1.
             const int Capacity = 7199370;
-            var set = new HashSet<T>(Capacity);
+            var set = new JCG.Net5.HashSet<T>(Capacity);
 
             // Assert that the HashTable's capacity is set to the descendant prime number of the given one.
             const int NextPrime = 7199371;
@@ -592,8 +387,8 @@ namespace J2N.Collections.Tests
         [Fact]
         public void HashSet_Generic_Constructor_int_Negative_ThrowsArgumentOutOfRangeException()
         {
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new HashSet<T>(-1));
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new HashSet<T>(int.MinValue));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new JCG.Net5.HashSet<T>(-1));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new JCG.Net5.HashSet<T>(int.MinValue));
         }
 
         [Theory]
@@ -601,7 +396,7 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_Constructor_int_IEqualityComparer(int capacity)
         {
             SCG.IEqualityComparer<T> comparer = GetIEqualityComparer();
-            HashSet<T> set = new HashSet<T>(capacity, comparer);
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(capacity, comparer);
             Assert.Equal(0, set.Count);
             if (comparer == null)
                 Assert.Equal(EqualityComparer<T>.Default, set.EqualityComparer);
@@ -614,7 +409,7 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_Constructor_int_IEqualityComparer_AddUpToAndBeyondCapacity(int capacity)
         {
             SCG.IEqualityComparer<T> comparer = GetIEqualityComparer();
-            HashSet<T> set = new HashSet<T>(capacity, comparer);
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T>(capacity, comparer);
 
             AddToCollection(set, capacity);
             Assert.Equal(capacity, set.Count);
@@ -627,8 +422,8 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_Constructor_int_IEqualityComparer_Negative_ThrowsArgumentOutOfRangeException()
         {
             SCG.IEqualityComparer<T> comparer = GetIEqualityComparer();
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new HashSet<T>(-1, comparer));
-            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new HashSet<T>(int.MinValue, comparer));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new JCG.Net5.HashSet<T>(-1, comparer));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new JCG.Net5.HashSet<T>(int.MinValue, comparer));
         }
 
         #region TryGetValue
@@ -637,16 +432,14 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_TryGetValue_Contains()
         {
             T value = CreateT(1);
-            HashSet<T> set = new HashSet<T> { value };
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T> { value };
             T equalValue = CreateT(1);
             T actualValue;
             Assert.True(set.TryGetValue(equalValue, out actualValue));
             Assert.Equal(value, actualValue);
             if (!typeof(T).GetTypeInfo().IsValueType)
             {
-#pragma warning disable xUnit2005 // Do not use identity check on value type
-                Assert.Same((object)value, (object)actualValue);
-#pragma warning restore xUnit2005 // Do not use identity check on value type
+                Assert.Equal((object)value, (object)actualValue);
             }
         }
 
@@ -654,16 +447,14 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_TryGetValue_Contains_OverwriteOutputParam()
         {
             T value = CreateT(1);
-            HashSet<T> set = new HashSet<T> { value };
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T> { value };
             T equalValue = CreateT(1);
             T actualValue = CreateT(2);
             Assert.True(set.TryGetValue(equalValue, out actualValue));
             Assert.Equal(value, actualValue);
             if (!typeof(T).GetTypeInfo().IsValueType)
             {
-#pragma warning disable xUnit2005 // Do not use identity check on value type
-                Assert.Same((object)value, (object)actualValue);
-#pragma warning restore xUnit2005 // Do not use identity check on value type
+                Assert.Equal((object)value, (object)actualValue);
             }
         }
 
@@ -671,7 +462,7 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_TryGetValue_NotContains()
         {
             T value = CreateT(1);
-            HashSet<T> set = new HashSet<T> { value };
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T> { value };
             T equalValue = CreateT(2);
             T actualValue;
             Assert.False(set.TryGetValue(equalValue, out actualValue));
@@ -682,14 +473,14 @@ namespace J2N.Collections.Tests
         public void HashSet_Generic_TryGetValue_NotContains_OverwriteOutputParam()
         {
             T value = CreateT(1);
-            HashSet<T> set = new HashSet<T> { value };
+            JCG.Net5.HashSet<T> set = new JCG.Net5.HashSet<T> { value };
             T equalValue = CreateT(2);
             T actualValue = equalValue;
             Assert.False(set.TryGetValue(equalValue, out actualValue));
             Assert.Equal(default(T), actualValue);
         }
 
-        #endregion TryGetValue
+        #endregion
 
         #region EnsureCapacity
 
@@ -697,7 +488,7 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void EnsureCapacity_Generic_RequestingLargerCapacity_DoesNotInvalidateEnumeration(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)(GenericISetFactory(setLength));
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)(GenericISetFactory(setLength));
             var capacity = set.EnsureCapacity(0);
             IEnumerator valuesEnum = set.GetEnumerator();
             IEnumerator valuesListEnum = new SCG.List<T>(set).GetEnumerator();
@@ -714,14 +505,14 @@ namespace J2N.Collections.Tests
         [Fact]
         public void EnsureCapacity_Generic_NegativeCapacityRequested_Throws()
         {
-            var set = new HashSet<T>();
+            var set = new JCG.Net5.HashSet<T>();
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => set.EnsureCapacity(-1));
         }
 
         [Fact]
         public void EnsureCapacity_Generic_HashsetNotInitialized_RequestedZero_ReturnsZero()
         {
-            var set = new HashSet<T>();
+            var set = new JCG.Net5.HashSet<T>();
             Assert.Equal(0, set.EnsureCapacity(0));
         }
 
@@ -732,7 +523,7 @@ namespace J2N.Collections.Tests
         [InlineData(4)]
         public void EnsureCapacity_Generic_HashsetNotInitialized_RequestedNonZero_CapacityIsSetToAtLeastTheRequested(int requestedCapacity)
         {
-            var set = new HashSet<T>();
+            var set = new JCG.Net5.HashSet<T>();
             Assert.InRange(set.EnsureCapacity(requestedCapacity), requestedCapacity, int.MaxValue);
         }
 
@@ -741,12 +532,12 @@ namespace J2N.Collections.Tests
         [InlineData(7)]
         public void EnsureCapacity_Generic_RequestedCapacitySmallerThanCurrent_CapacityUnchanged(int currentCapacity)
         {
-            HashSet<T> set;
+            JCG.Net5.HashSet<T> set;
 
             // assert capacity remains the same when ensuring a capacity smaller or equal than existing
             for (int i = 0; i <= currentCapacity; i++)
             {
-                set = new HashSet<T>(currentCapacity);
+                set = new JCG.Net5.HashSet<T>(currentCapacity);
                 Assert.Equal(currentCapacity, set.EnsureCapacity(i));
             }
         }
@@ -756,10 +547,10 @@ namespace J2N.Collections.Tests
         [InlineData(89)]
         public void EnsureCapacity_Generic_ExistingCapacityRequested_SameValueReturned(int capacity)
         {
-            var set = new HashSet<T>(capacity);
+            var set = new JCG.Net5.HashSet<T>(capacity);
             Assert.Equal(capacity, set.EnsureCapacity(capacity));
 
-            set = (HashSet<T>)GenericISetFactory(capacity);
+            set = (JCG.Net5.HashSet<T>)GenericISetFactory(capacity);
             Assert.Equal(capacity, set.EnsureCapacity(capacity));
         }
 
@@ -771,15 +562,15 @@ namespace J2N.Collections.Tests
         [InlineData(4)]
         public void EnsureCapacity_Generic_EnsureCapacityCalledTwice_ReturnsSameValue(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             int capacity = set.EnsureCapacity(0);
             Assert.Equal(capacity, set.EnsureCapacity(0));
 
-            set = (HashSet<T>)GenericISetFactory(setLength);
+            set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             capacity = set.EnsureCapacity(setLength);
             Assert.Equal(capacity, set.EnsureCapacity(setLength));
 
-            set = (HashSet<T>)GenericISetFactory(setLength);
+            set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             capacity = set.EnsureCapacity(setLength + 1);
             Assert.Equal(capacity, set.EnsureCapacity(setLength + 1));
         }
@@ -791,7 +582,7 @@ namespace J2N.Collections.Tests
         [InlineData(8)]
         public void EnsureCapacity_Generic_HashsetNotEmpty_RequestedSmallerThanCount_ReturnsAtLeastSizeOfCount(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
             Assert.InRange(set.EnsureCapacity(setLength - 1), setLength, int.MaxValue);
         }
 
@@ -800,7 +591,7 @@ namespace J2N.Collections.Tests
         [InlineData(20)]
         public void EnsureCapacity_Generic_HashsetNotEmpty_SetsToAtLeastTheRequested(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
 
             // get current capacity
             int currentCapacity = set.EnsureCapacity(0);
@@ -813,13 +604,13 @@ namespace J2N.Collections.Tests
         [Fact]
         public void EnsureCapacity_Generic_CapacityIsSetToPrimeNumberLargerOrEqualToRequested()
         {
-            var set = new HashSet<T>();
+            var set = new JCG.Net5.HashSet<T>();
             Assert.Equal(17, set.EnsureCapacity(17));
 
-            set = new HashSet<T>();
+            set = new JCG.Net5.HashSet<T>();
             Assert.Equal(17, set.EnsureCapacity(15));
 
-            set = new HashSet<T>();
+            set = new JCG.Net5.HashSet<T>();
             Assert.Equal(17, set.EnsureCapacity(13));
         }
 
@@ -828,7 +619,7 @@ namespace J2N.Collections.Tests
         [InlineData(10)]
         public void EnsureCapacity_Generic_GrowCapacityWithFreeList(int setLength)
         {
-            HashSet<T> set = (HashSet<T>)GenericISetFactory(setLength);
+            JCG.Net5.HashSet<T> set = (JCG.Net5.HashSet<T>)GenericISetFactory(setLength);
 
             // Remove the first element to ensure we have a free list.
             Assert.True(set.Remove(set.ElementAt(0)));
@@ -840,7 +631,7 @@ namespace J2N.Collections.Tests
             Assert.True(newCapacity > currentCapacity);
         }
 
-        #endregion EnsureCapacity
+        #endregion
 
         #region Remove
 
@@ -849,7 +640,7 @@ namespace J2N.Collections.Tests
         public void Remove_NonDefaultComparer_ComparerUsed(int capacity)
         {
             var c = new TrackingEqualityComparer<T>();
-            var set = new HashSet<T>(capacity, c);
+            var set = new JCG.Net5.HashSet<T>(capacity, c);
 
             AddToCollection(set, capacity);
             T first = set.First();
@@ -864,67 +655,6 @@ namespace J2N.Collections.Tests
             Assert.InRange(c.GetHashCodeCalls, 1, int.MaxValue);
         }
 
-        #endregion Remove
-
-        #region Serialization
-
-#if FEATURE_SERIALIZABLE
-        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsBinaryFormatterSupported))]
-        public void ComparerSerialization()
-        {
-            // Strings switch between randomized and non-randomized comparers,
-            // however this should never be observable externally.
-            TestComparerSerialization(EqualityComparer<string>.Default, "System.OrdinalComparer");
-
-            // OrdinalCaseSensitiveComparer is internal and (de)serializes as OrdinalComparer
-            TestComparerSerialization(StringComparer.Ordinal, "System.OrdinalComparer");
-
-            // OrdinalIgnoreCaseComparer is internal and (de)serializes as OrdinalComparer
-            TestComparerSerialization(StringComparer.OrdinalIgnoreCase, "System.OrdinalComparer");
-            TestComparerSerialization(StringComparer.CurrentCulture);
-            TestComparerSerialization(StringComparer.CurrentCultureIgnoreCase);
-            TestComparerSerialization(StringComparer.InvariantCulture);
-            TestComparerSerialization(StringComparer.InvariantCultureIgnoreCase);
-
-            // Check other types while here, IEquatable valuetype, nullable valuetype, and non IEquatable object
-            TestComparerSerialization(EqualityComparer<int>.Default);
-            TestComparerSerialization(EqualityComparer<int?>.Default);
-            TestComparerSerialization(EqualityComparer<object>.Default);
-
-            static void TestComparerSerialization<TCompared>(SCG.IEqualityComparer<TCompared> equalityComparer, string internalTypeName = null)
-            {
-                var bf = new BinaryFormatter();
-                var s = new MemoryStream();
-
-                var set = new HashSet<TCompared>(equalityComparer);
-
-                Assert.Same(equalityComparer, set.EqualityComparer);
-
-                bf.Serialize(s, set);
-                s.Position = 0;
-                set = (HashSet<TCompared>)bf.Deserialize(s);
-
-                // J2N: this assertion fails on .NET <= 8, due to different internal implementations. Skipping it for now.
-                // if (equalityComparer.Equals(EqualityComparer<string>.Default))
-                // {
-                //     // EqualityComparer<string>.Default is mapped to StringEqualityComparer, but serialized as GenericEqualityComparer<string>
-                //     Assert.Equal("System.Collections.Generic.GenericEqualityComparer`1[System.String]", set.Comparer.GetType().ToString());
-                //     return;
-                // }
-
-                if (internalTypeName == null)
-                {
-                    Assert.IsType(equalityComparer.GetType(), set.EqualityComparer);
-                }
-                else
-                {
-                    Assert.Equal(internalTypeName, set.EqualityComparer.GetType().ToString());
-                }
-
-                Assert.True(equalityComparer.Equals(set.EqualityComparer));
-            }
-        }
-#endif
-        #endregion Serialization
+        #endregion
     }
 }

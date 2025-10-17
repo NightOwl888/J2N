@@ -1,6 +1,5 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using System;
 using System.Collections;
@@ -9,23 +8,21 @@ using JCG = J2N.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
-    public class HashSet_IEnumerable_NonGeneric_Tests : IEnumerable_NonGeneric_Tests
+    public class Net5_HashSet_IEnumerable_NonGeneric_Tests : IEnumerable_NonGeneric_Tests
     {
         protected override IEnumerable NonGenericIEnumerableFactory(int count)
         {
-            var set = new JCG.HashSet<string>();
+            var set = new JCG.Net5.HashSet<string>();
             int seed = 12354;
             while (set.Count < count)
                 set.Add(CreateT(set, seed++));
             return set;
         }
 
-        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
 
-        protected override ModifyOperation ModifyEnumeratorThrows => base.ModifyEnumeratorAllowed & ~ModifyOperation.Remove;
-
-        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Overwrite | ModifyOperation.Remove;
+        protected override ModifyOperation ModifyEnumeratorThrows => ModifyOperation.Add | ModifyOperation.Insert;
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Remove | ModifyOperation.Clear;
 
         /// <summary>
         /// Returns a set of ModifyEnumerable delegates that modify the enumerable passed to them.
@@ -36,7 +33,7 @@ namespace J2N.Collections.Tests
             {
                 yield return (IEnumerable enumerable) =>
                 {
-                    JCG.HashSet<string> casted = ((JCG.HashSet<string>)enumerable);
+                    JCG.Net5.HashSet<string> casted = ((JCG.Net5.HashSet<string>)enumerable);
                     if (casted.Count > 0)
                     {
                         casted.Clear();
@@ -47,7 +44,7 @@ namespace J2N.Collections.Tests
             }
         }
 
-        protected string CreateT(JCG.HashSet<string> set, int seed)
+        private string CreateT(JCG.Net5.HashSet<string> set, int seed) // J2N: make private due to HashSet<T> being internal
         {
             int stringLength = seed % 10 + 5;
             Random rand = new Random(seed);
