@@ -363,27 +363,9 @@ namespace J2N.Threading.Atomic
         /// Implicitly converts an <see cref="AtomicInt64"/> to a <see cref="long"/>.
         /// </summary>
         /// <param name="atomicInt64">The <see cref="AtomicInt64"/> to convert.</param>
-        /// <returns>The value of the <see cref="AtomicInt64"/>.</returns>
-        public static implicit operator long(AtomicInt64? atomicInt64)
+        public static implicit operator long(AtomicInt64 atomicInt64)
         {
-            var value = atomicInt64?.Value;
-
-            if (value == null)
-            {
-                ThrowHelper.ThrowArgumentNullException(ExceptionResource.ArgumentNull_NullOrNullValue);
-            }
-
-            return value.Value;
-        }
-
-        /// <summary>
-        /// Implicitly converts an <see cref="AtomicInt64"/> to a nullable <see cref="long"/>.
-        /// </summary>
-        /// <param name="atomicInt64">The <see cref="AtomicInt64"/> to convert.</param>
-        /// <returns>The value of the <see cref="AtomicInt64"/>, or <c>null</c> if <paramref name="atomicInt64"/> is <c>null</c>.</returns>
-        public static implicit operator long?(AtomicInt64? atomicInt64)
-        {
-            return atomicInt64?.Value;
+            return atomicInt64.Value;
         }
 
         /// <summary>

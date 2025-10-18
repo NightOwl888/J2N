@@ -327,41 +327,6 @@ namespace J2N.Threading.Atomic
         }
 
         [Test]
-        public void TestImplicitOperatorLong_Null()
-        {
-            AtomicInt64? ai = null;
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                long x = ai;
-                Assert.Fail("Should throw exception");
-            });
-        }
-
-        [Test]
-        public void TestImplicitOperatorLong_Value()
-        {
-            AtomicInt64 ai = new AtomicInt64(42L);
-            long x = ai;
-            Assert.AreEqual(42L, x);
-        }
-
-        [Test]
-        public void TestImplicitOperatorNullableLong_Null()
-        {
-            AtomicInt64? ai = null;
-            long? x = ai;
-            Assert.False(x.HasValue);
-        }
-
-        [Test]
-        public void TestImplicitOperatorNullableLong_Value()
-        {
-            AtomicInt64 ai = new AtomicInt64(42L);
-            long? x = ai;
-            Assert.AreEqual(42L, x);
-        }
-
-        [Test]
         public void TestOperatorEquals_AtomicInt64_AtomicInt64_BothNull()
         {
             AtomicInt64? ai1 = null;

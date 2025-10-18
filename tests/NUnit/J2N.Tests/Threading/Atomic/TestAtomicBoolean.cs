@@ -170,41 +170,6 @@ namespace J2N.Threading.Atomic
         }
 
         [Test]
-        public void TestImplicitOperatorBool_Null()
-        {
-            AtomicBoolean? ab = null;
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                bool x = ab;
-                Assert.Fail("Should throw exception");
-            });
-        }
-
-        [Test]
-        public void TestImplicitOperatorBool_Value()
-        {
-            AtomicBoolean ab = new AtomicBoolean(true);
-            bool x = ab;
-            Assert.IsTrue(x);
-        }
-
-        [Test]
-        public void TestImplicitOperatorNullableBool_Null()
-        {
-            AtomicBoolean? ab = null;
-            bool? x = ab;
-            Assert.False(x.HasValue);
-        }
-
-        [Test]
-        public void TestImplicitOperatorNullableBool_Value()
-        {
-            AtomicBoolean ab = new AtomicBoolean(true);
-            bool? x = ab;
-            Assert.IsTrue(x);
-        }
-
-        [Test]
         public void TestOperatorEquals_AtomicBoolean_AtomicBoolean_BothNull()
         {
             AtomicBoolean? ab1 = null;

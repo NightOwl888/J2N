@@ -362,27 +362,9 @@ namespace J2N.Threading.Atomic
         /// Implicitly converts an <see cref="AtomicInt32"/> to an <see cref="int"/>.
         /// </summary>
         /// <param name="atomicInt32">The <see cref="AtomicInt32"/> to convert.</param>
-        /// <returns>The value of the <see cref="AtomicInt32"/>.</returns>
-        public static implicit operator int(AtomicInt32? atomicInt32)
+        public static implicit operator int(AtomicInt32 atomicInt32)
         {
-            var value = atomicInt32?.Value;
-
-            if (value == null)
-            {
-                ThrowHelper.ThrowArgumentNullException(ExceptionResource.ArgumentNull_NullOrNullValue);
-            }
-
-            return value.Value;
-        }
-
-        /// <summary>
-        /// Implicitly converts an <see cref="AtomicInt32"/> to a nullable <see cref="int"/>.
-        /// </summary>
-        /// <param name="atomicInt32">The <see cref="AtomicInt32"/> to convert.</param>
-        /// <returns>The value of the <see cref="AtomicInt32"/>, or <c>null</c> if <paramref name="atomicInt32"/> is <c>null</c>.</returns>
-        public static implicit operator int?(AtomicInt32? atomicInt32)
-        {
-            return atomicInt32?.Value;
+            return atomicInt32.Value;
         }
 
         /// <summary>

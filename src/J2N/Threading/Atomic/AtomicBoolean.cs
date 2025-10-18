@@ -171,27 +171,9 @@ namespace J2N.Threading.Atomic
         /// Implicitly converts an <see cref="AtomicBoolean"/> to an <see cref="bool"/>.
         /// </summary>
         /// <param name="atomicBoolean">The <see cref="AtomicBoolean"/> to convert.</param>
-        /// <returns>The value of the <see cref="AtomicBoolean"/>.</returns>
-        public static implicit operator bool(AtomicBoolean? atomicBoolean)
+        public static implicit operator bool(AtomicBoolean atomicBoolean)
         {
-            var value = atomicBoolean?.Value;
-
-            if (value == null)
-            {
-                ThrowHelper.ThrowArgumentNullException(ExceptionResource.ArgumentNull_NullOrNullValue);
-            }
-
-            return value.Value;
-        }
-
-        /// <summary>
-        /// Implicitly converts an <see cref="AtomicBoolean"/> to a nullable <see cref="bool"/>.
-        /// </summary>
-        /// <param name="atomicBoolean">The <see cref="AtomicBoolean"/> to convert.</param>
-        /// <returns>The value of the <see cref="AtomicBoolean"/>, or <c>null</c> if <paramref name="atomicBoolean"/> is <c>null</c>.</returns>
-        public static implicit operator bool?(AtomicBoolean? atomicBoolean)
-        {
-            return atomicBoolean?.Value;
+            return atomicBoolean.Value;
         }
 
         /// <summary>

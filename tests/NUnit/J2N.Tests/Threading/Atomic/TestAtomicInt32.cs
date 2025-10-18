@@ -327,41 +327,6 @@ namespace J2N.Threading.Atomic
         }
 
         [Test]
-        public void TestImplicitOperatorInt_Null()
-        {
-            AtomicInt32? ai = null;
-            Assert.Throws<ArgumentNullException>(() =>
-            {
-                int x = ai;
-                Assert.Fail("Should throw exception");
-            });
-        }
-
-        [Test]
-        public void TestImplicitOperatorInt_Value()
-        {
-            AtomicInt32 ai = new AtomicInt32(42);
-            int x = ai;
-            Assert.AreEqual(42, x);
-        }
-
-        [Test]
-        public void TestImplicitOperatorNullableInt_Null()
-        {
-            AtomicInt32? ai = null;
-            int? x = ai;
-            Assert.False(x.HasValue);
-        }
-
-        [Test]
-        public void TestImplicitOperatorNullableInt_Value()
-        {
-            AtomicInt32 ai = new AtomicInt32(42);
-            int? x = ai;
-            Assert.AreEqual(42, x);
-        }
-
-        [Test]
         public void TestOperatorEquals_AtomicInt32_AtomicInt32_BothNull()
         {
             AtomicInt32? ai1 = null;
