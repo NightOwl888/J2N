@@ -373,9 +373,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicInt32 a1, AtomicInt32 a2)
+        public static bool operator ==(AtomicInt32? a1, AtomicInt32? a2)
         {
-            return a1.Value == a2.Value;
+            return ReferenceEquals(a1, a2) || a1?.Value == a2?.Value;
         }
 
         /// <summary>
@@ -384,7 +384,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicInt32 a1, AtomicInt32 a2)
+        public static bool operator !=(AtomicInt32? a1, AtomicInt32? a2)
         {
             return !(a1 == a2);
         }
@@ -395,9 +395,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicInt32 a1, int a2)
+        public static bool operator ==(AtomicInt32? a1, int a2)
         {
-            return a1.Value == a2;
+            return a1?.Value == a2;
         }
 
         /// <summary>
@@ -406,7 +406,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicInt32 a1, int a2)
+        public static bool operator !=(AtomicInt32? a1, int a2)
         {
             return !(a1 == a2);
         }
@@ -417,9 +417,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(int a1, AtomicInt32 a2)
+        public static bool operator ==(int a1, AtomicInt32? a2)
         {
-            return a1 == a2.Value;
+            return a1 == a2?.Value;
         }
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(int a1, AtomicInt32 a2)
+        public static bool operator !=(int a1, AtomicInt32? a2)
         {
             return !(a1 == a2);
         }
@@ -439,9 +439,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(AtomicInt32 a1, int? a2)
+        public static bool operator ==(AtomicInt32? a1, int? a2)
         {
-            return a1.Value == a2.GetValueOrDefault();
+            return a1?.Value == a2;
         }
 
         /// <summary>
@@ -450,7 +450,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(AtomicInt32 a1, int? a2)
+        public static bool operator !=(AtomicInt32? a1, int? a2)
         {
             return !(a1 == a2);
         }
@@ -461,9 +461,9 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are equal; otherwise, <c>false</c>.</returns>
-        public static bool operator ==(int? a1, AtomicInt32 a2)
+        public static bool operator ==(int? a1, AtomicInt32? a2)
         {
-            return a1.GetValueOrDefault() == a2.Value;
+            return a1 == a2?.Value;
         }
 
         /// <summary>
@@ -472,7 +472,7 @@ namespace J2N.Threading.Atomic
         /// <param name="a1">The first number.</param>
         /// <param name="a2">The second number.</param>
         /// <returns><c>true</c> if the given numbers are not equal; otherwise, <c>false</c>.</returns>
-        public static bool operator !=(int? a1, AtomicInt32 a2)
+        public static bool operator !=(int? a1, AtomicInt32? a2)
         {
             return !(a1 == a2);
         }

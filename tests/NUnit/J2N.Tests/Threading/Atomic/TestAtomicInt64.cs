@@ -2,6 +2,7 @@
 using System;
 using System.Globalization;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading.Atomic
 {
@@ -323,6 +324,220 @@ namespace J2N.Threading.Atomic
             assertTrue(ai < 7);
             assertFalse(ai < 6);
             assertTrue(ai <= 6);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt64_AtomicInt64_BothNull()
+        {
+            AtomicInt64? ai1 = null;
+            AtomicInt64? ai2 = null;
+            Assert.IsTrue(ai1 == ai2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt64_AtomicInt64_OneNull()
+        {
+            AtomicInt64? ai1 = null;
+            AtomicInt64 ai2 = new AtomicInt64(42L);
+            Assert.IsFalse(ai1 == ai2);
+            Assert.IsFalse(ai2 == ai1);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt64_AtomicInt64_BothNonNull()
+        {
+            AtomicInt64 ai1 = new AtomicInt64(42L);
+            AtomicInt64 ai2 = new AtomicInt64(42L);
+            AtomicInt64 ai3 = new AtomicInt64(7L);
+            Assert.IsTrue(ai1 == ai2);
+            Assert.IsFalse(ai1 == ai3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt64_AtomicInt64_BothNull()
+        {
+            AtomicInt64? ai1 = null;
+            AtomicInt64? ai2 = null;
+            Assert.IsFalse(ai1 != ai2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt64_AtomicInt64_OneNull()
+        {
+            AtomicInt64? ai1 = null;
+            AtomicInt64 ai2 = new AtomicInt64(42L);
+            Assert.IsTrue(ai1 != ai2);
+            Assert.IsTrue(ai2 != ai1);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt64_AtomicInt64_BothNonNull()
+        {
+            AtomicInt64 ai1 = new AtomicInt64(42L);
+            AtomicInt64 ai2 = new AtomicInt64(42L);
+            AtomicInt64 ai3 = new AtomicInt64(7L);
+            Assert.IsFalse(ai1 != ai2);
+            Assert.IsTrue(ai1 != ai3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt64_Long_LeftNull()
+        {
+            AtomicInt64? ai1 = null;
+            const long i2 = 42L;
+            Assert.IsFalse(ai1 == i2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt64_Long_LeftValue()
+        {
+            AtomicInt64 ai1 = new AtomicInt64(42L);
+            const long i2 = 42L;
+            const long i3 = 7L;
+            Assert.IsTrue(ai1 == i2);
+            Assert.IsFalse(ai1 == i3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt64_Long_LeftNull()
+        {
+            AtomicInt64? ai1 = null;
+            const long i2 = 42L;
+            Assert.IsTrue(ai1 != i2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt64_Long_LeftValue()
+        {
+            AtomicInt64 ai1 = new AtomicInt64(42L);
+            const long i2 = 42L;
+            const long i3 = 7L;
+            Assert.IsFalse(ai1 != i2);
+            Assert.IsTrue(ai1 != i3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_Long_AtomicInt64_RightNull()
+        {
+            const long i1 = 42L;
+            AtomicInt64? ai2 = null;
+            Assert.IsFalse(i1 == ai2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_Long_AtomicInt64_RightValue()
+        {
+            const long i1 = 42L;
+            const long i3 = 7L;
+            AtomicInt64 ai2 = new AtomicInt64(42L);
+            Assert.IsTrue(i1 == ai2);
+            Assert.IsFalse(i3 == ai2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_Long_AtomicInt64_RightNull()
+        {
+            const long i1 = 42L;
+            AtomicInt64? ai2 = null;
+            Assert.IsTrue(i1 != ai2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_Long_AtomicInt64_RightValue()
+        {
+            const long i1 = 42L;
+            const long i3 = 7L;
+            AtomicInt64 ai2 = new AtomicInt64(42L);
+            Assert.IsFalse(i1 != ai2);
+            Assert.IsTrue(i3 != ai2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt64_NullableLong_LeftNull()
+        {
+            AtomicInt64? ai1 = null;
+            long? i2 = null;
+            long? i3 = 42L;
+            Assert.IsTrue(ai1 == i2);
+            Assert.IsFalse(ai1 == i3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicInt64_NullableLong_LeftValue()
+        {
+            AtomicInt64 ai1 = new AtomicInt64(42L);
+            long? i2 = null;
+            long? i3 = 42L;
+            long? i4 = 7L;
+            Assert.IsFalse(ai1 == i2);
+            Assert.IsTrue(ai1 == i3);
+            Assert.IsFalse(ai1 == i4);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt64_NullableLong_LeftNull()
+        {
+            AtomicInt64? ai1 = null;
+            long? i2 = null;
+            long? i3 = 42L;
+            Assert.IsFalse(ai1 != i2);
+            Assert.IsTrue(ai1 != i3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicInt64_NullableLong_LeftValue()
+        {
+            AtomicInt64 ai1 = new AtomicInt64(42L);
+            long? i2 = null;
+            long? i3 = 42L;
+            long? i4 = 7L;
+            Assert.IsTrue(ai1 != i2);
+            Assert.IsFalse(ai1 != i3);
+            Assert.IsTrue(ai1 != i4);
+        }
+
+        [Test]
+        public void TestOperatorEquals_NullableLong_AtomicInt64_RightNull()
+        {
+            long? i1 = null;
+            AtomicInt64? ai2 = null;
+            AtomicInt64 ai3 = new AtomicInt64(42L);
+            Assert.IsTrue(i1 == ai2);
+            Assert.IsFalse(i1 == ai3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_NullableLong_AtomicInt64_RightValue()
+        {
+            long? i1 = 42L;
+            long? i2 = 7L;
+            AtomicInt64? ai3 = null;
+            AtomicInt64 ai4 = new AtomicInt64(42L);
+            Assert.IsFalse(i1 == ai3);
+            Assert.IsTrue(i1 == ai4);
+            Assert.IsFalse(i2 == ai4);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_NullableLong_AtomicInt64_RightNull()
+        {
+            long? i1 = null;
+            AtomicInt64? ai2 = null;
+            AtomicInt64 ai3 = new AtomicInt64(42L);
+            Assert.IsFalse(i1 != ai2);
+            Assert.IsTrue(i1 != ai3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_NullableLong_AtomicInt64_RightValue()
+        {
+            long? i1 = 42L;
+            long? i2 = 7L;
+            AtomicInt64? ai3 = null;
+            AtomicInt64 ai4 = new AtomicInt64(42L);
+            Assert.IsTrue(i1 != ai3);
+            Assert.IsFalse(i1 != ai4);
+            Assert.IsTrue(i2 != ai4);
         }
     }
 }

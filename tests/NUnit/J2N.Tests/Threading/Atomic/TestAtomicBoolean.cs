@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using System;
 using System.Threading;
+#nullable enable
 
 namespace J2N.Threading.Atomic
 {
@@ -95,7 +96,7 @@ namespace J2N.Threading.Atomic
 
         /////**
         //// * repeated weakCompareAndSet succeeds in changing value when equal
-        //// * to expected 
+        //// * to expected
         //// */
         ////[Test]
         ////public void TestWeakCompareAndSet()
@@ -168,5 +169,218 @@ namespace J2N.Threading.Atomic
             assertEquals(ai.ToString(), "true");
         }
 
+        [Test]
+        public void TestOperatorEquals_AtomicBoolean_AtomicBoolean_BothNull()
+        {
+            AtomicBoolean? ab1 = null;
+            AtomicBoolean? ab2 = null;
+            Assert.IsTrue(ab1 == ab2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicBoolean_AtomicBoolean_OneNull()
+        {
+            AtomicBoolean? ab1 = null;
+            AtomicBoolean ab2 = new AtomicBoolean(true);
+            Assert.IsFalse(ab1 == ab2);
+            Assert.IsFalse(ab2 == ab1);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicBoolean_AtomicBoolean_BothNonNull()
+        {
+            AtomicBoolean ab1 = new AtomicBoolean(true);
+            AtomicBoolean ab2 = new AtomicBoolean(true);
+            AtomicBoolean ab3 = new AtomicBoolean(false);
+            Assert.IsTrue(ab1 == ab2);
+            Assert.IsFalse(ab1 == ab3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicBoolean_AtomicBoolean_BothNull()
+        {
+            AtomicBoolean? ab1 = null;
+            AtomicBoolean? ab2 = null;
+            Assert.IsFalse(ab1 != ab2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicBoolean_AtomicBoolean_OneNull()
+        {
+            AtomicBoolean? ab1 = null;
+            AtomicBoolean ab2 = new AtomicBoolean(true);
+            Assert.IsTrue(ab1 != ab2);
+            Assert.IsTrue(ab2 != ab1);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicBoolean_AtomicBoolean_BothNonNull()
+        {
+            AtomicBoolean ab1 = new AtomicBoolean(true);
+            AtomicBoolean ab2 = new AtomicBoolean(true);
+            AtomicBoolean ab3 = new AtomicBoolean(false);
+            Assert.IsFalse(ab1 != ab2);
+            Assert.IsTrue(ab1 != ab3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicBoolean_Bool_LeftNull()
+        {
+            AtomicBoolean? ab1 = null;
+            const bool b2 = true;
+            Assert.IsFalse(ab1 == b2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicBoolean_Bool_LeftValue()
+        {
+            AtomicBoolean ab1 = new AtomicBoolean(true);
+            const bool b2 = true;
+            const bool b3 = false;
+            Assert.IsTrue(ab1 == b2);
+            Assert.IsFalse(ab1 == b3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicBoolean_Bool_LeftNull()
+        {
+            AtomicBoolean? ab1 = null;
+            const bool b2 = true;
+            Assert.IsTrue(ab1 != b2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicBoolean_Bool_LeftValue()
+        {
+            AtomicBoolean ab1 = new AtomicBoolean(true);
+            const bool b2 = true;
+            const bool b3 = false;
+            Assert.IsFalse(ab1 != b2);
+            Assert.IsTrue(ab1 != b3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_Bool_AtomicBoolean_RightNull()
+        {
+            const bool b1 = true;
+            AtomicBoolean? ab2 = null;
+            Assert.IsFalse(b1 == ab2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_Bool_AtomicBoolean_RightValue()
+        {
+            const bool b1 = true;
+            const bool b3 = false;
+            AtomicBoolean ab2 = new AtomicBoolean(true);
+            Assert.IsTrue(b1 == ab2);
+            Assert.IsFalse(b3 == ab2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_Bool_AtomicBoolean_RightNull()
+        {
+            const bool b1 = true;
+            AtomicBoolean? ab2 = null;
+            Assert.IsTrue(b1 != ab2);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_Bool_AtomicBoolean_RightValue()
+        {
+            const bool b1 = true;
+            const bool b3 = false;
+            AtomicBoolean ab2 = new AtomicBoolean(true);
+            Assert.IsFalse(b1 != ab2);
+            Assert.IsTrue(b3 != ab2);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicBoolean_NullableBool_LeftNull()
+        {
+            AtomicBoolean? ab1 = null;
+            bool? b2 = null;
+            bool? b3 = true;
+            Assert.IsTrue(ab1 == b2);
+            Assert.IsFalse(ab1 == b3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_AtomicBoolean_NullableBool_LeftValue()
+        {
+            AtomicBoolean ab1 = new AtomicBoolean(true);
+            bool? b2 = null;
+            bool? b3 = true;
+            bool? b4 = false;
+            Assert.IsFalse(ab1 == b2);
+            Assert.IsTrue(ab1 == b3);
+            Assert.IsFalse(ab1 == b4);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicBoolean_NullableBool_LeftNull()
+        {
+            AtomicBoolean? ab1 = null;
+            bool? b2 = null;
+            bool? b3 = true;
+            Assert.IsFalse(ab1 != b2);
+            Assert.IsTrue(ab1 != b3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_AtomicBoolean_NullableBool_LeftValue()
+        {
+            AtomicBoolean ab1 = new AtomicBoolean(true);
+            bool? b2 = null;
+            bool? b3 = true;
+            bool? b4 = false;
+            Assert.IsTrue(ab1 != b2);
+            Assert.IsFalse(ab1 != b3);
+            Assert.IsTrue(ab1 != b4);
+        }
+
+        [Test]
+        public void TestOperatorEquals_NullableBool_AtomicBoolean_RightNull()
+        {
+            bool? b1 = null;
+            AtomicBoolean? ab2 = null;
+            AtomicBoolean ab3 = new AtomicBoolean(true);
+            Assert.IsTrue(b1 == ab2);
+            Assert.IsFalse(b1 == ab3);
+        }
+
+        [Test]
+        public void TestOperatorEquals_NullableBool_AtomicBoolean_RightValue()
+        {
+            bool? b1 = true;
+            bool? b2 = false;
+            AtomicBoolean? ab3 = null;
+            AtomicBoolean ab4 = new AtomicBoolean(true);
+            Assert.IsFalse(b1 == ab3);
+            Assert.IsTrue(b1 == ab4);
+            Assert.IsFalse(b2 == ab4);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_NullableBool_AtomicBoolean_RightNull()
+        {
+            bool? b1 = null;
+            AtomicBoolean? ab2 = null;
+            AtomicBoolean ab3 = new AtomicBoolean(true);
+            Assert.IsFalse(b1 != ab2);
+            Assert.IsTrue(b1 != ab3);
+        }
+
+        [Test]
+        public void TestOperatorNotEquals_NullableBool_AtomicBoolean_RightValue()
+        {
+            bool? b1 = true;
+            bool? b2 = false;
+            AtomicBoolean? ab3 = null;
+            AtomicBoolean ab4 = new AtomicBoolean(true);
+            Assert.IsTrue(b1 != ab3);
+            Assert.IsFalse(b1 != ab4);
+            Assert.IsTrue(b2 != ab4);
+        }
     }
 }
