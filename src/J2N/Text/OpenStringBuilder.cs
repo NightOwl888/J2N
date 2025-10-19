@@ -26,8 +26,8 @@ namespace J2N.Text
     /// 
     /// <list type="bullet">
     ///     <item><description>
-    ///         Rather than managing chunks of memory, <see cref="OpenStringBuilder"/> manages a single block of
-    ///         <see cref="char"/>s.
+    ///         Rather than managing chunks of memory, <see cref="OpenStringBuilder"/> manages a single contigouous
+    ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
     ///         Memory is directly accessible using <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> and
@@ -510,6 +510,15 @@ namespace J2N.Text
             }
         }
 
+        /// <summary>
+        /// Gets or sets the character at the specified character position in this instance.
+        /// </summary>
+        /// <param name="index">The position of the character.</param>
+        /// <returns>The Unicode character at position <paramref name="index"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside
+        /// the bounds of this instance while setting a character.</exception>
+        /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is outside the bounds
+        /// of this instance while getting a character.</exception>
         [IndexerName("Chars")]
         public char this[int index]
         {
