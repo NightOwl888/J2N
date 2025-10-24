@@ -497,7 +497,7 @@ namespace J2N.Collections.Generic
         /// <param name="value">The value of the element to add. The value can be null for reference types.</param>
         public bool Add([AllowNull] T value)
         {
-            return TryInsert(index: -1, value, InsertionBehavior.OverwriteExisting, out _);
+            return TryInsert(index: -1, value, InsertionBehavior.None, out _);
         }
 
         /// <summary>Adds the specified value to the set if the value doesn't already exist.</summary>
@@ -809,6 +809,38 @@ namespace J2N.Collections.Generic
             _entries![index].Value = value; // [!]: asserted above
         }
 
+        /// <summary>Removes all elements that match the condition defined by the specified predicate from the set.</summary>
+        /// <param name="match">The <see cref="Predicate{T}"/> that defines the conditions of the elements to remove.</param>
+        /// <returns>The number of elements that were removed from the set.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="match"/> is <c>null</c>.</exception>
+        public int RemoveWhere(Predicate<T> match)
+        {
+            ThrowIfNull(match);
+
+            // Empty sets may have _entries == null
+            if (_entries is null)
+            {
+                return 0;
+            }
+
+            int numRemoved = 0;
+            for (int i = _count - 1; i >= 0; i--)
+            {
+                // Cache value in case delegate removes it
+                T value = _entries![i].Value;
+                if (match(value))
+                {
+                    // Check again that remove actually removed it
+                    if (Remove(value))
+                    {
+                        numRemoved++;
+                    }
+                }
+            }
+
+            return numRemoved;
+        }
+
         /// <summary>Ensures that the set can hold up to <paramref name="capacity"/> entries without resizing.</summary>
         /// <param name="capacity">The desired minimum capacity of the set. The actual capacity provided may be larger.</param>
         /// <returns>The new capacity of the set.</returns>
@@ -827,8 +859,6 @@ namespace J2N.Collections.Generic
                 {
                     Resize(HashHelpers.GetPrime(capacity));
                 }
-
-                _version++;
             }
 
             return Capacity;
@@ -1380,6 +1410,25 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
+        /// Copies the elements of a <see cref="OrderedHashSet{T}"/> object to an array,
+        /// starting at the specified array index.
+        /// </summary>
+        /// <param name="array">The one-dimensional array that is the destination of
+        /// the elements copied from the <see cref="OrderedHashSet{T}"/> object.
+        /// The array must have zero-based indexing.</param>
+        /// <param name="arrayIndex">The zero-based index in <paramref name="array"/> at which copying begins.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="array"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="arrayIndex"/> is less than 0.</exception>
+        /// <exception cref="ArgumentException"><paramref name="arrayIndex"/> is greater than the length of the destination <paramref name="array"/>.</exception>
+        /// <remarks>
+        /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
+        /// </remarks>
+        public void CopyTo(T[] array, int arrayIndex)
+        {
+            CopyTo(array, arrayIndex, _count);
+        }
+
+        /// <summary>
         /// Copies the specified number of elements of a <see cref="OrderedHashSet{T}"/>
         /// object to an array, starting at the specified array index.
         /// </summary>
@@ -1916,7 +1965,7 @@ namespace J2N.Collections.Generic
         {
             Entry[]? entries = _entries;
             int count = _count;
-            for (int i = 0; i < count; i++)
+            for (int i = count - 1; i >= 0; i--)
             {
                 ref Entry entry = ref entries![i];
                 T item = entry.Value;
@@ -1959,7 +2008,7 @@ namespace J2N.Collections.Generic
 
             // If anything unmarked, remove it. Perf can be optimized here if BitHelper had a
             // FindFirstUnmarked method.
-            for (int i = 0; i < originalCount; i++)
+            for (int i = originalCount - 1; i >= 0; i--)
             {
                 ref Entry entry = ref _entries![i];
                 if (!bitHelper.IsMarked(i))
@@ -2045,7 +2094,7 @@ namespace J2N.Collections.Generic
             }
 
             // if anything marked, remove it
-            for (int i = 0; i < originalCount; i++)
+            for (int i = originalCount - 1; i >= 0; i--)
             {
                 if (itemsToRemove.IsMarked(i))
                 {
