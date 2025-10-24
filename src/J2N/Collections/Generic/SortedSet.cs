@@ -125,7 +125,7 @@ namespace J2N.Collections.Generic
         private const string lBoundInclusiveName = "lBoundInclusive";
         private const string uBoundInclusiveName = "uBoundInclusive";
 
-        private SerializationInfo? siInfo; //A temporary variable which we need during deserialization. 
+        private SerializationInfo? siInfo; //A temporary variable which we need during deserialization.
 #endif
 
         internal const int StackAllocThreshold = 100;
@@ -2813,7 +2813,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
-        /// using rules similar to those in the JDK's AbstactSet class. Two sets are considered
+        /// using rules similar to those in the JDK's AbstractSet class. Two sets are considered
         /// equal when they both contain the same objects (in any order).
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
@@ -2824,7 +2824,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, SetEqualityComparer<T>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current list. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>

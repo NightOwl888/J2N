@@ -53,7 +53,7 @@ namespace J2N.Collections.Generic
     /// Operations on the collection have algorithmic complexities that are similar to that of the <see cref="List{T}"/>
     /// class, except with element lookups similar in complexity to that of <see cref="HashSet{T}"/>.
     /// </remarks>
-    [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
+    [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
     public class OrderedHashSet<T> : ICollection<T>, ISet<T>,
 #if FEATURE_IREADONLYCOLLECTIONS
@@ -147,7 +147,7 @@ namespace J2N.Collections.Generic
             //   more collisions than a preset threshold.
             // - Other reference types: we always want to store a comparer instance, either the one provided,
             //   or if one wasn't provided, the default (accessing EqualityComparer<TKey>.Default
-            //   with shared generics on every dictionary access can add measurable overhead).
+            //   with shared generics on every access can add measurable overhead).
             // - Value types: if no comparer is provided, or if the default is provided, we'd prefer to use
             //   EqualityComparer<TKey>.Default.Equals on every use, enabling the JIT to
             //   devirtualize and possibly inline the operation.
@@ -2271,8 +2271,8 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
-        /// using rules similar to those in the JDK's AbstractMap class. Two dictionaries are considered
-        /// equal when they both contain the same mapppings (in any order).
+        /// using rules similar to those in the JDK's AbstractSet class. Two sets are considered
+        /// equal when they both contain the same objects (in any order).
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object implements <see cref="ISet{T}"/>
