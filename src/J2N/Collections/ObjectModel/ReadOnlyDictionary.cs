@@ -412,8 +412,8 @@ namespace J2N.Collections.ObjectModel
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current dictionary
-        /// using rules similar to those in the JDK's AbstactMap class. Two dictionaries are considered
-        /// equal when they both contain the same mapppings (in any order).
+        /// using rules similar to those in the JDK's AbstractMap class. Two dictionaries are considered
+        /// equal when they both contain the same mappings (in any order).
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
         /// <returns><c>true</c> if the specified object implements <see cref="IDictionary{TKey, TValue}"/>
@@ -423,7 +423,7 @@ namespace J2N.Collections.ObjectModel
             => Equals(obj, structuralEqualityComparer);
 
         /// <summary>
-        /// Gets the hash code for the current dictionary. The hash code is calculated 
+        /// Gets the hash code for the current dictionary. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
@@ -869,7 +869,7 @@ namespace J2N.Collections.ObjectModel
                     }
 
                     //
-                    // We can't cast array of value type to object[], so we don't support 
+                    // We can't cast array of value type to object[], so we don't support
                     // widening of primitive types here.
                     //
                     object?[]? objects = array as object?[];
