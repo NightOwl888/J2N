@@ -77,6 +77,11 @@ namespace J2N.Collections.Generic
         IStructuralEquatable,
         IStructuralFormattable
     {
+        /// <summary>Cutoff point for stackallocs. This corresponds to the number of ints.</summary>
+        private const int StackAllocThreshold = 100;
+        /// <summary>Shrink threshold for TrimExcess; if collection is larger than this multiple of its size, it will be shrunk.</summary>
+        private const int ShrinkThreshold = 3;
+
         /// <summary>The comparer used by the collection. May be null if the default comparer is used.</summary>
         private IEqualityComparer<T>? _comparer;
         /// <summary>Indexes into <see cref="_entries"/> for the start of chains; indices are 1-based.</summary>
@@ -237,7 +242,59 @@ namespace J2N.Collections.Generic
             if (collection is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.collection);
 
-            AddRange(collection);
+            if (collection is OrderedHashSet<T> otherAsOrderedHashSet && EffectiveEqualityComparersAreEqual(this, otherAsOrderedHashSet))
+            {
+                ConstructFrom(otherAsOrderedHashSet);
+            }
+            else
+            {
+                // To avoid excess resizes, first set size based on collection's count. The collection may
+                // contain duplicates, so call TrimExcess if resulting OrderedHashSet is larger than the threshold.
+                AddRange(collection);
+
+                if (_count > 0 && _entries!.Length / _count > ShrinkThreshold)
+                {
+                    TrimExcess();
+                }
+            }
+        }
+
+        /// <summary>Initializes the OrderedHashSet from another OrderedHashSet with the same element type and equality comparer.</summary>
+        private void ConstructFrom(OrderedHashSet<T> source)
+        {
+            Debug.Assert(EffectiveEqualityComparersAreEqual(this, source), "must use identical effective comparers.");
+
+            if (source.Count == 0)
+            {
+                // As well as short-circuiting on the rest of the work done,
+                // this avoids errors from trying to access source._buckets
+                // or source._entries when they aren't initialized.
+                return;
+            }
+
+            int capacity = source._buckets!.Length;
+            int threshold = HashHelpers.ExpandPrime(source.Count + 1);
+
+            if (threshold >= capacity)
+            {
+                _buckets = (int[])source._buckets.Clone();
+                _entries = (Entry[])source._entries!.Clone();
+                _count = source._count;
+                _fastModMultiplier = source._fastModMultiplier;
+            }
+            else
+            {
+                EnsureBucketsAndEntriesInitialized(source.Count);
+
+                Entry[]? entries = source._entries;
+                for (int i = 0; i < source._count; i++)
+                {
+                    ref Entry entry = ref entries![i];
+                    TryInsert(index: -1, entry.Value, InsertionBehavior.OverwriteExisting, out _);
+                }
+            }
+
+            Debug.Assert(Count == source.Count);
         }
 
         #region AsReadOnly
@@ -289,6 +346,9 @@ namespace J2N.Collections.Generic
                 return comparer ?? EqualityComparer<T>.Default;
             }
         }
+
+        /// <summary>Gets the effective equality comparer used for operations.</summary>
+        internal IEqualityComparer<T> EffectiveComparer => _comparer ?? EqualityComparer<T>.Default;
 
         /// <summary>Gets the number of elements contained in the <see cref="OrderedHashSet{T}"/>.</summary>
         public int Count => _count;
@@ -477,8 +537,16 @@ namespace J2N.Collections.Generic
             {
                 Debug.Assert(_entries is not null);
 
+#if FEATURE_ARRAY_CLEAR_ARRAY
+                Array.Clear(_buckets);
+#else
                 Array.Clear(_buckets, 0, _buckets.Length);
-                Array.Clear(_entries!, 0, _count); // [!]: asserted above
+#endif
+#if FEATURE_ARRAY_CLEAR_ARRAY
+                Array.Clear(_entries!);
+#else
+                Array.Clear(_entries!, 0, _count);
+#endif
                 _count = 0;
                 _version++;
             }
@@ -718,7 +786,11 @@ namespace J2N.Collections.Generic
                 UpdateBucketIndex(i, shiftAmount: -1);
             }
 
-            entries![--_count] = default; // [!]: asserted above
+            --_count;
+            if (RuntimeHelper.IsReferenceOrContainsReferences<T>())
+            {
+                entries![_count] = default;
+            }
             _version++;
         }
 
@@ -872,9 +944,9 @@ namespace J2N.Collections.Generic
 
                 // faster if other is a hashset using same equality comparer; so check
                 // that other is a hashset using the same equality comparer.
-                if (AreEqualityComparersEqual(this, otherAsCollection))
+                if (otherAsCollection is ISet<T> otherAsSet && AreEqualityComparersEqual(this, otherAsSet))
                 {
-                    IntersectWithHashSetWithSameEC(otherAsCollection);
+                    IntersectWithHashSetWithSameEC(otherAsSet);
                     return;
                 }
             }
@@ -953,9 +1025,9 @@ namespace J2N.Collections.Generic
             // will fail. So first check if other is a hashset using the same equality comparer;
             // symmetric except is a lot faster and avoids bit array allocations if we can assume
             // uniqueness
-            if (AreEqualityComparersEqual(this, other))
+            if (other is ISet<T> otherAsSet && AreEqualityComparersEqual(this, otherAsSet))
             {
-                SymmetricExceptWithUniqueHashSet(other);
+                SymmetricExceptWithUniqueHashSet(otherAsSet);
             }
             else
             {
@@ -1003,7 +1075,7 @@ namespace J2N.Collections.Generic
             ICollection<T>? otherAsCollection = other as ICollection<T>;
             // faster if other has unique elements according to this equality comparer; so check
             // that other is a hashset using the same equality comparer.
-            if (otherAsCollection != null && AreEqualityComparersEqual(this, otherAsCollection))
+            if (otherAsCollection != null && otherAsCollection is ISet<T> otherAsSet && AreEqualityComparersEqual(this, otherAsSet))
             {
                 // if this has more elements then it can't be a subset
                 if (_count > otherAsCollection.Count)
@@ -1013,7 +1085,7 @@ namespace J2N.Collections.Generic
 
                 // already checked that we're using same equality comparer. simply check that
                 // each element in this is contained in other.
-                return IsSubsetOfHashSetWithSameEC(otherAsCollection);
+                return IsSubsetOfHashSetWithSameEC(otherAsSet);
             }
             else
             {
@@ -1068,7 +1140,7 @@ namespace J2N.Collections.Generic
                     return otherAsCollection.Count > 0;
                 }
                 // faster if other is a hashset (and we're using same equality comparer)
-                if (AreEqualityComparersEqual(this, otherAsCollection))
+                if (otherAsCollection is ISet<T> otherAsSet && AreEqualityComparersEqual(this, otherAsSet))
                 {
                     if (_count >= otherAsCollection.Count)
                     {
@@ -1076,7 +1148,7 @@ namespace J2N.Collections.Generic
                     }
                     // this has strictly less than number of items in other, so the following
                     // check suffices for proper subset.
-                    return IsSubsetOfHashSetWithSameEC(otherAsCollection);
+                    return IsSubsetOfHashSetWithSameEC(otherAsSet);
                 }
             }
 
@@ -1355,13 +1427,12 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
             int numCopied = 0;
-            for (int i = 0; i < _lastIndex && numCopied < count; i++)
+            Entry[]? entries = _entries;
+            for (int i = 0; i < _count && numCopied < count; i++)
             {
-                if (_slots[i].hashCode >= 0)
-                {
-                    array[arrayIndex + numCopied] = _slots[i].value;
-                    numCopied++;
-                }
+                Debug.Assert(entries is not null);
+                array[arrayIndex + numCopied] = entries![i].Value; // [!]: asserted above
+                numCopied++;
             }
         }
 
@@ -1715,6 +1786,19 @@ namespace J2N.Collections.Generic
             }
         }
 
+        #region Nested Structure: ElementCount
+
+        /// <summary>Used for set checking operations (using enumerables) that rely on counting.</summary>
+        private struct ElementCount
+        {
+            /// <summary>The count of unique elements found in the other collection.</summary>
+            internal int uniqueCount;
+            /// <summary>The count of elements in the other collection not found in this set.</summary>
+            internal int unfoundCount;
+        }
+
+        #endregion
+
         #region Nested Structure: Entry
 
         /// <summary>Represents an element in the set.</summary>
@@ -1799,6 +1883,307 @@ namespace J2N.Collections.Generic
         }
 
         #endregion
+
+        #region Helper methods
+
+        /// <summary>
+        /// Implementation Notes:
+        /// If other is a set and is using same equality comparer, then checking subset is
+        /// faster. Simply check that each element in this is in other.
+        ///
+        /// Note: if other doesn't use same equality comparer, then Contains check is invalid,
+        /// which is why callers must take care of this.
+        ///
+        /// If callers are concerned about whether this is a proper subset, they take care of that.
+        /// </summary>
+        internal bool IsSubsetOfHashSetWithSameEC(ISet<T> other)
+        {
+            foreach (T item in this)
+            {
+                if (!other.Contains(item))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// If other is a set that uses same equality comparer, intersect is much faster
+        /// because we can use other's Contains
+        /// </summary>
+        private void IntersectWithHashSetWithSameEC(ISet<T> other)
+        {
+            Entry[]? entries = _entries;
+            int count = _count;
+            for (int i = 0; i < count; i++)
+            {
+                ref Entry entry = ref entries![i];
+                T item = entry.Value;
+                if (!other.Contains(item))
+                {
+                    Remove(item);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Iterate over other. If contained in this, mark an element in bit array corresponding to
+        /// its position in entries. If anything is unmarked (in bit array), remove it.
+        ///
+        /// This attempts to allocate on the stack, if below StackAllocThreshold.
+        /// </summary>
+        private unsafe void IntersectWithEnumerable(IEnumerable<T> other)
+        {
+            Debug.Assert(_buckets != null, "_buckets shouldn't be null; callers should check first");
+
+            // Keep track of current count; don't want to move past the end of our entries array
+            // (could happen if another thread is modifying the collection).
+            int originalCount = _count;
+            int intArrayLength = BitHelper.ToIntArrayLength(originalCount);
+
+            Span<int> span = stackalloc int[StackAllocThreshold];
+            BitHelper bitHelper = intArrayLength <= StackAllocThreshold ?
+                new BitHelper(span.Slice(0, intArrayLength), clear: true) :
+                new BitHelper(new int[intArrayLength], clear: false);
+
+            // Mark if contains: find index of in entries array and mark corresponding element in bit array.
+            foreach (T item in other)
+            {
+                int index = IndexOf(item);
+                if (index >= 0)
+                {
+                    bitHelper.MarkBit(index);
+                }
+            }
+
+            // If anything unmarked, remove it. Perf can be optimized here if BitHelper had a
+            // FindFirstUnmarked method.
+            for (int i = 0; i < originalCount; i++)
+            {
+                ref Entry entry = ref _entries![i];
+                if (!bitHelper.IsMarked(i))
+                {
+                    Remove(entry.Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// If other is a set, we can assume it doesn't have duplicate elements, so use this
+        /// technique: if can't remove, then it wasn't present in this set, so add.
+        ///
+        /// As with other methods, callers take care of ensuring that other is a set using the
+        /// same equality comparer.
+        /// </summary>
+        private void SymmetricExceptWithUniqueHashSet(ISet<T> other)
+        {
+            foreach (T item in other)
+            {
+                if (!Remove(item))
+                {
+                    Add(item);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Implementation notes:
+        ///
+        /// Used for symmetric except when other isn't a set. This is more tedious because
+        /// other may contain duplicates. Set technique could fail in these situations:
+        /// 1. Other has a duplicate that's not in this: Set technique would add then remove it.
+        /// 2. Other has a duplicate that's in this: Set technique would remove then add it back.
+        /// In general, its presence would be toggled each time it appears in other.
+        ///
+        /// This technique uses bit marking to indicate whether to add/remove the item. If already
+        /// present in collection, it will get marked for deletion. If added from other, it will
+        /// get marked as something not to remove.
+        /// </summary>
+        private unsafe void SymmetricExceptWithEnumerable(IEnumerable<T> other)
+        {
+            int originalCount = _count;
+            int intArrayLength = BitHelper.ToIntArrayLength(originalCount);
+
+            Span<int> itemsToRemoveSpan = stackalloc int[StackAllocThreshold / 2];
+            BitHelper itemsToRemove = intArrayLength <= StackAllocThreshold / 2 ?
+                new BitHelper(itemsToRemoveSpan.Slice(0, intArrayLength), clear: true) :
+                new BitHelper(new int[intArrayLength], clear: false);
+
+            Span<int> itemsAddedFromOtherSpan = stackalloc int[StackAllocThreshold / 2];
+            BitHelper itemsAddedFromOther = intArrayLength <= StackAllocThreshold / 2 ?
+                new BitHelper(itemsAddedFromOtherSpan.Slice(0, intArrayLength), clear: true) :
+                new BitHelper(new int[intArrayLength], clear: false);
+
+            foreach (T item in other)
+            {
+                if (Add(item))
+                {
+                    // wasn't already present in collection; flag it as something not to remove
+                    // *NOTE* if location is out of range, we should ignore. BitHelper will
+                    // detect that it's out of bounds and not try to mark it. But it's
+                    // expected that location could be out of bounds because adding the item
+                    // will increase _count as soon as all the free spots are filled.
+                    int location = IndexOf(item);
+                    if (location >= 0)
+                    {
+                        itemsAddedFromOther.MarkBit(location);
+                    }
+                }
+                else
+                {
+                    // already there...if not added from other, mark for remove.
+                    // *NOTE* Even though BitHelper will check that location is in range, we want
+                    // to check here. There's no point in checking items beyond originalCount
+                    // because they could not have been in the original collection
+                    int location = IndexOf(item);
+                    if (location < originalCount && !itemsAddedFromOther.IsMarked(location))
+                    {
+                        itemsToRemove.MarkBit(location);
+                    }
+                }
+            }
+
+            // if anything marked, remove it
+            for (int i = 0; i < originalCount; i++)
+            {
+                if (itemsToRemove.IsMarked(i))
+                {
+                    Remove(_entries![i].Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Determines counts that can be used to determine equality, subset, and superset. This
+        /// is only used when other is an IEnumerable and not a set. If other is a set
+        /// these properties can be checked faster without use of marking because we can assume
+        /// other has no duplicates.
+        ///
+        /// The following count checks are performed by callers:
+        /// 1. Equals: checks if unfoundCount = 0 and uniqueFoundCount = _count; i.e. everything
+        /// in other is in this and everything in this is in other
+        /// 2. Subset: checks if unfoundCount >= 0 and uniqueFoundCount = _count; i.e. other may
+        /// have elements not in this and everything in this is in other
+        /// 3. Proper subset: checks if unfoundCount > 0 and uniqueFoundCount = _count; i.e
+        /// other must have at least one element not in this and everything in this is in other
+        /// 4. Proper superset: checks if unfound count = 0 and uniqueFoundCount strictly less
+        /// than _count; i.e. everything in other was in this and this had at least one element
+        /// not contained in other.
+        ///
+        /// An earlier implementation used delegates to perform these checks rather than returning
+        /// an ElementCount struct; however this was changed due to the perf overhead of delegates.
+        /// </summary>
+        private ElementCount CheckUniqueAndUnfoundElements(IEnumerable<T> other, bool returnIfUnfound)
+        {
+            ElementCount result;
+
+            // Need special case in case this has no elements.
+            if (_count == 0)
+            {
+                int numElementsInOther = 0;
+                foreach (T item in other)
+                {
+                    numElementsInOther++;
+                    break; // break right away, all we want to know is whether other has 0 or 1 elements
+                }
+
+                result.uniqueCount = 0;
+                result.unfoundCount = numElementsInOther;
+                return result;
+            }
+
+            Debug.Assert((_buckets != null) && (_count > 0), "_buckets was null but count greater than 0");
+
+            int originalCount = _count;
+            int intArrayLength = BitHelper.ToIntArrayLength(originalCount);
+
+            Span<int> span = stackalloc int[StackAllocThreshold];
+            BitHelper bitHelper = intArrayLength <= StackAllocThreshold ?
+                new BitHelper(span.Slice(0, intArrayLength), clear: true) :
+                new BitHelper(new int[intArrayLength], clear: false);
+
+            int unfoundCount = 0; // count of items in other not found in this
+            int uniqueFoundCount = 0; // count of unique items in other found in this
+
+            foreach (T item in other)
+            {
+                int index = IndexOf(item);
+                if (index >= 0)
+                {
+                    if (!bitHelper.IsMarked(index))
+                    {
+                        // Item hasn't been seen yet.
+                        bitHelper.MarkBit(index);
+                        uniqueFoundCount++;
+                    }
+                }
+                else
+                {
+                    unfoundCount++;
+                    if (returnIfUnfound)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            result.uniqueCount = uniqueFoundCount;
+            result.unfoundCount = unfoundCount;
+            return result;
+        }
+
+        /// <summary>
+        /// Checks whether all elements of <paramref name="other"/> are contained in this set.
+        /// </summary>
+        private bool ContainsAllElements(IEnumerable<T> other)
+        {
+            foreach (T item in other)
+            {
+                if (!Contains(item))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if equality comparers are equal. This is used for algorithms that can
+        /// speed up if it knows the other item has unique elements. I.e. if they're using
+        /// different equality comparers, then uniqueness assumption between sets break.
+        /// </summary>
+        private static bool AreEqualityComparersEqual(OrderedHashSet<T> set1, IEnumerable<T> set2)
+        {
+            if (set2 is OrderedHashSet<T> orderedHashSet)
+                return set1.EqualityComparer.Equals(orderedHashSet.EqualityComparer);
+            else if (set2 is HashSet<T> hashSet)
+                return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
+            else if (set2 is ISet<T> set)
+            {
+                // For other ISet<T> implementations, try to extract comparer if possible
+                // This is a conservative check - we only return true if we can verify they match
+                return false;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if equality comparers are equal. This is used for algorithms that can
+        /// speed up if it knows the other item has unique elements. I.e. if they're using
+        /// different equality comparers, then uniqueness assumption between sets break.
+        /// </summary>
+        private static bool AreEqualityComparersEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2) =>
+            set1.EqualityComparer.Equals(set2.EqualityComparer);
+
+        /// <summary>
+        /// Checks if effective equality comparers are equal. This is used for algorithms that
+        /// require that both collections use identical hashing implementations for their entries.
+        /// </summary>
+        internal static bool EffectiveEqualityComparersAreEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2) =>
+            set1.EffectiveComparer.Equals(set2.EffectiveComparer);
+
+        #endregion Helper methods
 
         #region Structural Equality
 
