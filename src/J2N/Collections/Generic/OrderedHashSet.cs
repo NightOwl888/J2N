@@ -137,7 +137,10 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException">capacity is less than 0.</exception>
         public OrderedHashSet(int capacity, IEqualityComparer<T>? comparer)
         {
-            ThrowIfNegative(capacity);
+            if (capacity < 0)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            }
 
             if (capacity > 0)
             {
@@ -847,7 +850,10 @@ namespace J2N.Collections.Generic
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is negative.</exception>
         public int EnsureCapacity(int capacity)
         {
-            ThrowIfNegative(capacity);
+            if (capacity < 0)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(capacity, ExceptionArgument.capacity);
+            }
 
             if (Capacity < capacity)
             {
@@ -1890,7 +1896,17 @@ namespace J2N.Collections.Generic
 
             /// <inheritdoc/>
             [AllowNull]
-            readonly object IEnumerator.Current => Current!; // [!]: allow null values
+            readonly object IEnumerator.Current
+            {
+                get
+                {
+                    if (_index == 0 || _index == _set._count + 1)
+                    {
+                        ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
+                    }
+                    return Current!; // [!]: allow null values
+                }
+            }
 
             /// <inheritdoc/>
             public bool MoveNext()
@@ -1911,6 +1927,7 @@ namespace J2N.Collections.Generic
                     return true;
                 }
 
+                _index = set._count + 1;
                 Current = default;
                 return false;
             }
