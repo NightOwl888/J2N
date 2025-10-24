@@ -23,14 +23,9 @@ using static J2N.Collections.StaticThrowHelper;
 namespace J2N.Collections.Generic
 {
     /// <summary>
-    /// Represents a collection of key/value pairs that are sorted based on insertion order.
-    /// <see cref="OrderedDictionary{TKey, TValue}"/> adds the following features to <c>System.Collections.Generic.OrderedDictionary&lt;TKey, TValue&gt;</c>
-    /// (in addition to making it available on older platforms):
+    /// Represents a collection of unique elements that are sorted based on insertion order.
+    /// <see cref="OrderedHashSet{T}"/> adds the following features to <c>System.Collections.Generic.HashSet&lt;T&gt;</c>
     /// <list type="bullet">
-    ///     <item><description>
-    ///         If <typeparamref name="TKey"/> is <see cref="Nullable{T}"/> or a reference type, the key can be
-    ///         <c>null</c> without throwing an exception.
-    ///     </description></item>
     ///     <item><description>
     ///         Overrides the <see cref="Equals(object)"/> and <see cref="GetHashCode()"/> methods to compare collections
     ///         using structural equality by default. Also, <see cref="IStructuralEquatable"/> is implemented so the
@@ -47,18 +42,16 @@ namespace J2N.Collections.Generic
     ///     </description></item>
     /// </list>
     /// <para/>
-    /// Usage Note: This class is designed to be a direct replacement for Java's LinkedHashMap, except that
-    /// it doesn't contain a constructor overload with an order parameter to turn it into an LRU cache.
+    /// Usage Note: This class is designed to be a direct replacement for Java's LinkedHashSet.
     /// <para/>
     /// Note that the <see cref="ToString()"/> method uses the current culture by default to behave like other
     /// components in .NET. To exactly match Java's culture-neutral behavior,
     /// call <c>ToString(StringFormatter.InvariantCulture)</c>.
     /// </summary>
-    /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
-    /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+    /// <typeparam name="T">The type of the elements in the set.</typeparam>
     /// <remarks>
     /// Operations on the collection have algorithmic complexities that are similar to that of the <see cref="List{T}"/>
-    /// class, except with lookups by key similar in complexity to that of <see cref="Dictionary{TKey, TValue}"/>.
+    /// class, except with element lookups similar in complexity to that of <see cref="HashSet{T}"/>.
     /// </remarks>
     [DebuggerTypeProxy(typeof(IDictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
@@ -830,8 +823,8 @@ namespace J2N.Collections.Generic
             for (int i = _count - 1; i >= 0; i--)
             {
                 // Cache value in case delegate removes it
-                T value = _entries![i].Value;
-                if (match(value))
+                T? value = _entries![i].Value;
+                if (match(value!))
                 {
                     // Check again that remove actually removed it
                     if (Remove(value))
@@ -1486,7 +1479,7 @@ namespace J2N.Collections.Generic
             for (int i = 0; i < _count && numCopied < count; i++)
             {
                 Debug.Assert(entries is not null);
-                array[arrayIndex + numCopied] = entries![i].Value; // [!]: asserted above
+                array[arrayIndex + numCopied] = entries![i].Value!; // 1st [!]: asserted above, 2nd [!]: allow null values
                 numCopied++;
             }
         }
@@ -1773,7 +1766,7 @@ namespace J2N.Collections.Generic
             {
                 try
                 {
-                    object[]? objects = array as object[];
+                    object?[]? objects = array as object?[];
                     if (objects is null)
                     {
                         ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
@@ -1852,7 +1845,7 @@ namespace J2N.Collections.Generic
             internal int unfoundCount;
         }
 
-        #endregion
+        #endregion Nested Structure: ElementCount
 
         #region Nested Structure: Entry
 
@@ -1868,7 +1861,7 @@ namespace J2N.Collections.Generic
             public T Value;
         }
 
-        #endregion
+        #endregion Nested Structure: Entry
 
         #region Nested Structure: Enumerator
 
@@ -1948,7 +1941,7 @@ namespace J2N.Collections.Generic
             readonly void IDisposable.Dispose() { }
         }
 
-        #endregion
+        #endregion Nested Structure: Enumerator
 
         #region Helper methods
 
