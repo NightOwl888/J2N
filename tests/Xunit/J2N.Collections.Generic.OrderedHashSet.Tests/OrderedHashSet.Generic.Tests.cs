@@ -23,6 +23,7 @@ namespace J2N.Collections.Tests
         protected override bool ResetImplemented => true;
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
+        protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
 
         protected override SCG.ISet<T> GenericISetFactory()
         {
