@@ -252,5 +252,208 @@ namespace J2N.Collections.Tests
         }
 
         #endregion
+
+        #region Float and Double NaN and Signed Zero Tests
+
+        // These tests ensure that float and double IndexOf/LastIndexOf methods match Java's behavior
+        // regarding NaN and signed zero comparisons.
+
+        /// <summary>
+        /// Tests IndexOf with float NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_FloatNaN()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)float.NaN, (T)(object)3.0f };
+
+            // NaN should be found at index 1
+            Assert.Equal(1, list.IndexOf(float.NaN));
+            Assert.Equal(1, list.IndexOf(float.NaN, 0));
+            Assert.Equal(1, list.IndexOf(float.NaN, 0, 3));
+
+            // NaN at different positions
+            var list2 = new List<float> { float.NaN, 1.0f, float.NaN, 3.0f, float.NaN };
+            Assert.Equal(0, list2.IndexOf(float.NaN));
+            Assert.Equal(2, list2.IndexOf(float.NaN, 1));
+            Assert.Equal(2, list2.IndexOf(float.NaN, 2, 3));
+        }
+
+        /// <summary>
+        /// Tests IndexOf with double NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_DoubleNaN()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)double.NaN, (T)(object)3.0d };
+
+            // NaN should be found at index 1
+            Assert.Equal(1, list.IndexOf(double.NaN));
+            Assert.Equal(1, list.IndexOf(double.NaN, 0));
+            Assert.Equal(1, list.IndexOf(double.NaN, 0, 3));
+
+            // NaN at different positions
+            var list2 = new List<double> { double.NaN, 1.0d, double.NaN, 3.0d, double.NaN };
+            Assert.Equal(0, list2.IndexOf(double.NaN));
+            Assert.Equal(2, list2.IndexOf(double.NaN, 1));
+            Assert.Equal(2, list2.IndexOf(double.NaN, 2, 3));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with float NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_FloatNaN()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)float.NaN, (T)(object)3.0f };
+
+            // NaN should be found at index 1
+            Assert.Equal(1, list.LastIndexOf(float.NaN));
+            Assert.Equal(1, list.LastIndexOf(float.NaN, 2));
+            Assert.Equal(1, list.LastIndexOf(float.NaN, 2, 3));
+
+            // NaN at different positions
+            var list2 = new List<float> { float.NaN, 1.0f, float.NaN, 3.0f, float.NaN };
+            Assert.Equal(4, list2.LastIndexOf(float.NaN));
+            Assert.Equal(2, list2.LastIndexOf(float.NaN, 2));
+            Assert.Equal(0, list2.LastIndexOf(float.NaN, 1, 2));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with double NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_DoubleNaN()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)double.NaN, (T)(object)3.0d };
+
+            // NaN should be found at index 1
+            Assert.Equal(1, list.LastIndexOf(double.NaN));
+            Assert.Equal(1, list.LastIndexOf(double.NaN, 2));
+            Assert.Equal(1, list.LastIndexOf(double.NaN, 2, 3));
+
+            // NaN at different positions
+            var list2 = new List<double> { double.NaN, 1.0d, double.NaN, 3.0d, double.NaN };
+            Assert.Equal(4, list2.LastIndexOf(double.NaN));
+            Assert.Equal(2, list2.LastIndexOf(double.NaN, 2));
+            Assert.Equal(0, list2.LastIndexOf(double.NaN, 1, 2));
+        }
+
+        /// <summary>
+        /// Tests IndexOf with float signed zero. In Java/J2N, +0.0f != -0.0f, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_FloatSignedZero()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            float positiveZero = 0.0f;
+            float negativeZero = -0.0f;
+
+            List<float> list = (List<float>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0f,
+                (T)(object)negativeZero,
+                (T)(object)3.0f
+            };
+
+            // +0.0f should be found at index 0, not at index 2
+            Assert.Equal(0, list.IndexOf(positiveZero));
+            Assert.Equal(2, list.IndexOf(negativeZero));
+        }
+
+        /// <summary>
+        /// Tests IndexOf with double signed zero. In Java/J2N, +0.0d != -0.0d, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_DoubleSignedZero()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            double positiveZero = 0.0d;
+            double negativeZero = -0.0d;
+
+            List<double> list = (List<double>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0d,
+                (T)(object)negativeZero,
+                (T)(object)3.0d
+            };
+
+            // +0.0d should be found at index 0, not at index 2
+            Assert.Equal(0, list.IndexOf(positiveZero));
+            Assert.Equal(2, list.IndexOf(negativeZero));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with float signed zero. In Java/J2N, +0.0f != -0.0f, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_FloatSignedZero()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            float positiveZero = 0.0f;
+            float negativeZero = -0.0f;
+
+            List<float> list = (List<float>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0f,
+                (T)(object)negativeZero,
+                (T)(object)positiveZero,
+                (T)(object)3.0f
+            };
+
+            // Searching for +0.0f should return the last occurrence at index 3
+            // Searching for -0.0f should return the occurrence at index 2
+            Assert.Equal(3, list.LastIndexOf(positiveZero));
+            Assert.Equal(2, list.LastIndexOf(negativeZero));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with double signed zero. In Java/J2N, +0.0d != -0.0d, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_DoubleSignedZero()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            double positiveZero = 0.0d;
+            double negativeZero = -0.0d;
+
+            List<double> list = (List<double>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0d,
+                (T)(object)negativeZero,
+                (T)(object)positiveZero,
+                (T)(object)3.0d
+            };
+
+            // Searching for +0.0d should return the last occurrence at index 3
+            // Searching for -0.0d should return the occurrence at index 2
+            Assert.Equal(3, list.LastIndexOf(positiveZero));
+            Assert.Equal(2, list.LastIndexOf(negativeZero));
+        }
+
+        #endregion
     }
 }

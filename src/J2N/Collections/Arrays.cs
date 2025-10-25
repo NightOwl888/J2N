@@ -21,6 +21,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using JCG = J2N.Collections.Generic;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections
 {
@@ -32,7 +34,7 @@ namespace J2N.Collections
     // J2N: This class currently only exists as a proxy for testing
     // behaviors of equality comparers and to serve as examples until
     // documentation can be written.
-    // 
+    //
     // We should probably make any remaining Arrays functionality into
     // extension methods of single-dimensional arrays (in ArrayExtensions).
     internal static class Arrays
@@ -390,5 +392,224 @@ namespace J2N.Collections
             public static readonly T[] Empty = new T[0];
         }
 #endif
+
+        /// <summary>
+        /// Searches for the specified object in the array and returns the index of the first occurrence.
+        /// </summary>
+        /// <remarks>
+        /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
+        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// </remarks>
+        /// <typeparam name="T">The type of the array element.</typeparam>
+        /// <param name="array">The array to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <returns>The zero-based index of the first occurrence of <paramref name="value"/>, if found; otherwise, -1.</returns>
+        public static int IndexOf<T>(T[] array, T value)
+        {
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            return IndexOf(array, value, 0, array.Length);
+        }
+
+        /// <summary>
+        /// Searches for the specified object in the array, starting from the specified index, and returns the index of the first occurrence.
+        /// </summary>
+        /// <remarks>
+        /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
+        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// </remarks>
+        /// <typeparam name="T">The type of the array element.</typeparam>
+        /// <param name="array">The array to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <param name="startIndex">The zero-based starting index of the search.</param>
+        /// <returns>The zero-based index of the first occurrence of <paramref name="value"/>, if found; otherwise, -1.</returns>
+        public static int IndexOf<T>(T[] array, T value, int startIndex)
+        {
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            if ((uint)startIndex > (uint)array.Length)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex);
+            return IndexOf(array, value, startIndex, array.Length - startIndex);
+        }
+
+        /// <summary>
+        /// Searches for the specified object in the array, starting from the specified index and searching up to the specified count,
+        /// and returns the index of the first occurrence.
+        /// </summary>
+        /// <remarks>
+        /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
+        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// </remarks>
+        /// <typeparam name="T">The type of the array element.</typeparam>
+        /// <param name="array">The array to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <param name="startIndex">The zero-based starting index of the search.</param>
+        /// <param name="count">The number of elements in the section to search.</param>
+        /// <returns>The zero-based index of the first occurrence of <paramref name="value"/>, if found; otherwise, -1.</returns>
+        public static int IndexOf<T>(T[] array, T value, int startIndex, int count)
+        {
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            if ((uint)startIndex > (uint)array.Length)
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(startIndex);
+            if (count < 0 || startIndex > array.Length - count)
+                ThrowHelper.ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count(count);
+
+            // Special handling for float and double types to match Java's behavior
+            if (typeof(T) == typeof(float))
+            {
+                float floatValue = Unsafe.As<T, float>(ref value);
+                float[] floatArray = Unsafe.As<T[], float[]>(ref array);
+                return IndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float>.Default);
+            }
+            else if (typeof(T) == typeof(double))
+            {
+                double doubleValue = Unsafe.As<T, double>(ref value);
+                double[] doubleArray = Unsafe.As<T[], double[]>(ref array);
+                return IndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double>.Default);
+            }
+            else if (typeof(T) == typeof(float?))
+            {
+                float? floatValue = Unsafe.As<T, float?>(ref value);
+                float?[] floatArray = Unsafe.As<T[], float?[]>(ref array);
+                return IndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float?>.Default);
+            }
+            else if (typeof(T) == typeof(double?))
+            {
+                double? doubleValue = Unsafe.As<T, double?>(ref value);
+                double?[] doubleArray = Unsafe.As<T[], double?[]>(ref array);
+                return IndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double?>.Default);
+            }
+
+            // For all other types, delegate to Array.IndexOf
+            return Array.IndexOf(array, value, startIndex, count);
+        }
+
+        /// <summary>
+        /// Helper method to search for a floating-point value in an array using a custom equality comparer.
+        /// </summary>
+        private static int IndexOfFloatingPoint<TValue>(TValue[] array, TValue value, int startIndex, int count,
+            SCG.IEqualityComparer<TValue> comparer)
+        {
+            for (int i = startIndex; i < startIndex + count; i++)
+            {
+                if (comparer.Equals(array[i], value))
+                    return i;
+            }
+            return -1;
+        }
+
+        /// <summary>
+        /// Searches for the specified object in the array and returns the index of the last occurrence.
+        /// </summary>
+        /// <remarks>
+        /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
+        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// </remarks>
+        /// <typeparam name="T">The type of the array element.</typeparam>
+        /// <param name="array">The array to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <returns>The zero-based index of the last occurrence of <paramref name="value"/>, if found; otherwise, -1.</returns>
+        public static int LastIndexOf<T>(T[] array, T value)
+        {
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            if (array.Length == 0)
+                return -1;
+            return LastIndexOf(array, value, array.Length - 1, array.Length);
+        }
+
+        /// <summary>
+        /// Searches for the specified object in the array, starting from the specified index and searching backward,
+        /// and returns the index of the last occurrence.
+        /// </summary>
+        /// <remarks>
+        /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
+        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// </remarks>
+        /// <typeparam name="T">The type of the array element.</typeparam>
+        /// <param name="array">The array to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <param name="startIndex">The zero-based index where the backward search starts.</param>
+        /// <returns>The zero-based index of the last occurrence of <paramref name="value"/>, if found; otherwise, -1.</returns>
+        public static int LastIndexOf<T>(T[] array, T value, int startIndex)
+        {
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            if (array.Length == 0)
+                return -1;
+            if (startIndex < 0 || startIndex >= array.Length)
+                ThrowHelper.ThrowArgumentOutOfRangeException(startIndex, ExceptionArgument.startIndex, ExceptionResource.ArgumentOutOfRange_IndexMustBeLess);
+            return LastIndexOf(array, value, startIndex, startIndex + 1);
+        }
+
+        /// <summary>
+        /// Searches for the specified object in the array, starting from the specified index and searching backward up to the specified count,
+        /// and returns the index of the last occurrence.
+        /// </summary>
+        /// <remarks>
+        /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
+        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// </remarks>
+        /// <typeparam name="T">The type of the array element.</typeparam>
+        /// <param name="array">The array to search.</param>
+        /// <param name="value">The value to search for.</param>
+        /// <param name="startIndex">The zero-based index where the backward search starts.</param>
+        /// <param name="count">The number of elements to search.</param>
+        /// <returns>The zero-based index of the last occurrence of <paramref name="value"/>, if found; otherwise, -1.</returns>
+        public static int LastIndexOf<T>(T[] array, T value, int startIndex, int count)
+        {
+            if (array is null)
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
+            if (array.Length == 0)
+                return -1;
+            if (startIndex < 0 || startIndex >= array.Length)
+                ThrowHelper.ThrowArgumentOutOfRangeException(startIndex, ExceptionArgument.startIndex, ExceptionResource.ArgumentOutOfRange_IndexMustBeLess);
+            if (count < 0 || startIndex - count + 1 < 0)
+                ThrowHelper.ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count(count);
+
+            // Special handling for float and double types to match Java's behavior
+            if (typeof(T) == typeof(float))
+            {
+                float floatValue = Unsafe.As<T, float>(ref value);
+                float[] floatArray = Unsafe.As<T[], float[]>(ref array);
+                return LastIndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float>.Default);
+            }
+            else if (typeof(T) == typeof(double))
+            {
+                double doubleValue = Unsafe.As<T, double>(ref value);
+                double[] doubleArray = Unsafe.As<T[], double[]>(ref array);
+                return LastIndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double>.Default);
+            }
+            else if (typeof(T) == typeof(float?))
+            {
+                float? floatValue = Unsafe.As<T, float?>(ref value);
+                float?[] floatArray = Unsafe.As<T[], float?[]>(ref array);
+                return LastIndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float?>.Default);
+            }
+            else if (typeof(T) == typeof(double?))
+            {
+                double? doubleValue = Unsafe.As<T, double?>(ref value);
+                double?[] doubleArray = Unsafe.As<T[], double?[]>(ref array);
+                return LastIndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double?>.Default);
+            }
+
+            // For all other types, delegate to Array.LastIndexOf
+            return Array.LastIndexOf(array, value, startIndex, count);
+        }
+
+        /// <summary>
+        /// Helper method to search backward for a floating-point value in an array using a custom equality comparer.
+        /// </summary>
+        private static int LastIndexOfFloatingPoint<TValue>(TValue[] array, TValue value, int startIndex, int count,
+            SCG.IEqualityComparer<TValue> comparer)
+        {
+            for (int i = startIndex; i >= startIndex - count + 1; i--)
+            {
+                if (comparer.Equals(array[i], value))
+                    return i;
+            }
+            return -1;
+        }
     }
 }
