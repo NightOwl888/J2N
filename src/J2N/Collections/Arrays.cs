@@ -398,7 +398,10 @@ namespace J2N.Collections
         /// </summary>
         /// <remarks>
         /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
-        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// to match the behavior of <c>java.util.Float</c> and <c>java.util.Double</c> in collections.
+        /// Specifically, NaN values are treated as equal to each other, and positive/negative zero are treated as distinct.
+        /// This is necessary because Java requires primitives to be wrapped in reference types when used in collections,
+        /// and those wrapper types have different comparison semantics than .NET's default behavior.
         /// </remarks>
         /// <typeparam name="T">The type of the array element.</typeparam>
         /// <param name="array">The array to search.</param>
@@ -416,7 +419,10 @@ namespace J2N.Collections
         /// </summary>
         /// <remarks>
         /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
-        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// to match the behavior of <c>java.util.Float</c> and <c>java.util.Double</c> in collections.
+        /// Specifically, NaN values are treated as equal to each other, and positive/negative zero are treated as distinct.
+        /// This is necessary because Java requires primitives to be wrapped in reference types when used in collections,
+        /// and those wrapper types have different comparison semantics than .NET's default behavior.
         /// </remarks>
         /// <typeparam name="T">The type of the array element.</typeparam>
         /// <param name="array">The array to search.</param>
@@ -438,7 +444,10 @@ namespace J2N.Collections
         /// </summary>
         /// <remarks>
         /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
-        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// to match the behavior of <c>java.util.Float</c> and <c>java.util.Double</c> in collections.
+        /// Specifically, NaN values are treated as equal to each other, and positive/negative zero are treated as distinct.
+        /// This is necessary because Java requires primitives to be wrapped in reference types when used in collections,
+        /// and those wrapper types have different comparison semantics than .NET's default behavior.
         /// </remarks>
         /// <typeparam name="T">The type of the array element.</typeparam>
         /// <param name="array">The array to search.</param>
@@ -456,29 +465,12 @@ namespace J2N.Collections
                 ThrowHelper.ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count(count);
 
             // Special handling for float and double types to match Java's behavior
-            if (typeof(T) == typeof(float))
+            if (typeof(T) == typeof(float)
+                || typeof(T) == typeof(double)
+                || typeof(T) == typeof(float?)
+                || typeof(T) == typeof(double?))
             {
-                float floatValue = Unsafe.As<T, float>(ref value);
-                float[] floatArray = Unsafe.As<T[], float[]>(ref array);
-                return IndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float>.Default);
-            }
-            else if (typeof(T) == typeof(double))
-            {
-                double doubleValue = Unsafe.As<T, double>(ref value);
-                double[] doubleArray = Unsafe.As<T[], double[]>(ref array);
-                return IndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double>.Default);
-            }
-            else if (typeof(T) == typeof(float?))
-            {
-                float? floatValue = Unsafe.As<T, float?>(ref value);
-                float?[] floatArray = Unsafe.As<T[], float?[]>(ref array);
-                return IndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float?>.Default);
-            }
-            else if (typeof(T) == typeof(double?))
-            {
-                double? doubleValue = Unsafe.As<T, double?>(ref value);
-                double?[] doubleArray = Unsafe.As<T[], double?[]>(ref array);
-                return IndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double?>.Default);
+                return IndexOfFloatingPoint(array, value, startIndex, count, JCG.EqualityComparer<T>.Default);
             }
 
             // For all other types, delegate to Array.IndexOf
@@ -500,11 +492,15 @@ namespace J2N.Collections
         }
 
         /// <summary>
-        /// Searches for the specified object in the array and returns the index of the last occurrence.
+        /// Searches for the specified object in the array, searching backward from the end,
+        /// and returns the index of the last occurrence.
         /// </summary>
         /// <remarks>
         /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
-        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// to match the behavior of <c>java.util.Float</c> and <c>java.util.Double</c> in collections.
+        /// Specifically, NaN values are treated as equal to each other, and positive/negative zero are treated as distinct.
+        /// This is necessary because Java requires primitives to be wrapped in reference types when used in collections,
+        /// and those wrapper types have different comparison semantics than .NET's default behavior.
         /// </remarks>
         /// <typeparam name="T">The type of the array element.</typeparam>
         /// <param name="array">The array to search.</param>
@@ -525,7 +521,10 @@ namespace J2N.Collections
         /// </summary>
         /// <remarks>
         /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
-        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// to match the behavior of <c>java.util.Float</c> and <c>java.util.Double</c> in collections.
+        /// Specifically, NaN values are treated as equal to each other, and positive/negative zero are treated as distinct.
+        /// This is necessary because Java requires primitives to be wrapped in reference types when used in collections,
+        /// and those wrapper types have different comparison semantics than .NET's default behavior.
         /// </remarks>
         /// <typeparam name="T">The type of the array element.</typeparam>
         /// <param name="array">The array to search.</param>
@@ -549,7 +548,10 @@ namespace J2N.Collections
         /// </summary>
         /// <remarks>
         /// This method applies special-case handling for floating-point types (float, double, and their nullable variants)
-        /// to match Java's behavior with respect to NaN and signed zero comparisons.
+        /// to match the behavior of <c>java.util.Float</c> and <c>java.util.Double</c> in collections.
+        /// Specifically, NaN values are treated as equal to each other, and positive/negative zero are treated as distinct.
+        /// This is necessary because Java requires primitives to be wrapped in reference types when used in collections,
+        /// and those wrapper types have different comparison semantics than .NET's default behavior.
         /// </remarks>
         /// <typeparam name="T">The type of the array element.</typeparam>
         /// <param name="array">The array to search.</param>
@@ -569,29 +571,12 @@ namespace J2N.Collections
                 ThrowHelper.ThrowCountArgumentOutOfRange_ArgumentOutOfRange_Count(count);
 
             // Special handling for float and double types to match Java's behavior
-            if (typeof(T) == typeof(float))
+            if (typeof(T) == typeof(float)
+                || typeof(T) == typeof(double)
+                || typeof(T) == typeof(float?)
+                || typeof(T) == typeof(double?))
             {
-                float floatValue = Unsafe.As<T, float>(ref value);
-                float[] floatArray = Unsafe.As<T[], float[]>(ref array);
-                return LastIndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float>.Default);
-            }
-            else if (typeof(T) == typeof(double))
-            {
-                double doubleValue = Unsafe.As<T, double>(ref value);
-                double[] doubleArray = Unsafe.As<T[], double[]>(ref array);
-                return LastIndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double>.Default);
-            }
-            else if (typeof(T) == typeof(float?))
-            {
-                float? floatValue = Unsafe.As<T, float?>(ref value);
-                float?[] floatArray = Unsafe.As<T[], float?[]>(ref array);
-                return LastIndexOfFloatingPoint(floatArray, floatValue, startIndex, count, JCG.EqualityComparer<float?>.Default);
-            }
-            else if (typeof(T) == typeof(double?))
-            {
-                double? doubleValue = Unsafe.As<T, double?>(ref value);
-                double?[] doubleArray = Unsafe.As<T[], double?[]>(ref array);
-                return LastIndexOfFloatingPoint(doubleArray, doubleValue, startIndex, count, JCG.EqualityComparer<double?>.Default);
+                return LastIndexOfFloatingPoint<T>(array, value, startIndex, count, JCG.EqualityComparer<T>.Default);
             }
 
             // For all other types, delegate to Array.LastIndexOf

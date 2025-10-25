@@ -267,18 +267,39 @@ namespace J2N.Collections.Tests
             if (typeof(T) != typeof(float))
                 return;
 
-            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)float.NaN, (T)(object)3.0f };
+            // Test with different NaN bit patterns
+            float nanDefault = float.NaN; // 0x7FC00000
+            float nanVariant1 = BitConverter.Int32BitsToSingle(0x7FC00001);
+            float nanVariant2 = BitConverter.Int32BitsToSingle(0xFFC00001);
 
-            // NaN should be found at index 1
-            Assert.Equal(1, list.IndexOf(float.NaN));
-            Assert.Equal(1, list.IndexOf(float.NaN, 0));
-            Assert.Equal(1, list.IndexOf(float.NaN, 0, 3));
+            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)nanDefault, (T)(object)3.0f };
 
-            // NaN at different positions
-            var list2 = new List<float> { float.NaN, 1.0f, float.NaN, 3.0f, float.NaN };
-            Assert.Equal(0, list2.IndexOf(float.NaN));
-            Assert.Equal(2, list2.IndexOf(float.NaN, 1));
-            Assert.Equal(2, list2.IndexOf(float.NaN, 2, 3));
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.IndexOf(nanDefault));
+            Assert.Equal(1, list.IndexOf(nanVariant1));
+            Assert.Equal(1, list.IndexOf(nanVariant2));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<float> { nanVariant1, 1.0f, nanDefault, 3.0f, nanVariant2 };
+            Assert.Equal(0, list2.IndexOf(nanDefault));
+            Assert.Equal(0, list2.IndexOf(nanVariant1));
+            Assert.Equal(0, list2.IndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 1));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 2, 3));
         }
 
         /// <summary>
@@ -290,18 +311,39 @@ namespace J2N.Collections.Tests
             if (typeof(T) != typeof(double))
                 return;
 
-            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)double.NaN, (T)(object)3.0d };
+            // Test with different NaN bit patterns
+            double nanDefault = double.NaN; // 0x7FF8000000000000
+            double nanVariant1 = BitConverter.Int64BitsToDouble(0x7FF8000000000001);
+            double nanVariant2 = BitConverter.Int64BitsToDouble(0xFFF8000000000001);
 
-            // NaN should be found at index 1
-            Assert.Equal(1, list.IndexOf(double.NaN));
-            Assert.Equal(1, list.IndexOf(double.NaN, 0));
-            Assert.Equal(1, list.IndexOf(double.NaN, 0, 3));
+            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)nanDefault, (T)(object)3.0d };
 
-            // NaN at different positions
-            var list2 = new List<double> { double.NaN, 1.0d, double.NaN, 3.0d, double.NaN };
-            Assert.Equal(0, list2.IndexOf(double.NaN));
-            Assert.Equal(2, list2.IndexOf(double.NaN, 1));
-            Assert.Equal(2, list2.IndexOf(double.NaN, 2, 3));
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.IndexOf(nanDefault));
+            Assert.Equal(1, list.IndexOf(nanVariant1));
+            Assert.Equal(1, list.IndexOf(nanVariant2));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<double> { nanVariant1, 1.0d, nanDefault, 3.0d, nanVariant2 };
+            Assert.Equal(0, list2.IndexOf(nanDefault));
+            Assert.Equal(0, list2.IndexOf(nanVariant1));
+            Assert.Equal(0, list2.IndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 1));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 2, 3));
         }
 
         /// <summary>
@@ -313,18 +355,39 @@ namespace J2N.Collections.Tests
             if (typeof(T) != typeof(float))
                 return;
 
-            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)float.NaN, (T)(object)3.0f };
+            // Test with different NaN bit patterns
+            float nanDefault = float.NaN; // 0x7FC00000
+            float nanVariant1 = BitConverter.Int32BitsToSingle(0x7FC00001);
+            float nanVariant2 = BitConverter.Int32BitsToSingle(0xFFC00001);
 
-            // NaN should be found at index 1
-            Assert.Equal(1, list.LastIndexOf(float.NaN));
-            Assert.Equal(1, list.LastIndexOf(float.NaN, 2));
-            Assert.Equal(1, list.LastIndexOf(float.NaN, 2, 3));
+            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)nanDefault, (T)(object)3.0f };
 
-            // NaN at different positions
-            var list2 = new List<float> { float.NaN, 1.0f, float.NaN, 3.0f, float.NaN };
-            Assert.Equal(4, list2.LastIndexOf(float.NaN));
-            Assert.Equal(2, list2.LastIndexOf(float.NaN, 2));
-            Assert.Equal(0, list2.LastIndexOf(float.NaN, 1, 2));
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.LastIndexOf(nanDefault));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<float> { nanVariant1, 1.0f, nanDefault, 3.0f, nanVariant2 };
+            Assert.Equal(4, list2.LastIndexOf(nanDefault));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant1));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.LastIndexOf(nanDefault, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(0, list2.LastIndexOf(nanDefault, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant1, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant2, 1, 2));
         }
 
         /// <summary>
@@ -336,18 +399,39 @@ namespace J2N.Collections.Tests
             if (typeof(T) != typeof(double))
                 return;
 
-            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)double.NaN, (T)(object)3.0d };
+            // Test with different NaN bit patterns
+            double nanDefault = double.NaN; // 0x7FF8000000000000
+            double nanVariant1 = BitConverter.Int64BitsToDouble(0x7FF8000000000001);
+            double nanVariant2 = BitConverter.Int64BitsToDouble(0xFFF8000000000001);
 
-            // NaN should be found at index 1
-            Assert.Equal(1, list.LastIndexOf(double.NaN));
-            Assert.Equal(1, list.LastIndexOf(double.NaN, 2));
-            Assert.Equal(1, list.LastIndexOf(double.NaN, 2, 3));
+            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)nanDefault, (T)(object)3.0d };
 
-            // NaN at different positions
-            var list2 = new List<double> { double.NaN, 1.0d, double.NaN, 3.0d, double.NaN };
-            Assert.Equal(4, list2.LastIndexOf(double.NaN));
-            Assert.Equal(2, list2.LastIndexOf(double.NaN, 2));
-            Assert.Equal(0, list2.LastIndexOf(double.NaN, 1, 2));
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.LastIndexOf(nanDefault));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<double> { nanVariant1, 1.0d, nanDefault, 3.0d, nanVariant2 };
+            Assert.Equal(4, list2.LastIndexOf(nanDefault));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant1));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.LastIndexOf(nanDefault, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(0, list2.LastIndexOf(nanDefault, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant1, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant2, 1, 2));
         }
 
         /// <summary>
