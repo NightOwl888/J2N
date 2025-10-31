@@ -269,8 +269,8 @@ namespace J2N.Collections.Tests
 
             // Test with different NaN bit patterns
             float nanDefault = float.NaN; // 0x7FC00000
-            float nanVariant1 = BitConverter.Int32BitsToSingle(0x7FC00001);
-            float nanVariant2 = BitConverter.Int32BitsToSingle(0xFFC00001);
+            float nanVariant1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+            float nanVariant2 = BitConversion.Int32BitsToSingle(unchecked((int)0xFFC00001));
 
             List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)nanDefault, (T)(object)3.0f };
 
@@ -313,8 +313,8 @@ namespace J2N.Collections.Tests
 
             // Test with different NaN bit patterns
             double nanDefault = double.NaN; // 0x7FF8000000000000
-            double nanVariant1 = BitConverter.Int64BitsToDouble(0x7FF8000000000001);
-            double nanVariant2 = BitConverter.Int64BitsToDouble(0xFFF8000000000001);
+            double nanVariant1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001);
+            double nanVariant2 = BitConversion.Int64BitsToDouble(unchecked((long)0xFFF8000000000001));
 
             List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)nanDefault, (T)(object)3.0d };
 
@@ -357,8 +357,8 @@ namespace J2N.Collections.Tests
 
             // Test with different NaN bit patterns
             float nanDefault = float.NaN; // 0x7FC00000
-            float nanVariant1 = BitConverter.Int32BitsToSingle(0x7FC00001);
-            float nanVariant2 = BitConverter.Int32BitsToSingle(0xFFC00001);
+            float nanVariant1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+            float nanVariant2 = BitConversion.Int32BitsToSingle(unchecked((int)0xFFC00001));
 
             List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)nanDefault, (T)(object)3.0f };
 
@@ -401,8 +401,8 @@ namespace J2N.Collections.Tests
 
             // Test with different NaN bit patterns
             double nanDefault = double.NaN; // 0x7FF8000000000000
-            double nanVariant1 = BitConverter.Int64BitsToDouble(0x7FF8000000000001);
-            double nanVariant2 = BitConverter.Int64BitsToDouble(0xFFF8000000000001);
+            double nanVariant1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001);
+            double nanVariant2 = BitConversion.Int64BitsToDouble(unchecked((long)0xFFF8000000000001));
 
             List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)nanDefault, (T)(object)3.0d };
 
