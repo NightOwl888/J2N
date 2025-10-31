@@ -990,7 +990,7 @@ namespace J2N.Collections.Concurrent
             set
             {
                 var info = new AddInfo<TKey, TValue> { Value = value, CanUpdate = true };
-                Insert(key, ref info);
+                Insert(key, in info);
             }
         }
 
@@ -1003,7 +1003,7 @@ namespace J2N.Collections.Concurrent
         /// </returns>
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         {
@@ -1021,7 +1021,7 @@ namespace J2N.Collections.Concurrent
         public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
             var info = new AddInfo<TKey, TValue> { Value = value! };
-            if (InsertResult.Inserted != Insert(key, ref info))
+            if (InsertResult.Inserted != Insert(key, in info))
                 ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(key);
         }
 
@@ -1053,7 +1053,7 @@ namespace J2N.Collections.Concurrent
         public TValue GetOrAdd(TKey key, TValue value)
         {
             var info = new AddInfo<TKey, TValue> { Value = value, CanUpdate = false };
-            if (InsertResult.Exists == Insert(key, ref info))
+            if (InsertResult.Exists == Insert(key, in info))
                 return info.Value;
             return value;
         }
@@ -1067,7 +1067,7 @@ namespace J2N.Collections.Concurrent
         public bool TryAdd(TKey key, TValue value)
         {
             var info = new AddInfo<TKey, TValue> { Value = value, CanUpdate = false };
-            return InsertResult.Inserted == Insert(key, ref info);
+            return InsertResult.Inserted == Insert(key, in info);
         }
 
         /// <summary>
@@ -1079,7 +1079,7 @@ namespace J2N.Collections.Concurrent
         public bool TryUpdate(TKey key, TValue value)
         {
             var info = new UpdateInfo<TKey, TValue> { Value = value };
-            return InsertResult.Updated == Insert(key, ref info);
+            return InsertResult.Updated == Insert(key, in info);
         }
 
         /// <summary>
@@ -1092,7 +1092,7 @@ namespace J2N.Collections.Concurrent
         public bool TryUpdate(TKey key, TValue value, TValue comparisonValue)
         {
             var info = new UpdateInfo<TKey, TValue>(comparisonValue) { Value = value };
-            return InsertResult.Updated == Insert(key, ref info);
+            return InsertResult.Updated == Insert(key, in info);
         }
 
         /// <summary>
@@ -1134,12 +1134,12 @@ namespace J2N.Collections.Concurrent
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.fnCreate);
 
             var info = new Add2Info<TKey, TValue> { Create = fnCreate };
-            Insert(key, ref info);
+            Insert(key, in info);
             return info.Value;
         }
 
         /// <summary>
-        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist, 
+        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist,
         /// or updates a key/value pair if the key already exists.
         /// </summary>
         /// <param name="key">The key of the element to add or update.</param>
@@ -1151,12 +1151,12 @@ namespace J2N.Collections.Concurrent
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.fnUpdate);
 
             var info = new Add2Info<TKey, TValue>(addValue) { Update = fnUpdate };
-            Insert(key, ref info);
+            Insert(key, in info);
             return info.Value;
         }
 
         /// <summary>
-        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist, 
+        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist,
         /// or updates a key/value pair if the key already exists.
         /// </summary>
         /// <param name="key">The key of the element to add or update.</param>
@@ -1182,7 +1182,7 @@ namespace J2N.Collections.Concurrent
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.fnUpdate);
 
             var info = new Add2Info<TKey, TValue> { Create = fnCreate, Update = fnUpdate };
-            Insert(key, ref info);
+            Insert(key, in info);
             return info.Value;
         }
 
@@ -1219,7 +1219,7 @@ namespace J2N.Collections.Concurrent
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.fnCreate);
 
             var info = new Add2Info<TKey, TValue> { Create = fnCreate };
-            return InsertResult.Inserted == Insert(key, ref info);
+            return InsertResult.Inserted == Insert(key, in info);
         }
 
         /// <summary>
@@ -1236,7 +1236,7 @@ namespace J2N.Collections.Concurrent
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.fnUpdate);
 
             var info = new Add2Info<TKey, TValue> { Update = fnUpdate };
-            return InsertResult.Updated == Insert(key, ref info);
+            return InsertResult.Updated == Insert(key, in info);
         }
 
         /// <summary>Removes a key and value from the dictionary.</summary>
@@ -2358,7 +2358,7 @@ namespace J2N.Collections.Concurrent
 
         private enum InsertResult { Inserted = 1, Updated = 2, Exists = 3, NotFound = 4 }
 
-        private bool InternalGetValue(int hash, [AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        private bool InternalGetValue(int hash, [AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (_entries == null)
                 throw new ObjectDisposedException(ThisTypeName);
@@ -2419,14 +2419,14 @@ namespace J2N.Collections.Concurrent
             return false;
         }
 
-        private InsertResult Insert<T>([AllowNull] TKey key, [MaybeNull] ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
+        private InsertResult Insert<T>(TKey? key, in T value) where T : ICreateOrUpdateValue<TKey, TValue>
         {
             if (_entries == null)
                 throw new ObjectDisposedException(ThisTypeName);
 
             int hash = GetHash(key);
 
-            InsertResult result = InternalInsert(hash, key, out int added, ref value);
+            InsertResult result = InternalInsert(hash, key, out int added, in value);
 
             if (added > _limit && _ordering != LurchTableOrder.None)
             {
@@ -2435,7 +2435,7 @@ namespace J2N.Collections.Concurrent
             return result;
         }
 
-        private InsertResult InternalInsert<T>(int hash, [AllowNull] TKey key, out int added, ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
+        private InsertResult InternalInsert<T>(int hash, TKey? key, out int added, in T value) where T : ICreateOrUpdateValue<TKey, TValue>
         {
             int bucket = hash % _hsize;
             lock (_locks[bucket % _lsize])

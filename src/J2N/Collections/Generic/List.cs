@@ -2822,7 +2822,7 @@ namespace J2N.Collections.Generic
             private readonly List<T> list;
             private int index;
             private readonly int version;
-            [AllowNull, MaybeNull] private T current;
+            private T? current;
 
             internal Enumerator(List<T> list)
             {
@@ -2909,7 +2909,7 @@ namespace J2N.Collections.Generic
             /// <see cref="Current"/> returns the same element until <see cref="MoveNext()"/> is called. <see cref="MoveNext()"/>
             /// sets <see cref="Current"/> to the next element.
             /// </remarks>
-            public T Current => current;
+            public T Current => current!;
 
             object? IEnumerator.Current
             {

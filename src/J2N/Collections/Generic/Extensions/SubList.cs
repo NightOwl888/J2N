@@ -1,12 +1,10 @@
-﻿using J2N.Collections.Generic;
-using J2N.Collections.Generic.Extensions;
+﻿using J2N.Collections.Generic.Extensions;
 using J2N.Collections.ObjectModel;
 using J2N.Text;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using JCG = J2N.Collections.Generic;
 using SCG = System.Collections.Generic;
 
@@ -241,7 +239,7 @@ namespace J2N.Collections.Generic
             => Equals(obj, ListEqualityComparer<T>.Default);
 
         /// <summary>
-        /// Gets the hash code for the current list. The hash code is calculated 
+        /// Gets the hash code for the current list. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>
@@ -320,7 +318,7 @@ namespace J2N.Collections.Generic
             private readonly SubList<T> list;
             private int index;
             private readonly int version;
-            [AllowNull, MaybeNull] private T current;
+            private T? current;
 
             internal Enumerator(SubList<T> list)
             {
@@ -360,7 +358,7 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            public T Current => current;
+            public T Current => current!;
 
             object? IEnumerator.Current
             {

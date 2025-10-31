@@ -31,10 +31,8 @@ namespace J2N.Collections.Generic
 #endif
         {
             private SortedSet<T> _underlying;
-            [MaybeNull, AllowNull]
-            private T _min;
-            [MaybeNull, AllowNull]
-            private T _max;
+            private T? _min;
+            private T? _max;
             // keeps track of whether the count variable is up to date
             // up to date -> _countVersion = _underlying.version
             // not up to date -> _countVersion < _underlying.version
@@ -521,4 +519,3 @@ namespace J2N.Collections.Generic
         }
     }
 }
-

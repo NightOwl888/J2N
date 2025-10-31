@@ -1928,7 +1928,7 @@ namespace J2N.Collections.Generic
                 public bool MoveNext() => _enumerator.MoveNext();
 
                 /// <inheritdoc/>
-                void IEnumerator.Reset() => EnumerableHelpers.Reset(ref _enumerator);
+                void IEnumerator.Reset() => EnumerableHelpers.Reset(in _enumerator);
 
                 /// <inheritdoc/>
                 readonly void IDisposable.Dispose() { }
@@ -2218,7 +2218,7 @@ namespace J2N.Collections.Generic
                 public bool MoveNext() => _enumerator.MoveNext();
 
                 /// <inheritdoc/>
-                void IEnumerator.Reset() => EnumerableHelpers.Reset(ref _enumerator);
+                void IEnumerator.Reset() => EnumerableHelpers.Reset(in _enumerator);
 
                 /// <inheritdoc/>
                 readonly void IDisposable.Dispose() { }
