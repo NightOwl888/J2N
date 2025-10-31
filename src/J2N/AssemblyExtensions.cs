@@ -295,7 +295,7 @@ namespace J2N
             });
         }
 
-        private static bool TryFindResource(string[] resourceNames, [AllowNull, MaybeNull] string prefix, string resourceName, string exactResourceName, [MaybeNullWhen(false)] out string result)
+        private static bool TryFindResource(string[] resourceNames, [AllowNull] string prefix, string resourceName, string exactResourceName, [MaybeNullWhen(false)] out string result)
         {
             if (!resourceNames.Contains(resourceName))
             {

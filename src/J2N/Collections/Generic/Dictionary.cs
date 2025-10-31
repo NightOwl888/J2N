@@ -1112,7 +1112,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
-        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         {
@@ -2256,8 +2256,9 @@ namespace J2N.Collections.Generic
             /// <para/>
             /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
             /// </remarks>
-            public void CopyTo([MaybeNull] TKey[] array, int index)
+            public void CopyTo(TKey[] array, int index)
             {
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (array is null)
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if ((uint)index > (uint)array.Length)
@@ -2662,8 +2663,9 @@ namespace J2N.Collections.Generic
             /// <para/>
             /// This method is an O(<c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
             /// </remarks>
-            public void CopyTo([MaybeNull] TValue[] array, int index)
+            public void CopyTo(TValue[] array, int index)
             {
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
                 if (array is null)
                     ThrowHelper.ThrowArgumentNullException(ExceptionArgument.array);
                 if ((uint)index > (uint)array.Length)

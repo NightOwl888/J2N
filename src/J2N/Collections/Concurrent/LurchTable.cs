@@ -1003,7 +1003,7 @@ namespace J2N.Collections.Concurrent
         /// </returns>
 #pragma warning disable IDE0079 // Remove unnecessary suppression
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
-        public bool TryGetValue([AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter doesn't match implicitly implemented member (possibly because of nullability attributes).
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         {
@@ -1139,7 +1139,7 @@ namespace J2N.Collections.Concurrent
         }
 
         /// <summary>
-        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist, 
+        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist,
         /// or updates a key/value pair if the key already exists.
         /// </summary>
         /// <param name="key">The key of the element to add or update.</param>
@@ -1156,7 +1156,7 @@ namespace J2N.Collections.Concurrent
         }
 
         /// <summary>
-        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist, 
+        /// Adds a key/value pair to the <see cref="T:System.Collections.Generic.IDictionary`2"/> if the key does not already exist,
         /// or updates a key/value pair if the key already exists.
         /// </summary>
         /// <param name="key">The key of the element to add or update.</param>
@@ -2358,7 +2358,7 @@ namespace J2N.Collections.Concurrent
 
         private enum InsertResult { Inserted = 1, Updated = 2, Exists = 3, NotFound = 4 }
 
-        private bool InternalGetValue(int hash, [AllowNull, MaybeNull] TKey key, [MaybeNullWhen(false)] out TValue value)
+        private bool InternalGetValue(int hash, [AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
             if (_entries == null)
                 throw new ObjectDisposedException(ThisTypeName);
@@ -2419,7 +2419,7 @@ namespace J2N.Collections.Concurrent
             return false;
         }
 
-        private InsertResult Insert<T>([AllowNull] TKey key, [MaybeNull] ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
+        private InsertResult Insert<T>(TKey? key, ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
         {
             if (_entries == null)
                 throw new ObjectDisposedException(ThisTypeName);
@@ -2435,7 +2435,7 @@ namespace J2N.Collections.Concurrent
             return result;
         }
 
-        private InsertResult InternalInsert<T>(int hash, [AllowNull] TKey key, out int added, ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
+        private InsertResult InternalInsert<T>(int hash, TKey? key, out int added, ref T value) where T : ICreateOrUpdateValue<TKey, TValue>
         {
             int bucket = hash % _hsize;
             lock (_locks[bucket % _lsize])
