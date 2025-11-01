@@ -52,7 +52,7 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Gets a <see cref="SetEqualityComparer{T}"/> object that compares
         /// <see cref="ISet{T}"/> implementations for structural equality
-        /// using rules similar to those in Java. Nested elemements that implement 
+        /// using rules similar to those in Java. Nested elemements that implement
         /// <see cref="IStructuralEquatable"/> are also compared.
         /// </summary>
         public static SetEqualityComparer<T> Default { get; } = new DefaultSetEqualityComparer();
@@ -96,7 +96,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two sets for structural equality using rules similar to those in
-        /// the JDK's AbstactSet class. Two sets are considered equal if they contain
+        /// the JDK's AbstractSet class. Two sets are considered equal if they contain
         /// the same elements (in any order).
         /// <para/>
         /// This method is similar in behavior to <see cref="System.Collections.Generic.HashSet{T}.SetEquals(IEnumerable{T})"/>,
@@ -160,7 +160,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two objects for structural equality using rules similar to those in
-        /// the JDK's AbstactSet class. Two sets are considered equal if they contain
+        /// the JDK's AbstractSet class. Two sets are considered equal if they contain
         /// the same elements (in any order).
         /// <para/>
         /// This method is similar in behavior to <see cref="System.Collections.Generic.HashSet{T}.SetEquals(IEnumerable{T})"/>,
@@ -223,7 +223,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two objects for structural equality using rules similar to those in
-        /// the JDK's AbstactSet class. Two sets are considered equal when they both contain
+        /// the JDK's AbstractSet class. Two sets are considered equal when they both contain
         /// the same objects (in any order).
         /// <para/>
         /// Usage Note: This overload can be used in a collection of <see cref="ISet{T}"/> to

@@ -463,7 +463,7 @@ namespace J2N.Collections.ObjectModel
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
-        /// using rules similar to those in the JDK's AbstactSet class. Two sets are considered
+        /// using rules similar to those in the JDK's AbstractSet class. Two sets are considered
         /// equal when they both contain the same objects (in any order).
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
@@ -474,7 +474,7 @@ namespace J2N.Collections.ObjectModel
             => Equals(obj, structuralEqualityComparer);
 
         /// <summary>
-        /// Gets the hash code for the current set. The hash code is calculated 
+        /// Gets the hash code for the current set. The hash code is calculated
         /// by taking each nested element's hash code into account.
         /// </summary>
         /// <returns>A hash code for the current object.</returns>

@@ -60,7 +60,7 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Gets a <see cref="DictionaryEqualityComparer{TKey, TValue}"/> object that compares
         /// <see cref="IDictionary{TKey, TValue}"/> implementations for structural equality
-        /// using rules similar to those in Java. Nested elemements that implement 
+        /// using rules similar to those in Java. Nested elemements that implement
         /// <see cref="IStructuralEquatable"/> are also compared.
         /// </summary>
         public static DictionaryEqualityComparer<TKey, TValue> Default { get; } = new DefaultDictionaryEqualityComparer();
@@ -105,7 +105,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two dictionaries for structural equality using rules similar to those in
-        /// the JDK's AbstactMap class. Two dictionaries are considered equal if
+        /// the JDK's AbstractMap class. Two dictionaries are considered equal if
         /// both of them contain the same mappings (ignoring order).
         /// </summary>
         /// <param name="dictionaryA">The first dictionary to compare.</param>
@@ -172,7 +172,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two dictionaries for structural equality using rules similar to those in
-        /// the JDK's AbstactMap class. Two dictionaries are considered equal if
+        /// the JDK's AbstractMap class. Two dictionaries are considered equal if
         /// both of them contain the same mappings (ignoring order).
         /// </summary>
         /// <param name="a">The first dictionary to compare.</param>
@@ -188,7 +188,7 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns the hash code for the specified <paramref name="obj"/>.
         /// <para/>
-        /// If the <paramref name="obj"/> argument is a <see cref="IDictionary{TKey, TValue}"/>, 
+        /// If the <paramref name="obj"/> argument is a <see cref="IDictionary{TKey, TValue}"/>,
         /// this implementation iterates over the dictionary getting the hash code
         /// for each element using <see cref="EqualityComparer{T}.Default"/>,
         /// uses a bitwise logical XOR <c>^</c> to combine key and value hash codes, and adds
@@ -239,7 +239,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two objects for structural equality using rules similar to those in
-        /// the JDK's AbstactMap class. Two dictionaries are considered equal when they both contain
+        /// the JDK's AbstractMap class. Two dictionaries are considered equal when they both contain
         /// the same mappings (in any order).
         /// <para/>
         /// Usage Note: This overload can be used in a collection of <see cref="IDictionary{TKey, TValue}"/> to

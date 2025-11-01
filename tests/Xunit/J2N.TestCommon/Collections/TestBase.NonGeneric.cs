@@ -32,6 +32,7 @@ namespace J2N.Collections.Tests
             Net5HashSet,
             SortedSet,
             LinkedHashSet,
+            OrderedHashSet,
             List,
             Queue,
             Lazy,
