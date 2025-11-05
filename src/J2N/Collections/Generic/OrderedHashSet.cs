@@ -2270,35 +2270,24 @@ namespace J2N.Collections.Generic
         /// speed up if it knows the other item has unique elements. I.e. if they're using
         /// different equality comparers, then uniqueness assumption between sets break.
         /// </summary>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool AreEqualityComparersEqual(OrderedHashSet<T> set1, IEnumerable<T> set2)
-        {
-            if (set2 is OrderedHashSet<T> orderedHashSet)
-                return set1.EqualityComparer.Equals(orderedHashSet.EqualityComparer);
-            else if (set2 is HashSet<T> hashSet)
-                return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
-            else if (set2 is ISet<T> set)
-            {
-                // For other ISet<T> implementations, try to extract comparer if possible
-                // This is a conservative check - we only return true if we can verify they match
-                return false;
-            }
-            return false;
-        }
+            => EqualityComparerHelper.AreSetEqualityComparersEqual(set1.EqualityComparer, set2);
 
         /// <summary>
         /// Checks if equality comparers are equal. This is used for algorithms that can
         /// speed up if it knows the other item has unique elements. I.e. if they're using
         /// different equality comparers, then uniqueness assumption between sets break.
         /// </summary>
-        private static bool AreEqualityComparersEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2) =>
-            set1.EqualityComparer.Equals(set2.EqualityComparer);
+        private static bool AreEqualityComparersEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2)
+            => set1.EqualityComparer.Equals(set2.EqualityComparer);
 
         /// <summary>
         /// Checks if effective equality comparers are equal. This is used for algorithms that
         /// require that both collections use identical hashing implementations for their entries.
         /// </summary>
-        internal static bool EffectiveEqualityComparersAreEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2) =>
-            set1.EffectiveComparer.Equals(set2.EffectiveComparer);
+        internal static bool EffectiveEqualityComparersAreEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2)
+            => set1.EffectiveComparer.Equals(set2.EffectiveComparer);
 
         #endregion Helper methods
 
@@ -2364,11 +2353,11 @@ namespace J2N.Collections.Generic
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
         {
-            // J2N: Fast path for same-type comparison - if obj is OrderedHashSet<T> with same equality comparer,
+            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
             // use hash-based lookups instead of the slower SetEqualityComparer (O(n) vs O(n²))
-            if (obj is OrderedHashSet<T> other && AreEqualityComparersEqual(this, other))
+            if (obj is ISet<T> other && AreEqualityComparersEqual(this, other))
             {
-                if (_count != other._count)
+                if (_count != other.Count)
                     return false;
                 return ContainsAllElements(other);
             }

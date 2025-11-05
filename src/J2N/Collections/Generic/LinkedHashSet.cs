@@ -994,13 +994,13 @@ namespace J2N.Collections.Generic
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
         {
-            // J2N: Fast path for same-type comparison - if obj is LinkedHashSet<T> with same equality comparer,
+            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
             // compare via the underlying Net5.HashSet<T> which uses hash-based lookups (O(n) vs O(n²))
-            if (obj is LinkedHashSet<T> other && EqualityComparer.Equals(other.EqualityComparer))
+            if (obj is ISet<T> other && EqualityComparerHelper.AreSetEqualityComparersEqual(EqualityComparer, other))
             {
                 if (Count != other.Count)
                     return false;
-                return hashSet.SetEquals(other.hashSet);
+                return hashSet.SetEquals(other);
             }
 
             // J2N: Fall back to SetEqualityComparer for special cases:

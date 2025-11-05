@@ -2221,18 +2221,9 @@ namespace J2N.Collections.Generic.Net5
         /// <param name="set1"></param>
         /// <param name="set2"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool AreEqualityComparersEqual(HashSet<T> set1, IEnumerable<T> set2)
-        {
-            if (set2 is HashSet<T> hashSet)
-                return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
-            else if (set2 is Generic.HashSet<T> hashSet2)
-                return set1.EqualityComparer.Equals(hashSet2.EqualityComparer);
-            else if (set2 is LinkedHashSet<T> linkedHashSet)
-                return set1.EqualityComparer.Equals(linkedHashSet.EqualityComparer);
-            else if (set2 is SCG.HashSet<T> scgHashSet)
-                return set1.EqualityComparer.Equals(scgHashSet.Comparer);
-            return false;
-        }
+            => EqualityComparerHelper.AreSetEqualityComparersEqual(set1.EqualityComparer, set2);
 
         /// <summary>
         /// Checks if equality comparers are equal. This is used for algorithms that can
@@ -2335,11 +2326,11 @@ namespace J2N.Collections.Generic.Net5
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
         {
-            // J2N: Fast path for same-type comparison - if obj is Net5.HashSet<T> with same equality comparer,
+            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
             // use hash-based lookups instead of the slower SetEqualityComparer (O(n) vs O(n²))
-            if (obj is Net5.HashSet<T> other && AreEqualityComparersEqual(this, other))
+            if (obj is ISet<T> other && AreEqualityComparersEqual(this, other))
             {
-                if (_count != other._count)
+                if (_count != other.Count)
                     return false;
                 return ContainsAllElements(other);
             }

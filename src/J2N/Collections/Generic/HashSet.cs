@@ -2375,18 +2375,9 @@ namespace J2N.Collections.Generic
         /// <param name="set1"></param>
         /// <param name="set2"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool EqualityComparersAreEqual(HashSet<T> set1, IEnumerable<T> set2)
-        {
-            if (set2 is HashSet<T> hashSet)
-                return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
-            else if (set2 is LinkedHashSet<T> linkedHashSet)
-                return set1.EqualityComparer.Equals(linkedHashSet.EqualityComparer);
-            else if (set2 is SCG.HashSet<T> scgHashSet)
-                return set1.EqualityComparer.Equals(scgHashSet.Comparer);
-            else if (set2 is Net5.HashSet<T> net5HashSet)
-                return set1.EqualityComparer.Equals(net5HashSet.EqualityComparer);
-            return false;
-        }
+            => EqualityComparerHelper.AreSetEqualityComparersEqual(set1.EqualityComparer, set2);
 
         /// <summary>
         /// Checks if equality comparers are equal. This is used for algorithms that can
@@ -2465,13 +2456,13 @@ namespace J2N.Collections.Generic
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
         {
-            // J2N: Fast path for same-type comparison - if obj is HashSet<T> with same equality comparer,
+            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
             // use hash-based lookups instead of the slower SetEqualityComparer (O(n) vs O(n²))
-            if (obj is HashSet<T> other && EqualityComparersAreEqual(this, other))
+            if (obj is ISet<T> other && EqualityComparersAreEqual(this, other))
             {
                 if (Count != other.Count)
                     return false;
-                return other.IsSubsetOfHashSetWithSameEC(this);
+                return IsSubsetOfHashSetWithSameEC(other);
             }
 
             // J2N: Fall back to SetEqualityComparer for special cases:
