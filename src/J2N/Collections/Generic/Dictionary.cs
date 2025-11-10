@@ -2337,64 +2337,124 @@ namespace J2N.Collections.Generic
             public bool Remove([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
             {
                 Dictionary<TKey, TValue> dictionary = Dictionary;
-                IAlternateEqualityComparer<TAlternateKey, TKey> comparer = GetAlternateComparer(dictionary);
 
                 if (dictionary._buckets != null)
                 {
                     Debug.Assert(dictionary._entries != null, "entries should be non-null");
                     uint collisionCount = 0;
 
-                    uint hashCode = (uint)comparer.GetHashCode(key);
-
-                    ref int bucket = ref dictionary.GetBucket(hashCode);
-                    Entry[]? entries = dictionary._entries;
-                    int last = -1;
-                    int i = bucket - 1; // Value in buckets is 1-based
-                    while (i >= 0)
+                    if (key is not null)
                     {
-                        ref Entry entry = ref entries[i];
+                        IAlternateEqualityComparer<TAlternateKey, TKey> comparer = GetAlternateComparer(dictionary); // J2N: Moved within null check, since we don't need to look this up for null keys
 
-                        if (entry.hashCode == hashCode && comparer.Equals(key, entry.key))
+                        uint hashCode = (uint)comparer.GetHashCode(key);
+
+                        ref int bucket = ref dictionary.GetBucket(hashCode);
+                        Entry[]? entries = dictionary._entries;
+                        int last = -1;
+                        int i = bucket - 1; // Value in buckets is 1-based
+                        while (i >= 0)
                         {
-                            if (last < 0)
+                            ref Entry entry = ref entries[i];
+
+                            if (entry.hashCode == hashCode && comparer.Equals(key, entry.key))
                             {
-                                bucket = entry.next + 1; // Value in buckets is 1-based
+                                if (last < 0)
+                                {
+                                    bucket = entry.next + 1; // Value in buckets is 1-based
+                                }
+                                else
+                                {
+                                    entries[last].next = entry.next;
+                                }
+
+                                actualKey = entry.key;
+                                value = entry.value;
+
+                                Debug.Assert((StartOfFreeList - dictionary._freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
+                                entry.next = StartOfFreeList - dictionary._freeList;
+
+                                if (RuntimeHelpers.IsReferenceOrContainsReferences<TKey>())
+                                {
+                                    entry.key = default!;
+                                }
+
+                                if (RuntimeHelpers.IsReferenceOrContainsReferences<TValue>())
+                                {
+                                    entry.value = default!;
+                                }
+
+                                dictionary._freeList = i;
+                                dictionary._freeCount++;
+                                return true;
                             }
-                            else
+
+                            last = i;
+                            i = entry.next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
                             {
-                                entries[last].next = entry.next;
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                // Break out of the loop and throw, rather than looping forever.
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                             }
-
-                            actualKey = entry.key;
-                            value = entry.value;
-
-                            Debug.Assert((StartOfFreeList - dictionary._freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
-                            entry.next = StartOfFreeList - dictionary._freeList;
-
-                            if (RuntimeHelpers.IsReferenceOrContainsReferences<TKey>())
-                            {
-                                entry.key = default!;
-                            }
-
-                            if (RuntimeHelpers.IsReferenceOrContainsReferences<TValue>())
-                            {
-                                entry.value = default!;
-                            }
-
-                            dictionary._freeList = i;
-                            dictionary._freeCount++;
-                            return true;
                         }
+                    }
+                    else
+                    {
+                        uint hashCode = 0;
 
-                        last = i;
-                        i = entry.next;
-
-                        collisionCount++;
-                        if (collisionCount > (uint)entries.Length)
+                        ref int bucket = ref dictionary.GetBucket(hashCode);
+                        Entry[]? entries = dictionary._entries;
+                        int last = -1;
+                        int i = bucket - 1; // Value in buckets is 1-based
+                        while (i >= 0)
                         {
-                            // The chain of entries forms a loop; which means a concurrent update has happened.
-                            // Break out of the loop and throw, rather than looping forever.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                            ref Entry entry = ref entries[i];
+
+                            if (entry.hashCode == hashCode && entry.key is null)
+                            {
+                                if (last < 0)
+                                {
+                                    bucket = entry.next + 1; // Value in buckets is 1-based
+                                }
+                                else
+                                {
+                                    entries[last].next = entry.next;
+                                }
+
+                                actualKey = entry.key;
+                                value = entry.value;
+
+                                Debug.Assert((StartOfFreeList - dictionary._freeList) < 0, "shouldn't underflow because max hashtable length is MaxPrimeArrayLength = 0x7FEFFFFD(2146435069) _freelist underflow threshold 2147483646");
+                                entry.next = StartOfFreeList - dictionary._freeList;
+
+                                if (RuntimeHelpers.IsReferenceOrContainsReferences<TKey>())
+                                {
+                                    entry.key = default!;
+                                }
+
+                                if (RuntimeHelpers.IsReferenceOrContainsReferences<TValue>())
+                                {
+                                    entry.value = default!;
+                                }
+
+                                dictionary._freeList = i;
+                                dictionary._freeCount++;
+                                return true;
+                            }
+
+                            last = i;
+                            i = entry.next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
+                            {
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                // Break out of the loop and throw, rather than looping forever.
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                            }
                         }
                     }
                 }
@@ -2438,38 +2498,61 @@ namespace J2N.Collections.Generic
                 Entry[]? entries = dictionary._entries;
                 Debug.Assert(entries != null, "expected entries to be non-null");
 
-                uint hashCode = (uint)comparer.GetHashCode(key);
+                uint hashCode = (uint)(key is not null ? comparer.GetHashCode(key) : 0);
 
                 uint collisionCount = 0;
                 ref int bucket = ref dictionary.GetBucket(hashCode);
                 int i = bucket - 1; // Value in _buckets is 1-based
 
                 Debug.Assert(comparer is not null);
-                while ((uint)i < (uint)entries.Length)
+                if (key is not null)
                 {
-                    if (entries[i].hashCode == hashCode && comparer.Equals(key, entries[i].key))
+                    while ((uint)i < (uint)entries.Length)
                     {
-                        exists = true;
+                        if (entries[i].hashCode == hashCode && comparer.Equals(key, entries[i].key!))
+                        {
+                            exists = true;
 
-                        return ref entries[i].value!;
+                            return ref entries[i].value!;
+                        }
+
+                        i = entries[i].next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        }
                     }
-
-                    i = entries[i].next;
-
-                    collisionCount++;
-                    if (collisionCount > (uint)entries.Length)
+                }
+                else
+                {
+                    while ((uint)i < (uint)entries.Length)
                     {
-                        // The chain of entries forms a loop; which means a concurrent update has happened.
-                        // Break out of the loop and throw, rather than looping forever.
-                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        if (entries[i].hashCode == hashCode && entries[i].key is null)
+                        {
+                            exists = true;
+
+                            return ref entries[i].value!;
+                        }
+
+                        i = entries[i].next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        }
                     }
                 }
 
-                TKey actualKey = comparer.Create(key);
-                if (actualKey is null)
-                {
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.key);
-                }
+                TKey? actualKey = key is not null ? comparer.Create(key) : default;
+
+                // J2N allows null keys
 
                 int index;
                 if (dictionary._freeCount > 0)
