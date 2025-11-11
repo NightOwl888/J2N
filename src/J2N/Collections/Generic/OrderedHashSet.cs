@@ -109,18 +109,15 @@ namespace J2N.Collections.Generic
     /// </remarks>
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    public class OrderedHashSet<T> : ICollection<T>, ISet<T>,
+    public class OrderedHashSet<T> : ICollection<T>,
+        ICollection,
+        ISet<T>,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyCollection<T>,
 #endif
 #if FEATURE_READONLYSET
         IReadOnlySet<T>,
 #endif
-        IList<T>,
-#if FEATURE_IREADONLYCOLLECTIONS
-        IReadOnlyList<T>,
-#endif
-        IList,
         IStructuralEquatable,
         IStructuralFormattable
     {
@@ -402,7 +399,7 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>Gets the effective equality comparer used for operations.</summary>
-        internal IEqualityComparer<T> EffectiveComparer => _comparer ?? EqualityComparer<T>.Default;
+        private IEqualityComparer<T> EffectiveComparer => _comparer ?? EqualityComparer<T>.Default;
 
         /// <summary>Gets the number of elements contained in the <see cref="OrderedHashSet{T}"/>.</summary>
         public int Count => _count;
@@ -411,46 +408,10 @@ namespace J2N.Collections.Generic
         bool ICollection<T>.IsReadOnly => false;
 
         /// <inheritdoc/>
-        bool IList.IsReadOnly => false;
-
-        /// <inheritdoc/>
-        bool IList.IsFixedSize => false;
-
-        /// <inheritdoc/>
         bool ICollection.IsSynchronized => false;
 
         /// <inheritdoc/>
         object ICollection.SyncRoot => this;
-
-        /// <inheritdoc/>
-        object? IList.this[int index]
-        {
-            get => GetAt(index);
-            set
-            {
-                ThrowIfNull(value);
-
-                if (value is not T t)
-                {
-                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
-                    return;
-                }
-
-                SetAt(index, t);
-            }
-        }
-
-        /// <inheritdoc/>
-        T IList<T>.this[int index]
-        {
-            get => GetAt(index);
-            set => SetAt(index, value);
-        }
-
-#if FEATURE_IREADONLYCOLLECTIONS
-        /// <inheritdoc/>
-        T IReadOnlyList<T>.this[int index] => GetAt(index);
-#endif
 
         // Contains changes from an unreleased future version (at time of writing) of .NET:
         // https://github.com/dotnet/runtime/blob/251ef76584bd6568439b5cbb3eb19bd13e42b93e/src/libraries/System.Collections/src/System/Collections/Generic/OrderedDictionary.cs#L385-L478
@@ -554,15 +515,6 @@ namespace J2N.Collections.Generic
             return TryInsert(index: -1, value, InsertionBehavior.None, out _);
         }
 
-        /// <summary>Adds the specified value to the set if the value doesn't already exist.</summary>
-        /// <param name="value">The value of the element to add. The value can be null for reference types.</param>
-        /// <param name="index">The index of the added or existing <paramref name="value"/>. This is always a valid index into the set.</param>
-        /// <returns>true if the key didn't exist and the value was added to the set; otherwise, false.</returns>
-        public bool TryAdd([AllowNull] T value, out int index)
-        {
-            return TryInsert(index: -1, value, InsertionBehavior.None, out index);
-        }
-
         /// <summary>Adds each element of the enumerable to the set.</summary>
         private void AddRange(IEnumerable<T> collection)
         {
@@ -611,27 +563,10 @@ namespace J2N.Collections.Generic
         /// <returns>true if the <see cref="OrderedHashSet{T}"/> contains the specified value; otherwise, false.</returns>
         public bool Contains([AllowNull] T value) => IndexOf(value) >= 0;
 
-        /// <summary>Gets the element at the specified index.</summary>
-        /// <param name="index">The zero-based index of the element to get.</param>
-        /// <returns>The element at the specified index.</returns>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0 or greater than or equal to <see cref="Count"/>.</exception>
-        public T GetAt(int index)
-        {
-            if ((uint)index >= (uint)_count)
-            {
-                ThrowHelper.ThrowIndexArgumentOutOfRange();
-            }
-
-            Debug.Assert(_entries is not null, "count must be positive, which means we must have entries");
-
-            ref Entry e = ref _entries![index]; // [!]: asserted above
-            return e.Value;
-        }
-
         /// <summary>Determines the index of a specific value in the <see cref="OrderedHashSet{T}"/>.</summary>
         /// <param name="value">The value to locate.</param>
         /// <returns>The index of <paramref name="value"/> if found; otherwise, -1.</returns>
-        public int IndexOf([AllowNull] T value)
+        private int IndexOf([AllowNull] T value)
         {
             uint _ = 0;
             return IndexOf(value, ref _, ref _);
@@ -783,21 +718,6 @@ namespace J2N.Collections.Generic
             return i;
         }
 
-        /// <summary>Inserts an item into the collection at the specified index.</summary>
-        /// <param name="index">The zero-based index at which item should be inserted.</param>
-        /// <param name="value">The value to insert.</param>
-        /// <exception cref="ArgumentException">An element with the same value already exists in the <see cref="OrderedHashSet{T}"/>.</exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0 or greater than <see cref="Count"/>.</exception>
-        public void Insert(int index, [AllowNull] T value)
-        {
-            if ((uint)index > (uint)_count)
-            {
-                ThrowHelper.ThrowIndexArgumentOutOfRange();
-            }
-
-            TryInsert(index, value, InsertionBehavior.ThrowOnExisting, out _);
-        }
-
         /// <summary>Removes the element with the specified value from the <see cref="OrderedHashSet{T}"/>.</summary>
         /// <param name="value">The value of the element to remove.</param>
         /// <returns></returns>
@@ -820,7 +740,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>Removes the element at the specified index.</summary>
         /// <param name="index">The zero-based index of the item to remove.</param>
-        public void RemoveAt(int index)
+        private void RemoveAt(int index)
         {
             int count = _count;
             if ((uint)index >= (uint)count)
@@ -846,21 +766,6 @@ namespace J2N.Collections.Generic
                 entries![_count] = default;
             }
             _version++;
-        }
-
-        /// <summary>Sets the value at the specified index.</summary>
-        /// <param name="index">The zero-based index of the element to get or set.</param>
-        /// <param name="value">The value to store at the specified index.</param>
-        public void SetAt(int index, [AllowNull] T value)
-        {
-            if ((uint)index >= (uint)_count)
-            {
-                ThrowHelper.ThrowIndexArgumentOutOfRange();
-            }
-
-            Debug.Assert(_entries is not null);
-
-            _entries![index].Value = value; // [!]: asserted above
         }
 
         /// <summary>Removes all elements that match the condition defined by the specified predicate from the set.</summary>
@@ -1747,6 +1652,291 @@ namespace J2N.Collections.Generic
             }
         }
 
+        #region AlternateLookup
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedHashSet{T}"/>
+        /// using a <typeparamref name="TAlternate"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternate">The alternate type of instance for performing lookups.</typeparam>
+        /// <returns>The created lookup instance.</returns>
+        /// <exception cref="InvalidOperationException">The set's comparer is not compatible with <typeparamref name="TAlternate"/>.</exception>
+        /// <remarks>
+        /// The set must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternate, T}"/> with
+        /// <typeparamref name="TAlternate"/> and <typeparamref name="T"/>. If it doesn't, an exception will be thrown.
+        /// </remarks>
+        public AlternateLookup<TAlternate> GetAlternateLookup<TAlternate>()
+            where TAlternate : allows ref struct
+        {
+            if (!AlternateLookup<TAlternate>.IsCompatibleItem(this))
+            {
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+            }
+
+            return new AlternateLookup<TAlternate>(this);
+        }
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedHashSet{T}"/>
+        /// using a <typeparamref name="TAlternate"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternate">The alternate type of instance for performing lookups.</typeparam>
+        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
+        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <remarks>
+        /// The set must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternate, T}"/> with
+        /// <typeparamref name="TAlternate"/> and <typeparamref name="T"/>. If it doesn't, the method returns false.
+        /// </remarks>
+        public bool TryGetAlternateLookup<TAlternate>(out AlternateLookup<TAlternate> lookup)
+            where TAlternate : allows ref struct
+        {
+            if (AlternateLookup<TAlternate>.IsCompatibleItem(this))
+            {
+                lookup = new AlternateLookup<TAlternate>(this);
+                return true;
+            }
+
+            lookup = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a type that may be used to perform operations on an <see cref="OrderedHashSet{T}"/>
+        /// using a <typeparamref name="TAlternate"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternate">The alternate type of instance for performing lookups.</typeparam>
+        public readonly struct AlternateLookup<TAlternate> where TAlternate : allows ref struct
+        {
+            /// <summary>Initialize the instance. The set must have already been verified to have a compatible comparer.</summary>
+            internal AlternateLookup(OrderedHashSet<T> set)
+            {
+                Debug.Assert(set is not null);
+                Debug.Assert(IsCompatibleItem(set));
+                Set = set;
+            }
+
+            /// <summary>Gets the <see cref="OrderedHashSet{T}"/> against which this instance performs operations.</summary>
+            public OrderedHashSet<T> Set { get; }
+
+            /// <summary>Checks whether the set has a comparer compatible with <typeparamref name="TAlternate"/>.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static bool IsCompatibleItem(OrderedHashSet<T> set)
+            {
+                Debug.Assert(set is not null);
+                return set._comparer is IAlternateEqualityComparer<TAlternate, T>;
+            }
+
+            /// <summary>Gets the set's alternate comparer. The set must have already been verified as compatible.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static IAlternateEqualityComparer<TAlternate, T> GetAlternateComparer(OrderedHashSet<T> set)
+            {
+                Debug.Assert(IsCompatibleItem(set));
+                return Unsafe.As<IAlternateEqualityComparer<TAlternate, T>>(set._comparer)!;
+            }
+
+            /// <summary>Adds the specified element to a set.</summary>
+            /// <param name="item">The element to add to the set.</param>
+            /// <returns>true if the element is added to the set; false if the element is already present.</returns>
+            public bool Add(TAlternate item)
+            {
+                OrderedHashSet<T> set = Set;
+                IAlternateEqualityComparer<TAlternate, T> comparer = GetAlternateComparer(set);
+
+                if (set._buckets == null)
+                {
+                    set.EnsureBucketsAndEntriesInitialized(0);
+                }
+                Debug.Assert(set._buckets != null);
+
+                Entry[]? entries = set._entries;
+                Debug.Assert(entries != null, "expected entries to be non-null");
+
+                uint hashCode;
+
+                uint collisionCount = 0;
+                ref int bucket = ref Unsafe.NullRef<int>();
+
+                Debug.Assert(comparer is not null);
+                hashCode = (uint)comparer.GetHashCode(item);
+                bucket = ref set.GetBucket(hashCode);
+                int i = bucket - 1; // Value in _buckets is 1-based
+                while (i >= 0)
+                {
+                    ref Entry entry = ref entries[i];
+                    if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                    {
+                        return false;
+                    }
+                    i = entry.Next;
+
+                    collisionCount++;
+                    if (collisionCount > (uint)entries.Length)
+                    {
+                        // The chain of entries forms a loop, which means a concurrent update has happened.
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                    }
+                }
+
+                // Invoke comparer.Create before allocating space in the collection in order to avoid corrupting
+                // the collection if the operation fails.
+                T mappedItem = comparer.Create(item);
+
+                // Since OrderedHashSet maintains insertion order (unlike HashSet which uses a free list),
+                // we always append to the end
+                int index = set._count;
+                if (index == entries.Length)
+                {
+                    set.Resize(HashHelpers.ExpandPrime(entries.Length));
+                    bucket = ref set.GetBucket(hashCode);
+                    entries = set._entries;
+                }
+
+                {
+                    ref Entry entry = ref entries![index];
+                    entry.HashCode = hashCode;
+                    entry.Next = bucket - 1; // Value in _buckets is 1-based
+                    entry.Value = mappedItem;
+                    bucket = index + 1;
+                    set._count = index + 1;
+                    set._version++;
+                }
+
+                // Value types never rehash
+                if (!typeof(T).IsValueType && collisionCount > HashHelpers.HashCollisionThreshold && comparer is NonRandomizedStringEqualityComparer)
+                {
+                    // If we hit the collision threshold we'll need to switch to the comparer which is using randomized string hashing
+                    // i.e. EqualityComparer<string>.Default.
+                    set.Resize(entries.Length, forceNewHashCodes: true);
+                }
+
+                return true;
+            }
+
+            /// <summary>Removes the specified element from a set.</summary>
+            /// <param name="item">The element to remove.</param>
+            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            public bool Remove(TAlternate item)
+            {
+                OrderedHashSet<T> set = Set;
+                IAlternateEqualityComparer<TAlternate, T> comparer = GetAlternateComparer(set);
+
+                if (set._buckets != null)
+                {
+                    Entry[]? entries = set._entries;
+                    Debug.Assert(entries != null, "entries should be non-null");
+
+                    uint collisionCount = 0;
+
+                    uint hashCode = (uint)comparer.GetHashCode(item);
+                    ref int bucket = ref set.GetBucket(hashCode);
+                    int i = bucket - 1; // Value in buckets is 1-based
+
+                    while (i >= 0)
+                    {
+                        ref Entry entry = ref entries[i];
+
+                        if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                        {
+                            // J2N: Since we are ordered, it is easier to just use RemoveAt
+                            set.RemoveAt(i);
+                            return true;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            /// <summary>Determines whether a set contains the specified element.</summary>
+            /// <param name="item">The element to locate in the set.</param>
+            /// <returns>true if the set contains the specified element; otherwise, false.</returns>
+            public bool Contains(TAlternate item) => !Unsafe.IsNullRef(in FindValue(item));
+
+            /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
+            /// <param name="equalValue">The value to search for.</param>
+            /// <param name="actualValue">The value from the set that the search found, or the default value of <typeparamref name="T"/> when the search yielded no match.</param>
+            /// <returns>A value indicating whether the search was successful.</returns>
+            public bool TryGetValue(TAlternate equalValue, [MaybeNullWhen(false)] out T actualValue)
+            {
+                ref readonly T value = ref FindValue(equalValue);
+                if (!Unsafe.IsNullRef(in value))
+                {
+                    actualValue = value;
+                    return true;
+                }
+
+                actualValue = default!;
+                return false;
+            }
+
+            /// <summary>Finds the item in the set and returns a reference to the found item, or a null reference if not found.</summary>
+            private ref readonly T FindValue(TAlternate item)
+            {
+                OrderedHashSet<T> set = Set;
+                IAlternateEqualityComparer<TAlternate, T> comparer = GetAlternateComparer(set);
+
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+                if (set._buckets != null)
+                {
+                    Debug.Assert(set._entries != null, "expected entries to be != null");
+
+                    uint hashCode = (uint)comparer.GetHashCode(item);
+                    int i = set.GetBucket(hashCode);
+                    Entry[]? entries = set._entries;
+                    uint collisionCount = 0;
+                    i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                    do
+                    {
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries.Length)
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                        {
+                            goto ReturnFound;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+
+                goto ReturnNotFound;
+
+            ConcurrentOperation:
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+            ReturnFound:
+                ref readonly T value = ref entry.Value;
+            Return:
+                return ref value;
+            ReturnNotFound:
+                value = ref Unsafe.NullRef<T>();
+                goto Return;
+            }
+        }
+#endif
+
+        #endregion AlternateLookup
+
         /// <summary>Returns an enumerator that iterates through the <see cref="OrderedHashSet{T}"/>.</summary>
         /// <returns>A <see cref="OrderedHashSet{T}.Enumerator"/> structure for the <see cref="OrderedHashSet{T}"/>.</returns>
         public Enumerator GetEnumerator() => new(this);
@@ -1758,25 +1948,6 @@ namespace J2N.Collections.Generic
 
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<T>)this).GetEnumerator();
-
-        /// <inheritdoc/>
-        int IList<T>.IndexOf(T item)
-        {
-            int index = IndexOf(item);
-            if (index >= 0)
-            {
-                Debug.Assert(_entries is not null);
-                if (EqualityComparer<T>.Default.Equals(item, _entries![index].Value!)) // [!]: asserted above
-                {
-                    return index;
-                }
-            }
-
-            return -1;
-        }
-
-        /// <inheritdoc/>
-        void IList<T>.Insert(int index, T item) => Insert(index, item);
 
         /// <inheritdoc/>
         void ICollection<T>.Add(T item) => Add(item);
@@ -1839,56 +2010,6 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentException_Argument_IncompatibleArrayType(ExceptionArgument.array);
                 }
-            }
-        }
-
-        /// <inheritdoc/>
-        int IList.Add(object? value)
-        {
-            if (value is not T t)
-            {
-                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
-                return Count - 1;
-            }
-
-            Add(t);
-            return Count - 1;
-        }
-
-        /// <inheritdoc/>
-        bool IList.Contains(object? value) =>
-            value is T t &&
-            Contains(t);
-
-        /// <inheritdoc/>
-        int IList.IndexOf(object? value)
-        {
-            if (value is T t)
-            {
-                return ((IList<T>)this).IndexOf(t);
-            }
-
-            return -1;
-        }
-
-        /// <inheritdoc/>
-        void IList.Insert(int index, object? value)
-        {
-            if (value is not T t)
-            {
-                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
-                return;
-            }
-
-            Insert(index, t);
-        }
-
-        /// <inheritdoc/>
-        void IList.Remove(object? value)
-        {
-            if (value is T t)
-            {
-                ((ICollection<T>)this).Remove(t);
             }
         }
 
@@ -2013,7 +2134,7 @@ namespace J2N.Collections.Generic
         ///
         /// If callers are concerned about whether this is a proper subset, they take care of that.
         /// </summary>
-        internal bool IsSubsetOfHashSetWithSameEC(ISet<T> other)
+        private bool IsSubsetOfHashSetWithSameEC(ISet<T> other)
         {
             foreach (T item in this)
             {
@@ -2275,18 +2396,10 @@ namespace J2N.Collections.Generic
             => EqualityComparerHelper.AreSetEqualityComparersEqual(set1.EqualityComparer, set2);
 
         /// <summary>
-        /// Checks if equality comparers are equal. This is used for algorithms that can
-        /// speed up if it knows the other item has unique elements. I.e. if they're using
-        /// different equality comparers, then uniqueness assumption between sets break.
-        /// </summary>
-        private static bool AreEqualityComparersEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2)
-            => set1.EqualityComparer.Equals(set2.EqualityComparer);
-
-        /// <summary>
         /// Checks if effective equality comparers are equal. This is used for algorithms that
         /// require that both collections use identical hashing implementations for their entries.
         /// </summary>
-        internal static bool EffectiveEqualityComparersAreEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2)
+        private static bool EffectiveEqualityComparersAreEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2)
             => set1.EffectiveComparer.Equals(set2.EffectiveComparer);
 
         #endregion Helper methods
