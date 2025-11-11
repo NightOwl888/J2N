@@ -864,7 +864,52 @@ namespace J2N.Collections.Generic
 
             Debug.Assert(_entries is not null);
 
-            _entries![index].Value = value; // [!]: asserted above
+            ref Entry e = ref _entries![index]; // [!]: asserted above
+
+            // If the value matches the one that's already in that slot, just update the value.
+            if (value is null)
+            {
+                if (e.Value is null)
+                {
+                    e.Value = value;
+                    return;
+                }
+            }
+            else if (typeof(T).IsValueType && _comparer is null)
+            {
+                if (EqualityComparer<T>.Default.Equals(value!, e.Value!))
+                {
+                    e.Value = value;
+                    return;
+                }
+            }
+            else
+            {
+                IEqualityComparer<T>? comparer = _comparer;
+                if (comparer is not null && comparer.Equals(value!, e.Value!))
+                {
+                    e.Value = value;
+                    return;
+                }
+            }
+
+            // The value doesn't match the one at that index. If it exists elsewhere in the collection, fail.
+            uint hashCode = 0, collisionCount = 0;
+            if (IndexOf(value, ref hashCode, ref collisionCount) >= 0)
+            {
+                throw new ArgumentException(SR.Format(SR.Argument_AddingDuplicate), nameof(value));
+            }
+
+            // The value doesn't exist in the collection. Update the value, but also update
+            // the bucket chains, as the new value may not hash to the same bucket as the old value.
+            RemoveEntryFromBucket(index);
+            e.HashCode = hashCode;
+            e.Value = value;
+            PushEntryIntoBucket(ref e, index);
+
+            _version++;
+
+            RehashIfNecessary(collisionCount, _entries);
         }
 
         /// <summary>Removes all elements that match the condition defined by the specified predicate from the set.</summary>

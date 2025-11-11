@@ -781,5 +781,158 @@ namespace J2N.Collections.Tests
 #endif
 
         #endregion
+
+        #region SetAt
+
+        [Theory]
+        [MemberData(nameof(ValidPositiveCollectionSizes))]
+        public void OrderedHashSet_Generic_SetAt_InvalidInputs(int count)
+        {
+            OrderedHashSet<T> set = (OrderedHashSet<T>)GenericISetFactory(count);
+            T value = CreateT(1);
+
+            // Test index out of range
+            Assert.Throws<ArgumentOutOfRangeException>(() => set.SetAt(-1, value));
+            Assert.Throws<ArgumentOutOfRangeException>(() => set.SetAt(count, value));
+            Assert.Throws<ArgumentOutOfRangeException>(() => set.SetAt(int.MaxValue, value));
+        }
+
+        [Fact]
+        public void OrderedHashSet_Generic_SetAt_ValueUpdated()
+        {
+            OrderedHashSet<int> set = new OrderedHashSet<int> { 1, 2, 3, 4, 5 };
+            int newValue = 99;
+
+            set.SetAt(0, newValue);
+
+            // The value at index 0 should be updated
+            Assert.Equal(newValue, set.ElementAt(0));
+        }
+
+        [Fact]
+        public void OrderedHashSet_Generic_SetAt_ValueReplacedAndFindable()
+        {
+            // When a value at an index is replaced via SetAt, the new value
+            // should be findable via Contains() and the old value should not be.
+
+            OrderedHashSet<int> set = new OrderedHashSet<int>();
+
+            // Add values 1-10
+            for (int i = 1; i <= 10; i++)
+            {
+                set.Add(i);
+            }
+
+            Assert.Equal(10, set.Count);
+            Assert.True(set.Contains(1)); // Value at index 0 initially
+
+            // Replace value 1 (at index 0) with value 12
+            set.SetAt(0, 12);
+
+            // After SetAt, the entry array contains 12 at index 0
+            Assert.Equal(12, set.ElementAt(0));
+
+            // The new value should be findable via Contains()
+            // (requires rehashing of buckets)
+            Assert.True(set.Contains(12));
+
+            // The old value should no longer be findable
+            Assert.False(set.Contains(1));
+        }
+
+        [Fact]
+        public void OrderedHashSet_Generic_SetAt_ReplacedValueFindableByLookup()
+        {
+            // After replacing a value via SetAt, the new value should be
+            // findable and retrievable from the set.
+
+            OrderedHashSet<int> set = new OrderedHashSet<int>();
+
+            for (int i = 1; i <= 10; i++)
+            {
+                set.Add(i);
+            }
+
+            int oldValue = 1;
+            int newValue = 12;
+
+            // Get the index of the old value
+            int indexOfOldValue = set.ToList().IndexOf(oldValue);
+
+            // Replace old value with new value
+            set.SetAt(indexOfOldValue, newValue);
+
+            // The old value should no longer be findable
+            Assert.False(set.Contains(oldValue));
+
+            // The new value should be stored at the index
+            Assert.Equal(newValue, set.ElementAt(indexOfOldValue));
+
+            // The new value should be findable via Contains()
+            Assert.True(set.Contains(newValue));
+        }
+
+        [Fact]
+        public void OrderedHashSet_Generic_SetAt_ReplacedValueWithDifferentHash()
+        {
+            // When replacing a value with one that hashes to a different bucket,
+            // the new value should still be findable.
+
+            OrderedHashSet<int> set = new OrderedHashSet<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+            // SetAt(1, 20) - replace value at index 1 (which is value 2) with value 20
+            // 2 and 20 hash to different buckets
+            set.SetAt(1, 20);
+
+            // The new value is stored in the entries array
+            Assert.Equal(20, set.ElementAt(1));
+
+            // The new value should be findable via Contains()
+            Assert.True(set.Contains(20));
+
+            // The old value should no longer be findable
+            Assert.False(set.Contains(2));
+        }
+
+        [Fact]
+        public void OrderedHashSet_Generic_SetAt_MultipleReplacements_AllFindable()
+        {
+            // When multiple values are replaced via SetAt, all new values
+            // should be findable and old values should not be.
+
+            OrderedHashSet<int> set = new OrderedHashSet<int>();
+
+            // Build initial set
+            for (int i = 1; i <= 5; i++)
+            {
+                set.Add(i);
+            }
+
+            // Replace multiple values
+            set.SetAt(0, 100); // Replace 1 with 100
+            set.SetAt(1, 101); // Replace 2 with 101
+            set.SetAt(2, 102); // Replace 3 with 102
+
+            // The entry array is updated
+            Assert.Equal(100, set.ElementAt(0));
+            Assert.Equal(101, set.ElementAt(1));
+            Assert.Equal(102, set.ElementAt(2));
+
+            // All new values should be findable via Contains()
+            Assert.True(set.Contains(100));
+            Assert.True(set.Contains(101));
+            Assert.True(set.Contains(102));
+
+            // The old values should not be found
+            Assert.False(set.Contains(1));
+            Assert.False(set.Contains(2));
+            Assert.False(set.Contains(3));
+
+            // The unchanged values should still be findable
+            Assert.True(set.Contains(4));
+            Assert.True(set.Contains(5));
+        }
+
+        #endregion
     }
 }
