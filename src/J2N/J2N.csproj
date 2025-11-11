@@ -20,7 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup Label="NuGet Package Includes">
-    <None Include="$(RepositoryRoot)README.md" Pack="true" PackagePath="\readme.md"/>
+    <None Include="$(RepositoryRoot)README.md" Pack="true" PackagePath="\readme.md" />
   </ItemGroup>
 
   <PropertyGroup Label="Compilation Features">
@@ -48,10 +48,16 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.CSharp" Version="$(MicrosoftCSharpPackageReferenceVersion)" />
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' Or '$(TargetFramework)' == 'net45' ">
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net462' ">
     <PackageReference Include="System.Memory" Version="$(SystemMemoryPackageReferenceVersion)" />
+    <PackageReference Include="System.Runtime.CompilerServices.Unsafe" Version="$(SystemRuntimeCompilerServicesUnsafePackageReferenceVersion)" />
+  </ItemGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="NetFx.System.Memory" Version="$(NetFxSystemMemoryPackageReferenceVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition=" '$(TargetFramework)' == 'net40' ">

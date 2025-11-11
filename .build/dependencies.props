@@ -8,7 +8,9 @@
     <MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>1.1.1</MicrosoftSourceLinkAzureReposGitPackageReferenceVersion>
     <MicrosoftSourceLinkGitHubPackageReferenceVersion>$(MicrosoftSourceLinkAzureReposGitPackageReferenceVersion)</MicrosoftSourceLinkGitHubPackageReferenceVersion>
     <NerdBankGitVersioningPackageReferenceVersion>[3.5.73-alpha]</NerdBankGitVersioningPackageReferenceVersion>
+    <NetFxSystemBuffersPackageReferenceVersion>4.0.0</NetFxSystemBuffersPackageReferenceVersion>
     <NetFxSystemMemoryPackageReferenceVersion>4.0.0</NetFxSystemMemoryPackageReferenceVersion>
+    <NetFxSystemRuntimeCompilerServicesUnsafePackageReferenceVersion>4.0.0</NetFxSystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <NETStandardLibrary20PackageReferenceVersion>2.0.3</NETStandardLibrary20PackageReferenceVersion>
     <NUnitPackageReferenceVersion>3.12.0</NUnitPackageReferenceVersion>
     <NUnit3TestAdapterPackageReferenceVersion>4.6.0</NUnit3TestAdapterPackageReferenceVersion>
