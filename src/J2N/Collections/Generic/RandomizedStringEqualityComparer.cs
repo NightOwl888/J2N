@@ -4,8 +4,8 @@
 using J2N.Security.Cryptography;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
@@ -53,14 +53,34 @@ namespace J2N.Collections.Generic
         }
 
         private sealed class OrdinalComparer : RandomizedStringEqualityComparer
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
+#endif
         {
             internal OrdinalComparer(IEqualityComparer<string?> wrappedComparer)
                 : base(wrappedComparer)
             {
             }
 
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            string IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
+
+#endif
             public override bool Equals(string? x, string? y) => string.Equals(x, y);
 
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> alternate, string? other)
+            {
+                // See explanation in System.OrdinalComparer.Equals.
+                if (alternate.IsEmpty && other is null)
+                {
+                    return false;
+                }
+
+                return alternate.SequenceEqual(other);
+            }
+#endif
             public override int GetHashCode(string? obj)
             {
                 if (obj is null)
@@ -82,19 +102,47 @@ namespace J2N.Collections.Generic
                     }
                 }
             }
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> alternate) =>
+                Marvin.ComputeHash32(
+                    ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(alternate)),
+                    (uint)alternate.Length * 2,
+                    _seed.p0, _seed.p1);
+#endif
+
         }
 
         private sealed class OrdinalIgnoreCaseComparer : RandomizedStringEqualityComparer
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
+#endif
         {
-            private static readonly StringComparer _stringComparer = StringComparer.OrdinalIgnoreCase;
-
             internal OrdinalIgnoreCaseComparer(IEqualityComparer<string?> wrappedComparer)
                 : base(wrappedComparer)
             {
             }
 
-            public override bool Equals(string? x, string? y) => _stringComparer.Equals(x, y); //string.EqualsOrdinalIgnoreCase(x, y);
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            string IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
+#endif
 
+            public override bool Equals(string? x, string? y) => string.Equals(x, y, StringComparison.OrdinalIgnoreCase);
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> alternate, string? other)
+            {
+                // See explanation in System.OrdinalComparer.Equals.
+                if (alternate.IsEmpty && other is null)
+                {
+                    return false;
+                }
+
+                //return alternate.EqualsOrdinalIgnoreCase(other);
+                return System.MemoryExtensions.Equals(alternate, other, StringComparison.OrdinalIgnoreCase);
+            }
+#endif
             public override int GetHashCode(string? obj)
             {
                 if (obj is null)
@@ -102,16 +150,29 @@ namespace J2N.Collections.Generic
                     return 0;
                 }
 
-                // J2N TODO: Finsh randomized implementation for OrdinalIgnoreCase
-                return _stringComparer.GetHashCode(obj);
-
-                //// The OrdinalIgnoreCase version of Marvin32 operates over chars,
-                //// so pass in the char count directly.
-                //return Marvin.ComputeHash32OrdinalIgnoreCase(
-                //    ref obj.GetRawStringData(),
-                //    obj.Length,
-                //    _seed.p0, _seed.p1);
+                unsafe
+                {
+                    fixed (char* charPtr = obj)
+                    {
+                        // The OrdinalIgnoreCase version of Marvin32 operates over chars,
+                        // so pass in the char count directly.
+                        return Marvin.ComputeHash32OrdinalIgnoreCase(
+                            ref *charPtr,
+                            obj.Length,
+                            _seed.p0,
+                            _seed.p1);
+                    }
+                }
             }
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> alternate) =>
+                Marvin.ComputeHash32OrdinalIgnoreCase(
+                    ref MemoryMarshal.GetReference(alternate),
+                    alternate.Length,
+                    _seed.p0, _seed.p1);
+#endif
+
         }
     }
 }
