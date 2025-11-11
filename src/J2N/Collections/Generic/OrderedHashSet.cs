@@ -120,6 +120,11 @@ namespace J2N.Collections.Generic
 #if FEATURE_READONLYSET
         IReadOnlySet<T>,
 #endif
+        IList<T>,
+#if FEATURE_IREADONLYCOLLECTIONS
+        IReadOnlyList<T>,
+#endif
+        IList,
         IStructuralEquatable,
         IStructuralFormattable
     {
@@ -410,10 +415,46 @@ namespace J2N.Collections.Generic
         bool ICollection<T>.IsReadOnly => false;
 
         /// <inheritdoc/>
+        bool IList.IsReadOnly => false;
+
+        /// <inheritdoc/>
+        bool IList.IsFixedSize => false;
+
+        /// <inheritdoc/>
         bool ICollection.IsSynchronized => false;
 
         /// <inheritdoc/>
         object ICollection.SyncRoot => this;
+
+        /// <inheritdoc/>
+        object? IList.this[int index]
+        {
+            get => GetAt(index);
+            set
+            {
+                ThrowIfNull(value);
+
+                if (value is not T t)
+                {
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
+                    return;
+                }
+
+                SetAt(index, t);
+            }
+        }
+
+        /// <inheritdoc/>
+        T IList<T>.this[int index]
+        {
+            get => GetAt(index);
+            set => SetAt(index, value);
+        }
+
+#if FEATURE_IREADONLYCOLLECTIONS
+        /// <inheritdoc/>
+        T IReadOnlyList<T>.this[int index] => GetAt(index);
+#endif
 
         // Contains changes from an unreleased future version (at time of writing) of .NET:
         // https://github.com/dotnet/runtime/blob/251ef76584bd6568439b5cbb3eb19bd13e42b93e/src/libraries/System.Collections/src/System/Collections/Generic/OrderedDictionary.cs#L385-L478
@@ -517,6 +558,15 @@ namespace J2N.Collections.Generic
             return TryInsert(index: -1, value, InsertionBehavior.None, out _);
         }
 
+        /// <summary>Adds the specified value to the set if the value doesn't already exist.</summary>
+        /// <param name="value">The value of the element to add. The value can be null for reference types.</param>
+        /// <param name="index">The index of the added or existing <paramref name="value"/>. This is always a valid index into the set.</param>
+        /// <returns>true if the key didn't exist and the value was added to the set; otherwise, false.</returns>
+        public bool TryAdd([AllowNull] T value, out int index)
+        {
+            return TryInsert(index: -1, value, InsertionBehavior.None, out index);
+        }
+
         /// <summary>Adds each element of the enumerable to the set.</summary>
         private void AddRange(IEnumerable<T> collection)
         {
@@ -565,10 +615,27 @@ namespace J2N.Collections.Generic
         /// <returns>true if the <see cref="OrderedHashSet{T}"/> contains the specified value; otherwise, false.</returns>
         public bool Contains([AllowNull] T value) => IndexOf(value) >= 0;
 
+        /// <summary>Gets the element at the specified index.</summary>
+        /// <param name="index">The zero-based index of the element to get.</param>
+        /// <returns>The element at the specified index.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0 or greater than or equal to <see cref="Count"/>.</exception>
+        public T GetAt(int index)
+        {
+            if ((uint)index >= (uint)_count)
+            {
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
+            }
+
+            Debug.Assert(_entries is not null, "count must be positive, which means we must have entries");
+
+            ref Entry e = ref _entries![index]; // [!]: asserted above
+            return e.Value;
+        }
+
         /// <summary>Determines the index of a specific value in the <see cref="OrderedHashSet{T}"/>.</summary>
         /// <param name="value">The value to locate.</param>
         /// <returns>The index of <paramref name="value"/> if found; otherwise, -1.</returns>
-        private int IndexOf([AllowNull] T value)
+        public int IndexOf([AllowNull] T value)
         {
             uint _ = 0;
             return IndexOf(value, ref _, ref _);
@@ -720,6 +787,21 @@ namespace J2N.Collections.Generic
             return i;
         }
 
+        /// <summary>Inserts an item into the collection at the specified index.</summary>
+        /// <param name="index">The zero-based index at which item should be inserted.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <exception cref="ArgumentException">An element with the same value already exists in the <see cref="OrderedHashSet{T}"/>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is less than 0 or greater than <see cref="Count"/>.</exception>
+        public void Insert(int index, [AllowNull] T value)
+        {
+            if ((uint)index > (uint)_count)
+            {
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
+            }
+
+            TryInsert(index, value, InsertionBehavior.ThrowOnExisting, out _);
+        }
+
         /// <summary>Removes the element with the specified value from the <see cref="OrderedHashSet{T}"/>.</summary>
         /// <param name="value">The value of the element to remove.</param>
         /// <returns></returns>
@@ -742,7 +824,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>Removes the element at the specified index.</summary>
         /// <param name="index">The zero-based index of the item to remove.</param>
-        private void RemoveAt(int index)
+        public void RemoveAt(int index)
         {
             int count = _count;
             if ((uint)index >= (uint)count)
@@ -768,6 +850,21 @@ namespace J2N.Collections.Generic
                 entries![_count] = default;
             }
             _version++;
+        }
+
+        /// <summary>Sets the value at the specified index.</summary>
+        /// <param name="index">The zero-based index of the element to get or set.</param>
+        /// <param name="value">The value to store at the specified index.</param>
+        public void SetAt(int index, [AllowNull] T value)
+        {
+            if ((uint)index >= (uint)_count)
+            {
+                ThrowHelper.ThrowIndexArgumentOutOfRange();
+            }
+
+            Debug.Assert(_entries is not null);
+
+            _entries![index].Value = value; // [!]: asserted above
         }
 
         /// <summary>Removes all elements that match the condition defined by the specified predicate from the set.</summary>
@@ -1652,6 +1749,72 @@ namespace J2N.Collections.Generic
             {
                 return ref buckets![(uint)hashCode % buckets.Length]; // [!]: asserted above
             }
+        }
+
+        /// <inheritdoc/>
+        int IList.Add(object? value)
+        {
+            if (value is not T t)
+            {
+                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
+                return Count - 1;
+            }
+
+            Add(t);
+            return Count - 1;
+        }
+
+        /// <inheritdoc/>
+        bool IList.Contains(object? value) =>
+            value is T t &&
+            Contains(t);
+
+        /// <inheritdoc/>
+        int IList.IndexOf(object? value)
+        {
+            if (value is T t)
+            {
+                return ((IList<T>)this).IndexOf(t);
+            }
+
+            return -1;
+        }
+
+        /// <inheritdoc/>
+        void IList.Insert(int index, object? value)
+        {
+            if (value is not T t)
+            {
+                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
+                return;
+            }
+
+            Insert(index, t);
+        }
+
+        /// <inheritdoc/>
+        void IList.Remove(object? value)
+        {
+            if (value is T t)
+            {
+                ((ICollection<T>)this).Remove(t);
+            }
+        }
+
+        /// <inheritdoc/>
+        int IList<T>.IndexOf(T item)
+        {
+            int index = IndexOf(item);
+            if (index >= 0)
+            {
+                Debug.Assert(_entries is not null);
+                if (EqualityComparer<T>.Default.Equals(item, _entries![index].Value!)) // [!]: asserted above
+                {
+                    return index;
+                }
+            }
+
+            return -1;
         }
 
         #region AlternateLookup
