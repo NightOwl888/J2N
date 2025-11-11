@@ -26,7 +26,7 @@ namespace J2N.Collections.Generic
         // that was passed in to the ctor. The caller chooses one of these singletons so that the
         // GetUnderlyingEqualityComparer method can return the correct value.
 
-        private static readonly NonRandomizedStringEqualityComparer WrappedAroundDefaultComparer = new DefaultComparer(EqualityComparer<string?>.Default);
+        private static readonly NonRandomizedStringEqualityComparer WrappedAroundDefaultComparer = new OrdinalComparer(EqualityComparer<string?>.Default);
 
         private static readonly NonRandomizedStringEqualityComparer WrappedAroundStringComparerOrdinal = new OrdinalComparer(StringComparer.Ordinal);
 
@@ -85,55 +85,7 @@ namespace J2N.Collections.Generic
             //System.Collections.Generic.EqualityComparer<string>.
 
             //info.SetType(typeof(System.Collections.Generic.GenericEqualityComparer<string>));
-            info.SetType(typeof(EqualityComparer<string>)); // J2N TODO: Use type strings to get this type to set it correctly
-        }
-
-        // TODO https://github.com/dotnet/runtime/issues/102906:
-        // This custom class exists because EqualityComparer<string>.Default doesn't implement IAlternateEqualityComparer<ROS<char>, string>.
-        // If OrdinalComparer were used, then a dictionary created with a null/Default comparer would be using a comparer that does
-        // implement IAlternateEqualityComparer<ROS<char>, string>, but only until it hits a collision and switches to the randomized comparer.
-        // Once EqualityComparer<string>.Default implements IAlternateEqualityComparer<ROS<char>, string>, we can remove this class, and change
-        // WrappedAroundDefaultComparer to be an instance of OrdinalComparer.
-        private sealed class DefaultComparer : NonRandomizedStringEqualityComparer
-#if FEATURE_IALTERNATEEQUALITYCOMPARER
-            , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
-#endif
-        {
-            internal DefaultComparer(IEqualityComparer<string?> wrappedComparer) : base(wrappedComparer)
-            {
-            }
-
-            public override bool Equals(string? x, string? y) => string.Equals(x, y, StringComparison.Ordinal);
-
-            public override int GetHashCode(string? obj)
-            {
-                //Debug.Assert(obj != null, "This implementation is only called from first-party collection types that guarantee non-null parameters.");
-                //return obj.GetNonRandomizedHashCode();
-
-                if (obj is null)
-                    return 0;
-
-                return StringHelper.GetNonRandomizedHashCode(obj);
-            }
-
-#if FEATURE_IALTERNATEEQUALITYCOMPARER
-            int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> span) =>
-                StringHelper.GetNonRandomizedHashCode(span);
-
-            bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> span, string? target)
-            {
-                // See explanation in StringEqualityComparer.Equals.
-                if (span.IsEmpty && target is null)
-                {
-                    return false;
-                }
-
-                return span.SequenceEqual(target);
-            }
-
-            string IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
-                span.ToString();
-#endif
+            info.SetType(typeof(EqualityComparer<string>));
         }
 
         private sealed class OrdinalComparer : NonRandomizedStringEqualityComparer
