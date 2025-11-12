@@ -172,18 +172,6 @@ namespace J2N.Collections.Generic
             {
                 return RandomizedStringEqualityComparer.Create(_underlyingComparer, ignoreCase: true);
             }
-
-            /// <summary>
-            /// Returns true iff the UInt32 represents two ASCII UTF-16 characters in machine endianness.
-            /// </summary>
-            /// <remarks>
-            /// From Utf16Utility in .NET
-            /// </remarks>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static bool AllCharsInUInt32AreAscii(uint value)
-            {
-                return (value & ~0x007F_007Fu) == 0;
-            }
         }
 
         public static IEqualityComparer<string>? GetStringComparer(object comparer)
