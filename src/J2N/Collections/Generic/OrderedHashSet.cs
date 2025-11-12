@@ -866,38 +866,19 @@ namespace J2N.Collections.Generic
 
             ref Entry e = ref _entries![index]; // [!]: asserted above
 
-            // If the value matches the one that's already in that slot, just update the value.
-            if (value is null)
+            uint hashCode = 0, collisionCount = 0;
+            int existingIndex = IndexOf(value, ref hashCode, ref collisionCount);
+
+            // The value is already set at this index, nothing to do.
+            if (existingIndex == index)
             {
-                if (e.Value is null)
-                {
-                    e.Value = value;
-                    return;
-                }
-            }
-            else if (typeof(T).IsValueType && _comparer is null)
-            {
-                if (EqualityComparer<T>.Default.Equals(value!, e.Value!))
-                {
-                    e.Value = value;
-                    return;
-                }
-            }
-            else
-            {
-                IEqualityComparer<T>? comparer = _comparer;
-                if (comparer is not null && comparer.Equals(value!, e.Value!))
-                {
-                    e.Value = value;
-                    return;
-                }
+                return;
             }
 
-            // The value doesn't match the one at that index. If it exists elsewhere in the collection, fail.
-            uint hashCode = 0, collisionCount = 0;
-            if (IndexOf(value, ref hashCode, ref collisionCount) >= 0)
+            // If the value exists elsewhere in the collection, fail.
+            if (existingIndex >= 0)
             {
-                throw new ArgumentException(SR.Format(SR.Argument_AddingDuplicate), nameof(value));
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException(value);
             }
 
             // The value doesn't exist in the collection. Update the value, but also update

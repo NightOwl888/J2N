@@ -810,6 +810,19 @@ namespace J2N.Collections.Tests
         }
 
         [Fact]
+        public void OrderedHashSet_Generic_SetAt_SameIndex_ValueUnchanged()
+        {
+            OrderedHashSet<int> set = new OrderedHashSet<int> { 1, 2, 3, 4, 5 };
+            int originalValue = set.GetAt(2);
+            int newValue = originalValue;
+
+            set.SetAt(2, newValue);
+
+            // The value at index 2 should be the same as before
+            Assert.Equal(originalValue, set.ElementAt(2));
+        }
+
+        [Fact]
         public void OrderedHashSet_Generic_SetAt_ValueReplacedAndFindable()
         {
             // When a value at an index is replaced via SetAt, the new value
