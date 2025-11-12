@@ -24,6 +24,8 @@ using static System.ArgumentOutOfRangeException;
 using static J2N.Collections.StaticThrowHelper;
 #endif
 
+// ReSharper disable NonReadonlyMemberInGetHashCode
+
 namespace J2N.Collections.Generic
 {
     /// <summary>
@@ -53,6 +55,61 @@ namespace J2N.Collections.Generic
     /// call <c>ToString(StringFormatter.InvariantCulture)</c>.
     /// </summary>
     /// <typeparam name="T">The type of elements in the set.</typeparam>
+    /// <remarks>
+    /// <b>Java to .NET Method Mapping</b>
+    /// <para/>
+    /// The following table shows how common Java <see cref="ISet{T}"/> operations map to .NET <see cref="ISet{T}"/> operations:
+    /// <list type="table">
+    ///   <listheader>
+    ///     <term>Java Operation</term>
+    ///     <description>.NET Operation</description>
+    ///   </listheader>
+    ///   <item>
+    ///     <term><c>set1.containsAll(set2)</c></term>
+    ///     <description><see cref="IsSupersetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>set1.containsAll(set2) &amp;&amp; !set1.equals(set2)</c></term>
+    ///     <description><see cref="IsProperSupersetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>set2.containsAll(set1)</c></term>
+    ///     <description><see cref="IsSubsetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>set2.containsAll(set1) &amp;&amp; !set2.equals(set1)</c></term>
+    ///     <description><see cref="IsProperSubsetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>Collections.disjoint(set1, set2)</c></term>
+    ///     <description><c>!<see cref="Overlaps(IEnumerable{T})"/></c></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>!Collections.disjoint(set1, set2)</c></term>
+    ///     <description><see cref="Overlaps(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>EnumSet.complementOf(enumSet)</c></term>
+    ///     <description><see cref="SymmetricExceptWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>removeAll(other)</c></term>
+    ///     <description><see cref="ExceptWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>retainAll(other)</c></term>
+    ///     <description><see cref="IntersectWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>addAll(other)</c></term>
+    ///     <description><see cref="UnionWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>equals(other)</c></term>
+    ///     <description><see cref="SetEquals(IEnumerable{T})"/> or <see cref="Equals(object)"/></description>
+    ///   </item>
+    /// </list>
+    /// </remarks>
     [SuppressMessage("Style", "IDE0018:Inline variable declaration", Justification = "Following Microsoft's code style")]
     [SuppressMessage("Style", "IDE0019:Use pattern matching", Justification = "Following Microsoft's code style")]
 #if FEATURE_SERIALIZABLE
@@ -105,6 +162,10 @@ namespace J2N.Collections.Generic
         private int _freeCount;
         private int _version;
         private IEqualityComparer<T>? _comparer;
+        /// <summary>J2N: Cached hash code value.</summary>
+        private int _cachedHashCode;
+        /// <summary>J2N: Version number when hash code was cached (-1 indicates uncached).</summary>
+        private int _hashCodeVersion = -1;
 
         #region Constructors
 
@@ -2316,18 +2377,9 @@ namespace J2N.Collections.Generic
         /// <param name="set1"></param>
         /// <param name="set2"></param>
         /// <returns></returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool EqualityComparersAreEqual(HashSet<T> set1, IEnumerable<T> set2)
-        {
-            if (set2 is HashSet<T> hashSet)
-                return set1.EqualityComparer.Equals(hashSet.EqualityComparer);
-            else if (set2 is LinkedHashSet<T> linkedHashSet)
-                return set1.EqualityComparer.Equals(linkedHashSet.EqualityComparer);
-            else if (set2 is SCG.HashSet<T> scgHashSet)
-                return set1.EqualityComparer.Equals(scgHashSet.Comparer);
-            else if (set2 is Net5.HashSet<T> net5HashSet)
-                return set1.EqualityComparer.Equals(net5HashSet.EqualityComparer);
-            return false;
-        }
+            => EqualityComparerHelper.AreSetEqualityComparersEqual(set1.EqualityComparer, set2);
 
         /// <summary>
         /// Checks if equality comparers are equal. This is used for algorithms that can
@@ -2371,7 +2423,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
-        /// using rules similar to those in the JDK's AbstactSet class. Two sets are considered
+        /// using rules similar to those in the JDK's AbstractSet class. Two sets are considered
         /// equal when they both contain the same objects (in any order).
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
@@ -2379,7 +2431,25 @@ namespace J2N.Collections.Generic
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-            => Equals(obj, SetEqualityComparer<T>.Default);
+        {
+            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
+            // use hash-based lookups instead of the slower SetEqualityComparer (O(n) vs O(n²))
+            if (obj is ISet<T> other
+                && EqualityComparersAreEqual(this, other)
+                && !GenericType<T>.IsCollection
+                && !GenericType<T>.IsStructuralEquatable)
+            {
+                if (Count != other.Count) // NOTE: intentionally using Count property here since it subtracts free count
+                    return false;
+                return IsSubsetOfHashSetWithSameEC(other);
+            }
+
+            // J2N: Fall back to SetEqualityComparer for special cases:
+            // - Nested array types (using structural equality)
+            // - "Aggressive" mode for nested BCL collection types
+            // - Cross-type set comparisons
+            return Equals(obj, SetEqualityComparer<T>.Default);
+        }
 
         /// <summary>
         /// Gets the hash code for the current set. The hash code is calculated
@@ -2388,7 +2458,31 @@ namespace J2N.Collections.Generic
         /// <returns>A hash code for the current object.</returns>
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
         public override int GetHashCode()
-            => GetHashCode(SetEqualityComparer<T>.Default);
+        {
+            // J2N: Fast path for default comparer - use cached value if valid
+            if (!GenericType<T>.IsCollection && !GenericType<T>.IsStructuralEquatable)
+            {
+                if (_hashCodeVersion == _version)
+                    return _cachedHashCode;
+
+                // J2N: Calculate hash code locally instead of delegating
+                int hashCode = 0;
+                foreach (T element in this)
+                {
+                    hashCode += element?.GetHashCode() ?? 0;
+                }
+
+                // Cache the result
+                _cachedHashCode = hashCode;
+                _hashCodeVersion = _version;
+                return hashCode;
+            }
+
+            // J2N: Fall back to SetEqualityComparer for special cases:
+            // - Nested array types (using structural equality)
+            // - "Aggressive" mode for nested BCL collection types
+            return GetHashCode(SetEqualityComparer<T>.Default);
+        }
 
         #endregion Structural Equality
 
