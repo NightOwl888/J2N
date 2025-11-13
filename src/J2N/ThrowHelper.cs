@@ -670,6 +670,12 @@ namespace J2N
         }
 
         [DoesNotReturn]
+        internal static void ThrowArgumentException_Argument_InvalidCodePoint(uint codePoint)
+        {
+            throw new ArgumentException(SR.Format(SR.Argument_InvalidCodePoint, codePoint));
+        }
+
+        [DoesNotReturn]
         internal static void ThrowArgumentException_Argument_MinMaxValue(ExceptionArgument min, ExceptionArgument max)
         {
             throw new ArgumentException(SR.Format(SR.Argument_MinMaxValue, GetArgumentName(min), GetArgumentName(max)));
@@ -1473,8 +1479,8 @@ namespace J2N
                 //    return SR.TaskCompletionSourceT_TrySetException_NullException;
                 //case ExceptionResource.TaskCompletionSourceT_TrySetException_NoExceptions:
                 //    return SR.TaskCompletionSourceT_TrySetException_NoExceptions;
-                //case ExceptionResource.NotSupported_StringComparison:
-                //    return SR.NotSupported_StringComparison;
+                case ExceptionResource.NotSupported_StringComparison:
+                    return SR.NotSupported_StringComparison;
                 case ExceptionResource.ConcurrentCollection_SyncRoot_NotSupported:
                     return SR.ConcurrentCollection_SyncRoot_NotSupported;
                 //case ExceptionResource.Task_MultiTaskContinuation_NullTask:
@@ -1565,8 +1571,8 @@ namespace J2N
                 //    return SR.Argument_AlignmentMustBePow2;
                 //case ExceptionResource.ArgumentOutOfRange_NotGreaterThanBufferLength:
                 //    return SR.ArgumentOutOfRange_NotGreaterThanBufferLength;
-                //case ExceptionResource.InvalidOperation_SpanOverlappedOperation:
-                //    return SR.InvalidOperation_SpanOverlappedOperation;
+                case ExceptionResource.InvalidOperation_SpanOverlappedOperation:
+                    return SR.InvalidOperation_SpanOverlappedOperation;
                 //case ExceptionResource.InvalidOperation_TimeProviderNullLocalTimeZone:
                 //    return SR.InvalidOperation_TimeProviderNullLocalTimeZone;
                 //case ExceptionResource.InvalidOperation_TimeProviderInvalidTimestampFrequency:
@@ -1618,6 +1624,7 @@ namespace J2N
         comments,
         comparer,
         comparison,
+        comparisonType,
         converter,
         count,
         culture,
@@ -1731,7 +1738,7 @@ namespace J2N
         //comparable,
 
 
-        //comparisonType,
+        
         //manager,
         //sourceBytesToCopy,
         //callBack,
@@ -1835,7 +1842,7 @@ namespace J2N
         //TaskT_TransitionToFinal_AlreadyCompleted,
         //TaskCompletionSourceT_TrySetException_NullException,
         //TaskCompletionSourceT_TrySetException_NoExceptions,
-        //NotSupported_StringComparison,
+        NotSupported_StringComparison,
         ConcurrentCollection_SyncRoot_NotSupported,
         //Task_MultiTaskContinuation_NullTask,
         //InvalidOperation_WrongAsyncResultOrEndCalledMultiple,
@@ -1880,7 +1887,7 @@ namespace J2N
         //Argument_InvalidFlag,
         //CancellationTokenSource_Disposed,
         //Argument_AlignmentMustBePow2,
-        //InvalidOperation_SpanOverlappedOperation,
+        InvalidOperation_SpanOverlappedOperation,
         //InvalidOperation_TimeProviderNullLocalTimeZone,
         //InvalidOperation_TimeProviderInvalidTimestampFrequency,
         //Format_UnexpectedClosingBrace,
