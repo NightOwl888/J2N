@@ -957,22 +957,7 @@ namespace J2N.Collections.Generic
         /// and it contains the same elements; otherwise, <c>false</c>.</returns>
         /// <seealso cref="Equals(object, IEqualityComparer)"/>
         public override bool Equals(object? obj)
-        {
-            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
-            // compare via the underlying Net5.HashSet<T> which uses hash-based lookups (O(n) vs O(n²))
-            if (obj is ISet<T> other && EqualityComparerHelper.AreSetEqualityComparersEqual(EqualityComparer, other))
-            {
-                if (Count != other.Count)
-                    return false;
-                return hashSet.SetEquals(other);
-            }
-
-            // J2N: Fall back to SetEqualityComparer for special cases:
-            // - Nested array types (using structural equality)
-            // - "Aggressive" mode for nested BCL collection types
-            // - Cross-type set comparisons
-            return Equals(obj, SetEqualityComparer<T>.Default);
-        }
+            => Equals(obj, SetEqualityComparer<T>.Default);
 
         /// <summary>
         /// Gets the hash code for the current list. The hash code is calculated
