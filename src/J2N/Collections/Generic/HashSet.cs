@@ -24,8 +24,6 @@ using static System.ArgumentOutOfRangeException;
 using static J2N.Collections.StaticThrowHelper;
 #endif
 
-// ReSharper disable NonReadonlyMemberInGetHashCode
-
 namespace J2N.Collections.Generic
 {
     /// <summary>
@@ -2419,49 +2417,12 @@ namespace J2N.Collections.Generic
         /// the hash code.</param>
         /// <returns>A hash code representing the current set.</returns>
         public virtual int GetHashCode(IEqualityComparer comparer)
-            => SetEqualityComparer<T>.GetHashCode(this, comparer);
-
-        /// <summary>
-        /// Determines whether the specified object is structurally equal to the current set
-        /// using rules similar to those in the JDK's AbstractSet class. Two sets are considered
-        /// equal when they both contain the same objects (in any order).
-        /// </summary>
-        /// <param name="obj">The object to compare with the current object.</param>
-        /// <returns><c>true</c> if the specified object implements <see cref="ISet{T}"/>
-        /// and it contains the same elements; otherwise, <c>false</c>.</returns>
-        /// <seealso cref="Equals(object, IEqualityComparer)"/>
-        public override bool Equals(object? obj)
-        {
-            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
-            // use hash-based lookups instead of the slower SetEqualityComparer (O(n) vs O(n²))
-            if (obj is ISet<T> other
-                && EqualityComparersAreEqual(this, other)
-                && !GenericType<T>.IsCollection
-                && !GenericType<T>.IsStructuralEquatable)
-            {
-                if (Count != other.Count) // NOTE: intentionally using Count property here since it subtracts free count
-                    return false;
-                return IsSubsetOfHashSetWithSameEC(other);
-            }
-
-            // J2N: Fall back to SetEqualityComparer for special cases:
-            // - Nested array types (using structural equality)
-            // - "Aggressive" mode for nested BCL collection types
-            // - Cross-type set comparisons
-            return Equals(obj, SetEqualityComparer<T>.Default);
-        }
-
-        /// <summary>
-        /// Gets the hash code for the current set. The hash code is calculated
-        /// by taking each nested element's hash code into account.
-        /// </summary>
-        /// <returns>A hash code for the current object.</returns>
-        /// <seealso cref="GetHashCode(IEqualityComparer)"/>
-        public override int GetHashCode()
         {
             // J2N: Fast path for default comparer - use cached value if valid
-            if (!GenericType<T>.IsCollection && !GenericType<T>.IsStructuralEquatable)
+            if (comparer is SetEqualityComparer<T> setComparer &&
+                Equals(setComparer, SetEqualityComparer<T>.Default))
             {
+                // Check if cached hash code is still valid
                 if (_hashCodeVersion == _version)
                     return _cachedHashCode;
 
@@ -2481,8 +2442,44 @@ namespace J2N.Collections.Generic
             // J2N: Fall back to SetEqualityComparer for special cases:
             // - Nested array types (using structural equality)
             // - "Aggressive" mode for nested BCL collection types
-            return GetHashCode(SetEqualityComparer<T>.Default);
+            return SetEqualityComparer<T>.GetHashCode(this, comparer);
         }
+
+        /// <summary>
+        /// Determines whether the specified object is structurally equal to the current set
+        /// using rules similar to those in the JDK's AbstractSet class. Two sets are considered
+        /// equal when they both contain the same objects (in any order).
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns><c>true</c> if the specified object implements <see cref="ISet{T}"/>
+        /// and it contains the same elements; otherwise, <c>false</c>.</returns>
+        /// <seealso cref="Equals(object, IEqualityComparer)"/>
+        public override bool Equals(object? obj)
+        {
+            // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
+            // use hash-based lookups instead of the slower SetEqualityComparer (O(n) vs O(n²))
+            if (obj is ISet<T> other && EqualityComparersAreEqual(this, other))
+            {
+                if (Count != other.Count)
+                    return false;
+                return IsSubsetOfHashSetWithSameEC(other);
+            }
+
+            // J2N: Fall back to SetEqualityComparer for special cases:
+            // - Nested array types (using structural equality)
+            // - "Aggressive" mode for nested BCL collection types
+            // - Cross-type set comparisons
+            return Equals(obj, SetEqualityComparer<T>.Default);
+        }
+
+        /// <summary>
+        /// Gets the hash code for the current set. The hash code is calculated
+        /// by taking each nested element's hash code into account.
+        /// </summary>
+        /// <returns>A hash code for the current object.</returns>
+        /// <seealso cref="GetHashCode(IEqualityComparer)"/>
+        public override int GetHashCode()
+            => GetHashCode(SetEqualityComparer<T>.Default);
 
         #endregion Structural Equality
 

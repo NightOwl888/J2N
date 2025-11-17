@@ -13,8 +13,6 @@ using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using SCG = System.Collections.Generic;
 
-// ReSharper disable NonReadonlyMemberInGetHashCode
-
 namespace J2N.Collections.Generic.Net5
 {
     /// <summary>
@@ -2289,7 +2287,33 @@ namespace J2N.Collections.Generic.Net5
         /// the hash code.</param>
         /// <returns>A hash code representing the current set.</returns>
         public virtual int GetHashCode(IEqualityComparer comparer)
-            => SetEqualityComparer<T>.GetHashCode(this, comparer);
+        {
+            // J2N: Fast path for default comparer - use cached value if valid
+            if (comparer is SetEqualityComparer<T> setComparer &&
+                Equals(setComparer, SetEqualityComparer<T>.Default))
+            {
+                // Check if cached hash code is still valid
+                if (_hashCodeVersion == _version)
+                    return _cachedHashCode;
+
+                // J2N: Calculate hash code locally instead of delegating
+                int hashCode = 0;
+                foreach (T element in this)
+                {
+                    hashCode += element?.GetHashCode() ?? 0;
+                }
+
+                // Cache the result
+                _cachedHashCode = hashCode;
+                _hashCodeVersion = _version;
+                return hashCode;
+            }
+
+            // J2N: Fall back to SetEqualityComparer for special cases:
+            // - Nested array types (using structural equality)
+            // - "Aggressive" mode for nested BCL collection types
+            return SetEqualityComparer<T>.GetHashCode(this, comparer);
+        }
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
@@ -2304,10 +2328,7 @@ namespace J2N.Collections.Generic.Net5
         {
             // J2N: Fast path for same-type comparison - if obj is ISet<T> with same equality comparer,
             // use hash-based lookups instead of the slower SetEqualityComparer (O(n) vs O(n²))
-            if (obj is ISet<T> other
-                && AreEqualityComparersEqual(this, other)
-                && !GenericType<T>.IsCollection
-                && !GenericType<T>.IsStructuralEquatable)
+            if (obj is ISet<T> other && AreEqualityComparersEqual(this, other))
             {
                 if (_count != other.Count)
                     return false;
@@ -2328,31 +2349,7 @@ namespace J2N.Collections.Generic.Net5
         /// <returns>A hash code for the current object.</returns>
         /// <seealso cref="GetHashCode(IEqualityComparer)"/>
         public override int GetHashCode()
-        {
-            // J2N: Fast path for default comparer - use cached value if valid
-            if (!GenericType<T>.IsCollection && !GenericType<T>.IsStructuralEquatable)
-            {
-                if (_hashCodeVersion == _version)
-                    return _cachedHashCode;
-
-                // J2N: Calculate hash code locally instead of delegating
-                int hashCode = 0;
-                foreach (T element in this)
-                {
-                    hashCode += element?.GetHashCode() ?? 0;
-                }
-
-                // Cache the result
-                _cachedHashCode = hashCode;
-                _hashCodeVersion = _version;
-                return hashCode;
-            }
-
-            // J2N: Fall back to SetEqualityComparer for special cases:
-            // - Nested array types (using structural equality)
-            // - "Aggressive" mode for nested BCL collection types
-            return GetHashCode(SetEqualityComparer<T>.Default);
-        }
+            => GetHashCode(SetEqualityComparer<T>.Default);
 
         #endregion
 
