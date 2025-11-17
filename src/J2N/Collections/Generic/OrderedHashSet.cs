@@ -143,10 +143,6 @@ namespace J2N.Collections.Generic
         private int _version;
         /// <summary>Multiplier used on 64-bit to enable faster % operations.</summary>
         private ulong _fastModMultiplier;
-        /// <summary>J2N: Cached hash code value.</summary>
-        private int _cachedHashCode;
-        /// <summary>J2N: Version number when hash code was cached (-1 indicates uncached).</summary>
-        private int _hashCodeVersion = -1;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OrderedHashSet{T}"/> class that is empty,
@@ -2616,33 +2612,7 @@ namespace J2N.Collections.Generic
         /// the hash code.</param>
         /// <returns>A hash code representing the current set.</returns>
         public virtual int GetHashCode(IEqualityComparer comparer)
-        {
-            // J2N: Fast path for default comparer - use cached value if valid
-            if (comparer is SetEqualityComparer<T> setComparer &&
-                Equals(setComparer, SetEqualityComparer<T>.Default))
-            {
-                // Check if cached hash code is still valid
-                if (_hashCodeVersion == _version)
-                    return _cachedHashCode;
-
-                // J2N: Calculate hash code locally instead of delegating
-                int hashCode = 0;
-                foreach (T element in this)
-                {
-                    hashCode += element?.GetHashCode() ?? 0;
-                }
-
-                // Cache the result
-                _cachedHashCode = hashCode;
-                _hashCodeVersion = _version;
-                return hashCode;
-            }
-
-            // J2N: Fall back to SetEqualityComparer for special cases:
-            // - Nested array types (using structural equality)
-            // - "Aggressive" mode for nested BCL collection types
-            return SetEqualityComparer<T>.GetHashCode(this, comparer);
-        }
+            => SetEqualityComparer<T>.GetHashCode(this, comparer);
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
