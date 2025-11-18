@@ -20,6 +20,7 @@
     <SystemNetHttpPackageReferenceVersion>4.3.4</SystemNetHttpPackageReferenceVersion>
     <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>6.0.0</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
     <SystemRuntimeCompilerServicesUnsafePackageReferenceVersion Condition=" '$(TargetFramework)' == 'net45' ">4.7.1</SystemRuntimeCompilerServicesUnsafePackageReferenceVersion>
+    <SystemRuntimeSerializationFormattersPackageReferenceVersion>10.0.0</SystemRuntimeSerializationFormattersPackageReferenceVersion>
     <SystemTextEncodingCodePagesPackageReferenceVersion>4.3.0</SystemTextEncodingCodePagesPackageReferenceVersion>
     <SystemTextRegularExpressionsPackageReferenceVersion>4.3.1</SystemTextRegularExpressionsPackageReferenceVersion>
     <XunitPackageReferenceVersion>2.9.3</XunitPackageReferenceVersion>
