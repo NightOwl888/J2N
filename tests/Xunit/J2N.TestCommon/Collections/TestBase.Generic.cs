@@ -326,6 +326,22 @@ namespace J2N.Collections.Tests
         }
 
         /// <summary>
+        /// Create an OrderedHashSet with a specific initial capacity and fill it with a specific number of elements.
+        /// </summary>
+        protected JCG.OrderedHashSet<T> CreateOrderedHashSetWithCapacity(int count, int capacity)
+        {
+            var set = new JCG.OrderedHashSet<T>(capacity, GetIEqualityComparer());
+            int seed = 528;
+
+            for (int i = 0; i < count; i++)
+            {
+                while (!set.Add(CreateT(seed++))) ;
+            }
+
+            return set;
+        }
+
+        /// <summary>
         /// Helper function to create an SortedSet fulfilling the given specific parameters. The function will
         /// create an SortedSet using the Comparer constructor and then add values
         /// to it until it is full. It will begin by adding the desired number of matching,
