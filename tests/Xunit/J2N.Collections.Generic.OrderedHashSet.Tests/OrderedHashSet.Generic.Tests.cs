@@ -860,22 +860,84 @@ namespace J2N.Collections.Tests
 
         #endregion
 
-        #region SetAt
+        #region GetAt / SetAt
+
+        // Based on: https://github.com/dotnet/runtime/blob/v10.0.0-rc.2.25502.107/src/libraries/System.Collections/tests/Generic/OrderedDictionary/OrderedDictionary.Generic.Tests.cs
+
+        [Fact]
+        public void OrderedHashSet_Generic_SetAt_GetAt_InvalidInputs()
+        {
+            OrderedHashSet<T> set = (OrderedHashSet<T>)GenericISetFactory();
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.GetAt(-1));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.GetAt(0));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.SetAt(-1, CreateT(0)));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.SetAt(0, CreateT(0)));
+
+            set.Add(CreateT(0));
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.GetAt(-1));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.GetAt(1));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.SetAt(-1, CreateT(0)));
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () => set.SetAt(1, CreateT(0)));
+
+            if (default(T) is null)
+            {
+                set.SetAt(0, default); // J2N: We allow null values, this should not throw
+            }
+
+            set.Add(CreateT(1));
+
+            T first = set.GetAt(0);
+            set.SetAt(0, first);
+            set.SetAt(0, CreateT(2));
+            set.SetAt(0, first);
+
+            AssertExtensions.Throws<ArgumentException>(() => set.SetAt(1, first));
+        }
 
         [Theory]
         [MemberData(nameof(ValidPositiveCollectionSizes))]
-        public void OrderedHashSet_Generic_SetAt_InvalidInputs(int count)
+        public void OrderedHashSet_Generic_SetAt_GetAt_Roundtrip(int count)
         {
             OrderedHashSet<T> set = (OrderedHashSet<T>)GenericISetFactory(count);
-            T value = CreateT(1);
+            T value;
 
-            // Test index out of range
-            Assert.Throws<ArgumentOutOfRangeException>(() => set.SetAt(-1, value));
-            Assert.Throws<ArgumentOutOfRangeException>(() => set.SetAt(count, value));
-            Assert.Throws<ArgumentOutOfRangeException>(() => set.SetAt(int.MaxValue, value));
+            for (int i = 0; i < set.Count; i++)
+            {
+                value = set.GetAt(i);
+                Assert.Equal(value, ((SCG.IList<T>)set)[i]);
+
+                set.SetAt(i, CreateT(i + 500));
+                value = set.GetAt(i);
+                Assert.Equal(value, ((SCG.IList<T>)set)[i]);
+
+                set.SetAt(i, CreateT(i + 1000));
+                value = set.GetAt(i);
+                Assert.Equal(value, ((SCG.IList<T>)set)[i]);
+            }
         }
 
         [Fact]
+        public void OrderedHashSet_SetAt_ValueSubsequentlyAvailable()
+        {
+            T value0 = CreateT(0), value1 = CreateT(1);
+
+            var set = new OrderedHashSet<T>
+            {
+                value0,
+            };
+
+            set.SetAt(index: 0, value1);
+
+            Assert.Equal(1, set.Count);
+            Assert.Equal([value1], set);
+            Assert.False(set.Contains(value0));
+            Assert.True(set.Contains(value1));
+        }
+
+
+        [Fact] // J2N specific
         public void OrderedHashSet_Generic_SetAt_ValueUpdated()
         {
             OrderedHashSet<int> set = new OrderedHashSet<int> { 1, 2, 3, 4, 5 };
@@ -887,7 +949,7 @@ namespace J2N.Collections.Tests
             Assert.Equal(newValue, set.ElementAt(0));
         }
 
-        [Fact]
+        [Fact] // J2N specific
         public void OrderedHashSet_Generic_SetAt_SameIndex_ValueUnchanged()
         {
             OrderedHashSet<int> set = new OrderedHashSet<int> { 1, 2, 3, 4, 5 };
@@ -900,7 +962,7 @@ namespace J2N.Collections.Tests
             Assert.Equal(originalValue, set.ElementAt(2));
         }
 
-        [Fact]
+        [Fact] // J2N specific
         public void OrderedHashSet_Generic_SetAt_ValueReplacedAndFindable()
         {
             // When a value at an index is replaced via SetAt, the new value
@@ -931,7 +993,7 @@ namespace J2N.Collections.Tests
             Assert.False(set.Contains(1));
         }
 
-        [Fact]
+        [Fact] // J2N specific
         public void OrderedHashSet_Generic_SetAt_ReplacedValueFindableByLookup()
         {
             // After replacing a value via SetAt, the new value should be
@@ -963,7 +1025,7 @@ namespace J2N.Collections.Tests
             Assert.True(set.Contains(newValue));
         }
 
-        [Fact]
+        [Fact] // J2N specific
         public void OrderedHashSet_Generic_SetAt_ReplacedValueWithDifferentHash()
         {
             // When replacing a value with one that hashes to a different bucket,
@@ -985,7 +1047,7 @@ namespace J2N.Collections.Tests
             Assert.False(set.Contains(2));
         }
 
-        [Fact]
+        [Fact] // J2N specific
         public void OrderedHashSet_Generic_SetAt_MultipleReplacements_AllFindable()
         {
             // When multiple values are replaced via SetAt, all new values
