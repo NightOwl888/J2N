@@ -19,10 +19,16 @@ namespace J2N.Collections.Tests
     public abstract class OrderedHashSet_Generic_Tests<T> : ISet_Generic_Tests<T>
     {
         #region ISet<T> Helper Methods
-
-        protected override bool ResetImplemented => true;
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
+
+        protected override bool ResetImplemented => true;
+
+        // J2N TODO: Make OrderedHashSet allow Remove/Clear while iterating forward, like HashSet<T> and Dictionary<TKey, TValue>
+        protected override ModifyOperation ModifyEnumeratorThrows => base.ModifyEnumeratorAllowed /*& ~(ModifyOperation.Remove | ModifyOperation.Clear)*/;
+
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Overwrite /*| ModifyOperation.Remove | ModifyOperation.Clear*/;
+
         protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
 
         protected override SCG.ISet<T> GenericISetFactory()
