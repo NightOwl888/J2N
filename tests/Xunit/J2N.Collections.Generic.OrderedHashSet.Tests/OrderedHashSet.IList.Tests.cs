@@ -104,5 +104,119 @@ namespace J2N.Collections.Tests
             AssertExtensions.Throws<ArgumentException>("value", () => list.Insert(0, 42));
             Assert.Equal(1, list.Count);
         }
+
+        #region Ordering tests
+
+        // Based on: https://github.com/dotnet/runtime/blob/v10.0.0-rc.2.25502.107/src/libraries/System.Collections/tests/Generic/OrderedDictionary/OrderedDictionary.Tests.cs#L47-L95
+
+        [Fact]
+        public void Ordering_AddInsertRemoveClear_ExpectedOrderResults()
+        {
+            OrderedHashSet<int> d = [];
+
+            d.Add(1);
+            d.Add(2);
+            d.Add(3);
+            Assert.Equal(new[] { 1, 2, 3 }, d);
+
+            d.Remove(2);
+            Assert.Equal(new[] { 1, 3 }, d);
+
+            d.Add(4);
+            Assert.Equal(new[] { 1, 3, 4 }, d);
+
+            d.Insert(0, 5);
+            Assert.Equal(new[] { 5, 1, 3, 4 }, d);
+
+            d.RemoveAt(2);
+            Assert.Equal(new[] { 5, 1, 4 }, d);
+
+            d.Add(6);
+            Assert.Equal(new[] { 5, 1, 4, 6 }, d);
+
+            d.Clear();
+            Assert.Empty(d);
+
+            d.Add(7);
+            d.Add(9);
+            d.Add(8);
+            Assert.Equal(new[] { 7, 9, 8 }, d);
+        }
+
+        #endregion
+
+        #region IList tests
+
+        // Based on: https://github.com/dotnet/runtime/blob/v10.0.0-rc.2.25502.107/src/libraries/System.Collections/tests/Generic/OrderedDictionary/OrderedDictionary.Tests.cs#L99-L220
+
+        [Fact]
+        public void IList_NonGeneric_ItemSet_NullValueWhenDefaultValueIsNonNull()
+        {
+            IList set = new OrderedHashSet<int>();
+            Assert.Throws<ArgumentNullException>(() => set[0] = null);
+        }
+
+        [Fact]
+        public void IList_NonGeneric_Add_NullValueWhenDefaultTIsNonNull()
+        {
+            if (!IsReadOnly)
+            {
+                IList set = new OrderedHashSet<int>();
+                Assert.Throws<ArgumentNullException>(() => set.Add(null));
+                Assert.Empty(set);
+            }
+        }
+
+        [Fact]
+        public void IList_NonGeneric_Contains_WrongType()
+        {
+            if (!IsReadOnly)
+            {
+                IList set = new OrderedHashSet<string>();
+                Assert.False(set.Contains(1));
+            }
+        }
+
+        [Fact]
+        public void IList_NonGeneric_Remove_WrongType()
+        {
+            if (!IsReadOnly)
+            {
+                IList set = new OrderedHashSet<string>();
+                set.Remove(1); // ignored
+                Assert.Empty(set);
+            }
+        }
+
+        #endregion
+
+        #region ICollection tests
+
+        // Based on: https://github.com/dotnet/runtime/blob/v10.0.0-rc.2.25502.107/src/libraries/System.Collections/tests/Generic/OrderedDictionary/OrderedDictionary.Tests.cs#L222-L247
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void ICollection_NonGeneric_CopyTo_ArrayOfIncorrectType(int count)
+        {
+            ICollection collection = NonGenericICollectionFactory(count);
+            int[] array = new int[count * 3 / 2];
+            AssertExtensions.Throws<ArgumentException>("array", null, () => collection.CopyTo(array, 0));
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void ICollection_NonGeneric_CopyTo_ArrayOfCorrectType(int count)
+        {
+            ICollection collection = NonGenericICollectionFactory(count);
+            string[] array = new string[count];
+            collection.CopyTo(array, 0);
+            int i = 0;
+            foreach (object obj in collection)
+            {
+                Assert.Equal(array[i++], obj);
+            }
+        }
+
+        #endregion
     }
 }
