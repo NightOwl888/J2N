@@ -538,6 +538,59 @@ namespace J2N.Collections.Tests
                 Assert.Equal(i, set.Count);
             }
         }
+
+        // J2N specific
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        public void OrderedHashSet_GetAlternateLookup_NullableType_OperationsMatchUnderlyingSet(int mode)
+        {
+            // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying set
+            OrderedHashSet<string> set = new(new AlternateStringComparer(mode switch
+            {
+                0 => StringComparer.Ordinal,
+                1 => StringComparer.OrdinalIgnoreCase,
+                2 => StringComparer.InvariantCulture,
+                3 => StringComparer.InvariantCultureIgnoreCase,
+                4 => StringComparer.CurrentCulture,
+                5 => StringComparer.CurrentCultureIgnoreCase,
+                _ => throw new ArgumentOutOfRangeException(nameof(mode))
+            }));
+            OrderedHashSet<string>.AlternateLookup<string> lookup = set.GetAlternateLookup<string>();
+            Assert.Same(set, lookup.Set);
+            Assert.Same(lookup.Set, lookup.Set);
+
+            // Test the behavior of null vs "" in the set and lookup
+            // including using null for the lookup key
+            Assert.True(set.Add(null));
+            Assert.True(set.Add(string.Empty));
+            Assert.Equal(2, set.Count);
+            Assert.True(set.Contains(null));
+            Assert.True(set.Contains(""));
+            Assert.False(lookup.Add(null));
+            Assert.False(lookup.Add(""));
+            Assert.True(lookup.Contains(null));
+            Assert.True(lookup.Contains(""));
+            Assert.True(lookup.TryGetValue(null, out string value));
+            Assert.Null(value);
+            Assert.True(lookup.TryGetValue("", out value));
+            Assert.Equal("", value);
+            Assert.True(lookup.Remove(""));
+            Assert.True(lookup.Remove(null));
+            Assert.True(lookup.Add(null));
+            Assert.True(set.Remove(null));
+            Assert.Equal(0, set.Count);
+            Assert.False(lookup.Remove(""));
+            Assert.False(set.Remove(""));
+            Assert.False(lookup.Remove(null));
+            Assert.False(set.Remove(null));
+            Assert.Equal(0, set.Count);
+        }
+
 #endif
 
         #endregion
