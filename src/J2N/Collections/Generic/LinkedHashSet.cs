@@ -45,6 +45,60 @@ namespace J2N.Collections.Generic
     /// when calling methods that add or remove items multiple times in succession, however, there will be an impact
     /// when alternating between the remove and add operations in rapid succession or when calling
     /// <see cref="SymmetricExceptWith(IEnumerable{T})"/>, which does both a remove and an add operation.
+    /// <para/>
+    /// <b>Java to .NET Method Mapping</b>
+    /// <para/>
+    /// The following table shows how common Java <see cref="ISet{T}"/> operations map to .NET <see cref="ISet{T}"/> operations:
+    /// <list type="table">
+    ///   <listheader>
+    ///     <term>Java Operation</term>
+    ///     <description>.NET Operation</description>
+    ///   </listheader>
+    ///   <item>
+    ///     <term><c>set1.containsAll(set2)</c></term>
+    ///     <description><see cref="IsSupersetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>set1.containsAll(set2) &amp;&amp; !set1.equals(set2)</c></term>
+    ///     <description><see cref="IsProperSupersetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>set2.containsAll(set1)</c></term>
+    ///     <description><see cref="IsSubsetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>set2.containsAll(set1) &amp;&amp; !set2.equals(set1)</c></term>
+    ///     <description><see cref="IsProperSubsetOf(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>Collections.disjoint(set1, set2)</c></term>
+    ///     <description><c>!<see cref="Overlaps(IEnumerable{T})"/></c></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>!Collections.disjoint(set1, set2)</c></term>
+    ///     <description><see cref="Overlaps(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>EnumSet.complementOf(enumSet)</c></term>
+    ///     <description><see cref="SymmetricExceptWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>removeAll(other)</c></term>
+    ///     <description><see cref="ExceptWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>retainAll(other)</c></term>
+    ///     <description><see cref="IntersectWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>addAll(other)</c></term>
+    ///     <description><see cref="UnionWith(IEnumerable{T})"/></description>
+    ///   </item>
+    ///   <item>
+    ///     <term><c>equals(other)</c></term>
+    ///     <description><see cref="SetEquals(IEnumerable{T})"/> or <see cref="Equals(object)"/></description>
+    ///   </item>
+    /// </list>
     /// </remarks>
     /// <typeparam name="T">The type of elements in the set.</typeparam>
 #if FEATURE_SERIALIZABLE
@@ -895,7 +949,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current set
-        /// using rules similar to those in the JDK's AbstactSet class. Two sets are considered
+        /// using rules similar to those in the JDK's AbstractSet class. Two sets are considered
         /// equal when they both contain the same objects (in any order).
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>

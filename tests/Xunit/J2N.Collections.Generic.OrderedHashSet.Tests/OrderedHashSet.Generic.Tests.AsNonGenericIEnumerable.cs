@@ -1,0 +1,67 @@
+// Based on: https://github.com/dotnet/runtime/blob/v10.0.0-rc.2.25502.107/src/libraries/System.Collections/tests/Generic/HashSet/HashSet.Generic.Tests.AsNonGenericIEnumerable.cs
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+using J2N.Collections.Generic;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+
+namespace J2N.Collections.Tests
+{
+    public class OrderedHashSet_IEnumerable_NonGeneric_Tests : IEnumerable_NonGeneric_Tests
+    {
+        protected override IEnumerable NonGenericIEnumerableFactory(int count)
+        {
+            var set = new OrderedHashSet<string>();
+            int seed = 12354;
+            while (set.Count < count)
+                set.Add(CreateT(set, seed++));
+            return set;
+        }
+
+        protected override bool Enumerator_Empty_UsesSingletonInstance => true;
+        protected override bool Enumerator_Current_UndefinedOperation_Throws => true; // J2N: Use IList behavior
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throw => true;
+
+        protected override ModifyOperation ModifyEnumeratorThrows => base.ModifyEnumeratorAllowed & ~ModifyOperation.Remove;
+
+        protected override ModifyOperation ModifyEnumeratorAllowed => ModifyOperation.Overwrite | ModifyOperation.Remove;
+
+        /// <summary>
+        /// Returns a set of ModifyEnumerable delegates that modify the enumerable passed to them.
+        /// </summary>
+        protected override IEnumerable<ModifyEnumerable> GetModifyEnumerables(ModifyOperation operations)
+        {
+            if ((operations & ModifyOperation.Clear) == ModifyOperation.Clear)
+            {
+                yield return (IEnumerable enumerable) =>
+                {
+                    OrderedHashSet<string> casted = ((OrderedHashSet<string>)enumerable);
+                    if (casted.Count > 0)
+                    {
+                        casted.Clear();
+                        return true;
+                    }
+                    return false;
+                };
+            }
+        }
+
+        protected string CreateT(OrderedHashSet<string> set, int seed)
+        {
+            int stringLength = seed % 10 + 5;
+            Random rand = new Random(seed);
+            byte[] bytes = new byte[stringLength];
+            rand.NextBytes(bytes);
+            string ret = Convert.ToBase64String(bytes);
+            while (set.Contains(ret))
+            {
+                rand.NextBytes(bytes);
+                ret = Convert.ToBase64String(bytes);
+            }
+            return ret;
+        }
+    }
+}

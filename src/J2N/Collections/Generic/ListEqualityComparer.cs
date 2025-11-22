@@ -52,7 +52,7 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Gets a <see cref="ListEqualityComparer{T}"/> object that compares
         /// <see cref="IList{T}"/> implementations for structural equality
-        /// using rules similar to those in Java. Nested elemements that implement 
+        /// using rules similar to those in Java. Nested elemements that implement
         /// <see cref="IStructuralEquatable"/> are also compared.
         /// </summary>
         public static ListEqualityComparer<T> Default { get; } = new DefaultListEqualityComparer();
@@ -96,7 +96,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two lists for structural equality using rules similar to those in
-        /// the JDK's AbstactList class. Two lists are considered equal when they both contain
+        /// the JDK's AbstractList class. Two lists are considered equal when they both contain
         /// the same objects in the same order.
         /// </summary>
         /// <param name="listA">The first list to compare.</param>
@@ -148,7 +148,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two objects for structural equality using rules similar to those in
-        /// the JDK's AbstactList class. Two lists are considered equal when they both contain
+        /// the JDK's AbstractList class. Two lists are considered equal when they both contain
         /// the same objects in the same order.
         /// </summary>
         /// <param name="a">The first list to compare.</param>
@@ -209,7 +209,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Compares two objects for structural equality using rules similar to those in
-        /// the JDK's AbstactList class. Two lists are considered equal when they both contain
+        /// the JDK's AbstractList class. Two lists are considered equal when they both contain
         /// the same objects in the same order.
         /// <para/>
         /// Usage Note: This overload can be used in a collection of <see cref="IList{T}"/> to

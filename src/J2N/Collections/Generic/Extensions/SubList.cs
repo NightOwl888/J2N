@@ -228,7 +228,7 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Determines whether the specified object is structurally equal to the current list
-        /// using rules similar to those in the JDK's AbstactList class. Two lists are considered
+        /// using rules similar to those in the JDK's AbstractList class. Two lists are considered
         /// equal when they both contain the same objects in the same order.
         /// </summary>
         /// <param name="obj">The object to compare with the current object.</param>
