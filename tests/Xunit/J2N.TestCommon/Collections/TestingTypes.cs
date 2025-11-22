@@ -4,6 +4,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Xunit;
 
 namespace J2N.Collections.Tests
 {
@@ -167,6 +168,47 @@ namespace J2N.Collections.Tests
         public int GetHashCode(int x)
         {
             return Math.Abs(x);
+        }
+    }
+
+    /// <summary>
+    /// Allows testing for null in alternate comparer implementations
+    /// and asserts to ensure that null is not passed into the comparer.
+    /// </summary>
+#if FEATURE_SERIALIZABLE
+    [Serializable]
+#endif
+    public class AlternateStringComparer : IEqualityComparer<string> // J2N specific
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        , IAlternateEqualityComparer<string, string>
+#endif
+    {
+        private readonly StringComparer underlyingComparer;
+
+        public AlternateStringComparer(StringComparer underlyingComparer)
+        {
+            this.underlyingComparer = underlyingComparer;
+        }
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        string IAlternateEqualityComparer<string, string>.Create(string alternate)
+        {
+            Assert.NotNull(alternate); // We should not rely on this for null
+            return alternate;
+        }
+#endif
+
+        public bool Equals(string x, string y)
+        {
+            Assert.NotNull(x); // We should not rely on this for null
+            Assert.NotNull(y);
+            return underlyingComparer.Equals(x, y);
+        }
+
+        public int GetHashCode(string obj)
+        {
+            Assert.NotNull(obj); // We should not rely on this for null
+            return underlyingComparer.GetHashCode(obj);
         }
     }
 
