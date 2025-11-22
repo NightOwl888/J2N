@@ -21,7 +21,9 @@ namespace J2N.Collections.Tests
         }
 
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
-        protected override bool Enumerator_Current_UndefinedOperation_Throws => true;
+        protected override bool Enumerator_Current_UndefinedOperation_Throws => true; // J2N: Use IList behavior
+
+        protected override bool Enumerator_Empty_Current_UndefinedOperation_Throw => true;
 
         protected override ModifyOperation ModifyEnumeratorThrows => base.ModifyEnumeratorAllowed & ~ModifyOperation.Remove;
 

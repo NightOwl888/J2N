@@ -426,12 +426,20 @@ namespace J2N.Collections.Generic
             get => GetAt(index);
             set
             {
-                ThrowIfNull(value);
-
-                if (value is not T t)
+                T t = default!;
+                if (value is not null)
                 {
-                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
-                    return;
+                    if (value is not T temp)
+                    {
+                        ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
+                        return;
+                    }
+
+                    t = temp;
+                }
+                else if (default(T) is not null)
+                {
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
                 }
 
                 SetAt(index, t);
@@ -1774,10 +1782,20 @@ namespace J2N.Collections.Generic
         /// <inheritdoc/>
         int IList.Add(object? value)
         {
-            if (value is not T t)
+            T t = default!;
+            if (value is not null)
             {
-                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
-                return Count - 1;
+                if (value is not T temp)
+                {
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
+                    return Count - 1;
+                }
+
+                t = temp;
+            }
+            else if (default(T) is not null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
 
             Add(t);
@@ -1786,15 +1804,15 @@ namespace J2N.Collections.Generic
 
         /// <inheritdoc/>
         bool IList.Contains(object? value) =>
-            value is T t &&
-            Contains(t);
+            IsCompatibleValue(value) &&
+            Contains((T)value!);
 
         /// <inheritdoc/>
         int IList.IndexOf(object? value)
         {
-            if (value is T t)
+            if (IsCompatibleValue(value))
             {
-                return ((IList<T>)this).IndexOf(t);
+                return ((IList<T>)this).IndexOf((T)value!);
             }
 
             return -1;
@@ -1803,10 +1821,20 @@ namespace J2N.Collections.Generic
         /// <inheritdoc/>
         void IList.Insert(int index, object? value)
         {
-            if (value is not T t)
+            T t = default!;
+            if (value is not null)
             {
-                ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
-                return;
+                if (value is not T temp)
+                {
+                    ThrowHelper.ThrowWrongValueTypeArgumentException(value, typeof(T));
+                    return;
+                }
+
+                t = temp;
+            }
+            else if (default(T) is not null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
             }
 
             Insert(index, t);
@@ -1815,9 +1843,9 @@ namespace J2N.Collections.Generic
         /// <inheritdoc/>
         void IList.Remove(object? value)
         {
-            if (value is T t)
+            if (IsCompatibleValue(value))
             {
-                ((ICollection<T>)this).Remove(t);
+                ((ICollection<T>)this).Remove((T)value!);
             }
         }
 
@@ -2239,21 +2267,23 @@ namespace J2N.Collections.Generic
             private readonly int _version;
             /// <summary>The current index.</summary>
             private int _index;
+            /// <summary>The current element.</summary>
+            private T _current;
 
             /// <summary>Initialize the enumerator.</summary>
             internal Enumerator(OrderedHashSet<T> set)
             {
                 _set = set;
                 _version = _set._version;
+                _index = 0;
+                _current = default!;
             }
 
             /// <inheritdoc/>
-            [AllowNull]
-            public T Current { get; private set; }
+            public T Current => _current;
 
             /// <inheritdoc/>
-            [AllowNull]
-            readonly object IEnumerator.Current
+            readonly object? IEnumerator.Current
             {
                 get
                 {
@@ -2261,7 +2291,7 @@ namespace J2N.Collections.Generic
                     {
                         ThrowHelper.ThrowInvalidOperationException_InvalidOperation_EnumOpCantHappen();
                     }
-                    return Current!; // [!]: allow null values
+                    return _current!; // [!]: allow null values
                 }
             }
 
@@ -2279,13 +2309,13 @@ namespace J2N.Collections.Generic
                 {
                     Debug.Assert(set._entries is not null);
                     ref Entry entry = ref set._entries![_index]; // [!]: asserted above
-                    Current = entry.Value;
+                    _current = entry.Value;
                     _index++;
                     return true;
                 }
 
                 _index = set._count + 1;
-                Current = default;
+                _current = default!;
                 return false;
             }
 
@@ -2298,7 +2328,7 @@ namespace J2N.Collections.Generic
                 }
 
                 _index = 0;
-                Current = default;
+                _current = default!;
             }
 
             /// <inheritdoc/>
@@ -2586,6 +2616,14 @@ namespace J2N.Collections.Generic
         /// </summary>
         private static bool EffectiveEqualityComparersAreEqual(OrderedHashSet<T> set1, OrderedHashSet<T> set2)
             => set1.EffectiveComparer.Equals(set2.EffectiveComparer);
+
+        private static bool IsCompatibleValue(object? value)
+        {
+            if (value is null)
+                return default(T) == null;
+
+            return (value is T);
+        }
 
         #endregion Helper methods
 
