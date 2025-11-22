@@ -1,6 +1,6 @@
+// Based on: https://github.com/dotnet/runtime/blob/v10.0.0-rc.2.25502.107/src/libraries/System.Collections/tests/Generic/HashSet/HashSet.Generic.Tests.AsNonGenericIEnumerable.cs
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
 using System;
