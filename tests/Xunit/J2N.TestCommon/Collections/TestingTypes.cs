@@ -183,9 +183,9 @@ namespace J2N.Collections.Tests
         , IAlternateEqualityComparer<string, string>
 #endif
     {
-        private readonly StringComparer underlyingComparer;
+        private readonly IEqualityComparer<string> underlyingComparer;
 
-        public AlternateStringComparer(StringComparer underlyingComparer)
+        public AlternateStringComparer(IEqualityComparer<string> underlyingComparer)
         {
             this.underlyingComparer = underlyingComparer;
         }

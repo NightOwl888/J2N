@@ -995,6 +995,8 @@ namespace J2N.Collections.Generic
                 Entry[]? entries = _entries;
                 int last = -1;
                 int i = bucket - 1; // Value in buckets is 1-based
+
+                // J2N: optimize for null case below to avoid comparer call
                 if (key is not null)
                 {
                     while (i >= 0)
@@ -1253,6 +1255,8 @@ namespace J2N.Collections.Generic
                 Entry[]? entries = _entries;
                 int last = -1;
                 int i = bucket - 1; // Value in buckets is 1-based
+
+                // J2N: optimize for null case below to avoid comparer call
                 if (key is not null)
                 {
                     while (i >= 0)
@@ -1598,19 +1602,22 @@ namespace J2N.Collections.Generic
             if (_buckets != null)
             {
                 Debug.Assert(_entries != null, "expected entries to be != null");
-                IEqualityComparer<TKey>? comparer = _comparer;
-                if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
-                    comparer == null)
-                {
-                    uint hashCode = (uint)(key?.GetHashCode() ?? 0);
-                    int i = GetBucket(hashCode);
-                    Entry[]? entries = _entries;
-                    uint collisionCount = 0;
 
-                    // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
-                    i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-                    if (key is not null)
+                // J2N: optimize for null case below to avoid comparer call
+                if (key is not null)
+                {
+                    IEqualityComparer<TKey>? comparer = _comparer;
+                    if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                        comparer == null)
                     {
+                        uint hashCode = (uint)key.GetHashCode();
+                        int i = GetBucket(hashCode);
+                        Entry[]? entries = _entries;
+                        uint collisionCount = 0;
+
+                        // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
+                        i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
                         do
                         {
                             // Should be a while loop https://github.com/dotnet/runtime/issues/9422
@@ -1630,39 +1637,15 @@ namespace J2N.Collections.Generic
 
                             collisionCount++;
                         } while (collisionCount <= (uint)entries.Length);
+
+
+                        // The chain of entries forms a loop; which means a concurrent update has happened.
+                        // Break out of the loop and throw, rather than looping forever.
+                        goto ConcurrentOperation;
                     }
                     else
                     {
-                        do
-                        {
-                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
-                            // Test in if to drop range check for following array access
-                            if ((uint)i >= (uint)entries!.Length)
-                            {
-                                goto ReturnNotFound;
-                            }
-
-                            entry = ref entries[i];
-                            if (entry.hashCode == hashCode && entry.key is null)
-                            {
-                                goto ReturnFound;
-                            }
-
-                            i = entry.next;
-
-                            collisionCount++;
-                        } while (collisionCount <= (uint)entries.Length);
-                    }
-
-                    // The chain of entries forms a loop; which means a concurrent update has happened.
-                    // Break out of the loop and throw, rather than looping forever.
-                    goto ConcurrentOperation;
-                }
-                else
-                {
-                    Debug.Assert(comparer is not null);
-                    if (key is not null)
-                    {
+                        Debug.Assert(comparer is not null);
                         uint hashCode = (uint)comparer!.GetHashCode(key);
                         int i = GetBucket(hashCode);
                         Entry[]? entries = _entries;
@@ -1687,34 +1670,38 @@ namespace J2N.Collections.Generic
 
                             collisionCount++;
                         } while (collisionCount <= (uint)entries.Length);
+
+                        // The chain of entries forms a loop; which means a concurrent update has happened.
+                        // Break out of the loop and throw, rather than looping forever.
+                        goto ConcurrentOperation;
                     }
-                    else
+                }
+                else
+                {
+                    uint hashCode = 0;
+                    int i = GetBucket(hashCode);
+                    Entry[]? entries = _entries;
+                    uint collisionCount = 0;
+                    i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                    do
                     {
-                        uint hashCode = 0;
-                        int i = GetBucket(hashCode);
-                        Entry[]? entries = _entries;
-                        uint collisionCount = 0;
-                        i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-                        do
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length)
                         {
-                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
-                            // Test in if to drop range check for following array access
-                            if ((uint)i >= (uint)entries!.Length)
-                            {
-                                goto ReturnNotFound;
-                            }
+                            goto ReturnNotFound;
+                        }
 
-                            entry = ref entries[i];
-                            if (entry.hashCode == hashCode && key is null)
-                            {
-                                goto ReturnFound;
-                            }
+                        entry = ref entries[i];
+                        if (entry.hashCode == hashCode && key is null)
+                        {
+                            goto ReturnFound;
+                        }
 
-                            i = entry.next;
+                        i = entry.next;
 
-                            collisionCount++;
-                        } while (collisionCount <= (uint)entries.Length);
-                    }
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
 
                     // The chain of entries forms a loop; which means a concurrent update has happened.
                     // Break out of the loop and throw, rather than looping forever.
@@ -1777,12 +1764,13 @@ namespace J2N.Collections.Generic
             ref int bucket = ref GetBucket(hashCode);
             int i = bucket - 1; // Value in _buckets is 1-based
 
-            if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
-                comparer == null)
+            // J2N: optimize for null case below to avoid comparer call
+            if (key is not null)
             {
-                // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
-                if (key is not null)
+                if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                    comparer == null)
                 {
+                    // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
                     while (true)
                     {
                         // Should be a while loop https://github.com/dotnet/runtime/issues/9422
@@ -1821,47 +1809,6 @@ namespace J2N.Collections.Generic
                 }
                 else
                 {
-                    while (true)
-                    {
-                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
-                        // Test uint in if rather than loop condition to drop range check for following array access
-                        if ((uint)i >= (uint)entries!.Length)
-                        {
-                            break;
-                        }
-
-                        if (entries[i].hashCode == hashCode && entries[i].key is null)
-                        {
-                            if (behavior == InsertionBehavior.OverwriteExisting)
-                            {
-                                entries[i].value = value;
-                                return true;
-                            }
-
-                            if (behavior == InsertionBehavior.ThrowOnExisting)
-                            {
-                                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException("(null)");
-                            }
-
-                            return false;
-                        }
-
-                        i = entries[i].next;
-
-                        collisionCount++;
-                        if (collisionCount > (uint)entries.Length)
-                        {
-                            // The chain of entries forms a loop; which means a concurrent update has happened.
-                            // Break out of the loop and throw, rather than looping forever.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                        }
-                    }
-                }
-            }
-            else
-            {
-                if (key is not null)
-                {
                     Debug.Assert(comparer is not null);
                     while (true)
                     {
@@ -1899,42 +1846,42 @@ namespace J2N.Collections.Generic
                         }
                     }
                 }
-                else
+            }
+            else
+            {
+                while (true)
                 {
-                    while (true)
+                    // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                    // Test uint in if rather than loop condition to drop range check for following array access
+                    if ((uint)i >= (uint)entries!.Length)
                     {
-                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
-                        // Test uint in if rather than loop condition to drop range check for following array access
-                        if ((uint)i >= (uint)entries!.Length)
+                        break;
+                    }
+
+                    if (entries[i].hashCode == hashCode && entries[i].key is null)
+                    {
+                        if (behavior == InsertionBehavior.OverwriteExisting)
                         {
-                            break;
+                            entries[i].value = value;
+                            return true;
                         }
 
-                        if (entries[i].hashCode == hashCode && entries[i].key is null)
+                        if (behavior == InsertionBehavior.ThrowOnExisting)
                         {
-                            if (behavior == InsertionBehavior.OverwriteExisting)
-                            {
-                                entries[i].value = value;
-                                return true;
-                            }
-
-                            if (behavior == InsertionBehavior.ThrowOnExisting)
-                            {
-                                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException("(null)");
-                            }
-
-                            return false;
+                            ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException("(null)");
                         }
 
-                        i = entries[i].next;
+                        return false;
+                    }
 
-                        collisionCount++;
-                        if (collisionCount > (uint)entries.Length)
-                        {
-                            // The chain of entries forms a loop; which means a concurrent update has happened.
-                            // Break out of the loop and throw, rather than looping forever.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                        }
+                    i = entries[i].next;
+
+                    collisionCount++;
+                    if (collisionCount > (uint)entries.Length)
+                    {
+                        // The chain of entries forms a loop; which means a concurrent update has happened.
+                        // Break out of the loop and throw, rather than looping forever.
+                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                     }
                 }
             }
@@ -2153,6 +2100,12 @@ namespace J2N.Collections.Generic
                     ref TValue value = ref FindValue(key, out _);
                     if (Unsafe.IsNullRef(ref value))
                     {
+                        if (key is null)
+                        {
+                            ThrowHelper.ThrowKeyNotFoundException("(null)");
+                            return default;
+                        }
+
                         ThrowHelper.ThrowKeyNotFoundException(GetAlternateComparer(Dictionary).Create(key));
                     }
 
@@ -2216,7 +2169,7 @@ namespace J2N.Collections.Generic
                 if (!Unsafe.IsNullRef(ref valueRef))
                 {
                     value = valueRef;
-                    Debug.Assert(actualKey is not null);
+                    // J2N allows null keys
                     return true;
                 }
 
@@ -2244,6 +2197,7 @@ namespace J2N.Collections.Generic
                 {
                     Debug.Assert(dictionary._entries != null, "expected entries to be != null");
 
+                    // J2N: optimize for null case below to avoid comparer call
                     if (key is not null)
                     {
                         IAlternateEqualityComparer<TAlternateKey, TKey> comparer = GetAlternateComparer(dictionary); // J2N: Moved within null check, since we don't need to look this up for null keys
@@ -2346,6 +2300,7 @@ namespace J2N.Collections.Generic
                     Debug.Assert(dictionary._entries != null, "entries should be non-null");
                     uint collisionCount = 0;
 
+                    // J2N: optimize for null case below to avoid comparer call
                     if (key is not null)
                     {
                         IAlternateEqualityComparer<TAlternateKey, TKey> comparer = GetAlternateComparer(dictionary); // J2N: Moved within null check, since we don't need to look this up for null keys
@@ -2506,8 +2461,11 @@ namespace J2N.Collections.Generic
                 uint collisionCount = 0;
                 ref int bucket = ref dictionary.GetBucket(hashCode);
                 int i = bucket - 1; // Value in _buckets is 1-based
+                TKey? actualKey;
 
                 Debug.Assert(comparer is not null);
+
+                // J2N: optimize for null case below to avoid comparer call
                 if (key is not null)
                 {
                     while ((uint)i < (uint)entries.Length)
@@ -2529,6 +2487,8 @@ namespace J2N.Collections.Generic
                             ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
+
+                    actualKey = comparer.Create(key);
                 }
                 else
                 {
@@ -2551,11 +2511,9 @@ namespace J2N.Collections.Generic
                             ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
+
+                    actualKey = default; // J2N allows null keys
                 }
-
-                TKey? actualKey = key is not null ? comparer.Create(key) : default;
-
-                // J2N allows null keys
 
                 int index;
                 if (dictionary._freeCount > 0)
@@ -3677,12 +3635,14 @@ namespace J2N.Collections.Generic
                 ref int bucket = ref dictionary.GetBucket(hashCode);
                 int i = bucket - 1; // Value in _buckets is 1-based
 
-                if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
-                    comparer == null)
+                // J2N: optimize for null case below to avoid comparer call
+                if (key is not null)
                 {
-                    // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
-                    if (key is not null)
+                    if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                    comparer == null)
                     {
+                        // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
+
                         while (true)
                         {
                             // Should be a while loop https://github.com/dotnet/runtime/issues/9422
@@ -3712,38 +3672,6 @@ namespace J2N.Collections.Generic
                     }
                     else
                     {
-                        while (true)
-                        {
-                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
-                            // Test uint in if rather than loop condition to drop range check for following array access
-                            if ((uint)i >= (uint)entries!.Length)
-                            {
-                                break;
-                            }
-
-                            if (entries[i].hashCode == hashCode && entries[i].key is null)
-                            {
-                                exists = true;
-
-                                return ref entries[i].value!;
-                            }
-
-                            i = entries[i].next;
-
-                            collisionCount++;
-                            if (collisionCount > (uint)entries.Length)
-                            {
-                                // The chain of entries forms a loop; which means a concurrent update has happened.
-                                // Break out of the loop and throw, rather than looping forever.
-                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    if (key is not null)
-                    {
                         Debug.Assert(comparer is not null);
                         while (true)
                         {
@@ -3772,34 +3700,33 @@ namespace J2N.Collections.Generic
                             }
                         }
                     }
-                    else
+                }
+                else
+                {
+                    while (true)
                     {
-
-                        while (true)
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test uint in if rather than loop condition to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length)
                         {
-                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
-                            // Test uint in if rather than loop condition to drop range check for following array access
-                            if ((uint)i >= (uint)entries!.Length)
-                            {
-                                break;
-                            }
+                            break;
+                        }
 
-                            if (entries[i].hashCode == hashCode && entries[i].key is null)
-                            {
-                                exists = true;
+                        if (entries[i].hashCode == hashCode && entries[i].key is null)
+                        {
+                            exists = true;
 
-                                return ref entries[i].value!;
-                            }
+                            return ref entries[i].value!;
+                        }
 
-                            i = entries[i].next;
+                        i = entries[i].next;
 
-                            collisionCount++;
-                            if (collisionCount > (uint)entries.Length)
-                            {
-                                // The chain of entries forms a loop; which means a concurrent update has happened.
-                                // Break out of the loop and throw, rather than looping forever.
-                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
-                            }
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop; which means a concurrent update has happened.
+                            // Break out of the loop and throw, rather than looping forever.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
                         }
                     }
                 }
