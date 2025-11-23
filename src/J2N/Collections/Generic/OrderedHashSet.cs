@@ -2112,7 +2112,7 @@ namespace J2N.Collections.Generic
             /// <summary>Determines whether a set contains the specified element.</summary>
             /// <param name="item">The element to locate in the set.</param>
             /// <returns>true if the set contains the specified element; otherwise, false.</returns>
-            public bool Contains(TAlternate item) => !Unsafe.IsNullRef(in FindValue(item));
+            public bool Contains(TAlternate item) => IndexOf(item) >= 0;
 
             /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
             /// <param name="equalValue">The value to search for.</param>
@@ -2129,6 +2129,111 @@ namespace J2N.Collections.Generic
 
                 actualValue = default!;
                 return false;
+            }
+
+            /// <summary>Determines the index of a specific value in the <see cref="OrderedHashSet{T}"/>.</summary>
+            /// <param name="value">The value to locate.</param>
+            /// <returns>The index of <paramref name="value"/> if found; otherwise, -1.</returns>
+            public int IndexOf([AllowNull] TAlternate value)
+            {
+                uint _ = 0;
+                return IndexOf(value, ref _, ref _);
+            }
+
+            private int IndexOf([AllowNull] TAlternate value, ref uint outHashCode, ref uint outCollisionCount)
+            {
+                OrderedHashSet<T> set = Set;
+                IAlternateEqualityComparer<TAlternate, T> comparer = GetAlternateComparer(set);
+
+                uint hashCode;
+                uint collisionCount = 0;
+
+                if (set._buckets is null)
+                {
+                    hashCode = value is null ? 0 : (uint)comparer.GetHashCode(value);
+                    collisionCount = 0;
+                    goto ReturnNotFound;
+                }
+
+                int i = -1;
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+
+                Entry[]? entries = set._entries;
+                Debug.Assert(entries is not null, "expected entries to be is not null");
+
+                // J2N: optimize for null case below to avoid comparer call
+                if (value is not null)
+                {
+                    Debug.Assert(comparer is not null);
+                    hashCode = value is null ? 0 : (uint)comparer!.GetHashCode(value); // [!]: asserted above
+                    i = set.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode &&
+                            comparer!.Equals(value!, entry.Value)) // [!]: asserted above, allow null keys
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+                else
+                {
+                    hashCode = 0;
+                    i = set.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && entry.Value is null)
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+
+            ReturnNotFound:
+                i = -1;
+                outCollisionCount = collisionCount;
+                goto Return;
+
+            ConcurrentOperation:
+                // We examined more entries than are actually in the list, which means there's a cycle
+                // that's caused by erroneous concurrent use.
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+
+            Return:
+                outHashCode = hashCode;
+                return i;
             }
 
             /// <summary>Finds the item in the set and returns a reference to the found item, or a null reference if not found.</summary>
