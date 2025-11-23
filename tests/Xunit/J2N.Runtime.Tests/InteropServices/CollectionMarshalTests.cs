@@ -1,10 +1,12 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
+﻿// Source: https://github.com/dotnet/runtime/blob/v10.0.0/src/libraries/System.Runtime.InteropServices/tests/System.Runtime.InteropServices.UnitTests/System/Runtime/InteropServices/CollectionsMarshalTests.cs
+// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.Generic;
 using J2N.Runtime.CompilerServices;
 using J2N.TestUtilities.Xunit;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -149,8 +151,10 @@ namespace J2N.Runtime.InteropServices.Tests
             }
         }
 
+        #region Dictionary
+
         [Fact]
-        public void GetValueRefOrNullRefValueType()
+        public void Dictionary_GetValueRefOrNullRefValueType()
         {
             var dict = new Dictionary<int, Struct>
             {
@@ -206,7 +210,7 @@ namespace J2N.Runtime.InteropServices.Tests
         }
 
         [Fact]
-        public void GetValueRefOrNullRefClass()
+        public void Dictionary_GetValueRefOrNullRefClass()
         {
             var dict = new Dictionary<int, IntAsObject>
             {
@@ -262,7 +266,7 @@ namespace J2N.Runtime.InteropServices.Tests
         }
 
         [Fact]
-        public void GetValueRefOrNullRefLinkBreaksOnResize()
+        public void Dictionary_GetValueRefOrNullRefLinkBreaksOnResize()
         {
             var dict = new Dictionary<int, Struct>
             {
@@ -305,7 +309,7 @@ namespace J2N.Runtime.InteropServices.Tests
         }
 
         [Fact]
-        public void GetValueRefOrAddDefaultValueType()
+        public void Dictionary_GetValueRefOrAddDefaultValueType()
         {
             // This test is the same as the one for GetValueRefOrNullRef, but it uses
             // GetValueRefOrAddDefault instead, and also checks for incorrect additions.
@@ -382,7 +386,7 @@ namespace J2N.Runtime.InteropServices.Tests
         }
 
         [Fact]
-        public void GetValueRefOrAddDefaultClass()
+        public void Dictionary_GetValueRefOrAddDefaultClass()
         {
             var dict = new Dictionary<int, IntAsObject>
             {
@@ -455,7 +459,7 @@ namespace J2N.Runtime.InteropServices.Tests
         }
 
         [Fact]
-        public void GetValueRefOrAddDefaultLinkBreaksOnResize()
+        public void Dictionary_GetValueRefOrAddDefaultLinkBreaksOnResize()
         {
             var dict = new Dictionary<int, Struct>
             {
@@ -498,6 +502,378 @@ namespace J2N.Runtime.InteropServices.Tests
 
             Assert.Equal(50, dict.Count);
         }
+
+        #endregion Dictionary
+
+        #region Dictionary AlternateLookup
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+
+        [Fact] // J2N specific
+        public void Dictionary_AlternateLookup_GetValueRefOrNullRefValueType()
+        {
+            var dict = new Dictionary<string, Struct>
+            {
+                {  "1", default },
+                {  "2", default }
+            };
+
+            var lookup = dict.GetAlternateLookup<ReadOnlySpan<char>>();
+
+            Assert.Equal(2, dict.Count);
+
+            Assert.Equal(0, lookup["1".AsSpan()].Value);
+            Assert.Equal(0, lookup["1".AsSpan()].Property);
+
+            Struct itemVal = lookup["1".AsSpan()];
+            itemVal.Value = 1;
+            itemVal.Property = 2;
+
+            // Does not change values in dictionary
+            Assert.Equal(0, lookup["1".AsSpan()].Value);
+            Assert.Equal(0, lookup["1".AsSpan()].Property);
+
+            CollectionMarshal.GetValueRefOrNullRef(lookup, "1".AsSpan()).Value = 3;
+            CollectionMarshal.GetValueRefOrNullRef(lookup, "1".AsSpan()).Property = 4;
+
+            Assert.Equal(3, lookup["1".AsSpan()].Value);
+            Assert.Equal(4, lookup["1".AsSpan()].Property);
+
+            ref Struct itemRef = ref CollectionMarshal.GetValueRefOrNullRef(lookup, "2".AsSpan());
+
+            Assert.Equal(0, itemRef.Value);
+            Assert.Equal(0, itemRef.Property);
+
+            itemRef.Value = 5;
+            itemRef.Property = 6;
+
+            Assert.Equal(5, itemRef.Value);
+            Assert.Equal(6, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            itemRef = new Struct() { Value = 7, Property = 8 };
+
+            Assert.Equal(7, itemRef.Value);
+            Assert.Equal(8, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            // Check for null refs
+
+            Assert.True(Unsafe.IsNullRef(ref CollectionMarshal.GetValueRefOrNullRef(lookup, "3".AsSpan())));
+            Assert.Throws<NullReferenceException>(() => CollectionMarshal.GetValueRefOrNullRef(lookup, "3".AsSpan()).Value = 9);
+
+            Assert.Equal(2, dict.Count);
+        }
+
+        [Fact] // J2N specific
+        public void Dictionary_AlternateLookup_GetValueRefOrNullRefClass()
+        {
+            var dict = new Dictionary<string, IntAsObject>
+            {
+                {  "1", new IntAsObject() },
+                {  "2", new IntAsObject() }
+            };
+
+            var lookup = dict.GetAlternateLookup<ReadOnlySpan<char>>();
+
+            Assert.Equal(2, dict.Count);
+
+            Assert.Equal(0, lookup["1".AsSpan()].Value);
+            Assert.Equal(0, lookup["1".AsSpan()].Property);
+
+            IntAsObject itemVal = lookup["1".AsSpan()];
+            itemVal.Value = 1;
+            itemVal.Property = 2;
+
+            // Does change values in dictionary
+            Assert.Equal(1, lookup["1".AsSpan()].Value);
+            Assert.Equal(2, lookup["1".AsSpan()].Property);
+
+            CollectionMarshal.GetValueRefOrNullRef(lookup, "1".AsSpan()).Value = 3;
+            CollectionMarshal.GetValueRefOrNullRef(lookup, "1".AsSpan()).Property = 4;
+
+            Assert.Equal(3, lookup["1".AsSpan()].Value);
+            Assert.Equal(4, lookup["1".AsSpan()].Property);
+
+            ref IntAsObject itemRef = ref CollectionMarshal.GetValueRefOrNullRef(lookup, "2".AsSpan());
+
+            Assert.Equal(0, itemRef.Value);
+            Assert.Equal(0, itemRef.Property);
+
+            itemRef.Value = 5;
+            itemRef.Property = 6;
+
+            Assert.Equal(5, itemRef.Value);
+            Assert.Equal(6, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            itemRef = new IntAsObject() { Value = 7, Property = 8 };
+
+            Assert.Equal(7, itemRef.Value);
+            Assert.Equal(8, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            // Check for null refs
+
+            Assert.True(Unsafe.IsNullRef(ref CollectionMarshal.GetValueRefOrNullRef(lookup, "3".AsSpan())));
+            Assert.Throws<NullReferenceException>(() => CollectionMarshal.GetValueRefOrNullRef(lookup, "3".AsSpan()).Value = 9);
+
+            Assert.Equal(2, dict.Count);
+        }
+
+        [Fact] // J2N specific
+        public void Dictionary_AlternateLookup_GetValueRefOrNullRefLinkBreaksOnResize()
+        {
+            var dict = new Dictionary<string, Struct>
+            {
+                {  "1", new Struct() }
+            };
+
+            var lookup = dict.GetAlternateLookup<ReadOnlySpan<char>>();
+
+            Assert.Equal(1, dict.Count);
+
+            ref Struct itemRef = ref CollectionMarshal.GetValueRefOrNullRef(lookup, "1".AsSpan());
+
+            Assert.Equal(0, itemRef.Value);
+            Assert.Equal(0, itemRef.Property);
+
+            itemRef.Value = 1;
+            itemRef.Property = 2;
+
+            Assert.Equal(1, itemRef.Value);
+            Assert.Equal(2, itemRef.Property);
+            Assert.Equal(lookup["1".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["1".AsSpan()].Property, itemRef.Property);
+
+            // Resize
+            dict.EnsureCapacity(100);
+            for (int i = 2; i <= 50; i++)
+            {
+                Assert.True(lookup.TryAdd(i.ToString(CultureInfo.InvariantCulture).AsSpan(), new Struct()));
+            }
+
+            itemRef.Value = 3;
+            itemRef.Property = 4;
+
+            Assert.Equal(3, itemRef.Value);
+            Assert.Equal(4, itemRef.Property);
+
+            // Check connection broken
+            Assert.NotEqual(lookup["1".AsSpan()].Value, itemRef.Value);
+            Assert.NotEqual(lookup["1".AsSpan()].Property, itemRef.Property);
+
+            Assert.Equal(50, dict.Count);
+        }
+
+        [Fact] // J2N specific
+        public void Dictionary_AlternateLookup_GetValueRefOrAddDefaultValueType()
+        {
+            // This test is the same as the one for GetValueRefOrNullRef, but it uses
+            // GetValueRefOrAddDefault instead, and also checks for incorrect additions.
+            // The two APIs should behave the same when values already exist.
+            var dict = new Dictionary<string, Struct>
+            {
+                {  "1", default },
+                {  "2", default }
+            };
+
+            var lookup = dict.GetAlternateLookup<ReadOnlySpan<char>>();
+
+            Assert.Equal(2, dict.Count);
+
+            Assert.Equal(0, lookup["1".AsSpan()].Value);
+            Assert.Equal(0, lookup["1".AsSpan()].Property);
+
+            Struct itemVal = lookup["1".AsSpan()];
+            itemVal.Value = 1;
+            itemVal.Property = 2;
+
+            // Does not change values in dictionary
+            Assert.Equal(0, lookup["1".AsSpan()].Value);
+            Assert.Equal(0, lookup["1".AsSpan()].Property);
+
+            CollectionMarshal.GetValueRefOrAddDefault(lookup, "1".AsSpan(), out bool exists).Value = 3;
+
+            Assert.True(exists);
+            Assert.Equal(2, dict.Count);
+
+            CollectionMarshal.GetValueRefOrAddDefault(lookup, "1".AsSpan(), out exists).Property = 4;
+
+            Assert.True(exists);
+            Assert.Equal(2, dict.Count);
+            Assert.Equal(3, lookup["1".AsSpan()].Value);
+            Assert.Equal(4, lookup["1".AsSpan()].Property);
+
+            ref Struct itemRef = ref CollectionMarshal.GetValueRefOrAddDefault(lookup, "2".AsSpan(), out exists);
+
+            Assert.True(exists);
+            Assert.Equal(2, dict.Count);
+            Assert.Equal(0, itemRef.Value);
+            Assert.Equal(0, itemRef.Property);
+
+            itemRef.Value = 5;
+            itemRef.Property = 6;
+
+            Assert.Equal(5, itemRef.Value);
+            Assert.Equal(6, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            itemRef = new Struct() { Value = 7, Property = 8 };
+
+            Assert.Equal(7, itemRef.Value);
+            Assert.Equal(8, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            // Check for correct additions
+
+            ref Struct entry3Ref = ref CollectionMarshal.GetValueRefOrAddDefault(lookup, "3".AsSpan(), out exists);
+
+            Assert.False(exists);
+            Assert.Equal(3, dict.Count);
+            Assert.False(Unsafe.IsNullRef(ref entry3Ref));
+            Assert.True(EqualityComparer<Struct>.Default.Equals(entry3Ref, default));
+
+            entry3Ref.Property = 42;
+            entry3Ref.Value = 12345;
+
+            Struct value3 = lookup["3".AsSpan()];
+
+            Assert.Equal(42, value3.Property);
+            Assert.Equal(12345, value3.Value);
+        }
+
+        [Fact] // J2N specific
+        public void Dictionary_AlternateLookup_GetValueRefOrAddDefaultClass()
+        {
+            var dict = new Dictionary<string, IntAsObject>
+            {
+                {  "1", new IntAsObject() },
+                {  "2", new IntAsObject() }
+            };
+
+            var lookup = dict.GetAlternateLookup<ReadOnlySpan<char>>();
+
+            Assert.Equal(2, dict.Count);
+
+            Assert.Equal(0, lookup["1".AsSpan()].Value);
+            Assert.Equal(0, lookup["1".AsSpan()].Property);
+
+            IntAsObject itemVal = lookup["1".AsSpan()];
+            itemVal.Value = 1;
+            itemVal.Property = 2;
+
+            // Does change values in dictionary
+            Assert.Equal(1, lookup["1".AsSpan()].Value);
+            Assert.Equal(2, lookup["1".AsSpan()].Property);
+
+            CollectionMarshal.GetValueRefOrAddDefault(lookup, "1".AsSpan(), out bool exists).Value = 3;
+
+            Assert.True(exists);
+            Assert.Equal(2, dict.Count);
+
+            CollectionMarshal.GetValueRefOrAddDefault(lookup, "1".AsSpan(), out exists).Property = 4;
+
+            Assert.True(exists);
+            Assert.Equal(2, dict.Count);
+            Assert.Equal(3, lookup["1".AsSpan()].Value);
+            Assert.Equal(4, lookup["1".AsSpan()].Property);
+
+            ref IntAsObject itemRef = ref CollectionMarshal.GetValueRefOrAddDefault(lookup, "2".AsSpan(), out exists);
+
+            Assert.True(exists);
+            Assert.Equal(2, dict.Count);
+            Assert.Equal(0, itemRef.Value);
+            Assert.Equal(0, itemRef.Property);
+
+            itemRef.Value = 5;
+            itemRef.Property = 6;
+
+            Assert.Equal(5, itemRef.Value);
+            Assert.Equal(6, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            itemRef = new IntAsObject() { Value = 7, Property = 8 };
+
+            Assert.Equal(7, itemRef.Value);
+            Assert.Equal(8, itemRef.Property);
+            Assert.Equal(lookup["2".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["2".AsSpan()].Property, itemRef.Property);
+
+            // Check for correct additions
+
+            ref IntAsObject entry3Ref = ref CollectionMarshal.GetValueRefOrAddDefault(lookup, "3".AsSpan(), out exists);
+
+            Assert.False(exists);
+            Assert.Equal(3, dict.Count);
+            Assert.False(Unsafe.IsNullRef(ref entry3Ref));
+            Assert.Null(entry3Ref);
+
+            entry3Ref = new IntAsObject() { Value = 12345, Property = 42 };
+
+            IntAsObject value3 = lookup["3".AsSpan()];
+
+            Assert.Equal(42, value3.Property);
+            Assert.Equal(12345, value3.Value);
+        }
+
+        [Fact] // J2N specific
+        public void Dictionary_AlternateLookup_GetValueRefOrAddDefaultLinkBreaksOnResize()
+        {
+            var dict = new Dictionary<string, Struct>
+            {
+                {  "1", new Struct() }
+            };
+
+            var lookup = dict.GetAlternateLookup<ReadOnlySpan<char>>();
+
+            Assert.Equal(1, dict.Count);
+
+            ref Struct itemRef = ref CollectionMarshal.GetValueRefOrAddDefault(lookup, "1".AsSpan(), out bool exists);
+
+            Assert.True(exists);
+            Assert.Equal(1, dict.Count);
+            Assert.Equal(0, itemRef.Value);
+            Assert.Equal(0, itemRef.Property);
+
+            itemRef.Value = 1;
+            itemRef.Property = 2;
+
+            Assert.Equal(1, itemRef.Value);
+            Assert.Equal(2, itemRef.Property);
+            Assert.Equal(lookup["1".AsSpan()].Value, itemRef.Value);
+            Assert.Equal(lookup["1".AsSpan()].Property, itemRef.Property);
+
+            // Resize
+            dict.EnsureCapacity(100);
+            for (int i = 2; i <= 50; i++)
+            {
+                lookup.TryAdd(i.ToString(CultureInfo.InvariantCulture).AsSpan(), new Struct());
+            }
+
+            itemRef.Value = 3;
+            itemRef.Property = 4;
+
+            Assert.Equal(3, itemRef.Value);
+            Assert.Equal(4, itemRef.Property);
+
+            // Check connection broken
+            Assert.NotEqual(lookup["1".AsSpan()].Value, itemRef.Value);
+            Assert.NotEqual(lookup["1".AsSpan()].Property, itemRef.Property);
+
+            Assert.Equal(50, dict.Count);
+        }
+
+#endif
+
+        #endregion Dictionary AlternateLookup
 
         private struct Struct
         {
