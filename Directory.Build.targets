@@ -27,12 +27,12 @@
 
     <DebugType>portable</DebugType>
   </PropertyGroup>
-  
+
   <!-- Features in .NET 10.x+ only -->
   <PropertyGroup Condition=" $(TargetFramework.StartsWith('net10.')) ">
 
     <DefineConstants>$(DefineConstants);FEATURE_BITOPERATIONS_ROUNDUPTOPOWEROF2</DefineConstants>
-    
+
   </PropertyGroup>
 
   <!-- Features in .NET 9.x only -->
@@ -108,8 +108,6 @@
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_EQUALS_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STRINGBUILDER_INSERT_READONLYSPAN</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_TEXTWRITER_WRITE_READONLYSPAN</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_UNSAFE_ISNULLREF</DefineConstants>
-    <DefineConstants>$(DefineConstants);FEATURE_UNSAFE_NULLREF</DefineConstants>
 
   </PropertyGroup>
 
