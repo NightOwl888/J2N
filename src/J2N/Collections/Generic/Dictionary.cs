@@ -13,9 +13,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using SCG = System.Collections.Generic;
+
+#if FEATURE_COLLECTIONSMARSHAL_ASSPAN_LIST
+using System.Runtime.InteropServices;
+#endif
 
 namespace J2N.Collections.Generic
 {
@@ -901,7 +904,7 @@ namespace J2N.Collections.Generic
             get
             {
                 ref TValue value = ref FindValue(key);
-                if (!UnsafeHelpers.IsNullRef(ref value))
+                if (!Unsafe.IsNullRef(ref value))
                 {
                     return value;
                 }
@@ -957,7 +960,7 @@ namespace J2N.Collections.Generic
         /// with the specified key; otherwise, <c>false</c>.</returns>
         /// <remarks>This method is an O(log <c>n</c>) operation.</remarks>
         public bool ContainsKey([AllowNull] TKey key)
-            => !UnsafeHelpers.IsNullRef(ref FindValue(key));
+            => !Unsafe.IsNullRef(ref FindValue(key));
 
         /// <summary>
         /// Removes the element with the specified key from the <see cref="Dictionary{TKey, TValue}"/>.
@@ -1121,7 +1124,7 @@ namespace J2N.Collections.Generic
 #pragma warning restore IDE0079 // Remove unnecessary suppression
         {
             ref TValue valRef = ref FindValue(key);
-            if (!UnsafeHelpers.IsNullRef(ref valRef))
+            if (!Unsafe.IsNullRef(ref valRef))
             {
                 value = valRef;
                 return true;
@@ -1167,7 +1170,7 @@ namespace J2N.Collections.Generic
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> item)
         {
             ref TValue value = ref FindValue(item.Key);
-            if (!UnsafeHelpers.IsNullRef(ref value) && EqualityComparer<TValue>.Default.Equals(value, item.Value))
+            if (!Unsafe.IsNullRef(ref value) && EqualityComparer<TValue>.Default.Equals(value, item.Value))
             {
                 return true;
             }
@@ -1206,7 +1209,7 @@ namespace J2N.Collections.Generic
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> item)
         {
             ref TValue value = ref FindValue(item.Key);
-            if (!UnsafeHelpers.IsNullRef(ref value) && EqualityComparer<TValue>.Default.Equals(value, item.Value))
+            if (!Unsafe.IsNullRef(ref value) && EqualityComparer<TValue>.Default.Equals(value, item.Value))
             {
                 Remove(item.Key);
                 return true;
@@ -1433,7 +1436,7 @@ namespace J2N.Collections.Generic
                 if (IsCompatibleKey(key))
                 {
                     ref TValue value = ref FindValue((TKey)key!);
-                    if (!UnsafeHelpers.IsNullRef(ref value))
+                    if (!Unsafe.IsNullRef(ref value))
                     {
                         return value;
                     }
@@ -1591,7 +1594,7 @@ namespace J2N.Collections.Generic
         {
             // J2N supports null keys
 
-            ref Entry entry = ref UnsafeHelpers.NullRef<Entry>();
+            ref Entry entry = ref Unsafe.NullRef<Entry>();
             if (_buckets != null)
             {
                 Debug.Assert(_entries != null, "expected entries to be != null");
@@ -1728,7 +1731,7 @@ namespace J2N.Collections.Generic
         Return:
             return ref value;
         ReturnNotFound:
-            value = ref UnsafeHelpers.NullRef<TValue>();
+            value = ref Unsafe.NullRef<TValue>();
             goto Return;
         }
 
@@ -3845,7 +3848,7 @@ namespace J2N.Collections.Generic
                     // lookup is guaranteed to always find a value though and it will never return a null reference here.
                     ref TValue? value = ref dictionary.FindValue(key)!;
 
-                    Debug.Assert(!UnsafeHelpers.IsNullRef(ref value), "the lookup result cannot be a null ref here");
+                    Debug.Assert(!Unsafe.IsNullRef(ref value), "the lookup result cannot be a null ref here");
 
                     return ref value;
                 }

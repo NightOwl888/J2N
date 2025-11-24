@@ -199,7 +199,7 @@ namespace J2N.Runtime.InteropServices.Tests
 
             // Check for null refs
 
-            Assert.True(UnsafeHelpers.IsNullRef(ref CollectionMarshal.GetValueRefOrNullRef(dict, 3)));
+            Assert.True(Unsafe.IsNullRef(ref CollectionMarshal.GetValueRefOrNullRef(dict, 3)));
             Assert.Throws<NullReferenceException>(() => CollectionMarshal.GetValueRefOrNullRef(dict, 3).Value = 9);
 
             Assert.Equal(2, dict.Count);
@@ -255,7 +255,7 @@ namespace J2N.Runtime.InteropServices.Tests
 
             // Check for null refs
 
-            Assert.True(UnsafeHelpers.IsNullRef(ref CollectionMarshal.GetValueRefOrNullRef(dict, 3)));
+            Assert.True(Unsafe.IsNullRef(ref CollectionMarshal.GetValueRefOrNullRef(dict, 3)));
             Assert.Throws<NullReferenceException>(() => CollectionMarshal.GetValueRefOrNullRef(dict, 3).Value = 9);
 
             Assert.Equal(2, dict.Count);
@@ -369,7 +369,7 @@ namespace J2N.Runtime.InteropServices.Tests
 
             Assert.False(exists);
             Assert.Equal(3, dict.Count);
-            Assert.False(UnsafeHelpers.IsNullRef(ref entry3Ref));
+            Assert.False(Unsafe.IsNullRef(ref entry3Ref));
             Assert.True(EqualityComparer<Struct>.Default.Equals(entry3Ref, default));
 
             entry3Ref.Property = 42;
@@ -443,7 +443,7 @@ namespace J2N.Runtime.InteropServices.Tests
 
             Assert.False(exists);
             Assert.Equal(3, dict.Count);
-            Assert.False(UnsafeHelpers.IsNullRef(ref entry3Ref));
+            Assert.False(Unsafe.IsNullRef(ref entry3Ref));
             Assert.Null(entry3Ref);
 
             entry3Ref = new IntAsObject() { Value = 12345, Property = 42 };
