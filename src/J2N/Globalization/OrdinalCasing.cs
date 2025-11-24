@@ -172,16 +172,13 @@ namespace J2N.Globalization
                     continue;
                 }
 
-                if (char.IsHighSurrogate(c) && i < source.Length - 1)
+                if (char.IsHighSurrogate(c) && i < source.Length - 1 && char.IsLowSurrogate(source[i + 1]))
                 {
-                    char cl = source[i + 1];
-                    if (char.IsLowSurrogate(cl))
-                    {
-                        // well formed surrogates
-                        SurrogateCasing.ToUpper(c, cl, out destination[i], out destination[i + 1]);
-                        i++; // skip the low surrogate
-                        continue;
-                    }
+                    // well formed surrogates
+                    //SurrogateCasing.ToUpper(c, cl, out destination[i], out destination[i + 1]);
+                    System.MemoryExtensions.ToUpperInvariant(source.Slice(i, 2), destination.Slice(i, 2));
+                    i++; // skip the low surrogate
+                    continue;
                 }
 
                 //destination[i] = ToUpper(c);
