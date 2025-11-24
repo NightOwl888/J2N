@@ -2007,7 +2007,7 @@ namespace J2N.Collections.Generic
             int hashCode;
 
             uint collisionCount = 0;
-            ref int bucket = ref UnsafeHelpers.NullRef<int>();
+            ref int bucket = ref Unsafe.NullRef<int>();
 
             if (typeof(T).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
                 comparer == null)

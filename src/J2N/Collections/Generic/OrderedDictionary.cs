@@ -777,7 +777,7 @@ namespace J2N.Collections.Generic
             }
 
             int i = -1;
-            ref Entry entry = ref UnsafeHelpers.NullRef<Entry>();
+            ref Entry entry = ref Unsafe.NullRef<Entry>();
 
             Entry[]? entries = _entries;
             Debug.Assert(entries is not null, "expected entries to be is not null");
