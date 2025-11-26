@@ -2844,19 +2844,6 @@ namespace J2N.Text
             provider is null || provider is StringFormatter ? StringFormatter.FormatBoolean(value) : value.ToString(provider);
 
 
-        /// <summary>Round the specified value up to the next power of 2, if it isn't one already.</summary>
-        protected static int RoundUpToPowerOf2(int i)
-        {
-            // Based on https://graphics.stanford.edu/~seander/bithacks.html#RoundUpPowerOf2
-            --i;
-            i |= i >> 1;
-            i |= i >> 2;
-            i |= i >> 4;
-            i |= i >> 8;
-            i |= i >> 16;
-            return i + 1;
-        }
-
         [MethodImpl(MethodImplOptions.NoInlining)]
         private void AppendWithExpansion(char value)
         {
@@ -2897,7 +2884,7 @@ namespace J2N.Text
             int newCapacity = (int)Math.Max(
                 (uint)(m_Position + additionalCapacityBeyondPos),
                 Math.Min((uint)m_Chars.Length * 2, ArrayMaxLength));
-            return RoundUpToPowerOf2(newCapacity);
+            return newCapacity;
         }
 
         protected virtual char[] ReplaceBuffer(ReadOnlySpan<char> value, int newCapacity)
