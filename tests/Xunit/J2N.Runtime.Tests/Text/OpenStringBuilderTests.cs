@@ -2255,8 +2255,22 @@ namespace J2N.Text.Tests
             }
         }
 
+        [Fact] // J2N specific
+        public static void Equals_StringBuilder_IgnoresCapacity()
+        {
+            var sb1 = new OpenStringBuilder(5);
+            var sb2 = new StringBuilder(10);
+
+            Assert.True(sb1.Equals(sb2));
+
+            sb1.Append("12345");
+            sb2.Append("12345");
+
+            Assert.True(sb1.Equals(sb2));
+        }
+
         [Fact]
-        public static void EqualsIgnoresCapacity()
+        public static void Equals_OpenStringBuilder_IgnoresCapacity()
         {
             var sb1 = new OpenStringBuilder(5);
             var sb2 = new OpenStringBuilder(10);
@@ -2269,13 +2283,47 @@ namespace J2N.Text.Tests
             Assert.True(sb1.Equals(sb2));
         }
 
+        [Fact] // J2N specific
+        public static void Equals_StringBuilder_IgnoresMaxCapacity()
+        {
+            var sb1 = new OpenStringBuilder(5, 5);
+            var sb2 = new StringBuilder(5, 10);
+
+            Assert.True(sb1.Equals(sb2));
+
+            sb1.Append("12345");
+            sb2.Append("12345");
+
+            Assert.True(sb1.Equals(sb2));
+        }
+
         [Fact]
-        public static void EqualsIgnoresMaxCapacity()
+        public static void Equals_OpenStringBuilder_IgnoresMaxCapacity()
         {
             var sb1 = new OpenStringBuilder(5, 5);
             var sb2 = new OpenStringBuilder(5, 10);
 
             Assert.True(sb1.Equals(sb2));
+
+            sb1.Append("12345");
+            sb2.Append("12345");
+
+            Assert.True(sb1.Equals(sb2));
+        }
+
+        [Fact] // J2N specific
+        public static void Equals_StringBuilder_MultipleChunks()
+        {
+            var sb1 = new OpenStringBuilder(5);
+            var sb2 = new StringBuilder(5);
+
+            Assert.True(sb1.Equals(sb2));
+
+            sb1.Append("12345");
+            sb2.Append("12345");
+
+            sb1.Append("67890");
+            sb2.Append("67890");
 
             sb1.Append("12345");
             sb2.Append("12345");

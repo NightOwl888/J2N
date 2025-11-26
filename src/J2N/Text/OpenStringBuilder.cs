@@ -2315,6 +2315,10 @@ namespace J2N.Text
 
         #region Equals
 
+        /// <summary>
+        /// Determines if the contents of this builder are equal to the contents of another builder..
+        /// </summary>
+        /// <param name="sb">The other builder.</param>
         public bool Equals([NotNullWhen(true)] OpenStringBuilder? sb)
         {
             if (sb == null)
@@ -2329,16 +2333,13 @@ namespace J2N.Text
             {
                 return true;
             }
-            for (int i = m_Position - 1; i >= 0 ; i-- )
-            {
-                if (m_Chars[i] != sb.m_Chars[i])
-                {
-                    return false;
-                }
-            }
-            return true;
+            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(new ReadOnlySpan<char>(sb.m_Chars, 0, sb.m_Position));
         }
 
+        /// <summary>
+        /// Determines if the contents of this builder are equal to the contents of another builder..
+        /// </summary>
+        /// <param name="sb">The other builder.</param>
         public bool Equals([NotNullWhen(true)] StringBuilder? sb)
         {
             if (sb == null)
@@ -2354,7 +2355,7 @@ namespace J2N.Text
             foreach (ReadOnlyMemory<char> chunk in sb.GetChunks())
             {
                 ReadOnlySpan<char> thisChunk = new ReadOnlySpan<char>(m_Chars, offset, chunk.Length);
-                if (!chunk.Span.Equals(thisChunk, StringComparison.Ordinal))
+                if (!chunk.Span.SequenceEqual(thisChunk))
                     return false;
 
                 offset += chunk.Length;
@@ -2375,7 +2376,7 @@ namespace J2N.Text
                 Span<char> textChars = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(length);
                 sb.CopyTo(0, arrayToReturnToPool, 0, length);
 #endif
-                return new ReadOnlySpan<char>(m_Chars, 0, m_Position).Equals(textChars.Slice(0, length), StringComparison.Ordinal);
+                return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(textChars.Slice(0, length));
             }
             finally
             {
@@ -2387,15 +2388,15 @@ namespace J2N.Text
         /// <summary>
         /// Determines if the contents of this builder are equal to the contents of <see cref="ReadOnlySpan{Char}"/>.
         /// </summary>
-        /// <param name="span">The <see cref="ReadOnlySpan{Char}"/>.</param>
-        public bool Equals(ReadOnlySpan<char> span)
+        /// <param name="other">The <see cref="ReadOnlySpan{Char}"/>.</param>
+        public bool Equals(ReadOnlySpan<char> other)
         {
-            if (span.Length != Length)
+            if (other.Length != Length)
             {
                 return false;
             }
 
-            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).Equals(span, StringComparison.Ordinal);
+            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(other);
         }
 
         #endregion
