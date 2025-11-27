@@ -7,7 +7,6 @@ using J2N.TestUtilities;
 using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -235,14 +234,44 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () => builder.Append((ushort)1));
         }
 
-        [Theory]
-        [InlineData("Hello", true, "HelloTrue")]
-        [InlineData("Hello", false, "HelloFalse")]
-        [InlineData("", false, "False")]
-        public static void Append_Bool(string original, bool value, string expected)
+        // J2N: added a BooleanFormat parameter to specify lowercase vs titlecase, so these tests were changed from upstream
+
+        public static IEnumerable<object[]> Append_Bool_TestData()
+        {
+            yield return new object[] { "Hello", true, BooleanFormat.TitleCase, "HelloTrue" };
+            yield return new object[] { "Hello", true, BooleanFormat.Lowercase, "Hellotrue" };
+            yield return new object[] { "Hello", false, BooleanFormat.TitleCase, "HelloFalse" };
+            yield return new object[] { "Hello", false, BooleanFormat.Lowercase, "Hellofalse" };
+            yield return new object[] { "", false, BooleanFormat.TitleCase, "False" };
+            yield return new object[] { "", false, BooleanFormat.Lowercase, "false" };
+        }
+
+        [Fact]
+        public static void Test_Append_Bool()
+        {
+            foreach (var testdata in Append_Bool_TestData())
+            {
+                if(((BooleanFormat)testdata[2]) == BooleanFormat.Lowercase)
+                    Append_Bool_Format((string)testdata[0], (bool)testdata[1], null, (string)testdata[3]);
+            }
+        }
+
+        [Fact]
+        public static void Test_Append_Bool_Format()
+        {
+            foreach (var testdata in Append_Bool_TestData())
+            {
+                Append_Bool_Format((string)testdata[0], (bool)testdata[1], (BooleanFormat)testdata[2], (string)testdata[3]);
+            }
+        }
+
+        private static void Append_Bool_Format(string original, bool value, BooleanFormat? format, string expected)
         {
             var builder = new OpenStringBuilder(original);
-            builder.Append(value);
+            if (format is null)
+                builder.Append(value);
+            else
+                builder.Append(value, format.Value);
             Assert.Equal(expected, builder.ToString());
         }
 
@@ -1238,14 +1267,44 @@ namespace J2N.Text.Tests
             Assert.Throws<OutOfMemoryException>(() => builder.Insert(builder.Length, (uint)1)); // New length > builder.MaxCapacity
         }
 
-        [Theory]
-        [InlineData("Hello", 0, true, "TrueHello")]
-        [InlineData("Hello", 3, false, "HelFalselo")]
-        [InlineData("Hello", 5, false, "HelloFalse")]
-        public static void Insert_Bool(string original, int index, bool value, string expected)
+        // J2N: added a BooleanFormat parameter to specify lowercase vs titlecase, so these tests were changed from upstream
+
+        public static IEnumerable<object[]> Insert_Bool_TestData()
+        {
+            yield return new object[] { "Hello", 0, true, BooleanFormat.TitleCase, "TrueHello" };
+            yield return new object[] { "Hello", 0, true, BooleanFormat.Lowercase, "trueHello" };
+            yield return new object[] { "Hello", 3, false, BooleanFormat.TitleCase, "HelFalselo" };
+            yield return new object[] { "Hello", 3, false, BooleanFormat.Lowercase, "Helfalselo" };
+            yield return new object[] { "Hello", 5, false, BooleanFormat.TitleCase, "HelloFalse" };
+            yield return new object[] { "Hello", 5, false, BooleanFormat.Lowercase, "Hellofalse" };
+        }
+
+        [Fact]
+        public static void Test_Insert_Bool()
+        {
+            foreach (var testdata in Insert_Bool_TestData())
+            {
+                if (((BooleanFormat)testdata[3]) == BooleanFormat.Lowercase)
+                    Insert_Bool_Format((string)testdata[0], (int)testdata[1], (bool)testdata[2], null, (string)testdata[4]);
+            }
+        }
+
+        [Fact]
+        public static void Test_Insert_Bool_Format()
+        {
+            foreach (var testdata in Insert_Bool_TestData())
+            {
+                Insert_Bool_Format((string)testdata[0], (int)testdata[1], (bool)testdata[2], (BooleanFormat)testdata[3], (string)testdata[4]);
+            }
+        }
+
+        private static void Insert_Bool_Format(string original, int index, bool value, BooleanFormat? format, string expected)
         {
             var builder = new OpenStringBuilder(original);
-            builder.Insert(index, value);
+            if (format is null)
+                builder.Insert(index, value);
+            else
+                builder.Insert(index, value, format.Value);
             Assert.Equal(expected, builder.ToString());
         }
 
