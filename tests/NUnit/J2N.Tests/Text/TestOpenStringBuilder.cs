@@ -111,10 +111,10 @@ namespace J2N.Text
         public void Test_appendZ()
         {
             OpenStringBuilder sb = new OpenStringBuilder();
-            assertSame(sb, sb.Append(true, StringFormatter.InvariantCulture)); // J2N TODO: Make lowercase the default?
+            assertSame(sb, sb.Append(true));
             assertEquals("true", sb.ToString());
             sb.Length = (0);
-            assertSame(sb, sb.Append(false, StringFormatter.InvariantCulture)); // J2N TODO: Make lowercase the default?
+            assertSame(sb, sb.Append(false));
             assertEquals("false", sb.ToString());
         }
 
