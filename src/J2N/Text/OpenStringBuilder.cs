@@ -2,6 +2,7 @@
 using J2N.Collections;
 using J2N.Collections.Generic;
 using J2N.Numerics;
+using J2N.Numerics.Formatters;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -1079,105 +1080,322 @@ namespace J2N.Text
 
         #region Append Number
 
+        /// <summary>
+        /// Appends the string representation of a specified 8-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
         [CLSCompliant(false)]
-        public OpenStringBuilder Append(sbyte value, string? format = null, IFormatProvider? provider = null)
+        public OpenStringBuilder Append(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
+            => AppendSpanFormattable(value, format, provider);
+#else
+            => AppendNumberCore<sbyte, SByteFormatter>(3, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Appends the string representation of a specified 8-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Append(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => AppendSpanFormattable(value, format, provider);
+#else
+            => AppendNumberCore<byte, ByteFormatter>(4, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Appends the string representation of a specified 16-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Append(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => AppendSpanFormattable(value, format, provider);
+#else
+            => AppendNumberCore<short, Int16Formatter>(4, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Appends the string representation of a specified 32-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Append(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => AppendSpanFormattable(value, format, provider);
+#else
+            => AppendNumberCore<int, Int32Formatter>(6, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Appends the string representation of a specified 64-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Append(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => AppendSpanFormattable(value, format, provider);
+#else
+            => AppendNumberCore<long, Int64Formatter>(10, value, format.AsSpan(), provider);
+#endif
+        /// <summary>
+        /// Appends the string representation of a specified single-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+            => AppendNumberCore<float, SingleFormatter>(6, value, format.AsSpan(), provider);
+
+        /// <summary>
+        /// Appends the string representation of a specified double-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+            => AppendNumberCore<double, DoubleFormatter>(14, value, format.AsSpan(), provider);
+
+        /// <summary>
+        /// Appends the string representation of a specified decimal to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
+        internal OpenStringBuilder Append(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => AppendSpanFormattable(value, format, provider);
 #else
             => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
 #endif
 
-        public OpenStringBuilder Append(byte value, string? format = null, IFormatProvider? provider = null)
+        /// <summary>
+        /// Appends the string representation of a specified 16-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public OpenStringBuilder Append(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
+            => AppendSpanFormattable(value, format, provider);
 #else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
+            => AppendNumberCore<ushort, UInt16Formatter>(4, value, format.AsSpan(), provider);
+#endif
+        /// <summary>
+        /// Appends the string representation of a specified 32-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public OpenStringBuilder Append(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => AppendSpanFormattable(value, format, provider);
+#else
+            => AppendNumberCore<uint, UInt32Formatter>(6, value, format.AsSpan(), provider);
 #endif
 
-        public OpenStringBuilder Append(short value, string? format = null, IFormatProvider? provider = null)
+        /// <summary>
+        /// Appends the string representation of a specified 64-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// This method allows similar options as the <c>AppendFormat</c> methods, but has better performance because
+        /// the value being formatted is not boxed.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public OpenStringBuilder Append(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
+            => AppendSpanFormattable(value, format, provider);
 #else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
+            => AppendNumberCore<ulong, UInt64Formatter>(10, value, format.AsSpan(), provider);
 #endif
 
-        public OpenStringBuilder Append(int value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
+        // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
+        // on every number type.
 
-        public OpenStringBuilder Append(long value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
-
-        public OpenStringBuilder Append(float value, string? format = null, IFormatProvider? provider = null)
+        private OpenStringBuilder AppendNumberCore<T, TFormatter>(
+            int ensureAdditionalCapacityBeyondPos, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+            where TFormatter : struct, INumberFormatter<T>
         {
-            provider ??= NumberFormatInfo.InvariantInfo;
-            if (DotNetNumber.TryFormatSingle(value, format.AsSpan(), provider, m_Chars.AsSpan(m_Position), out int charsWritten))
+            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+
+            if ((uint)m_Position + (uint)ensureAdditionalCapacityBeyondPos > (uint)m_Chars.Length)
             {
-                m_Position += charsWritten;
+                // Check if the valueCount will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the StringBuilder.
+                int newLength = m_Position + ensureAdditionalCapacityBeyondPos;
+                if (newLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+
+                Grow(ensureAdditionalCapacityBeyondPos);
             }
-            else
+
+            int charsWritten;
+            while (!default(TFormatter).TryFormat(value, format, provider, m_Chars.AsSpan(m_Position), out charsWritten))
             {
-                Append(DotNetNumber.FormatSingle(value, format, provider));
+                // Check if the valueCount will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the StringBuilder.
+                int newLength = m_Chars.Length * 2;
+                if (newLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+
+                // J2N: This effectively doubles the buffer
+                Grow(m_Chars.Length + 1); // rare
             }
+
+            m_Position += charsWritten;
+
             return this;
         }
-
-        public OpenStringBuilder Append(double value, string? format = null, IFormatProvider? provider = null)
-        {
-            provider ??= NumberFormatInfo.InvariantInfo;
-            if (DotNetNumber.TryFormatDouble(value, format.AsSpan(), provider, m_Chars.AsSpan(m_Position), out int charsWritten))
-            {
-                m_Position += charsWritten;
-            }
-            else
-            {
-                Append(DotNetNumber.FormatDouble(value, format, provider));
-            }
-            return this;
-        }
-
-        public OpenStringBuilder Append(decimal value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
-
-        [CLSCompliant(false)]
-        public OpenStringBuilder Append(ushort value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
-
-        [CLSCompliant(false)]
-        public OpenStringBuilder Append(uint value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
-
-        [CLSCompliant(false)]
-        public OpenStringBuilder Append(ulong value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => AppendSpanFormattable(value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Append(value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo));
-#endif
-
 
         #endregion Append Number
 
-        private OpenStringBuilder AppendSpanFormattable<T>(T value, string? format = null, IFormatProvider? provider = null)
+
+        private OpenStringBuilder AppendSpanFormattable<T>(T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             where T : ISpanFormattable
 #else
@@ -1186,14 +1404,22 @@ namespace J2N.Text
         {
             Debug.Assert(typeof(T).Assembly.Equals(typeof(object).Assembly) || typeof(T).Assembly.Equals(typeof(Number).Assembly), "Implementation trusts the results of TryFormat because T is expected to be something known");
 
-            if (value.TryFormat(m_Chars.AsSpan(m_Position), out int charsWritten, format.AsSpan(), provider))
+            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+            int charsWritten;
+            while (!value.TryFormat(m_Chars.AsSpan(m_Position), out charsWritten, format, provider))
             {
-                m_Position += charsWritten;
+                // Check if the valueCount will put us over m_MaxCapacity.
+                // Doing the check here prevents corruption of the StringBuilder.
+                int newLength = m_Position + 16;
+                if (newLength > m_MaxCapacity)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                }
+
+                Grow(16);
             }
-            else
-            {
-                Append(value.ToString(format, provider));
-            }
+
+            m_Position += charsWritten;
 
             return this;
         }
@@ -1207,7 +1433,7 @@ namespace J2N.Text
                 return AppendSpanFormattable(spanFormattable, format, provider);
 #else
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
-                return AppendSpanFormattable(number, format, provider);
+                return AppendSpanFormattable(number, format.AsSpan(), provider);
 #endif
             else if (value is IFormattable formattable)
                 return Append(formattable.ToString(format, provider));
@@ -1442,106 +1668,305 @@ namespace J2N.Text
         public OpenStringBuilder Insert(int index, bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
+            // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
+            // we want exceeding the maximum capacity to throw an OutOfMemoryException.
             Insert(index, text.AsSpan(), 1);
             return this;
         }
 
         #region Insert Number
 
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
         [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, sbyte value, string? format = null, IFormatProvider? provider = null)
+        public OpenStringBuilder Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
+            => InsertSpanFormattable(index, value, format.AsSpan(), provider);
+#else
+            => InsertNumberCore<sbyte, SByteFormatter>(index, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Inserts the string representation of a specified 8-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Insert(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => InsertSpanFormattable(index, value, format, provider);
+#else
+            => InsertNumberCore<byte, ByteFormatter>(index, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Inserts the string representation of a specified 16-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Insert(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => InsertSpanFormattable(index, value, format, provider);
+#else
+            => InsertNumberCore<short, Int16Formatter>(index, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Inserts the string representation of a specified 32-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Insert(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => InsertSpanFormattable(index, value, format, provider);
+#else
+            => InsertNumberCore<int, Int32Formatter>(index, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Inserts the string representation of a specified 64-bit signed integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Insert(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => InsertSpanFormattable(index, value, format, provider);
+#else
+            => InsertNumberCore<long, Int64Formatter>(index, value, format.AsSpan(), provider);
+#endif
+
+        /// <summary>
+        /// Inserts the string representation of a specified single-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+            => InsertNumberCore<float, SingleFormatter>(index, value, format.AsSpan(), provider);
+
+        /// <summary>
+        /// Inserts the string representation of a specified double-precision floating-point number to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture using the "J" format, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        public OpenStringBuilder Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+            => InsertNumberCore<double, DoubleFormatter>(index, value, format.AsSpan(), provider);
+
+        /// <summary>
+        /// Inserts the string representation of a specified decimal to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
+        internal OpenStringBuilder Insert(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
+#if FEATURE_SPANFORMATTABLE
+            => InsertSpanFormattable(index, value, format, provider);
 #else
             => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
 #endif
 
-        public OpenStringBuilder Insert(int index, byte value, string? format = null, IFormatProvider? provider = null)
+        /// <summary>
+        /// Inserts the string representation of a specified 16-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public OpenStringBuilder Insert(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
+            => InsertSpanFormattable(index, value, format, provider);
 #else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
+            => InsertNumberCore<ushort, UInt16Formatter>(index, value, format.AsSpan(), provider);
 #endif
 
-        public OpenStringBuilder Insert(int index, short value, string? format = null, IFormatProvider? provider = null)
+        /// <summary>
+        /// Inserts the string representation of a specified 32-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public OpenStringBuilder Insert(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
+            => InsertSpanFormattable(index, value, format, provider);
 #else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
+            => InsertNumberCore<uint, UInt32Formatter>(index, value, format.AsSpan(), provider);
 #endif
 
-        public OpenStringBuilder Insert(int index, int value, string? format = null, IFormatProvider? provider = null)
+        /// <summary>
+        /// Inserts the string representation of a specified 64-bit unsigned integer to this instance
+        /// with the specified numeric format and culture-specific format information.
+        /// <para/>
+        /// Unless otherwise specified, formatting is performed in the invariant culture, which
+        /// is similar to how the JDK formats numbers.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to format and append.</param>
+        /// <param name="format">A standard or custom numeric format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
+        /// <remarks>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        [CLSCompliant(false)]
+        public OpenStringBuilder Insert(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
+            => InsertSpanFormattable(index, value, format, provider);
 #else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
+            => InsertNumberCore<ulong, UInt64Formatter>(index, value, format.AsSpan(), provider);
 #endif
 
-        public OpenStringBuilder Insert(int index, long value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
-#endif
-
-        public OpenStringBuilder Insert(int index, float value, string? format = null, IFormatProvider? provider = null)
+        // J2N: Helper method for supported types so we don't need to duplicate all of this business logic
+        // on every number type.
+        private OpenStringBuilder InsertNumberCore<T, TFormatter>(
+            int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
+            where TFormatter : struct, INumberFormatter<T>
         {
-            provider ??= NumberFormatInfo.InvariantInfo;
-            Span<char> buffer = stackalloc char[CharStackBufferSize];
-            if (DotNetNumber.TryFormatSingle(value, format.AsSpan(), provider, buffer, out int charsWritten))
+            if ((uint)index > (uint)Length)
             {
-                // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
-                // we want exceeding the maximum capacity to throw an OutOfMemoryException.
-                return Insert(index, buffer.Slice(0, charsWritten), 1);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
             }
 
-            return Insert(index, DotNetNumber.FormatSingle(value, format, provider), 1);
-        }
-
-        public OpenStringBuilder Insert(int index, double value, string? format = null, IFormatProvider? provider = null)
-        {
-            provider ??= NumberFormatInfo.InvariantInfo;
+            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+            char[]? arrayToReturnToPool = null;
             Span<char> buffer = stackalloc char[CharStackBufferSize];
-            if (DotNetNumber.TryFormatDouble(value, format.AsSpan(), provider, buffer, out int charsWritten))
+            int charsWritten = 0;
+            try
             {
+                while (!default(TFormatter).TryFormat(value, format, provider, buffer, out charsWritten))
+                {
+                    // Check if the valueCount will put us over m_MaxCapacity.
+                    // Doing the check here prevents corruption of the StringBuilder.
+                    int newLength = buffer.Length * 2;
+                    if (newLength > m_MaxCapacity)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                    }
+                    buffer = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(newLength);
+                }
+
                 // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
                 // we want exceeding the maximum capacity to throw an OutOfMemoryException.
-                return Insert(index, buffer.Slice(0, charsWritten), 1);
+                Insert(index, buffer.Slice(0, charsWritten), 1);
+            }
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
             }
 
-            return Insert(index, DotNetNumber.FormatDouble(value, format, provider), 1);
+            return this;
         }
-
-        public OpenStringBuilder Insert(int index, decimal value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
-#endif
-
-        [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, ushort value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
-#endif
-
-        [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, uint value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
-#endif
-
-        [CLSCompliant(false)]
-        public OpenStringBuilder Insert(int index, ulong value, string? format = null, IFormatProvider? provider = null)
-#if FEATURE_SPANFORMATTABLE
-            => InsertSpanFormattable(index, value, format, provider ?? NumberFormatInfo.InvariantInfo);
-#else
-            => Insert(index, value.ToString(format, provider ?? NumberFormatInfo.InvariantInfo), 1);
-#endif
 
         #endregion Insert Number
 
@@ -1623,7 +2048,7 @@ namespace J2N.Text
                 return InsertSpanFormattable(index, spanFormattable, format, provider);
 #else
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
-                return InsertSpanFormattable(index, number, format, provider);
+                return InsertSpanFormattable(index, number, format.AsSpan(), provider);
 #endif
             else if (value is IFormattable formattable)
                 return Insert(index, formattable.ToString(format, provider));
@@ -1646,7 +2071,7 @@ namespace J2N.Text
             return this;
         }
 
-        private OpenStringBuilder InsertSpanFormattable<T>(int index, T value, string? format = null, IFormatProvider? provider = null)
+        private OpenStringBuilder InsertSpanFormattable<T>(int index, T value, ReadOnlySpan<char> format = default, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             where T : ISpanFormattable
 #else
@@ -1655,15 +2080,42 @@ namespace J2N.Text
         {
             Debug.Assert(typeof(T).Assembly.Equals(typeof(object).Assembly) || typeof(T).Assembly.Equals(typeof(Number).Assembly), "Implementation trusts the results of TryFormat because T is expected to be something known");
 
-            Span<char> buffer = stackalloc char[CharStackBufferSize];
-            if (value.TryFormat(buffer, out int charsWritten, format.AsSpan(), provider))
+            provider ??= NumberFormatInfo.InvariantInfo; // For JDK-style formatting
+
+            if ((uint)index > (uint)Length)
             {
-                // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
-                // we want exceeding the maximum capacity to throw an OutOfMemoryException.
-                return Insert(index, buffer.Slice(0, charsWritten), 1);
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
             }
 
-            return Insert(index, value.ToString(format, provider), 1);
+            char[]? arrayToReturnToPool = null;
+            Span<char> buffer = stackalloc char[CharStackBufferSize];
+            int charsWritten = 0;
+            try
+            {
+                while (!value.TryFormat(buffer, out charsWritten, format, provider))
+                {
+                    // Check if the valueCount will put us over m_MaxCapacity.
+                    // Doing the check here prevents corruption of the StringBuilder.
+                    int newLength = buffer.Length * 2;
+                    if (newLength > m_MaxCapacity)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
+                    }
+
+                    buffer = arrayToReturnToPool = ArrayPool<char>.Shared.Rent(newLength);
+                }
+
+                // We don't use Insert(int, ReadOnlySpan<char>) for exception compatibility;
+                // we want exceeding the maximum capacity to throw an OutOfMemoryException.
+                Insert(index, buffer.Slice(0, charsWritten), 1);
+            }
+            finally
+            {
+                if (arrayToReturnToPool != null)
+                    ArrayPool<char>.Shared.Return(arrayToReturnToPool);
+            }
+
+            return this;
         }
 
 
