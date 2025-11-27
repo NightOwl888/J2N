@@ -1,8 +1,7 @@
 ﻿using J2N.Buffers;
+using J2N.Collections;
 using J2N.Collections.Generic;
 using J2N.Numerics;
-using J2N.Runtime.CompilerServices;
-using J2N.Runtime.InteropServices;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -42,7 +41,6 @@ namespace J2N.Text
     /// </remarks>
     public partial class OpenStringBuilder : IAppendable, ISpanAppendable, ICharSequence
                                                                           //, IEnumerable<char> // ICU4N TODO: Implement?
-
     {
         private const int CharStackBufferSize = 32;
 
@@ -74,6 +72,8 @@ namespace J2N.Text
         public OpenStringBuilder()
         {
             m_MaxCapacity = int.MaxValue;
+            // J2N: We assume that subclasses will not expose or call this constructor if they want
+            // full control over how the buffer is allocated.
             m_Chars = new char[DefaultCapacity];
         }
 
@@ -91,7 +91,7 @@ namespace J2N.Text
         /// </summary>
         /// <param name="value">The initial contents of this builder.</param>
         public OpenStringBuilder(string? value)
-            : this(value.AsSpan(), DefaultCapacity)
+            : this(value, DefaultCapacity)
         {
         }
 
@@ -101,7 +101,7 @@ namespace J2N.Text
         /// <param name="value">The initial contents of this builder.</param>
         /// <param name="capacity">The initial capacity of this builder.</param>
         public OpenStringBuilder(string? value, int capacity)
-            : this(value.AsSpan(), capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         {
         }
 
@@ -135,7 +135,13 @@ namespace J2N.Text
             }
             capacity = Math.Max(capacity, length);
 
-            m_Chars = AllocateArray(capacity);
+            // J2N: We assume that subclasses will not expose or call this constructor if they want
+            // full control over how the buffer is allocated.
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+#else
+            m_Chars = new char[capacity];
+#endif
             m_Position = length;
 
             value.AsSpan(startIndex, length).CopyTo(m_Chars);
@@ -161,7 +167,13 @@ namespace J2N.Text
             }
 
             m_MaxCapacity = maxCapacity;
-            m_Chars = AllocateArray(capacity);
+            // J2N: We assume that subclasses will not expose or call this method if they want
+            // full control over how the buffer is allocated.
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+#else
+            m_Chars = new char[capacity];
+#endif
         }
 
         #endregion BCL Constructors
@@ -195,7 +207,13 @@ namespace J2N.Text
             }
             capacity = Math.Max(capacity, length + DefaultCapacity);
 
-            m_Chars = AllocateArray(capacity);
+            // J2N: We assume that subclasses will not expose or call this method if they want
+            // full control over how the buffer is allocated.
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+#else
+            m_Chars = new char[capacity];
+#endif
             m_Position = length;
 
             value.CopyTo(m_Chars);
@@ -217,7 +235,13 @@ namespace J2N.Text
             }
 
             int length = value.Length;
-            m_Chars = AllocateArray(value.Capacity);
+            // J2N: We assume that subclasses will not expose or call this constructor if they want
+            // full control over how the buffer is allocated.
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            m_Chars = GC.AllocateUninitializedArray<char>(value.Capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+#else
+            m_Chars = new char[value.Capacity];
+#endif
             value.CopyTo(0, m_Chars, 0, length);
             m_Position = length;
         }
@@ -243,17 +267,22 @@ namespace J2N.Text
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
             }
 
+            // J2N: We assume that subclasses will not expose or call this constructor if they want
+            // full control over how the buffer is allocated.
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+#else
+            m_Chars = new char[capacity];
+#endif
+
             if (value is null)
             {
                 m_Position = 0;
-                m_Chars = new char[capacity];
                 return;
             }
 
-            m_Chars = AllocateArray(capacity);
-            m_Position = length;
-
             value.CopyTo(startIndex, m_Chars, 0, length);
+            m_Position = length;
         }
 
         /// <summary>
@@ -266,15 +295,19 @@ namespace J2N.Text
             int length = value?.Length ?? 0;
             int capacity = length + DefaultCapacity;
 
+            // J2N: We assume that subclasses will not expose or call this constructor if they want
+            // full control over how the buffer is allocated.
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            m_Chars = GC.AllocateUninitializedArray<char>(capacity); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+#else
+            m_Chars = new char[capacity];
+#endif
+
             if (value is null || !value.HasValue)
             {
                 m_Position = 0;
-                m_Chars = new char[capacity];
                 return;
             }
-
-            m_Chars = AllocateArray(capacity);
-            m_Position = length;
 
             if (value is StringCharSequence str)
             {
@@ -307,15 +340,63 @@ namespace J2N.Text
                 }
             }
 
-            m_Chars.AsSpan(value.Length).Fill('\0');
+            m_Position = length;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified
+        /// initial character buffer.
+        /// </summary>
+        /// <param name="initialBuffer">
+        /// The initial storage buffer to use. This array will become the underlying buffer for
+        /// the new instance and will be written to as the builder is modified.
+        /// </param>
+        /// <remarks>
+        /// This constructor is intended for use by subclasses that wish to supply an externally
+        /// allocated buffer, such as one obtained from a buffer pool or shared memory region.
+        /// <para/>
+        /// Ownership of <paramref name="initialBuffer"/> is transferred to the new instance. The
+        /// caller must not use or modify the array after passing it to this constructor. To read
+        /// the raw characters of the underlying <see cref="OpenStringBuilder"/>, call one of the
+        /// <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> or
+        /// <see cref="MemoryExtensions.AsMemory(OpenStringBuilder)"/> overloads.
+        /// </remarks>
         protected OpenStringBuilder(char[] initialBuffer) : this(initialBuffer, initialLength: 0) { }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified
+        /// initial character buffer and initial content length.
+        /// </summary>
+        /// <param name="initialBuffer">
+        /// The initial storage buffer to use. This array will become the underlying buffer for
+        /// the new instance and will be written to as the builder is modified.
+        /// </param>
+        /// <param name="initialLength">
+        /// The number of characters in <paramref name="initialBuffer"/> that should be considered
+        /// valid initial content for the builder.
+        /// </param>
+        /// <exception cref="ArgumentNullException">
+        /// <paramref name="initialBuffer"/> is <c>null</c>.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="initialLength"/> is negative or greater than the length of
+        /// <paramref name="initialBuffer"/>.
+        /// </exception>
+        /// <remarks>
+        /// This constructor is intended for use by subclasses that wish to supply an externally
+        /// allocated and optionally pre-populated buffer.
+        /// <para/>
+        /// Ownership of <paramref name="initialBuffer"/> is transferred to the new instance. The
+        /// caller must not use or modify the array after passing it to this constructor. To read
+        /// the raw characters of the underlying <see cref="OpenStringBuilder"/>, call one of the
+        /// <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> or
+        /// <see cref="MemoryExtensions.AsMemory(OpenStringBuilder)"/> overloads.
+        /// </remarks>
         protected OpenStringBuilder(char[] initialBuffer, int initialLength)
         {
             m_Chars = initialBuffer ?? throw new ArgumentNullException(nameof(initialBuffer));
             m_Position = initialLength;
+            m_MaxCapacity = int.MaxValue;
         }
 
         #endregion J2N Constructors
@@ -348,7 +429,7 @@ namespace J2N.Text
             }
 
             // Allocate the new array
-            char[] newArray = AllocateArray(CalculateNewArrayLength(count));
+            char[] newArray = AllocateBuffer(CalculateNewArrayLength(count));
 
 
             if (m_Position > 0)
@@ -368,21 +449,14 @@ namespace J2N.Text
                 }
             }
 
+            // We are done with the old array
+            ReleaseBuffer(m_Chars);
+
             // Wire in the new array
             m_Chars = newArray;
             m_Position += count;
 
             //AssertInvariants();
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static char[] AllocateArray(int capacity, bool useUninitialized = true)
-        {
-            return
-#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
-                useUninitialized ? GC.AllocateUninitializedArray<char>(capacity) :
-#endif
-                new char[capacity];
         }
 
         public int Capacity
@@ -399,7 +473,7 @@ namespace J2N.Text
 
                 if (Capacity != value)
                 {
-                    m_Chars = ReplaceBuffer(m_Chars.AsSpan(0, m_Position), newCapacity: value);
+                    ReplaceBuffer(newCapacity: value);
                 }
             }
         }
@@ -2872,37 +2946,102 @@ namespace J2N.Text
                 throw new ArgumentOutOfRangeException("requiredLength", SR.ArgumentOutOfRange_SmallCapacity);
             }
 
-            m_Chars = ReplaceBuffer(m_Chars.AsSpan(0, m_Position), CalculateNewArrayLength(additionalCapacityBeyondPos));
+            ReplaceBuffer(CalculateNewArrayLength(additionalCapacityBeyondPos));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private int CalculateNewArrayLength(int additionalCapacityBeyondPos)
         {
-            const uint ArrayMaxLength = 0x7FFFFFC7; // same as Array.MaxLength
-
             // Increase to at least the required size (m_Position + additionalCapacityBeyondPos), but try
             // to double the size if possible, bounding the doubling to not go beyond the max array length.
             int newCapacity = (int)Math.Max(
                 (uint)(m_Position + additionalCapacityBeyondPos),
-                Math.Min((uint)m_Chars.Length * 2, ArrayMaxLength));
+                Math.Min((uint)m_Chars.Length * 2, Arrays.MaxArrayLength));
             return newCapacity;
         }
 
-        protected virtual char[] ReplaceBuffer(ReadOnlySpan<char> value, int newCapacity)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void ReplaceBuffer(int newCapacity)
         {
+            Debug.Assert(newCapacity >= m_Position);
+
+            char[] oldBuffer = m_Chars;
+
             // Make sure to let the array allocation throw an exception if the caller has a bug and the desired capacity is negative.
             // This could also go negative if the actual required length wraps around.
-            char[] temp = new char[newCapacity];
-            value.CopyTo(temp);
-            return temp;
+            char[] newBuffer = AllocateBuffer(newCapacity);
+            oldBuffer.AsSpan(0, m_Position).CopyTo(newBuffer);
+            ReleaseBuffer(oldBuffer);
+            m_Chars = newBuffer;
         }
 
+        /// <summary>
+        /// Allocates a new character buffer for use by <see cref="OpenStringBuilder"/> when the
+        /// existing buffer changes in size. This may happen when the buffer grows to accommodate
+        /// more data or when calling <see cref="TrimExcess()"/> to shrink the buffer to fit its content.
+        /// </summary>
+        /// <param name="minimumLength">
+        /// The minimum required length of the returned buffer. The returned array MUST have a
+        /// length greater than or equal to this value.
+        /// </param>
+        /// <returns>
+        /// A new <see cref="char"/> array that will become the active buffer for this instance.
+        /// </returns>
+        /// <remarks>
+        /// This method is called internally whenever <see cref="OpenStringBuilder"/> needs to grow or
+        /// shrink its underlying storage. Subclasses may override this method to control how new buffers
+        /// are allocated. For example, buffers may be rented from <see cref="System.Buffers.ArrayPool{T}"/> or
+        /// another pooling mechanism.
+        /// <para/>
+        /// Implementations must <em>not</em> perform any data copying. The base class is solely
+        /// responsible for transferring existing content into the new buffer before it becomes active.
+        /// <para/>
+        /// The returned buffer should be considered newly allocated and uninitialized; the base
+        /// class will overwrite the portion it requires.
+        /// </remarks>
+        protected virtual char[] AllocateBuffer(int minimumLength)
+        {
+#if FEATURE_GC_ALLOCATEUNINITIALIZEDARRAY
+            return GC.AllocateUninitializedArray<char>(minimumLength); // J2N NOTE: If we decide to expose the actual array, we must use new char[] here.
+#else
+            return new char[minimumLength];
+#endif
+        }
 
+        /// <summary>
+        /// Releases a previously-used character buffer.
+        /// </summary>
+        /// <param name="buffer">
+        /// The buffer that is no longer used by this instance.
+        /// </param>
+        /// <remarks>
+        /// <para>
+        /// This method is called internally after <see cref="OpenStringBuilder"/> has finished copying
+        /// all required data out of the previous buffer and replaced it with a new one.
+        /// Subclasses may override this method to return buffers to a pool or perform other
+        /// cleanup logic.
+        /// </para>
+        /// <para>
+        /// The default implementation does nothing.
+        /// </para>
+        /// <para>
+        /// Implementations must assume that <paramref name="buffer"/> may contain arbitrary
+        /// application data. It is the subclass's responsibility to avoid leaking sensitive
+        /// information when using pooled or shared buffers.
+        /// </para>
+        /// </remarks>
+        protected virtual void ReleaseBuffer(char[] buffer)
+        {
+            // By default, do nothing. Derived classes can override to return to pool, etc.
+        }
 
         // J2N-specific methods
 
         // For testing
         internal char[] ToCharArray() => m_Position == m_Chars.Length ? m_Chars : m_Chars.AsSpan(0, m_Position).ToArray();
 
+        // For testing
+        internal char[] RawArray => m_Chars;
 
         /// <summary>
         /// Deletes a sequence of characters specified by <paramref name="startIndex"/> and <paramref name="count"/>.
@@ -2986,7 +3125,7 @@ namespace J2N.Text
         {
             if (m_Position < m_Chars.Length)
             {
-                m_Chars = ReplaceBuffer(m_Chars.AsSpan(0, m_Position), m_Position);
+                ReplaceBuffer(m_Position);
             }
         }
     }
