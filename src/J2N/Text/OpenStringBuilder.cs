@@ -1037,15 +1037,29 @@ namespace J2N.Text
             }
         }
 
-#pragma warning disable CA1830 // Prefer strongly-typed Append and Insert method overloads on StringBuilder. No need to fix for the builder itself
-        public OpenStringBuilder Append(bool value, IFormatProvider? provider = null) // J2N TODO: API - Should we make a boolean parameter here instead? We only need to say "title case" or "lower case"
+        /// <summary>
+        /// Appends the string representation of a specified Boolean value to this instance
+        /// in lowercase. This matches the behavior of Java's StringBuilder. To match the behavior
+        /// in .NET, call the overload that takes a <see cref="BooleanFormat"/> parameter
+        /// </summary>
+        /// <param name="value">The Boolean value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        public OpenStringBuilder Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
+
+        /// <summary>
+        /// Appends the string representation of a specified Boolean value to this instance
+        /// in the specified format.
+        /// </summary>
+        /// <param name="value">The Boolean value to append.</param>
+        /// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
+        /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        public OpenStringBuilder Append(bool value, BooleanFormat format)
         {
-            // J2N: Use lower-case formatting (the default in Java) if passed a StringFormatter,
-            // otherwise use the .NET default formatting.
-            Append(FormatBoolean(value, provider));
+            string text = FormatBoolean(value, format);
+            Append(ref MemoryMarshal.GetReference(text.AsSpan()), text.Length);
             return this;
         }
-#pragma warning restore CA1830
 
         public OpenStringBuilder Append(char value)
         {
@@ -1405,13 +1419,32 @@ namespace J2N.Text
             return this;
         }
 
-#pragma warning disable CA1830 // Prefer strongly-typed Append and Insert method overloads on StringBuilder. No need to fix for the builder itself
-        // bool does not implement ISpanFormattable but its ToString override returns cached strings.
-        public OpenStringBuilder Insert(int index, bool value, IFormatProvider? provider = null)
-            // J2N: Use lower-case formatting (the default in Java) if passed a StringFormatter,
-            // otherwise use the .NET default formatting.
-            => Insert(index, FormatBoolean(value, provider), 1);
-#pragma warning restore CA1830
+        /// <summary>
+        /// Inserts the string representation of a specified Boolean value to this instance
+        /// in lowercase. This matches the behavior of Java's StringBuilder. To match the behavior
+        /// in .NET, call the overload that takes a <see cref="BooleanFormat"/> parameter
+        /// </summary>
+        /// <param name="index">The position in this instance where the value is inserted.</param>
+        /// <param name="value">The Boolean value to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        public OpenStringBuilder Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
+
+        /// <summary>
+        /// Inserts the string representation of a specified Boolean value to this instance
+        /// in lowercase. This matches the behavior of Java's StringBuilder. To match the behavior
+        /// in .NET, call the overload that takes a <see cref="BooleanFormat"/> parameter
+        /// </summary>
+        /// <param name="index">The position in this instance where the value is inserted.</param>
+        /// <param name="value">The Boolean value to append.</param>
+        /// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
+        /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        public OpenStringBuilder Insert(int index, bool value, BooleanFormat format)
+        {
+            string text = FormatBoolean(value, format);
+            Insert(index, text.AsSpan(), 1);
+            return this;
+        }
 
         #region Insert Number
 
@@ -2914,8 +2947,11 @@ namespace J2N.Text
             }
         }
 
-        private static string FormatBoolean(bool value, IFormatProvider? provider) =>
-            provider is null || provider is StringFormatter ? StringFormatter.FormatBoolean(value) : value.ToString(provider);
+        private static string FormatBoolean(bool value, BooleanFormat format) =>
+            // J2N: System.Boolean ignores the IFormatProvider that is passed to it,
+            // so we are using a boolean flag for users to be able to specify whether to use
+            // title casing (.NET) or lower casing (Java).
+            format == BooleanFormat.Lowercase ? StringFormatter.FormatBoolean(value) : value.ToString();
 
 
         [MethodImpl(MethodImplOptions.NoInlining)]
