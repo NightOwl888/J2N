@@ -26,7 +26,7 @@ namespace J2N.Text
     /// 
     /// <list type="bullet">
     ///     <item><description>
-    ///         Rather than managing chunks of memory, <see cref="OpenStringBuilder"/> manages a single contigouous
+    ///         Rather than managing chunks of memory, <see cref="OpenStringBuilder"/> manages a single contiguous
     ///         block of <see cref="char"/>s.
     ///     </description></item>
     ///     <item><description>
@@ -61,15 +61,19 @@ namespace J2N.Text
         internal int m_MaxCapacity;
 
         /// <summary>
-        /// The default capacity of a <see cref="StringBuilder"/>.
+        /// The default capacity of an <see cref="OpenStringBuilder"/>.
         /// </summary>
         internal const int DefaultCapacity = 16;
 
         #region BCL Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
         /// </summary>
+        /// <remarks>
+        /// The string value of this instance is set to <see cref="string.Empty"/>, and the capacity is set to
+        /// the implementation-specific default capacity.
+        /// </remarks>
         public OpenStringBuilder()
         {
             m_MaxCapacity = int.MaxValue;
@@ -79,40 +83,84 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified capacity.
         /// </summary>
-        /// <param name="capacity">The initial capacity of this builder.</param>
+        /// <param name="capacity">The suggested starting size of this instance.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
+        /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
+        /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
+        /// the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// <para/>
+        /// The string value of this instance is set to <see cref="string.Empty"/>. If capacity is zero, the
+        /// implementation-specific default capacity is used.</remarks>
+        /// <seealso cref="Capacity"/>
         public OpenStringBuilder(int capacity)
             : this(capacity, int.MaxValue)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified string.
         /// </summary>
-        /// <param name="value">The initial contents of this builder.</param>
+        /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
+        /// is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty string (that is, it
+        /// contains <see cref="string.Empty"/>).</param>
+        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will
+        /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
         public OpenStringBuilder(string? value)
             : this(value, DefaultCapacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class with the specified string
+        /// and capacity.
         /// </summary>
-        /// <param name="value">The initial contents of this builder.</param>
-        /// <param name="capacity">The initial capacity of this builder.</param>
+        /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
+        /// is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty string (that is, it
+        /// contains <see cref="string.Empty"/>).</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
+        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// <para/>
+        /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
+        /// </remarks>
+        /// <seealso cref="Capacity"/>
         public OpenStringBuilder(string? value, int capacity)
             : this(value, 0, value?.Length ?? 0, capacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class from the specified
+        /// substring and capacity.
         /// </summary>
-        /// <param name="value">The initial contents of this builder.</param>
-        /// <param name="startIndex">The index to start in <paramref name="value"/>.</param>
-        /// <param name="length">The number of characters to read in <paramref name="value"/>.</param>
-        /// <param name="capacity">The initial capacity of this builder.</param>
+        /// <param name="value">The string that contains the substring used to initialize the value of this instance.
+        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty
+        /// string (that is, it contains <see cref="string.Empty"/>).</param>
+        /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
+        /// <param name="length">The number of characters in the substring.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> is not a position within <paramref name="value"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
+        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// <para/>
+        /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
+        /// </remarks>
+        /// <seealso cref="Capacity"/>
         public OpenStringBuilder(string? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
@@ -149,10 +197,37 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="StringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class that starts with a specified capacity
+        /// and can grow to a specified maximum.
         /// </summary>
-        /// <param name="capacity">The initial capacity of this builder.</param>
-        /// <param name="maxCapacity">The maximum capacity of this builder.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <param name="maxCapacity">The maximum number of characters the current string can contain.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="maxCapacity"/> is less than one, <paramref name="capacity"/> is less than zero,
+        /// or <paramref name="capacity"/> is greater than <paramref name="maxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be stored
+        /// in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/> property.
+        /// If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/> value,
+        /// the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// <para/>
+        /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
+        /// <para/>
+        /// The <paramref name="maxCapacity"/> property defines the maximum number of characters that the current
+        /// instance can hold. Its value is assigned to the <see cref="MaxCapacity"/> property. If the number of
+        /// characters to be stored in the current instance exceeds this <paramref name="maxCapacity"/> value,
+        /// the <see cref="OpenStringBuilder"/> object does not allocate additional memory, but instead throws an exception.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="Capacity"/>
+        /// <seealso cref="MaxCapacity"/>
         public OpenStringBuilder(int capacity, int maxCapacity)
         {
             if (capacity > maxCapacity)
@@ -182,19 +257,29 @@ namespace J2N.Text
         #region J2N Constructors
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> with the specified sequence of characters.
         /// </summary>
-        /// <param name="value">The initial contents of this builder.</param>
+        /// <param name="value">The characters used to initialize this instance.</param>
+        /// <remarks>The characters from the span are copied to the heap memory of this instance.</remarks>
         public OpenStringBuilder(ReadOnlySpan<char> value)
             : this(value, DefaultCapacity)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> with the specified sequence of characters.
         /// </summary>
-        /// <param name="value">The initial contents of this builder.</param>
-        /// <param name="capacity">The initial capacity of this builder.</param>
+        /// <param name="value">The characters used to initialize this instance.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
+        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// <para/>
+        /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
+        /// </remarks>
+        /// <seealso cref="Capacity"/>
         public OpenStringBuilder(ReadOnlySpan<char> value, int capacity)
         {
             if (capacity < 0)
@@ -221,9 +306,17 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class using the specified
+        /// <see cref="StringBuilder"/>.
         /// </summary>
-        /// <param name="value">The initial contents of this builder.</param>
+        /// <param name="value">The string used to initialize the value of the instance. If <paramref name="value"/>
+        /// is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain the empty string (that is, it
+        /// contains <see cref="string.Empty"/>).</param>
+        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will
+        /// contain the empty string (that is, it contains <see cref="string.Empty"/>).
+        /// <para/>
+        /// If value is non-<c>null</c>, <see cref="Capacity"/> is set using the <see cref="StringBuilder.Capacity"/>.
+        /// </remarks>
         public OpenStringBuilder(StringBuilder? value)
         {
             m_MaxCapacity = int.MaxValue;
@@ -247,11 +340,54 @@ namespace J2N.Text
             m_Position = length;
         }
 
-        public OpenStringBuilder(StringBuilder? value, int startIndex, int length)
-            : this(value, startIndex, length, DefaultCapacity)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class with the specified
+        /// <see cref="StringBuilder"/> and capacity.
+        /// </summary>
+        /// <param name="value">The <see cref="StringBuilder"/> used to initialize the value of the instance.
+        /// If <paramref name="value"/>is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain
+        /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="capacity"/> is less than zero.</exception>
+        /// <remarks>The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
+        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// <para/>
+        /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
+        /// </remarks>
+        /// <seealso cref="Capacity"/>
+        public OpenStringBuilder(StringBuilder? value, int capacity)
+            : this(value, 0, value?.Length ?? 0, capacity)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class from the specified
+        /// substring and capacity.
+        /// </summary>
+        /// <param name="value">The <see cref="StringBuilder"/> that contains the substring used to initialize the
+        /// value of this instance. If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/>
+        /// will contain the empty string (that is, it contains <see cref="string.Empty"/>).</param>
+        /// <param name="startIndex">The position within <paramref name="value"/> where the substring begins.</param>
+        /// <param name="length">The number of characters in the substring.</param>
+        /// <param name="capacity">The suggested starting size of the <see cref="OpenStringBuilder"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="length"/> is not a position within <paramref name="value"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <paramref name="capacity"/> parameter defines the maximum number of characters that can be
+        /// stored in the memory allocated by the current instance. Its value is assigned to the <see cref="Capacity"/>
+        /// property. If the number of characters to be stored in the current instance exceeds this <paramref name="capacity"/>
+        /// value, the <see cref="OpenStringBuilder"/> object allocates additional memory to store them.
+        /// <para/>
+        /// If <paramref name="capacity"/> is zero, the implementation-specific default capacity is used.
+        /// </remarks>
+        /// <seealso cref="Capacity"/>
         public OpenStringBuilder(StringBuilder? value, int startIndex, int length, int capacity)
         {
             if (capacity < 0)
@@ -287,10 +423,14 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> class.
+        /// Initializes a new instance of the <see cref="OpenStringBuilder"/> with the specified sequence of characters.
         /// </summary>
-        /// <param name="value">The initial contents of this builder.</param>
-        public OpenStringBuilder(ICharSequence? value)
+        /// <param name="value">The <see cref="ICharSequence"/> used to initialize the value of the instance.
+        /// If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will contain
+        /// the empty string (that is, it contains <see cref="string.Empty"/>).</param>
+        /// <remarks>If <paramref name="value"/> is <c>null</c>, the new <see cref="OpenStringBuilder"/> will
+        /// contain the empty string (that is, it contains <see cref="string.Empty"/>).</remarks>
+        public OpenStringBuilder(ICharSequence? value) // J2N TODO: Add overloads to slice the ICharsequence and set capacity?
         {
             m_MaxCapacity = int.MaxValue;
             int length = value?.Length ?? 0;
@@ -460,6 +600,26 @@ namespace J2N.Text
             //AssertInvariants();
         }
 
+        /// <summary>
+        /// Gets or sets the maximum number of characters that can be contained in the memory allocated by the current instance.
+        /// </summary>
+        /// <value>The maximum number of characters that can be contained in the memory allocated by the current instance.
+        /// Its value can range from <see cref="Length"/> to <see cref="MaxCapacity"/>.</value>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The value specified for a set operation is less than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The value specified for a set operation is greater than the maximum capacity.
+        /// </exception>
+        /// <remarks>
+        /// <see cref="Capacity"/> does not affect the string value of the current instance. <see cref="Capacity"/> can
+        /// be decreased as long as it is not less than <see cref="Length"/>.
+        /// <para/>
+        /// The <see cref="OpenStringBuilder"/> dynamically allocates more space when required and increases
+        /// <see cref="Capacity"/> accordingly. For performance reasons, a <see cref="OpenStringBuilder"/> might
+        /// allocate more memory than needed. The amount of memory allocated is implementation-specific.
+        /// </remarks>
         public int Capacity
         {
             get => m_Chars.Length;
@@ -480,8 +640,22 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Gets the maximum capacity this builder is allowed to have.
+        /// Gets the maximum capacity of this instance.
         /// </summary>
+        /// <value>The maximum number of characters this instance can hold.</value>
+        /// <remarks>
+        /// The maximum capacity for this implementation is <see cref="int.MaxValue"/>.
+        /// However, this value is implementation-specific and might be different in other or
+        /// later implementations. You can explicitly set the maximum capacity of a <see cref="OpenStringBuilder"/>
+        /// object by calling the <see cref="OpenStringBuilder(int, int)"/> constructor.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public int MaxCapacity => m_MaxCapacity;
 
         /// <summary>
@@ -555,8 +729,28 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Gets or sets the length of this builder.
+        /// Gets or sets the length of the current <see cref="OpenStringBuilder"/> object.
         /// </summary>
+        /// <value>The length of this instance.</value>
+        /// <exception cref="ArgumentOutOfRangeException">The value specified for a set operation
+        /// is less than zero or greater than <see cref="MaxCapacity"/>.</exception>
+        /// <remarks>
+        /// The length of a <see cref="OpenStringBuilder"/> object is defined by its number of 
+        /// <see cref="char"/> objects.
+        /// <para/>
+        /// Like the <see cref="string.Length"/> property, the <see cref="Length"/> property indicates
+        /// the length of the current string object. Unlike the <see cref="string.Length"/> property,
+        /// which is read-only, the <see cref="Length"/> property allows you to modify the length of
+        /// the string stored to the <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// If the specified length is less than the current length, the current <see cref="OpenStringBuilder"/>
+        /// object is truncated to the specified length. If the specified length is greater than the current
+        /// length, the end of the string value of the current <see cref="OpenStringBuilder"/> object is padded
+        /// with the Unicode NULL character (U+0000).
+        /// <para/>
+        /// If the specified length is greater than the current capacity, <see cref="Capacity"/> increases so
+        /// that it is greater than or equal to the specified length.
+        /// </remarks>
         public int Length
         {
             get => m_Position;
@@ -589,11 +783,59 @@ namespace J2N.Text
         /// Gets or sets the character at the specified character position in this instance.
         /// </summary>
         /// <param name="index">The position of the character.</param>
-        /// <returns>The Unicode character at position <paramref name="index"/>.</returns>
+        /// <value>The Unicode character at position <paramref name="index"/>.</value>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside
         /// the bounds of this instance while setting a character.</exception>
         /// <exception cref="IndexOutOfRangeException"><paramref name="index"/> is outside the bounds
         /// of this instance while getting a character.</exception>
+        /// <remarks>
+        /// The index parameter is the position of a character within the <see cref="OpenStringBuilder"/>.
+        /// The first character in the string is at index 0. The length of a string is the number of
+        /// characters it contains. The last accessible character of a <see cref="OpenStringBuilder"/> instance
+        /// is at index Length - 1.
+        /// <para/>
+        /// <see cref="this[int]"/> is the default property of the <see cref="OpenStringBuilder"/>  class.
+        /// In C#, it is an indexer. This means that individual characters can be retrieved from the <see cref="this[int]"/>
+        /// property as shown in the following example, which counts the number of alphabetic, white-space, and punctuation
+        /// characters in a string.
+        /// <code>
+        /// using System;
+        /// using System.Text;
+        /// 
+        /// public class Example
+        /// {
+        ///     public static void Main()
+        ///     {
+        ///         int nAlphabeticChars = 0;
+        ///         int nWhitespace = 0;
+        ///         int nPunctuation = 0;
+        ///         OpenStringBuilder sb = new OpenStringBuilder("This is a simple sentence.");
+        ///
+        ///         for (int ctr = 0; ctr &lt; sb.Length; ctr++)
+        ///         {
+        ///             char ch = sb[ctr];
+        ///             if (char.IsLetter(ch)) { nAlphabeticChars++; continue; }
+        ///             if (char.IsWhiteSpace(ch)) { nWhitespace++; continue; }
+        ///             if (char.IsPunctuation(ch)) nPunctuation++;
+        ///         }
+        ///
+        ///         Console.WriteLine("The sentence '{0}' has:", sb);
+        ///         Console.WriteLine("   Alphabetic characters: {0}", nAlphabeticChars);
+        ///         Console.WriteLine("   White-space characters: {0}", nWhitespace);
+        ///         Console.WriteLine("   Punctuation characters: {0}", nPunctuation);
+        ///     }
+        /// }
+        /// // The example displays the following output:
+        /// //       The sentence 'This is a simple sentence.' has:
+        /// //          Alphabetic characters: 21
+        /// //          White-space characters: 4
+        /// //          Punctuation characters: 1
+        /// </code>
+        /// <para/>
+        /// Unlike the <see cref="StringBuilder"/> class, <see cref="OpenStringBuilder"/>'s indexer does
+        /// not suffer from degraded performance due to chunky memory, since <see cref="OpenStringBuilder"/>
+        /// uses a single contiguous block of characters in memory.
+        /// </remarks>
         [IndexerName("Chars")]
         public char this[int index]
         {
@@ -1362,7 +1604,7 @@ namespace J2N.Text
             if ((uint)m_Position + (uint)ensureAdditionalCapacityBeyondPos > (uint)m_Chars.Length)
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the StringBuilder.
+                // Doing the check here prevents corruption of the OpenStringBuilder.
                 int newLength = m_Position + ensureAdditionalCapacityBeyondPos;
                 if (newLength > m_MaxCapacity)
                 {
@@ -1376,7 +1618,7 @@ namespace J2N.Text
             while (!default(TFormatter).TryFormat(value, format, provider, m_Chars.AsSpan(m_Position), out charsWritten))
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the StringBuilder.
+                // Doing the check here prevents corruption of the OpenStringBuilder.
                 int newLength = m_Chars.Length * 2;
                 if (newLength > m_MaxCapacity)
                 {
@@ -1408,7 +1650,7 @@ namespace J2N.Text
             while (!value.TryFormat(m_Chars.AsSpan(m_Position), out charsWritten, format, provider))
             {
                 // Check if the valueCount will put us over m_MaxCapacity.
-                // Doing the check here prevents corruption of the StringBuilder.
+                // Doing the check here prevents corruption of the OpenStringBuilder.
                 int newLength = m_Position + 16;
                 if (newLength > m_MaxCapacity)
                 {
@@ -1478,12 +1720,12 @@ namespace J2N.Text
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
         //public OpenStringBuilder Append(IFormatProvider? provider, [InterpolatedStringHandlerArgument("", nameof(provider))] ref AppendInterpolatedStringHandler handler) => this;
 
-        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current StringBuilder object.</summary>
+        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current OpenStringBuilder object.</summary>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
         //public OpenStringBuilder AppendLine([InterpolatedStringHandlerArgument("")] ref AppendInterpolatedStringHandler handler) => AppendLine();
 
-        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current StringBuilder object.</summary>
+        ///// <summary>Appends the specified interpolated string followed by the default line terminator to the end of the current OpenStringBuilder object.</summary>
         ///// <param name="provider">An object that supplies culture-specific formatting information.</param>
         ///// <param name="handler">The interpolated string to append.</param>
         ///// <returns>A reference to this instance after the append operation has completed.</returns>
@@ -1945,7 +2187,7 @@ namespace J2N.Text
                 while (!default(TFormatter).TryFormat(value, format, provider, buffer, out charsWritten))
                 {
                     // Check if the valueCount will put us over m_MaxCapacity.
-                    // Doing the check here prevents corruption of the StringBuilder.
+                    // Doing the check here prevents corruption of the OpenStringBuilder.
                     int newLength = buffer.Length * 2;
                     if (newLength > m_MaxCapacity)
                     {
@@ -2094,7 +2336,7 @@ namespace J2N.Text
                 while (!value.TryFormat(buffer, out charsWritten, format, provider))
                 {
                     // Check if the valueCount will put us over m_MaxCapacity.
-                    // Doing the check here prevents corruption of the StringBuilder.
+                    // Doing the check here prevents corruption of the OpenStringBuilder.
                     int newLength = buffer.Length * 2;
                     if (newLength > m_MaxCapacity)
                     {
@@ -3329,7 +3571,7 @@ namespace J2N.Text
         private void AppendWithExpansion(ref char value, int valueCount)
         {
             // Check if the valueCount will put us over m_MaxCapacity.
-            // Doing the check here prevents corruption of the StringBuilder.
+            // Doing the check here prevents corruption of the OpenStringBuilder.
             int newLength = Length + valueCount;
             if (newLength > m_MaxCapacity || newLength < valueCount)
             {
@@ -3573,7 +3815,7 @@ namespace J2N.Text
         /// reverse operation. Thus, the order of the high-low surrogates
         /// is never reversed.
         /// <para/>
-        /// IMPORTANT: This operation is done in-place. Although a <see cref="StringBuilder"/>
+        /// IMPORTANT: This operation is done in-place. Although an <see cref="OpenStringBuilder"/>
         /// is returned, it is the SAME instance as the one that is passed in.
         /// <para/>
         /// Let <c>n</c> be the character length of this character sequence
@@ -3592,9 +3834,9 @@ namespace J2N.Text
         /// Usage Note: This is the same operation as Java's StringBuilder.reverse()
         /// method. However, J2N also provides <see cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// and <see cref="J2N.MemoryExtensions.ReverseText(Span{char})"/> which
-        /// don't require a <see cref="StringBuilder"/> instance.
+        /// don't require an <see cref="OpenStringBuilder"/> instance.
         /// </summary>
-        /// <returns>A reference to this <see cref="StringBuilder"/>, for chaining.</returns>
+        /// <returns>A reference to this <see cref="OpenStringBuilder"/>, for chaining.</returns>
         /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
         /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
         /// <seealso cref="J2N.Text.StringBuilderExtensions.Reverse(StringBuilder)"/>
