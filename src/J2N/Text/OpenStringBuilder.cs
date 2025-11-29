@@ -5711,7 +5711,7 @@ namespace J2N.Text
         /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
         /// </remarks>
         [CLSCompliant(false)]
-        public unsafe OpenStringBuilder Insert(int index, char* value, int valueCount) // J2N TODO: API - tests
+        public unsafe OpenStringBuilder Insert(int index, char* value, int valueCount)
         {
             // We don't check null value as this case will throw null reference exception anyway
             if ((uint)index > (uint)Length)
@@ -5721,6 +5721,13 @@ namespace J2N.Text
             if (valueCount < 0)
             {
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(valueCount, ExceptionArgument.valueCount);
+            }
+            // Check if the valueCount will put us over m_MaxCapacity.
+            // Doing the check here prevents corruption of the OpenStringBuilder.
+            int newLength = m_Position + valueCount;
+            if (newLength > m_MaxCapacity || newLength < valueCount)
+            {
+                ThrowHelper.ThrowArgumentOutOfRangeException(valueCount, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
             }
 
             Insert(index, ref *value, valueCount);
