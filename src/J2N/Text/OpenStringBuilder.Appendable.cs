@@ -16,7 +16,8 @@ namespace J2N.Text
         /// <param name="charSequence">The sequence of characters to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
-        public OpenStringBuilder Append(ICharSequence? charSequence) // J2N: Parameter named charSequence so it can be specifed explicitly to differentate from object
+        /// <seealso cref="ICharSequence"/>
+        public OpenStringBuilder Append(ICharSequence? charSequence) // J2N: Parameter named charSequence so it can be specified explicitly to differentiate from object
         {
             if (charSequence is null || !charSequence.HasValue)
                 return this;
@@ -92,6 +93,7 @@ namespace J2N.Text
         /// <para/>
         /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
         /// </exception>
+        /// <seealso cref="ICharSequence"/>
         public OpenStringBuilder Append(ICharSequence? charSequence, int startIndex, int count)
         {
             if (charSequence is StringCharSequence str)
