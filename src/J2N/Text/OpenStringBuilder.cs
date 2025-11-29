@@ -41,7 +41,7 @@ namespace J2N.Text
     /// </list>
     /// </remarks>
     public partial class OpenStringBuilder : IAppendable, ISpanAppendable, ICharSequence
-                                                                          //, IEnumerable<char> // ICU4N TODO: Implement?
+        //, IEnumerable<char> // ICU4N TODO: Implement?
     {
         private const int CharStackBufferSize = 32;
 
@@ -1841,7 +1841,6 @@ namespace J2N.Text
                 {
                     m_Chars.AsSpan(m_Position).Fill('\0'); // Zero out the remaining chars
                 }
-                
             }
         }
 
@@ -5094,22 +5093,21 @@ namespace J2N.Text
         /// Returns a value indicating whether the characters in this instance are equal to the
         /// characters in a specified read-only character span.
         /// </summary>
-        /// <param name="other">The character span to compare with the current instance.</param>
-        /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// <param name="span">The character span to compare with the current instance.</param>
+        /// <returns><c>true</c> if the characters in this instance and <paramref name="span"/> are the same;
         /// otherwise, <c>false</c>.</returns>
-        /// <remarks>
         /// <remarks>
         /// The <see cref="Equals(OpenStringBuilder)"/> method performs an ordinal comparison to determine
         /// whether the characters in the current instance and span are equal.
         /// </remarks>
-        public bool Equals(ReadOnlySpan<char> other)
+        public bool Equals(ReadOnlySpan<char> span)
         {
-            if (other.Length != Length)
+            if (span.Length != Length)
             {
                 return false;
             }
 
-            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(other);
+            return new ReadOnlySpan<char>(m_Chars, 0, m_Position).SequenceEqual(span);
         }
 
         #endregion
