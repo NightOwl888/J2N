@@ -5411,7 +5411,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
         /// </exception>
-        public OpenStringBuilder Replace(int startIndex, int count, ReadOnlySpan<char> newValue) // J2N TODO: Tests
+        public OpenStringBuilder Replace(int startIndex, int count, ReadOnlySpan<char> newValue)
         {
             if ((uint)startIndex > (uint)m_Position)
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual(startIndex);
