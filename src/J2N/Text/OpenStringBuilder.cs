@@ -5194,97 +5194,101 @@ namespace J2N.Text
             }
 
             var replacements = new ValueListBuilder<int>(stackalloc int[128]); // A list of replacement positions in a chunk to apply
-
-            // Starting point.
-            int indexInChunk = startIndex;
-            while (count > 0)
+            try
             {
-                //Debug.Assert(chunk != null, "chunk was null in replace");
-
-                // While the remaining search space is at least as large as the old value being replaced,
-                // find all occurrences of it contained entirely within the chunk. We stop searching
-                // once we're within oldValue.Length from the end of the chunk (or count limit), at which point
-                // we need to consider a value that bridges between two chunks.
-                ReadOnlySpan<char> remainingChunk = m_Chars.AsSpan(indexInChunk, Math.Min(m_Position - indexInChunk, count));
-                while (oldValue.Length <= remainingChunk.Length)
+                // Starting point.
+                int indexInChunk = startIndex;
+                while (count > 0)
                 {
-                    // Find the next match.
-                    int foundPos = remainingChunk.IndexOf(oldValue);
-                    if (foundPos >= 0)
+                    //Debug.Assert(chunk != null, "chunk was null in replace");
+
+                    // While the remaining search space is at least as large as the old value being replaced,
+                    // find all occurrences of it contained entirely within the chunk. We stop searching
+                    // once we're within oldValue.Length from the end of the chunk (or count limit), at which point
+                    // we need to consider a value that bridges between two chunks.
+                    ReadOnlySpan<char> remainingChunk = m_Chars.AsSpan(indexInChunk, Math.Min(m_Position - indexInChunk, count));
+                    while (oldValue.Length <= remainingChunk.Length)
                     {
-                        // We found one.  Add it as a location for the replacement.
-                        indexInChunk += foundPos;
-                        replacements.Append(indexInChunk);
-
-                        // Move ahead to the next location.
-                        remainingChunk = remainingChunk.Slice(foundPos + oldValue.Length);
-                        indexInChunk += oldValue.Length;
-                        count -= foundPos + oldValue.Length;
-
-                        // If after accounting for moving past the match our count has
-                        // gone to 0, break out to stop searching.
-                        Debug.Assert(count >= 0, "count should never go negative");
-                        if (count == 0)
+                        // Find the next match.
+                        int foundPos = remainingChunk.IndexOf(oldValue);
+                        if (foundPos >= 0)
                         {
+                            // We found one.  Add it as a location for the replacement.
+                            indexInChunk += foundPos;
+                            replacements.Append(indexInChunk);
+
+                            // Move ahead to the next location.
+                            remainingChunk = remainingChunk.Slice(foundPos + oldValue.Length);
+                            indexInChunk += oldValue.Length;
+                            count -= foundPos + oldValue.Length;
+
+                            // If after accounting for moving past the match our count has
+                            // gone to 0, break out to stop searching.
+                            Debug.Assert(count >= 0, "count should never go negative");
+                            if (count == 0)
+                            {
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            // No match found. Reposition to one character beyond the last starting
+                            // location searched, which will be oldValue.Length - 1 from the end.
+                            // Then break out so that we can start the cross-chunk matching from that location.
+                            int move = remainingChunk.Length - (oldValue.Length - 1);
+                            indexInChunk += move;
+                            count -= move;
                             break;
                         }
                     }
-                    else
+
+                    Debug.Assert(oldValue.Length > Math.Min(count, m_Position - indexInChunk),
+                        $"oldValue.Length = {oldValue.Length}, m_Position - indexInChunk = {m_Position - indexInChunk}, count == {count}");
+
+                    // Now do the more complicated cross-chunk matching.
+                    while (indexInChunk < m_Position && count > 0)
                     {
-                        // No match found. Reposition to one character beyond the last starting
-                        // location searched, which will be oldValue.Length - 1 from the end.
-                        // Then break out so that we can start the cross-chunk matching from that location.
-                        int move = remainingChunk.Length - (oldValue.Length - 1);
-                        indexInChunk += move;
-                        count -= move;
-                        break;
+                        if (StartsWith(indexInChunk, count, oldValue))
+                        {
+                            replacements.Append(indexInChunk);
+                            indexInChunk += oldValue.Length;
+                            count -= oldValue.Length;
+                        }
+                        else
+                        {
+                            indexInChunk++;
+                            --count;
+                        }
                     }
-                }
 
-                Debug.Assert(oldValue.Length > Math.Min(count, m_Position - indexInChunk),
-                    $"oldValue.Length = {oldValue.Length}, m_Position - indexInChunk = {m_Position - indexInChunk}, count == {count}");
+                    // We've either fully explored the chunk or we've reached our count limit.
+                    Debug.Assert(indexInChunk >= m_Position || count == 0,
+                        $"indexInChunk = {indexInChunk}, m_Position == {m_Position}, count == {count}");
 
-                // Now do the more complicated cross-chunk matching.
-                while (indexInChunk < m_Position && count > 0)
-                {
-                    if (StartsWith(indexInChunk, count, oldValue))
+                    // Replacing mutates the blocks, so we need to convert to a logical index and back afterwards.
+                    int index = indexInChunk; // + chunk.m_ChunkOffset;
+
+                    // Apply any replacements we accumulated.
+                    if (replacements.Length != 0)
                     {
-                        replacements.Append(indexInChunk);
-                        indexInChunk += oldValue.Length;
-                        count -= oldValue.Length;
+                        // Perform all replacements, and adjust the logical index if the new and old values
+                        // have different lengths, such that the replacements would have impacted it.
+                        ReplaceAll(replacements.AsSpan(), oldValue.Length, newValue);
+                        index += (newValue.Length - oldValue.Length) * replacements.Length;
+                        replacements.Length = 0;
                     }
-                    else
-                    {
-                        indexInChunk++;
-                        --count;
-                    }
+
+                    //chunk = FindChunkForIndex(index);
+                    //indexInChunk = index - chunk.m_ChunkOffset;
+                    //Debug.Assert(chunk != null || count == 0, "Chunks ended prematurely!");
+
+                    indexInChunk = index - m_Position;
                 }
-
-                // We've either fully explored the chunk or we've reached our count limit.
-                Debug.Assert(indexInChunk >= m_Position || count == 0,
-                    $"indexInChunk = {indexInChunk}, m_Position == {m_Position}, count == {count}");
-
-                // Replacing mutates the blocks, so we need to convert to a logical index and back afterwards.
-                int index = indexInChunk; // + chunk.m_ChunkOffset;
-
-                // Apply any replacements we accumulated.
-                if (replacements.Length != 0)
-                {
-                    // Perform all replacements, and adjust the logical index if the new and old values
-                    // have different lengths, such that the replacements would have impacted it.
-                    ReplaceAll(replacements.AsSpan(), oldValue.Length, newValue);
-                    index += (newValue.Length - oldValue.Length) * replacements.Length;
-                    replacements.Length = 0;
-                }
-
-                //chunk = FindChunkForIndex(index);
-                //indexInChunk = index - chunk.m_ChunkOffset;
-                //Debug.Assert(chunk != null || count == 0, "Chunks ended prematurely!");
-
-                indexInChunk = index - m_Position;
             }
-
-            replacements.Dispose();
+            finally
+            {
+                replacements.Dispose();
+            }
 
             //AssertInvariants();
             return this;
