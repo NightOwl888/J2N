@@ -5969,5 +5969,49 @@ namespace J2N.Text
                 ReplaceBuffer(m_Position);
             }
         }
+
+        /// <summary>
+        /// Appends and returns a writable <see cref="Span{Char}"/> of the specified length to this builder.
+        /// Writes to the returned span will update the value of this instance.
+        /// </summary>
+        /// <param name="length">The number of characters to append to this instance.</param>
+        /// <returns>>A <see cref="Span{Char}"/> wrapping a block of memory that is appended to the existing
+        /// sequence of characters. The span may be written to by the caller to update this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="length"/> plus the current length of this instance exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method allows callers to append a block of a specific length to this instance that can be written
+        /// to after the fact. This is most useful for passing a span to an API that writes directly into a character buffer,
+        /// which can save a copy operation if the data fits in the returned span.
+        /// <para/>
+        /// The capacity is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        public Span<char> AppendSpan(int length)
+        {
+            if (length < 0)
+                ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(length, ExceptionArgument.length);
+
+            int pos = m_Position;
+            if (pos > m_Chars.Length - length)
+            {
+                Grow(length);
+            }
+            Span<char> buffer = m_Chars.AsSpan(pos, length);
+            buffer.Fill('\0'); // Ensure the buffer doesn't contain any sensitive data before providing it to the user
+            m_Position += length;
+            return buffer;
+        }
     }
 }
