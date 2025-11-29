@@ -1407,6 +1407,68 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.Insert(builder.Length, '\0')); // New length > builder.MaxCapacity
         }
 
+        [Theory] // J2N specific
+        [InlineData("Hello", 0, new char[] { 'a', 'b', 'c' }, 1, "aHello")]
+        [InlineData("Hello", 3, new char[] { 'a', 'b', 'c' }, 2, "Helablo")]
+        [InlineData("HelloThere", 7, new char[] { 'a', 'b', 'c' }, 3, "HelloThabcere")]
+        [InlineData("", 0, new char[] { 'a' }, 1, "a")]
+        [InlineData("", 0, new char[] { 'a' }, 0, "")]
+        [InlineData("Hello", 2, new char[0], 0, "Hello")]
+        [InlineData("Hello", 3, null, 0, "Hello")]
+        public static unsafe void Insert_CharPointer(string original, int index, char[] charArray, int valueCount, string expected)
+        {
+            _ = charArray; // https://github.com/xunit/xunit/issues/1969
+            fixed (char* value = charArray)
+            {
+                var builder = new OpenStringBuilder(original);
+                builder.Insert(index, value, valueCount);
+                Assert.Equal(expected, builder.ToString());
+            }
+        }
+
+        [Fact] // J2N specific
+        public static unsafe void Insert_CharPointer_Null_ThrowsNullReferenceException()
+        {
+            var builder = new OpenStringBuilder();
+            Assert.Throws<NullReferenceException>(() => builder.Insert(0, (char*)null, 2));
+        }
+
+        [Fact] // J2N specific
+        public static unsafe void Insert_CharPointer_NegativeValueCount_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = new OpenStringBuilder(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("valueCount", () =>
+            {
+                fixed (char* value = new char[0]) { builder.Insert(3, value, -1); }
+            });
+        }
+
+        [Fact] // J2N specific
+        public static unsafe void Insert_CharPointer_NoSpareCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = new OpenStringBuilder(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>(s_noCapacityParamName, () =>
+            {
+                fixed (char* value = new char[] { 'a' }) { builder.Insert(1, value, 1); }
+            });
+        }
+
+        [Fact] // J2N specific
+        public static unsafe void Insert_CharPointer_NegativeIndex_ThrowsArgumentOutOfRangeException()
+        {
+            var builder = new OpenStringBuilder(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("index", () =>
+            {
+                fixed (char* value = new char[] { 'a' }) { builder.Insert(-1, value, 1); }
+            });
+        }
+
         public static IEnumerable<object[]> Insert_Float_TestData()
         {
             yield return new object[] { "Hello", 0, (float)0, "0.0Hello" }; // J2N: Use the "j" format, which always has at least 1 digit after the decimal
