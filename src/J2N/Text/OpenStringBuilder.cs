@@ -661,10 +661,19 @@ namespace J2N.Text
         /// <summary>
         /// Ensures that the capacity of this builder is at least the specified value.
         /// </summary>
-        /// <param name="capacity">The new capacity for this builder.</param>
+        /// <param name="capacity">The minimum capacity to ensure.</param>
+        /// <returns>The new capacity of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="capacity"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <remarks>
-        /// If <paramref name="capacity"/> is less than or equal to the current capacity of
-        /// this builder, the capacity remains unchanged.
+        /// If the current capacity is less than the <paramref name="capacity"/> parameter,
+        /// memory for this instance is reallocated to hold at least <paramref name="capacity"/> number
+        /// of characters; otherwise, no memory is changed.
         /// </remarks>
         public int EnsureCapacity(int capacity)
         {
@@ -680,6 +689,21 @@ namespace J2N.Text
             return Capacity;
         }
 
+        /// <summary>
+        /// Converts the value of this instance to a <see cref="string"/>.
+        /// </summary>
+        /// <returns>A string whose value is the same as this instance.</returns>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of this
+        /// <see cref="OpenStringBuilder"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString()"/> method to convert the
+        /// <see cref="OpenStringBuilder"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="OpenStringBuilder"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
         public override string ToString()
         {
             //AssertInvariants();
@@ -692,9 +716,28 @@ namespace J2N.Text
             return m_Chars.AsSpan(0, m_Position).ToString();
         }
 
+        /// <summary>
+        /// Converts the value of a substring of this instance to a <see cref="string"/>.
+        /// </summary>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
+        /// <returns>A string whose value is the same as the specified substring of this instance.
+        /// That is, from <paramref name="startIndex"/> to the end of the string.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="startIndex"/> is less than 0 or greater than
+        /// <see cref="Length"/>.</exception>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
+        /// <see cref="OpenStringBuilder"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString(int)"/> method to convert the
+        /// <see cref="OpenStringBuilder"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="OpenStringBuilder"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
         public string ToString(int startIndex)
         {
-            if ((uint)startIndex > this.Length)
+            if ((uint)startIndex > (uint)Length)
                 ThrowHelper.ThrowStartIndexArgumentOutOfRange_ArgumentOutOfRange_IndexMustBeLessOrEqual();
 
             //AssertInvariants();
@@ -702,13 +745,33 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Creates a string from a substring of this builder.
+        /// Converts the value of a substring of this instance to a <see cref="string"/>.
         /// </summary>
-        /// <param name="startIndex">The index to start in this builder.</param>
-        /// <param name="length">The number of characters to read in this builder.</param>
+        /// <param name="startIndex">The starting position of the substring in this instance.</param>
+        /// <param name="length">The length of the substring.</param>
+        /// <returns>A string whose value is the same as the specified substring of this instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The sum of <paramref name="startIndex"/> and <paramref name="length"/> is greater than the length
+        /// of the current instance.
+        /// </exception>
+        /// <remarks>
+        /// This method causes a heap allocation. As an allocation-free alternative,
+        /// you may call the <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int, int)"/> method
+        /// to get a <see cref="ReadOnlySpan{T}"/> representing the characters of the substring of this
+        /// <see cref="OpenStringBuilder"/> instance.
+        /// <para/>
+        /// Call the <see cref="ToString(int)"/> method to convert the
+        /// <see cref="OpenStringBuilder"/> object to a <see cref="string"/> object before
+        /// you can pass the string represented by the <see cref="OpenStringBuilder"/> object to
+        /// a method that has a <see cref="string"/> parameter or display it in the user interface.
+        /// </remarks>
         public string ToString(int startIndex, int length)
         {
-            int currentLength = this.Length;
+            int currentLength = Length;
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
             if (startIndex > currentLength)
@@ -722,6 +785,12 @@ namespace J2N.Text
             return m_Chars.AsSpan(startIndex, length).ToString();
         }
 
+        /// <summary>
+        /// Removes all characters from the current <see cref="OpenStringBuilder"/> instance.
+        /// </summary>
+        /// <returns>An object whose <see cref="Length"/> is 0 (zero).</returns>
+        /// <remarks><see cref="Clear"/> is a convenience method that is equivalent to setting
+        /// the <see cref="Length"/> property of the current instance to 0 (zero).</remarks>
         public OpenStringBuilder Clear()
         {
             this.Length = 0;
@@ -858,6 +927,15 @@ namespace J2N.Text
             }
         }
 
+        /// <summary>
+        /// Returns an object that can be used to iterate through the chunks of characters represented in a
+        /// <see cref="ReadOnlyMemory{Char}"/> created from this <see cref="OpenStringBuilder"/> instance.
+        /// </summary>
+        /// <returns>An enumerator for the chunks in the <see cref="ReadOnlyMemory{Char}"/>.</returns>
+        /// <remarks>This API is for compatibility with <c>StringBuilder.GetChuncks()</c> method.
+        /// <see cref="OpenStringBuilder"/> will never have more than a single chunk of memory so it is generally more efficient
+        /// to use <see cref="MemoryExtensions.AsSpan(OpenStringBuilder)"/> or
+        /// <see cref="MemoryExtensions.AsMemory(OpenStringBuilder)"/> when you need to access the underlying memory.</remarks>
         public ChunkEnumerator GetChunks() => new ChunkEnumerator(this);
 
 
@@ -866,16 +944,37 @@ namespace J2N.Text
         // when building a foreach statement) but users typically don't use it explicitly.
         // (which is why it is a nested type).
 
+        /// <summary>
+        /// Supports simple iteration over the chunks of an <see cref="OpenStringBuilder"/> instance.
+        /// </summary>
+        /// <remarks>
+        /// A <see cref="ChunkEnumerator"/> is returned by the <see cref="GetChunks()"/> method. It supports both the
+        /// <see cref="System.Collections.IEnumerable"/> and <see cref="System.Collections.IEnumerator"/> patterns so
+        /// that the chunks can be enumerated with foreach in C# or For Each in Visual Basic.
+        /// <para/>
+        /// <see cref="ChunkEnumerator"/> is a public structure so that language compilers can use it to build a
+        /// foreach statement. However, developers typically don't use it explicitly (which is why it is a nested type).
+        /// </remarks>
         public struct ChunkEnumerator
         {
             private readonly OpenStringBuilder _firstChunk;
             private OpenStringBuilder? _currentChunk;
 
-
-            // Implement IEnumerable.GetEnumerator() to return  'this' as the IEnumerator
+            /// <summary>
+            /// Provides an <see cref="System.Collections.IEnumerable.GetEnumerator()"/> implementation that
+            /// returns <c>this</c> as the <see cref="System.Collections.IEnumerator"/>.
+            /// </summary>
+            /// <returns>An enumerator object that can be used to iterate through the chunks.</returns>
             [EditorBrowsable(EditorBrowsableState.Never)] // Only here to make foreach work
+#pragma warning disable IDE0251 // Make member 'readonly'
             public ChunkEnumerator GetEnumerator() => this;
+#pragma warning restore IDE0251 // Make member 'readonly'
 
+            /// <summary>
+            /// Advances the enumerator to the next chunk in the collection.
+            /// </summary>
+            /// <returns><c>true</c> if the enumerator was successfully advanced to the next element;
+            /// <c>false</c> if the enumerator has passed the end of the collection.</returns>
             public bool MoveNext()
             {
                 if (_currentChunk == _firstChunk)
@@ -887,6 +986,10 @@ namespace J2N.Text
                 return true;
             }
 
+            /// <summary>
+            /// Gets the chunk and the current position of the collection.
+            /// </summary>
+            /// <value>The chunk at the current position of the collection.</value>
             public ReadOnlyMemory<char> Current
             {
                 get
@@ -906,6 +1009,44 @@ namespace J2N.Text
             }
         }
 
+        /// <summary>
+        /// Appends a specified number of copies of the string representation of a Unicode character to this instance.
+        /// </summary>
+        /// <param name="value">The character to append.</param>
+        /// <param name="repeatCount">The number of times to append value.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="repeatCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">Out of memory.</exception>
+        /// <remarks>
+        /// The <see cref="Append(char, int)"/> method modifies the existing instance of this class;
+        /// it does not return a new class instance. Because of this, you can call a method or property
+        /// on the existing reference and you do not have to assign the return value to an
+        /// <see cref="OpenStringBuilder"/> object, as the following example illustrates.
+        /// <code>
+        /// decimal value = 1346.19m;
+        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// sb.Append('*', 5).AppendFormat("{0:C2}", value).Append('*', 5);
+        /// Console.WriteLine(sb);
+        /// // The example displays the following output:
+        /// //       *****$1,346.19*****
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="char"/>
         public OpenStringBuilder Append(char value, int repeatCount)
         {
             if (repeatCount < 0)
@@ -951,6 +1092,64 @@ namespace J2N.Text
             m_Position += repeatCount;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified subarray of Unicode characters to this instance.
+        /// </summary>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting position in <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="charCount"/> are not zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="charCount"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
+        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="charCount"/>
+        /// are both zero, no changes are made.
+        /// <para/>
+        /// The <see cref="Append(char[], int, int)"/> method modifies the existing instance of this class; it does
+        /// not return a new class instance. Because of this, you can call a method or property on the existing
+        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// as the following example illustrates.
+        /// <code>
+        /// char[] chars = { 'a', 'b', 'c', 'd', 'e'};
+        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// int startPosition = Array.IndexOf(chars, 'a');
+        /// int endPosition = Array.IndexOf(chars, 'c');
+        /// if (startPosition >= 0 &amp;&amp; endPosition >= 0) {
+        ///    sb.Append("The array from positions ").Append(startPosition).
+        ///              Append(" to ").Append(endPosition).Append(" contains ").
+        ///              Append(chars, startPosition, endPosition + 1).Append(".");
+        ///    Console.WriteLine(sb);
+        /// }
+        /// // The example displays the following output:
+        /// //       The array from positions 0 to 2 contains abc.
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="char"/>
         public OpenStringBuilder Append(char[]? value, int startIndex, int charCount)
         {
             if (startIndex < 0)
@@ -979,6 +1178,40 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Appends a copy of the specified string to this instance.
+        /// </summary>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="Append(string)"/> method modifies the existing instance of this class;
+        /// it does not return a new class instance. Because of this, you can call a method or
+        /// property on the existing reference and you do not have to assign the return value
+        /// to an <see cref="OpenStringBuilder"/> object, as the following example illustrates.
+        /// <code>
+        /// bool flag = false;
+        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// sb.Append("The value of the flag is ").Append(flag).Append(".");
+        /// Console.WriteLine(sb.ToString());
+        /// // The example displays the following output:
+        /// //       The value of the flag is False.
+        /// </code>
+        /// <para/>
+        /// If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="string"/>
         public OpenStringBuilder Append(string? value)
         {
             if (value is not null)
@@ -989,6 +1222,68 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Appends a copy of a specified substring to this instance.
+        /// </summary>
+        /// <param name="value">The string that contains the substring to append.</param>
+        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="count"/> are not zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
+        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
+        /// are both zero, no changes are made.
+        /// <para/>
+        /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
+        /// not return a new class instance. Because of this, you can call a method or property on the existing
+        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// as the following example illustrates.
+        /// <code>
+        /// string str = "First;George Washington;1789;1797";
+        /// int index = 0;
+        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// int length = str.IndexOf(';', index);
+        /// sb.Append(str, index, length).Append(" President of the United States: ");
+        /// index += length + 1;
+        /// length = str.IndexOf(';', index) - index;
+        /// sb.Append(str, index, length).Append(", from ");
+        /// index += length + 1;
+        /// length = str.IndexOf(';', index) - index;
+        /// sb.Append(str, index, length).Append(" to ");
+        /// index += length + 1;
+        /// sb.Append(str, index, str.Length - index);
+        /// Console.WriteLine(sb);
+        /// // The example displays the following output:
+        /// //    First President of the United States: George Washington, from 1789 to 1797
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="string"/>
         public OpenStringBuilder Append(string? value, int startIndex, int count)
         {
             if (startIndex < 0)
@@ -1018,6 +1313,32 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified string builder to this instance.
+        /// </summary>
+        /// <param name="value">The string builder to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="Append(StringBuilder)"/> method modifies the existing instance of this class;
+        /// it does not return a new class instance. Because of this, you can call a method or
+        /// property on the existing reference and you do not have to assign the return value
+        /// to an <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="StringBuilder"/>
         public OpenStringBuilder Append(StringBuilder? value)
         {
             if (value != null && value.Length != 0)
@@ -1027,6 +1348,69 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Appends a copy of a specified substring of a string builder to this instance.
+        /// </summary>
+        /// <param name="value">The string builder that contains the substring to append.</param>
+        /// <param name="startIndex">The starting position of the substring within <paramref name="value"/>.</param>
+        /// <param name="count">The number of characters in <paramref name="value"/> to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="count"/> are not zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method appends the specified range of characters in <paramref name="value"/> to the current instance. If
+        /// <paramref name="value"/> is <c>null</c> and <paramref name="startIndex"/> and <paramref name="count"/>
+        /// are both zero, no changes are made.
+        /// <para/>
+        /// The <see cref="Append(string, int, int)"/> method modifies the existing instance of this class; it does
+        /// not return a new class instance. Because of this, you can call a method or property on the existing
+        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// as the following example illustrates.
+        /// <code>
+        /// string str = "First;George Washington;1789;1797";
+        /// System.Text.StringBuilder builder = new System.Text.StringBuilder(str);
+        /// int index = 0;
+        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// int length = str.IndexOf(';', index);
+        /// sb.Append(builder, index, length).Append(" President of the United States: ");
+        /// index += length + 1;
+        /// length = str.IndexOf(';', index) - index;
+        /// sb.Append(builder, index, length).Append(", from ");
+        /// index += length + 1;
+        /// length = str.IndexOf(';', index) - index;
+        /// sb.Append(builder, index, length).Append(" to ");
+        /// index += length + 1;
+        /// sb.Append(builder, index, str.Length - index);
+        /// Console.WriteLine(sb);
+        /// // The example displays the following output:
+        /// //    First President of the United States: George Washington, from 1789 to 1797
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="StringBuilder"/>
         public OpenStringBuilder Append(StringBuilder? value, int startIndex, int count)
         {
             if (startIndex < 0)
@@ -1145,20 +1529,113 @@ namespace J2N.Text
 
         #endregion Custom Append
 
+        /// <summary>
+        /// Appends the default line terminator to the end of the current <see cref="OpenStringBuilder"/> object.
+        /// </summary>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
+        /// <see cref="MaxCapacity"/>.</exception>
+        /// <remarks>
+        /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendLine() => Append(Environment.NewLine);
 
+        /// <summary>
+        /// Appends a copy of the specified string followed by the default line terminator to the end of the
+        /// current <see cref="OpenStringBuilder"/> object.
+        /// </summary>
+        /// <param name="value">The string to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
+        /// <see cref="MaxCapacity"/>.</exception>
+        /// <remarks>
+        /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="string"/>
         public OpenStringBuilder AppendLine(string? value)
         {
             Append(value);
             return Append(Environment.NewLine);
         }
 
+        /// <summary>
+        /// Appends a copy of the specified sequence of characters followed by the default line terminator to the end of the
+        /// current <see cref="OpenStringBuilder"/> object.
+        /// </summary>
+        /// <param name="value">The sequence of characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed
+        /// <see cref="MaxCapacity"/>.</exception>
+        /// <remarks>
+        /// The default line terminator is the current value of the <see cref="Environment.NewLine"/> property.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="ReadOnlySpan{Char}"/>
         public OpenStringBuilder AppendLine(ReadOnlySpan<char> value)
         {
             Append(value);
             return Append(Environment.NewLine);
         }
 
+        /// <summary>
+        /// Copies the characters from a specified segment of this instance to a specified segment of a destination
+        /// <see cref="char"/> array.
+        /// </summary>
+        /// <param name="sourceIndex">The starting position in this instance where characters will be copied from.
+        /// The index is zero-based.</param>
+        /// <param name="destination">The array where characters will be copied.</param>
+        /// <param name="destinationIndex">The starting position in <paramref name="destination"/> where characters will be copied.
+        /// The index is zero-based.</param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="destination"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/>, <paramref name="destinationIndex"/>, or <paramref name="count"/>, is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="sourceIndex"/> is greater than the length of this instance.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="sourceIndex"/> + <paramref name="count"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="destinationIndex"/> + <paramref name="count"/> is greater than the length of <paramref name="destination"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="CopyTo(int, char[], int, int)"/> method is intended to be used in the rare situation when you need to
+        /// efficiently copy successive sections of a <see cref="OpenStringBuilder"/> object to an array. The array should be a
+        /// fixed size, preallocated, reusable, and possibly globally accessible.
+        /// <para/>
+        /// To access the characters for processing without allocating any heap memory, better alternatives are to use
+        /// <see cref="this[int]"/>, <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int, int)"/> or <see cref="CopyTo(int, Span{char}, int)"/>.
+        /// </remarks>
         public void CopyTo(int sourceIndex, char[] destination, int destinationIndex, int count)
         {
             if (destination is null)
@@ -1179,6 +1656,30 @@ namespace J2N.Text
             m_Chars.AsSpan(sourceIndex, count).CopyTo(new Span<char>(destination).Slice(destinationIndex));
         }
 
+        /// <summary>
+        /// Copies the characters from a specified segment of this instance to a destination <see cref="char"/> span.
+        /// </summary>
+        /// <param name="sourceIndex">The starting position in this instance where characters will be copied from.
+        /// The index is zero-based.</param>
+        /// <param name="destination">The writable span where characters will be copied.</param>
+        /// <param name="count">The number of characters to be copied.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="sourceIndex"/> or <paramref name="count"/> is less than 0.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="sourceIndex"/> is greater than <see cref="Length"/>.
+        /// </exception>
+        /// <exception cref="ArgumentException">
+        /// <paramref name="sourceIndex"/> + <paramref name="count"/> is greater than <see cref="Length"/>.
+        /// </exception>
+        /// <remarks>
+        /// The <see cref="CopyTo(int, Span{char}, int)"/> method is intended to be used in the rare situation
+        /// when you need to efficiently copy successive sections of a <see cref="OpenStringBuilder"/> object to a span.
+        /// <para/>
+        /// To access the characters for processing without alocating any heap memory, better alternatives are to use
+        /// <see cref="this[int]"/> or <see cref="MemoryExtensions.AsSpan(OpenStringBuilder, int, int)"/>.
+        /// </remarks>
         public void CopyTo(int sourceIndex, Span<char> destination, int count)
         {
             if (count < 0)
@@ -1199,9 +1700,57 @@ namespace J2N.Text
             m_Chars.AsSpan(sourceIndex, count).CopyTo(destination);
         }
 
+        /// <summary>
+        /// Inserts one or more copies of a specified string into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <param name="count">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after insertion has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="count"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="OpenStringBuilder"/> object is not changed if <paramref name="value"/> is <c>null</c>, 
+        /// <paramref name="value"/> is not <c>null</c> but its length is zero, or <paramref name="count"/> is zero.
+        /// </remarks>
         public OpenStringBuilder Insert(int index, string? value, int count) => Insert(index, value.AsSpan(), count);
 
-        private OpenStringBuilder Insert(int index, ReadOnlySpan<char> value, int count)
+        /// <summary>
+        /// Inserts one or more copies of a specified sequence of characters into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The sequence of characters to insert.</param>
+        /// <param name="count">The number of times to insert <paramref name="value"/>.</param>
+        /// <returns>A reference to this instance after insertion has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="count"/> is less than zero.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of <paramref name="value"/>
+        /// times <paramref name="count"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// This <see cref="OpenStringBuilder"/> object is not changed if the length of <paramref name="value"/> is zero or
+        /// <paramref name="count"/> is zero.
+        /// </remarks>
+        public OpenStringBuilder Insert(int index, ReadOnlySpan<char> value, int count) // J2N: Made public to match ValueStringBuilder API
         {
             if (count < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(count, ExceptionArgument.count);
@@ -1238,6 +1787,22 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Removes the specified range of characters from this instance.
+        /// </summary>
+        /// <param name="startIndex">The zero-based position in this instance where removal begins.</param>
+        /// <param name="length">The number of characters to remove.</param>
+        /// <returns>A reference to this instance after the excise operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// If <paramref name="startIndex"/> or <paramref name="length"/> is less than zero,
+        /// or <paramref name="startIndex"/> + <paramref name="length"/> is greater than the length of this instance.
+        /// </exception>
+        /// <remarks>
+        /// The current method removes the specified range of characters from the current instance. The characters at
+        /// (<paramref name="startIndex"/> + <paramref name="length"/>) are moved to <paramref name="startIndex"/>, and
+        /// the string value of the current instance is shortened by <paramref name="length"/>. The capacity of the
+        /// current instance is unaffected.
+        /// </remarks>
         public OpenStringBuilder Remove(int startIndex, int length)
         {
             if (length < 0)
@@ -1282,11 +1847,17 @@ namespace J2N.Text
 
         /// <summary>
         /// Appends the string representation of a specified Boolean value to this instance
-        /// in lowercase. This matches the behavior of Java's StringBuilder. To match the behavior
-        /// in .NET, call the overload that takes a <see cref="BooleanFormat"/> parameter
+        /// in lowercase.
         /// </summary>
         /// <param name="value">The Boolean value to append.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <remarks>
+        /// This matches the behavior of Java's StringBuilder. To match the behavior
+        /// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        /// <seealso cref="bool"/>
         public OpenStringBuilder Append(bool value) => Append(value, format: BooleanFormat.Lowercase);
 
         /// <summary>
@@ -1297,6 +1868,9 @@ namespace J2N.Text
         /// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
         /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <remarks>The capacity of this instance is adjusted as needed. </remarks>
+        /// <seealso cref="bool"/>
+        /// <seealso cref="BooleanFormat"/>
         public OpenStringBuilder Append(bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
@@ -1304,6 +1878,38 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified <see cref="char"/> object to this instance.
+        /// </summary>
+        /// <param name="value">The UTF-16-encoded code unit to append.</param>
+        /// <remarks>
+        /// The <see cref="Append(char)"/> method modifies the existing instance of this class;
+        /// it does not return a new class instance. Because of this, you can call a method or property
+        /// on the existing reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/>
+        /// object, as the following example illustrates.
+        /// <code>
+        /// string str = "Characters in a string.";
+        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// foreach (var ch in str)
+        ///    sb.Append(" '").Append(ch).Append("' ");
+        /// 
+        /// Console.WriteLine("Characters in the string:");
+        /// Console.WriteLine("  {0}", sb);
+        /// // The example displays the following output:
+        /// //    Characters in the string:
+        /// //       'C'  'h'  'a'  'r'  'a'  'c'  't'  'e'  'r'  's'  ' '  'i'  'n'  ' '  'a'  ' '  's'  't' 'r'  'i'  'n'  'g'  '.'
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="char"/>
         public OpenStringBuilder Append(char value)
         {
             int pos = m_Position;
@@ -1339,7 +1945,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Append(sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -1365,7 +1979,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="byte"/>
         public OpenStringBuilder Append(byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1390,7 +2012,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="short"/>
         public OpenStringBuilder Append(short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1415,7 +2045,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="int"/>
         public OpenStringBuilder Append(int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1440,7 +2078,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="long"/>
         public OpenStringBuilder Append(long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => AppendSpanFormattable(value, format, provider);
@@ -1464,7 +2110,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="float"/>
         public OpenStringBuilder Append(float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<float, SingleFormatter>(6, value, format.AsSpan(), provider);
 
@@ -1485,7 +2139,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="double"/>
         public OpenStringBuilder Append(double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => AppendNumberCore<double, DoubleFormatter>(14, value, format.AsSpan(), provider);
 
@@ -1506,7 +2168,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         internal OpenStringBuilder Append(decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -1532,7 +2202,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Append(ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -1557,7 +2235,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="uint"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Append(uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -1583,7 +2269,15 @@ namespace J2N.Text
         /// the value being formatted is not boxed.
         /// <para/>
         /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
         /// </remarks>
+        /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Append(ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -1665,6 +2359,29 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified object to this instance using the specified format
+        /// and culture-specific format information.
+        /// </summary>
+        /// <param name="value">The object to append.</param>
+        /// <param name="format">A standard or custom format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <remarks>
+        /// <paramref name="format"/> and <paramref name="provider"/> are only applied if the object implements <see cref="ISpanFormattable"/>,
+        /// <see cref="IFormattable"/>, <c>IStructuralFormattable</c>, or subclasses <see cref="Number"/>.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="object"/>
         public OpenStringBuilder Append(object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
@@ -1676,15 +2393,49 @@ namespace J2N.Text
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
                 return AppendSpanFormattable(number, format.AsSpan(), provider);
 #endif
+            else if (value is IStructuralFormattable structuralFormattable)
+                return Append(structuralFormattable.ToString(format, provider));
             else if (value is IFormattable formattable)
                 return Append(formattable.ToString(format, provider));
             else if (value is ICharSequence csq)
-                return Append(csq); // Not formattable
+                return Append(csq); // doesn't support format providers
             else
                 return Append(value.ToString());
         }
 
-
+        /// <summary>
+        /// Appends the string representation of the Unicode characters in a specified array to this instance.
+        /// </summary>
+        /// <param name="value">The array of characters to append.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <remarks>
+        /// This method appends the characters in the specified array to the current instance in the same order they
+        /// appear in value. If <paramref name="value"/> is <c>null</c>, no changes are made.
+        /// <para/>
+        /// The <see cref="Append(char[])"/> method modifies the existing instance of this class; it does not
+        /// return a new class instance. Because of this, you can call a method or property on the existing
+        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object,
+        /// as the following example illustrates.
+        /// <code>
+        /// char[] chars = { 'a', 'e', 'i', 'o', 'u' };
+        /// J2N.Text.OpenStringBuilder sb = new J2N.Text.OpenStringBuilder();
+        /// sb.Append("The characters in the array: ").Append(chars);
+        /// Console.WriteLine(sb);
+        /// // The example displays the following output:
+        /// //      The characters in the array: aeiou
+        /// </code>
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
+        /// <seealso cref="char"/>
         public OpenStringBuilder Append(char[]? value)
         {
             if (value is not null)
@@ -1699,12 +2450,24 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified read-only character span to this instance.
+        /// </summary>
+        /// <param name="value">The read-only character span to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+        /// <seealso cref="ReadOnlySpan{Char}"/>
         public OpenStringBuilder Append(ReadOnlySpan<char> value)
         {
             Append(ref MemoryMarshal.GetReference(value), value.Length);
             return this;
         }
 
+        /// <summary>
+        /// Appends the string representation of a specified read-only character memory region to this instance.
+        /// </summary>
+        /// <param name="value">The read-only character memory region to append.</param>
+        /// <returns>A reference to this instance after the append operation is completed.</returns>
+        /// <seealso cref="ReadOnlyMemory{Char}"/>
         public OpenStringBuilder Append(ReadOnlyMemory<char> value) => Append(value.Span);
 
         // J2N TODO: API - String interpolation for J2N formatters
@@ -1733,7 +2496,7 @@ namespace J2N.Text
 
         #region AppendJoin
 
-        public unsafe OpenStringBuilder AppendJoin(string? separator, params object?[] values)
+        public OpenStringBuilder AppendJoin(string? separator, params object?[] values)
         {
             if (values is null)
             {
@@ -1744,24 +2507,13 @@ namespace J2N.Text
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public unsafe OpenStringBuilder AppendJoin(string? separator, params ReadOnlySpan<object?> values)
+        public OpenStringBuilder AppendJoin(string? separator, params ReadOnlySpan<object?> values)
         {
             separator ??= string.Empty;
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public unsafe OpenStringBuilder AppendJoin<T>(string? separator, IEnumerable<T> values)
-        {
-            if (values is null)
-            {
-                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
-            }
-
-            separator ??= string.Empty;
-            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
-        }
-
-        public unsafe OpenStringBuilder AppendJoin(string? separator, params string?[] values)
+        public OpenStringBuilder AppendJoin<T>(string? separator, IEnumerable<T> values)
         {
             if (values is null)
             {
@@ -1772,13 +2524,24 @@ namespace J2N.Text
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public unsafe OpenStringBuilder AppendJoin(string? separator, params ReadOnlySpan<string?> values)
+        public OpenStringBuilder AppendJoin(string? separator, params string?[] values)
+        {
+            if (values is null)
+            {
+                ThrowHelper.ThrowArgumentNullException(ExceptionArgument.values);
+            }
+
+            separator ??= string.Empty;
+            return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
+        }
+
+        public OpenStringBuilder AppendJoin(string? separator, params ReadOnlySpan<string?> values)
         {
             separator ??= string.Empty;
             return AppendJoinCore(ref MemoryMarshal.GetReference(separator.AsSpan()), separator.Length, values);
         }
 
-        public unsafe OpenStringBuilder AppendJoin(char separator, params object?[] values)
+        public OpenStringBuilder AppendJoin(char separator, params object?[] values)
         {
             if (values is null)
             {
@@ -1788,10 +2551,10 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
-        public unsafe OpenStringBuilder AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
+        public OpenStringBuilder AppendJoin(char separator, params ReadOnlySpan<object?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
-        public unsafe OpenStringBuilder AppendJoin<T>(char separator, IEnumerable<T> values)
+        public OpenStringBuilder AppendJoin<T>(char separator, IEnumerable<T> values)
         {
             if (values is null)
             {
@@ -1801,7 +2564,7 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
-        public unsafe OpenStringBuilder AppendJoin(char separator, params string?[] values)
+        public OpenStringBuilder AppendJoin(char separator, params string?[] values)
         {
             if (values is null)
             {
@@ -1811,10 +2574,10 @@ namespace J2N.Text
             return AppendJoinCore(ref separator, 1, values);
         }
 
-        public unsafe OpenStringBuilder AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
+        public OpenStringBuilder AppendJoin(char separator, params ReadOnlySpan<string?> values) =>
             AppendJoinCore(ref separator, 1, values);
 
-        private unsafe OpenStringBuilder AppendJoinCore<T>(ref char separator, int separatorLength, IEnumerable<T> values)
+        private OpenStringBuilder AppendJoinCore<T>(ref char separator, int separatorLength, IEnumerable<T> values)
         {
             Debug.Assert(values != null);
             Debug.Assert(!Unsafe.IsNullRef(ref separator));
@@ -1871,6 +2634,26 @@ namespace J2N.Text
 
         #endregion AppendJoin
 
+        /// <summary>
+        /// Inserts a string into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The string to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        /// <para/>
+        /// This instance of <see cref="OpenStringBuilder"/> is not changed if <paramref name="value"/> is <c>null</c>,
+        /// or <paramref name="value"/> is not <c>null</c> but its length is zero.
+        /// </remarks>
         public OpenStringBuilder Insert(int index, string? value)
         {
             if ((uint)index > (uint)Length)
@@ -1888,24 +2671,50 @@ namespace J2N.Text
 
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
-        /// in lowercase. This matches the behavior of Java's StringBuilder. To match the behavior
-        /// in .NET, call the overload that takes a <see cref="BooleanFormat"/> parameter
+        /// in lowercase at the specifed character position.
         /// </summary>
-        /// <param name="index">The position in this instance where the value is inserted.</param>
-        /// <param name="value">The Boolean value to append.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This matches the behavior of Java's StringBuilder. To match the behavior
+        /// of .NET, call <see cref="Insert(int, bool, BooleanFormat)"/> and specify <see cref="BooleanFormat.TitleCase"/>.
+        /// <para/>
+        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        /// </remarks>
+        /// <seealso cref="bool"/>
         public OpenStringBuilder Insert(int index, bool value) => Insert(index, value, BooleanFormat.Lowercase);
 
         /// <summary>
         /// Inserts the string representation of a specified Boolean value to this instance
-        /// in lowercase. This matches the behavior of Java's StringBuilder. To match the behavior
-        /// in .NET, call the overload that takes a <see cref="BooleanFormat"/> parameter
+        /// in the specified format at the specified position.
         /// </summary>
-        /// <param name="index">The position in this instance where the value is inserted.</param>
-        /// <param name="value">The Boolean value to append.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
         /// <param name="format">The format to use. Specify <see cref="BooleanFormat.Lowercase"/> to match Java.
         /// Specify <see cref="BooleanFormat.TitleCase"/> to match .NET.</param>
-        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        /// </remarks>
+        /// <seealso cref="bool"/>
+        /// <seealso cref="BooleanFormat"/>
         public OpenStringBuilder Insert(int index, bool value, BooleanFormat format)
         {
             string text = FormatBoolean(value, format);
@@ -1929,10 +2738,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="sbyte"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Insert(int index, sbyte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -1953,10 +2771,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="byte"/>
         public OpenStringBuilder Insert(int index, byte value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -1976,10 +2803,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="short"/>
         public OpenStringBuilder Insert(int index, short value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -1998,11 +2834,20 @@ namespace J2N.Text
         /// <param name="value">The value to format and append.</param>
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="int"/>
         public OpenStringBuilder Insert(int index, int value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2022,10 +2867,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="long"/>
         public OpenStringBuilder Insert(int index, long value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
             => InsertSpanFormattable(index, value, format, provider);
@@ -2045,10 +2899,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="float"/>
         public OpenStringBuilder Insert(int index, float value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<float, SingleFormatter>(index, value, format.AsSpan(), provider);
 
@@ -2064,10 +2927,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="double"/>
         public OpenStringBuilder Insert(int index, double value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
             => InsertNumberCore<double, DoubleFormatter>(index, value, format.AsSpan(), provider);
 
@@ -2083,10 +2955,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="decimal"/>
         // J2N TODO: Since BigDecimal in Java doesn't use the same default format as this, we will need to change the default before this can be made public
         internal OpenStringBuilder Insert(int index, decimal value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -2107,10 +2988,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="ushort"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Insert(int index, ushort value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -2131,10 +3021,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="uint"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Insert(int index, uint value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -2155,10 +3054,19 @@ namespace J2N.Text
         /// <param name="format">A standard or custom numeric format string.</param>
         /// <param name="provider">An object that supplies culture-specific formatting information.</param>
         /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
         /// <exception cref="FormatException"><paramref name="format"/> is invalid.</exception>
         /// <remarks>
-        /// The capacity of this instance is adjusted as needed.
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
         /// </remarks>
+        /// <seealso cref="ulong"/>
         [CLSCompliant(false)]
         public OpenStringBuilder Insert(int index, ulong value, [StringSyntax(StringSyntaxAttribute.NumericFormat)] string? format = null, IFormatProvider? provider = null)
 #if FEATURE_SPANFORMATTABLE
@@ -2211,6 +3119,24 @@ namespace J2N.Text
 
         #endregion Insert Number
 
+        /// <summary>
+        /// Inserts the string representation of a specified Unicode character into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The value to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        /// <seealso cref="char"/>
         public OpenStringBuilder Insert(int index, char value)
         {
             if ((uint)index > (uint)Length)
@@ -2222,6 +3148,27 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified array of Unicode characters into this
+        /// instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character array to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The current length of this <see cref="OpenStringBuilder"/> object plus the length of
+        /// <paramref name="value"/> exceeds <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If <paramref name="value"/> is <c>null</c>, the <see cref="OpenStringBuilder"/> is not changed.
+        /// </remarks>
+        /// <seealso cref="char"/>
         public OpenStringBuilder Insert(int index, char[]? value)
         {
             if ((uint)index > (uint)Length)
@@ -2240,6 +3187,36 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Inserts the string representation of a specified subarray of Unicode characters
+        /// into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A character array.</param>
+        /// <param name="startIndex">The starting index within <paramref name="value"/>.</param>
+        /// <param name="charCount">The number of characters to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="value"/> is <c>null</c>, and <paramref name="startIndex"/>
+        /// and <paramref name="charCount"/> are not zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/>, <paramref name="startIndex"/>, or <paramref name="charCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="charCount"/> is not a position within paramref name="value"/>.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// </remarks>
+        /// <seealso cref="char"/>
         public OpenStringBuilder Insert(int index, char[]? value, int startIndex, int charCount)
         {
             int currentLength = Length;
@@ -2279,7 +3256,27 @@ namespace J2N.Text
             return this;
         }
 
-        
+        /// <summary>
+        /// Inserts the string representation of an object into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The object to insert, or <c>null</c>.</param>
+        /// <param name="format">A standard or custom format string.</param>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> is less than zero or greater than the current length of this instance.
+        /// </exception>
+        /// <exception cref="OutOfMemoryException">Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.</exception>
+        /// <remarks>
+        /// <paramref name="format"/> and <paramref name="provider"/> are only applied if the object implements <see cref="ISpanFormattable"/>,
+        /// <see cref="IFormattable"/>, <c>IStructuralFormattable</c>, or subclasses <see cref="Number"/>.
+        /// <para/>
+        /// Existing characters are shifted to make room for the new text. The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// If <paramref name="value"/> is <c>null</c>, the <see cref="OpenStringBuilder"/> is not changed.
+        /// </remarks>
+        /// <seealso cref="object"/>
         public OpenStringBuilder Insert(int index, object? value, string? format = null, IFormatProvider? provider = null)
         {
             if (value is null)
@@ -2291,13 +3288,26 @@ namespace J2N.Text
             else if (value is Number number) // J2N: Check for Number-derived reference types, as this will improve performance.
                 return InsertSpanFormattable(index, number, format.AsSpan(), provider);
 #endif
+            else if (value is IStructuralFormattable structuralFormattable)
+                return Insert(index, structuralFormattable.ToString(format, provider), 1);
             else if (value is IFormattable formattable)
-                return Insert(index, formattable.ToString(format, provider));
+                return Insert(index, formattable.ToString(format, provider), 1);
+            else if (value is ICharSequence csq)
+                return Insert(index, csq); // doesn't support format providers
             else
                 return Insert(index, value.ToString(), 1);
         }
 
-        public OpenStringBuilder Insert(int index, ReadOnlySpan<char> value)
+        /// <summary>
+        /// Inserts the sequence of characters into this instance at the specified character position.
+        /// </summary>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">The character span to insert.</param>
+        /// <returns>A reference to this instance after the insert operation has completed.</returns>
+        /// <remarks>The existing characters are shifted to make room for the character sequence in the
+        /// <paramref name="value"/> to insert it. The capacity is adjusted as needed.</remarks>
+        /// <seealso cref="ReadOnlySpan{Char}"/>
+        public OpenStringBuilder Insert(int index, ReadOnlySpan<char> value) // J2N NOTE: Weird that upstream they made an overload of ReadOnlyMemory<char> for Append, but not Insert.
         {
             if ((uint)index > (uint)Length)
             {
@@ -2359,9 +3369,84 @@ namespace J2N.Text
             return this;
         }
 
-
         #region AppendFormat
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of a single argument.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">An object to format.</param>
+        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced
+        /// by the string representation of <paramref name="arg0"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 1.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items. The index of the format items must be 0,
+        /// to correspond to <paramref name="arg0"/>, the single object in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of <paramref name="arg0"/>.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// <paramref name="arg0"/> represents the object to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of <paramref name="arg0"/>. If the format item includes <c>formatString</c>
+        /// and <paramref name="arg0"/> implements the <see cref="IFormattable"/> interface, then <c>arg0.ToString(formatString, null)</c>
+        /// defines the formatting. Otherwise, <c>arg0.ToString()</c> defines the formatting.
+        /// <para/>
+        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
+        /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
+        /// of food to our charitable organization."
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -2371,6 +3456,83 @@ namespace J2N.Text
 #endif
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of either of two arguments.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the
+        /// string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 2.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items, that correspond to <paramref name="arg0"/>
+        /// and <paramref name="arg1"/>, the two objects in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// <paramref name="arg0"/> and <paramref name="arg1"/> represent the objects to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of either <paramref name="arg0"/> or <paramref name="arg1"/>. If the format item includes <c>formatString</c>
+        /// and the corresponding argument implements the <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c>
+        /// defines the formatting. Otherwise, the argument's <c>ToString()</c> defines the formatting.
+        /// <para/>
+        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
+        /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
+        /// of food to our charitable organization."
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -2381,6 +3543,85 @@ namespace J2N.Text
 #endif
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of either of three arguments.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <param name="arg2">The third object to format.</param>
+        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the
+        /// string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 3.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items, that correspond to <paramref name="arg0"/>
+        /// and <paramref name="arg1"/>, the two objects in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// <paramref name="arg0"/>, <paramref name="arg1"/>, and <paramref name="arg2"/> represent the objects to be formatted.
+        /// Each format item in <paramref name="format"/> is replaced with the string representation of either <paramref name="arg0"/>, <paramref name="arg1"/>,
+        /// or <paramref name="arg2"/>. If the format item includes <c>formatString</c> and the corresponding argument implements the
+        /// <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c> defines the formatting. Otherwise,
+        /// the argument's <c>ToString()</c> defines the formatting.
+        /// <para/>
+        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
+        /// and <paramref name="arg0"/> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
+        /// of food to our charitable organization."
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -2391,6 +3632,82 @@ namespace J2N.Text
 #endif
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter array.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An array of objects to format.</param>
+        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the string representation
+        /// of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes <c>formatString</c>
+        /// and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
+        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
+        /// defines the formatting.
+        /// <para/>
+        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
+        /// and <c>args[0]</c> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
+        /// of food to our charitable organization."
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
@@ -2403,11 +3720,179 @@ namespace J2N.Text
             return AppendFormat(null, format, args);
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter span.
+        /// </summary>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">A span of objects to format.</param>
+        /// <returns>A reference to this instance with format appended. Each format item in <paramref name="format"/> is replaced by the string representation
+        /// of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> or <paramref name="args"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes <c>formatString</c>
+        /// and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
+        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
+        /// defines the formatting.
+        /// <para/>
+        /// If the string assigned to format is "Thank you for your donation of {0:####} cans of food to our charitable organization."
+        /// and <c>args[0]</c> is an integer with the value 10, the return value will be "Thank you for your donation of 10 cans
+        /// of food to our charitable organization."
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat([StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args)
         {
             return AppendFormat(null, format, args);
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of a single argument using a specified
+        /// format provider.
+        /// </summary>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">An object to format.</param>
+        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
+        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
+        /// format specification is replaced by the string representation of <paramref name="arg0"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 1 (one).
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items. The index of the format items must be zero (0),
+        /// to correspond to <paramref name="arg0"/>, the single object in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of <paramref name="arg0"/>.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
+        /// for the objects in <c>args</c>. <paramref name="provider"/> can be any of the following:
+        /// <list type="bullet">
+        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
+        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/> if it is a numeric value.</description></item>
+        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/> if it is a date and time value.</description></item>
+        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/> with rules similar to the JDK.</description></item>
+        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
+        ///     information for <paramref name="arg0"/>.Typically, such an implementation also implements the
+        ///     <see cref="ICustomFormatter"/> interface.</item>
+        /// </list>
+        /// <para/>
+        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// <para/>
+        /// <paramref name="arg0"/> represents the object to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of <paramref name="arg0"/>. If the format item includes <c>formatString</c>
+        /// and <paramref name="arg0"/> implements the <see cref="IFormattable"/> interface, then <c>arg0.ToString(formatString, null)</c>
+        /// defines the formatting. Otherwise, <c>arg0.ToString()</c> defines the formatting.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -2417,6 +3902,98 @@ namespace J2N.Text
 #endif
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of either of two arguments using a specified
+        /// format provider.
+        /// </summary>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
+        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
+        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 2 (two).
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
+        /// for the objects in <c>args</c>. <paramref name="provider"/> can be any of the following:
+        /// <list type="bullet">
+        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
+        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/> or <paramref name="arg1"/> if they are numeric values.</description></item>
+        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/> or <paramref name="arg1"/> if they are date and time values.</description></item>
+        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/> or <paramref name="arg1"/> with rules similar to the JDK.</description></item>
+        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
+        ///     information for <paramref name="arg0"/> or <paramref name="arg1"/>.Typically, such an implementation also implements the
+        ///     <see cref="ICustomFormatter"/> interface.</item>
+        /// </list>
+        /// <para/>
+        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// <para/>
+        /// <paramref name="arg0"/> and <paramref name="arg1"/> represent the objects to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of the object that has the corresponding index. If the format item includes <c>formatString</c>
+        /// and the corresponding argument implements the <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c>
+        /// defines the formatting. Otherwise, the argument's <c>ToString()</c> defines the formatting.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -2427,6 +4004,100 @@ namespace J2N.Text
 #endif
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of either of three arguments using a specified
+        /// format provider.
+        /// </summary>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="arg0">The first object to format.</param>
+        /// <param name="arg1">The second object to format.</param>
+        /// <param name="arg2">The third object to format.</param>
+        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
+        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
+        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to 3 (three).
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
+        /// for the objects in <c>args</c>. <paramref name="provider"/> can be any of the following:
+        /// <list type="bullet">
+        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
+        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/> if they are a numeric values.</description></item>
+        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/> if they are date and time values.</description></item>
+        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
+        ///     <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/> with rules similar to the JDK.</description></item>
+        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
+        ///     information for <paramref name="arg0"/>, <paramref name="arg1"/>, or <paramref name="arg2"/>.Typically, such an
+        ///     implementation also implements the <see cref="ICustomFormatter"/> interface.</item>
+        /// </list>
+        /// <para/>
+        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// <para/>
+        /// <paramref name="arg0"/>, <paramref name="arg1"/>, and <paramref name="arg2"/> represent the objects to be formatted.
+        /// Each format item in <paramref name="format"/> is replaced with the string representation of the object that has the
+        /// corresponding index. If the format item includes <c>formatString</c> and the corresponding argument implements the
+        /// <see cref="IFormattable"/> interface, then the argument's <c>ToString(formatString, null)</c> defines the formatting. Otherwise,
+        /// the argument's <c>ToString()</c> defines the formatting.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, object? arg0, object? arg1, object? arg2)
         {
 #if FEATURE_INLINEARRAYATTRIBUTE
@@ -2437,6 +4108,98 @@ namespace J2N.Text
 #endif
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a
+        /// parameter array using a specified format provider.
+        /// </summary>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An array of objects to format.</param>
+        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
+        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
+        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> array.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
+        /// for the objects in <paramref name="args"/>. <paramref name="provider"/> can be any of the following:
+        /// <list type="bullet">
+        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
+        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
+        ///     numeric values in <paramref name="args"/>.</description></item>
+        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
+        ///     date and time values in <paramref name="args"/>.</description></item>
+        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
+        ///      one or more of the objects in <paramref name="args"/> with rules similar to the JDK.</description></item>
+        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
+        ///     information for one or more of the objects in <paramref name="args"/>.Typically, such an implementation also implements the
+        ///     <see cref="ICustomFormatter"/> interface.</item>
+        /// </list>
+        /// <para/>
+        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// <para/>
+        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
+        /// <c>formatString</c> and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
+        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
+        /// defines the formatting.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params object?[] args)
         {
             if (args is null)
@@ -2449,6 +4212,98 @@ namespace J2N.Text
             return AppendFormat(provider, format, (ReadOnlySpan<object?>)args);
         }
 
+        /// <summary>
+        /// Appends the string returned by processing a composite format string, which contains zero or more format items,
+        /// to this instance. Each format item is replaced by the string representation of a corresponding argument in a
+        /// parameter span using a specified format provider.
+        /// </summary>
+        /// <param name="provider">An object that supplies culture-specific formatting information.</param>
+        /// <param name="format">A composite format string.</param>
+        /// <param name="args">An span of objects to format.</param>
+        /// <returns>A reference to this instance after the append operation has completed. After the append operation,
+        /// this instance contains any data that existed before the operation, suffixed by a copy of <paramref name="format"/> in which any
+        /// format specification is replaced by the string representation of the corresponding object argument.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="format"/> is <c>null</c>.</exception>
+        /// <exception cref="FormatException">
+        /// <paramref name="format"/> is invalid.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// The index of a format item is less than 0 (zero), or greater than or equal to the length of the <paramref name="args"/> span.
+        /// </exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// The length of the expanded string would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method uses the <a href="https://learn.microsoft.com/en-us/dotnet/standard/base-types/composite-formatting">
+        /// composite formatting feature</a> of the .NET Framework to convert the value of an object to its text
+        /// representation and embed that representation in the current <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The <paramref name="format"/> parameter consists of zero or more runs of text intermixed with
+        /// zero or more indexed placeholders, called format items, that correspond to objects in the parameter list of this method.
+        /// The formatting process replaces each format item with the string representation of the corresponding object.
+        /// <para/>
+        /// The syntax of a format item is as follows:
+        /// <para/>
+        /// <i>{index[,length][:formatString]}</i>
+        /// <para/>
+        /// Elements in square brackets are optional. The following table describes each element.
+        /// <list type="table">
+        ///   <listheader>
+        ///     <description>Element</description>
+        ///     <description>Descripton</description>
+        ///   </listheader>
+        ///   <item>
+        ///     <description><i>index</i></description>
+        ///     <description>
+        ///       The zero-based position in the parameter list of the object to be formatted.
+        ///       If the object specified by index is <c>null</c>, the format item is replaced by <see cref="String.Empty"/>.
+        ///       If there is no parameter in the index position, a <see cref="FormatException"/> is thrown.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>,length</i></description>
+        ///     <description>
+        ///       The minimum number of characters in the string representation of the parameter. If positive,
+        ///       the parameter is right-aligned; if negative, it is left-aligned.
+        ///     </description>
+        ///   </item>
+        ///   <item>
+        ///     <description><i>:formatString</i></description>
+        ///     <description>A standard or custom format string that is supported by the parameter.</description>
+        ///   </item>
+        /// </list>
+        /// <para/>
+        /// The provider parameter specifies an <see cref="IFormatProvider"/> implementation that can provide formatting information
+        /// for the objects in <paramref name="args"/>. <paramref name="provider"/> can be any of the following:
+        /// <list type="bullet">
+        ///   <item><description>A <see cref="CultureInfo"/> object that provides culture-specific formatting information.</description></item>
+        ///   <item><description>A <see cref="NumberFormatInfo"/> object that provides culture-specific formatting information for
+        ///     numeric values in <paramref name="args"/>.</description></item>
+        ///   <item><description>A <see cref="DateTimeFormatInfo"/> object that provides culture-specific formatting information for
+        ///     date and time values in <paramref name="args"/>.</description></item>
+        ///   <item><description>A <see cref="StringFormatter"/> object that provides culture-specific formatting information for
+        ///      one or more of the objects in <paramref name="args"/> with rules similar to the JDK.</description></item>
+        ///   <item><description></description>A custom <see cref="IFormatProvider"/> implementation that provides formatting
+        ///     information for one or more of the objects in <paramref name="args"/>.Typically, such an implementation also implements the
+        ///     <see cref="ICustomFormatter"/> interface.</item>
+        /// </list>
+        /// <para/>
+        /// If the <paramref name="provider"/> parameter is <c>null</c>, formatting information is obtained from the current culture.
+        /// <para/>
+        /// <paramref name="args"/> represents the objects to be formatted. Each format item in <paramref name="format"/> is replaced
+        /// with the string representation of the corresponding object in <paramref name="args"/>. If the format item includes
+        /// <c>formatString</c> and the corresponding object in <paramref name="args"/> implements the <see cref="IFormattable"/> interface, then
+        /// <c>args[index].ToString(formatString, null)</c> defines the formatting. Otherwise, <c>args[index].ToString()</c>
+        /// defines the formatting.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         public OpenStringBuilder AppendFormat(IFormatProvider? provider, [StringSyntax(StringSyntaxAttribute.CompositeFormat)] string format, params ReadOnlySpan<object?> args) // KEEP OVERLOADS FOR ReadOnlySpan<object?> and ParamsArray IN SYNC
         {
             if (format is null)
@@ -3105,8 +4960,40 @@ namespace J2N.Text
 
         #region Replace
 
+        /// <summary>
+        /// Replaces all occurrences of a specified string in this instance with another specified string.
+        /// </summary>
+        /// <param name="oldValue">The string to replace.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
+        /// current instance. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>, all occurrences of
+        /// <paramref name="oldValue"/> are removed.
+        /// </remarks>
+        /// <seealso cref="Remove(int, int)"/>
         public OpenStringBuilder Replace(string oldValue, string? newValue) => Replace(oldValue, newValue, 0, Length);
 
+        /// <summary>
+        /// Replaces all instances of one read-only character span with another in this builder.
+        /// </summary>
+        /// <param name="oldValue">The read-only character span to replace.</param>
+        /// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
+        /// <returns>A reference to this instance with with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>.</returns>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/> in the
+        /// current instance. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/> are removed.
+        /// </remarks>
+        /// <seealso cref="Remove(int, int)"/>
         public OpenStringBuilder Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue) => Replace(oldValue, newValue, 0, Length);
 
 
@@ -3116,9 +5003,16 @@ namespace J2N.Text
         #region Equals
 
         /// <summary>
-        /// Determines if the contents of this builder are equal to the contents of another builder..
+        /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
-        /// <param name="sb">The other builder.</param>
+        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
+        /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
+        /// <see cref="OpenStringBuilder"/> objects are the same. To determine equality, the
+        /// <see cref="Equals(OpenStringBuilder)"/> method uses ordinal comparison.
+        /// </remarks>
         public bool Equals([NotNullWhen(true)] OpenStringBuilder? sb)
         {
             if (sb == null)
@@ -3137,9 +5031,20 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Determines if the contents of this builder are equal to the contents of another builder..
+        /// Returns a value indicating whether this instance is equal to a specified object.
         /// </summary>
-        /// <param name="sb">The other builder.</param>
+        /// <param name="sb">An object to compare with this instance, or <c>null</c>.</param>
+        /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// The current instance and <paramref name="sb"/> are equal if the strings assigned to both
+        /// objects are the same. To determine equality, the <see cref="Equals(OpenStringBuilder)"/>
+        /// method uses ordinal comparison.
+        /// </remarks>
+        /// <remarks>
+        /// The <see cref="Equals(StringBuilder)"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and span are equal.
+        /// </remarks>
         public bool Equals([NotNullWhen(true)] StringBuilder? sb)
         {
             if (sb == null)
@@ -3186,9 +5091,17 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Determines if the contents of this builder are equal to the contents of <see cref="ReadOnlySpan{Char}"/>.
+        /// Returns a value indicating whether the characters in this instance are equal to the
+        /// characters in a specified read-only character span.
         /// </summary>
-        /// <param name="other">The <see cref="ReadOnlySpan{Char}"/>.</param>
+        /// <param name="other">The character span to compare with the current instance.</param>
+        /// <returns><c>true</c> if the characters in this instance and <paramref name="sb"/> are the same;
+        /// otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// <remarks>
+        /// The <see cref="Equals(OpenStringBuilder)"/> method performs an ordinal comparison to determine
+        /// whether the characters in the current instance and span are equal.
+        /// </remarks>
         public bool Equals(ReadOnlySpan<char> other)
         {
             if (other.Length != Length)
@@ -3202,6 +5115,35 @@ namespace J2N.Text
         #endregion
 
         #region Replace
+
+        /// <summary>
+        /// Replaces, within a substring of this instance, all occurrences of a specified string with another specified string.
+        /// </summary>
+        /// <param name="oldValue">The string to replace.</param>
+        /// <param name="newValue">The string that replaces <paramref name="oldValue"/>, or <c>null</c>.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring to search within.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>
+        /// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="oldValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
+        /// in the specified substring. If <paramref name="newValue"/> is <c>null</c> or <see cref="string.Empty"/>,
+        /// all occurrences of <paramref name="oldValue"/> in the specified range are removed.
+        /// </remarks>
+        /// <seealso cref="Remove(int, int)"/>
         public OpenStringBuilder Replace(string oldValue, string? newValue, int startIndex, int count)
         {
             if (oldValue is null)
@@ -3209,6 +5151,33 @@ namespace J2N.Text
             return Replace(oldValue.AsSpan(), newValue.AsSpan(), startIndex, count);
         }
 
+        /// <summary>
+        /// Replaces all instances of one read-only character span with another in a substring of this builder.
+        /// </summary>
+        /// <param name="oldValue">The read-only character span to replace.</param>
+        /// <param name="newValue">The read-only character span to replace <paramref name="oldValue"/> with.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring to search within.</param>
+        /// <returns>A reference to this instance with all instances of <paramref name="oldValue"/> replaced by <paramref name="newValue"/>
+        /// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> - 1.</returns>
+        /// <exception cref="ArgumentException">The length of <paramref name="oldValue"/> is zero.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <remarks>
+        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of <paramref name="oldValue"/>
+        /// in the specified substring. If <paramref name="newValue"/> is empty, all occurrences of <paramref name="oldValue"/>
+        /// in the specified range are removed.
+        /// </remarks>
+        /// <seealso cref="Remove(int, int)"/>
         public OpenStringBuilder Replace(ReadOnlySpan<char> oldValue, ReadOnlySpan<char> newValue, int startIndex, int count)
         {
             int currentLength = Length;
@@ -3322,11 +5291,44 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Replaces all occurrences of a specified character in this instance with another specified character.
+        /// </summary>
+        /// <param name="oldChar">The character to replace.</param>
+        /// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
+        /// <returns>A reference to this instance with all occurrences of <paramref name="oldChar"/>
+        /// replaced by <paramref name="newChar"/>.</returns>
+        /// <remarks>
+        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
+        /// <paramref name="oldChar"/> in the current instance. The size of the current
+        /// <see cref="OpenStringBuilder"/> instance is unchanged after the replacement.
+        /// </remarks>
         public OpenStringBuilder Replace(char oldChar, char newChar)
         {
             return Replace(oldChar, newChar, 0, Length);
         }
 
+        /// <summary>
+        /// Replaces, within a substring of this instance, all occurrences of a specified character with another specified character.
+        /// </summary>
+        /// <param name="oldChar">The character to replace.</param>
+        /// <param name="newChar">The character that replaces <paramref name="oldChar"/>.</param>
+        /// <param name="startIndex">The position in this instance where the substring begins.</param>
+        /// <param name="count">The length of the substring to search within.</param>
+        /// <returns>A reference to this instance with <paramref name="oldChar"/> replaced by <paramref name="newChar"/>
+        /// in the range from <paramref name="startIndex"/> to <paramref name="startIndex"/> + <paramref name="count"/> -1.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> plus <paramref name="count"/> indicates a character position not within this instance.
+        /// </exception>
+        /// <remarks>
+        /// This method performs an ordinal, case-sensitive comparison to identify occurrences of
+        /// <paramref name="oldChar"/> in the current instance within the specified substring. The size of the current
+        /// <see cref="OpenStringBuilder"/> instance is unchanged after the replacement.
+        /// </remarks>
         public OpenStringBuilder Replace(char oldChar, char newChar, int startIndex, int count)
         {
             int currentLength = Length;
@@ -3349,6 +5351,29 @@ namespace J2N.Text
 
         // JDK overloads
 
+        /// <summary>
+        /// Replaces the specified substring in this builder with the specified
+        /// string, <paramref name="newValue"/>. The substring begins at the specified
+        /// <paramref name="startIndex"/> and ends to the character at
+        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// to the end of the sequence if no such character exists. First the
+        /// characters in the substring ar removed and then the specified
+        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
+        /// specified <paramref name="newValue"/> if necessary.
+        /// </summary>
+        /// <param name="startIndex">The inclusive begin index in this builder.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="newValue"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
+        /// </exception>
         public OpenStringBuilder Replace(int startIndex, int count, string newValue)
         {
             if (newValue is null)
@@ -3362,6 +5387,28 @@ namespace J2N.Text
             return this;
         }
 
+        /// <summary>
+        /// Replaces the specified substring in this builder with the specified
+        /// character span, <paramref name="newValue"/>. The substring begins at the specified
+        /// <paramref name="startIndex"/> and ends to the character at
+        /// <c><paramref name="count"/> - <paramref name="startIndex"/></c> or
+        /// to the end of the sequence if no such character exists. First the
+        /// characters in the substring ar removed and then the specified
+        /// <paramref name="newValue"/> is inserted at <paramref name="startIndex"/>.
+        /// This <see cref="ValueStringBuilder"/> will be lengthened to accommodate the
+        /// specified <paramref name="newValue"/> if necessary.
+        /// </summary>
+        /// <param name="startIndex">The inclusive begin index in this builder.</param>
+        /// <param name="count">The number of characters to replace.</param>
+        /// <param name="newValue">The replacement string.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="startIndex"/> or <paramref name="count"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="startIndex"/> is greater than or equal to <see cref="Length"/>.
+        /// </exception>
         public OpenStringBuilder Replace(int startIndex, int count, ReadOnlySpan<char> newValue) // J2N TODO: Tests
         {
             if ((uint)startIndex > (uint)m_Position)
@@ -3518,8 +5565,39 @@ namespace J2N.Text
             }
         }
 
-#endregion Replace
+        #endregion Replace
 
+        /// <summary>
+        /// Appends an array of Unicode characters starting at a specified address to this instance.
+        /// </summary>
+        /// <param name="value">A pointer to an array of characters.</param>
+        /// <param name="valueCount">The number of characters in the array.</param>
+        /// <returns>A reference to this instance after the append operation has completed.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="valueCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
+        /// <remarks>
+        /// This method appends <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
+        /// to the current instance.
+        /// <para/>
+        /// The <see cref="Append(char*, int)"/> method modifies the existing instance of this class; it does
+        /// not return a new class instance. Because of this, you can call a method or property on the existing
+        /// reference and you do not have to assign the return value to an <see cref="OpenStringBuilder"/> object.
+        /// <para/>
+        /// The capacity of this instance is adjusted as needed.
+        /// <para/>
+        /// <b>Notes to Callers</b>
+        /// <para/>
+        /// When you instantiate an <see cref="OpenStringBuilder"/> object by calling the <see cref="OpenStringBuilder(int, int)"/>
+        /// constructor, both the length and the capacity of the <see cref="OpenStringBuilder"/> instance can grow beyond
+        /// the value of its <see cref="MaxCapacity"/> property. This can occur particularly when you call the <see cref="Append(string)"/>
+        /// and <see cref="AppendFormat(string, object)"/> methods to append small strings.
+        /// </remarks>
         [CLSCompliant(false)]
         public unsafe OpenStringBuilder Append(char* value, int valueCount)
         {
@@ -3607,17 +5685,41 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Inserts a character buffer into this builder at the specified position.
+        /// Inserts an array of Unicode characters starting at a specified address into this instance.
         /// </summary>
-        /// <param name="index">The index to insert in this builder.</param>
-        /// <param name="value">The pointer to the start of the buffer.</param>
-        /// <param name="valueCount">The number of characters in the buffer.</param>
+        /// <param name="index">The position in this instance where insertion begins.</param>
+        /// <param name="value">A pointer to an array of characters.</param>
+        /// <param name="valueCount">The number of characters in the array.</param>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// <paramref name="index"/> or <paramref name="valueCount"/> is less than zero.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// <paramref name="index"/> is greater than the length of this instance.
+        /// <para/>
+        /// -or-
+        /// <para/>
+        /// Enlarging the value of this instance would exceed <see cref="MaxCapacity"/>.
+        /// </exception>
+        /// <exception cref="NullReferenceException"><paramref name="value"/> is a null pointer.</exception>
+        /// <remarks>
+        /// This method inserts <paramref name="valueCount"/> characters starting at address <paramref name="value"/>
+        /// to the current instance.
+        /// <para/>
+        /// Existing characters are shifted to make room for the new text. The capacity is adjusted as needed.
+        /// </remarks>
         [CLSCompliant(false)]
         public unsafe OpenStringBuilder Insert(int index, char* value, int valueCount) // J2N TODO: API - tests
         {
             // We don't check null value as this case will throw null reference exception anyway
+            if ((uint)index > (uint)Length)
+            {
+                ThrowHelper.ThrowArgumentOutOfRange_IndexMustBeLessOrEqualException(index);
+            }
             if (valueCount < 0)
+            {
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(valueCount, ExceptionArgument.valueCount);
+            }
 
             Insert(index, ref *value, valueCount);
             return this;
@@ -3779,9 +5881,9 @@ namespace J2N.Text
         /// IMPORTANT: This method has .NET semantics. That is, the <paramref name="count"/> parameter is a count rather than
         /// an exclusive end index. To translate from Java, use <c>end - start</c> for <paramref name="count"/>.
         /// <para/>
-        /// This method differs from <see cref="OpenStringBuilder.Remove(int, int)"/> in that it will automatically
-        /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="OpenStringBuilder.Length"/></c>
-        /// to <c><see cref="OpenStringBuilder.Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="OpenStringBuilder.MaxCapacity"/>.
+        /// This method differs from <see cref="Remove(int, int)"/> in that it will automatically
+        /// adjust the <paramref name="count"/> if <c><paramref name="startIndex"/> + <paramref name="count"/> > <see cref="Length"/></c>
+        /// to <c><see cref="Length"/> - <paramref name="startIndex"/>.</c>, provided it is not bounded by <see cref="MaxCapacity"/>.
         /// </summary>
         /// <param name="startIndex">The start index.</param>
         /// <param name="count">The number of characters to delete.</param>
@@ -3837,9 +5939,9 @@ namespace J2N.Text
         /// don't require an <see cref="OpenStringBuilder"/> instance.
         /// </summary>
         /// <returns>A reference to this <see cref="OpenStringBuilder"/>, for chaining.</returns>
-        /// <seealso cref="J2N.Text.StringExtensions.ReverseText(string)"/>
-        /// <seealso cref="J2N.MemoryExtensions.ReverseText(Span{char})"/>
-        /// <seealso cref="J2N.Text.StringBuilderExtensions.Reverse(StringBuilder)"/>
+        /// <seealso cref="StringExtensions.ReverseText(string)"/>
+        /// <seealso cref="MemoryExtensions.ReverseText(Span{char})"/>
+        /// <seealso cref="StringBuilderExtensions.Reverse(StringBuilder)"/>
         public OpenStringBuilder Reverse()
         {
             m_Chars.AsSpan(0, m_Position).ReverseText();
@@ -3847,9 +5949,19 @@ namespace J2N.Text
         }
 
         /// <summary>
-        /// Trims off any extra capacity beyond the current length. Note, this method
-        /// is NOT guaranteed to change the capacity.
+        /// Sets the capacity of an <see cref="OpenStringBuilder"/> object to the actual number of characters
+        /// it contains.
         /// </summary>
+        /// <remarks>
+        /// This method is similar to <c>trimToSize()</c> in the JDK.
+        /// <para/>
+        /// You can use the <see cref="TrimExcess()"/> method to minimize an <see cref="OpenStringBuilder"/> object's
+        /// memory overhead once it is known that no new characters will be added. To completely clear an
+        /// <see cref="OpenStringBuilder"/> object and release all memory referenced by it, call this method
+        /// after calling the <see cref="Clear()"/> method or setting <see cref="Length"/> property to 0.
+        /// <para/>
+        /// If the capacity is already equal to the current length, this method has no effect.
+        /// </remarks>
         public void TrimExcess()
         {
             if (m_Position < m_Chars.Length)
