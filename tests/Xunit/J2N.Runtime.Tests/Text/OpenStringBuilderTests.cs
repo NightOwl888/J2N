@@ -171,6 +171,71 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder("foo".AsSpan(0, 0), -1)); // Capacity < 0
         }
 
+        [Theory] // J2N specific
+        [InlineData("Hello")]
+        [InlineData("")]
+        [InlineData(null)]
+        public static void Ctor_StringBuilder(string value)
+        {
+            var sb = value is not null ? new StringBuilder(value) : (StringBuilder)null;
+            var builder = new OpenStringBuilder(sb);
+
+            string expected = value ?? "";
+            Assert.Equal(expected, builder.ToString());
+            Assert.Equal(expected.Length, builder.Length);
+        }
+
+        [Theory] // J2N specific
+        [InlineData("Hello")]
+        [InlineData("")]
+        [InlineData(null)]
+        public static void Ctor_StringBuilder_Int(string value)
+        {
+            var sb = value is not null ? new StringBuilder(value) : (StringBuilder)null;
+            var builder = new OpenStringBuilder(sb, 42);
+
+            string expected = value ?? "";
+            Assert.Equal(expected, builder.ToString());
+            Assert.Equal(expected.Length, builder.Length);
+
+            Assert.True(builder.Capacity >= 42);
+        }
+
+        [Fact] // J2N specific
+        public static void Ctor_StringBuilder_Int_NegativeCapacity_ThrowsArgumentOutOfRangeException()
+        {
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder(new StringBuilder(""), -1)); // Capacity < 0
+        }
+
+        [Theory] // J2N specific
+        [InlineData("Hello", 0, 5)]
+        [InlineData("Hello", 2, 3)]
+        [InlineData("", 0, 0)]
+        [InlineData(null, 0, 0)]
+        public static void Ctor_StringBuilder_Int_Int_Int(string value, int startIndex, int length)
+        {
+            var sb = value is not null ? new StringBuilder(value) : (StringBuilder)null;
+            var builder = new OpenStringBuilder(sb, startIndex, length, 42);
+
+            string expected = value?.Substring(startIndex, length) ?? "";
+            Assert.Equal(expected, builder.ToString());
+            Assert.Equal(length, builder.Length);
+            Assert.Equal(expected.Length, builder.Length);
+
+            Assert.True(builder.Capacity >= 42);
+        }
+
+        [Fact] // J2N specific
+        public static void Ctor_StringBuilder_Int_Int_Int_Invalid()
+        {
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("startIndex", () => new OpenStringBuilder(new StringBuilder("foo"), -1, 0, 0)); // Start index < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder(new StringBuilder("foo"), 0, -1, 0)); // Length < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder(new StringBuilder("foo"), 0, 0, -1)); // Capacity < 0
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder(new StringBuilder("foo"), 4, 0, 0)); // Start index + length > builder.Length
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder(new StringBuilder("foo"), 3, 1, 0)); // Start index + length > builder.Length
+        }
+
         [Fact]
         public static void Item_Get_Set()
         {
