@@ -1954,6 +1954,85 @@ namespace J2N.Text
             assertEquals("12XXX7", buffer.ToString());
         }
 
+        /**
+         * @tests java.lang.StringBuilder.Replace(int, int, String)'
+         */
+        [Test]
+        public void Test_replaceIILjava_lang_ReadOnlySpan()
+        {
+            const string fixture = "0000";
+            OpenStringBuilder sb = new OpenStringBuilder(fixture);
+            assertSame(sb, sb.Replace(1, 3 - 1, "11".AsSpan())); // J2N: Corrected 2nd parameter
+            assertEquals("0110", sb.ToString());
+            assertEquals(4, sb.Length);
+
+            sb = new OpenStringBuilder(fixture);
+            assertSame(sb, sb.Replace(1, 2 - 1, "11".AsSpan())); // J2N: Corrected 2nd parameter
+            assertEquals("01100", sb.ToString());
+            assertEquals(5, sb.Length);
+
+            sb = new OpenStringBuilder(fixture);
+            assertSame(sb, sb.Replace(4, 5 - 4, "11".AsSpan())); // J2N: Corrected 2nd parameter
+            assertEquals("000011", sb.ToString());
+            assertEquals(6, sb.Length);
+
+            sb = new OpenStringBuilder(fixture);
+            assertSame(sb, sb.Replace(4, 6 - 4, "11".AsSpan())); // J2N: Corrected 2nd parameter
+            assertEquals("000011", sb.ToString());
+            assertEquals(6, sb.Length);
+
+            // J2N: null converts to an empty span, so no exception is thrown
+
+            //// FIXME Undocumented NPE in Sun's JRE 5.0_5
+            //try
+            //{
+            //    sb.Replace(1, 2 - 1, (string)null); // J2N: Corrected 2nd parameter
+            //    fail("No NPE");
+            //}
+            //catch (ArgumentNullException) // NullPointerException
+            //{
+            //    // Expected
+            //}
+
+            try
+            {
+                sb = new OpenStringBuilder(fixture);
+                sb.Replace(-1, 2 - -1, "11".AsSpan()); // J2N: Corrected 2nd parameter
+                fail("No SIOOBE, negative start");
+            }
+            catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
+            {
+                // Expected
+            }
+
+            try
+            {
+                sb = new OpenStringBuilder(fixture);
+                sb.Replace(5, 2 - 5, "11".AsSpan()); // J2N: Corrected 2nd parameter
+                fail("No SIOOBE, start > length");
+            }
+            catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
+            {
+                // Expected
+            }
+
+            try
+            {
+                sb = new OpenStringBuilder(fixture);
+                sb.Replace(3, 2 - 3, "11".AsSpan()); // J2N: Corrected 2nd parameter
+                fail("No SIOOBE, start > end");
+            }
+            catch (ArgumentOutOfRangeException) // StringIndexOutOfBoundsException
+            {
+                // Expected
+            }
+
+            // Regression for HARMONY-348
+            OpenStringBuilder buffer = new OpenStringBuilder("1234567");
+            buffer.Replace(2, 6 - 2, "XXX".AsSpan()); // J2N: Corrected 2nd parameter
+            assertEquals("12XXX7", buffer.ToString());
+        }
+
         private void reverseTest(String org, String rev, String back)
         {
             // create non-shared StringBuilder
