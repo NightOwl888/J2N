@@ -29,7 +29,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="value"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
-        public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
+        public int IndexOf(ReadOnlySpan<char> value, StringComparison comparisonType) // Coverage for the JDK
             => new ReadOnlySpan<char>(m_Chars, 0, m_Position).IndexOf(value, comparisonType);
 
         /// <summary>
@@ -44,7 +44,7 @@ namespace J2N.Text
         /// or greater than <see cref="Length"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
-        public int IndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType)
+        public int IndexOf(ReadOnlySpan<char> value, int startIndex, StringComparison comparisonType) // Coverage for the JDK
         {
             if ((uint)startIndex > (uint)Length)
                 ThrowHelper.ThrowArgumentOutOfRange_ArgumentOutOfRange_IndexString(startIndex, ExceptionArgument.startIndex);
@@ -62,7 +62,7 @@ namespace J2N.Text
         /// <exception cref="ArgumentNullException">If <paramref name="value"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
-        public int IndexOf(string value, StringComparison comparisonType)
+        public int IndexOf(string value, StringComparison comparisonType) // Coverage for the JDK
         {
             if (value is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
@@ -83,7 +83,7 @@ namespace J2N.Text
         /// or greater than <see cref="Length"/>.</exception>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
-        public int IndexOf(string value, int startIndex, StringComparison comparisonType)
+        public int IndexOf(string value, int startIndex, StringComparison comparisonType) // Coverage for the JDK
         {
             if (value is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.value);
@@ -123,7 +123,7 @@ namespace J2N.Text
         /// <returns>The index of the specified character, <c>-1</c> if the character isn't found.</returns>
         /// <exception cref="ArgumentException"><paramref name="comparisonType"/> is not a
         /// <see cref="StringComparison"/> value.</exception>
-        public int LastIndexOf(ReadOnlySpan<char> value, StringComparison comparisonType)
+        public int LastIndexOf(ReadOnlySpan<char> value, StringComparison comparisonType) // Coverage for the JDK
             => new ReadOnlySpan<char>(m_Chars, 0, m_Position).LastIndexOf(value, comparisonType);
 
         /// <summary>
