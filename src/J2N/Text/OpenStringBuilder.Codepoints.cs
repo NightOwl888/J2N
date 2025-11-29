@@ -22,7 +22,7 @@ namespace J2N.Text
         /// <param name="codePoint">A Unicode code point.</param>
         /// <returns>This <see cref="OpenStringBuilder"/>, for chaining.</returns>
         /// <exception cref="ArgumentException"><paramref name="codePoint"/> is not a valid Unicode code point.</exception>
-        public OpenStringBuilder AppendCodePoint(int codePoint)
+        public OpenStringBuilder AppendCodePoint(int codePoint) // Coverage for the JDK
         {
             int count = Character.ToChars(codePoint, out char high, out char low);
 
@@ -111,7 +111,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="index"/> is less than zero.
         /// </exception>
-        public int CodePointAt(int index)
+        public int CodePointAt(int index) // Coverage for the JDK
             => new ReadOnlySpan<char>(m_Chars, 0, m_Position).CodePointAt(index);
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace J2N.Text
         /// in this <see cref="OpenStringBuilder"/>.</returns>
         /// <exception cref="ArgumentOutOfRangeException">If the <paramref name="index"/> is less than
         /// 1 or greater than <see cref="Length"/>.</exception>
-        public int CodePointBefore(int index)
+        public int CodePointBefore(int index) // Coverage for the JDK
             => new ReadOnlySpan<char>(m_Chars, 0, m_Position).CodePointBefore(index);
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// </exception>
-        public int CodePointCount(int startIndex, int length)
+        public int CodePointCount(int startIndex, int length) // Coverage for the JDK
         {
             if (startIndex < 0)
                 ThrowHelper.ThrowArgumentOutOfRange_MustBeNonNegative(startIndex, ExceptionArgument.startIndex);
@@ -186,7 +186,7 @@ namespace J2N.Text
         /// <paramref name="codePointOffset"/> is negative and the subsequence before <paramref name="index"/>
         /// has fewer than the absolute value of <paramref name="codePointOffset"/> code points.
         /// </exception>
-        public int OffsetByCodePoints(int index, int codePointOffset)
+        public int OffsetByCodePoints(int index, int codePointOffset) // Coverage for the JDK
             => new ReadOnlySpan<char>(m_Chars, 0, m_Position).OffsetByCodePoints(index, codePointOffset);
     }
 }

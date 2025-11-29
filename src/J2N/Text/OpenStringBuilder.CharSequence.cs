@@ -24,7 +24,7 @@ namespace J2N.Text
         /// <para/>
         /// <paramref name="startIndex"/> or <paramref name="length"/> is less than zero.
         /// </exception>
-        public ICharSequence Subsequence(int startIndex, int length)
+        public ICharSequence Subsequence(int startIndex, int length) // Coverage for the JDK
         {
             // From Apache Harmony String class
             if (m_Chars is null || (startIndex == 0 && length == m_Position))
