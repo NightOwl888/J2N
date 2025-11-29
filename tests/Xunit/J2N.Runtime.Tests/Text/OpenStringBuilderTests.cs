@@ -2407,5 +2407,49 @@ namespace J2N.Text.Tests
         //        });
         //    }).Dispose();
         //}
+
+
+        [Fact] // J2N specific - copied over from ValueStringBuilder
+        public static void AppendSpan_DataAppendedCorrectly()
+        {
+            var sb = new StringBuilder();
+            var osb = new OpenStringBuilder();
+
+            for (int i = 1; i <= 1000; i++)
+            {
+                string s = i.ToString();
+
+                sb.Append(s);
+
+                Span<char> span = osb.AppendSpan(s.Length);
+                Assert.Equal(sb.Length, osb.Length);
+
+                s.AsSpan().CopyTo(span);
+            }
+
+            Assert.Equal(sb.Length, osb.Length);
+            Assert.Equal(sb.ToString(), osb.ToString());
+        }
+
+        [Fact] // J2N specific
+        public static void AppendSpan_ZerosBuffer()
+        {
+            var builder = new OpenStringBuilder();
+            builder.Append("Hello");
+            builder.Length = 0;
+
+            Span<char> span = builder.AppendSpan(5);
+            Assert.Equal("\0\0\0\0\0", span.ToString());
+        }
+
+        [Fact] // J2N specific
+        public static void AppendSpan_Invalid()
+        {
+            var builder = new OpenStringBuilder(0, 5);
+            builder.Append("Hello");
+
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => builder.AppendSpan(-1)); // length < 0
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("requiredLength", () => builder.AppendSpan(builder.Length)); // New length > builder.MaxCapacity
+        }
     }
 }
