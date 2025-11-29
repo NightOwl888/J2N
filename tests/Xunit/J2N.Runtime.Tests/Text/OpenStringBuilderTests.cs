@@ -133,6 +133,44 @@ namespace J2N.Text.Tests
             AssertExtensions.Throws<ArgumentOutOfRangeException>("length", () => new OpenStringBuilder("foo", 3, 1, 0)); // Start index + length > builder.Length
         }
 
+        [Theory] // J2N specific
+        [InlineData("Hello", 0, 5)]
+        [InlineData("Hello", 2, 3)]
+        [InlineData("", 0, 0)]
+        [InlineData(null, 0, 0)]
+        public static void Ctor_ReadOnlySpan(string value, int startIndex, int length)
+        {
+            var builder = new OpenStringBuilder(value.AsSpan(startIndex, length));
+
+            string expected = value?.Substring(startIndex, length) ?? "";
+            Assert.Equal(expected, builder.ToString());
+            Assert.Equal(length, builder.Length);
+            Assert.Equal(expected.Length, builder.Length);
+        }
+
+        [Theory] // J2N specific
+        [InlineData("Hello", 0, 5)]
+        [InlineData("Hello", 2, 3)]
+        [InlineData("", 0, 0)]
+        [InlineData(null, 0, 0)]
+        public static void Ctor_ReadOnlySpan_Int(string value, int startIndex, int length)
+        {
+            var builder = new OpenStringBuilder(value.AsSpan(startIndex, length), 42);
+
+            string expected = value?.Substring(startIndex, length) ?? "";
+            Assert.Equal(expected, builder.ToString());
+            Assert.Equal(length, builder.Length);
+            Assert.Equal(expected.Length, builder.Length);
+
+            Assert.True(builder.Capacity >= 42);
+        }
+
+        [Fact] // J2N specific
+        public static void Ctor_ReadOnlySpan_Int_Invalid()
+        {
+            AssertExtensions.Throws<ArgumentOutOfRangeException>("capacity", () => new OpenStringBuilder("foo".AsSpan(0, 0), -1)); // Capacity < 0
+        }
+
         [Fact]
         public static void Item_Get_Set()
         {
