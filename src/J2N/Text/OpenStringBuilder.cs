@@ -2318,7 +2318,8 @@ namespace J2N.Text
                     ThrowHelper.ThrowArgumentOutOfRangeException(value, ExceptionArgument.valueCount, ExceptionResource.ArgumentOutOfRange_LengthGreaterThanCapacity);
                 }
 
-                Grow(m_Chars.Length); // rare
+                // J2N: This effectively doubles the buffer
+                Grow(m_Chars.Length + 1); // rare
             }
 
             m_Position += charsWritten;
