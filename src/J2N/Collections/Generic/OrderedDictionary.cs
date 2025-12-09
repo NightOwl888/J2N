@@ -11,6 +11,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using J2N.Collections.ObjectModel;
 using J2N.Runtime.CompilerServices;
+using J2N.Runtime.InteropServices;
 using J2N.Text;
 
 #if FEATURE_EXCEPTION_STATIC_GUARDCLAUSES
@@ -532,7 +533,7 @@ namespace J2N.Collections.Generic
             Entry[]? entries = _entries;
             Debug.Assert(entries is not null);
 
-            // Grow capacity if necessary to accomodate the extra entry.
+            // Grow capacity if necessary to accommodate the extra entry.
             if (entries!.Length == _count) // [!]: asserted above
             {
                 Resize(HashHelpers.ExpandPrime(entries.Length));
@@ -782,17 +783,17 @@ namespace J2N.Collections.Generic
             Entry[]? entries = _entries;
             Debug.Assert(entries is not null, "expected entries to be is not null");
 
-            if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
-                comparer is null)
+            // J2N: optimize for null case below to avoid comparer call
+            if (key is not null)
             {
-                // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
-
-                hashCode = key is null ? 0 : (uint)key.GetHashCode();
-                i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-
-                // J2N: optimize for null case below to avoid comparer call
-                if (key is not null)
+                if (typeof(TKey).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                    comparer is null)
                 {
+                    // ValueType: Devirtualize with EqualityComparer<TKey>.Default intrinsic
+
+                    hashCode = (uint)key.GetHashCode();
+                    i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
                     do
                     {
                         // Test in if to drop range check for following array access
@@ -811,42 +812,17 @@ namespace J2N.Collections.Generic
 
                         collisionCount++;
                     } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
                 }
                 else
                 {
-                    do
-                    {
-                        // Test in if to drop range check for following array access
-                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
-                        {
-                            goto ReturnNotFound;
-                        }
+                    Debug.Assert(comparer is not null);
+                    hashCode = (uint)comparer!.GetHashCode(key); // [!]: asserted above
+                    i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
 
-                        entry = ref entries[i];
-                        if (entry.HashCode == hashCode && entry.Key is null)
-                        {
-                            goto Return;
-                        }
-
-                        i = entry.Next;
-
-                        collisionCount++;
-                    } while (collisionCount <= (uint)entries.Length);
-                }
-
-                // The chain of entries forms a loop; which means a concurrent update has happened.
-                // Break out of the loop and throw, rather than looping forever.
-                goto ConcurrentOperation;
-            }
-            else
-            {
-                Debug.Assert(comparer is not null);
-                hashCode = key is null ? 0 : (uint)comparer!.GetHashCode(key); // [!]: asserted above
-                i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-
-                // J2N: optimize for null case below to avoid comparer call
-                if (key is not null)
-                {
                     do
                     {
                         // Test in if to drop range check for following array access
@@ -866,28 +842,35 @@ namespace J2N.Collections.Generic
 
                         collisionCount++;
                     } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
                 }
-                else
+            }
+            else
+            {
+                hashCode = 0;
+                i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                do
                 {
-                    do
+                    // Test in if to drop range check for following array access
+                    if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
                     {
-                        // Test in if to drop range check for following array access
-                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
-                        {
-                            goto ReturnNotFound;
-                        }
+                        goto ReturnNotFound;
+                    }
 
-                        entry = ref entries[i];
-                        if (entry.HashCode == hashCode && entry.Key is null)
-                        {
-                            goto Return;
-                        }
+                    entry = ref entries[i];
+                    if (entry.HashCode == hashCode && entry.Key is null)
+                    {
+                        goto Return;
+                    }
 
-                        i = entry.Next;
+                    i = entry.Next;
 
-                        collisionCount++;
-                    } while (collisionCount <= (uint)entries.Length);
-                }
+                    collisionCount++;
+                } while (collisionCount <= (uint)entries.Length);
 
                 // The chain of entries forms a loop; which means a concurrent update has happened.
                 // Break out of the loop and throw, rather than looping forever.
@@ -907,6 +890,27 @@ namespace J2N.Collections.Generic
         Return:
             outHashCode = hashCode;
             return i;
+        }
+
+        internal ref TValue FindValue([AllowNull] TKey key)
+        {
+            // J2N supports null keys
+
+            //ref TValue value = ref Unsafe.NullRef<TValue>();
+            // Find the key.
+            int index = IndexOf(key);
+            if (index >= 0)
+            {
+                // It exists. Return its value.
+                Debug.Assert(_entries is not null);
+
+                ref Entry entry = ref _entries![index]; // [!]: asserted above
+                ref TValue value = ref entry.Value;
+                return ref value;
+            }
+
+            ref TValue nullValue = ref Unsafe.NullRef<TValue>();
+            return ref nullValue;
         }
 
         /// <summary>Inserts an item into the collection at the specified index.</summary>
@@ -2226,6 +2230,625 @@ namespace J2N.Collections.Generic
         }
 
         #endregion
+
+        #region Nested Class: CollectionsMarshalHelper
+
+        /// <summary>
+        /// A helper class containing APIs exposed through <see cref="CollectionMarshal"/>.
+        /// These methods are relatively niche and only used in specific scenarios, so adding them in a separate type avoids
+        /// the additional overhead on each <see cref="OrderedDictionary{TKey, TValue}"/> instantiation, especially in AOT scenarios.
+        /// </summary>
+        internal static class CollectionsMarshalHelper
+        {
+            /// <inheritdoc cref="CollectionMarshal.GetValueRefOrAddDefault{TKey, TValue}(OrderedDictionary{TKey, TValue}, TKey, out bool)"/>
+            public static ref TValue? GetValueRefOrAddDefault(OrderedDictionary<TKey, TValue> dictionary, [AllowNull] TKey key, out bool exists)
+            {
+                // NOTE: this method is mirrored by OrderedDictionary<TKey, TValue>.TryInsert above.
+                // If you make any changes here, make sure to keep that version in sync as well.
+
+                // J2N supports null keys
+
+                // Search for the key in the dictionary.
+                uint hashCode = 0, collisionCount = 0;
+                int i = dictionary.IndexOf(key, ref hashCode, ref collisionCount);
+
+                if (dictionary._buckets == null)
+                {
+                    dictionary.EnsureBucketsAndEntriesInitialized(0);
+                }
+                Debug.Assert(dictionary._buckets != null);
+
+                Entry[]? entries = dictionary._entries;
+                Debug.Assert(entries != null, "expected entries to be non-null");
+
+                // The key exists, get the value
+                if (i >= 0)
+                {
+                    exists = true;
+                    //keyIndex = i; // J2N: Return this? We already return the value, so no reason to find the entry except to get the key
+                    return ref entries![i].Value!;
+                }
+
+                // The key doesn't exist. If a non-negative index was provided, that is the desired index at which to insert,
+                // which should have already been validated by the caller. If negative, we're appending.
+                exists = false;
+                int index = dictionary._count;
+
+                // Grow capacity if necessary to accommodate the extra entry.
+                if (entries!.Length == dictionary._count) // [!]: asserted above
+                {
+                    dictionary.Resize(HashHelpers.ExpandPrime(entries.Length));
+                    entries = dictionary._entries;
+                }
+
+                // The _entries array is ordered, so we need to insert the new entry at the specified index. That means
+                // not only shifting up all elements at that index and higher, but also updating the buckets and chains
+                // to record the newly updated indices.
+                for (i = dictionary._count - 1; i >= index; --i)
+                {
+                    entries![i + 1] = entries[i]; // [!]: asserted above
+                    dictionary.UpdateBucketIndex(i, shiftAmount: 1);
+                }
+
+                // Store the new key/value pair.
+                ref Entry entry = ref entries![index]; // [!]: asserted above
+                entry.HashCode = hashCode;
+                entry.Key = key; // allow null keys
+                entry.Value = default; // allow null values
+                dictionary.PushEntryIntoBucket(ref entry, index);
+                dictionary._count++;
+                dictionary._version++;
+
+                dictionary.RehashIfNecessary(collisionCount, entries);
+
+                //keyIndex = index;
+                //Debug.Assert(0 <= keyIndex && keyIndex < dictionary._count);
+
+                return ref entry.Value!;
+            }
+        }
+
+        #endregion Nested Class: CollectionsMarshalHelper
+
+        #region AlternateLookup
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedDictionary{TKey, TValue}"/>
+        /// using a <typeparamref name="TAlternateKey"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKey">The alternate type of a key for performing lookups.</typeparam>
+        /// <returns>The created lookup instance.</returns>
+        /// <exception cref="InvalidOperationException">The dictionary's comparer is not compatible with <typeparamref name="TAlternateKey"/>.</exception>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternateKey, TKey}"/> with
+        /// <typeparamref name="TAlternateKey"/> and <typeparamref name="TKey"/>. If it doesn't, an exception will be thrown.
+        /// </remarks>
+        public AlternateLookup<TAlternateKey> GetAlternateLookup<TAlternateKey>()
+            where TAlternateKey : allows ref struct
+        {
+            if (!AlternateLookup<TAlternateKey>.IsCompatibleKey(this))
+            {
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+            }
+
+            return new AlternateLookup<TAlternateKey>(this);
+        }
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedDictionary{TKey, TValue}"/>
+        /// using a <typeparamref name="TAlternateKey"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKey">The alternate type of a key for performing lookups.</typeparam>
+        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
+        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternateKey, TKey}"/> with
+        /// <typeparamref name="TAlternateKey"/> and <typeparamref name="TKey"/>. If it doesn't, the method will return false.
+        /// </remarks>
+        public bool TryGetAlternateLookup<TAlternateKey>(
+            out AlternateLookup<TAlternateKey> lookup)
+            where TAlternateKey : allows ref struct
+        {
+            if (AlternateLookup<TAlternateKey>.IsCompatibleKey(this))
+            {
+                lookup = new AlternateLookup<TAlternateKey>(this);
+                return true;
+            }
+
+            lookup = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a type that may be used to perform operations on an <see cref="OrderedDictionary{TKey, TValue}"/>
+        /// using a <typeparamref name="TAlternateKey"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKey">The alternate type of a key for performing lookups.</typeparam>
+        public readonly struct AlternateLookup<TAlternateKey> where TAlternateKey : allows ref struct
+        {
+            /// <summary>Initialize the instance. The dictionary must have already been verified to have a compatible comparer.</summary>
+            internal AlternateLookup(OrderedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                Debug.Assert(IsCompatibleKey(dictionary));
+                Dictionary = dictionary;
+            }
+
+            /// <summary>Gets the <see cref="Dictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
+            public OrderedDictionary<TKey, TValue> Dictionary { get; }
+
+            /// <summary>Gets or sets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get or set.</param>
+            /// <value>
+            /// The value associated with the specified alternate key. If the specified alternate key is not found, a get operation throws
+            /// a <see cref="KeyNotFoundException"/>, and a set operation creates a new element with the specified key.
+            /// </value>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            /// <exception cref="KeyNotFoundException">The property is retrieved and alternate key does not exist in the collection.</exception>
+            public TValue this[[AllowNull] TAlternateKey key]
+            {
+                get
+                {
+                    if (!TryGetValue(key, out TValue? value))
+                    {
+                        if (key is null)
+                        {
+                            ThrowHelper.ThrowKeyNotFoundException("(null)");
+                            return default;
+                        }
+
+                        ThrowHelper.ThrowKeyNotFoundException(GetAlternateComparer(Dictionary).Create(key));
+                    }
+
+                    return value;
+                }
+                set => GetValueRefOrAddDefault(key, out _) = value;
+            }
+
+            /// <summary>Checks whether the dictionary has a comparer compatible with <typeparamref name="TAlternateKey"/>.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static bool IsCompatibleKey(OrderedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                return dictionary._comparer is IAlternateEqualityComparer<TAlternateKey, TKey>;
+            }
+
+            /// <summary>Gets the dictionary's alternate comparer. The dictionary must have already been verified as compatible.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static IAlternateEqualityComparer<TAlternateKey, TKey> GetAlternateComparer(OrderedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(IsCompatibleKey(dictionary));
+                return Unsafe.As<IAlternateEqualityComparer<TAlternateKey, TKey>>(dictionary._comparer)!;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryGetValue([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TValue value)
+            {
+                // The overload TryGetValue(TAlternateKey key, out TKey actualKey, out TValue value) is a copy of this method with one additional
+                // statement to copy the key for entry into the output parameter.
+                // Code has been intentionally duplicated for performance reasons.
+
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Return its value.
+                    Debug.Assert(dictionary._entries is not null);
+                    value = dictionary._entries![index].Value!; // [!]: asserted above
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="actualKey">
+            /// When this method returns, contains the actual key associated with the alternate key, if the key is found;
+            /// otherwise, the default value for the type of the key parameter.
+            /// </param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryGetValue([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Return its actual key and value.
+                    Debug.Assert(dictionary._entries is not null);
+                    ref Entry entry = ref dictionary._entries![index];
+                    actualKey = entry.Key;
+                    value = entry.Value!; // [!]: asserted above
+                    return true;
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Determines whether the <see cref="OrderedDictionary{TKey, TValue}"/> contains the specified alternate key.</summary>
+            /// <param name="key">The alternate key to check.</param>
+            /// <returns><see langword="true"/> if the key is in the dictionary; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool ContainsKey([AllowNull] TAlternateKey key) => IndexOf(key) >= 0;
+
+            /// <summary>Finds the entry associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key.</param>
+            /// <param name="actualKey">The actual key, if found.</param>
+            /// <returns>A reference to the value associated with the key, if found; otherwise, a null reference.</returns>
+            internal ref TValue FindValue([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TKey actualKey)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+                if (dictionary._buckets != null)
+                {
+                    Debug.Assert(dictionary._entries != null, "expected entries to be != null");
+
+                    // J2N: optimize for null case below to avoid comparer call
+                    if (key is not null)
+                    {
+                        IAlternateEqualityComparer<TAlternateKey, TKey> comparer = GetAlternateComparer(dictionary); // J2N: Moved within null check, since we don't need to look this up for null keys
+
+                        uint hashCode = (uint)comparer.GetHashCode(key);
+                        int i = dictionary.GetBucket(hashCode);
+                        Entry[]? entries = dictionary._entries;
+                        uint collisionCount = 0;
+                        i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                        do
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
+
+                            entry = ref entries[i];
+                            if (entry.HashCode == hashCode && comparer.Equals(key, entry.Key))
+                            {
+                                goto ReturnFound;
+                            }
+
+                            i = entry.Next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
+                    else
+                    {
+                        uint hashCode = 0;
+                        int i = dictionary.GetBucket(hashCode);
+                        Entry[]? entries = dictionary._entries;
+                        uint collisionCount = 0;
+                        i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                        do
+                        {
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
+
+                            entry = ref entries[i];
+                            if (entry.HashCode == hashCode && entry.Key is null)
+                            {
+                                goto ReturnFound;
+                            }
+
+                            i = entry.Next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+
+                goto ReturnNotFound;
+
+            ConcurrentOperation:
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+            ReturnFound:
+                ref TValue value = ref entry.Value;
+                actualKey = entry.Key;
+            Return:
+                return ref value;
+            ReturnNotFound:
+                value = ref Unsafe.NullRef<TValue>();
+                actualKey = default!;
+                goto Return;
+            }
+
+            /// <summary>Removes the value with the specified alternate key from the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove([AllowNull] TAlternateKey key)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Remove it.
+                    Debug.Assert(dictionary._entries is not null);
+                    dictionary.RemoveAt(index);
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            /// <summary>
+            /// Removes the value with the specified alternate key from the <see cref="OrderedDictionary{TKey, TValue}"/>,
+            /// and copies the element to the value parameter.
+            /// </summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <param name="actualKey">The removed key.</param>
+            /// <param name="value">The removed element.</param>
+            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Remove it.
+                    Debug.Assert(dictionary._entries is not null);
+
+                    ref Entry entry = ref dictionary._entries![index];
+                    actualKey = entry.Key;
+                    value = entry.Value!; // [!]: asserted above
+
+                    dictionary.RemoveAt(index);
+
+                    return true;
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Determines the index of a specific alternate key in the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
+            /// <param name="key">The alternate key to locate.</param>
+            /// <returns>The index of <paramref name="key"/> if found; otherwise, -1.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is null.</exception>
+            public int IndexOf([AllowNull] TAlternateKey key)
+            {
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                uint _ = 0;
+                return IndexOf(key, ref _, ref _);
+            }
+
+            private int IndexOf([AllowNull] TAlternateKey key, ref uint outHashCode, ref uint outCollisionCount)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //Debug.Assert(key is not null, "Key nullness should have been validated by caller.");
+
+                uint hashCode;
+                uint collisionCount = 0;
+                IAlternateEqualityComparer<TAlternateKey, TKey> comparer = GetAlternateComparer(dictionary); // J2N: Moved within null check, since we don't need to look this up for null keys
+
+                if (dictionary._buckets is null)
+                {
+                    hashCode = key is null ? 0 : (uint)comparer.GetHashCode(key);
+                    collisionCount = 0;
+                    goto ReturnNotFound;
+                }
+
+                int i = -1;
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+
+                Entry[]? entries = dictionary._entries;
+                Debug.Assert(entries is not null, "expected entries to be is not null");
+
+                // J2N: optimize for null case below to avoid comparer call
+                if (key is not null)
+                {
+                    Debug.Assert(comparer is not null);
+                    hashCode = (uint)comparer!.GetHashCode(key); // [!]: asserted above
+                    i = dictionary.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode &&
+                            comparer!.Equals(key!, entry.Key)) // [!]: asserted above, allow null keys
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+                }
+                else
+                {
+                    hashCode = 0;
+                    i = dictionary.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && entry.Key is null)
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+                }
+
+                // The chain of entries forms a loop; which means a concurrent update has happened.
+                // Break out of the loop and throw, rather than looping forever.
+                goto ConcurrentOperation;
+
+            ReturnNotFound:
+                i = -1;
+                outCollisionCount = collisionCount;
+                goto Return;
+
+            ConcurrentOperation:
+                // We examined more entries than are actually in the list, which means there's a cycle
+                // that's caused by erroneous concurrent use.
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+
+            Return:
+                outHashCode = hashCode;
+                return i;
+            }
+
+            /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
+            /// <param name="key">The alternate key of the element to add.</param>
+            /// <param name="value">The value of the element to add.</param>
+            /// <returns>true if the key/value pair was added to the dictionary successfully; otherwise, false.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryAdd([AllowNull] TAlternateKey key, TValue value)
+            {
+                ref TValue? slot = ref GetValueRefOrAddDefault(key, out bool exists);
+                if (!exists)
+                {
+                    slot = value;
+                    return true;
+                }
+
+                return false;
+            }
+
+            /// <inheritdoc cref="CollectionMarshal.GetValueRefOrAddDefault{TKey, TValue}(OrderedDictionary{TKey, TValue}, TKey, out bool)"/>
+            internal ref TValue? GetValueRefOrAddDefault([AllowNull] TAlternateKey key, out bool exists)
+            {
+                // NOTE: this method is a mirror of GetValueRefOrAddDefault above. Keep it in sync.
+
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+                IAlternateEqualityComparer<TAlternateKey, TKey> comparer = GetAlternateComparer(dictionary);
+
+                // Search for the key in the dictionary.
+                uint hashCode = 0, collisionCount = 0;
+                int i = IndexOf(key, ref hashCode, ref collisionCount);
+
+                if (dictionary._buckets == null)
+                {
+                    dictionary.EnsureBucketsAndEntriesInitialized(0);
+                }
+                Debug.Assert(dictionary._buckets != null);
+
+                Entry[]? entries = dictionary._entries;
+                Debug.Assert(entries != null, "expected entries to be non-null");
+
+                // The key exists, get the value
+                if (i >= 0)
+                {
+                    exists = true;
+                    //keyIndex = i; // J2N: Return this? We already return the value, so no reason to find the entry except to get the key
+                    return ref entries[i].Value!;
+                }
+
+                // The key doesn't exist. If a non-negative index was provided, that is the desired index at which to insert,
+                // which should have already been validated by the caller. If negative, we're appending.
+                exists = false;
+                int index = dictionary._count;
+
+                // Grow capacity if necessary to accommodate the extra entry.
+                if (entries!.Length == dictionary._count) // [!]: asserted above
+                {
+                    dictionary.Resize(HashHelpers.ExpandPrime(entries.Length));
+                    entries = dictionary._entries;
+                }
+
+                // The _entries array is ordered, so we need to insert the new entry at the specified index. That means
+                // not only shifting up all elements at that index and higher, but also updating the buckets and chains
+                // to record the newly updated indices.
+                for (i = dictionary._count - 1; i >= index; --i)
+                {
+                    entries![i + 1] = entries[i]; // [!]: asserted above
+                    dictionary.UpdateBucketIndex(i, shiftAmount: 1);
+                }
+
+                TKey? actualKey = key is not null ? comparer.Create(key) : default;
+
+                // Store the new key/value pair.
+                ref Entry entry = ref entries![index]; // [!]: asserted above
+                entry.HashCode = hashCode;
+                entry.Key = actualKey; // allow null keys
+                entry.Value = default; // allow null values
+                dictionary.PushEntryIntoBucket(ref entry, index);
+                dictionary._count++;
+                dictionary._version++;
+
+                dictionary.RehashIfNecessary(collisionCount, entries);
+
+                //keyIndex = index;
+                //Debug.Assert(0 <= keyIndex && keyIndex < dictionary._count);
+
+                return ref entry.Value!;
+            }
+        }
+
+#endif
+
+        #endregion AlternateLookup
 
         #region Structural Equality
 

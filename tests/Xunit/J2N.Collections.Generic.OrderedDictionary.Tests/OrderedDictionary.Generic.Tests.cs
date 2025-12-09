@@ -398,6 +398,195 @@ namespace J2N.Collections.Tests
 
         #endregion
 
+        #region GetAlternateComparer
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+
+        [Fact]
+        public void GetAlternateLookup_FailsWhenIncompatible()
+        {
+            var dictionary = new JCG.OrderedDictionary<string, string>(StringComparer.Ordinal);
+
+            dictionary.GetAlternateLookup<ReadOnlySpan<char>>();
+            Assert.True(dictionary.TryGetAlternateLookup<ReadOnlySpan<char>>(out _));
+
+            Assert.Throws<InvalidOperationException>(() => dictionary.GetAlternateLookup<ReadOnlySpan<byte>>());
+            Assert.Throws<InvalidOperationException>(() => dictionary.GetAlternateLookup<string>());
+            Assert.Throws<InvalidOperationException>(() => dictionary.GetAlternateLookup<int>());
+
+            Assert.False(dictionary.TryGetAlternateLookup<ReadOnlySpan<byte>>(out _));
+            Assert.False(dictionary.TryGetAlternateLookup<string>(out _));
+            Assert.False(dictionary.TryGetAlternateLookup<int>(out _));
+        }
+
+        public static IEnumerable<object[]> Dictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData()
+        {
+            yield return new object[] { JCG.EqualityComparer<string>.Default };
+            yield return new object[] { StringComparer.Ordinal };
+            yield return new object[] { StringComparer.OrdinalIgnoreCase };
+            yield return new object[] { StringComparer.InvariantCulture };
+            yield return new object[] { StringComparer.InvariantCultureIgnoreCase };
+            yield return new object[] { StringComparer.CurrentCulture };
+            yield return new object[] { StringComparer.CurrentCultureIgnoreCase };
+        }
+
+        [Theory]
+        [MemberData(nameof(Dictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData))]
+        public void Dictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary(IEqualityComparer<string> comparer)
+        {
+            // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying dictionary
+            JCG.OrderedDictionary<string, int> dictionary = new(comparer);
+            JCG.OrderedDictionary<string, int>.AlternateLookup<ReadOnlySpan<char>> lookup = dictionary.GetAlternateLookup<ReadOnlySpan<char>>();
+            Assert.Same(dictionary, lookup.Dictionary);
+            Assert.Same(lookup.Dictionary, lookup.Dictionary);
+
+            string? actualKey;
+            int value;
+
+            // Add to the dictionary and validate that the lookup reflects the changes
+            dictionary["123"] = 123;
+            Assert.True(lookup.ContainsKey("123".AsSpan()));
+            Assert.True(lookup.TryGetValue("123".AsSpan(), out value));
+            Assert.Equal(123, value);
+            Assert.Equal(123, lookup["123".AsSpan()]);
+            Assert.False(lookup.TryAdd("123".AsSpan(), 321));
+            Assert.True(lookup.Remove("123".AsSpan()));
+            Assert.False(dictionary.ContainsKey("123"));
+            Assert.Throws<KeyNotFoundException>(() => lookup["123".AsSpan()]);
+
+            // Add via the lookup and validate that the dictionary reflects the changes
+            Assert.True(lookup.TryAdd("123".AsSpan(), 123));
+            Assert.True(dictionary.ContainsKey("123"));
+            lookup.TryGetValue("123".AsSpan(), out value);
+            Assert.Equal(123, value);
+            Assert.False(lookup.Remove("321".AsSpan(), out actualKey, out value));
+            Assert.Null(actualKey);
+            Assert.Equal(0, value);
+            Assert.True(lookup.Remove("123".AsSpan(), out actualKey, out value));
+            Assert.Equal("123", actualKey);
+            Assert.Equal(123, value);
+
+            // Ensure that case-sensitivity of the comparer is respected
+            lookup["a".AsSpan()] = 42;
+            if (dictionary.EqualityComparer.Equals(EqualityComparer<string>.Default) ||
+                dictionary.EqualityComparer.Equals(StringComparer.Ordinal) ||
+                dictionary.EqualityComparer.Equals(StringComparer.InvariantCulture) ||
+                dictionary.EqualityComparer.Equals(StringComparer.CurrentCulture))
+            {
+                Assert.True(lookup.TryGetValue("a".AsSpan(), out actualKey, out value));
+                Assert.Equal("a", actualKey);
+                Assert.Equal(42, value);
+                Assert.True(lookup.TryAdd("A".AsSpan(), 42));
+                Assert.True(lookup.Remove("a".AsSpan()));
+                Assert.False(lookup.Remove("a".AsSpan()));
+                Assert.True(lookup.Remove("A".AsSpan()));
+            }
+            else
+            {
+                Assert.True(lookup.TryGetValue("A".AsSpan(), out actualKey, out value));
+                Assert.Equal("a", actualKey);
+                Assert.Equal(42, value);
+                Assert.False(lookup.TryAdd("A".AsSpan(), 42));
+                Assert.True(lookup.Remove("A".AsSpan()));
+                Assert.False(lookup.Remove("a".AsSpan()));
+                Assert.False(lookup.Remove("A".AsSpan()));
+            }
+
+            // Validate overwrites
+            lookup["a".AsSpan()] = 42;
+            Assert.Equal(42, dictionary["a"]);
+            lookup["a".AsSpan()] = 43;
+            Assert.True(lookup.Remove("a".AsSpan(), out actualKey, out value));
+            Assert.Equal("a", actualKey);
+            Assert.Equal(43, value);
+
+            // Test adding multiple entries via the lookup
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.Equal(i, dictionary.Count);
+                Assert.True(lookup.TryAdd(i.ToString().AsSpan(), i));
+                Assert.False(lookup.TryAdd(i.ToString().AsSpan(), i));
+            }
+
+            Assert.Equal(10, dictionary.Count);
+
+            // Test that the lookup and the dictionary agree on what's in and not in
+            for (int i = -1; i <= 10; i++)
+            {
+                Assert.Equal(dictionary.TryGetValue(i.ToString(), out int dv), lookup.TryGetValue(i.ToString().AsSpan(), out int lv));
+                Assert.Equal(dv, lv);
+            }
+
+            // Test removing multiple entries via the lookup
+            for (int i = 9; i >= 0; i--)
+            {
+                Assert.True(lookup.Remove(i.ToString().AsSpan(), out actualKey, out value));
+                Assert.Equal(i.ToString(), actualKey);
+                Assert.Equal(i, value);
+                Assert.False(lookup.Remove(i.ToString().AsSpan(), out actualKey, out value));
+                Assert.Null(actualKey);
+                Assert.Equal(0, value);
+                Assert.Equal(i, dictionary.Count);
+            }
+        }
+
+        [Theory] // J2N specific
+        [MemberData(nameof(Dictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData))]
+        public void Dictionary_GetAlternateLookup_NullableType_OperationsMatchUnderlyingDictionary(IEqualityComparer<string> comparer)
+        {
+            // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying dictionary
+            JCG.OrderedDictionary<string, int> dictionary = new(new AlternateStringComparer(comparer));
+            JCG.OrderedDictionary<string, int>.AlternateLookup<string> lookup = dictionary.GetAlternateLookup<string>();
+            Assert.Same(dictionary, lookup.Dictionary);
+            Assert.Same(lookup.Dictionary, lookup.Dictionary);
+
+            // Test the behavior of null vs "" in the dictionary and lookup
+            // including using null for the lookup key
+            Assert.True(dictionary.TryAdd(null, 1));
+            Assert.True(dictionary.TryAdd(string.Empty, 2));
+            Assert.Equal(2, dictionary.Count);
+            Assert.True(dictionary.Contains(new(null!, 1)));
+            Assert.True(dictionary.Contains(new("", 2)));
+            Assert.True(dictionary.ContainsKey(null));
+            Assert.True(dictionary.ContainsKey(""));
+            Assert.False(lookup.TryAdd(null, 1));
+            Assert.False(lookup.TryAdd("", 2));
+            Assert.True(lookup.ContainsKey(null));
+            Assert.True(lookup.ContainsKey(""));
+            Assert.True(lookup.TryGetValue(null, out string? actualKey, out int value));
+            Assert.Null(actualKey);
+            Assert.Equal(1, value);
+            Assert.True(lookup.TryGetValue("", out actualKey, out value));
+            Assert.Equal("", actualKey);
+            Assert.Equal(2, value);
+            Assert.True(lookup.Remove(""));
+            Assert.True(lookup.Remove(null));
+            Assert.True(lookup.TryAdd(null, 1));
+            Assert.True(dictionary.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+            Assert.False(lookup.Remove(""));
+            Assert.False(dictionary.Remove(""));
+            Assert.False(lookup.Remove(null));
+            Assert.False(dictionary.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+
+            lookup[null] = 3;
+            lookup.TryGetValue(null, out value);
+            Assert.Equal(3, value);
+            Assert.True(lookup.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+
+            dictionary[null] = 3;
+            dictionary.TryGetValue(null, out value);
+            Assert.Equal(3, value);
+            Assert.True(dictionary.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+        }
+
+#endif
+
+        #endregion
+
         #region EnsureCapacity
 
         [Fact]

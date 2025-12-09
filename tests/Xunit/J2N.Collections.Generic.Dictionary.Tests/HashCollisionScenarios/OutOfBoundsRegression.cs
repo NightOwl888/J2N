@@ -227,7 +227,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.InvariantCulture;
         protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.InvariantCulture.GetType();
     }
-#endregion
+    #endregion
 
     #region OrderedDictionary
     public class InternalHashCodeTests_OrderedDictionary_NullComparer : InternalHashCodeTests<OrderedDictionary<string, string>>
@@ -298,6 +298,88 @@ namespace J2N.Collections.Tests
         protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.InvariantCulture.GetType();
 
         protected override bool SupportsAlternateLookup(OrderedDictionary<string, string> collection) => false;
+    }
+    #endregion
+
+    #region OrderedHashSet
+    public class InternalHashCodeTests_OrderedHashSet_NullComparer : InternalHashCodeTests<OrderedHashSet<string>>
+    {
+        protected override OrderedHashSet<string> CreateCollection() => new OrderedHashSet<string>();
+        protected override void AddKey(OrderedHashSet<string> collection, string key) => collection.Add(key);
+        protected override bool ContainsKey(OrderedHashSet<string> collection, string key) => collection.Contains(key);
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#endif
+        protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
+
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
+        protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => EqualityComparer<string>.Default;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => EqualityComparer<string>.Default.GetType();
+    }
+
+    public class InternalHashCodeTests_OrderedHashSet_DefaultComparer : InternalHashCodeTests<OrderedHashSet<string>>
+    {
+        protected override OrderedHashSet<string> CreateCollection() => new OrderedHashSet<string>(EqualityComparer<string>.Default);
+        protected override void AddKey(OrderedHashSet<string> collection, string key) => collection.Add(key);
+        protected override bool ContainsKey(OrderedHashSet<string> collection, string key) => collection.Contains(key);
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#endif
+        protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
+
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
+        protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => EqualityComparer<string>.Default;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => EqualityComparer<string>.Default.GetType();
+    }
+
+    public class InternalHashCodeTests_OrderedHashSet_OrdinalComparer : InternalHashCodeTests<OrderedHashSet<string>>
+    {
+        protected override OrderedHashSet<string> CreateCollection() => new OrderedHashSet<string>(StringComparer.Ordinal);
+        protected override void AddKey(OrderedHashSet<string> collection, string key) => collection.Add(key);
+        protected override bool ContainsKey(OrderedHashSet<string> collection, string key) => collection.Contains(key);
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#endif
+        protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
+
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
+        protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.Ordinal;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.Ordinal.GetType();
+    }
+
+    public class InternalHashCodeTests_OrderedHashSet_OrdinalIgnoreCaseComparer : InternalHashCodeTests<OrderedHashSet<string>>
+    {
+        protected override OrderedHashSet<string> CreateCollection() => new OrderedHashSet<string>(StringComparer.OrdinalIgnoreCase);
+        protected override void AddKey(OrderedHashSet<string> collection, string key) => collection.Add(key);
+        protected override bool ContainsKey(OrderedHashSet<string> collection, string key) => collection.Contains(key);
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#endif
+        protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
+
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalIgnoreCaseComparerType;
+        protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.OrdinalIgnoreCase;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.OrdinalIgnoreCase.GetType();
+    }
+
+    public class InternalHashCodeTests_OrderedHashSet_LinguisticComparer : InternalHashCodeTests<OrderedHashSet<string>> // (not optimized)
+    {
+        protected override OrderedHashSet<string> CreateCollection() => new OrderedHashSet<string>(StringComparer.InvariantCulture);
+        protected override void AddKey(OrderedHashSet<string> collection, string key) => collection.Add(key);
+        protected override bool ContainsKey(OrderedHashSet<string> collection, string key) => collection.Contains(key);
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#endif
+        protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
+
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => StringComparer.InvariantCulture.GetType();
+        protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.InvariantCulture;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.InvariantCulture.GetType();
     }
     #endregion
 

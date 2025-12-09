@@ -36,6 +36,24 @@ namespace J2N
             }
         }
 
+        // Gets a hash code for the string. If strings A and B are such that A.Equals(B), then
+        // they will return the same hash code.
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal static int GetHashCode(string value)
+        {
+            Debug.Assert(value != null, "Caller should skip this call and return 0 for null values. This method is set up to match string.Empty.GetHashCode() so it matches the ReadOnlySpan<char> overload.");
+
+            ulong seed = Marvin.DefaultSeed;
+            unsafe
+            {
+                fixed (char* charPtr = value)
+                {
+                    // Multiplication below will not overflow since going from positive Int32 to UInt32.
+                    return Marvin.ComputeHash32(ref Unsafe.As<char, byte>(ref *charPtr), (uint)value!.Length * 2 /* in bytes, not chars */, (uint)seed, (uint)(seed >> 32));
+                }
+            }
+        }
+
         // A span-based equivalent of String.GetHashCode(). Computes an ordinal hash code.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int GetHashCode(ReadOnlySpan<char> value)

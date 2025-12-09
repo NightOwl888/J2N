@@ -64,6 +64,20 @@ namespace J2N.Runtime.InteropServices
         public static ref TValue GetValueRefOrNullRef<TKey, TValue>(Dictionary<TKey, TValue> dictionary, [AllowNull] TKey key)
             => ref dictionary.FindValue(key);
 
+        /// <summary>
+        /// Gets either a ref to a <typeparamref name="TValue"/> in the <see cref="OrderedDictionary{TKey, TValue}"/> or a ref null if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <remarks>
+        /// Items should not be added or removed from the <see cref="OrderedDictionary{TKey, TValue}"/> while the ref <typeparamref name="TValue"/> is in use.
+        /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
+        /// </remarks>
+        public static ref TValue GetValueRefOrNullRef<TKey, TValue>(OrderedDictionary<TKey, TValue> dictionary, [AllowNull] TKey key)
+            => ref dictionary.FindValue(key);
+
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
 
         /// <summary>
@@ -83,6 +97,23 @@ namespace J2N.Runtime.InteropServices
             where TAlternateKey : allows ref struct
             => ref dictionary.FindValue(key, out _);
 
+        /// <summary>
+        /// Gets either a ref to a <typeparamref name="TValue"/> in the <see cref="OrderedDictionary{TKey, TValue}"/> or a ref null if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <typeparam name="TAlternateKey">The type of an alternate key for lookups in the dictionary.</typeparam>
+        /// <remarks>
+        /// Items should not be added or removed from the <see cref="OrderedDictionary{TKey, TValue}"/> while the ref <typeparamref name="TValue"/> is in use.
+        /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
+        /// </remarks>
+        public static ref TValue GetValueRefOrNullRef<TKey, TValue, TAlternateKey>(OrderedDictionary<TKey, TValue>.AlternateLookup<TAlternateKey> dictionary, TAlternateKey key)
+            where TKey : notnull
+            where TAlternateKey : allows ref struct
+            => ref dictionary.FindValue(key, out _);
+
 #endif
 
         /// <summary>
@@ -97,6 +128,18 @@ namespace J2N.Runtime.InteropServices
         public static ref TValue? GetValueRefOrAddDefault<TKey, TValue>(Dictionary<TKey, TValue> dictionary, [AllowNull] TKey key, out bool exists)
             => ref Dictionary<TKey, TValue>.CollectionsMarshalHelper.GetValueRefOrAddDefault(dictionary, key, out exists);
 
+        /// <summary>
+        /// Gets a ref to a <typeparamref name="TValue"/> in the <see cref="Dictionary{TKey, TValue}"/>, adding a new entry with a default value if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <param name="exists">Whether or not a new entry for the given key was added to the dictionary.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <remarks>Items should not be added to or removed from the <see cref="Dictionary{TKey, TValue}"/> while the ref <typeparamref name="TValue"/> is in use.</remarks>
+        public static ref TValue? GetValueRefOrAddDefault<TKey, TValue>(OrderedDictionary<TKey, TValue> dictionary, [AllowNull] TKey key, out bool exists)
+            => ref OrderedDictionary<TKey, TValue>.CollectionsMarshalHelper.GetValueRefOrAddDefault(dictionary, key, out exists);
+
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
 
         /// <summary>
@@ -110,6 +153,20 @@ namespace J2N.Runtime.InteropServices
         /// <typeparam name="TAlternateKey">The type of the alternate key in the dictionary lookup.</typeparam>
         /// <remarks>Items should not be added to or removed from the <see cref="Dictionary{TKey, TValue}.AlternateLookup{TAlternateKey}"/> while the ref <typeparamref name="TValue"/> is in use.</remarks>
         public static ref TValue? GetValueRefOrAddDefault<TKey, TValue, TAlternateKey>(Dictionary<TKey, TValue>.AlternateLookup<TAlternateKey> dictionary, TAlternateKey key, out bool exists)
+            where TAlternateKey : allows ref struct
+            => ref dictionary.GetValueRefOrAddDefault(key, out exists);
+
+        /// <summary>
+        /// Gets a ref to a <typeparamref name="TValue"/> in the <see cref="OrderedDictionary{TKey, TValue}.AlternateLookup{TAlternateKey}"/>, adding a new entry with a default value if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <param name="exists">Whether or not a new entry for the given key was added to the dictionary.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <typeparam name="TAlternateKey">The type of the alternate key in the dictionary lookup.</typeparam>
+        /// <remarks>Items should not be added to or removed from the <see cref="Dictionary{TKey, TValue}.AlternateLookup{TAlternateKey}"/> while the ref <typeparamref name="TValue"/> is in use.</remarks>
+        public static ref TValue? GetValueRefOrAddDefault<TKey, TValue, TAlternateKey>(OrderedDictionary<TKey, TValue>.AlternateLookup<TAlternateKey> dictionary, TAlternateKey key, out bool exists)
             where TAlternateKey : allows ref struct
             => ref dictionary.GetValueRefOrAddDefault(key, out exists);
 

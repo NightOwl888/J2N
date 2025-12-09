@@ -783,6 +783,59 @@ namespace J2N.Collections.Tests
             }
         }
 
+        [Theory] // J2N specific
+        [MemberData(nameof(Dictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData))]
+        public void Dictionary_GetAlternateLookup_NullableType_OperationsMatchUnderlyingDictionary(SCG.IEqualityComparer<string> comparer)
+        {
+            // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying dictionary
+            Dictionary<string, int> dictionary = new(new AlternateStringComparer(comparer));
+            Dictionary<string, int>.AlternateLookup<string> lookup = dictionary.GetAlternateLookup<string>();
+            Assert.Same(dictionary, lookup.Dictionary);
+            Assert.Same(lookup.Dictionary, lookup.Dictionary);
+
+            // Test the behavior of null vs "" in the dictionary and lookup
+            // including using null for the lookup key
+            Assert.True(dictionary.TryAdd(null, 1));
+            Assert.True(dictionary.TryAdd(string.Empty, 2));
+            Assert.Equal(2, dictionary.Count);
+            Assert.True(dictionary.Contains(new(null, 1)));
+            Assert.True(dictionary.Contains(new("", 2)));
+            Assert.True(dictionary.ContainsKey(null));
+            Assert.True(dictionary.ContainsKey(""));
+            Assert.False(lookup.TryAdd(null, 1));
+            Assert.False(lookup.TryAdd("", 2));
+            Assert.True(lookup.ContainsKey(null));
+            Assert.True(lookup.ContainsKey(""));
+            Assert.True(lookup.TryGetValue(null, out string actualKey, out int value));
+            Assert.Null(actualKey);
+            Assert.Equal(1, value);
+            Assert.True(lookup.TryGetValue("", out actualKey, out value));
+            Assert.Equal("", actualKey);
+            Assert.Equal(2, value);
+            Assert.True(lookup.Remove(""));
+            Assert.True(lookup.Remove(null));
+            Assert.True(lookup.TryAdd(null, 1));
+            Assert.True(dictionary.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+            Assert.False(lookup.Remove(""));
+            Assert.False(dictionary.Remove(""));
+            Assert.False(lookup.Remove(null));
+            Assert.False(dictionary.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+
+            lookup[null] = 3;
+            lookup.TryGetValue(null, out value);
+            Assert.Equal(3, value);
+            Assert.True(lookup.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+
+            dictionary[null] = 3;
+            dictionary.TryGetValue(null, out value);
+            Assert.Equal(3, value);
+            Assert.True(dictionary.Remove(null));
+            Assert.Equal(0, dictionary.Count);
+        }
+
 #endif
 
         #endregion

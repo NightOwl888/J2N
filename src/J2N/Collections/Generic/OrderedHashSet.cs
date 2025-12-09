@@ -662,17 +662,17 @@ namespace J2N.Collections.Generic
             Entry[]? entries = _entries;
             Debug.Assert(entries is not null, "expected entries to be is not null");
 
-            if (typeof(T).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
-                comparer is null)
+            // J2N: optimize for null case below to avoid comparer call
+            if (value is not null)
             {
-                // ValueType: Devirtualize with EqualityComparer<T>.Default intrinsic
-
-                hashCode = value is null ? 0 : (uint)value.GetHashCode();
-                i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-
-                // J2N: optimize for null case below to avoid comparer call
-                if (value is not null)
+                if (typeof(T).IsValueType && // comparer can only be null for value types; enable JIT to eliminate entire if block for ref types
+                    comparer is null)
                 {
+                    // ValueType: Devirtualize with EqualityComparer<T>.Default intrinsic
+
+                    hashCode = (uint)value.GetHashCode();
+                    i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
                     do
                     {
                         // Test in if to drop range check for following array access
@@ -691,42 +691,18 @@ namespace J2N.Collections.Generic
 
                         collisionCount++;
                     } while (collisionCount <= (uint)entries.Length);
+
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
                 }
                 else
                 {
-                    do
-                    {
-                        // Test in if to drop range check for following array access
-                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
-                        {
-                            goto ReturnNotFound;
-                        }
+                    Debug.Assert(comparer is not null);
+                    hashCode = (uint)comparer!.GetHashCode(value); // [!]: asserted above
+                    i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
 
-                        entry = ref entries[i];
-                        if (entry.HashCode == hashCode && entry.Value is null)
-                        {
-                            goto Return;
-                        }
-
-                        i = entry.Next;
-
-                        collisionCount++;
-                    } while (collisionCount <= (uint)entries.Length);
-                }
-
-                // The chain of entries forms a loop; which means a concurrent update has happened.
-                // Break out of the loop and throw, rather than looping forever.
-                goto ConcurrentOperation;
-            }
-            else
-            {
-                Debug.Assert(comparer is not null);
-                hashCode = value is null ? 0 : (uint)comparer!.GetHashCode(value); // [!]: asserted above
-                i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-
-                // J2N: optimize for null case below to avoid comparer call
-                if (value is not null)
-                {
                     do
                     {
                         // Test in if to drop range check for following array access
@@ -746,28 +722,35 @@ namespace J2N.Collections.Generic
 
                         collisionCount++;
                     } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
                 }
-                else
+            }
+            else
+            {
+                hashCode = 0;
+                i = GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                do
                 {
-                    do
+                    // Test in if to drop range check for following array access
+                    if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
                     {
-                        // Test in if to drop range check for following array access
-                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
-                        {
-                            goto ReturnNotFound;
-                        }
+                        goto ReturnNotFound;
+                    }
 
-                        entry = ref entries[i];
-                        if (entry.HashCode == hashCode && entry.Value is null)
-                        {
-                            goto Return;
-                        }
+                    entry = ref entries[i];
+                    if (entry.HashCode == hashCode && entry.Value is null)
+                    {
+                        goto Return;
+                    }
 
-                        i = entry.Next;
+                    i = entry.Next;
 
-                        collisionCount++;
-                    } while (collisionCount <= (uint)entries.Length);
-                }
+                    collisionCount++;
+                } while (collisionCount <= (uint)entries.Length);
 
                 // The chain of entries forms a loop; which means a concurrent update has happened.
                 // Break out of the loop and throw, rather than looping forever.
@@ -1741,7 +1724,7 @@ namespace J2N.Collections.Generic
                 // Update all of the entries' hash codes based on the new comparer.
                 for (int i = 0; i < count; i++)
                 {
-                    newEntries[i].HashCode = (uint)comparer.GetHashCode(newEntries[i].Value!);
+                    newEntries[i].HashCode = newEntries[i].Value is not null ? (uint)comparer.GetHashCode(newEntries[i].Value!) : 0;
                 }
             }
 
@@ -1971,29 +1954,58 @@ namespace J2N.Collections.Generic
                 ref int bucket = ref Unsafe.NullRef<int>();
 
                 Debug.Assert(comparer is not null);
-                hashCode = (uint)comparer.GetHashCode(item);
+                hashCode = item is not null ? (uint)comparer.GetHashCode(item) : 0;
                 bucket = ref set.GetBucket(hashCode);
                 int i = bucket - 1; // Value in _buckets is 1-based
-                while (i >= 0)
+                T mappedItem;
+
+                // J2N: optimize for null case below to avoid comparer call
+                if (item is not null)
                 {
-                    ref Entry entry = ref entries[i];
-                    if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                    while (i >= 0)
                     {
-                        return false;
-                    }
-                    i = entry.Next;
+                        ref Entry entry = ref entries[i];
+                        if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                        {
+                            return false;
+                        }
+                        i = entry.Next;
 
-                    collisionCount++;
-                    if (collisionCount > (uint)entries.Length)
-                    {
-                        // The chain of entries forms a loop, which means a concurrent update has happened.
-                        ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop, which means a concurrent update has happened.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        }
                     }
+
+                    // Invoke comparer.Create before allocating space in the collection in order to avoid corrupting
+                    // the collection if the operation fails.
+                    mappedItem = comparer.Create(item);
                 }
+                else
+                {
+                    while (i >= 0)
+                    {
+                        ref Entry entry = ref entries[i];
+                        if (entry.HashCode == hashCode && entry.Value is null)
+                        {
+                            return false;
+                        }
+                        i = entry.Next;
 
-                // Invoke comparer.Create before allocating space in the collection in order to avoid corrupting
-                // the collection if the operation fails.
-                T mappedItem = comparer.Create(item);
+                        collisionCount++;
+                        if (collisionCount > (uint)entries.Length)
+                        {
+                            // The chain of entries forms a loop, which means a concurrent update has happened.
+                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                        }
+                    }
+
+                    // Invoke comparer.Create before allocating space in the collection in order to avoid corrupting
+                    // the collection if the operation fails.
+                    mappedItem = default!;
+                }
 
                 // Since OrderedHashSet maintains insertion order (unlike HashSet which uses a free list),
                 // we always append to the end
@@ -2041,28 +2053,55 @@ namespace J2N.Collections.Generic
 
                     uint collisionCount = 0;
 
-                    uint hashCode = (uint)comparer.GetHashCode(item);
+                    uint hashCode = item is not null ? (uint)comparer.GetHashCode(item) : 0;
                     ref int bucket = ref set.GetBucket(hashCode);
                     int i = bucket - 1; // Value in buckets is 1-based
 
-                    while (i >= 0)
+                    // J2N: optimize for null case below to avoid comparer call
+                    if (item is not null)
                     {
-                        ref Entry entry = ref entries[i];
-
-                        if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                        while (i >= 0)
                         {
-                            // J2N: Since we are ordered, it is easier to just use RemoveAt
-                            set.RemoveAt(i);
-                            return true;
+                            ref Entry entry = ref entries[i];
+
+                            if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                            {
+                                // J2N: Since we are ordered, it is easier to just use RemoveAt
+                                set.RemoveAt(i);
+                                return true;
+                            }
+
+                            i = entry.Next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
+                            {
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                            }
                         }
-
-                        i = entry.Next;
-
-                        collisionCount++;
-                        if (collisionCount > (uint)entries.Length)
+                    }
+                    else
+                    {
+                        while (i >= 0)
                         {
-                            // The chain of entries forms a loop; which means a concurrent update has happened.
-                            ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                            ref Entry entry = ref entries[i];
+
+                            if (entry.HashCode == hashCode && entry.Value is null)
+                            {
+                                // J2N: Since we are ordered, it is easier to just use RemoveAt
+                                set.RemoveAt(i);
+                                return true;
+                            }
+
+                            i = entry.Next;
+
+                            collisionCount++;
+                            if (collisionCount > (uint)entries.Length)
+                            {
+                                // The chain of entries forms a loop; which means a concurrent update has happened.
+                                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+                            }
                         }
                     }
                 }
@@ -2073,7 +2112,7 @@ namespace J2N.Collections.Generic
             /// <summary>Determines whether a set contains the specified element.</summary>
             /// <param name="item">The element to locate in the set.</param>
             /// <returns>true if the set contains the specified element; otherwise, false.</returns>
-            public bool Contains(TAlternate item) => !Unsafe.IsNullRef(in FindValue(item));
+            public bool Contains(TAlternate item) => IndexOf(item) >= 0;
 
             /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
             /// <param name="equalValue">The value to search for.</param>
@@ -2092,6 +2131,111 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
+            /// <summary>Determines the index of a specific value in the <see cref="OrderedHashSet{T}"/>.</summary>
+            /// <param name="value">The value to locate.</param>
+            /// <returns>The index of <paramref name="value"/> if found; otherwise, -1.</returns>
+            public int IndexOf([AllowNull] TAlternate value)
+            {
+                uint _ = 0;
+                return IndexOf(value, ref _, ref _);
+            }
+
+            private int IndexOf([AllowNull] TAlternate value, ref uint outHashCode, ref uint outCollisionCount)
+            {
+                OrderedHashSet<T> set = Set;
+                IAlternateEqualityComparer<TAlternate, T> comparer = GetAlternateComparer(set);
+
+                uint hashCode;
+                uint collisionCount = 0;
+
+                if (set._buckets is null)
+                {
+                    hashCode = value is null ? 0 : (uint)comparer.GetHashCode(value);
+                    collisionCount = 0;
+                    goto ReturnNotFound;
+                }
+
+                int i = -1;
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+
+                Entry[]? entries = set._entries;
+                Debug.Assert(entries is not null, "expected entries to be is not null");
+
+                // J2N: optimize for null case below to avoid comparer call
+                if (value is not null)
+                {
+                    Debug.Assert(comparer is not null);
+                    hashCode = value is null ? 0 : (uint)comparer!.GetHashCode(value); // [!]: asserted above
+                    i = set.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode &&
+                            comparer!.Equals(value!, entry.Value)) // [!]: asserted above, allow null keys
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+                else
+                {
+                    hashCode = 0;
+                    i = set.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                    do
+                    {
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && entry.Value is null)
+                        {
+                            goto Return;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+
+            ReturnNotFound:
+                i = -1;
+                outCollisionCount = collisionCount;
+                goto Return;
+
+            ConcurrentOperation:
+                // We examined more entries than are actually in the list, which means there's a cycle
+                // that's caused by erroneous concurrent use.
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+
+            Return:
+                outHashCode = hashCode;
+                return i;
+            }
+
             /// <summary>Finds the item in the set and returns a reference to the found item, or a null reference if not found.</summary>
             private ref readonly T FindValue(TAlternate item)
             {
@@ -2103,30 +2247,57 @@ namespace J2N.Collections.Generic
                 {
                     Debug.Assert(set._entries != null, "expected entries to be != null");
 
-                    uint hashCode = (uint)comparer.GetHashCode(item);
+                    uint hashCode = item is not null ? (uint)comparer.GetHashCode(item) : 0;
                     int i = set.GetBucket(hashCode);
                     Entry[]? entries = set._entries;
                     uint collisionCount = 0;
                     i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
-                    do
+
+                    // J2N: optimize for null case below to avoid comparer call
+                    if (item is not null)
                     {
-                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
-                        // Test in if to drop range check for following array access
-                        if ((uint)i >= (uint)entries.Length)
+                        do
                         {
-                            goto ReturnNotFound;
-                        }
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
 
-                        entry = ref entries[i];
-                        if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                            entry = ref entries[i];
+                            if (entry.HashCode == hashCode && comparer.Equals(item, entry.Value))
+                            {
+                                goto ReturnFound;
+                            }
+
+                            i = entry.Next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
+                    else
+                    {
+                        do
                         {
-                            goto ReturnFound;
-                        }
+                            // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                            // Test in if to drop range check for following array access
+                            if ((uint)i >= (uint)entries.Length)
+                            {
+                                goto ReturnNotFound;
+                            }
 
-                        i = entry.Next;
+                            entry = ref entries[i];
+                            if (entry.HashCode == hashCode && entry.Value is null)
+                            {
+                                goto ReturnFound;
+                            }
 
-                        collisionCount++;
-                    } while (collisionCount <= (uint)entries.Length);
+                            i = entry.Next;
+
+                            collisionCount++;
+                        } while (collisionCount <= (uint)entries.Length);
+                    }
 
                     // The chain of entries forms a loop; which means a concurrent update has happened.
                     // Break out of the loop and throw, rather than looping forever.
