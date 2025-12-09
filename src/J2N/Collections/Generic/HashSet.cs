@@ -2260,7 +2260,7 @@ namespace J2N.Collections.Generic
                 }
             }
 
-                int index;
+            int index;
             if (_freeCount > 0)
             {
                 index = _freeList;
