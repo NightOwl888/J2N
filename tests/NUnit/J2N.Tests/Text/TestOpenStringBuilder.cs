@@ -89,7 +89,7 @@ namespace J2N.Text
         {
             OpenStringBuilder sb = new OpenStringBuilder("fixture");
             assertEquals("fixture", sb.ToString());
-            assertEquals("fixture".Length + 16, sb.Capacity);
+            assertEquals(16, sb.Capacity); // J2N: Allocation behavior changed to match .NET
 
             // J2N: Changed behavior to match .NET string overload to allow null
             sb = new OpenStringBuilder((string)null);
@@ -902,14 +902,14 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             OpenStringBuilder sb = new OpenStringBuilder(fixture);
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.IndexOf("0")); // J2N NOTE: OpenStringBuilder defaults to Ordinal comparison
+            assertEquals(0, sb.IndexOf("012"));
+            assertEquals(-1, sb.IndexOf("02"));
+            assertEquals(8, sb.IndexOf("89"));
 
             try
             {
-                sb.IndexOf((string)null, StringComparison.Ordinal);
+                sb.IndexOf((string)null);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
@@ -926,24 +926,24 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             OpenStringBuilder sb = new OpenStringBuilder(fixture);
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.IndexOf("0")); // J2N NOTE: OpenStringBuilder defaults to Ordinal comparison
+            assertEquals(0, sb.IndexOf("012"));
+            assertEquals(-1, sb.IndexOf("02"));
+            assertEquals(8, sb.IndexOf("89"));
 
-            assertEquals(0, sb.IndexOf("0", StringComparison.Ordinal), 0);
-            assertEquals(0, sb.IndexOf("012", StringComparison.Ordinal), 0);
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 0);
+            assertEquals(0, sb.IndexOf("0", 0));
+            assertEquals(0, sb.IndexOf("012", 0));
+            assertEquals(-1, sb.IndexOf("02", 0));
+            assertEquals(8, sb.IndexOf("89", 0));
 
-            assertEquals(-1, sb.IndexOf("0", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.IndexOf("012", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.IndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.IndexOf("89", StringComparison.Ordinal), 5);
+            assertEquals(-1, sb.IndexOf("0", 5));
+            assertEquals(-1, sb.IndexOf("012", 5));
+            assertEquals(-1, sb.IndexOf("02", 0));
+            assertEquals(8, sb.IndexOf("89", 5));
 
             try
             {
-                sb.IndexOf((string)null, 0, StringComparison.Ordinal);
+                sb.IndexOf((string)null, 0);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
@@ -1732,14 +1732,14 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             OpenStringBuilder sb = new OpenStringBuilder(fixture);
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.LastIndexOf("0")); // J2N NOTE: OpenStringBuilder defaults to Ordinal comparison
+            assertEquals(0, sb.LastIndexOf("012"));
+            assertEquals(-1, sb.LastIndexOf("02"));
+            assertEquals(8, sb.LastIndexOf("89"));
 
             try
             {
-                sb.LastIndexOf((string)null, StringComparison.Ordinal);
+                sb.LastIndexOf((string)null);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
@@ -1756,24 +1756,32 @@ namespace J2N.Text
         {
             const string fixture = "0123456789";
             OpenStringBuilder sb = new OpenStringBuilder(fixture);
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal));
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal));
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal));
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal));
+            assertEquals(0, sb.LastIndexOf("0")); // J2N NOTE: OpenStringBuilder defaults to Ordinal comparison
+            assertEquals(0, sb.LastIndexOf("012"));
+            assertEquals(-1, sb.LastIndexOf("02"));
+            assertEquals(8, sb.LastIndexOf("89"));
 
-            assertEquals(0, sb.LastIndexOf("0", StringComparison.Ordinal), 0);
-            assertEquals(0, sb.LastIndexOf("012", StringComparison.Ordinal), 0);
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 0);
+            // J2N: Fixed bugs in Harmony test because it was calling the wrong overload for all of the tests.
+            // For this group, we pass fixture.Length to simulate searching the entire span.
+            assertEquals(0, sb.LastIndexOf("0", sb.Length));
+            assertEquals(0, sb.LastIndexOf("012", sb.Length));
+            assertEquals(-1, sb.LastIndexOf("02", sb.Length));
+            assertEquals(8, sb.LastIndexOf("89", sb.Length));
 
-            assertEquals(-1, sb.LastIndexOf("0", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.LastIndexOf("012", StringComparison.Ordinal), 5);
-            assertEquals(-1, sb.LastIndexOf("02", StringComparison.Ordinal), 0);
-            assertEquals(8, sb.LastIndexOf("89", StringComparison.Ordinal), 5);
+            //assertEquals(-1, sb.LastIndexOf("0", 5));
+            //assertEquals(-1, sb.LastIndexOf("012", 5));
+            //assertEquals(-1, sb.LastIndexOf("02", 0));
+            //assertEquals(8, sb.LastIndexOf("89", 5));
+
+            // For this group, we need to change the values to show actual behavior of LastIndexOf with a starting index.
+            assertEquals(0, sb.LastIndexOf("0", 5));     // 0 ≤ 5
+            assertEquals(0, sb.LastIndexOf("012", 5));   // starts at 0
+            assertEquals(-1, sb.LastIndexOf("02", 5));   // nonexistent
+            assertEquals(-1, sb.LastIndexOf("89", 5));   // start at 8 > 5, so skipped
 
             try
             {
-                sb.LastIndexOf((string)null, 0, StringComparison.Ordinal);
+                sb.LastIndexOf((string)null, 0);
                 fail("no NPE");
             }
             catch (ArgumentNullException) // NullPointerException
