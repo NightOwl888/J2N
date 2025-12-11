@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
@@ -88,7 +89,7 @@ namespace J2N.Collections.Generic
             info.SetType(typeof(EqualityComparer<string>));
         }
 
-        private sealed class OrdinalComparer : NonRandomizedStringEqualityComparer
+        private sealed class OrdinalComparer : NonRandomizedStringEqualityComparer, ISpanAlternateEqualityComparer<char, string?>
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
             , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
 #endif
@@ -126,9 +127,25 @@ namespace J2N.Collections.Generic
             string IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
                 span.ToString();
 #endif
+
+            int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> span) =>
+                StringHelper.GetNonRandomizedHashCode(span);
+
+            bool ISpanAlternateEqualityComparer<char, string?>.Equals(ReadOnlySpan<char> span, string? target)
+            {
+                if (span.IsEmpty && target is null)
+                {
+                    return false;
+                }
+
+                return span.SequenceEqual(target.AsSpan());
+            }
+
+            string ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
         }
 
-        private sealed class OrdinalIgnoreCaseComparer : NonRandomizedStringEqualityComparer
+        private sealed class OrdinalIgnoreCaseComparer : NonRandomizedStringEqualityComparer, ISpanAlternateEqualityComparer<char, string?>
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
            , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
 #endif
@@ -168,10 +185,123 @@ namespace J2N.Collections.Generic
                 span.ToString();
 #endif
 
+            int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> span) =>
+                StringHelper.GetNonRandomizedHashCodeOrdinalIgnoreCase(span);
+
+            bool ISpanAlternateEqualityComparer<char, string?>.Equals(ReadOnlySpan<char> span, string? target)
+            {
+                if (span.IsEmpty && target is null)
+                {
+                    return false;
+                }
+
+                return System.MemoryExtensions.Equals(span, target.AsSpan(), StringComparison.OrdinalIgnoreCase);
+            }
+
+            string ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
+
             internal override RandomizedStringEqualityComparer GetRandomizedEqualityComparer()
             {
                 return RandomizedStringEqualityComparer.Create(_underlyingComparer, ignoreCase: true);
             }
+        }
+
+        // NOTE: We don't implement NonRandomizedStringEqualityComparer here because there is no corresponding RandomizedStringEqualityComparer to switch to.
+        private sealed class CultureAwareComparer : IEqualityComparer<string?>, IInternalStringEqualityComparer, ISpanAlternateEqualityComparer<char, string?>
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+           , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
+#endif
+        {
+
+            public static readonly CultureAwareComparer InvariantCulture = new CultureAwareComparer(StringComparer.InvariantCulture, StringComparison.InvariantCulture);
+            public static readonly CultureAwareComparer InvariantCultureIgnoreCase = new CultureAwareComparer(StringComparer.InvariantCultureIgnoreCase, StringComparison.InvariantCultureIgnoreCase);
+
+            private readonly IEqualityComparer<string?> _underlyingComparer;
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+            private readonly IAlternateEqualityComparer<ReadOnlySpan<char>, string?>? _alternateComparer;
+#endif
+            private readonly StringComparison _comparison;
+
+            internal CultureAwareComparer(IEqualityComparer<string?> wrappedComparer, StringComparison comparison)
+            {
+                _underlyingComparer = wrappedComparer;
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+                _alternateComparer = wrappedComparer as IAlternateEqualityComparer<ReadOnlySpan<char>, string?>;
+#endif
+                _comparison = comparison;
+            }
+
+            public IEqualityComparer<string?> GetUnderlyingEqualityComparer() => _underlyingComparer;
+
+            public bool Equals(string? x, string? y) => string.Equals(x, y, _comparison);
+
+            public int GetHashCode(string? obj)
+            {
+                if (obj is null)
+                    return 0;
+
+#if FEATURE_STRING_GETHASHCODE_STRINGCOMPARISON
+                return obj.GetHashCode(_comparison);
+#else
+                return StringHelper.GetHashCode(obj.AsSpan(), _comparison);
+#endif
+            }
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+
+            int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> span)
+            {
+                if (_alternateComparer is not null)
+                    return _alternateComparer.GetHashCode(span);
+
+                return StringHelper.GetHashCode(span, _comparison);
+            }
+
+            bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> span, string? target)
+            {
+                // See explanation in StringEqualityComparer.Equals.
+                if (span.IsEmpty && target is null)
+                {
+                    return false;
+                }
+
+                if (_alternateComparer is not null)
+                    return _alternateComparer.Equals(span, target);
+
+                return System.MemoryExtensions.Equals(span, target.AsSpan(), _comparison);
+            }
+
+            string? IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
+#endif
+
+            int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> span)
+            {
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+                if (_alternateComparer is not null)
+                    return _alternateComparer.GetHashCode(span);
+#endif
+                return StringHelper.GetHashCode(span, _comparison);
+            }
+
+            bool ISpanAlternateEqualityComparer<char, string?>.Equals(ReadOnlySpan<char> span, string? target)
+            {
+                // See explanation in StringEqualityComparer.Equals.
+                if (span.IsEmpty && target is null)
+                {
+                    return false;
+                }
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+                if (_alternateComparer is not null)
+                    return _alternateComparer.Equals(span, target);
+#endif
+                return System.MemoryExtensions.Equals(span, target.AsSpan(), _comparison);
+            }
+
+            string? ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
         }
 
         public static IEqualityComparer<string>? GetStringComparer(object comparer)
@@ -193,6 +323,29 @@ namespace J2N.Collections.Generic
             if (ReferenceEquals(comparer, StringComparer.OrdinalIgnoreCase))
             {
                 return WrappedAroundStringComparerOrdinalIgnoreCase;
+            }
+
+            if (ReferenceEquals(comparer, StringComparer.InvariantCulture))
+            {
+                return CultureAwareComparer.InvariantCulture;
+            }
+
+            if (ReferenceEquals(comparer, StringComparer.InvariantCultureIgnoreCase))
+            {
+                return CultureAwareComparer.InvariantCultureIgnoreCase;
+            }
+
+            // These are not cached, since they read the culture of the current thread upon creation. So,
+            // we need to actively check whether the culture matches the one of the current thread rather than
+            // checking against a specific instance.
+            if (StringComparer.CurrentCulture.Equals(comparer))
+            {
+                return new CultureAwareComparer((IEqualityComparer<string?>)comparer, StringComparison.CurrentCulture);
+            }
+
+            if (StringComparer.CurrentCultureIgnoreCase.Equals(comparer))
+            {
+                return new CultureAwareComparer((IEqualityComparer<string?>)comparer, StringComparison.CurrentCultureIgnoreCase);
             }
 
             return null;
