@@ -156,6 +156,9 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(HashSet<string> collection) => collection.EqualityComparer;
 
@@ -172,6 +175,9 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(HashSet<string> collection) => collection.EqualityComparer;
 
@@ -188,6 +194,9 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(HashSet<string> collection) => collection.EqualityComparer;
 
@@ -204,6 +213,9 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(HashSet<string> collection) => collection.EqualityComparer;
 
@@ -220,12 +232,15 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(HashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(HashSet<string> collection) => collection.EqualityComparer;
 
-        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => StringComparer.InvariantCulture.GetType();
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => cultureAwareComparerType; // J2N: Wrapped culture-aware comparers with our own type
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.InvariantCulture;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.InvariantCulture.GetType();
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => cultureAwareComparerType; // J2N: Wrapped culture-aware comparers with our own type
     }
     #endregion
 
@@ -395,15 +410,17 @@ namespace J2N.Collections.Tests
         protected static Type randomizedOrdinalComparerType = typeof(J2N.Character).Assembly.GetType("J2N.Collections.Generic.RandomizedStringEqualityComparer+OrdinalComparer", throwOnError: true);
         protected static Type randomizedOrdinalIgnoreCaseComparerType = typeof(J2N.Character).Assembly.GetType("J2N.Collections.Generic.RandomizedStringEqualityComparer+OrdinalIgnoreCaseComparer", throwOnError: true);
 
+        protected static Type cultureAwareComparerType = typeof(J2N.Character).Assembly.GetType("J2N.Collections.Generic.NonRandomizedStringEqualityComparer+CultureAwareComparer", throwOnError: true);
+
         protected abstract TCollection CreateCollection();
         protected abstract void AddKey(TCollection collection, string key);
         protected abstract bool ContainsKey(TCollection collection, string key);
         protected abstract SCG.IEqualityComparer<string> GetComparer(TCollection collection);
 
-#if FEATURE_IALTERNATEEQUALITYCOMPARER
+#if FEATURE_IALTERNATEEQUALITYCOMPARER // J2N TODO: Remove this conditional compile once all types have been converted
         protected virtual bool SupportsAlternateLookup(TCollection collection) => true;
 #else
-        protected virtual bool SupportsAlternateLookup(TCollection collection) => false;
+        protected virtual bool SupportsAlternateLookup(TCollection collection) => collection is HashSet<string>;
 #endif
         protected virtual bool ContainsKey(TCollection collection, ReadOnlySpan<char> key) => throw new NotSupportedException();
 
