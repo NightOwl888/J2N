@@ -268,13 +268,20 @@ namespace J2N.Collections.Tests
         protected override OrderedDictionary<string, string> CreateCollection() => new OrderedDictionary<string, string>();
         protected override void AddKey(OrderedDictionary<string, string> collection, string key) => collection.Add(key, key);
         protected override bool ContainsKey(OrderedDictionary<string, string> collection, string key) => collection.ContainsKey(key);
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().ContainsKey(key);
+#else
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().ContainsKey(key);
+#endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedDictionary<string, string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => EqualityComparer<string>.Default;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => EqualityComparer<string>.Default.GetType();
 
-        protected override bool SupportsAlternateLookup(OrderedDictionary<string, string> collection) => false;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedDictionary_DefaultComparer : InternalHashCodeTests<OrderedDictionary<string, string>>
@@ -282,13 +289,19 @@ namespace J2N.Collections.Tests
         protected override OrderedDictionary<string, string> CreateCollection() => new OrderedDictionary<string, string>(EqualityComparer<string>.Default);
         protected override void AddKey(OrderedDictionary<string, string> collection, string key) => collection.Add(key, key);
         protected override bool ContainsKey(OrderedDictionary<string, string> collection, string key) => collection.ContainsKey(key);
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().ContainsKey(key);
+#else
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().ContainsKey(key);
+#endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedDictionary<string, string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => EqualityComparer<string>.Default;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => EqualityComparer<string>.Default.GetType();
-
-        protected override bool SupportsAlternateLookup(OrderedDictionary<string, string> collection) => false;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedDictionary_OrdinalComparer : InternalHashCodeTests<OrderedDictionary<string, string>>
@@ -296,13 +309,19 @@ namespace J2N.Collections.Tests
         protected override OrderedDictionary<string, string> CreateCollection() => new OrderedDictionary<string, string>(StringComparer.Ordinal);
         protected override void AddKey(OrderedDictionary<string, string> collection, string key) => collection.Add(key, key);
         protected override bool ContainsKey(OrderedDictionary<string, string> collection, string key) => collection.ContainsKey(key);
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().ContainsKey(key);
+#else
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().ContainsKey(key);
+#endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedDictionary<string, string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.Ordinal;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.Ordinal.GetType();
-
-        protected override bool SupportsAlternateLookup(OrderedDictionary<string, string> collection) => false;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedDictionary_OrdinalIgnoreCaseComparer : InternalHashCodeTests<OrderedDictionary<string, string>>
@@ -310,13 +329,19 @@ namespace J2N.Collections.Tests
         protected override OrderedDictionary<string, string> CreateCollection() => new OrderedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
         protected override void AddKey(OrderedDictionary<string, string> collection, string key) => collection.Add(key, key);
         protected override bool ContainsKey(OrderedDictionary<string, string> collection, string key) => collection.ContainsKey(key);
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().ContainsKey(key);
+#else
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().ContainsKey(key);
+#endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedDictionary<string, string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalIgnoreCaseComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.OrdinalIgnoreCase;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.OrdinalIgnoreCase.GetType();
-
-        protected override bool SupportsAlternateLookup(OrderedDictionary<string, string> collection) => false;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalIgnoreCaseComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedDictionary_LinguisticComparer : InternalHashCodeTests<OrderedDictionary<string, string>> // (not optimized)
@@ -324,13 +349,19 @@ namespace J2N.Collections.Tests
         protected override OrderedDictionary<string, string> CreateCollection() => new OrderedDictionary<string, string>(StringComparer.InvariantCulture);
         protected override void AddKey(OrderedDictionary<string, string> collection, string key) => collection.Add(key, key);
         protected override bool ContainsKey(OrderedDictionary<string, string> collection, string key) => collection.ContainsKey(key);
+
+#if FEATURE_IALTERNATEEQUALITYCOMPARER
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetAlternateLookup<ReadOnlySpan<char>>().ContainsKey(key);
+#else
+        protected override bool ContainsKey(OrderedDictionary<string, string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().ContainsKey(key);
+#endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedDictionary<string, string> collection) => collection.EqualityComparer;
 
-        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => StringComparer.InvariantCulture.GetType();
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => cultureAwareComparerType; // J2N: Wrapped culture-aware comparers with our own type
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.InvariantCulture;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.InvariantCulture.GetType();
-
-        protected override bool SupportsAlternateLookup(OrderedDictionary<string, string> collection) => false;
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => cultureAwareComparerType; // J2N: Wrapped culture-aware comparers with our own type
     }
     #endregion
 
@@ -450,11 +481,8 @@ namespace J2N.Collections.Tests
         protected abstract bool ContainsKey(TCollection collection, string key);
         protected abstract SCG.IEqualityComparer<string> GetComparer(TCollection collection);
 
-#if FEATURE_IALTERNATEEQUALITYCOMPARER // J2N TODO: Remove this conditional compile once all types have been converted
         protected virtual bool SupportsAlternateLookup(TCollection collection) => true;
-#else
-        protected virtual bool SupportsAlternateLookup(TCollection collection) => collection is HashSet<string> || collection is OrderedHashSet<string> || collection is Dictionary<string, string>;
-#endif
+
         protected virtual bool ContainsKey(TCollection collection, ReadOnlySpan<char> key) => throw new NotSupportedException();
 
         protected abstract Type ExpectedInternalComparerTypeBeforeCollisionThreshold { get; }
