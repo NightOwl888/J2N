@@ -325,12 +325,15 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => EqualityComparer<string>.Default;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => EqualityComparer<string>.Default.GetType();
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedHashSet_DefaultComparer : InternalHashCodeTests<OrderedHashSet<string>>
@@ -341,12 +344,15 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => EqualityComparer<string>.Default;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => EqualityComparer<string>.Default.GetType();
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedHashSet_OrdinalComparer : InternalHashCodeTests<OrderedHashSet<string>>
@@ -357,12 +363,15 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.Ordinal;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.Ordinal.GetType();
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedHashSet_OrdinalIgnoreCaseComparer : InternalHashCodeTests<OrderedHashSet<string>>
@@ -373,12 +382,15 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
 
         protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => nonRandomizedOrdinalIgnoreCaseComparerType;
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.OrdinalIgnoreCase;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.OrdinalIgnoreCase.GetType();
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => randomizedOrdinalIgnoreCaseComparerType; // J2N: We must use our wrapper here to support alternate lookup
     }
 
     public class InternalHashCodeTests_OrderedHashSet_LinguisticComparer : InternalHashCodeTests<OrderedHashSet<string>> // (not optimized)
@@ -389,12 +401,15 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
         protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
             collection.GetAlternateLookup<ReadOnlySpan<char>>().Contains(key);
+#else
+        protected override bool ContainsKey(OrderedHashSet<string> collection, ReadOnlySpan<char> key) =>
+            collection.GetSpanAlternateLookup<char>().Contains(key);
 #endif
         protected override SCG.IEqualityComparer<string> GetComparer(OrderedHashSet<string> collection) => collection.EqualityComparer;
 
-        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => StringComparer.InvariantCulture.GetType();
+        protected override Type ExpectedInternalComparerTypeBeforeCollisionThreshold => cultureAwareComparerType; // J2N: Wrapped culture-aware comparers with our own type
         protected override SCG.IEqualityComparer<string> ExpectedPublicComparerBeforeCollisionThreshold => StringComparer.InvariantCulture;
-        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => StringComparer.InvariantCulture.GetType();
+        protected override Type ExpectedInternalComparerTypeAfterCollisionThreshold => cultureAwareComparerType; // J2N: Wrapped culture-aware comparers with our own type
     }
     #endregion
 
@@ -420,7 +435,7 @@ namespace J2N.Collections.Tests
 #if FEATURE_IALTERNATEEQUALITYCOMPARER // J2N TODO: Remove this conditional compile once all types have been converted
         protected virtual bool SupportsAlternateLookup(TCollection collection) => true;
 #else
-        protected virtual bool SupportsAlternateLookup(TCollection collection) => collection is HashSet<string>;
+        protected virtual bool SupportsAlternateLookup(TCollection collection) => collection is HashSet<string> || collection is OrderedHashSet<string>;
 #endif
         protected virtual bool ContainsKey(TCollection collection, ReadOnlySpan<char> key) => throw new NotSupportedException();
 
