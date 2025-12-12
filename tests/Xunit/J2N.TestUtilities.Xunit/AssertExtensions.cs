@@ -648,9 +648,12 @@ namespace J2N.TestUtilities.Xunit
             }
         }
 
-        public static void SequenceEqual<T>(Span<T> expected, Span<T> actual) where T : IEquatable<T> => SequenceEqual((ReadOnlySpan<T>)expected, (ReadOnlySpan<T>)actual);
+        //public static void SequenceEqual<T>(Span<T> expected, Span<T> actual) where T : IEquatable<T> => SequenceEqual((ReadOnlySpan<T>)expected, (ReadOnlySpan<T>)actual);
 
-        public static void SequenceEqual<T>(T[] expected, T[] actual) where T : IEquatable<T> => SequenceEqual(expected.AsSpan(), actual.AsSpan());
+        //public static void SequenceEqual<T>(T[] expected, T[] actual) where T : IEquatable<T> => SequenceEqual(expected.AsSpan(), actual.AsSpan());
+
+        // J2N: Added this overload to eliminate some casting and removed the above two overloads because C# 14.0 now has implicit support for spans
+        public static void SequenceEqual<T>(Span<T> expected, T[] actual) where T : IEquatable<T> => SequenceEqual((ReadOnlySpan<T>)expected, actual.AsSpan());
 
         public static void AtLeastOneEquals<T>(T expected1, T expected2, T value)
         {
