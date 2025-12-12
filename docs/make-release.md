@@ -4,7 +4,10 @@ This project uses Nerdbank.GitVersioning to assist with creating version numbers
 
 ## Prerequisites
 
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- [.NET 9 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) (Required only if testing)
+- [.NET 8 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) (Required only if testing)
+- [.NET 6 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) (Required only if testing)
 - [nbgv tool](https://www.nuget.org/packages/nbgv/) (the version must match the one used in the [dependencies.props](.build/dependencies.props) file)
 
 ### Installing NBGV Tool
