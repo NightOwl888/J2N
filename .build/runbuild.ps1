@@ -17,7 +17,7 @@ properties {
     [string]$configuration         = "Release"
     [string]$platform              = "Any CPU"
     [bool]$backupFiles             = $true
-    [string]$minimumSdkVersion     = "9.0.100"
+    [string]$minimumSdkVersion     = "10.0.100"
 
     #test parameters
     [string]$testPlatforms         = Get-DefaultPlatform # Pass a parameter (not a property) to override
