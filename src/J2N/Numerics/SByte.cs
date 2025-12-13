@@ -288,7 +288,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 ThrowHelper.ThrowFormatException(s);
 
-            int r = ParseNumbers.StringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign, ref i, s.Length - i);
+            int r = ParseNumbers.StringToInt(s, @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign, ref i, s.Length - i);
 
             if (r < sbyte.MinValue || r > sbyte.MaxValue)
                 throw new OverflowException(SR.Overflow_SByte);
@@ -397,7 +397,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 return false;
 
-            if (!ParseNumbers.TryStringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign, ref i, s.Length - i, out int r) ||
+            if (!ParseNumbers.TryStringToInt(s, @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign, ref i, s.Length - i, out int r) ||
                 // Only allow negative if it was passed as a sign in the string
                 (r < 0 && sign > 0) ||
                 (r < sbyte.MinValue || r > sbyte.MaxValue))
@@ -619,7 +619,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign: 1, ref startIndex, length);
+            int r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign: 1, ref startIndex, length);
             if (radix != 10 && r <= byte.MaxValue)
                 return (sbyte)r;
 
@@ -1054,7 +1054,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            if (ParseNumbers.TryStringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign: 1, ref startIndex, length, out int r))
+            if (ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI1, sign: 1, ref startIndex, length, out int r))
             {
                 if (radix != 10 && r <= byte.MaxValue)
                 {
@@ -1458,7 +1458,7 @@ namespace J2N.Numerics
                 return 0;
             }
 
-            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI1);
+            int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI1);
 
             if (radix != 10 && r <= byte.MaxValue)
                 return (sbyte)r;
@@ -1578,7 +1578,7 @@ namespace J2N.Numerics
                 return true;
             }
 
-            if (!ParseNumbers.TryStringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI1, out int r))
+            if (!ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI1, out int r))
             {
                 result = default;
                 return false;
@@ -2042,7 +2042,7 @@ namespace J2N.Numerics
             NumberStyleExtensions.ValidateParseStyleInteger(style);
             if (s is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
-            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i);
+            DotNetNumber.ParsingStatus status = DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i);
             if (status != DotNetNumber.ParsingStatus.OK)
             {
                 if (status == DotNetNumber.ParsingStatus.Overflow)
@@ -2523,7 +2523,7 @@ namespace J2N.Numerics
             }
             // For hex number styles AllowHexSpecifier >> 2 == 0x80 and cancels out MinValue so the check is effectively: (uint)i > byte.MaxValue
             // For integer styles it's zero and the effective check is (uint)(i - MinValue) > byte.MaxValue
-            if (DotNetNumber.TryParseInt32(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
+            if (DotNetNumber.TryParseInt32(s, style, NumberFormatInfo.GetInstance(provider), out int i) != DotNetNumber.ParsingStatus.OK
                 || (uint)(i - sbyte.MinValue - ((int)(style & NumberStyle.AllowHexSpecifier) >> 2)) > byte.MaxValue)
             {
                 result = 0;

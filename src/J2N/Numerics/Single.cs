@@ -903,7 +903,7 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return DotNetNumber.TryParseSingle(s.AsSpan(), NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
+            return DotNetNumber.TryParseSingle(s, NumberStyle.Float | NumberStyle.AllowThousands, NumberFormatInfo.CurrentInfo, out result);
         }
 
         /// <summary>
@@ -1311,7 +1311,7 @@ namespace J2N.Numerics
             if (s is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.s);
             NumberStyleExtensions.ValidateParseStyleFloatingPoint(style);
-            return DotNetNumber.ParseSingle(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider));
+            return DotNetNumber.ParseSingle(s, style, NumberFormatInfo.GetInstance(provider));
         }
 
         /// <summary>
@@ -1892,7 +1892,7 @@ namespace J2N.Numerics
                 return false;
             }
 
-            return DotNetNumber.TryParseSingle(s.AsSpan(), style, NumberFormatInfo.GetInstance(provider), out result);
+            return DotNetNumber.TryParseSingle(s, style, NumberFormatInfo.GetInstance(provider), out result);
         }
 
         /// <summary>

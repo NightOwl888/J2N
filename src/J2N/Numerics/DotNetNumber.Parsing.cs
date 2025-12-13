@@ -873,14 +873,14 @@ namespace J2N.Numerics
                     value = value.Slice(index);
                     index = 0;
                     string positiveSign = info.PositiveSign, negativeSign = info.NegativeSign;
-                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign.AsSpan(), StringComparison.Ordinal))
+                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign, StringComparison.Ordinal))
                     {
                         index += positiveSign.Length;
                         if ((uint)index >= (uint)value.Length)
                             goto FalseExit;
                         num = value[index];
                     }
-                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign.AsSpan(), StringComparison.Ordinal))
+                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign, StringComparison.Ordinal))
                     {
                         sign = -1;
                         index += negativeSign.Length;
@@ -1045,14 +1045,14 @@ namespace J2N.Numerics
                     value = value.Slice(index);
                     index = 0;
                     string positiveSign = info.PositiveSign, negativeSign = info.NegativeSign;
-                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign.AsSpan(), StringComparison.Ordinal))
+                    if (!string.IsNullOrEmpty(positiveSign) && value.StartsWith(positiveSign, StringComparison.Ordinal))
                     {
                         index += positiveSign.Length;
                         if ((uint)index >= (uint)value.Length)
                             goto FalseExit;
                         num = value[index];
                     }
-                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign.AsSpan(), StringComparison.Ordinal))
+                    else if (!string.IsNullOrEmpty(negativeSign) && value.StartsWith(negativeSign, StringComparison.Ordinal))
                     {
                         sign = -1;
                         index += negativeSign.Length;
@@ -2085,27 +2085,27 @@ namespace J2N.Numerics
                 // we don't so we'll check the existing cases first and then handle `PositiveSign` +
                 // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
 
-                if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                if (valueTrim.Equals(info.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.PositiveInfinity;
                 }
-                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NegativeInfinity;
                 }
-                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
-                else if (valueTrim.StartsWith(info.PositiveSign.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    if (valueTrim.Equals(info.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.PositiveInfinity;
                     }
-                    else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    else if (valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.NaN;
                     }
@@ -2115,8 +2115,8 @@ namespace J2N.Numerics
                         return false;
                     }
                 }
-                else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
-                        valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                        valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
@@ -2149,27 +2149,27 @@ namespace J2N.Numerics
                 // we don't so we'll check the existing cases first and then handle `PositiveSign` +
                 // `PositiveInfinitySymbol` and `PositiveSign/NegativeSign` + `NaNSymbol` last.
 
-                if (valueTrim.Equals(info!.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                if (valueTrim.Equals(info!.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.PositiveInfinity;
                 }
-                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NegativeInfinity;
                 }
-                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
-                else if (valueTrim.StartsWith(info.PositiveSign.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    if (valueTrim.Equals(info.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.PositiveInfinity;
                     }
-                    else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    else if (valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = double.NaN;
                     }
@@ -2179,8 +2179,8 @@ namespace J2N.Numerics
                         return false;
                     }
                 }
-                else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
-                        valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
+                        valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = double.NaN;
                 }
@@ -2292,27 +2292,27 @@ namespace J2N.Numerics
                 // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
                 // that case so that we don't start parsing things like `++infini`.
 
-                if (valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                if (valueTrim.Equals(info.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.PositiveInfinity;
                 }
-                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NegativeInfinity;
                 }
-                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }
-                else if (valueTrim.StartsWith(info.PositiveSign.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.PositiveInfinity;
                     }
-                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.NaN;
                     }
@@ -2322,9 +2322,9 @@ namespace J2N.Numerics
                         return false;
                     }
                 }
-                else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
                          !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                         valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }
@@ -2361,27 +2361,27 @@ namespace J2N.Numerics
                 // to include `PositiveSign`, we need to check whether `PositiveInfinitySymbol` fits
                 // that case so that we don't start parsing things like `++infini`.
 
-                if (valueTrim.Equals(info!.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                if (valueTrim.Equals(info!.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.PositiveInfinity;
                 }
-                else if (valueTrim.Equals(info.NegativeInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NegativeInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NegativeInfinity;
                 }
-                else if (valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }
-                else if (valueTrim.StartsWith(info.PositiveSign.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                else if (valueTrim.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase))
                 {
                     valueTrim = valueTrim.Slice(info.PositiveSign.Length);
 
-                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.PositiveInfinitySymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    if (!info.PositiveInfinitySymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.PositiveInfinitySymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.PositiveInfinity;
                     }
-                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                    else if (!info.NaNSymbol.StartsWith(info.PositiveSign, StringComparison.OrdinalIgnoreCase) && valueTrim.Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                     {
                         result = float.NaN;
                     }
@@ -2391,9 +2391,9 @@ namespace J2N.Numerics
                         return false;
                     }
                 }
-                else if (valueTrim.StartsWith(info.NegativeSign.AsSpan(), StringComparison.OrdinalIgnoreCase) &&
+                else if (valueTrim.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
                          !info.NaNSymbol.StartsWith(info.NegativeSign, StringComparison.OrdinalIgnoreCase) &&
-                         valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol.AsSpan(), StringComparison.OrdinalIgnoreCase))
+                         valueTrim.Slice(info.NegativeSign.Length).Equals(info.NaNSymbol, StringComparison.OrdinalIgnoreCase))
                 {
                     result = float.NaN;
                 }

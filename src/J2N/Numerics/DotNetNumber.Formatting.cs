@@ -410,7 +410,7 @@ namespace J2N.Numerics
                 if (fmtUpper == 'R' || value.IsNegativeZero())
                 {
                     var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
-                    return FormatDouble(ref sb, value, format.AsSpan(), NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+                    return FormatDouble(ref sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
                 }
 #endif
 
@@ -810,7 +810,7 @@ namespace J2N.Numerics
                 if (fmtUpper == 'R' || value.IsNegativeZero())
                 {
                     var sb = new ValueStringBuilder(stackalloc char[CharStackBufferSize]);
-                    return FormatSingle(ref sb, value, format.AsSpan(), NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
+                    return FormatSingle(ref sb, value, format, NumberFormatInfo.GetInstance(provider)) ?? sb.ToString();
                 }
 #endif
 
@@ -1144,11 +1144,9 @@ namespace J2N.Numerics
         //        sb.TryCopyTo(destination, out charsWritten);
         //}
 
-        internal static bool TryCopyTo(string source, Span<char> destination, out int charsWritten)
+        internal static bool TryCopyTo(ReadOnlySpan<char> source, Span<char> destination, out int charsWritten)
         {
-            Debug.Assert(source != null);
-
-            if (source.AsSpan().TryCopyTo(destination))
+            if (source.TryCopyTo(destination))
             {
                 charsWritten = source!.Length;
                 return true;

@@ -408,7 +408,7 @@ namespace J2N.Text
             if (len == 0 && text.Length == 0)
                 return true; // since both are empty strings
 
-            return charSequence.Equals(text.AsSpan(), StringComparison.Ordinal);
+            return charSequence.Equals(text, StringComparison.Ordinal);
         }
 
         /// <summary>
@@ -563,7 +563,7 @@ namespace J2N.Text
             if (len == 0 && text.Length == 0)
                 return true; // since both are empty strings
 
-            return charSequence.Equals(text.AsSpan(), comparisonType);
+            return charSequence.Equals(text, comparisonType);
         }
 
         #endregion ContentEquals
