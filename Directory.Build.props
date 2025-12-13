@@ -2,9 +2,18 @@
 
   <PropertyGroup>
     <RepositoryRoot>$(MSBuildThisFileDirectory)</RepositoryRoot>
-    <LangVersion>13.0</LangVersion>
+    <LangVersion>14.0</LangVersion>
     <GitHubOrganization>NightOwl888</GitHubOrganization>
     <GitHubProject>J2N</GitHubProject>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Legacy Visual Studio Support">
+    <VisualStudioMajorVersion>0</VisualStudioMajorVersion>
+    <!-- Extract major version (works for preview builds too) -->
+    <VisualStudioMajorVersion Condition="'$(VisualStudioVersion)' != ''">$([System.Version]::Parse($([System.Text.RegularExpressions.Regex]::Match('$(VisualStudioVersion)', '^\d+(\.\d+)*').Value)).Major)</VisualStudioMajorVersion>
+    <IsLegacyVisualStudioVersion>false</IsLegacyVisualStudioVersion>
+    <!-- Visual Studio 2026 == Version 18.x - anything below that major version is legacy -->
+    <IsLegacyVisualStudioVersion Condition="'$(BuildingInsideVisualStudio)' == 'true' And '$(VisualStudioMajorVersion)' &lt; '18'">true</IsLegacyVisualStudioVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Assembly Signing">

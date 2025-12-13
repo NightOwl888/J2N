@@ -282,7 +282,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 ThrowHelper.ThrowFormatException(s);
 
-            int r = ParseNumbers.StringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i);
+            int r = ParseNumbers.StringToInt(s, @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i);
 
             if (r < short.MinValue || r > short.MaxValue)
                 throw new OverflowException(SR.Overflow_Int16);
@@ -391,7 +391,7 @@ namespace J2N.Numerics
             if (s[i] == '-' || s[i] == '+')
                 return false;
 
-            if (!ParseNumbers.TryStringToInt(s.AsSpan(), @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i, out int r) ||
+            if (!ParseNumbers.TryStringToInt(s, @base, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign, ref i, s.Length - i, out int r) ||
                 // Only allow negative if it was passed as a sign in the string
                 (r < 0 && sign > 0) ||
                 (r < short.MinValue || r > short.MaxValue))
@@ -613,7 +613,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
+            int r = ParseNumbers.StringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length);
             if (radix != 10 && r <= ushort.MaxValue)
                 return (short)r;
 
@@ -1048,7 +1048,7 @@ namespace J2N.Numerics
             if (startIndex > s.Length - length) // Checks for int overflow
                 ThrowHelper.ThrowArgumentOutOfRange_IndexLengthString(startIndex, length);
 
-            if (ParseNumbers.TryStringToInt(s.AsSpan(), radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out int r))
+            if (ParseNumbers.TryStringToInt(s, radix, flags: ParseNumbers.IsTight | ParseNumbers.TreatAsI2, sign: 1, ref startIndex, length, out int r))
             {
                 if (radix != 10 && r <= ushort.MaxValue)
                 {
@@ -1452,7 +1452,7 @@ namespace J2N.Numerics
                 return 0;
             }
 
-            int r = ParseNumbers.StringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
+            int r = ParseNumbers.StringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2);
             if (radix != 10 && r <= ushort.MaxValue)
                 return (short)r;
 
@@ -1571,7 +1571,7 @@ namespace J2N.Numerics
                 return true;
             }
 
-            if (!ParseNumbers.TryStringToInt(s.AsSpan(), radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out int r))
+            if (!ParseNumbers.TryStringToInt(s, radix, ParseNumbers.IsTight | ParseNumbers.TreatAsI2, out int r))
             {
                 result = default;
                 return false;

@@ -5,7 +5,10 @@
 ### Prerequisites
 
 - [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell) 6.0 or higher (see [this question](http://stackoverflow.com/questions/1825585/determine-installed-powershell-version) to check your PowerShell version)
-- [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/8.0)
+- [.NET 10 SDK](https://dotnet.microsoft.com/en-us/download/dotnet/10.0)
+- [.NET 9 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) (Required only if testing)
+- [.NET 8 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) (Required only if testing)
+- [.NET 6 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) (Required only if testing)
 
 ### Execution
 
@@ -83,10 +86,13 @@ Then all you need to do is choose the `spatial4n Local Packages` feed from the d
 
 ### Prerequisites
 
-1. Visual Studio 2019 or higher
-2. [.NET 8.0 SDK or higher](https://dotnet.microsoft.com/download/visual-studio-sdks)
+- Visual Studio 2022 or higher
+- [.NET 10.0 SDK](https://dotnet.microsoft.com/download/visual-studio-sdks)
+- [.NET 9 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/9.0) (Required only if testing)
+- [.NET 8 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/8.0) (Required only if testing)
+- [.NET 6 Runtime (Or SDK)](https://dotnet.microsoft.com/en-us/download/dotnet/6.0) (Required only if testing)
 
-> **NOTE:** Preview versions of .NET SDK require the "Use previews of the .NET SDK (requires restart)" option to be enabled in Visual Studio under Tools > Options > Environment > Preview Features. .NET 6.0 is not supported on Visual Studio 2019, so the only option available for building on VS 2019 is to use a pre-release .NET 6.0 SDK.
+> **NOTE:** Visual Studio 2022 is only supported for building and testing .NET Core and .NET Standard 2.1 due to false errors caused by lack of LSP language support for C# 14.0. It is recommended to use Visual Studio 2026, which fully supports our build. If using Visual Studio 2022, we recommend running `dotnet build` on the command line prior to submitting PRs to ensure builds succeed on .NET Framework and .NET Standard 2.0.
 
 ### Execution
 
