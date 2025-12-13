@@ -122,7 +122,7 @@ namespace J2N.Collections.Generic
                     return false;
                 }
 
-                return alternate.SequenceEqual(other.AsSpan());
+                return alternate.SequenceEqual(other);
             }
 
             int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> alternate) =>
@@ -203,7 +203,7 @@ namespace J2N.Collections.Generic
                     return false;
                 }
 
-                return System.MemoryExtensions.Equals(alternate, other.AsSpan(), StringComparison.OrdinalIgnoreCase);
+                return System.MemoryExtensions.Equals(alternate, other, StringComparison.OrdinalIgnoreCase);
             }
 
             int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> alternate) =>

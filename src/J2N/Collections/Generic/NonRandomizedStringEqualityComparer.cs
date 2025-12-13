@@ -5,8 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
-using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -105,8 +103,14 @@ namespace J2N.Collections.Generic
                 //Debug.Assert(obj != null, "This implementation is only called from first-party collection types that guarantee non-null parameters.");
                 if (obj is null)
                     return 0;
-                
+
+#if NET || NETFRAMEWORK
                 return StringHelper.GetNonRandomizedHashCode(obj);
+#else
+                // J2N: There is no guarantee that any future .NET platform will use null-terminated
+                // strings, so we call the span overload to be safe.
+                return StringHelper.GetNonRandomizedHashCode(obj.AsSpan());
+#endif
             }
 
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
@@ -138,7 +142,7 @@ namespace J2N.Collections.Generic
                     return false;
                 }
 
-                return span.SequenceEqual(target.AsSpan());
+                return span.SequenceEqual(target);
             }
 
             string ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
@@ -164,7 +168,13 @@ namespace J2N.Collections.Generic
                 if (obj is null)
                     return 0;
 
+#if NET || NETFRAMEWORK
                 return StringHelper.GetNonRandomizedHashCodeOrdinalIgnoreCase(obj);
+#else
+                // J2N: There is no guarantee that any future .NET platform will use null-terminated
+                // strings, so we call the span overload to be safe.
+                return StringHelper.GetNonRandomizedHashCodeOrdinalIgnoreCase(obj.AsSpan());
+#endif
             }
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
             int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> span) =>
@@ -195,7 +205,7 @@ namespace J2N.Collections.Generic
                     return false;
                 }
 
-                return System.MemoryExtensions.Equals(span, target.AsSpan(), StringComparison.OrdinalIgnoreCase);
+                return System.MemoryExtensions.Equals(span, target, StringComparison.OrdinalIgnoreCase);
             }
 
             string ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
@@ -213,7 +223,6 @@ namespace J2N.Collections.Generic
            , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
 #endif
         {
-
             public static readonly CultureAwareComparer InvariantCulture = new CultureAwareComparer(StringComparer.InvariantCulture, StringComparison.InvariantCulture);
             public static readonly CultureAwareComparer InvariantCultureIgnoreCase = new CultureAwareComparer(StringComparer.InvariantCultureIgnoreCase, StringComparison.InvariantCultureIgnoreCase);
 
@@ -241,10 +250,15 @@ namespace J2N.Collections.Generic
                 if (obj is null)
                     return 0;
 
+                // J2N: Ensure this is in sync across all target frameworks for a given comparison type.
+                // If we call the BCL method for one GetHashCode() method, we should do it for all in this class.
+                // The BCL seed will always be the same for a given process, so the hash codes will be consistent,
+                // however, the J2N seed will likely be different.
+
 #if FEATURE_STRING_GETHASHCODE_STRINGCOMPARISON
                 return obj.GetHashCode(_comparison);
 #else
-                return StringHelper.GetHashCode(obj.AsSpan(), _comparison);
+                return StringHelper.GetHashCode(obj, _comparison);
 #endif
             }
 
@@ -252,10 +266,19 @@ namespace J2N.Collections.Generic
 
             int IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.GetHashCode(ReadOnlySpan<char> span)
             {
+                // J2N: Ensure this is in sync across all target frameworks for a given comparison type.
+                // If we call the BCL method for one GetHashCode() method, we should do it for all in this class.
+                // The BCL seed will always be the same for a given process, so the hash codes will be consistent,
+                // however, the J2N seed will likely be different.
+
                 if (_alternateComparer is not null)
                     return _alternateComparer.GetHashCode(span);
 
+#if FEATURE_STRING_GETHASHCODE_READONLYSPAN_STRINGCOMPARISON
+                return string.GetHashCode(span, _comparison);
+#else
                 return StringHelper.GetHashCode(span, _comparison);
+#endif
             }
 
             bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> span, string? target)
@@ -269,7 +292,7 @@ namespace J2N.Collections.Generic
                 if (_alternateComparer is not null)
                     return _alternateComparer.Equals(span, target);
 
-                return System.MemoryExtensions.Equals(span, target.AsSpan(), _comparison);
+                return System.MemoryExtensions.Equals(span, target, _comparison);
             }
 
             string? IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
@@ -278,11 +301,19 @@ namespace J2N.Collections.Generic
 
             int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> span)
             {
+                // J2N: Ensure this is in sync across all target frameworks for a given comparison type.
+                // If we call the BCL method for one GetHashCode() method, we should do it for all in this class.
+                // The BCL seed will always be the same for a given process, so the hash codes will be consistent,
+                // however, the J2N seed will likely be different.
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
                 if (_alternateComparer is not null)
                     return _alternateComparer.GetHashCode(span);
 #endif
+#if FEATURE_STRING_GETHASHCODE_READONLYSPAN_STRINGCOMPARISON
+                return string.GetHashCode(span, _comparison);
+#else
                 return StringHelper.GetHashCode(span, _comparison);
+#endif
             }
 
             bool ISpanAlternateEqualityComparer<char, string?>.Equals(ReadOnlySpan<char> span, string? target)
@@ -297,7 +328,7 @@ namespace J2N.Collections.Generic
                 if (_alternateComparer is not null)
                     return _alternateComparer.Equals(span, target);
 #endif
-                return System.MemoryExtensions.Equals(span, target.AsSpan(), _comparison);
+                return System.MemoryExtensions.Equals(span, target, _comparison);
             }
 
             string? ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
