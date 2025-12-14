@@ -209,6 +209,14 @@ namespace J2N.Collections.Generic
         public SortedSet(IComparer<T>? comparer)
         {
             this.comparer = comparer ?? Comparer<T>.Default;
+
+            // J2N: Special-case Comparer<string>.Default and StringComparer (all options).
+            // We wrap these comparers to ensure that alternate string comparison is available.
+            if (typeof(T) == typeof(string) &&
+                WrappedStringComparer.GetStringComparer(this.comparer) is IComparer<string> stringComparer)
+            {
+                this.comparer = (IComparer<T>)stringComparer;
+            }
         }
 
         /// <summary>
@@ -454,7 +462,22 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Retrieving the value of this property is an <c>O(1)</c> operation.
         /// </remarks>
-        public IComparer<T> Comparer => comparer;
+        public IComparer<T> Comparer
+        {
+            get
+            {
+                Debug.Assert(comparer is not null, "The comparer should never be null.");
+                // J2N: We must unwrap the comparer before returning it to the user.
+                if (typeof(T) == typeof(string))
+                {
+                    return (IComparer<T>)InternalStringComparer.GetUnderlyingComparer((IComparer<string?>)comparer!); // [!]: asserted above
+                }
+                else
+                {
+                    return comparer!; // [!]: asserted above
+                }
+            }
+        }
 
         bool ICollection<T>.IsReadOnly => false;
 
@@ -2273,7 +2296,7 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
 
             info.AddValue(CountName, count); // This is the length of the bucket array.
-            info.AddValue(ComparerName, comparer, typeof(IComparer<T>));
+            info.AddValue(ComparerName, Comparer, typeof(IComparer<T>)); // J2N: Ensure we call the Comparer property to unwrap the comparer for serialization.
             info.AddValue(VersionName, version);
 
             if (root != null)
