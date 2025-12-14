@@ -4,6 +4,9 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 
 namespace J2N.Collections.Generic
 {
@@ -289,5 +292,175 @@ namespace J2N.Collections.Generic
             }
             assertEquals("end less than start should throw", 1, result);
         }
+
+#if FEATURE_SERIALIZABLE
+        /// <summary>
+        /// Tests that SortedSet instances serialized with J2N 2.1.0 can be deserialized
+        /// correctly. This ensures backward compatibility with binary serialization.
+        /// </summary>
+        [Test]
+        public void TestDeserializeLegacy_String_OrdinalComparer()
+        {
+            SortedSet<string> set;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sortedset-string-ordinal-v2.1.0.bin")!)
+            {
+                set = (SortedSet<string>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, set.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualValues = set.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparer = StringComparer.Ordinal;
+            var actualComparer = set.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_OrdinalIgnoreCaseComparer()
+        {
+            SortedSet<string> set;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sortedset-string-ordinalignorecase-v2.1.0.bin")!)
+            {
+                set = (SortedSet<string>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, set.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualValues = set.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparer = StringComparer.OrdinalIgnoreCase;
+            var actualComparer = set.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_InvariantComparer()
+        {
+            SortedSet<string> set;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sortedset-string-invariant-v2.1.0.bin")!)
+            {
+                set = (SortedSet<string>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, set.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualValues = set.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparer = StringComparer.InvariantCulture;
+            var actualComparer = set.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_CustomComparer()
+        {
+            SortedSet<string> set;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sortedset-string-customcomparer-v2.1.0.bin")!)
+            {
+                set = (SortedSet<string>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, set.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualValues = set.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparerType = typeof(CustomStringComparer);
+            var actualComparerType = set.Comparer.GetType();
+            assertEquals(expectedComparerType, actualComparerType);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_DefaultComparer_Empty()
+        {
+            SortedSet<string> set;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sortedset-string-defaultcomparer-empty-v2.1.0.bin")!)
+            {
+                set = (SortedSet<string>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(0, set.Count);
+
+            var expectedComparer = Comparer<string>.Default; // J2N default comparer (ordinal)
+            var actualComparer = set.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_Int32_CustomComparer()
+        {
+            SortedSet<int> set;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sortedset-int32-customcomparer-v2.1.0.bin")!)
+            {
+                set = (SortedSet<int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, set.Count);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { 1, 2, 3, 4, 5 };
+            var actualValues = set.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparerType = typeof(CustomInt32Comparer);
+            var actualComparerType = set.Comparer.GetType();
+            assertEquals(expectedComparerType, actualComparerType);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_Int32_DefaultComparer_Empty()
+        {
+            SortedSet<int> set;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sortedset-int32-defaultcomparer-empty-v2.1.0.bin")!)
+            {
+                set = (SortedSet<int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(0, set.Count);
+
+            var expectedComparer = Comparer<int>.Default; // J2N default comparer
+            var actualComparer = set.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        // IMPORTANT: These are serialized with the J2N.Tests assembly name. So, they must always be available at that location.
+        [Serializable]
+        public class CustomStringComparer : IComparer<string>
+        {
+            public int Compare(string? x, string? y) => StringComparer.Ordinal.Compare(x, y);
+        }
+
+        [Serializable]
+        public class CustomInt32Comparer : IComparer<int>
+        {
+            public int Compare(int x, int y) => x.CompareTo(y);
+        }
+#endif
     }
 }

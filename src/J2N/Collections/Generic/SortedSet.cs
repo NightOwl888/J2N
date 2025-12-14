@@ -193,8 +193,8 @@ namespace J2N.Collections.Generic
         /// Initializes a new instance of the <see cref="SortedSet{T}"/> class.
         /// </summary>
         public SortedSet()
+            : this(Comparer<T>.Default)
         {
-            comparer = Comparer<T>.Default;
         }
 
         /// <summary>
