@@ -2,6 +2,12 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+#if FEATURE_SERIALIZABLE
+using System.Runtime.Serialization.Formatters.Binary;
+#endif
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
@@ -123,5 +129,195 @@ namespace J2N.Collections.Generic
             Assert.AreEqual(null, key);
             Assert.AreEqual(null, value);
         }
+
+#if FEATURE_SERIALIZABLE
+        /// <summary>
+        /// Tests that SortedDictionary instances serialized with J2N 2.1.0 can be deserialized
+        /// correctly. This ensures backward compatibility with binary serialization.
+        /// </summary>
+        [Test]
+        public void TestDeserializeLegacy_String_Int32_OrdinalComparer()
+        {
+            SortedDictionary<string, int> dict;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sorteddictionary-string-int32-ordinal-v2.1.0.bin")!)
+            {
+                dict = (SortedDictionary<string, int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, dict.Count);
+
+            var expectedKeys = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualKeys = dict.Keys.ToArray();
+            CollectionAssert.AreEqual(expectedKeys, actualKeys);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { 5, 4, 1, 3, 2 };
+            var actualValues = dict.Values.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparer = StringComparer.Ordinal;
+            var actualComparer = dict.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_Int32_OrdinalIgnoreCaseComparer()
+        {
+            SortedDictionary<string, int> dict;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sorteddictionary-string-int32-ordinalignorecase-v2.1.0.bin")!)
+            {
+                dict = (SortedDictionary<string, int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, dict.Count);
+
+            var expectedKeys = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualKeys = dict.Keys.ToArray();
+            CollectionAssert.AreEqual(expectedKeys, actualKeys);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { 5, 4, 1, 3, 2 };
+            var actualValues = dict.Values.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparer = StringComparer.OrdinalIgnoreCase;
+            var actualComparer = dict.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_Int32_InvariantComparer()
+        {
+            SortedDictionary<string, int> dict;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sorteddictionary-string-int32-invariant-v2.1.0.bin")!)
+            {
+                dict = (SortedDictionary<string, int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, dict.Count);
+
+            var expectedKeys = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualKeys = dict.Keys.ToArray();
+            CollectionAssert.AreEqual(expectedKeys, actualKeys);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { 5, 4, 1, 3, 2 };
+            var actualValues = dict.Values.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparer = StringComparer.InvariantCulture;
+            var actualComparer = dict.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_Int32_CustomComparer()
+        {
+            SortedDictionary<string, int> dict;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sorteddictionary-string-int32-customcomparer-v2.1.0.bin")!)
+            {
+                dict = (SortedDictionary<string, int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, dict.Count);
+
+            var expectedKeys = new[] { "five", "four", "one", "three", "two" }; // Sorted lexographically
+            var actualKeys = dict.Keys.ToArray();
+            CollectionAssert.AreEqual(expectedKeys, actualKeys);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { 5, 4, 1, 3, 2 };
+            var actualValues = dict.Values.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparerType = typeof(CustomStringComparer);
+            var actualComparerType = dict.Comparer.GetType();
+            assertEquals(expectedComparerType, actualComparerType);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_String_Int32_DefaultComparer_Empty()
+        {
+            SortedDictionary<string, int> dict;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sorteddictionary-string-int32-defaultcomparer-empty-v2.1.0.bin")!)
+            {
+                dict = (SortedDictionary<string, int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(0, dict.Count);
+
+            var expectedComparer = Comparer<string>.Default; // J2N default comparer (ordinal)
+            var actualComparer = dict.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_Int32_Int32_CustomComparer()
+        {
+            SortedDictionary<int, int> dict;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sorteddictionary-int32-int32-customcomparer-v2.1.0.bin")!)
+            {
+                dict = (SortedDictionary<int, int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(5, dict.Count);
+
+            var expectedKeys = new[] { 1, 2, 3, 4, 5 };
+            var actualKeys = dict.Keys.ToArray();
+            CollectionAssert.AreEqual(expectedKeys, actualKeys);
+
+            // Verify the values are correct and in the expected order
+            var expectedValues = new[] { 1, 2, 3, 4, 5 };
+            var actualValues = dict.Values.ToArray();
+            CollectionAssert.AreEqual(expectedValues, actualValues);
+
+            var expectedComparerType = typeof(CustomInt32Comparer);
+            var actualComparerType = dict.Comparer.GetType();
+            assertEquals(expectedComparerType, actualComparerType);
+        }
+
+        [Test]
+        public void TestDeserializeLegacy_Int32_Int32_DefaultComparer_Empty()
+        {
+            SortedDictionary<int, int> dict;
+            var formatter = new BinaryFormatter();
+
+            using (Stream stream = this.GetType().FindAndGetManifestResourceStream("sorteddictionary-int32-int32-defaultcomparer-empty-v2.1.0.bin")!)
+            {
+                dict = (SortedDictionary<int, int>)formatter.Deserialize(stream);
+            }
+
+            assertEquals(0, dict.Count);
+
+            var expectedComparer = Comparer<int>.Default; // J2N default comparer
+            var actualComparer = dict.Comparer;
+            assertEquals(expectedComparer, actualComparer);
+        }
+
+        // IMPORTANT: These are serialized with the J2N.Tests assembly name. So, they must always be available at that location.
+        [Serializable]
+        public class CustomStringComparer : IComparer<string>
+        {
+            public int Compare(string? x, string? y) => StringComparer.Ordinal.Compare(x, y);
+        }
+
+        [Serializable]
+        public class CustomInt32Comparer : IComparer<int>
+        {
+            public int Compare(int x, int y) => x.CompareTo(y);
+        }
+#endif
     }
 }
