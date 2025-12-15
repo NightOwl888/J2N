@@ -2,6 +2,7 @@
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 #if FEATURE_SERIALIZABLE
@@ -305,6 +306,78 @@ namespace J2N.Collections.Generic
             var actualComparer = dict.Comparer;
             assertEquals(expectedComparer, actualComparer);
         }
+
+
+        [Test]
+        public void TestSerializeRoundTrip_String_Int32_CurrentCulture()
+        {
+            CultureInfo originalCulture = CultureInfo.CurrentCulture;
+
+            try
+            {
+                // Culture A (creation + serialization)
+                CultureInfo cultureA = CultureInfo.GetCultureInfo("tr-TR");
+                CultureInfo cultureB = CultureInfo.GetCultureInfo("en-US");
+
+                CultureInfo.CurrentCulture = cultureA;
+
+                SortedDictionary<string,int> source = new SortedDictionary<string, int>(StringComparer.CurrentCulture)
+                {
+                    ["I"] = 1,
+                    ["ı"] = 2, // dotless i
+                    ["i"] = 3,
+                    ["İ"] = 4  // dotted I
+                };
+
+                byte[] blob;
+
+#pragma warning disable SYSLIB0011 // BinaryFormatter obsolete
+                var formatter = new BinaryFormatter();
+
+                using (var ms = new MemoryStream())
+                {
+                    formatter.Serialize(ms, source);
+                    blob = ms.ToArray();
+                }
+#pragma warning restore SYSLIB0011
+
+                // Switch culture BEFORE deserialization
+                CultureInfo.CurrentCulture = cultureB;
+
+                SortedDictionary<string, int> roundTripped;
+
+                using (var ms = new MemoryStream(blob))
+                {
+                    roundTripped = (SortedDictionary<string, int>)formatter.Deserialize(ms);
+                }
+
+                // 🔴 This is the key assertion
+                // The comparer must NOT be tied to cultureB
+                Assert.That(roundTripped.Comparer, Is.Not.EqualTo(StringComparer.CurrentCulture),
+                    "Comparer incorrectly rebound to the current culture after deserialization.");
+
+                // Verify behavior matches cultureA
+                int compareResult = roundTripped.Comparer.Compare("I", "ı");
+
+                Assert.That(compareResult, Is.EqualTo(
+                    StringComparer.Create(cultureA, ignoreCase: false).Compare("I", "ı")),
+                    "Comparer did not preserve original culture semantics.");
+
+                // Extra sanity: ordering consistency
+                KeyValuePair<string, int>[] result = new KeyValuePair<string, int>[roundTripped.Count];
+                roundTripped.CopyTo(result, 0);
+
+                CollectionAssert.AreEqual(
+                    source,
+                    result,
+                    "SortedSet order changed after round-trip serialization.");
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+            }
+        }
+
 
         // IMPORTANT: These are serialized with the J2N.Tests assembly name. So, they must always be available at that location.
         [Serializable]

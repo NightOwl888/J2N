@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
-using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -1982,7 +1981,20 @@ namespace J2N.Collections.Generic
         [Serializable]
 #endif
         internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>> // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
+#if FEATURE_SERIALIZABLE
+            , ISerializable
+#endif
         {
+
+#if FEATURE_SERIALIZABLE
+            private const string ComparerName = "keyComparer"; // Do not rename (binary serialization)
+
+            //needed for Comparer (for correct wrapping and support of alterante lookup)
+            private const string ComparerDescriptorTypeName = "ComparerDescriptor.Type";
+            private const string ComparerDescriptorCultureName = "ComparerDescriptor.Culture";
+            private const string ComparerDescriptorOptionsName = "ComparerDescriptor.Options";
+#endif
+
             internal IComparer<TKey> keyComparer; // Do not rename (binary serialization)
 
             public KeyValuePairComparer(IComparer<TKey>? keyComparer)
@@ -1997,6 +2009,40 @@ namespace J2N.Collections.Generic
                     this.keyComparer = (IComparer<TKey>)stringComparer;
                 }
             }
+
+#if FEATURE_SERIALIZABLE
+            private KeyValuePairComparer(SerializationInfo info, StreamingContext context)
+            {
+                keyComparer = (IComparer<TKey>)info.GetValue(ComparerName, typeof(IComparer<TKey>))!;
+
+                // J2N:Try to wrap the comparer with WrappedStringComparer
+                if (typeof(TKey) == typeof(string) && SortedSet<TKey>.TryGetKnownStringComparer(info, out IComparer<string?>? stringComparer))
+                {
+                    keyComparer = (IComparer<TKey>)stringComparer;
+                }
+            }
+
+            void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                IComparer<TKey> comparerToSerialize = keyComparer;
+
+                if (typeof(TKey) == typeof(string) && comparerToSerialize is IInternalStringComparer internalComparer)
+                {
+                    comparerToSerialize = (IComparer<TKey>)internalComparer.GetUnderlyingComparer();
+                }
+
+                info.AddValue(ComparerName, comparerToSerialize, typeof(IComparer<TKey>));
+
+                // J2N: Add metadata to the serialization blob so we can rehydrate the WrappedStringComparer properly
+                if (typeof(TKey) == typeof(string) && StringComparerDescriptor.TryDescribe(comparerToSerialize, out var desc))
+                {
+                    info.AddValue(ComparerDescriptorTypeName, (int)desc.Type);
+                    info.AddValue(ComparerDescriptorCultureName, desc.CultureName, typeof(string));
+                    info.AddValue(ComparerDescriptorOptionsName, (int)desc.Options);
+                }
+            }
+#endif
+
 
             internal IComparer<TKey> Comparer
             {

@@ -4,16 +4,18 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+#nullable enable
 
 namespace J2N.Collections.Generic
 {
     public class TestSortedSet : TestCase
     {
         private int[] objArray = new int[1000];
-        private SortedSet<int> tree;
+        private SortedSet<int>? tree;
 
         public override void SetUp()
         {
@@ -31,7 +33,7 @@ namespace J2N.Collections.Generic
         private void loadup()
         {
             for (int i = 0; i < 20; i++)
-                tree.Add(2 * i);
+                tree!.Add(2 * i);
         }
 
         private void LoadForGetViewBetween()
@@ -40,7 +42,7 @@ namespace J2N.Collections.Generic
             {
                 int x = new Integer(i);
                 objArray[i] = x;
-                tree.Add(x);
+                tree!.Add(x);
             }
         }
 
@@ -49,7 +51,7 @@ namespace J2N.Collections.Generic
         {
             loadup();
             int res;
-            Assert.IsTrue(tree.TryGetPredecessor(7, out res) && res == 6);
+            Assert.IsTrue(tree!.TryGetPredecessor(7, out res) && res == 6);
             Assert.IsTrue(tree.TryGetPredecessor(8, out res) && res == 6);
 
             //The bottom
@@ -81,7 +83,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetPredecessor_TooLow()
         {
             int res;
-            Assert.IsFalse(tree.TryGetPredecessor(-2, out res));
+            Assert.IsFalse(tree!.TryGetPredecessor(-2, out res));
             Assert.AreEqual(0, res);
             Assert.IsFalse(tree.TryGetPredecessor(0, out res));
             Assert.AreEqual(0, res);
@@ -92,7 +94,7 @@ namespace J2N.Collections.Generic
         {
             loadup();
             int res;
-            Assert.IsTrue(tree.TryGetSuccessor(7, out res) && res == 8);
+            Assert.IsTrue(tree!.TryGetSuccessor(7, out res) && res == 8);
             Assert.IsTrue(tree.TryGetSuccessor(8, out res) && res == 10);
 
             //The bottom
@@ -125,7 +127,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetSuccessor_TooHigh()
         {
             int res;
-            Assert.IsFalse(tree.TryGetSuccessor(38, out res));
+            Assert.IsFalse(tree!.TryGetSuccessor(38, out res));
             Assert.AreEqual(0, res);
             Assert.IsFalse(tree.TryGetSuccessor(39, out res));
             Assert.AreEqual(0, res);
@@ -273,7 +275,7 @@ namespace J2N.Collections.Generic
             // java.util.TreeSet.subSet(java.lang.Object, java.lang.Object)
             int startPos = objArray.Length / 4;
             int endPos = 3 * objArray.Length / 4;
-            SortedSet<int> aSubSet = tree.GetViewBetween(objArray[startPos], lowerValueInclusive: true, objArray[endPos], upperValueInclusive: false);
+            SortedSet<int> aSubSet = tree!.GetViewBetween(objArray[startPos], lowerValueInclusive: true, objArray[endPos], upperValueInclusive: false);
             assertTrue("Subset has wrong number of elements",
                     aSubSet.Count == (endPos - startPos));
             for (int counter = startPos; counter < endPos; counter++)
@@ -447,6 +449,76 @@ namespace J2N.Collections.Generic
             var expectedComparer = Comparer<int>.Default; // J2N default comparer
             var actualComparer = set.Comparer;
             assertEquals(expectedComparer, actualComparer);
+        }
+
+        [Test]
+        public void TestSerializeRoundTrip_String_CurrentCulture()
+        {
+            CultureInfo originalCulture = CultureInfo.CurrentCulture;
+
+            try
+            {
+                // Culture A (creation + serialization)
+                CultureInfo cultureA = CultureInfo.GetCultureInfo("tr-TR");
+                CultureInfo cultureB = CultureInfo.GetCultureInfo("en-US");
+
+                CultureInfo.CurrentCulture = cultureA;
+
+                SortedSet<string> source = new SortedSet<string>(StringComparer.CurrentCulture)
+                {
+                    "I",
+                    "ı", // dotless i
+                    "i",
+                    "İ"  // dotted I
+                };
+
+                byte[] blob;
+
+#pragma warning disable SYSLIB0011 // BinaryFormatter obsolete
+                var formatter = new BinaryFormatter();
+
+                using (var ms = new MemoryStream())
+                {
+                    formatter.Serialize(ms, source);
+                    blob = ms.ToArray();
+                }
+#pragma warning restore SYSLIB0011
+
+                // Switch culture BEFORE deserialization
+                CultureInfo.CurrentCulture = cultureB;
+
+                SortedSet<string> roundTripped;
+
+                using (var ms = new MemoryStream(blob))
+                {
+                    roundTripped = (SortedSet<string>)formatter.Deserialize(ms);
+                }
+
+                // 🔴 This is the key assertion
+                // The comparer must NOT be tied to cultureB
+                Assert.That(roundTripped.Comparer, Is.Not.EqualTo(StringComparer.CurrentCulture),
+                    "Comparer incorrectly rebound to the current culture after deserialization.");
+
+                // Verify behavior matches cultureA
+                int compareResult = roundTripped.Comparer.Compare("I", "ı");
+
+                Assert.That(compareResult, Is.EqualTo(
+                    StringComparer.Create(cultureA, ignoreCase: false).Compare("I", "ı")),
+                    "Comparer did not preserve original culture semantics.");
+
+                // Extra sanity: ordering consistency
+                string[] result = new string[roundTripped.Count];
+                roundTripped.CopyTo(result);
+
+                CollectionAssert.AreEqual(
+                    source,
+                    result,
+                    "SortedSet order changed after round-trip serialization.");
+            }
+            finally
+            {
+                CultureInfo.CurrentCulture = originalCulture;
+            }
         }
 
         // IMPORTANT: These are serialized with the J2N.Tests assembly name. So, they must always be available at that location.
