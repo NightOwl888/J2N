@@ -339,7 +339,7 @@ namespace J2N.Collections.Generic
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
         public IComparer<TKey> Comparer
-            => ((KeyValuePairComparer)_set.Comparer).keyComparer;
+            => ((KeyValuePairComparer)_set.Comparer).Comparer;
 
         /// <summary>
         /// Gets a collection containing the keys in the <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -1987,13 +1987,31 @@ namespace J2N.Collections.Generic
 
             public KeyValuePairComparer(IComparer<TKey>? keyComparer)
             {
-                if (keyComparer == null)
+                this.keyComparer = keyComparer ?? Comparer<TKey>.Default;
+
+                // J2N: Special-case Comparer<string>.Default and StringComparer (all options).
+                // We wrap these comparers to ensure that alternate string comparison is available.
+                if (typeof(TKey) == typeof(string) &&
+                    WrappedStringComparer.GetStringComparer(this.keyComparer) is IComparer<string> stringComparer)
                 {
-                    this.keyComparer = Comparer<TKey>.Default;
+                    this.keyComparer = (IComparer<TKey>)stringComparer;
                 }
-                else
+            }
+
+            internal IComparer<TKey> Comparer
+            {
+                get
                 {
-                    this.keyComparer = keyComparer;
+                    Debug.Assert(keyComparer is not null, "The comparer should never be null.");
+                    // J2N: We must unwrap the comparer before returning it to the user.
+                    if (typeof(TKey) == typeof(string))
+                    {
+                        return (IComparer<TKey>)InternalStringComparer.GetUnderlyingComparer((IComparer<string?>)keyComparer!); // [!]: asserted above
+                    }
+                    else
+                    {
+                        return keyComparer!; // [!]: asserted above
+                    }
                 }
             }
 
