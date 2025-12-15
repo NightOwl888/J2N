@@ -43,6 +43,25 @@ namespace J2N.Collections.Generic
 
             // used to see if the count is out of date
 
+
+
+            #region Properties for Alternate Lookup
+
+            // J2N: This is state from TreeSubSet exposed to allow range checks in Alternate Lookup
+
+            internal override SortedSet<T> UnderlyingSet => _underlying;
+
+            internal override bool HasLowerBound => _lBoundActive;
+            internal override bool HasUpperBound => _uBoundActive;
+
+            internal override bool LowerBoundInclusive => _lBoundInclusive;
+            internal override bool UpperBoundInclusive => _uBoundInclusive;
+
+            internal override T? LowerBound => _min;
+            internal override T? UpperBound => _max;
+
+            #endregion
+
 #if DEBUG
             internal override bool versionUpToDate()
             {
