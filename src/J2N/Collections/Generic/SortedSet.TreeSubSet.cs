@@ -20,9 +20,6 @@ namespace J2N.Collections.Generic
         /// This class represents a subset view into the tree. Any changes to this view
         /// are reflected in the actual tree. It uses the comparer of the underlying tree.
         /// </summary>
-#if FEATURE_SERIALIZABLE
-        [Serializable]
-#endif
         [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
         [DebuggerDisplay("Count = {Count}")]
         internal sealed class TreeSubSet : SortedSet<T>
@@ -68,19 +65,6 @@ namespace J2N.Collections.Generic
                 version = -1;
                 _countVersion = -1;
             }
-
-#if FEATURE_SERIALIZABLE
-            [SuppressMessage("Microsoft.Usage", "CA2236:CallBaseClassMethodsOnISerializableTypes", Justification = "special case TreeSubSet serialization")]
-            [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2236 doesn't fire on all target frameworks")]
-            [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-            private TreeSubSet(SerializationInfo info, StreamingContext context)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-            {
-                siInfo = info;
-                OnDeserializationImpl(info);
-            }
-#endif
 
             internal override bool AddIfNotPresent(T item)
             {
@@ -615,70 +599,12 @@ namespace J2N.Collections.Generic
             [EditorBrowsable(EditorBrowsableState.Never)]
             protected override void GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                if (info is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
-
-                info.AddValue(maxName, _max, typeof(T));
-                info.AddValue(minName, _min, typeof(T));
-                info.AddValue(lBoundActiveName, _lBoundActive);
-                info.AddValue(uBoundActiveName, _uBoundActive);
-                info.AddValue(lBoundInclusiveName, _lBoundInclusive);
-                info.AddValue(uBoundInclusiveName, _uBoundInclusive);
-                base.GetObjectData(info, context);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_SerializationDeprecated);
             }
 
-            void IDeserializationCallback.OnDeserialization(object? sender) => OnDeserialization(sender);
+            void IDeserializationCallback.OnDeserialization(object? sender) => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_SerializationDeprecated);
 
-            protected override void OnDeserialization(object? sender)
-            {
-                OnDeserializationImpl(sender);
-            }
-
-            [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Following Microsoft's code style")]
-            [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0060 doesn't fire on all target frameworks")]
-            private void OnDeserializationImpl(object? sender)
-            {
-                if (siInfo == null)
-                {
-                    throw new SerializationException(SR.Serialization_InvalidOnDeser);
-                }
-
-                comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
-                int savedCount = siInfo.GetInt32(CountName);
-                _max = (T)siInfo.GetValue(maxName, typeof(T))!;
-                _min = (T)siInfo.GetValue(minName, typeof(T))!;
-                _lBoundActive = siInfo.GetBoolean(lBoundActiveName);
-                _uBoundActive = siInfo.GetBoolean(uBoundActiveName);
-                _lBoundInclusive = siInfo.GetBoolean(lBoundInclusiveName);
-                _uBoundInclusive = siInfo.GetBoolean(uBoundInclusiveName);
-                _underlying = new SortedSet<T>();
-
-                if (savedCount != 0)
-                {
-                    T[]? items = (T[]?)siInfo.GetValue(ItemsName, typeof(T[]));
-
-                    if (items == null)
-                    {
-                        throw new SerializationException(SR.Serialization_MissingValues);
-                    }
-
-                    for (int i = 0; i < items.Length; i++)
-                    {
-                        _underlying.Add(items[i]);
-                    }
-                }
-                _underlying.version = siInfo.GetInt32(VersionName);
-                count = _underlying.count;
-                version = _underlying.version - 1;
-                VersionCheck(); //this should update the count to be right and update root to be right
-
-                if (count != savedCount)
-                {
-                    throw new SerializationException(SR.Serialization_MismatchedCount);
-                }
-                siInfo = null;
-
-            }
+            protected override void OnDeserialization(object? sender) => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_SerializationDeprecated);
 #endif
         }
     }

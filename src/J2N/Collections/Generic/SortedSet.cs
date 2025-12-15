@@ -179,14 +179,6 @@ namespace J2N.Collections.Generic
         private const string ReverseName = "Reverse";
         private const string EnumVersionName = "EnumVersion";
 
-        //needed for TreeSubset
-        private const string minName = "Min";
-        private const string maxName = "Max";
-        private const string lBoundActiveName = "lBoundActive";
-        private const string uBoundActiveName = "uBoundActive";
-        private const string lBoundInclusiveName = "lBoundInclusive";
-        private const string uBoundInclusiveName = "uBoundInclusive";
-
         private SerializationInfo? siInfo; //A temporary variable which we need during deserialization.
 #endif
 
