@@ -19,6 +19,8 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace J2N.Collections.Generic
 {
@@ -32,8 +34,6 @@ namespace J2N.Collections.Generic
         // SortedDictionary<...>.Comparer and similar methods need to return the original IComparer
         // that was passed in to the ctor. The caller chooses one of these singletons so that the
         // GetUnderlyingComparer method can return the correct value.
-
-        private static readonly WrappedStringComparer WrappedAroundDefaultComparer = new OrdinalComparer(Comparer<string?>.Default);
 
         private static readonly WrappedStringComparer WrappedAroundStringComparerOrdinal = new OrdinalComparer(StringComparer.Ordinal);
 
@@ -100,33 +100,37 @@ namespace J2N.Collections.Generic
 
         private sealed class CultureAwareComparer : WrappedStringComparer, ISpanAlternateComparer<char, string?>
         {
-            public static readonly CultureAwareComparer InvariantCulture = new CultureAwareComparer(StringComparer.InvariantCulture, StringComparison.InvariantCulture);
-            public static readonly CultureAwareComparer InvariantCultureIgnoreCase = new CultureAwareComparer(StringComparer.InvariantCultureIgnoreCase, StringComparison.InvariantCultureIgnoreCase);
+            public static readonly CultureAwareComparer InvariantCulture = new CultureAwareComparer(StringComparer.InvariantCulture);
+            public static readonly CultureAwareComparer InvariantCultureIgnoreCase = new CultureAwareComparer(StringComparer.InvariantCultureIgnoreCase);
 
-            private readonly StringComparison _comparisonType;
-            internal CultureAwareComparer(IComparer<string?> wrappedComparer, StringComparison comparisonType) : base(wrappedComparer)
+
+            internal CultureAwareComparer(IComparer<string?> wrappedComparer) : base(wrappedComparer)
             {
-                _comparisonType = comparisonType;
             }
-            public override int Compare(string? x, string? y) => string.Compare(x, y, _comparisonType);
+
+            public override int Compare(string? x, string? y) => _underlyingComparer.Compare(x, y);
 
             int ISpanAlternateComparer<char, string?>.Compare(ReadOnlySpan<char> span, string? other)
             {
                 if (other is null) return 1; // Using 1 if other is null as specified here: https://stackoverflow.com/a/4852537
 
-                return System.MemoryExtensions.CompareTo(span, other, _comparisonType);
+#if FEATURE_STRINGCOMPARER_ISWELLKNOWNCULTUREAWARECOMPARER
+                if (_underlyingComparer is IEqualityComparer<string?> ec &&
+                    StringComparer.IsWellKnownCultureAwareComparer(ec, out CompareInfo? compareInfo, out CompareOptions compareOptions))
+                {
+                    return compareInfo.Compare(span, other, compareOptions);
+                }
+#endif
+                // Legacy - no choice but to allocate
+                return _underlyingComparer.Compare(span.ToString(), other);
             }
+
             string? ISpanAlternateComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
                 span.ToString();
         }
         
         public static IComparer<string?>? GetStringComparer(object comparer)
         {
-            if (ReferenceEquals(comparer, Comparer<string>.Default))
-            {
-                return WrappedAroundDefaultComparer;
-            }
-
             if (ReferenceEquals(comparer, StringComparer.Ordinal))
             {
                 return WrappedAroundStringComparerOrdinal;
@@ -137,30 +141,59 @@ namespace J2N.Collections.Generic
                 return WrappedAroundStringComparerOrdinalIgnoreCase;
             }
 
-            if (ReferenceEquals(comparer, StringComparer.InvariantCulture))
+            if (StringComparerDescriptor.TryDescribe(comparer, out StringComparerDescriptor descriptor) &&
+                TryGetStringComparer(descriptor, out IComparer<string?>? stringComparer))
             {
-                return CultureAwareComparer.InvariantCulture;
-            }
-
-            if (ReferenceEquals(comparer, StringComparer.InvariantCultureIgnoreCase))
-            {
-                return CultureAwareComparer.InvariantCultureIgnoreCase;
-            }
-
-            // These are not cached, since they read the culture of the current thread upon creation. So,
-            // we need to actively check whether the culture matches the one of the current thread rather than
-            // checking against a specific instance.
-            if (StringComparer.CurrentCulture.Equals(comparer))
-            {
-                return new CultureAwareComparer((IComparer<string?>)comparer, StringComparison.CurrentCulture);
-            }
-
-            if (StringComparer.CurrentCultureIgnoreCase.Equals(comparer))
-            {
-                return new CultureAwareComparer((IComparer<string?>)comparer, StringComparison.CurrentCultureIgnoreCase);
+                return stringComparer;
             }
 
             return null;
+        }
+
+        public static bool TryGetStringComparer(in StringComparerDescriptor descriptor, [MaybeNullWhen(false)] out IComparer<string?>? comparer)
+        {
+            if (descriptor.Type == StringComparerDescriptor.Classification.Ordinal)
+            {
+                comparer = WrappedAroundStringComparerOrdinal;
+                return true;
+            }
+
+            if (descriptor.Type == StringComparerDescriptor.Classification.OrdinalIgnoreCase)
+            {
+                comparer = WrappedAroundStringComparerOrdinalIgnoreCase;
+                return true;
+            }
+
+            if (descriptor.Type == StringComparerDescriptor.Classification.InvariantCulture)
+            {
+                comparer = CultureAwareComparer.InvariantCulture;
+                return true;
+            }
+
+            if (descriptor.Type == StringComparerDescriptor.Classification.InvariantCultureIgnoreCase)
+            {
+                comparer = CultureAwareComparer.InvariantCultureIgnoreCase;
+                return true;
+            }
+
+            if (descriptor.TryCreateStringComparer(out StringComparer? stringComparer))
+            {
+                // Otherwise, this is culture-aware
+                if (descriptor.Type == StringComparerDescriptor.Classification.CurrentCultureIgnoreCase)
+                {
+                    comparer = new CultureAwareComparer(stringComparer!);
+                    return true;
+                }
+
+                if (descriptor.Type == StringComparerDescriptor.Classification.CurrentCulture)
+                {
+                    comparer = new CultureAwareComparer(stringComparer!);
+                    return true;
+                }
+            }
+
+            comparer = null;
+            return false;
         }
     }
 }
