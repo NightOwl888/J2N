@@ -449,12 +449,14 @@ namespace J2N.Collections.Generic
 #endif
 
                 // If item is at or below lower bound, no strict predecessor exists
-                if (IsTooLow(item) || (_lBoundActive &&
-                    Comparer.Compare(item!, _min!) == 0 &&
-                    _lBoundInclusive))
+                if (_lBoundActive)
                 {
-                    result = default!;
-                    return false;
+                    int c = Comparer.Compare(item!, _min!);
+                    if (c <= 0)
+                    {
+                        result = default!;
+                        return false;
+                    }
                 }
 
                 Node? current = root;
@@ -494,12 +496,14 @@ namespace J2N.Collections.Generic
 #endif
 
                 // If item is at or above upper bound, no strict successor exists
-                if (IsTooHigh(item) || (_uBoundActive &&
-                    Comparer.Compare(item!, _max!) == 0 &&
-                    _uBoundInclusive))
+                if (_uBoundActive)
                 {
-                    result = default!;
-                    return false;
+                    int c = Comparer.Compare(item!, _max!);
+                    if (c >= 0)
+                    {
+                        result = default!;
+                        return false;
+                    }
                 }
 
                 Node? current = root;
