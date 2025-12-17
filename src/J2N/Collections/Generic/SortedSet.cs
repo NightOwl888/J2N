@@ -503,7 +503,16 @@ namespace J2N.Collections.Generic
         /// <param name="item">The entry to get the predecessor of.</param>
         /// <param name="result">The predessor, if any.</param>
         /// <returns><c>true</c> if a predecessor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
-        public bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <c>strict predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result) => DoTryGetPredecessor(item, out result);
+
+        internal virtual bool DoTryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
         {
             Node? current = root, match = null;
 
@@ -548,7 +557,16 @@ namespace J2N.Collections.Generic
         /// <param name="item">The entry to get the successor of.</param>
         /// <param name="result">The successor, if any.</param>
         /// <returns><c>true</c> if a successor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
-        public bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <c>strict successor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result) => DoTryGetSuccessor(item, out result);
+
+        internal virtual bool DoTryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
         {
             Node? current = root, match = null;
 
@@ -584,6 +602,99 @@ namespace J2N.Collections.Generic
                 result = match.Item;
                 return true;
             }
+        }
+
+        /// <summary>
+        /// Gets the value in the <see cref="SortedSet{T}"/> whose value
+        /// is the greatest element less than or equal to <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the floor of.</param>
+        /// <param name="result">The floor, if any.</param>
+        /// <returns><c>true</c> if a floor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <c>weak predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetFloor(T item, [MaybeNullWhen(false)] out T result) => DoTryGetFloor(item, out result);
+
+        internal virtual bool DoTryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+        {
+            Node? current = root;
+            Node? candidate = null;
+
+            while (current != null)
+            {
+                int cmp = comparer.Compare(item, current.Item);
+
+                if (cmp < 0)
+                {
+                    current = current.Left;
+                }
+                else
+                {
+                    candidate = current;
+                    current = current.Right;
+                }
+            }
+
+            if (candidate == null)
+            {
+                result = default!;
+                return false;
+            }
+
+            result = candidate.Item;
+            return true;
+        }
+
+
+        /// <summary>
+        /// Gets the value in the <see cref="SortedSet{T}"/> whose value
+        /// is the least element greater than or equal to <paramref name="item"/>.
+        /// </summary>
+        /// <param name="item">The entry to get the ceiling of.</param>
+        /// <param name="result">The ceiling, if any.</param>
+        /// <returns><c>true</c> if a ceiling to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <b>weak successor</b> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetCeiling(T item, [MaybeNullWhen(false)] out T result) => DoTryGetCeiling(item, out result);
+
+        internal virtual bool DoTryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+        {
+            Node? current = root;
+            Node? candidate = null;
+
+            while (current != null)
+            {
+                int cmp = comparer.Compare(item, current.Item);
+
+                if (cmp > 0)
+                {
+                    current = current.Right;
+                }
+                else
+                {
+                    candidate = current;
+                    current = current.Left;
+                }
+            }
+
+            if (candidate == null)
+            {
+                result = default!;
+                return false;
+            }
+
+            result = candidate.Item;
+            return true;
         }
 
         #endregion

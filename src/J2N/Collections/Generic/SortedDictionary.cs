@@ -850,9 +850,38 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the predecessor of.</param>
         /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predessor, if any.</param>
         /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
-        public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
         {
             return _set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
+        }
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the predecessor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the predecessor of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
+        /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <c>strict predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>lowerEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetPredecessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetPredecessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
         }
 
         /// <summary>
@@ -862,9 +891,94 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the successor of.</param>
         /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the successor, if any.</param>
         /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
-        public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result)
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
         {
             return _set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out result);
+        }
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the successor of the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the successor of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
+        /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <c>strict successor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>higherEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetSuccessor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetSuccessor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the greatest element less than or equal to the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the floor of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
+        /// <returns><c>true</c> if a floor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <c>weak predecessor</c> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>floorEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetFloor(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetFloor(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the lease element greater than or equal to the specified <paramref name="key"/>.
+        /// </summary>
+        /// <param name="key">The key of the entry to get the ceiling of.</param>
+        /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
+        /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
+        /// <returns><c>true</c> if a ceiling to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// This method is a O(log n) operation.
+        /// <para/>
+        /// This is referred to as <b>weak successor</b> in order theory.
+        /// <para/>
+        /// Usage Note: This corresponds to the <c>ceilingEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetCeiling(TKey key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+        {
+            if (_set.TryGetCeiling(new KeyValuePair<TKey, TValue>(key, default!), out KeyValuePair<TKey, TValue> result))
+            {
+                resultKey = result.Key;
+                resultValue = result.Value;
+                return true;
+            }
+            resultKey = default;
+            resultValue = default;
+            return false;
         }
 
         #endregion

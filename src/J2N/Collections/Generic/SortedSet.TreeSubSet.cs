@@ -441,6 +441,170 @@ namespace J2N.Collections.Generic
             }
 #endif
 
+            internal override bool DoTryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+            {
+                VersionCheck();
+#if DEBUG
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+
+                // If item is at or below lower bound, no strict predecessor exists
+                if (_lBoundActive)
+                {
+                    int c = Comparer.Compare(item!, _min!);
+                    if (c <= 0)
+                    {
+                        result = default!;
+                        return false;
+                    }
+                }
+
+                Node? current = root;
+                Node? match = null;
+
+                while (current != null)
+                {
+                    int cmp = Comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        match = current;
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        current = current.Left;
+                    }
+                }
+
+                // Final safety check: candidate must be within view
+                if (match == null || IsTooLow(match.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = match.Item;
+                return true;
+            }
+
+            internal override bool DoTryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+            {
+                VersionCheck();
+#if DEBUG
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+
+                // If item is at or above upper bound, no strict successor exists
+                if (_uBoundActive)
+                {
+                    int c = Comparer.Compare(item!, _max!);
+                    if (c >= 0)
+                    {
+                        result = default!;
+                        return false;
+                    }
+                }
+
+                Node? current = root;
+                Node? match = null;
+
+                while (current != null)
+                {
+                    int cmp = Comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        match = current;
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        current = current.Right;
+                    }
+                }
+
+                // Final safety check
+                if (match == null || IsTooHigh(match.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = match.Item;
+                return true;
+            }
+
+            internal override bool DoTryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+            {
+                VersionCheck();
+#if DEBUG
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+
+                Node? current = root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = Comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Right;
+                    }
+                }
+
+                if (candidate == null || IsTooLow(candidate.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            internal override bool DoTryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+            {
+                VersionCheck();
+#if DEBUG
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+
+                Node? current = root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = Comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Left;
+                    }
+                }
+
+                if (candidate == null || IsTooHigh(candidate.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
 #if FEATURE_SERIALIZABLE
 
             [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]

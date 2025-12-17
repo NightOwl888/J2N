@@ -1,4 +1,5 @@
-﻿using J2N.Util;
+﻿// Partly based on: https://github.com/sestoft/C5/blob/master/C5.Tests/Trees/RedBlackTreeSetTests.cs#L857-L966
+using J2N.Util;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -56,6 +57,24 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
+        public void TestTryGetPredecessor_View()
+        {
+            loadup();
+            var view = tree.GetViewBetween(6, 14);
+
+            int res;
+            Assert.IsTrue(view.TryGetPredecessor(9, out res) && res == 8);
+            Assert.IsTrue(view.TryGetPredecessor(10, out res) && res == 8);
+
+            // The bottom (relative to view)
+            Assert.IsTrue(view.TryGetPredecessor(7, out res) && res == 6);
+
+            // The top (relative to view)
+            Assert.IsTrue(view.TryGetPredecessor(15, out res) && res == 14);
+        }
+
+
+        [Test]
         public void TestTryGetPredecessor_TooLow()
         {
             int res;
@@ -82,6 +101,24 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
+        public void TestTryGetSuccessor_View()
+        {
+            loadup();
+            var view = tree.GetViewBetween(6, 14);
+
+            int res;
+            Assert.IsTrue(view.TryGetSuccessor(9, out res) && res == 10);
+            Assert.IsTrue(view.TryGetSuccessor(10, out res) && res == 12);
+
+            // The bottom (relative to view)
+            Assert.IsTrue(view.TryGetSuccessor(5, out res) && res == 6);
+
+            // The top (relative to view)
+            Assert.IsTrue(view.TryGetSuccessor(13, out res) && res == 14);
+        }
+
+
+        [Test]
         public void TestTryGetSuccessor_TooHigh()
         {
             int res;
@@ -90,6 +127,118 @@ namespace J2N.Collections.Generic
             Assert.IsFalse(tree.TryGetSuccessor(39, out res));
             Assert.AreEqual(0, res);
         }
+
+        [Test] // Regression for https://github.com/NightOwl888/J2N/issues/175
+        public void TestTryGetSuccessor_View_TooHigh()
+        {
+            var set = new SortedSet<int>();
+            for (int i = 0; i <= 10; i++)
+                set.Add(i);
+
+            // View contains [4..7]
+            var view = set.GetViewBetween(4, 7);
+
+            // Ask for successor of the maximum element in the view
+            bool found = view.TryGetSuccessor(7, out int successor);
+
+            Assert.IsFalse(found);
+        }
+
+
+        [Test]
+        public void TestTryGetFloor() // weak predecessor in C5, floor in JDK
+        {
+            loadup();
+            Assert.IsTrue(tree.TryGetFloor(7, out int res) && res == 6);
+            Assert.IsTrue(tree.TryGetFloor(8, out res) && res == 8);
+
+            //The bottom
+            Assert.IsTrue(tree.TryGetFloor(1, out res) && res == 0);
+            Assert.IsTrue(tree.TryGetFloor(0, out res) && res == 0);
+
+            //The top
+            Assert.IsTrue(tree.TryGetFloor(39, out res) && res == 38);
+            Assert.IsTrue(tree.TryGetFloor(38, out res) && res == 38);
+        }
+
+        [Test]
+        public void TestTryGetFloor_View()
+        {
+            loadup();
+            var view = tree.GetViewBetween(6, 14);
+
+            Assert.IsTrue(view.TryGetFloor(9, out int res) && res == 8);
+            Assert.IsTrue(view.TryGetFloor(10, out res) && res == 10);
+
+            // The bottom
+            Assert.IsTrue(view.TryGetFloor(6, out res) && res == 6);
+
+            // The top
+            Assert.IsTrue(view.TryGetFloor(15, out res) && res == 14);
+            Assert.IsTrue(view.TryGetFloor(14, out res) && res == 14);
+        }
+
+
+        [Test]
+        public void TestTryGetFloor_TooLow()
+        {
+            Assert.IsFalse(tree.TryGetFloor(-1, out int res));
+            Assert.AreEqual(0, res);
+        }
+
+        [Test]
+        public void TestTryGetCeiling() // weak successor in C5, floor in JDK
+        {
+            loadup();
+            Assert.IsTrue(tree.TryGetCeiling(6, out int res) && res == 6);
+            Assert.IsTrue(tree.TryGetCeiling(7, out res) && res == 8);
+
+            //The bottom
+            Assert.IsTrue(tree.TryGetCeiling(-1, out res) && res == 0);
+            Assert.IsTrue(tree.TryGetCeiling(0, out res) && res == 0);
+
+            //The top
+            Assert.IsTrue(tree.TryGetCeiling(37, out res) && res == 38);
+            Assert.IsTrue(tree.TryGetCeiling(38, out res) && res == 38);
+        }
+
+        [Test]
+        public void TestTryGetCeiling_View()
+        {
+            loadup();
+            var view = tree.GetViewBetween(6, 14);
+
+            Assert.IsTrue(view.TryGetCeiling(8, out int res) && res == 8);
+            Assert.IsTrue(view.TryGetCeiling(9, out res) && res == 10);
+
+            // The bottom
+            Assert.IsTrue(view.TryGetCeiling(5, out res) && res == 6);
+            Assert.IsTrue(view.TryGetCeiling(6, out res) && res == 6);
+
+            // The top
+            Assert.IsTrue(view.TryGetCeiling(13, out res) && res == 14);
+            Assert.IsTrue(view.TryGetCeiling(14, out res) && res == 14);
+        }
+
+
+
+        [Test]
+        public void TryGetCeiling_TooHigh()
+        {
+            Assert.IsFalse(tree.TryGetCeiling(39, out int res));
+            Assert.AreEqual(0, res);
+        }
+
+        [Test]
+        public void TryGetCeiling_View_TooHigh()
+        {
+            loadup();
+            var view = tree.GetViewBetween(6, 14);
+
+            Assert.IsFalse(view.TryGetCeiling(15, out int res));
+            Assert.AreEqual(0, res);
+        }
+
 
         public class MockComparer : IComparer<int>
         {
