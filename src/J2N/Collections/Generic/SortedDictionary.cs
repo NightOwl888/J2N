@@ -13,6 +13,8 @@ using System.Runtime.CompilerServices;
 
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
+using System.Threading;
+
 #endif
 using SCG = System.Collections.Generic;
 
@@ -73,6 +75,12 @@ namespace J2N.Collections.Generic
         private ValueCollection? _values;
 
         private readonly TreeSet<KeyValuePair<TKey, TValue>> _set; // Do not rename (binary serialization)
+
+#if FEATURE_SERIALIZABLE
+        [NonSerialized]
+#endif
+        private object? _spanAdapterCache;
+
 
         #region Constructors
 
@@ -842,12 +850,32 @@ namespace J2N.Collections.Generic
 
         #endregion
 
-        #region Properties for Alternate Lookup
+        #region Members for Alternate Lookup
 
-        // This calls the correct layer to get the *outermost* comparer (a user comparer or a comparer wrapper around a user comparer)
-        internal IComparer<TKey> AlternateComparer => ((KeyValuePairComparer)_set.AlternateComparer).keyComparer;
+        // This calls the correct layer to get the *outermost* comparer (a user comparer or a comparer wrapper around a BCL StringComparer)
+        internal IComparer<TKey> RawComparer => ((KeyValuePairComparer)_set.RawComparer).keyComparer;
 
-        #endregion Properties for Alternate Lookup
+        // A simple one-instance cache to ensure that multiple SpanAlternateLookup calls with the same TAlternateKeySpan
+        // don't incur runtime heap overhead. We need this because our comparer requires an adapter of type TAlternateKeySpan
+        // which isn't known until the time of lookup, but our comparer is created during construction.
+        private AlternateKeyValuePairComparer<TAlternateKeySpan> GetOrCreateAlternateComparer<TAlternateKeySpan>()
+        {
+            // Fast path (no fence)
+            object? cache = _spanAdapterCache;
+            if (cache is AlternateKeyValuePairComparer<TAlternateKeySpan> typed)
+                return typed;
+
+            // Create candidate
+            var created = new AlternateKeyValuePairComparer<TAlternateKeySpan>((KeyValuePairComparer)_set.RawComparer);
+
+            // Publish if still empty
+            object? original = Interlocked.CompareExchange(ref _spanAdapterCache, created, null);
+
+            // If we won the race, use ours; otherwise use existing
+            return (original ?? created) as AlternateKeyValuePairComparer<TAlternateKeySpan> ?? created;
+        }
+
+        #endregion Members for Alternate Lookup
 
         #region Java TreeMap-like Members
 
@@ -1049,6 +1077,7 @@ namespace J2N.Collections.Generic
         {
             private readonly TreeSet<KeyValuePair<TKey, TValue>> _set;
             private readonly SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateKeySpan> _setLookup;
+            private readonly AlternateKeyValuePairComparer<TAlternateKeySpan> _alternateComparer;
 
             /// <summary>Initialize the instance. The dictionary must have already been verified to have a compatible comparer.</summary>
             internal SpanAlternateLookup(SortedDictionary<TKey, TValue> dictionary)
@@ -1057,7 +1086,8 @@ namespace J2N.Collections.Generic
                 Debug.Assert(IsCompatibleKey(dictionary!)); // [!]: asserted above
                 Dictionary = dictionary!; // [!]: asserted above
                 _set = dictionary!._set; // [!]: asserted above
-                _setLookup = _set.GetSpanAlternateLookup<TAlternateKeySpan>(); // [!]: asserted above
+                _alternateComparer = dictionary!.GetOrCreateAlternateComparer<TAlternateKeySpan>(); // [!]: asserted above
+                _setLookup = _set.GetSpanAlternateLookup(_alternateComparer); // [!]: asserted above
             }
 
             /// <summary>Gets the <see cref="SortedDictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
@@ -1100,7 +1130,7 @@ namespace J2N.Collections.Generic
             internal static bool IsCompatibleKey(SortedDictionary<TKey, TValue> dictionary)
             {
                 Debug.Assert(dictionary is not null);
-                return dictionary!.AlternateComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey>; // [!]: asserted above
+                return dictionary!.RawComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey>; // [!]: asserted above
             }
 
             /// <summary>Gets the dictionary's alternate comparer. The dictionary must have already been verified as compatible.</summary>
@@ -1108,7 +1138,7 @@ namespace J2N.Collections.Generic
             internal static ISpanAlternateComparer<TAlternateKeySpan, TKey> GetAlternateComparer(SortedDictionary<TKey, TValue> dictionary)
             {
                 Debug.Assert(IsCompatibleKey(dictionary));
-                return Unsafe.As<ISpanAlternateComparer<TAlternateKeySpan, TKey>>(dictionary.AlternateComparer)!;
+                return Unsafe.As<ISpanAlternateComparer<TAlternateKeySpan, TKey>>(dictionary.RawComparer)!;
             }
 
             /// <summary>Gets the value associated with the specified alternate key.</summary>
@@ -2216,13 +2246,11 @@ namespace J2N.Collections.Generic
         // 2. The Comparer property provides access to the comparer that was provided by the user and unwraps it if necessary.
         // 3. SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> uses the keyComparer property to check whether ISpanAlternateComparer<TAlternateKeySpan, T> is implemented.
         //    Alternate lookup will fail without it.
-        // 4. SortedSet<KeyValuePair<TKey, TValue>> uses this class as an adapter for ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>> to ISpanAlternateComparer<char, string?>
 
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>>, // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
-            ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>>
+        internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>> // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
 #if FEATURE_SERIALIZABLE
             , ISerializable
 #endif
@@ -2237,7 +2265,7 @@ namespace J2N.Collections.Generic
             private const string ComparerDescriptorOptionsName = "ComparerDescriptor.Options";
 #endif
 
-            internal IComparer<TKey> keyComparer; // Do not rename (binary serialization)
+            internal IComparer<TKey> keyComparer;
 
             public KeyValuePairComparer(IComparer<TKey>? keyComparer)
             {
@@ -2322,14 +2350,34 @@ namespace J2N.Collections.Generic
             {
                 return this.keyComparer.GetHashCode();
             }
+        }
+
+        #endregion
+
+        #region Nested Class: AlternateKeyValuePairComparer<TAlternateKeySpan>
+
+        /// <summary>
+        /// An adapter to allow alternate lookup to cascade calls to the (already instantiated) comparer of <see cref="SortedSet{T}"/>
+        /// and deferring the identification of <typeparamref name="TAlternateKeySpan"/> until alternate lookup is used.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The type of <see cref="ReadOnlySpan{T}"/> for the alternate lookup comparer.</typeparam>
+        private sealed class AlternateKeyValuePairComparer<TAlternateKeySpan> : ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>
+        {
+            private readonly KeyValuePairComparer comparer;
+
+            public AlternateKeyValuePairComparer(KeyValuePairComparer comparer)
+            {
+                Debug.Assert(comparer is not null);
+                this.comparer = comparer!; // [!] asserted above
+            }
 
             // J2N: To use span alternate lookup from the underlying SortedSet<KeyValuePair<TKey, TValue>>, we
             // need this interface implemented so the checks pass when cascading from
             // SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> ->
             // SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateSpan>
-            int ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>>.Compare(ReadOnlySpan<char> span, KeyValuePair<TKey, TValue> other)
+            int ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other)
             {
-                if (keyComparer is ISpanAlternateComparer<char, TKey> spanAlternateComparer)
+                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
                 {
                     return spanAlternateComparer.Compare(span, other.Key);
                 }
@@ -2339,9 +2387,9 @@ namespace J2N.Collections.Generic
                 return 0;
             }
 
-            KeyValuePair<TKey, TValue> ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<char> span)
+            KeyValuePair<TKey, TValue> ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<TAlternateKeySpan> span)
             {
-                if (keyComparer is ISpanAlternateComparer<char, TKey> spanAlternateComparer)
+                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
                 {
                     return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, default!);
                 }

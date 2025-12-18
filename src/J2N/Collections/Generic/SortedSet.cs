@@ -17,6 +17,8 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 #endif
 
+using System.Threading;
+
 namespace J2N.Collections.Generic
 {
     // A binary search tree is a red-black tree if it satisfies the following red-black properties:
@@ -489,7 +491,8 @@ namespace J2N.Collections.Generic
 
         #region Properties for Alternate Lookup
 
-        internal IComparer<T> AlternateComparer => comparer;
+        // This calls the correct layer to get the *outermost* comparer (a user comparer or a comparer wrapper around a BCL StringComparer)
+        internal IComparer<T> RawComparer => comparer;
 
         // J2N: This is state from TreeSubSet exposed to allow range checks in Alternate Lookup
         internal virtual SortedSet<T> UnderlyingSet => this;
@@ -1126,6 +1129,19 @@ namespace J2N.Collections.Generic
             return new SpanAlternateLookup<TAlternateSpan>(this);
         }
 
+        // This overload is a special case for the comparer to be passed down from SortedDictionary<TKey, TValue>,
+        // since it requires an adapter. This is recursively called inside of this type to ensure the same comparer
+        // is used by other view instances, even if it is not the SortedSet<T> comparer.
+        internal SpanAlternateLookup<TAlternateSpan> GetSpanAlternateLookup<TAlternateSpan>(ISpanAlternateComparer<TAlternateSpan, T>? alternateComparer)
+        {
+            if (alternateComparer is null)
+            {
+                return new SpanAlternateLookup<TAlternateSpan>(this);
+            }
+
+            return new SpanAlternateLookup<TAlternateSpan>(this, alternateComparer!);
+        }
+
         /// <summary>
         /// Gets an instance of a type that may be used to perform operations on the current <see cref="SortedSet{T}"/>
         /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
@@ -1157,6 +1173,7 @@ namespace J2N.Collections.Generic
         /// <typeparam name="TAlternateSpan">The alternate type of instance for performing lookups.</typeparam>
         public readonly struct SpanAlternateLookup<TAlternateSpan>
         {
+            private readonly ISpanAlternateComparer<TAlternateSpan, T>? _alternateComparer;
             private readonly bool _isUnderlying;
 
             /// <summary>Initialize the instance. The set must have already been verified to have a compatible comparer.</summary>
@@ -1166,6 +1183,17 @@ namespace J2N.Collections.Generic
                 Debug.Assert(IsCompatibleItem(set!)); // [!]: asserted above
                 Set = set!; // [!]: asserted above
                 _isUnderlying = set == set!.UnderlyingSet; // [!]: asserted above
+                _alternateComparer = null;
+            }
+
+            /// <summary>Initialize the instance. The comparer must have already been verified to be compatible with the set.</summary>
+            internal SpanAlternateLookup(SortedSet<T> set, ISpanAlternateComparer<TAlternateSpan, T> alternateComparer)
+            {
+                Debug.Assert(set is not null);
+                Debug.Assert(alternateComparer is not null); // [!]: asserted above
+                Set = set!; // [!]: asserted above
+                _isUnderlying = set == set!.UnderlyingSet; // [!]: asserted above
+                _alternateComparer = alternateComparer;
             }
 
             /// <summary>Gets the <see cref="SortedSet{T}"/> against which this instance performs operations.</summary>
@@ -1181,10 +1209,17 @@ namespace J2N.Collections.Generic
 
             /// <summary>Gets the set's alternate comparer. The set must have already been verified as compatible.</summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal static ISpanAlternateComparer<TAlternateSpan, T> GetAlternateComparer(SortedSet<T> set)
+            internal ISpanAlternateComparer<TAlternateSpan, T> GetAlternateComparer()
             {
-                Debug.Assert(IsCompatibleItem(set));
-                return Unsafe.As<ISpanAlternateComparer<TAlternateSpan, T>>(set.comparer)!;
+                if (_alternateComparer is null)
+                {
+                    Debug.Assert(IsCompatibleItem(Set));
+                    return Unsafe.As<ISpanAlternateComparer<TAlternateSpan, T>>(Set.comparer)!;
+                }
+
+                // This path is for the SortedDictionary<TKey, TValue>, since it will pass its comparer through the constructor directly
+                // to satisfy the generic closing types (something that KeyValuePairComparer cannot do).
+                return _alternateComparer;
             }
 
             /// <summary>Adds the specified element to a set.</summary>
@@ -1193,17 +1228,18 @@ namespace J2N.Collections.Generic
             public bool Add(ReadOnlySpan<TAlternateSpan> item)
             {
                 SortedSet<T> set = Set;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (_isUnderlying)
                     return AddIfNotPresent(item, comparer);
 
-                return Add_View(item, set, comparer);
+                return Add_View(item, comparer);
             }
 
             [MethodImpl(MethodImplOptions.NoInlining)]
-            private bool Add_View(ReadOnlySpan<TAlternateSpan> item, SortedSet<T> set, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            private bool Add_View(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
+                SortedSet<T> set = Set;
                 SortedSet<T> underlying = set.UnderlyingSet;
 
                 if (!IsWithinRange(item, comparer))
@@ -1213,7 +1249,7 @@ namespace J2N.Collections.Generic
 
                 // Delegate to underlying set.
                 // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                bool ret = underlying.GetSpanAlternateLookup<TAlternateSpan>().AddIfNotPresent(item, comparer);
+                bool ret = underlying.GetSpanAlternateLookup(_alternateComparer).AddIfNotPresent(item, comparer);
 
                 set.VersionCheck();
 
@@ -1307,18 +1343,18 @@ namespace J2N.Collections.Generic
             /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
             public bool Remove(ReadOnlySpan<TAlternateSpan> item)
             {
-                SortedSet<T> set = Set;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (_isUnderlying)
                     return DoRemove(item, comparer);
 
-                return Remove_View(item, set, comparer);
+                return Remove_View(item, comparer);
             }
 
             [MethodImpl(MethodImplOptions.NoInlining)]
-            private bool Remove_View(ReadOnlySpan<TAlternateSpan> item, SortedSet<T> set, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            private bool Remove_View(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
+                SortedSet<T> set = Set;
                 SortedSet<T> underlying = set.UnderlyingSet;
 
                 if (!IsWithinRange(item, comparer))
@@ -1514,7 +1550,7 @@ namespace J2N.Collections.Generic
             public bool TryGetPredecessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 Node? current = set.root, match = null;
 
@@ -1562,7 +1598,7 @@ namespace J2N.Collections.Generic
             public bool TryGetSuccessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 Node? current = set.root, match = null;
 
@@ -1628,7 +1664,7 @@ namespace J2N.Collections.Generic
             {
                 SortedSet<T> set = Set;
                 SortedSet<T> underlying = set.UnderlyingSet;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooLow(lowerValue, comparer))
                 {
@@ -1643,7 +1679,7 @@ namespace J2N.Collections.Generic
                 // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
                 return _isUnderlying
                     ? GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true, comparer)
-                    : underlying.GetSpanAlternateLookup<TAlternateSpan>().GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true, comparer);
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true, comparer);
             }
 
             /// <summary>
@@ -1675,7 +1711,7 @@ namespace J2N.Collections.Generic
             {
                 SortedSet<T> set = Set;
                 SortedSet<T> underlying = set.UnderlyingSet;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooLow(lowerValue, comparer))
                 {
@@ -1690,7 +1726,7 @@ namespace J2N.Collections.Generic
                 // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
                 return _isUnderlying
                     ? GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer)
-                    : underlying.GetSpanAlternateLookup<TAlternateSpan>().GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer);
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer);
             }
 
             internal SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
@@ -1725,7 +1761,7 @@ namespace J2N.Collections.Generic
             private Node? FindNode_View(ReadOnlySpan<TAlternateSpan> item)
             {
                 SortedSet<T> set = Set;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (!IsWithinRange(item, comparer))
                 {
@@ -1744,7 +1780,7 @@ namespace J2N.Collections.Generic
             internal Node? FindNode(ReadOnlySpan<TAlternateSpan> item)
             {
                 SortedSet<T> set = Set;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 return FindNode(item, comparer);
             }
