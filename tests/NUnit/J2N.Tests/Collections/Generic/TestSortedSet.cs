@@ -65,7 +65,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetPredecessor_View()
         {
             loadup();
-            var view = tree.GetViewBetween(6, 14);
+            var view = tree!.GetViewBetween(6, 14);
 
             int res;
             Assert.IsTrue(view.TryGetPredecessor(9, out res) && res == 8);
@@ -109,7 +109,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetSuccessor_View()
         {
             loadup();
-            var view = tree.GetViewBetween(6, 14);
+            var view = tree!.GetViewBetween(6, 14);
 
             int res;
             Assert.IsTrue(view.TryGetSuccessor(9, out res) && res == 10);
@@ -154,7 +154,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetFloor() // weak predecessor in C5, floor in JDK
         {
             loadup();
-            Assert.IsTrue(tree.TryGetFloor(7, out int res) && res == 6);
+            Assert.IsTrue(tree!.TryGetFloor(7, out int res) && res == 6);
             Assert.IsTrue(tree.TryGetFloor(8, out res) && res == 8);
 
             //The bottom
@@ -170,7 +170,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetFloor_View()
         {
             loadup();
-            var view = tree.GetViewBetween(6, 14);
+            var view = tree!.GetViewBetween(6, 14);
 
             Assert.IsTrue(view.TryGetFloor(9, out int res) && res == 8);
             Assert.IsTrue(view.TryGetFloor(10, out res) && res == 10);
@@ -187,7 +187,7 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestTryGetFloor_TooLow()
         {
-            Assert.IsFalse(tree.TryGetFloor(-1, out int res));
+            Assert.IsFalse(tree!.TryGetFloor(-1, out int res));
             Assert.AreEqual(0, res);
         }
 
@@ -195,7 +195,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetCeiling() // weak successor in C5, floor in JDK
         {
             loadup();
-            Assert.IsTrue(tree.TryGetCeiling(6, out int res) && res == 6);
+            Assert.IsTrue(tree!.TryGetCeiling(6, out int res) && res == 6);
             Assert.IsTrue(tree.TryGetCeiling(7, out res) && res == 8);
 
             //The bottom
@@ -211,7 +211,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetCeiling_View()
         {
             loadup();
-            var view = tree.GetViewBetween(6, 14);
+            var view = tree!.GetViewBetween(6, 14);
 
             Assert.IsTrue(view.TryGetCeiling(8, out int res) && res == 8);
             Assert.IsTrue(view.TryGetCeiling(9, out res) && res == 10);
@@ -230,7 +230,7 @@ namespace J2N.Collections.Generic
         [Test]
         public void TryGetCeiling_TooHigh()
         {
-            Assert.IsFalse(tree.TryGetCeiling(39, out int res));
+            Assert.IsFalse(tree!.TryGetCeiling(39, out int res));
             Assert.AreEqual(0, res);
         }
 
@@ -238,7 +238,7 @@ namespace J2N.Collections.Generic
         public void TryGetCeiling_View_TooHigh()
         {
             loadup();
-            var view = tree.GetViewBetween(6, 14);
+            var view = tree!.GetViewBetween(6, 14);
 
             Assert.IsFalse(view.TryGetCeiling(15, out int res));
             Assert.AreEqual(0, res);

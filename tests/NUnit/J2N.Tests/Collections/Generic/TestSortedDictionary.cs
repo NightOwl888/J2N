@@ -14,24 +14,11 @@ namespace J2N.Collections.Generic
 {
     public class TestSortedDictionary : TestCase
     {
-        private SortedDictionary<string, string> dict;
-
-
-        public override void SetUp()
-        {
-            base.SetUp();
-            dict = new SortedDictionary<string, string>(StringComparer.Ordinal);
-        }
-
-        public override void TearDown()
-        {
-            dict = null;
-            base.TearDown();
-        }
-
         [Test]
         public void TestTryGetPredecessor_KeyValuePair()
         {
+            var dict = new SortedDictionary<string, string>(StringComparer.Ordinal);
+
             dict.Add("A", "1");
             dict.Add("C", "2");
             dict.Add("E", "3");
@@ -49,6 +36,8 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestTryGetSuccessor_KeyValuePair()
         {
+            var dict = new SortedDictionary<string, string>(StringComparer.Ordinal);
+
             dict.Add("A", "1");
             dict.Add("C", "2");
             dict.Add("E", "3");
@@ -66,16 +55,18 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestTryGetPredecessor()
         {
+            var dict = new SortedDictionary<string, string>(StringComparer.Ordinal);
+
             dict.Add("A", "1");
             dict.Add("C", "2");
             dict.Add("E", "3");
 
-            Assert.IsTrue(dict.TryGetPredecessor("B", out _, out string value));
+            Assert.IsTrue(dict.TryGetPredecessor("B", out _, out string? value));
             Assert.AreEqual("1", value);
             Assert.IsTrue(dict.TryGetPredecessor("C", out _, out value));
             Assert.AreEqual("1", value);
 
-            Assert.IsFalse(dict.TryGetPredecessor("A", out string key, out value));
+            Assert.IsFalse(dict.TryGetPredecessor("A", out string? key, out value));
             Assert.AreEqual(null, key);
             Assert.AreEqual(null, value);
         }
@@ -83,16 +74,18 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestTryGetSuccessor()
         {
+            var dict = new SortedDictionary<string, string>(StringComparer.Ordinal);
+
             dict.Add("A", "1");
             dict.Add("C", "2");
             dict.Add("E", "3");
 
-            Assert.IsTrue(dict.TryGetSuccessor("B", out _, out string value));
+            Assert.IsTrue(dict.TryGetSuccessor("B", out _, out string? value));
             Assert.AreEqual("2", value);
             Assert.IsTrue(dict.TryGetSuccessor("C", out _, out value));
             Assert.AreEqual("3", value);
 
-            Assert.IsFalse(dict.TryGetSuccessor("E", out string key, out value));
+            Assert.IsFalse(dict.TryGetSuccessor("E", out string? key, out value));
             Assert.AreEqual(null, key);
             Assert.AreEqual(null, value);
         }
@@ -100,16 +93,18 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestTryGetFloor()
         {
+            var dict = new SortedDictionary<string, string>(StringComparer.Ordinal);
+
             dict.Add("A", "1");
             dict.Add("C", "2");
             dict.Add("E", "3");
 
-            Assert.IsTrue(dict.TryGetFloor("B", out _, out string value));
+            Assert.IsTrue(dict.TryGetFloor("B", out _, out string? value));
             Assert.AreEqual("1", value);
             Assert.IsTrue(dict.TryGetFloor("C", out _, out value));
             Assert.AreEqual("2", value);
 
-            Assert.IsFalse(dict.TryGetFloor("@", out string key, out value));
+            Assert.IsFalse(dict.TryGetFloor("@", out string? key, out value));
             Assert.AreEqual(null, key);
             Assert.AreEqual(null, value);
         }
@@ -117,16 +112,18 @@ namespace J2N.Collections.Generic
         [Test]
         public void TestTryGetCeiling()
         {
+            var dict = new SortedDictionary<string, string>(StringComparer.Ordinal);
+
             dict.Add("A", "1");
             dict.Add("C", "2");
             dict.Add("E", "3");
 
-            Assert.IsTrue(dict.TryGetCeiling("B", out _, out string value));
+            Assert.IsTrue(dict.TryGetCeiling("B", out _, out string? value));
             Assert.AreEqual("2", value);
             Assert.IsTrue(dict.TryGetCeiling("C", out _, out value));
             Assert.AreEqual("2", value);
 
-            Assert.IsFalse(dict.TryGetCeiling("F", out string key, out value));
+            Assert.IsFalse(dict.TryGetCeiling("F", out string? key, out value));
             Assert.AreEqual(null, key);
             Assert.AreEqual(null, value);
         }
