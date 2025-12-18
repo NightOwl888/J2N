@@ -489,6 +489,8 @@ namespace J2N.Collections.Generic
 
         #region Properties for Alternate Lookup
 
+        internal IComparer<T> AlternateComparer => comparer;
+
         // J2N: This is state from TreeSubSet exposed to allow range checks in Alternate Lookup
         internal virtual SortedSet<T> UnderlyingSet => this;
 
@@ -1739,7 +1741,7 @@ namespace J2N.Collections.Generic
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private Node? FindNode(ReadOnlySpan<TAlternateSpan> item)
+            internal Node? FindNode(ReadOnlySpan<TAlternateSpan> item)
             {
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer(set);
@@ -3755,6 +3757,17 @@ namespace J2N.Collections.Generic
 
         // Used for set checking operations (using enumerables) that rely on counting
         private static int Log2(int value) => BitOperation.Log2((uint)value);
+
+        // Used by SortedDictionary alternate lookup to set "this" without deleting and re-adding
+        internal void ReplaceItem(Node node, T newItem)
+        {
+            Debug.Assert(node != null);
+#if DEBUG
+            Debug.Assert(Comparer.Compare(node!.Item, newItem) == 0); // [!]: asserted above
+#endif
+            node.Item = newItem;
+            version++;
+        }
 
         #endregion
 

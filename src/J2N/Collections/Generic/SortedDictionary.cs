@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
@@ -840,6 +842,13 @@ namespace J2N.Collections.Generic
 
         #endregion
 
+        #region Properties for Alternate Lookup
+
+        // This calls the correct layer to get the *outermost* comparer (a user comparer or a comparer wrapper around a user comparer)
+        internal IComparer<TKey> AlternateComparer => ((KeyValuePairComparer)_set.AlternateComparer).keyComparer;
+
+        #endregion Properties for Alternate Lookup
+
         #region Java TreeMap-like Members
 
         /// <summary>
@@ -981,6 +990,230 @@ namespace J2N.Collections.Generic
         }
 
         #endregion
+
+        #region SpanAlternateLookup
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="SortedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        /// <returns>The created lookup instance.</returns>
+        /// <exception cref="InvalidOperationException">The dictionary's comparer is not compatible with <typeparamref name="TAlternateKeySpan"/>.</exception>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateKeySpan, TKey}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
+        /// If it doesn't, an exception will be thrown.
+        /// </remarks>
+        public SpanAlternateLookup<TAlternateKeySpan> GetSpanAlternateLookup<TAlternateKeySpan>()
+        {
+            if (!SpanAlternateLookup<TAlternateKeySpan>.IsCompatibleKey(this))
+            {
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+            }
+
+            return new SpanAlternateLookup<TAlternateKeySpan>(this);
+        }
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="SortedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        /// <param name="lookup">The created lookup instance when the method returns <c>true</c>, or a default instance
+        /// that should not be used if the method returns <c>false</c>.</param>
+        /// <returns><c>true</c> if a lookup could be created; otherwise, <c>false</c>.</returns>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateKeySpan, TKey}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
+        /// If it doesn't, the method will return <c>false</c>.
+        /// </remarks>
+        public bool TryGetSpanAlternateLookup<TAlternateKeySpan>(out SpanAlternateLookup<TAlternateKeySpan> lookup)
+        {
+            if (SpanAlternateLookup<TAlternateKeySpan>.IsCompatibleKey(this))
+            {
+                lookup = new SpanAlternateLookup<TAlternateKeySpan>(this);
+                return true;
+            }
+
+            lookup = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a type that may be used to perform operations on a <see cref="SortedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        public readonly struct SpanAlternateLookup<TAlternateKeySpan>
+        {
+            private readonly TreeSet<KeyValuePair<TKey, TValue>> _set;
+            private readonly SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateKeySpan> _setLookup;
+
+            /// <summary>Initialize the instance. The dictionary must have already been verified to have a compatible comparer.</summary>
+            internal SpanAlternateLookup(SortedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                Debug.Assert(IsCompatibleKey(dictionary!)); // [!]: asserted above
+                Dictionary = dictionary!; // [!]: asserted above
+                _set = dictionary!._set; // [!]: asserted above
+                _setLookup = _set.GetSpanAlternateLookup<TAlternateKeySpan>(); // [!]: asserted above
+            }
+
+            /// <summary>Gets the <see cref="SortedDictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
+            public SortedDictionary<TKey, TValue> Dictionary { get; }
+
+            /// <summary>Gets or sets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get or set.</param>
+            /// <value>
+            /// The value associated with the specified alternate key. If the specified alternate key is not found, a get operation throws
+            /// a <see cref="KeyNotFoundException"/>, and a set operation creates a new element with the specified key.
+            /// </value>
+            /// <exception cref="KeyNotFoundException">The property is retrieved and alternate key does not exist in the collection.</exception>
+            public TValue this[ReadOnlySpan<TAlternateKeySpan> key]
+            {
+                get
+                {
+                    if (!_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                    {
+                        ThrowHelper.ThrowKeyNotFoundException(GetAlternateComparer(Dictionary).Create(key));
+                    }
+
+                    return pair.Value;
+                }
+                set
+                {
+                    TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _setLookup.FindNode(key);
+                    if (node is not null)
+                    {
+                        _set.ReplaceItem(node, new KeyValuePair<TKey, TValue>(node.Item.Key, value));
+                    }
+                    else
+                    {
+                        _set.Add(new KeyValuePair<TKey, TValue>(GetAlternateComparer(Dictionary).Create(key), value));
+                    }
+                }
+            }
+
+            /// <summary>Checks whether the dictionary has a comparer compatible with <typeparamref name="TAlternateKeySpan"/>.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static bool IsCompatibleKey(SortedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                return dictionary!.AlternateComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey>; // [!]: asserted above
+            }
+
+            /// <summary>Gets the dictionary's alternate comparer. The dictionary must have already been verified as compatible.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static ISpanAlternateComparer<TAlternateKeySpan, TKey> GetAlternateComparer(SortedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(IsCompatibleKey(dictionary));
+                return Unsafe.As<ISpanAlternateComparer<TAlternateKeySpan, TKey>>(dictionary.AlternateComparer)!;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            public bool TryGetValue(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TValue value)
+            {
+                if (_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                {
+                    value = pair.Value;
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="actualKey">
+            /// When this method returns, contains the actual key associated with the alternate key, if the key is found;
+            /// otherwise, the default value for the type of the key parameter.
+            /// </param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryGetValue(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                if (_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                {
+                    actualKey = pair.Key;
+                    value = pair.Value;
+                    return true;
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Determines whether the <see cref="Dictionary{TKey, TValue}"/> contains the specified alternate key.</summary>
+            /// <param name="key">The alternate key to check.</param>
+            /// <returns><see langword="true"/> if the key is in the dictionary; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool ContainsKey(ReadOnlySpan<TAlternateKeySpan> key) =>
+                _setLookup.Contains(key);
+
+            /// <summary>Removes the value with the specified alternate key from the <see cref="Dictionary{TKey, TValue}"/>.</summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove(ReadOnlySpan<TAlternateKeySpan> key) =>
+                _setLookup.Remove(key);
+
+            /// <summary>
+            /// Removes the value with the specified alternate key from the <see cref="Dictionary{TKey, TValue}"/>,
+            /// and copies the element to the value parameter.
+            /// </summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <param name="actualKey">The removed key.</param>
+            /// <param name="value">The removed element.</param>
+            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                // J2N: Calling TryGetValue ensures the decision whether to call on an underlying set or a view is respected
+                if (_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                {
+                    actualKey = pair.Key;
+                    value = pair.Value;
+                    return _setLookup.Remove(key);
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
+            /// <param name="key">The alternate key of the element to add.</param>
+            /// <param name="value">The value of the element to add.</param>
+            /// <returns><c>true</c> if the key/value pair was added to the dictionary successfully; otherwise, <c>false</c>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryAdd(ReadOnlySpan<TAlternateKeySpan> key, TValue value)
+            {
+                if (_setLookup.Contains(key))
+                    return false;
+
+                SortedDictionary<TKey, TValue> dictionary = Dictionary;
+                ISpanAlternateComparer<TAlternateKeySpan, TKey> comparer = GetAlternateComparer(dictionary);
+                TKey actualKey = comparer.Create(key);
+                dictionary.Add(actualKey, value); // Contains() already called. So, this should succeed.
+
+                return true;
+            }
+        }
+
+        #endregion SpanAlternateLookup
 
         #region Structural Equality
 
@@ -1977,10 +2210,19 @@ namespace J2N.Collections.Generic
 
         #region Nested Class: KeyValuePairComparer
 
+        // This class provides different comparer visibility:
+        //
+        // 1. keyComparer is the comparer used by SortedDictionary<TKey, TValue>, which may be wrapped in an IInternalStringComparer instance.
+        // 2. The Comparer property provides access to the comparer that was provided by the user and unwraps it if necessary.
+        // 3. SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> uses the keyComparer property to check whether ISpanAlternateComparer<TAlternateKeySpan, T> is implemented.
+        //    Alternate lookup will fail without it.
+        // 4. SortedSet<KeyValuePair<TKey, TValue>> uses this class as an adapter for ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>> to ISpanAlternateComparer<char, string?>
+
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
-        internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>> // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
+        internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>>, // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
+            ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>>
 #if FEATURE_SERIALIZABLE
             , ISerializable
 #endif
@@ -2079,6 +2321,34 @@ namespace J2N.Collections.Generic
             public override int GetHashCode()
             {
                 return this.keyComparer.GetHashCode();
+            }
+
+            // J2N: To use span alternate lookup from the underlying SortedSet<KeyValuePair<TKey, TValue>>, we
+            // need this interface implemented so the checks pass when cascading from
+            // SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> ->
+            // SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateSpan>
+            int ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>>.Compare(ReadOnlySpan<char> span, KeyValuePair<TKey, TValue> other)
+            {
+                if (keyComparer is ISpanAlternateComparer<char, TKey> spanAlternateComparer)
+                {
+                    return spanAlternateComparer.Compare(span, other.Key);
+                }
+
+                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+                return 0;
+            }
+
+            KeyValuePair<TKey, TValue> ISpanAlternateComparer<char, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<char> span)
+            {
+                if (keyComparer is ISpanAlternateComparer<char, TKey> spanAlternateComparer)
+                {
+                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, default!);
+                }
+
+                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+                return default;
             }
         }
 
