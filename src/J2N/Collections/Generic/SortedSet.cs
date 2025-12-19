@@ -4130,17 +4130,6 @@ namespace J2N.Collections.Generic
         // Used for set checking operations (using enumerables) that rely on counting
         private static int Log2(int value) => BitOperation.Log2((uint)value);
 
-        // Used by SortedDictionary alternate lookup to set "this" without deleting and re-adding
-        internal void ReplaceItem(Node node, T newItem)
-        {
-            Debug.Assert(node != null);
-#if DEBUG
-            Debug.Assert(Comparer.Compare(node!.Item, newItem) == 0); // [!]: asserted above
-#endif
-            node.Item = newItem;
-            version++;
-        }
-
         #endregion
 
         #region Structural Equality

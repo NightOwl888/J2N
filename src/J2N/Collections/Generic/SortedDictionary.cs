@@ -1114,13 +1114,14 @@ namespace J2N.Collections.Generic
                 set
                 {
                     TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _setLookup.FindNode(key);
-                    if (node is not null)
+                    if (node is null)
                     {
-                        _set.ReplaceItem(node, new KeyValuePair<TKey, TValue>(node.Item.Key, value));
+                        _set.Add(new KeyValuePair<TKey, TValue>(GetAlternateComparer(Dictionary).Create(key), value));
                     }
                     else
                     {
-                        _set.Add(new KeyValuePair<TKey, TValue>(GetAlternateComparer(Dictionary).Create(key), value));
+                        node.Item = new KeyValuePair<TKey, TValue>(node.Item.Key, value);
+                        _set.UpdateVersion();
                     }
                 }
             }
