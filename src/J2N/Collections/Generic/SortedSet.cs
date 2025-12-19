@@ -17,8 +17,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 #endif
 
-using System.Threading;
-
 namespace J2N.Collections.Generic
 {
     // A binary search tree is a red-black tree if it satisfies the following red-black properties:
@@ -1345,6 +1343,146 @@ namespace J2N.Collections.Generic
             }
 
             #endregion Add
+
+            #region TryAdd
+
+            // J2N: Called from SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> only. We need to do tasks in the following order:
+            //
+            // 1. Traverse the tree to see if the node exists
+            // 2. If not, instantiate the TKey value
+            // 3. Create a KeyValuePair, populating both TKey and TValue
+            // 4. Add the KeyValuePair to the SortedSet as type T
+            //
+            // This method requires both type info about the dictionary and the ability to traverse the tree and internal state of SortedSet<T>.
+            // Since SortedSet<T> owns the tree and ReadOnlySpan<T> limits how we can instantiate the value, it is more sensible to do unsafe casts here than to
+            // expose all of the internal state of SortedSet<T> to SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> to pull this off.
+            internal bool TryAdd<TKey, TValue>(ReadOnlySpan<TAlternateSpan> key, TValue value, SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan> comparer)
+            {
+#if DEBUG
+                Debug.Assert(typeof(T) == typeof(KeyValuePair<TKey, TValue>));
+#endif
+
+                if (_isUnderlying)
+                    return AddIfNotPresent(key, value, comparer);
+
+                return TryAdd_View(key, value, comparer);
+            }
+
+            internal bool TryAdd_View<TKey, TValue>(ReadOnlySpan<TAlternateSpan> key, TValue value, SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan> comparer)
+            {
+#if DEBUG
+                Debug.Assert(typeof(T) == typeof(KeyValuePair<TKey, TValue>));
+                Debug.Assert(_alternateComparer is not null);
+#endif
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> cmp = Unsafe.As<SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan>, ISpanAlternateComparer<TAlternateSpan, T>>(ref comparer);
+
+                if (!IsWithinRange(key, cmp))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(key));
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                bool ret = underlying.GetSpanAlternateLookup(_alternateComparer).AddIfNotPresent(key, value, comparer);
+
+                set.VersionCheck();
+
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == underlying.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                return ret;
+            }
+
+
+            private bool AddIfNotPresent<TKey, TValue>(ReadOnlySpan<TAlternateSpan> key, TValue value, SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan> comparer)
+            {
+#if DEBUG
+                Debug.Assert(typeof(T) == typeof(KeyValuePair<TKey, TValue>));
+#endif
+
+                SortedSet<T> set = Set;
+
+                if (set.root == null)
+                {
+                    // The tree is empty and this is the first item.
+                    KeyValuePair<TKey, TValue> kvpBlack = comparer.Create(key, value);
+                    set.root = new Node(Unsafe.As<KeyValuePair<TKey,TValue>, T>(ref kvpBlack), NodeColor.Black);
+                    set.count = 1;
+                    set.version++;
+                    return true;
+                }
+
+                // Search for a node at bottom to insert the new node.
+                // If we can guarantee the node we found is not a 4-node, it would be easy to do insertion.
+                // We split 4-nodes along the search path.
+                Node? current = set.root;
+                Node? parent = null;
+                Node? grandParent = null;
+                Node? greatGrandParent = null;
+
+                // Even if we don't actually add to the set, we may be altering its structure (by doing rotations and such).
+                // So update `_version` to disable any instances of Enumerator/TreeSubSet from working on it.
+                set.version++;
+
+                int order = 0;
+                while (current != null)
+                {
+                    ref T item = ref current.Item;
+                    order = comparer.Compare(key, Unsafe.As<T, KeyValuePair<TKey,TValue>>(ref item));
+                    if (order == 0)
+                    {
+                        // We could have changed root node to red during the search process.
+                        // We need to set it to black before we return.
+                        set.root.ColorBlack();
+                        return false;
+                    }
+
+                    // Split a 4-node into two 2-nodes.
+                    if (current.Is4Node)
+                    {
+                        current.Split4Node();
+                        // We could have introduced two consecutive red nodes after split. Fix that by rotation.
+                        if (Node.IsNonNullRed(parent))
+                        {
+                            set.InsertionBalance(current, ref parent!, grandParent!, greatGrandParent!);
+                        }
+                    }
+
+                    greatGrandParent = grandParent;
+                    grandParent = parent;
+                    parent = current;
+                    current = (order < 0) ? current.Left : current.Right;
+                }
+
+                Debug.Assert(parent != null);
+                // We're ready to insert the new node.
+                KeyValuePair<TKey, TValue> kvpRed = comparer.Create(key, value);
+                Node node = new Node(Unsafe.As<KeyValuePair<TKey, TValue>, T>(ref kvpRed), NodeColor.Red);
+                if (order > 0)
+                {
+                    parent!.Right = node;
+                }
+                else
+                {
+                    parent!.Left = node;
+                }
+
+                // The new node will be red, so we will need to adjust colors if its parent is also red.
+                if (parent.IsRed)
+                {
+                    set.InsertionBalance(node, ref parent!, grandParent!, greatGrandParent!);
+                }
+
+                // The root node is always black.
+                set.root.ColorBlack();
+                ++set.count;
+                return true;
+            }
+
+            #endregion TryAdd
 
             #region Remove
 
@@ -3533,7 +3671,7 @@ namespace J2N.Collections.Generic
 
             public static bool IsNullOrBlack(Node? node) => node == null || node.IsBlack;
 
-            public T Item { get; set; }
+            public T Item; // J2N: Changed to a field so we can directly access it with Unsafe
 
             public Node? Left { get; set; }
 

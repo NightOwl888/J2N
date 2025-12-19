@@ -10,13 +10,12 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using SCG = System.Collections.Generic;
 
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
-using System.Threading;
-
 #endif
-using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
@@ -160,7 +159,7 @@ namespace J2N.Collections.Generic
             var keyValuePairComparer = new KeyValuePairComparer(comparer);
 
             if (dictionary is SortedDictionary<TKey, TValue> sortedDictionary &&
-            sortedDictionary._set.Comparer is KeyValuePairComparer kv &&
+                sortedDictionary._set.Comparer is KeyValuePairComparer kv &&
                 kv.keyComparer.Equals(keyValuePairComparer.keyComparer))
             {
                 _set = new TreeSet<KeyValuePair<TKey, TValue>>(sortedDictionary._set, keyValuePairComparer);
@@ -171,7 +170,11 @@ namespace J2N.Collections.Generic
 
                 foreach (KeyValuePair<TKey, TValue> pair in dictionary)
                 {
-                    _set.Add(pair);
+                    // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
+                    if (!_set.Add(pair))
+                    {
+                        ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(pair.Key);
+                    }
                 }
             }
         }
@@ -220,7 +223,11 @@ namespace J2N.Collections.Generic
 
         void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> keyValuePair)
         {
-            _set.Add(keyValuePair);
+            // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
+            if (!_set.Add(keyValuePair))
+            {
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(keyValuePair.Key);
+            }
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
@@ -417,13 +424,15 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public void Add([AllowNull] TKey key, [AllowNull]TValue value)
+        public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
-            //if (key == null) // J2N: Making key nullable
-            //{
-            //    throw new ArgumentNullException(nameof(key));
-            //}
-            _set.Add(new KeyValuePair<TKey, TValue>(key!, value!));
+            // J2N supports null keys
+
+            // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
+            if (!_set.Add(new KeyValuePair<TKey, TValue>(key!, value!)))
+            {
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(key);
+            }
         }
 
         /// <summary>
@@ -657,16 +666,8 @@ namespace J2N.Collections.Generic
         /// <see cref="TryAdd(TKey, TValue)"/> does nothing and returns <c>false</c>.</remarks>
         // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
         // It is redefined here to ensure we have it in prior platforms.
-        public bool TryAdd([AllowNull] TKey key, TValue value)
-        {
-            if (!ContainsKey(key))
-            {
-                Add(key, value);
-                return true;
-            }
-
-            return false;
-        }
+        public bool TryAdd([AllowNull] TKey key, [AllowNull] TValue value)
+            => _set.Add(new KeyValuePair<TKey, TValue>(key!, value!));
 
         /// <summary>
         /// Gets the value associated with the specified key.
@@ -691,8 +692,6 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method approaches an O(1) operation.
         /// </remarks>
-
-
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
@@ -1087,7 +1086,7 @@ namespace J2N.Collections.Generic
                 Dictionary = dictionary!; // [!]: asserted above
                 _set = dictionary!._set; // [!]: asserted above
                 _alternateComparer = dictionary!.GetOrCreateAlternateComparer<TAlternateKeySpan>(); // [!]: asserted above
-                _setLookup = _set.GetSpanAlternateLookup(_alternateComparer); // [!]: asserted above
+                _setLookup = _set.GetSpanAlternateLookup(_alternateComparer);
             }
 
             /// <summary>Gets the <see cref="SortedDictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
@@ -1230,18 +1229,8 @@ namespace J2N.Collections.Generic
             /// <param name="value">The value of the element to add.</param>
             /// <returns><c>true</c> if the key/value pair was added to the dictionary successfully; otherwise, <c>false</c>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
-            public bool TryAdd(ReadOnlySpan<TAlternateKeySpan> key, TValue value)
-            {
-                if (_setLookup.Contains(key))
-                    return false;
-
-                SortedDictionary<TKey, TValue> dictionary = Dictionary;
-                ISpanAlternateComparer<TAlternateKeySpan, TKey> comparer = GetAlternateComparer(dictionary);
-                TKey actualKey = comparer.Create(key);
-                dictionary.Add(actualKey, value); // Contains() already called. So, this should succeed.
-
-                return true;
-            }
+            public bool TryAdd(ReadOnlySpan<TAlternateKeySpan> key, TValue value) =>
+                _setLookup.TryAdd(key, value, _alternateComparer);
 
             /// <summary>
             /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
@@ -2474,7 +2463,7 @@ namespace J2N.Collections.Generic
         /// and deferring the identification of <typeparamref name="TAlternateKeySpan"/> until alternate lookup is used.
         /// </summary>
         /// <typeparam name="TAlternateKeySpan">The type of <see cref="ReadOnlySpan{T}"/> for the alternate lookup comparer.</typeparam>
-        private sealed class AlternateKeyValuePairComparer<TAlternateKeySpan> : ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>
+        internal sealed class AlternateKeyValuePairComparer<TAlternateKeySpan> : ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>
         {
             private readonly KeyValuePairComparer comparer;
 
@@ -2488,7 +2477,21 @@ namespace J2N.Collections.Generic
             // need this interface implemented so the checks pass when cascading from
             // SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> ->
             // SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateSpan>
-            int ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other)
+            int ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other) => Compare(span, other);
+
+            KeyValuePair<TKey, TValue> ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<TAlternateKeySpan> span)
+            {
+                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
+                {
+                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, default!);
+                }
+
+                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+                return default;
+            }
+
+            public int Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other)
             {
                 if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
                 {
@@ -2500,11 +2503,13 @@ namespace J2N.Collections.Generic
                 return 0;
             }
 
-            KeyValuePair<TKey, TValue> ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<TAlternateKeySpan> span)
+            // This overload is not part of the ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>
+            // contract, but is needed to allow the value to be passed to the KeyValuePair constructor.
+            public KeyValuePair<TKey, TValue> Create(ReadOnlySpan<TAlternateKeySpan> span, TValue value)
             {
                 if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
                 {
-                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, default!);
+                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, value);
                 }
 
                 // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
@@ -2523,7 +2528,9 @@ namespace J2N.Collections.Generic
     /// TreeSet. To ensure that we can read back anything that has already been written to disk, we need to
     /// make sure that we have a class named TreeSet that does everything the way it used to.
     ///
-    /// The only thing that makes it different from SortedSet is that it throws on duplicates
+    /// The only thing that makes it different from SortedSet is the type for serialization. Note that
+    /// that the AddIfNotPresent() method is not overridden here so we can use the method from
+    /// <see cref="SortedDictionary{TKey, TValue}.TryAdd(TKey, TValue)"/> without throwing exceptions.
     /// </summary>
     /// <typeparam name="T"></typeparam>
 #if FEATURE_SERIALIZABLE
@@ -2543,15 +2550,5 @@ namespace J2N.Collections.Generic
         [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
         private TreeSet(SerializationInfo siInfo, StreamingContext context) : base(siInfo, context) { /* Intentionally blank */ }
 #endif
-
-        internal override bool AddIfNotPresent(T item)
-        {
-            bool ret = base.AddIfNotPresent(item);
-            if (!ret)
-            {
-                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<T>(item);
-            }
-            return ret;
-        }
     }
 }
