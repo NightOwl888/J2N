@@ -644,9 +644,9 @@ namespace J2N.Collections.Generic
         // It is redefined here to ensure we have it in prior platforms.
         public bool Remove([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
-            if (TryGetValue(key, out value))
+            if (_set.DoRemove(new KeyValuePair<TKey, TValue>(key!, default!), out KeyValuePair<TKey, TValue> removed))
             {
-                _set.Remove(new KeyValuePair<TKey, TValue>(key!, default!));
+                value = removed.Value;
                 return true;
             }
 
@@ -1211,12 +1211,11 @@ namespace J2N.Collections.Generic
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
             {
-                // J2N: Calling TryGetValue ensures the decision whether to call on an underlying set or a view is respected
-                if (_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                if (_setLookup.Remove(key, out KeyValuePair<TKey, TValue> removed))
                 {
-                    actualKey = pair.Key;
-                    value = pair.Value;
-                    return _setLookup.Remove(key);
+                    actualKey = removed.Key;
+                    value = removed.Value;
+                    return true;
                 }
 
                 actualKey = default;

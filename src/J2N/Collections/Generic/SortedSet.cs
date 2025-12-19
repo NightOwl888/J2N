@@ -852,12 +852,13 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an <c>O(log n)</c> operation.
         /// </remarks>
-        public bool Remove(T item) => DoRemove(item); // Hack so the implementation can be made virtual
+        public bool Remove(T item) => DoRemove(item, out _); // Hack so the implementation can be made virtual
 
-        internal virtual bool DoRemove(T item)
+        internal virtual bool DoRemove(T item, [MaybeNullWhen(false)] out T removed)
         {
             if (root == null)
             {
+                removed = default;
                 return false;
             }
 
@@ -965,8 +966,13 @@ namespace J2N.Collections.Generic
             // Move successor to the matching node position and replace links.
             if (match != null)
             {
+                removed = match.Item;
                 ReplaceNode(match, parentOfMatch!, parent!, grandParent!);
                 --count;
+            }
+            else
+            {
+                removed = default;
             }
 
             root?.ColorBlack();
@@ -1494,25 +1500,36 @@ namespace J2N.Collections.Generic
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (_isUnderlying)
-                    return DoRemove(item, comparer);
+                    return DoRemove(item, comparer, out _);
 
-                return Remove_View(item, comparer);
+                return Remove_View(item, comparer, out _);
+            }
+
+            internal bool Remove(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T removed)
+            {
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (_isUnderlying)
+                    return DoRemove(item, comparer, out removed);
+
+                return Remove_View(item, comparer, out removed);
             }
 
             [MethodImpl(MethodImplOptions.NoInlining)]
-            private bool Remove_View(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            private bool Remove_View(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer, [MaybeNullWhen(false)] out T removed)
             {
                 SortedSet<T> set = Set;
                 SortedSet<T> underlying = set.UnderlyingSet;
 
                 if (!IsWithinRange(item, comparer))
                 {
+                    removed = default;
                     return false;
                 }
 
                 // Delegate to underlying set.
                 // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                bool ret = underlying.GetSpanAlternateLookup<TAlternateSpan>().DoRemove(item, comparer);
+                bool ret = underlying.GetSpanAlternateLookup<TAlternateSpan>().DoRemove(item, comparer, out removed);
 
                 set.VersionCheck();
 
@@ -1523,12 +1540,13 @@ namespace J2N.Collections.Generic
                 return ret;
             }
 
-            private bool DoRemove(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            private bool DoRemove(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer, [MaybeNullWhen(false)] out T removed)
             {
                 SortedSet<T> set = Set;
 
                 if (set.root is null)
                 {
+                    removed = default;
                     return false;
                 }
 
@@ -1636,8 +1654,13 @@ namespace J2N.Collections.Generic
                 // Move successor to the matching node position and replace links.
                 if (match != null)
                 {
+                    removed = match.Item;
                     set.ReplaceNode(match, parentOfMatch!, parent!, grandParent!);
                     --set.count;
+                }
+                else
+                {
+                    removed = default;
                 }
 
                 set.root?.ColorBlack();

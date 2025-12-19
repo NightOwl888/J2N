@@ -170,6 +170,78 @@ namespace J2N.Collections.Tests
         #endregion
 #endif
 
+        #region Remove(TKey)
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_RemoveKey_ValidKeyNotContainedInDictionary(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            TValue value;
+            TKey missingKey = GetNewKey(dictionary);
+
+            Assert.False(dictionary.Remove(missingKey, out value));
+            Assert.Equal(count, dictionary.Count);
+            Assert.Equal(default(TValue), value);
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_RemoveKey_ValidKeyContainedInDictionary(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            TKey missingKey = GetNewKey(dictionary);
+            TValue outValue;
+            TValue inValue = CreateTValue(count);
+
+            dictionary.Add(missingKey, inValue);
+            Assert.True(dictionary.Remove(missingKey, out outValue));
+            Assert.Equal(count, dictionary.Count);
+            Assert.Equal(inValue, outValue);
+            Assert.False(dictionary.TryGetValue(missingKey, out outValue));
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_RemoveKey_DefaultKeyNotContainedInDictionary(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            TValue outValue;
+
+            if (DefaultValueAllowed)
+            {
+                TKey missingKey = default(TKey);
+                while (dictionary.ContainsKey(missingKey))
+                    dictionary.Remove(missingKey);
+                Assert.False(dictionary.Remove(missingKey, out outValue));
+                Assert.Equal(default(TValue), outValue);
+            }
+            else
+            {
+                TValue initValue = CreateTValue(count);
+                outValue = initValue;
+                Assert.Throws<ArgumentNullException>(() => dictionary.Remove(default(TKey), out outValue));
+                Assert.Equal(initValue, outValue);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_RemoveKey_DefaultKeyContainedInDictionary(int count)
+        {
+            if (DefaultValueAllowed)
+            {
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)(GenericIDictionaryFactory(count));
+                TKey missingKey = default(TKey);
+                TValue value;
+
+                dictionary.TryAdd(missingKey, default(TValue));
+                Assert.True(dictionary.Remove(missingKey, out value));
+            }
+        }
+
+        #endregion
+
         public static SCG.IEnumerable<object[]> SortedDictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData()
         {
             yield return new object[] { EqualityComparer<string>.Default };

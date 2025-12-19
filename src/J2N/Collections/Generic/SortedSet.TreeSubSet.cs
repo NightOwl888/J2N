@@ -112,14 +112,15 @@ namespace J2N.Collections.Generic
                 return base.Contains(item);
             }
 
-            internal override bool DoRemove(T item)
+            internal override bool DoRemove(T item, [MaybeNullWhen(false)] out T removed)
             {
                 if (!IsWithinRange(item))
                 {
+                    removed = default;
                     return false;
                 }
 
-                bool ret = _underlying.Remove(item);
+                bool ret = _underlying.DoRemove(item, out removed);
                 VersionCheck();
 #if DEBUG
                 Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
