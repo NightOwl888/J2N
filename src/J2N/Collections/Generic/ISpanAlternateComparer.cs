@@ -22,7 +22,7 @@ using System.Collections.Generic;
 namespace J2N.Collections.Generic
 {
     /// <summary>
-    /// Implmented by an <see cref="IComparer{T}"/> to support comparing
+    /// Implemented by an <see cref="IComparer{T}"/> to support comparing
     /// a <see cref="ReadOnlySpan{T}"/> instance of type <typeparamref name="TAlternateSpan"/>
     /// with a <typeparamref name="T"/> instance.
     /// </summary>

@@ -547,10 +547,10 @@ namespace J2N.Collections.Generic
         /// is the predecessor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the predecessor of.</param>
-        /// <param name="result">The predessor, if any.</param>
+        /// <param name="result">The predecessor, if any.</param>
         /// <returns><c>true</c> if a predecessor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict predecessor</c> in order theory.
         /// <para/>
@@ -598,13 +598,13 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
-        /// is the sucessor of the specified <paramref name="item"/>.
+        /// is the successor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the successor of.</param>
         /// <param name="result">The successor, if any.</param>
         /// <returns><c>true</c> if a successor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict successor</c> in order theory.
         /// <para/>
@@ -658,7 +658,7 @@ namespace J2N.Collections.Generic
         /// <param name="result">The floor, if any.</param>
         /// <returns><c>true</c> if a floor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>weak predecessor</c> in order theory.
         /// <para/>
@@ -705,7 +705,7 @@ namespace J2N.Collections.Generic
         /// <param name="result">The ceiling, if any.</param>
         /// <returns><c>true</c> if a ceiling to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <b>weak successor</b> in order theory.
         /// <para/>
@@ -1126,6 +1126,17 @@ namespace J2N.Collections.Generic
         /// The set must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateSpan, T}"/> with
         /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> and <typeparamref name="T"/>.
         /// If it doesn't, an exception will be thrown.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateSpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
         /// </remarks>
         public SpanAlternateLookup<TAlternateSpan> GetSpanAlternateLookup<TAlternateSpan>()
         {
@@ -1155,12 +1166,24 @@ namespace J2N.Collections.Generic
         /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="TAlternateSpan">The alternate type of <see cref="ReadOnlySpan{T}"/> instance for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
-        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default instance
+        /// that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The set must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateSpan, T}"/> with
         /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> and <typeparamref name="T"/>.
-        /// If it doesn't, the method returns false.
+        /// If it doesn't, the method returns <see langword="false"/>.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateSpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
         /// </remarks>
         public bool TryGetSpanAlternateLookup<TAlternateSpan>(out SpanAlternateLookup<TAlternateSpan> lookup)
         {
@@ -1234,7 +1257,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Adds the specified element to a set.</summary>
             /// <param name="item">The element to add to the set.</param>
-            /// <returns><c>true</c> if the element is added to the set; <c>false</c> if the element is already present.</returns>
+            /// <returns><see langword="true"/> if the element is added to the set; <see langword="false"/> if the element is already present.</returns>
             public bool Add(ReadOnlySpan<TAlternateSpan> item)
             {
                 SortedSet<T> set = Set;
@@ -1494,7 +1517,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the specified element from a set.</summary>
             /// <param name="item">The element to remove.</param>
-            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             public bool Remove(ReadOnlySpan<TAlternateSpan> item)
             {
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
@@ -1674,7 +1697,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Determines whether a set contains the specified element.</summary>
             /// <param name="item">The element to locate in the set.</param>
-            /// <returns><c>true</c> if the set contains the specified element; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the set contains the specified element; otherwise, <see langword="false"/>.</returns>
             public bool Contains(ReadOnlySpan<TAlternateSpan> item)
             {
                 if (_isUnderlying)
@@ -1726,10 +1749,10 @@ namespace J2N.Collections.Generic
             /// is the predecessor of the specified <paramref name="item"/>.
             /// </summary>
             /// <param name="item">The entry to get the predecessor of.</param>
-            /// <param name="result">The predessor, if any.</param>
-            /// <returns><c>true</c> if a predecessor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+            /// <param name="result">The predecessor, if any.</param>
+            /// <returns><see langword="true"/> if a predecessor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <c>strict predecessor</c> in order theory.
             /// <para/>
@@ -1835,13 +1858,13 @@ namespace J2N.Collections.Generic
 
             /// <summary>
             /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
-            /// is the sucessor of the specified <paramref name="item"/>.
+            /// is the successor of the specified <paramref name="item"/>.
             /// </summary>
             /// <param name="item">The entry to get the successor of.</param>
             /// <param name="result">The successor, if any.</param>
-            /// <returns><c>true</c> if a successor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if a successor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <c>strict successor</c> in order theory.
             /// <para/>
@@ -1951,9 +1974,9 @@ namespace J2N.Collections.Generic
             /// </summary>
             /// <param name="item">The entry to get the floor of.</param>
             /// <param name="result">The floor, if any.</param>
-            /// <returns><c>true</c> if a floor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if a floor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <c>weak predecessor</c> in order theory.
             /// <para/>
@@ -2043,9 +2066,9 @@ namespace J2N.Collections.Generic
             /// </summary>
             /// <param name="item">The entry to get the ceiling of.</param>
             /// <param name="result">The ceiling, if any.</param>
-            /// <returns><c>true</c> if a ceiling to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if a ceiling to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <b>weak successor</b> in order theory.
             /// <para/>
@@ -2134,7 +2157,7 @@ namespace J2N.Collections.Generic
             /// <para/>
             /// Usage Note: In Java, the upper bound of TreeSet.subSet() is exclusive. To match the behavior, call
             /// <see cref="GetViewBetween(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/>,
-            /// setting <c>lowerValueInclusive</c> to <c>true</c> and <c>upperValueInclusive</c> to <c>false</c>.
+            /// setting <c>lowerValueInclusive</c> to <see langword="true"/> and <c>upperValueInclusive</c> to <see langword="false"/>.
             /// </summary>
             /// <param name="lowerValue">The lowest desired value in the view.</param>
             /// <param name="upperValue">The highest desired value in the view.</param>
@@ -2175,13 +2198,13 @@ namespace J2N.Collections.Generic
             /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
             /// <para/>
             /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="lowerValueInclusive"/>
-            /// set to <c>true</c> and <paramref name="upperValueInclusive"/> set to <c>false</c>.
+            /// set to <see langword="true"/> and <paramref name="upperValueInclusive"/> set to <see langword="false"/>.
             /// </summary>
             /// <param name="lowerValue">The lowest value in the range for the view.</param>
-            /// <param name="lowerValueInclusive">If <c>true</c>, <paramref name="lowerValue"/> will be included in the range;
+            /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
             /// otherwise, it is an exclusive lower bound.</param>
             /// <param name="upperValue">The highest desired value in the view.</param>
-            /// <param name="upperValueInclusive">If <c>true</c>, <paramref name="upperValue"/> will be included in the range;
+            /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
             /// otherwise, it is an exclusive upper bound.</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
             /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
@@ -2191,7 +2214,7 @@ namespace J2N.Collections.Generic
             /// <remarks>
             /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
             /// <paramref name="upperValue"/>, as defined by the comparer. Each bound may either be inclusive
-            /// (<c>true</c>) or exclusive (<c>false</c>) depending on the values of <paramref name="lowerValueInclusive"/>
+            /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="lowerValueInclusive"/>
             /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
             /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
@@ -3454,8 +3477,8 @@ namespace J2N.Collections.Generic
         /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
         /// <para/>
         /// Usage Note: In Java, the upper bound of TreeSet.subSet() is exclusive. To match the behavior, call
-        /// <see cref="GetViewBetween(T, bool, T, bool)"/>, setting <c>lowerValueInclusive</c> to <c>true</c>
-        /// and <c>upperValueInclusive</c> to <c>false</c>.
+        /// <see cref="GetViewBetween(T, bool, T, bool)"/>, setting <c>lowerValueInclusive</c> to <see langword="true"/>
+        /// and <c>upperValueInclusive</c> to <see langword="false"/>.
         /// </summary>
         /// <param name="lowerValue">The lowest desired value in the view.</param>
         /// <param name="upperValue">The highest desired value in the view.</param>
@@ -3483,13 +3506,13 @@ namespace J2N.Collections.Generic
         /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
         /// <para/>
         /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="lowerValueInclusive"/>
-        /// set to <c>true</c> and <paramref name="upperValueInclusive"/> set to <c>false</c>.
+        /// set to <see langword="true"/> and <paramref name="upperValueInclusive"/> set to <see langword="false"/>.
         /// </summary>
         /// <param name="lowerValue">The lowest value in the range for the view.</param>
-        /// <param name="lowerValueInclusive">If <c>true</c>, <paramref name="lowerValue"/> will be included in the range;
+        /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
         /// otherwise, it is an exclusive lower bound.</param>
         /// <param name="upperValue">The highest desired value in the view.</param>
-        /// <param name="upperValueInclusive">If <c>true</c>, <paramref name="upperValue"/> will be included in the range;
+        /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
         /// otherwise, it is an exclusive upper bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
@@ -3499,7 +3522,7 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
         /// <paramref name="upperValue"/>, as defined by the comparer. Each bound may either be inclusive
-        /// (<c>true</c>) or exclusive (<c>false</c>) depending on the values of <paramref name="lowerValueInclusive"/>
+        /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="lowerValueInclusive"/>
         /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.

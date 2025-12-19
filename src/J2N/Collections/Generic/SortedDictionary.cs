@@ -883,8 +883,8 @@ namespace J2N.Collections.Generic
         /// is the predecessor of the specified <paramref name="key"/>.
         /// </summary>
         /// <param name="key">The key of the entry to get the predecessor of.</param>
-        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predessor, if any.</param>
-        /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predecessor, if any.</param>
+        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
         {
@@ -898,9 +898,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the predecessor of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
-        /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict predecessor</c> in order theory.
         /// <para/>
@@ -925,7 +925,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="key">The key of the entry to get the successor of.</param>
         /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the successor, if any.</param>
-        /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
         {
@@ -939,9 +939,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the successor of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
-        /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict successor</c> in order theory.
         /// <para/>
@@ -967,9 +967,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the floor of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
-        /// <returns><c>true</c> if a floor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a floor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>weak predecessor</c> in order theory.
         /// <para/>
@@ -995,9 +995,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the ceiling of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
-        /// <returns><c>true</c> if a ceiling to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a ceiling to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <b>weak successor</b> in order theory.
         /// <para/>
@@ -1031,6 +1031,17 @@ namespace J2N.Collections.Generic
         /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateKeySpan, TKey}"/> with
         /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
         /// If it doesn't, an exception will be thrown.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateKeySpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
         /// </remarks>
         public SpanAlternateLookup<TAlternateKeySpan> GetSpanAlternateLookup<TAlternateKeySpan>()
         {
@@ -1047,13 +1058,24 @@ namespace J2N.Collections.Generic
         /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
         /// </summary>
         /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns <c>true</c>, or a default instance
-        /// that should not be used if the method returns <c>false</c>.</param>
-        /// <returns><c>true</c> if a lookup could be created; otherwise, <c>false</c>.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default instance
+        /// that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateKeySpan, TKey}"/> with
         /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
-        /// If it doesn't, the method will return <c>false</c>.
+        /// If it doesn't, the method will return <see langword="false"/>.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateKeySpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
         /// </remarks>
         public bool TryGetSpanAlternateLookup<TAlternateKeySpan>(out SpanAlternateLookup<TAlternateKeySpan> lookup)
         {
@@ -1195,7 +1217,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the value with the specified alternate key from the <see cref="Dictionary{TKey, TValue}"/>.</summary>
             /// <param name="key">The alternate key of the element to remove.</param>
-            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove(ReadOnlySpan<TAlternateKeySpan> key) =>
                 _setLookup.Remove(key);
@@ -1207,7 +1229,7 @@ namespace J2N.Collections.Generic
             /// <param name="key">The alternate key of the element to remove.</param>
             /// <param name="actualKey">The removed key.</param>
             /// <param name="value">The removed element.</param>
-            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
             {
@@ -1226,7 +1248,7 @@ namespace J2N.Collections.Generic
             /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
             /// <param name="key">The alternate key of the element to add.</param>
             /// <param name="value">The value of the element to add.</param>
-            /// <returns><c>true</c> if the key/value pair was added to the dictionary successfully; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the key/value pair was added to the dictionary successfully; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool TryAdd(ReadOnlySpan<TAlternateKeySpan> key, TValue value) =>
                 _setLookup.TryAdd(key, value, _alternateComparer);
@@ -1238,9 +1260,9 @@ namespace J2N.Collections.Generic
             /// <param name="key">The key of the entry to get the predecessor of.</param>
             /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
             /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
-            /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <c>strict predecessor</c> in order theory.
             /// <para/>
@@ -1266,9 +1288,9 @@ namespace J2N.Collections.Generic
             /// <param name="key">The key of the entry to get the successor of.</param>
             /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
             /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
-            /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <c>strict successor</c> in order theory.
             /// <para/>
@@ -1294,9 +1316,9 @@ namespace J2N.Collections.Generic
             /// <param name="key">The key of the entry to get the floor of.</param>
             /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
             /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
-            /// <returns><c>true</c> if a floor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if a floor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <c>weak predecessor</c> in order theory.
             /// <para/>
@@ -1322,9 +1344,9 @@ namespace J2N.Collections.Generic
             /// <param name="key">The key of the entry to get the ceiling of.</param>
             /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
             /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
-            /// <returns><c>true</c> if a ceiling to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if a ceiling to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
             /// <remarks>
-            /// This method is a O(log n) operation.
+            /// This method is a O(log <c>n</c>) operation.
             /// <para/>
             /// This is referred to as <b>weak successor</b> in order theory.
             /// <para/>
