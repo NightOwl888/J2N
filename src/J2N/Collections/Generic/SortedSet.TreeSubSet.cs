@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
@@ -145,16 +147,19 @@ namespace J2N.Collections.Generic
                 version = _underlying.version;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal override bool IsWithinRange(T item)
             {
                 return !IsTooLow(item) && !IsTooHigh(item);
             }
 
-            private bool IsTooHigh([AllowNull] T item)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal override bool IsTooHigh([AllowNull] T item)
             {
                 return IsTooHigh(item, _uBoundInclusive);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsTooHigh([AllowNull] T item, bool upperBoundInclusive)
             {
                 if (_uBoundActive)
@@ -166,11 +171,13 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            private bool IsTooLow([AllowNull] T item)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal override bool IsTooLow([AllowNull] T item)
             {
                 return IsTooLow(item, _lBoundInclusive);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsTooLow([AllowNull] T item, bool lowerBoundInclusive)
             {
                 if (_lBoundActive)

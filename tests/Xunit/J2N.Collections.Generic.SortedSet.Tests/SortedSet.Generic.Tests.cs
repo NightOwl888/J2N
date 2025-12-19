@@ -565,7 +565,8 @@ namespace J2N.Collections.Tests
                 Assert.True(lookup.Add(i.ToString().AsSpan()));
             }
 
-            // Test TryGetPredecessor and TryGetSuccessor
+            // Test TryGetPredecessor, TryGetSuccessor,
+            // TryGetFlor, TryGetCeiling
             for (int i = 0; i < 5; i++)
             {
                 string item = i.ToString();
@@ -576,6 +577,14 @@ namespace J2N.Collections.Tests
                 Assert.Equal(set.TryGetSuccessor(item, out string successor),
                     lookup.TryGetSuccessor(item.AsSpan(), out string spanSuccessor));
                 Assert.Equal(successor, spanSuccessor);
+
+                Assert.Equal(set.TryGetFloor(item, out string floor),
+                    lookup.TryGetFloor(item.AsSpan(), out string spanFloor));
+                Assert.Equal(floor, spanFloor);
+
+                Assert.Equal(set.TryGetCeiling(item, out string ceiling),
+                    lookup.TryGetCeiling(item.AsSpan(), out string spanCeiling));
+                Assert.Equal(ceiling, spanCeiling);
             }
         }
         private static void AssertSpanLookupMatchesView(SortedSet<string> set, int minInclusive, int maxInclusive)
@@ -608,14 +617,24 @@ namespace J2N.Collections.Tests
                 string s = i.ToString("D2");
 
                 Assert.Equal(
-                    set.TryGetPredecessor(s, out var p1),
-                    lookup.TryGetPredecessor(s.AsSpan(), out var p2));
-                Assert.Equal(p1, p2);
+                    set.TryGetPredecessor(s, out var predecessor),
+                    lookup.TryGetPredecessor(s.AsSpan(), out var spanPredecessor));
+                Assert.Equal(predecessor, spanPredecessor);
 
                 Assert.Equal(
-                    set.TryGetSuccessor(s, out var s1),
-                    lookup.TryGetSuccessor(s.AsSpan(), out var s2));
-                Assert.Equal(s1, s2);
+                    set.TryGetSuccessor(s, out var successor),
+                    lookup.TryGetSuccessor(s.AsSpan(), out var spanSuccessor));
+                Assert.Equal(successor, spanSuccessor);
+
+                Assert.Equal(
+                    set.TryGetPredecessor(s, out var floor),
+                    lookup.TryGetPredecessor(s.AsSpan(), out var spanFloor));
+                Assert.Equal(floor, spanFloor);
+
+                Assert.Equal(
+                    set.TryGetSuccessor(s, out var ceiling),
+                    lookup.TryGetSuccessor(s.AsSpan(), out var spanCeiling));
+                Assert.Equal(ceiling, spanCeiling);
             }
 
             // in-range remove

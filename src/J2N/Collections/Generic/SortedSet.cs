@@ -518,6 +518,10 @@ namespace J2N.Collections.Generic
         // Virtual function for TreeSubSet, which may need to do range checks.
         internal virtual bool IsWithinRange(T item) => true;
 
+        internal virtual bool IsTooLow(T item) => false;
+
+        internal virtual bool IsTooHigh(T item) => false;
+
         #endregion
 
         #region AsReadOnly
@@ -1222,6 +1226,8 @@ namespace J2N.Collections.Generic
                 return _alternateComparer;
             }
 
+            #region Add
+
             /// <summary>Adds the specified element to a set.</summary>
             /// <param name="item">The element to add to the set.</param>
             /// <returns><c>true</c> if the element is added to the set; <c>false</c> if the element is already present.</returns>
@@ -1337,6 +1343,10 @@ namespace J2N.Collections.Generic
                 ++set.count;
                 return true;
             }
+
+            #endregion Add
+
+            #region Remove
 
             /// <summary>Removes the specified element from a set.</summary>
             /// <param name="item">The element to remove.</param>
@@ -1497,6 +1507,10 @@ namespace J2N.Collections.Generic
                 return foundMatch;
             }
 
+            #endregion Remove
+
+            #region Contains
+
             /// <summary>Determines whether a set contains the specified element.</summary>
             /// <param name="item">The element to locate in the set.</param>
             /// <returns><c>true</c> if the set contains the specified element; otherwise, <c>false</c>.</returns>
@@ -1520,6 +1534,10 @@ namespace J2N.Collections.Generic
                 return FindNode_View(item) is not null;
             }
 
+            #endregion Contains
+
+            #region TryGetValue
+
             /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
             /// <param name="equalValue">The value to search for.</param>
             /// <param name="actualValue">The value from the set that the search found, or the default value of
@@ -1538,7 +1556,9 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            #region Java TreeSet-like Members
+            #endregion TryGetValue
+
+            #region TryGetPredecessor
 
             /// <summary>
             /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
@@ -1547,7 +1567,17 @@ namespace J2N.Collections.Generic
             /// <param name="item">The entry to get the predecessor of.</param>
             /// <param name="result">The predessor, if any.</param>
             /// <returns><c>true</c> if a predecessor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
-            public bool TryGetPredecessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <c>strict predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetPredecessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetPredecessor(item, out result) : DoTryGetPredecessor_View(item, out result);
+
+            private bool DoTryGetPredecessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
@@ -1588,6 +1618,60 @@ namespace J2N.Collections.Generic
                 }
             }
 
+            private bool DoTryGetPredecessor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                // If item is at or below lower bound, no strict predecessor exists
+                if (set.HasLowerBound)
+                {
+                    int c = comparer.Compare(item!, set.LowerBound!);
+                    if (c <= 0)
+                    {
+                        result = default!;
+                        return false;
+                    }
+                }
+
+                Node? current = set.root;
+                Node? match = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        match = current;
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        current = current.Left;
+                    }
+                }
+
+                // Final safety check: candidate must be within view
+                if (match == null || set.IsTooLow(match.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = match.Item;
+                return true;
+            }
+
+            #endregion TryGetPredecessor
+
+            #region TryGetSuccessor
+
             /// <summary>
             /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
             /// is the sucessor of the specified <paramref name="item"/>.
@@ -1595,7 +1679,17 @@ namespace J2N.Collections.Generic
             /// <param name="item">The entry to get the successor of.</param>
             /// <param name="result">The successor, if any.</param>
             /// <returns><c>true</c> if a successor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
-            public bool TryGetSuccessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <c>strict successor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetSuccessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetSuccessor(item, out result) : DoTryGetSuccessor_View(item, out result);
+
+            private bool DoTryGetSuccessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
@@ -1636,7 +1730,241 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            #endregion
+            private bool DoTryGetSuccessor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                // If item is at or above upper bound, no strict successor exists
+                if (set.HasUpperBound)
+                {
+                    int c = comparer.Compare(item!, set.UpperBound!);
+                    if (c >= 0)
+                    {
+                        result = default!;
+                        return false;
+                    }
+                }
+
+                Node? current = set.root;
+                Node? match = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        match = current;
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        current = current.Right;
+                    }
+                }
+
+                // Final safety check
+                if (match == null || set.IsTooHigh(match.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = match.Item;
+                return true;
+            }
+
+            #endregion TryGetSuccessor
+
+            #region TryGetFloor
+
+            /// <summary>
+            /// Gets the value in the <see cref="SortedSet{T}"/> whose value
+            /// is the greatest element less than or equal to <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The entry to get the floor of.</param>
+            /// <param name="result">The floor, if any.</param>
+            /// <returns><c>true</c> if a floor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <c>weak predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetFloor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetFloor(item, out result) :DoTryGetFloor_View(item, out result);
+
+            private bool DoTryGetFloor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Right;
+                    }
+                }
+
+                if (candidate == null)
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            private bool DoTryGetFloor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Right;
+                    }
+                }
+
+                if (candidate == null || set.IsTooLow(candidate.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            #endregion TryGetFloor
+
+            #region TryGetCeiling
+
+            /// <summary>
+            /// Gets the value in the <see cref="SortedSet{T}"/> whose value
+            /// is the least element greater than or equal to <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The entry to get the ceiling of.</param>
+            /// <param name="result">The ceiling, if any.</param>
+            /// <returns><c>true</c> if a ceiling to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <b>weak successor</b> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetCeiling(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetCeiling(item, out result) : DoTryGetCeiling_View(item, out result);
+
+            private bool DoTryGetCeiling(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Left;
+                    }
+                }
+
+                if (candidate == null)
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            private bool DoTryGetCeiling_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Left;
+                    }
+                }
+
+                if (candidate == null || set.IsTooHigh(candidate.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            #endregion TryGetCeiling
 
             #region GetViewBetween
 
@@ -1757,6 +2085,8 @@ namespace J2N.Collections.Generic
 
             #endregion GetViewBetween
 
+            #region FindNode
+
             [MethodImpl(MethodImplOptions.NoInlining)]
             private Node? FindNode_View(ReadOnlySpan<TAlternateSpan> item)
             {
@@ -1805,6 +2135,10 @@ namespace J2N.Collections.Generic
                 return null;
             }
 
+            #endregion
+
+            #region Bounds Checking
+
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsWithinRange(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
@@ -1835,6 +2169,8 @@ namespace J2N.Collections.Generic
                 int c = comparer.Compare(item, set.UpperBound);
                 return c > 0 || (c == 0 && !set.UpperBoundInclusive);
             }
+
+            #endregion Bounds Checking
         }
 
         #endregion SpanAlternateLookup
