@@ -299,15 +299,18 @@ namespace J2N.Collections.Generic
         {
             get
             {
-                //if (key == null) // J2N: Making key nullable
-                //{
-                //    throw new ArgumentNullException(nameof(key));
-                //}
+                // J2N supports null keys
 
                 TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
                 {
-                    ThrowHelper.ThrowKeyNotFoundException(key?.ToString() ?? "(null)");
+                    if (key is null)
+                    {
+                        ThrowHelper.ThrowKeyNotFoundException("(null)");
+                        return default;
+                    }
+
+                    ThrowHelper.ThrowKeyNotFoundException(key);
                     return default;
                 }
 
@@ -315,10 +318,7 @@ namespace J2N.Collections.Generic
             }
             set
             {
-                //if (key == null) // J2N: Making key nullable
-                //{
-                //    throw new ArgumentNullException(nameof(key));
-                //}
+                // J2N supports null keys
 
                 TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
