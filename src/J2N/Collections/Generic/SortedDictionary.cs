@@ -1241,6 +1241,118 @@ namespace J2N.Collections.Generic
 
                 return true;
             }
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the predecessor of the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the predecessor of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
+            /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <c>strict predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>lowerEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetPredecessor(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetPredecessor(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the successor of the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the successor of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
+            /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <c>strict successor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>higherEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetSuccessor(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetSuccessor(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the greatest element less than or equal to the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the floor of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
+            /// <returns><c>true</c> if a floor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <c>weak predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>floorEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetFloor(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetFloor(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the lease element greater than or equal to the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the ceiling of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
+            /// <returns><c>true</c> if a ceiling to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+            /// <remarks>
+            /// This method is a O(log n) operation.
+            /// <para/>
+            /// This is referred to as <b>weak successor</b> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>ceilingEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetCeiling(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetCeiling(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
         }
 
         #endregion SpanAlternateLookup

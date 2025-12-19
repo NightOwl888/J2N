@@ -298,6 +298,39 @@ namespace J2N.Collections.Tests
                 Assert.Equal(0, value);
                 Assert.Equal(i, dictionary.Count);
             }
+
+            // Add some sequential items again
+            for (int i = 0; i < 5; i++)
+            {
+                Assert.Equal(i, dictionary.Count);
+                Assert.True(lookup.TryAdd(i.ToString().AsSpan(), i));
+            }
+
+            // Test TryGetPredecessor, TryGetSuccessor,
+            // TryGetFlor, TryGetCeiling
+            for (int i = 0; i < 5; i++)
+            {
+                string item = i.ToString();
+                Assert.Equal(dictionary.TryGetPredecessor(item, out string predecessorKey, out int predecessorValue),
+                    lookup.TryGetPredecessor(item.AsSpan(), out string spanPredecessorKey, out int spanPredecessorValue));
+                Assert.Equal(predecessorKey, spanPredecessorKey);
+                Assert.Equal(predecessorValue, spanPredecessorValue);
+
+                Assert.Equal(dictionary.TryGetSuccessor(item, out string successorKey, out int successorValue),
+                    lookup.TryGetSuccessor(item.AsSpan(), out string spanSuccessorKey, out int spanSuccessorValue));
+                Assert.Equal(successorKey, spanSuccessorKey);
+                Assert.Equal(successorValue, spanSuccessorValue);
+
+                Assert.Equal(dictionary.TryGetFloor(item, out string floorKey, out int floorValue),
+                    lookup.TryGetFloor(item.AsSpan(), out string spanFloorKey, out int spanFloorValue));
+                Assert.Equal(floorKey, spanFloorKey);
+                Assert.Equal(floorValue, spanFloorValue);
+
+                Assert.Equal(dictionary.TryGetCeiling(item, out string ceilingKey, out int ceilingValue),
+                    lookup.TryGetCeiling(item.AsSpan(), out string spanCeilingKey, out int spanCeilingValue));
+                Assert.Equal(ceilingKey, spanCeilingKey);
+                Assert.Equal(ceilingValue, spanCeilingValue);
+            }
         }
 
         #endregion
