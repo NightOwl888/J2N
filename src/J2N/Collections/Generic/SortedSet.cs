@@ -1260,7 +1260,6 @@ namespace J2N.Collections.Generic
             /// <returns><see langword="true"/> if the element is added to the set; <see langword="false"/> if the element is already present.</returns>
             public bool Add(ReadOnlySpan<TAlternateSpan> item)
             {
-                SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (_isUnderlying)
@@ -2293,7 +2292,6 @@ namespace J2N.Collections.Generic
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal Node? FindNode(ReadOnlySpan<TAlternateSpan> item)
             {
-                SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 return FindNode(item, comparer);
