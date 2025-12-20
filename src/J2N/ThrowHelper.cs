@@ -1595,6 +1595,8 @@ namespace J2N
                     return SR.InvalidOperation_ViewFailedVersion;
                 case ExceptionResource.LurchTable_NeedLimitIntMaxValue:
                     return SR.LurchTable_NeedLimitIntMaxValue;
+                case ExceptionResource.NotSupported_SerializationDeprecated:
+                    return SR.NotSupported_SerializationDeprecated;
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1899,5 +1901,6 @@ namespace J2N
         ArgumentOutOfRange_LimitMustBeLessThanCapacity,
         InvalidOperation_ViewFailedVersion,
         LurchTable_NeedLimitIntMaxValue,
+        NotSupported_SerializationDeprecated,
     }
 }

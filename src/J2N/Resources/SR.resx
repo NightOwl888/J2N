@@ -477,4 +477,7 @@
   <data name="NotSupported_StringComparison" xml:space="preserve">
     <value>The string comparison type passed in is currently not supported.</value>
   </data>
+  <data name="NotSupported_SerializationDeprecated" xml:space="preserve">
+    <value>Binary serialization has been deprecated and is no longer supported.</value>
+  </data>
 </root>

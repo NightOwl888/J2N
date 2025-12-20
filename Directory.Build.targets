@@ -61,6 +61,7 @@
     <DefineConstants>$(DefineConstants);FEATURE_RANDOM_NEXTSINGLE</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_READONLYSET</DefineConstants>
     <DefineConstants>$(DefineConstants);FEATURE_STACKTRACEHIDDENATTRIBUTE</DefineConstants>
+    <DefineConstants>$(DefineConstants);FEATURE_STRINGCOMPARER_ISWELLKNOWNCULTUREAWARECOMPARER</DefineConstants>
 
   </PropertyGroup>
 
