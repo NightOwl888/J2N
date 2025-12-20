@@ -483,7 +483,7 @@ namespace J2N.Collections.Tests
             Assert.True(lookup.Remove("123".AsSpan()));
 
             // Ensure that case-sensitivity of the comparer is respected
-            Assert.True(lookup.Add("a"));
+            Assert.True(lookup.Add("a".AsSpan()));
             if (set.EqualityComparer.Equals(StringComparer.Ordinal) ||
                 set.EqualityComparer.Equals(StringComparer.InvariantCulture) ||
                 set.EqualityComparer.Equals(StringComparer.CurrentCulture))
@@ -592,6 +592,123 @@ namespace J2N.Collections.Tests
         }
 
 #endif
+
+        #endregion
+
+        #region GetSpanAlternateLookup
+
+        [Fact]
+        public void GetSpanAlternateLookup_FailsWhenIncompatible()
+        {
+            var orderedSet = new OrderedHashSet<string>(StringComparer.Ordinal);
+
+            orderedSet.GetSpanAlternateLookup<char>();
+            Assert.True(orderedSet.TryGetSpanAlternateLookup<char>(out _));
+
+            Assert.Throws<InvalidOperationException>(() => orderedSet.GetSpanAlternateLookup<byte>());
+            Assert.Throws<InvalidOperationException>(() => orderedSet.GetSpanAlternateLookup<string>());
+            Assert.Throws<InvalidOperationException>(() => orderedSet.GetSpanAlternateLookup<int>());
+
+            Assert.False(orderedSet.TryGetSpanAlternateLookup<byte>(out _));
+            Assert.False(orderedSet.TryGetSpanAlternateLookup<string>(out _));
+            Assert.False(orderedSet.TryGetSpanAlternateLookup<int>(out _));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        public void OrderedHashSet_GetSpanAlternateLookup_OperationsMatchUnderlyingSet(int mode)
+        {
+            // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying set
+            OrderedHashSet<string> set = new(mode switch
+            {
+                0 => StringComparer.Ordinal,
+                1 => StringComparer.OrdinalIgnoreCase,
+                2 => StringComparer.InvariantCulture,
+                3 => StringComparer.InvariantCultureIgnoreCase,
+                4 => StringComparer.CurrentCulture,
+                5 => StringComparer.CurrentCultureIgnoreCase,
+                _ => throw new ArgumentOutOfRangeException(nameof(mode))
+            });
+            OrderedHashSet<string>.SpanAlternateLookup<char> lookup = set.GetSpanAlternateLookup<char>();
+            Assert.Same(set, lookup.Set);
+            Assert.Same(lookup.Set, lookup.Set);
+
+            // Add to the set and validate that the lookup reflects the changes
+            Assert.True(set.Add("123"));
+            Assert.True(lookup.Contains("123".AsSpan()));
+            Assert.False(lookup.Add("123".AsSpan()));
+            Assert.True(lookup.Remove("123".AsSpan()));
+            Assert.False(set.Contains("123"));
+
+            // Add via the lookup and validate that the set reflects the changes
+            Assert.True(lookup.Add("123".AsSpan()));
+            Assert.True(set.Contains("123"));
+            lookup.TryGetValue("123".AsSpan(), out string value);
+            Assert.Equal("123", value);
+            Assert.False(lookup.Remove("321".AsSpan()));
+            Assert.True(lookup.Remove("123".AsSpan()));
+
+            // Ensure that case-sensitivity of the comparer is respected
+            Assert.True(lookup.Add("a".AsSpan()));
+            if (set.EqualityComparer.Equals(StringComparer.Ordinal) ||
+                set.EqualityComparer.Equals(StringComparer.InvariantCulture) ||
+                set.EqualityComparer.Equals(StringComparer.CurrentCulture))
+            {
+                Assert.True(lookup.Add("A".AsSpan()));
+                Assert.True(lookup.Remove("a".AsSpan()));
+                Assert.False(lookup.Remove("a".AsSpan()));
+                Assert.True(lookup.Remove("A".AsSpan()));
+            }
+            else
+            {
+                Assert.False(lookup.Add("A".AsSpan()));
+                Assert.True(lookup.Remove("A".AsSpan()));
+                Assert.False(lookup.Remove("a".AsSpan()));
+                Assert.False(lookup.Remove("A".AsSpan()));
+            }
+
+            // Test the behavior of null vs "" in the set and lookup
+            Assert.True(set.Add(null));
+            Assert.True(set.Add(string.Empty));
+            Assert.True(set.Contains(null));
+            Assert.True(set.Contains(""));
+            Assert.True(lookup.Contains("".AsSpan()));
+            Assert.True(lookup.Remove("".AsSpan()));
+            Assert.Equal(1, set.Count);
+            Assert.False(lookup.Remove("".AsSpan()));
+            Assert.True(set.Remove(null));
+            Assert.Equal(0, set.Count);
+
+            // Test adding multiple entries via the lookup
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.Equal(i, set.Count);
+                Assert.True(lookup.Add(i.ToString().AsSpan()));
+                Assert.False(lookup.Add(i.ToString().AsSpan()));
+            }
+
+            Assert.Equal(10, set.Count);
+
+            // Test that the lookup and the set agree on what's in and not in
+            for (int i = -1; i <= 10; i++)
+            {
+                Assert.Equal(set.TryGetValue(i.ToString(), out string dv), lookup.TryGetValue(i.ToString().AsSpan(), out string lv));
+                Assert.Equal(dv, lv);
+            }
+
+            // Test removing multiple entries via the lookup
+            for (int i = 9; i >= 0; i--)
+            {
+                Assert.True(lookup.Remove(i.ToString().AsSpan()));
+                Assert.False(lookup.Remove(i.ToString().AsSpan()));
+                Assert.Equal(i, set.Count);
+            }
+        }
 
         #endregion
 
