@@ -78,6 +78,34 @@ namespace J2N.Collections.Generic
             Assert.IsTrue(view.TryGetPredecessor(15, out res) && res == 14);
         }
 
+        [Test]
+        public void TestTryGetPredecessor_View_LowerExclusive_AtLowerBound()
+        {
+            loadup();
+
+            // View is (6, 14] or (6, 14) depending on implementation
+            var view = tree!.GetViewBetween(6, lowerValueInclusive: false, 14, upperValueInclusive: true);
+
+            // 6 is excluded — predecessor should NOT exist
+            bool found = view.TryGetPredecessor(6, out int res);
+
+            Assert.IsFalse(found);
+            Assert.AreEqual(0, res);
+        }
+
+        [Test]
+        public void TestTryGetPredecessor_View_LowerExclusive_AboveLowerBound()
+        {
+            loadup();
+
+            var view = tree!.GetViewBetween(6, lowerValueInclusive: false, 14, upperValueInclusive: true);
+
+            // 7 → predecessor would be 6, but 6 is excluded
+            bool found = view.TryGetPredecessor(7, out int res);
+
+            Assert.IsFalse(found);
+            Assert.AreEqual(0, res);
+        }
 
         [Test]
         public void TestTryGetPredecessor_TooLow()
@@ -120,6 +148,34 @@ namespace J2N.Collections.Generic
 
             // The top (relative to view)
             Assert.IsTrue(view.TryGetSuccessor(13, out res) && res == 14);
+        }
+
+        [Test]
+        public void TestTryGetSuccessor_View_UpperExclusive_AtUpperBound()
+        {
+            loadup();
+
+            var view = tree!.GetViewBetween(6, lowerValueInclusive: true, 14, upperValueInclusive: false);
+
+            // 14 is excluded — successor should NOT exist
+            bool found = view.TryGetSuccessor(14, out int res);
+
+            Assert.IsFalse(found);
+            Assert.AreEqual(0, res);
+        }
+
+        [Test]
+        public void TestTryGetSuccessor_View_UpperExclusive_BelowUpperBound()
+        {
+            loadup();
+
+            var view = tree!.GetViewBetween(6, lowerValueInclusive: true, 14, upperValueInclusive: false);
+
+            // 13 → successor would be 14, but 14 is excluded
+            bool found = view.TryGetSuccessor(13, out int res);
+
+            Assert.IsFalse(found);
+            Assert.AreEqual(0, res);
         }
 
 
@@ -183,6 +239,19 @@ namespace J2N.Collections.Generic
             Assert.IsTrue(view.TryGetFloor(14, out res) && res == 14);
         }
 
+        [Test]
+        public void TestTryGetFloor_View_LowerExclusive()
+        {
+            loadup();
+
+            var view = tree!.GetViewBetween(6, lowerValueInclusive: false, 14, upperValueInclusive: true);
+
+            // Floor of 6 would be 6, but 6 is excluded
+            bool found = view.TryGetFloor(6, out int res);
+
+            Assert.IsFalse(found);
+            Assert.AreEqual(0, res);
+        }
 
         [Test]
         public void TestTryGetFloor_TooLow()
@@ -225,6 +294,19 @@ namespace J2N.Collections.Generic
             Assert.IsTrue(view.TryGetCeiling(14, out res) && res == 14);
         }
 
+        [Test]
+        public void TestTryGetCeiling_View_UpperExclusive()
+        {
+            loadup();
+
+            var view = tree!.GetViewBetween(6, lowerValueInclusive: true, 14, upperValueInclusive: false);
+
+            // Ceiling of 14 would be 14, but 14 is excluded
+            bool found = view.TryGetCeiling(14, out int res);
+
+            Assert.IsFalse(found);
+            Assert.AreEqual(0, res);
+        }
 
 
         [Test]

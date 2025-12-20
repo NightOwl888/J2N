@@ -1812,14 +1812,10 @@ namespace J2N.Collections.Generic
 #endif
 
                 // If item is at or below lower bound, no strict predecessor exists
-                if (set.HasLowerBound)
+                if (IsTooLow(item, comparer))
                 {
-                    int c = comparer.Compare(item!, set.LowerBound!);
-                    if (c <= 0)
-                    {
-                        result = default!;
-                        return false;
-                    }
+                    result = default!;
+                    return false;
                 }
 
                 Node? current = set.root;
@@ -1924,14 +1920,10 @@ namespace J2N.Collections.Generic
 #endif
 
                 // If item is at or above upper bound, no strict successor exists
-                if (set.HasUpperBound)
+                if (IsTooHigh(item, comparer))
                 {
-                    int c = comparer.Compare(item!, set.UpperBound!);
-                    if (c >= 0)
-                    {
-                        result = default!;
-                        return false;
-                    }
+                    result = default!;
+                    return false;
                 }
 
                 Node? current = set.root;
