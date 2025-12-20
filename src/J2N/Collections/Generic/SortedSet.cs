@@ -1551,7 +1551,7 @@ namespace J2N.Collections.Generic
 
                 // Delegate to underlying set.
                 // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                bool ret = underlying.GetSpanAlternateLookup<TAlternateSpan>().DoRemove(item, comparer, out removed);
+                bool ret = underlying.GetSpanAlternateLookup(_alternateComparer).DoRemove(item, comparer, out removed);
 
                 set.VersionCheck();
 
