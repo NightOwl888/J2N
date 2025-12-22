@@ -1,6 +1,7 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
 
+using J2N.Collections;
 using J2N.Collections.ObjectModel;
 using J2N.Runtime.CompilerServices;
 using J2N.Text;
@@ -1614,7 +1615,7 @@ namespace J2N.Collections.Generic
             CoModificationCheck();
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             int offset = Offset;
-            int result = Array.IndexOf(_items, item, offset, Size);
+            int result = Arrays.IndexOf(_items, item, offset, Size);
             return result > -1 ? result - offset : result;
         }
 
@@ -1656,7 +1657,7 @@ namespace J2N.Collections.Generic
 
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             int offset = Offset;
-            int result = Array.IndexOf(_items, item, index + offset, Size - index);
+            int result = Arrays.IndexOf(_items, item, index + offset, Size - index);
             return result > -1 ? result - offset : result;
         }
 
@@ -1701,7 +1702,7 @@ namespace J2N.Collections.Generic
 
             Debug.Assert(Origin._items == _items); // J2N: Ensure SubList uses the latest array instance
             int offset = Offset;
-            int result = Array.IndexOf(_items, item, index + offset, count);
+            int result = Arrays.IndexOf(_items, item, index + offset, count);
             return result > -1 ? result - offset : result;
         }
 
@@ -2024,7 +2025,7 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentOutOfRangeException(count, ExceptionArgument.count, ExceptionResource.ArgumentOutOfRange_BiggerThanCollection);
 
             int offset = Offset;
-            int result = Array.LastIndexOf(_items, item, index + offset, count);
+            int result = Arrays.LastIndexOf(_items, item, index + offset, count);
             return result > -1 ? result - offset : result;
         }
 
