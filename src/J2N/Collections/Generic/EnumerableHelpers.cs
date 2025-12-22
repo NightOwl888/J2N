@@ -93,5 +93,101 @@ namespace J2N.Collections.Generic
             length = 0;
             return Arrays.Empty<T>();
         }
+
+        /// <summary>
+        /// Converts a sorted enumerable to an array, removing any duplicates. The
+        /// <paramref name="source"/> data must already be sorted.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="source">The enumerable to convert.</param>
+        /// <param name="length">The number of items stored in the resulting array, 0-indexed.</param>
+        /// <returns>
+        /// The resulting array.  The length of the array may be greater than <paramref name="length"/>,
+        /// which is the actual number of elements in the array.
+        /// </returns>
+        internal static T[] ToDistinctArray<T>(IEnumerable<T> source, out int length)
+        {
+            // Fast path: ICollection<T> gives us max size
+            if (source is ICollection<T> ic)
+            {
+                int count = ic.Count;
+                if (count == 0)
+                {
+                    length = 0;
+                    return Arrays.Empty<T>();
+                }
+
+                // Allocate an array of the desired size, then copy the elements into it (skipping duplicates). Note that this has the same
+                // issue regarding concurrency as other existing collections like List<T>. If the collection size
+                // concurrently changes between the array allocation and the CopyTo, we could end up either getting an
+                // exception from overrunning the array (if the size went up) or we could end up not filling as many
+                // items as 'count' suggests (if the size went down).  This is only an issue for concurrent collections
+                // that implement ICollection<T>, which as of .NET 4.6 is just ConcurrentDictionary<TKey, TValue>.
+                T[] arr = new T[count];
+                int write = 0;
+                bool hasPrev = false;
+                T prev = default!;
+
+                foreach (T current in source)
+                {
+                    if (!hasPrev || !EqualityComparer<T>.Default.Equals(current, prev))
+                    {
+                        arr[write++] = current;
+                        prev = current;
+                        hasPrev = true;
+                    }
+                }
+
+                length = write;
+                return arr;
+            }
+
+            // Fallback: enumerator-only (rare here, but consistent)
+            using (IEnumerator<T> en = source.GetEnumerator())
+            {
+                if (!en.MoveNext())
+                {
+                    length = 0;
+                    return Arrays.Empty<T>();
+                }
+
+                const int DefaultCapacity = 4;
+                T[] arr = new T[DefaultCapacity];
+
+                T prev = en.Current;
+                arr[0] = prev;
+                int write = 1;
+
+                while (en.MoveNext())
+                {
+                    T current = en.Current;
+                    if (!EqualityComparer<T>.Default.Equals(current, prev))
+                    {
+                        if (write == arr.Length)
+                        {
+                            // This is the same growth logic as in List<T>:
+                            // If the array is currently empty, we make it a default size.  Otherwise, we attempt to
+                            // double the size of the array.  Doubling will overflow once the size of the array reaches
+                            // 2^30, since doubling to 2^31 is 1 larger than Int32.MaxValue.  In that case, we instead
+                            // constrain the length to be Arrays.MaxArrayLength (this overflow check works because of the
+                            // cast to uint).
+                            int newLength = write << 1;
+                            if ((uint)newLength > Arrays.MaxArrayLength)
+                            {
+                                newLength = Arrays.MaxArrayLength <= write ? write + 1 : Arrays.MaxArrayLength;
+                            }
+
+                            Array.Resize(ref arr, newLength);
+                        }
+
+                        arr[write++] = current;
+                        prev = current;
+                    }
+                }
+
+                length = write;
+                return arr;
+            }
+        }
     }
 }
