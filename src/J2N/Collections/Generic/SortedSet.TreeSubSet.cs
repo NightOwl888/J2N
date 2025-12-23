@@ -417,15 +417,15 @@ namespace J2N.Collections.Generic
             // Cannot increase the bounds of the subset, can only decrease it
             public override SortedSet<T> GetViewBetween([AllowNull] T lowerValue, [AllowNull] T upperValue)
             {
-                if (IsTooLow(lowerValue))
+                if (IsTooLow(lowerValue, _lBoundInclusive))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                if (IsTooHigh(upperValue))
+                if (IsTooHigh(upperValue, _uBoundInclusive))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                return (TreeSubSet)_underlying.GetViewBetween(lowerValue, upperValue);
+                return (TreeSubSet)_underlying.GetViewBetween(lowerValue, _lBoundInclusive, upperValue, _uBoundInclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
