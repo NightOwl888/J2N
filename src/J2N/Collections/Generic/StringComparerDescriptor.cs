@@ -22,7 +22,7 @@ using System.Globalization;
 
 namespace J2N.Collections.Generic
 {
-    internal ref struct StringComparerDescriptor
+    internal readonly ref struct StringComparerDescriptor
     {
         public enum Classification
         {
@@ -139,7 +139,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        public bool TryCreateStringComparer(out StringComparer? comparer) =>
+        public readonly bool TryCreateStringComparer(out StringComparer? comparer) =>
             TryCreateStringComparer(in this, out comparer);
 
         public static bool TryCreateStringComparer(in StringComparerDescriptor descriptor, [MaybeNullWhen(false)] out StringComparer comparer)
