@@ -274,7 +274,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(SortedDictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData))]
-        public void Dictionary_GetSpanAlternateLookup_OperationsMatchUnderlyingDictionary(SCG.IComparer<string> comparer)
+        public void SortedDictionary_GetSpanAlternateLookup_OperationsMatchUnderlyingDictionary(SCG.IComparer<string> comparer)
         {
             // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying dictionary
             SortedDictionary<string, int> dictionary = new(comparer);
