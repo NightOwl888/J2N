@@ -1006,14 +1006,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are
+        /// Modifies the current <see cref="OrderedHashSet{T}"/> object to contain only elements that are
         /// present in that object and in the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// If the collection represented by the other parameter is a <see cref="HashSet{T}"/> collection with
-        /// the same equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by the other parameter is a <see cref="OrderedHashSet{T}"/> collection with
+        /// the same equality comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in <paramref name="other"/>.
         /// </remarks>
@@ -1058,9 +1058,9 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Removes all elements in the specified collection from the current <see cref="HashSet{T}"/> object.
+        /// Removes all elements in the specified collection from the current <see cref="OrderedHashSet{T}"/> object.
         /// </summary>
-        /// <param name="other">The collection of items to remove from the <see cref="HashSet{T}"/> object.</param>
+        /// <param name="other">The collection of items to remove from the <see cref="OrderedHashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// The <see cref="ExceptWith(IEnumerable{T})"/> method is the equivalent of mathematical set subtraction.
@@ -1093,14 +1093,14 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Modifies the current <see cref="HashSet{T}"/> object to contain only elements that are present either
+        /// Modifies the current <see cref="OrderedHashSet{T}"/> object to contain only elements that are present either
         /// in that object or in the specified collection, but not both.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
-        /// If the other parameter is a <see cref="HashSet{T}"/> collection with the same equality comparer as
-        /// the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the other parameter is a <see cref="OrderedHashSet{T}"/> collection with the same equality comparer as
+        /// the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where n is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -1139,22 +1139,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a subset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a subset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a subset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a subset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a subset of any other collection, including an empty set; therefore, this method returns
-        /// <c>true</c> if the collection represented by the current <see cref="HashSet{T}"/> object is empty,
+        /// <c>true</c> if the collection represented by the current <see cref="OrderedHashSet{T}"/> object is empty,
         /// even if the <paramref name="other"/> parameter is an empty set.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is greater than the number of
         /// elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
-        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
         /// is the number of elements in other.
         /// </remarks>
@@ -1198,22 +1198,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a proper subset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a proper subset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper subset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a proper subset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a proper subset of any other collection. Therefore, this method returns <c>true</c> if the
-        /// collection represented by the current <see cref="HashSet{T}"/> object is empty unless the other
+        /// collection represented by the current <see cref="OrderedHashSet{T}"/> object is empty unless the other
         /// parameter is also an empty set.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is greater than or equal to the number of
         /// elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="HashSet{T}"/> object, then this method is an O(n) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="OrderedHashSet{T}"/> object, then this method is an O(n) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c> is the
         /// number of elements in other.
         /// </remarks>
@@ -1260,22 +1260,22 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a superset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a superset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a superset of <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a superset of <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// All collections, including the empty set, are supersets of the empty set. Therefore, this method returns
         /// <c>true</c> if the collection represented by the other parameter is empty, even if the current
-        /// <see cref="HashSet{T}"/> object is empty.
+        /// <see cref="OrderedHashSet{T}"/> object is empty.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than the number of elements
         /// in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same
-        /// equality comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation.
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same
+        /// equality comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation.
         /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other
         /// and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
@@ -1315,19 +1315,19 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object is a proper superset of the specified collection.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object is a proper superset of the specified collection.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is a proper superset of other; otherwise, <c>false</c>.</returns>
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is a proper superset of other; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// An empty set is a proper superset of any other collection. Therefore, this method returns <c>true</c> if the
-        /// collection represented by the other parameter is empty unless the current <see cref="HashSet{T}"/> collection is also empty.
+        /// collection represented by the other parameter is empty unless the current <see cref="OrderedHashSet{T}"/> collection is also empty.
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than or equal to the number of elements in other.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and <c>m</c>
         /// is <see cref="Count"/>.
         /// </remarks>
@@ -1374,11 +1374,11 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether the current <see cref="HashSet{T}"/> object and a specified collection
+        /// Determines whether the current <see cref="OrderedHashSet{T}"/> object and a specified collection
         /// share common elements.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object and <paramref name="other"/> share
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object and <paramref name="other"/> share
         /// at least one common element; otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
@@ -1411,18 +1411,18 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether a <see cref="HashSet{T}"/> object and the specified collection contain the same elements.
+        /// Determines whether a <see cref="OrderedHashSet{T}"/> object and the specified collection contain the same elements.
         /// </summary>
-        /// <param name="other">The collection to compare to the current <see cref="HashSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="HashSet{T}"/> object is equal to <paramref name="other"/>;
+        /// <param name="other">The collection to compare to the current <see cref="OrderedHashSet{T}"/> object.</param>
+        /// <returns><c>true</c> if the <see cref="OrderedHashSet{T}"/> object is equal to <paramref name="other"/>;
         /// otherwise, <c>false</c>.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
         /// <remarks>
         /// The <see cref="SetEquals(IEnumerable{T})"/> method ignores duplicate entries and the order of elements in the
         /// <paramref name="other"/> parameter.
         /// <para/>
-        /// If the collection represented by other is a <see cref="HashSet{T}"/> collection with the same equality
-        /// comparer as the current <see cref="HashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
+        /// If the collection represented by other is a <see cref="OrderedHashSet{T}"/> collection with the same equality
+        /// comparer as the current <see cref="OrderedHashSet{T}"/> object, this method is an O(<c>n</c>) operation. Otherwise,
         /// this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of elements in other and
         /// <c>m</c> is <see cref="Count"/>.
         /// </remarks>
