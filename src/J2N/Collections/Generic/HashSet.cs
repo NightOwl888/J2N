@@ -1178,7 +1178,7 @@ namespace J2N.Collections.Generic
         /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="TAlternateSpan">The alternate type of instance for performing lookups.</typeparam>
-        public struct SpanAlternateLookup<TAlternateSpan>
+        public readonly struct SpanAlternateLookup<TAlternateSpan>
         {
             /// <summary>Initialize the instance. The set must have already been verified to have a compatible comparer.</summary>
             internal SpanAlternateLookup(HashSet<T> set)
