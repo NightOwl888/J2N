@@ -166,7 +166,7 @@ namespace J2N.Collections.Tests
         public void TryAdd_AddsItem()
         {
             var dictionary = new SortedDictionary<string, string>();
-            dictionary.TryAdd("a", "b");
+            Assert.True(dictionary.TryAdd("a", "b"));
 
             Assert.True(dictionary.ContainsKey("a"));
         }
