@@ -32,7 +32,6 @@ namespace J2N.Collections.Generic
             InvariantCultureIgnoreCase,
             CurrentCulture,
             CurrentCultureIgnoreCase,
-            Unknown
         }
 
         [Flags]
