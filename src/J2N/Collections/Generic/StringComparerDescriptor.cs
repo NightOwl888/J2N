@@ -157,7 +157,13 @@ namespace J2N.Collections.Generic
                     return true;
 
                 case Classification.InvariantCulture:
+                    comparer = StringComparer.InvariantCulture;
+                    return true;
+
                 case Classification.InvariantCultureIgnoreCase:
+                    comparer = StringComparer.InvariantCultureIgnoreCase;
+                    return true;
+
                 case Classification.CurrentCulture:
                 case Classification.CurrentCultureIgnoreCase:
                     {
