@@ -2500,18 +2500,6 @@ namespace J2N.Collections.Generic
             // SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateSpan>
             int ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other) => Compare(span, other);
 
-            KeyValuePair<TKey, TValue> ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<TAlternateKeySpan> span)
-            {
-                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
-                {
-                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, default!);
-                }
-
-                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
-                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
-                return default;
-            }
-
             public int Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other)
             {
                 if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
@@ -2522,6 +2510,18 @@ namespace J2N.Collections.Generic
                 // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
                 ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
                 return 0;
+            }
+
+            KeyValuePair<TKey, TValue> ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<TAlternateKeySpan> span)
+            {
+                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
+                {
+                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, default!);
+                }
+
+                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+                return default;
             }
 
             // This overload is not part of the ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>
