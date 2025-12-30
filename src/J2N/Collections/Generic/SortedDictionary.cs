@@ -160,7 +160,8 @@ namespace J2N.Collections.Generic
 
             if (dictionary is SortedDictionary<TKey, TValue> sortedDictionary &&
                 sortedDictionary._set.Comparer is KeyValuePairComparer kv &&
-                kv.keyComparer.Equals(keyValuePairComparer.keyComparer))
+                // J2N: Use Comparer property to ensure we compare the *user* comparer for equality, not a wrapper
+                kv.Comparer.Equals(keyValuePairComparer.Comparer))
             {
                 _set = new TreeSet<KeyValuePair<TKey, TValue>>(sortedDictionary._set, keyValuePairComparer);
             }
@@ -2458,15 +2459,20 @@ namespace J2N.Collections.Generic
             {
                 if (obj is KeyValuePairComparer other)
                 {
+                    // J2N: Get the underlying comparer for comparison, not a wrapper
+                    IComparer<TKey> thisComparer = Comparer;
+                    IComparer<TKey> otherComparer = other.Comparer;
+
                     // Commonly, both comparers will be the default comparer (and reference-equal). Avoid a virtual method call to Equals() in that case.
-                    return this.keyComparer == other.keyComparer || this.keyComparer.Equals(other.keyComparer);
+                    return thisComparer == otherComparer || thisComparer.Equals(otherComparer);
                 }
                 return false;
             }
 
             public override int GetHashCode()
             {
-                return this.keyComparer.GetHashCode();
+                // J2N: Get the underlying comparer for comparison, not a wrapper
+                return Comparer.GetHashCode();
             }
         }
 
