@@ -168,10 +168,7 @@ namespace J2N.Collections.Generic
         private const string ItemsName = "Items"; // Do not rename (binary serialization)
         private const string VersionName = "Version"; // Do not rename (binary serialization)
 
-        //needed for Comparer (for correct wrapping and support of alterante lookup)
-        private const string ComparerDescriptorTypeName = "ComparerDescriptor.Type";
-        private const string ComparerDescriptorCultureName = "ComparerDescriptor.Culture";
-        private const string ComparerDescriptorOptionsName = "ComparerDescriptor.Options";
+        // J2N NOTE: The constants in StringComparerMetadataSerializer are also used to round-trip any StringComparer metadata
 
         //needed for enumerator
         private const string TreeName = "Tree";
@@ -3564,11 +3561,9 @@ namespace J2N.Collections.Generic
             info.AddValue(ComparerName, Comparer, typeof(IComparer<T>)); // J2N: Ensure we call the Comparer property to unwrap the comparer for serialization.
 
             // J2N: Add metadata to the serialization blob so we can rehydrate the WrappedStringComparer properly
-            if (typeof(T) == typeof(string) && StringComparerDescriptor.TryDescribe(Comparer, out var desc))
+            if (typeof(T) == typeof(string) && StringComparerDescriptor.TryDescribe(Comparer, out StringComparerDescriptor descriptor))
             {
-                info.AddValue(ComparerDescriptorTypeName, (int)desc.Type);
-                info.AddValue(ComparerDescriptorCultureName, desc.CultureName, typeof(string));
-                info.AddValue(ComparerDescriptorOptionsName, (int)desc.Options);
+                info.AddValue(descriptor);
             }
 
             info.AddValue(VersionName, version);
@@ -3606,7 +3601,7 @@ namespace J2N.Collections.Generic
             comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
 
             // J2N:Try to wrap the comparer with WrappedStringComparer
-            if (typeof(T) == typeof(string) && TryGetKnownStringComparer(siInfo, out IComparer<string?>? stringComparer))
+            if (typeof(T) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(siInfo, out IComparer<string?>? stringComparer))
             {
                 comparer = (IComparer<T>)stringComparer;
             }
@@ -3635,56 +3630,6 @@ namespace J2N.Collections.Generic
             }
 
             siInfo = null;
-        }
-
-        internal static bool TryGetKnownStringComparer(SerializationInfo info, [MaybeNullWhen(false)] out IComparer<string?> comparer)
-        {
-            Debug.Assert(info != null);
-
-            // Descriptor fields may not exist (old blobs)
-            SerializationInfoEnumerator e = info!.GetEnumerator();
-
-            StringComparerDescriptor.Classification type = default;
-            StringComparerDescriptor.Fields found = StringComparerDescriptor.Fields.None;
-            CompareOptions options = default;
-            string? cultureName = null;
-
-            while (e.MoveNext())
-            {
-                switch (e.Name)
-                {
-                    case ComparerDescriptorTypeName:
-                        type = (StringComparerDescriptor.Classification)(int)e.Value!;
-                        found |= StringComparerDescriptor.Fields.Type;
-                        break;
-
-                    case ComparerDescriptorCultureName:
-                        cultureName = (string?)e.Value;
-                        found |= StringComparerDescriptor.Fields.CultureName;
-                        break;
-
-                    case ComparerDescriptorOptionsName:
-                        options = (CompareOptions)(int)e.Value!;
-                        found |= StringComparerDescriptor.Fields.Options;
-                        break;
-                }
-
-                // Exit early once we have everything we need
-                if (found == StringComparerDescriptor.Fields.All)
-                {
-                    break;
-                }
-            }
-
-            if ((found & StringComparerDescriptor.Fields.Type) == 0)
-            {
-                // Old blob – descriptor not present
-                comparer = null;
-                return false;
-            }
-
-            StringComparerDescriptor descriptor = new(type, cultureName, options);
-            return WrappedStringComparer.TryGetStringComparer(descriptor, out comparer);
         }
 
 #endif

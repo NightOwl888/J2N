@@ -2382,10 +2382,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
             private const string ComparerName = "keyComparer"; // Do not rename (binary serialization)
 
-            //needed for Comparer (for correct wrapping and support of alterante lookup)
-            private const string ComparerDescriptorTypeName = "ComparerDescriptor.Type";
-            private const string ComparerDescriptorCultureName = "ComparerDescriptor.Culture";
-            private const string ComparerDescriptorOptionsName = "ComparerDescriptor.Options";
+            // J2N NOTE: The constants in StringComparerMetadataSerializer are also used to round-trip any StringComparer metadata
 #endif
 
             internal IComparer<TKey> keyComparer;
@@ -2409,7 +2406,7 @@ namespace J2N.Collections.Generic
                 keyComparer = (IComparer<TKey>)info.GetValue(ComparerName, typeof(IComparer<TKey>))!;
 
                 // J2N:Try to wrap the comparer with WrappedStringComparer
-                if (typeof(TKey) == typeof(string) && SortedSet<TKey>.TryGetKnownStringComparer(info, out IComparer<string?>? stringComparer))
+                if (typeof(TKey) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(info, out IComparer<string?>? stringComparer))
                 {
                     keyComparer = (IComparer<TKey>)stringComparer;
                 }
@@ -2427,11 +2424,9 @@ namespace J2N.Collections.Generic
                 info.AddValue(ComparerName, comparerToSerialize, typeof(IComparer<TKey>));
 
                 // J2N: Add metadata to the serialization blob so we can rehydrate the WrappedStringComparer properly
-                if (typeof(TKey) == typeof(string) && StringComparerDescriptor.TryDescribe(comparerToSerialize, out var desc))
+                if (typeof(TKey) == typeof(string) && StringComparerDescriptor.TryDescribe(comparerToSerialize, out StringComparerDescriptor descriptor))
                 {
-                    info.AddValue(ComparerDescriptorTypeName, (int)desc.Type);
-                    info.AddValue(ComparerDescriptorCultureName, desc.CultureName, typeof(string));
-                    info.AddValue(ComparerDescriptorOptionsName, (int)desc.Options);
+                    info.AddValue(descriptor);
                 }
             }
 #endif
