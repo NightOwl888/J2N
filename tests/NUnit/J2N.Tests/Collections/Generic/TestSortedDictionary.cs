@@ -8,6 +8,7 @@ using System.Linq;
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization.Formatters.Binary;
 #endif
+using SCG = System.Collections.Generic;
 #nullable enable
 
 namespace J2N.Collections.Generic
@@ -348,7 +349,7 @@ namespace J2N.Collections.Generic
                     roundTripped = (SortedDictionary<string, int>)formatter.Deserialize(ms);
                 }
 
-                // 🔴 This is the key assertion
+                // This is the key assertion
                 // The comparer must NOT be tied to cultureB
                 Assert.That(roundTripped.Comparer, Is.Not.EqualTo(StringComparer.CurrentCulture),
                     "Comparer incorrectly rebound to the current culture after deserialization.");
@@ -389,5 +390,20 @@ namespace J2N.Collections.Generic
             public int Compare(int x, int y) => x.CompareTo(y);
         }
 #endif
+
+        [Test]
+        public void Test_Constructor_BclSortedDictionaryKeys_WithMatchingComparer()
+        {
+            SCG.SortedDictionary<int, string> dict = new(Comparer<int>.Default)
+            {
+                [1] = "a",
+                [2] = "b",
+                [3] = "c"
+            };
+
+            SortedDictionary<int, string> target = new(dict, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(dict, target);
+        }
     }
 }

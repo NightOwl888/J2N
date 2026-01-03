@@ -58,7 +58,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary,
+    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, INavigableCollection<KeyValuePair<TKey, TValue>>,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -73,7 +73,16 @@ namespace J2N.Collections.Generic
 #endif
         private ValueCollection? _values;
 
-        private readonly TreeSet<KeyValuePair<TKey, TValue>> _set; // Do not rename (binary serialization)
+        // J2N NOTE: In the BCL, this field was type TreeSet<KeyValuePair<TKey, TValue>>.
+        // We have changed it to SortedSet<KeyValuePair<TKey, TValue>> to allow
+        // views to function. Note that views are not serializable. The concrete type set here
+        // is TreeSet<KeyValuePair<TKey, TValue>> for regular sets (which still round trip as TreeSet
+        // during serialization), and for views it is SortedSet<KeyValuePair<TKey, TValue>.TreeSubSet
+        // which does not support serialization by design (throws NotSupportedException). Any other types
+        // are not currently set, so consideration must be given to how it will behave in terms of
+        // serialization if another subclass of SortedSet<T> is allowed to be used here.
+
+        private readonly SortedSet<KeyValuePair<TKey, TValue>> _set; // Do not rename (binary serialization)
 
 #if FEATURE_SERIALIZABLE
         [NonSerialized]
@@ -164,18 +173,26 @@ namespace J2N.Collections.Generic
                 kv.Comparer.Equals(keyValuePairComparer.Comparer))
             {
                 _set = new TreeSet<KeyValuePair<TKey, TValue>>(sortedDictionary._set, keyValuePairComparer);
+                return;
             }
-            else
-            {
-                _set = new TreeSet<KeyValuePair<TKey, TValue>>(keyValuePairComparer);
 
-                foreach (KeyValuePair<TKey, TValue> pair in dictionary)
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+            // J2N: Added optimization for BCL SortedDictionary<TKey, TValue>
+            if (dictionary is SCG.SortedDictionary<TKey, TValue> bclSortedDictionary)
+            {
+                _set = new TreeSet<KeyValuePair<TKey, TValue>>(new BclSortedDictionaryAdapter(bclSortedDictionary, keyValuePairComparer), keyValuePairComparer);
+                return;
+            }
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+
+            _set = new TreeSet<KeyValuePair<TKey, TValue>>(keyValuePairComparer);
+
+            foreach (KeyValuePair<TKey, TValue> pair in dictionary)
+            {
+                // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
+                if (!_set.Add(pair))
                 {
-                    // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
-                    if (!_set.Add(pair))
-                    {
-                        ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(pair.Key);
-                    }
+                    ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(pair.Key);
                 }
             }
         }
@@ -198,6 +215,19 @@ namespace J2N.Collections.Generic
         public SortedDictionary(IComparer<TKey>? comparer)
         {
             _set = new TreeSet<KeyValuePair<TKey, TValue>>(new KeyValuePairComparer(comparer));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SortedDictionary{TKey, TValue}"/> class
+        /// with the specified backing <paramref name="set"/>. This overload intended to be used
+        /// to create views over a <see cref="SortedDictionary{TKey, TValue}"/> instance.
+        /// </summary>
+        /// <param name="set">The backing view set (an instance if <see cref="SortedSet{T}.TreeSubSet"/>).</param>
+        /// <remarks>This constructor isn't intended to be used directly. Instead, it is exposed through
+        /// <see cref="GetViewBetween(TKey?, TKey?)"/>.</remarks>
+        internal SortedDictionary(SortedSet<KeyValuePair<TKey, TValue>> set)
+        {
+            _set = set;
         }
 
         #endregion
@@ -1097,7 +1127,7 @@ namespace J2N.Collections.Generic
         /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
         public readonly struct SpanAlternateLookup<TAlternateKeySpan>
         {
-            private readonly TreeSet<KeyValuePair<TKey, TValue>> _set;
+            private readonly SortedSet<KeyValuePair<TKey, TValue>> _set;
             private readonly SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateKeySpan> _setLookup;
             private readonly AlternateKeyValuePairComparer<TAlternateKeySpan> _alternateComparer;
 
@@ -1368,6 +1398,103 @@ namespace J2N.Collections.Generic
         }
 
         #endregion SpanAlternateLookup
+
+        #region ISortedCollection<KeyValuePair<TKey, TValue>> members
+
+        IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => ((KeyValuePairComparer)_set.Comparer); // J2N TODO: This should be KeyComparer once we merge with the alternate lookup functionality
+
+        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Min => _set.Min;
+
+        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Max => _set.Max;
+
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBetween(KeyValuePair<TKey, TValue> lowerValue, KeyValuePair<TKey, TValue> upperValue)
+            => _set.GetViewBetween(lowerValue, upperValue);
+
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBetween(KeyValuePair<TKey, TValue> lowerValue, bool lowerValueInclusive, KeyValuePair<TKey, TValue> upperValue, bool upperValueInclusive)
+            => _set.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
+
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetPredecessor(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
+            => _set.TryGetPredecessor(item, out result);
+
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetSuccessor(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
+            => _set.TryGetSuccessor(item, out result);
+
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetFloor(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
+            => _set.TryGetFloor(item, out result);
+
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetCeiling(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
+            => _set.TryGetCeiling(item, out result);
+
+        #endregion ISortedCollection<KeyValuePair<TKey, TValue>> members
+
+        #region GetView Members
+
+        /// <summary>
+        /// Returns a view of a sub dictionary in a <see cref="SortedDictionary{TKey, TValue}"/>.
+        /// <para/>
+        /// Usage Note: In Java, the upper bound of TreeMap.subMap() is exclusive. To match the behavior, call
+        /// <see cref="GetViewBetween(TKey, bool, TKey, bool)"/>, setting <c>lowerValueInclusive</c> to <see langword="true"/>
+        /// and <c>upperValueInclusive</c> to <see langword="false"/>.
+        /// </summary>
+        /// <param name="lowerKey">The lowest desired key in the view.</param>
+        /// <param name="upperKey">The highest desired key in the view.</param>
+        /// <returns>A sub dictionary view that contains only the values in the specified range.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lowerKey"/> is more than <paramref name="upperKey"/>
+        /// according to the comparer.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
+        /// specified by <paramref name="lowerKey"/> and <paramref name="upperKey"/>.</exception>
+        /// <remarks>
+        /// This method returns a view of the range of elements that fall between <paramref name="lowerKey"/> and
+        /// <paramref name="upperKey"/> (inclusive), as defined by the comparer. This method does not copy elements from the
+        /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
+        /// </remarks>
+        internal SortedDictionary<TKey, TValue> GetViewBetween(TKey? lowerKey, TKey? upperKey)
+        {
+            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewBetween(
+                new KeyValuePair<TKey, TValue>(lowerKey!, default!),
+                new KeyValuePair<TKey, TValue>(upperKey!, default!));
+
+            return new SortedDictionary<TKey, TValue>(viewSet);
+        }
+
+        /// <summary>
+        /// Returns a view of a sub dictionary in a <see cref="SortedDictionary{TKey, TValue}"/>.
+        /// <para/>
+        /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="lowerKeyInclusive"/>
+        /// set to <see langword="true"/> and <paramref name="upperKeyInclusive"/> set to <see langword="false"/>.
+        /// </summary>
+        /// <param name="lowerKey">The lowest key in the range for the view.</param>
+        /// <param name="lowerKeyInclusive">If <c>true</c>, <paramref name="lowerKey"/> will be included in the range;
+        /// otherwise, it is an exclusive lower bound.</param>
+        /// <param name="upperKey">The highest desired key in the view.</param>
+        /// <param name="upperKeyInclusive">If <c>true</c>, <paramref name="upperKey"/> will be included in the range;
+        /// otherwise, it is an exclusive upper bound.</param>
+        /// <returns>A sub dictionary view that contains only the values in the specified range.</returns>
+        /// <exception cref="ArgumentException"><paramref name="lowerKey"/> is more than <paramref name="upperKey"/>
+        /// according to the comparer.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
+        /// specified by <paramref name="lowerKey"/> and <paramref name="upperKey"/>.</exception>
+        /// <remarks>
+        /// This method returns a view of the range of elements that fall between <paramref name="lowerKey"/> and
+        /// <paramref name="upperKey"/>, as defined by the comparer. Each bound may either be inclusive
+        /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="lowerKeyInclusive"/>
+        /// and <paramref name="upperKeyInclusive"/>. This method does not copy elements from the
+        /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
+        /// </remarks>
+        internal SortedDictionary<TKey, TValue> GetViewBetween(TKey? lowerKey, bool lowerKeyInclusive, TKey? upperKey, bool upperKeyInclusive)
+        {
+            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewBetween(
+                new KeyValuePair<TKey, TValue>(lowerKey!, default!),
+                lowerKeyInclusive,
+                new KeyValuePair<TKey, TValue>(upperKey!, default!),
+                upperKeyInclusive);
+
+            return new SortedDictionary<TKey, TValue>(viewSet);
+        }
+
+        #endregion GetView Members
 
         #region Structural Equality
 
@@ -1705,7 +1832,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public sealed class KeyCollection : ICollection<TKey>, ICollection
+        public sealed class KeyCollection : ICollection<TKey>, ICollection, INavigableCollection<TKey>
 #if FEATURE_IREADONLYCOLLECTIONS
             , IReadOnlyCollection<TKey>
 #endif
@@ -1808,7 +1935,8 @@ namespace J2N.Collections.Generic
                 if (array.Length - index < Count)
                     ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
-                _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Key; return true; });
+                // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
+                _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Key; return true; });
             }
 
             void ICollection.CopyTo(Array array, int index)
@@ -1833,7 +1961,8 @@ namespace J2N.Collections.Generic
                     try
                     {
                         object?[] objects = (object?[])array;
-                        _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Key; return true; });
+                        // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
+                        _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Key; return true; });
                     }
                     catch (ArrayTypeMismatchException)
                     {
@@ -1885,6 +2014,44 @@ namespace J2N.Collections.Generic
             bool ICollection.IsSynchronized => false;
 
             object ICollection.SyncRoot => ((ICollection)_dictionary).SyncRoot;
+
+            #region INavigableSet<T> members
+
+            TKey INavigableCollection<TKey>.Min => _dictionary._set.Min.Key;
+
+            TKey INavigableCollection<TKey>.Max => _dictionary._set.Max.Key;
+
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBetween(TKey? lowerKey, TKey? upperKey)
+            {
+                // Note that if this is called on TreeSubSet, it overrides GetViewBetween() and properly
+                // cascades the call to the underlying set.
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBetween(lowerKey, upperKey);
+                return new KeyCollection(viewDictionary);
+            }
+
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBetween(TKey? lowerValue, bool lowerValueInclusive, TKey? upperValue, bool upperValueInclusive)
+            {
+                // Note that if this is called on TreeSubSet, it overrides GetViewBetween() and properly
+                // cascades the call to the underlying set.
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
+                return new KeyCollection(viewDictionary);
+            }
+
+            bool INavigableCollection<TKey>.TryGetPredecessor(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetPredecessor(item, out result, out _);
+
+            bool INavigableCollection<TKey>.TryGetSuccessor(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetSuccessor(item, out result, out _);
+
+            bool INavigableCollection<TKey>.TryGetFloor(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetFloor(item, out result, out _);
+
+            bool INavigableCollection<TKey>.TryGetCeiling(TKey item, [MaybeNullWhen(false)] out TKey result)
+                => _dictionary.TryGetCeiling(item, out result, out _);
+
+            IComparer<TKey> ISortedCollection<TKey>.Comparer => _dictionary.Comparer;
+
+            #endregion INavigableSet<T> members
 
             /// <summary>
             /// Enumerates the elements of a <see cref="KeyCollection"/>.
@@ -2038,7 +2205,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public sealed class ValueCollection : ICollection<TValue>, ICollection
+        public sealed class ValueCollection : ICollection<TValue>, ICollection, ISortedCollection<TValue>
 #if FEATURE_IREADONLYCOLLECTIONS
             , IReadOnlyCollection<TValue>
 #endif
@@ -2140,7 +2307,8 @@ namespace J2N.Collections.Generic
                 if (array.Length - index < Count)
                     ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
-                _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Value; return true; });
+                // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
+                _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Value; return true; });
             }
 
             void ICollection.CopyTo(Array array, int index)
@@ -2179,7 +2347,8 @@ namespace J2N.Collections.Generic
                     try
                     {
                         object?[] objects = (object?[])array;
-                        _dictionary._set.InOrderTreeWalk(delegate (TreeSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Value; return true; });
+                        // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
+                        _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Value; return true; });
                     }
                     catch (ArrayTypeMismatchException)
                     {
@@ -2228,6 +2397,12 @@ namespace J2N.Collections.Generic
             {
                 get { return ((ICollection)_dictionary).SyncRoot; }
             }
+
+            #region ISortedCollection<T> members
+
+            IComparer<TValue> ISortedCollection<TValue>.Comparer => Comparer<TValue>.Default; // Only support the default comparer for values
+
+            #endregion ISortedCollection<T> members
 
             #region Nested Structure: Enumerator
 
@@ -2541,6 +2716,46 @@ namespace J2N.Collections.Generic
         }
 
         #endregion
+
+        #region Nested Class: BclSortedDictionaryAdapter
+
+#pragma warning disable CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+        private sealed class BclSortedDictionaryAdapter : IDistinctSortedCollection<KeyValuePair<TKey, TValue>>
+        {
+            private readonly SCG.SortedDictionary<TKey, TValue> dictionary;
+            private readonly KeyValuePairComparer comparer;
+
+            public BclSortedDictionaryAdapter(SCG.SortedDictionary<TKey, TValue> sortedDictionary, KeyValuePairComparer comparer)
+            {
+                Debug.Assert(sortedDictionary != null);
+                Debug.Assert(comparer != null);
+                dictionary = sortedDictionary!; // [!] asserted above
+                this.comparer = comparer!; // [!] asserted above
+            }
+
+            public int Count => dictionary.Count;
+
+            bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly => ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).IsReadOnly;
+
+            public IComparer<KeyValuePair<TKey, TValue>> Comparer => comparer;
+
+            public void Add(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).Add(item);
+
+            public void Clear() => dictionary.Clear();
+
+            public bool Contains(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).Contains(item);
+
+            public void CopyTo(KeyValuePair<TKey, TValue>[] array, int arrayIndex) => ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).CopyTo(array, arrayIndex);
+
+            public IEnumerator<KeyValuePair<TKey, TValue>> GetEnumerator() => ((IEnumerable<KeyValuePair<TKey, TValue>>)dictionary).GetEnumerator();
+
+            public bool Remove(KeyValuePair<TKey, TValue> item) => ((ICollection<KeyValuePair<TKey, TValue>>)dictionary).Remove(item);
+
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)dictionary).GetEnumerator();
+        }
+#pragma warning restore CS8714 // The type cannot be used as type parameter in the generic type or method. Nullability of type argument doesn't match 'notnull' constraint.
+
+        #endregion Nested Class: BclSortedDictionaryAdapter
     }
 
     /// <summary>
@@ -2566,7 +2781,8 @@ namespace J2N.Collections.Generic
 
         public TreeSet(IComparer<T> comparer) : base(comparer) { /* Intentionally blank */ }
 
-        internal TreeSet(TreeSet<T> set, IComparer<T>? comparer) : base(set, comparer) { /* Intentionally blank */ }
+        // J2N: Widened to allow any type of sorted collection as input
+        internal TreeSet(ISortedCollection<T> collection, IComparer<T>? comparer) : base(collection, comparer) { /* Intentionally blank */ }
 
 #if FEATURE_SERIALIZABLE
         [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
