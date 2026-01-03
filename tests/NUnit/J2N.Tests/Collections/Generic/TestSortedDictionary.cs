@@ -405,5 +405,22 @@ namespace J2N.Collections.Generic
 
             CollectionAssert.AreEqual(dict, target);
         }
+
+        [Test]
+        public void Test_Values_AreNotSorted()
+        {
+            SortedDictionary<int, int> dict = new()
+            {
+                [1] = 100,
+                [2] = 1,
+                [3] = 50,
+                [4] = 2
+            };
+
+            CollectionAssert.AreEqual(
+                new[] { 100, 1, 50, 2 },
+                dict.Values.ToArray());
+        }
+
     }
 }

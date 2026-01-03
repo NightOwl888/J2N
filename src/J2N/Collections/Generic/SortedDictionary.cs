@@ -2205,7 +2205,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public sealed class ValueCollection : ICollection<TValue>, ICollection, ISortedCollection<TValue>
+        public sealed class ValueCollection : ICollection<TValue>, ICollection
 #if FEATURE_IREADONLYCOLLECTIONS
             , IReadOnlyCollection<TValue>
 #endif
@@ -2397,12 +2397,6 @@ namespace J2N.Collections.Generic
             {
                 get { return ((ICollection)_dictionary).SyncRoot; }
             }
-
-            #region ISortedCollection<T> members
-
-            IComparer<TValue> ISortedCollection<TValue>.Comparer => Comparer<TValue>.Default; // Only support the default comparer for values
-
-            #endregion ISortedCollection<T> members
 
             #region Nested Structure: Enumerator
 
