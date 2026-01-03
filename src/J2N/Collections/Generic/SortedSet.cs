@@ -12,6 +12,7 @@ using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using SCG = System.Collections.Generic;
 
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
@@ -143,7 +144,7 @@ namespace J2N.Collections.Generic
 #endif
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    public partial class SortedSet<T> : ISet<T>, ICollection<T>, ICollection,
+    public partial class SortedSet<T> : ISet<T>, ICollection<T>, ICollection, INavigableCollection<T>,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyCollection<T>,
 #endif
@@ -255,6 +256,14 @@ namespace J2N.Collections.Generic
                     this.count = sortedSet.count;
                     root = sortedSet.root!.DeepClone(this.count);
                 }
+                return;
+            }
+
+            if (TryGetSortedItems(collection, out T[]? sortedItems, out int sortedCount))
+            {
+                // We have a sorted array of items with no duplicates.
+                root = ConstructRootFromSortedArray(sortedItems!, 0, sortedCount - 1, null);
+                this.count = sortedCount;
                 return;
             }
 
@@ -2617,6 +2626,11 @@ namespace J2N.Collections.Generic
             return Comparer == other.Comparer || Comparer.Equals(other.Comparer);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool ComparerEquals(IComparer<T> a, IComparer<T> b)
+            // Commonly, both comparers will be the default comparer (and reference-equal). Avoid a virtual method call to Equals() in that case.
+            => a == b || a.Equals(b);
+
         #endregion
 
         #region ISet members
@@ -2767,6 +2781,111 @@ namespace J2N.Collections.Generic
             }
 
             return root;
+        }
+
+        private bool TryGetSortedItems(IEnumerable<T> source, out T[] items, out int count)
+        {
+            items = null!;
+            count = 0;
+
+            if (TryGetDistinctSortedCollection(source, out IDistinctSortedCollection<T>? sortedSet))
+            {
+                if (ComparerEquals(Comparer, sortedSet.Comparer))
+                {
+                    items = EnumerableHelpers.ToArray(source, out count);
+                    return true;
+                }
+                return false;
+            }
+
+            if (TryGetSortedCollection(source, out ISortedCollection<T>? sortedCollection))
+            {
+                if (ComparerEquals(Comparer, sortedCollection.Comparer))
+                {
+                    items = EnumerableHelpers.ToDistinctArray(source, out count);
+                    return true;
+                }
+                return false;
+            }
+
+            return false;
+        }
+
+        private bool TryGetDistinctSortedCollection(IEnumerable<T> source, [MaybeNullWhen(false)] out IDistinctSortedCollection<T> distinctSortedCollection)
+        {
+            if (source is IDistinctSortedCollection<T> sorted)
+            {
+                distinctSortedCollection = sorted;
+                return true;
+            }
+
+            if (source is SCG.SortedSet<T> bclSortedSet)
+            {
+                distinctSortedCollection = new BclSortedSetAdapter(bclSortedSet);
+                return true;
+            }
+
+            // J2N TODO: Add support for SCG.SortedDictionary<T,>.KeyCollection
+            distinctSortedCollection = default;
+            return false;
+        }
+
+        private bool TryGetSortedCollection(IEnumerable<T> source, [MaybeNullWhen(false)] out ISortedCollection<T> sortedCollection)
+        {
+            if (source is ISortedCollection<T> sorted)
+            {
+                sortedCollection = sorted;
+                return true;
+            }
+
+            sortedCollection = default;
+
+            // J2N TODO: Add support for SCG.SortedDictionary<,T>.ValueCollection
+            //Type type = source.GetType();
+            //if (!type.IsGenericType)
+            //    return false;
+
+            //Type def = type.GetGenericTypeDefinition();
+
+            //// SortedDictionary values
+            //if (def == typeof(SCG.SortedDictionary<,>.ValueCollection) &&
+            //    ComparerEquals(Comparer, Comparer<T>.Default))
+            //{
+            //    return true;
+            //}
+
+            return false;
+        }
+
+        private sealed class BclSortedSetAdapter : IDistinctSortedCollection<T>
+        {
+            private readonly SCG.SortedSet<T> set;
+
+            public BclSortedSetAdapter(SCG.SortedSet<T> sortedSet)
+            {
+                Debug.Assert(sortedSet != null);
+                this.set = sortedSet!; // [!] asserted above
+            }
+
+            public int Count => set.Count;
+
+            bool ICollection<T>.IsReadOnly => ((ICollection<T>)set).IsReadOnly;
+
+            public IComparer<T> Comparer => set.Comparer;
+
+            public void Add(T item) => set.Add(item);
+
+            public void Clear() => set.Clear();
+
+            public bool Contains(T item) => set.Contains(item);
+
+            public void CopyTo(T[] array, int index) => set.CopyTo(array, index);
+
+            public IEnumerator<T> GetEnumerator() => set.GetEnumerator();
+
+            public bool Remove(T item) => set.Remove(item);
+
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)set).GetEnumerator();
         }
 
         /// <summary>
@@ -3392,6 +3511,34 @@ namespace J2N.Collections.Generic
         }
 
         #endregion
+
+        #region INavigableCollection<T> members
+
+        T? INavigableCollection<T>.Min => Min;
+
+        T? INavigableCollection<T>.Max => Max;
+
+        INavigableCollection<T> INavigableCollection<T>.GetViewBetween(T? lowerValue, T? upperValue)
+            => GetViewBetween(lowerValue, upperValue);
+
+        INavigableCollection<T> INavigableCollection<T>.GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive) 
+            => GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
+
+        IComparer<T> ISortedCollection<T>.Comparer => Comparer;
+
+        bool INavigableCollection<T>.TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetPredecessor(item, out result);
+
+        bool INavigableCollection<T>.TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetSuccessor(item, out result);
+
+        bool INavigableCollection<T>.TryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetFloor(item, out result);
+
+        bool INavigableCollection<T>.TryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+            => TryGetCeiling(item, out result);
+
+        #endregion INavigableCollection<T> members
 
         #region ISorted members
 

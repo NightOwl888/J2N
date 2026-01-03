@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
+using SCG = System.Collections.Generic;
 #nullable enable
 
 namespace J2N.Collections.Generic
@@ -576,7 +577,7 @@ namespace J2N.Collections.Generic
                     roundTripped = (SortedSet<string>)formatter.Deserialize(ms);
                 }
 
-                // 🔴 This is the key assertion
+                // This is the key assertion
                 // The comparer must NOT be tied to cultureB
                 Assert.That(roundTripped.Comparer, Is.Not.EqualTo(StringComparer.CurrentCulture),
                     "Comparer incorrectly rebound to the current culture after deserialization.");
@@ -616,5 +617,160 @@ namespace J2N.Collections.Generic
             public int Compare(int x, int y) => x.CompareTo(y);
         }
 #endif
+
+        #region Loading and Comparing
+
+        [Test]
+        public void Test_Constructor_BclSortedSet_WithSameComparer()
+        {
+            SCG.SortedSet<int> src = new() { 1, 2, 3 };
+            SortedSet<int> target = new(src, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(src, target);
+        }
+
+        [Test]
+        public void Test_Constructor_BclSortedDictionaryKeys_WithMatchingComparer()
+        {
+            SCG.SortedDictionary<int, string> dict = new(Comparer<int>.Default)
+            {
+                [1] = "a",
+                [2] = "b",
+                [3] = "c"
+            };
+
+            SortedSet<int> target = new(dict.Keys, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, target);
+        }
+
+        [Test]
+        public void Test_Constructor_BclSortedDictionaryValues_Deduplicates()
+        {
+            SCG.SortedDictionary<int, int> dict = new()
+            {
+                [1] = 10,
+                [2] = 10,
+                [3] = 20
+            };
+
+            SortedSet<int> target = new(dict.Values, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(new[] { 10, 20 }, target);
+        }
+
+        [Test]
+        public void Test_Constructor_BclSortedDictionaryValues_RejectsNonDefaultComparer()
+        {
+            SCG.SortedDictionary<int, int> dict = new()
+            {
+                [1] = 10,
+                [2] = 20
+            };
+
+            var reverse = SCG.Comparer<int>.Create((a, b) => b.CompareTo(a));
+
+            SortedSet<int> set = new(dict.Values, reverse);
+
+            CollectionAssert.AreEqual(new[] { 20, 10 }, set); // falls back to slow path
+        }
+
+        [Test]
+        public void Test_Constructor_BclSortedDictionaryValuesWithDuplicates_UsesDistinctPath()
+        {
+            SCG.SortedDictionary<int, int> src = new()
+            {
+                [1] = 10,
+                [2] = 10,
+                [3] = 10
+            };
+
+            SortedSet<int> set = new(src.Values, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(new[] { 10 }, set);
+        }
+
+
+        [Test]
+        public void Test_Constructor_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> src = new() { 1, 2, 3 };
+            SortedSet<int> target = new(src, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(src, target);
+        }
+
+        [Test]
+        public void Test_Constructor_J2NSortedDictionaryKeys_WithMatchingComparer()
+        {
+            SortedDictionary<int, string> dict = new(Comparer<int>.Default)
+            {
+                [1] = "a",
+                [2] = "b",
+                [3] = "c"
+            };
+
+            SortedSet<int> target = new(dict.Keys, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, target);
+        }
+
+        [Test]
+        public void Test_Constructor_J2NSortedDictionaryValues_Deduplicates()
+        {
+            SortedDictionary<int, int> dict = new()
+            {
+                [1] = 10,
+                [2] = 10,
+                [3] = 20
+            };
+
+            SortedSet<int> target = new(dict.Values, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(new[] { 10, 20 }, target);
+        }
+
+        [Test]
+        public void Test_Constructor_J2NSortedDictionaryValues_RejectsNonDefaultComparer()
+        {
+            SortedDictionary<int, int> dict = new()
+            {
+                [1] = 10,
+                [2] = 20
+            };
+
+            var reverse = SCG.Comparer<int>.Create((a, b) => b.CompareTo(a));
+
+            SortedSet<int> set = new(dict.Values, reverse);
+
+            CollectionAssert.AreEqual(new[] { 20, 10 }, set); // falls back to slow path
+        }
+
+        [Test]
+        public void Test_Constructor_J2NSortedDictionaryValuesWithDuplicates_UsesDistinctPath()
+        {
+            SortedDictionary<int, int> src = new()
+            {
+                [1] = 10,
+                [2] = 10,
+                [3] = 10
+            };
+
+            SortedSet<int> set = new(src.Values, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(new[] { 10 }, set);
+        }
+
+
+        [Test]
+        public void Test_Constructor_UnsortedEnumerable_FallsBackToSortAndDedup()
+        {
+            var src = new[] { 3, 1, 2, 2, 1 };
+            SortedSet<int> set = new(src, Comparer<int>.Default);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, set);
+        }
+
+        #endregion Loading and Comparing
     }
 }
