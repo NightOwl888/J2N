@@ -2641,29 +2641,52 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="other">The collection to compare to the current <see cref="SortedSet{T}"/> object.</param>
         /// <exception cref="ArgumentNullException"><paramref name="other"/> is <c>null</c>.</exception>
-        /// <remarks>Any duplicate elements in <paramref name="other"/> are ignored.</remarks>
+        /// <remarks>
+        /// Any duplicate elements in <paramref name="other"/> are ignored.
+        /// <para/>
+        /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/>,
+        /// <see cref="SCG.SortedSet{T}"/>, <see cref="IDistinctSortedCollection{T}"/>, or
+        /// <see cref="ISortedCollection{T}"/> with the same equality comparer as the current <see cref="SortedSet{T}"/> object,
+        /// this is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the <see cref="Count"/> of the current set
+        /// and <c>m</c> is the <see cref="SCG.ICollection{T}.Count"/> of <paramref name="other"/>. Otherwise,
+        /// this is an O(<c>m</c> log <c>n</c>) operation.
+        /// </remarks>
         public void UnionWith(IEnumerable<T> other)
         {
             if (other is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
-            SortedSet<T>? asSorted = other as SortedSet<T>;
+            IDistinctSortedCollection<T>? asSorted;
+            if (other is not SCG.SortedSet<T> otherSortedSet)
+                asSorted = other as IDistinctSortedCollection<T>;
+            else
+                asSorted = new BclSortedSetAdapter(otherSortedSet);
+
             TreeSubSet? treeSubset = this as TreeSubSet;
 
             if (treeSubset != null)
                 VersionCheck();
 
+            // If asSorted is null, this is not a distinct sorted collection.
+            if (asSorted is null && treeSubset is null && other is ISortedCollection<T> otherSortedNonDistinct)
+            {
+                UnionWithSortedNonDistinctCollection(otherSortedNonDistinct);
+                return;
+            }
+
             if (asSorted != null && treeSubset == null && Count == 0)
             {
-                SortedSet<T> dummy = new SortedSet<T>(asSorted, comparer);
+                SortedSet<T> dummy = new SortedSet<T>(asSorted, Comparer);
                 root = dummy.root;
                 count = dummy.count;
                 version++;
                 return;
             }
 
+            IComparer<T>? comparer;
+
             // This actually hurts if N is much greater than M. The / 2 is arbitrary.
-            if (asSorted != null && treeSubset == null && HasEqualComparer(asSorted) && (asSorted.Count > this.Count / 2))
+            if (asSorted != null && treeSubset == null && ComparerEquals(comparer = Comparer, asSorted.Comparer) && (asSorted.Count > this.Count / 2))
             {
                 // First do a merge sort to an array.
                 T[] merged = new T[asSorted.Count + this.Count];
@@ -2673,7 +2696,7 @@ namespace J2N.Collections.Generic
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
                 while (!mineEnded && !theirsEnded)
                 {
-                    int comp = Comparer.Compare(mine.Current, theirs.Current);
+                    int comp = comparer.Compare(mine.Current, theirs.Current);
                     if (comp < 0)
                     {
                         merged[c++] = mine.Current;
@@ -2715,6 +2738,119 @@ namespace J2N.Collections.Generic
             {
                 AddAllElements(other);
             }
+        }
+
+        private void UnionWithSortedNonDistinctCollection(ISortedCollection<T> other)
+        {
+            Debug.Assert(other != null);
+
+            if (Count ==  0)
+            {
+                SortedSet<T> dummy = new SortedSet<T>(other!, Comparer);
+                root = dummy.root;
+                count = dummy.count;
+                version++;
+                return;
+            }
+
+            IComparer<T>? comparer;
+
+            if (ComparerEquals(comparer = Comparer, other!.Comparer) && (other.Count > this.Count / 2))
+            {
+                MergeWithSortedNonDistinctCollection(other!, comparer);
+                return;
+            }
+
+            AddAllElements(other!);
+        }
+
+        private void MergeWithSortedNonDistinctCollection(ISortedCollection<T> other, IComparer<T> comparer)
+        {
+            // Preconditions already checked:
+            // - treeSubset == null
+            // - comparer equality
+            // - other.Count > this.Count / 2
+
+            T[] merged = new T[other.Count + this.Count];
+            int c = 0;
+
+            IEnumerator<T> mine = this.GetEnumerator();
+            IEnumerator<T> theirs = other.GetEnumerator();
+
+            bool mineEnded = !mine.MoveNext();
+            bool theirsEnded = !theirs.MoveNext();
+
+            bool hasPrevOther = false;
+            T prevOther = default!;
+
+            while (!mineEnded && !theirsEnded)
+            {
+                T theirsCurrent = theirs.Current;
+
+                // Collapse duplicates in "other"
+                if (hasPrevOther &&
+                    EqualityComparer<T>.Default.Equals(theirsCurrent, prevOther))
+                {
+                    theirsEnded = !theirs.MoveNext();
+                    continue;
+                }
+
+                int comp = comparer.Compare(mine.Current, theirsCurrent);
+
+                if (comp < 0)
+                {
+                    merged[c++] = mine.Current;
+                    mineEnded = !mine.MoveNext();
+                }
+                else if (comp == 0)
+                {
+                    merged[c++] = theirsCurrent;
+                    mineEnded = !mine.MoveNext();
+
+                    prevOther = theirsCurrent;
+                    hasPrevOther = true;
+                    theirsEnded = !theirs.MoveNext();
+                }
+                else
+                {
+                    merged[c++] = theirsCurrent;
+                    prevOther = theirsCurrent;
+                    hasPrevOther = true;
+                    theirsEnded = !theirs.MoveNext();
+                }
+            }
+
+            // Remaining elements
+            if (!mineEnded)
+            {
+                do
+                {
+                    merged[c++] = mine.Current;
+                }
+                while (mine.MoveNext());
+            }
+            else if (!theirsEnded)
+            {
+                do
+                {
+                    T current = theirs.Current;
+
+                    if (!hasPrevOther ||
+                        !EqualityComparer<T>.Default.Equals(current, prevOther))
+                    {
+                        merged[c++] = current;
+                        prevOther = current;
+                        hasPrevOther = true;
+                    }
+                }
+                while (theirs.MoveNext());
+            }
+
+            // Replace tree
+            root = null;
+            root = ConstructRootFromSortedArray(merged, 0, c - 1, null);
+            count = c;
+            version++;
         }
 
         private static Node? ConstructRootFromSortedArray(T[] arr, int startIndex, int endIndex, Node? redNode)

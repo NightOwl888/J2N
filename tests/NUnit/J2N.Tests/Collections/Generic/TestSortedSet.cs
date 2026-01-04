@@ -2,6 +2,7 @@
 using J2N.Util;
 using NUnit.Framework;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -771,6 +772,155 @@ namespace J2N.Collections.Generic
             CollectionAssert.AreEqual(new[] { 1, 2, 3 }, set);
         }
 
+
+        [Test]
+        public void Test_UnionWith_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 3 };
+            SortedSet<int> right = new() { 2, 3 };
+
+            left.UnionWith(right);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, left);
+        }
+
+        [Test]
+        public void Test_UnionWith_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 3 };
+            SCG.SortedSet<int> right = new() { 2, 3 };
+
+            left.UnionWith(right);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, left);
+        }
+
+        [Test]
+        public void Test_UnionWith_J2NSortedDictionaryKeys()
+        {
+            SortedSet<int> left = new() { 1, 3 };
+
+            SortedDictionary<int, string> dict = new()
+            {
+                [3] = "c",
+                [2] = "b",
+            };
+
+            left.UnionWith(dict.Keys);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, left);
+        }
+
+        [Test]
+        public void Test_UnionWith_J2NSortedDictionaryValues_Deduplicates()
+        {
+            SortedSet<int> left = new() { 5 };
+
+            SortedDictionary<int, int> dict = new()
+            {
+                [1] = 10,
+                [2] = 10,
+                [3] = 20
+            };
+
+            left.UnionWith(dict.Values);
+
+            CollectionAssert.AreEqual(new[] { 5, 10, 20 }, left);
+        }
+
+        [Test]
+        public void Test_UnionWith_SortedNonDistinct_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 4 };
+
+            SortedDictionary<int, int> dict = new()
+            {
+                [1] = 2,
+                [2] = 2,
+                [3] = 3,
+                [4] = 3
+            };
+
+            left.UnionWith(dict.Values);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, left);
+        }
+
+        [Test]
+        public void Test_UnionWith_J2NSortedDictionaryValues_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 4 };
+
+            SortedDictionary<int, int> dict = new()
+            {
+                [1] = 100,
+                [2] = 1,
+                [3] = 50,
+                [4] = 2
+            };
+
+            left.UnionWith(dict.Values);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 4, 50, 100 }, left);
+        }
+
+        [Test]
+        public void Test_UnionWith_SortedNonDistinct_UsesOptimizedMergePath()
+        {
+            SortedSet<int> left = new() { 4, 1 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                1, 1, 1, 2, 2, 2, 3, 3,
+            };
+
+            left.UnionWith(nonDistinct);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, left);
+        }
+
         #endregion Loading and Comparing
+
+        /// <summary>
+        /// Represents a sorted collection that may contain duplicates. Note this is just a mock and
+        /// the data provided to the constructor must already be sorted according to the provided comparer.
+        /// The <see cref="ISortedCollection{T}"/> interface is guaranteed only by implementation, not by
+        /// interface contract.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        private sealed class SortedCollection<T> : ISortedCollection<T>
+        {
+            private readonly IComparer<T> comparer;
+            private readonly List<T> list = new List<T>();
+
+            public SortedCollection() : this(null)
+            {
+            }
+
+            public SortedCollection(IComparer<T>? comparer)
+            {
+                this.comparer = comparer ?? Comparer<T>.Default;
+            }
+
+            public IComparer<T> Comparer => comparer;
+
+            public int Count => list.Count;
+
+            public bool IsReadOnly => false;
+
+            public void Add(T item) => list.Add(item);
+
+            public void Clear() => list.Clear();
+
+            public bool Contains(T item) => list.Contains(item);
+
+            public void CopyTo(T[] array, int arrayIndex) => list.CopyTo(array, arrayIndex);
+
+            public IEnumerator<T> GetEnumerator() => list.GetEnumerator();
+
+            public bool Remove(T item) => list.Remove(item);
+
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)list).GetEnumerator();
+        }
     }
 }
