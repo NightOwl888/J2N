@@ -2947,7 +2947,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        private bool TryGetDistinctSortedCollection(IEnumerable<T> source, [MaybeNullWhen(false)] out IDistinctSortedCollection<T> distinctSortedCollection)
+        private static bool TryGetDistinctSortedCollection(IEnumerable<T> source, [MaybeNullWhen(false)] out IDistinctSortedCollection<T> distinctSortedCollection)
         {
             if (source is IDistinctSortedCollection<T> sorted)
             {
@@ -2966,7 +2966,7 @@ namespace J2N.Collections.Generic
             return false;
         }
 
-        private bool TryGetSortedCollection(IEnumerable<T> source, [MaybeNullWhen(false)] out ISortedCollection<T> sortedCollection)
+        private static bool TryGetSortedCollection(IEnumerable<T> source, [MaybeNullWhen(false)] out ISortedCollection<T> sortedCollection)
         {
             if (source is ISortedCollection<T> sorted)
             {
