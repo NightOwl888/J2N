@@ -2853,7 +2853,7 @@ namespace J2N.Collections.Generic
             version++;
         }
 
-        private static Node? ConstructRootFromSortedArray(T[] arr, int startIndex, int endIndex, Node? redNode)
+        private static Node? ConstructRootFromSortedArray(ReadOnlySpan<T> arr, int startIndex, int endIndex, Node? redNode)
         {
             // You're given a sorted array... say 1 2 3 4 5 6
             // There are 2 cases:
@@ -3033,10 +3033,15 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This method ignores any duplicate elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by the <paramref name="other"/> parameter is a <see cref="SortedSet{T}"/> collection with
-        /// the same equality comparer as the current <see cref="SortedSet{T}"/> object, this method is an <c>O(n)</c>
-        /// operation. Otherwise, this method is an <c>O(n + m)</c> operation, where <c>n</c> is <see cref="Count"/> and <c>m</c>
-        /// is the number of elements in <paramref name="other"/>.
+        /// If the collection represented by the <paramref name="other"/> parameter is a <see cref="SortedSet{T}"/>,
+        /// <see cref="SCG.SortedSet{T}"/>, <see cref="IDistinctSortedCollection{T}"/> with the same equality comparer
+        /// as the current <see cref="SortedSet{T}"/> object, this is an O(<c>n</c>) operation.
+        /// If the collection is an <see cref="ISortedCollection{T}"/> with the same equality comparer as the current
+        /// <see cref="SortedSet{T}"/> object, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c>
+        /// is <see cref="Count"/> and <c>m</c> is the number of elements in <paramref name="other"/>. Otherwise,
+        /// this method is an O(<c>m</c> * log <c>n</c> + <c>k</c> * log <c>k</c>) operation, where <c>k</c> is the
+        /// number of elements in the intersection. For range-restricted views, this method falls
+        /// back to incremental insertion per element to preserve range validation and projection invariants.
         /// </remarks>
         public virtual void IntersectWith(IEnumerable<T> other)
         {
@@ -3051,26 +3056,38 @@ namespace J2N.Collections.Generic
 
             // HashSet<T> optimizations can't be done until equality comparers and comparers are related
 
-            // Technically, this would work as well with an ISorted<T>
-            SortedSet<T>? asSorted = other as SortedSet<T>;
+            IDistinctSortedCollection<T>? asSorted;
+            if (other is not SCG.SortedSet<T> otherSortedSet)
+                asSorted = other as IDistinctSortedCollection<T>;
+            else
+                asSorted = new BclSortedSetAdapter(otherSortedSet);
+
             TreeSubSet? treeSubset = this as TreeSubSet;
 
             if (treeSubset != null)
                 VersionCheck();
 
-            if (asSorted != null && treeSubset == null && HasEqualComparer(asSorted))
+            // If asSorted is null, this is not a distinct sorted collection.
+            if (asSorted == null && treeSubset == null && other is ISortedCollection<T> otherSortedNonDistinct)
+            {
+                IntersectWithSortedNonDistinctCollection(otherSortedNonDistinct);
+                return;
+            }
+
+            IComparer<T>? comparer;
+            if (asSorted != null && treeSubset == null && ComparerEquals(comparer = Comparer, asSorted.Comparer))
             {
                 // First do a merge sort to an array.
-                T[] merged = new T[this.Count];
+                T[] merged = new T[Math.Min(this.Count, asSorted.Count)];
                 int c = 0;
                 IEnumerator<T> mine = this.GetEnumerator();
                 IEnumerator<T> theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
                 T? max = Max;
 
-                while (!mineEnded && !theirsEnded && Comparer.Compare(theirs.Current!, max!) <= 0)
+                while (!mineEnded && !theirsEnded && comparer.Compare(theirs.Current!, max!) <= 0)
                 {
-                    int comp = Comparer.Compare(mine.Current, theirs.Current);
+                    int comp = comparer.Compare(mine.Current, theirs.Current);
                     if (comp < 0)
                     {
                         mineEnded = !mine.MoveNext();
@@ -3102,10 +3119,102 @@ namespace J2N.Collections.Generic
             }
         }
 
+        private void IntersectWithSortedNonDistinctCollection(ISortedCollection<T> other)
+        {
+            Debug.Assert(other != null);
+            Debug.Assert(Count > 0);
+
+            IComparer<T> comparer = Comparer;
+            if (ComparerEquals(comparer, other!.Comparer)) // [!] asserted above
+            {
+
+                // Result cannot exceed the smaller of this.Count or other.Count
+                T[] merged = new T[Math.Min(this.Count, other.Count)];
+                int c = 0;
+
+                IEnumerator<T> mine = this.GetEnumerator();
+                IEnumerator<T> theirs = other!.GetEnumerator(); // [!] asserted above
+
+                bool mineEnded = !mine.MoveNext();
+                bool theirsEnded = !theirs.MoveNext();
+
+                bool hasPrevOther = false;
+                T prevOther = default!;
+
+                // Optional pruning using Max
+                T max = Max!;
+
+                while (!mineEnded && !theirsEnded &&
+                       comparer.Compare(theirs.Current, max) <= 0)
+                {
+                    T theirsCurrent = theirs.Current;
+
+                    // Collapse duplicates in "other"
+                    if (hasPrevOther &&
+                        EqualityComparer<T>.Default.Equals(theirsCurrent, prevOther))
+                    {
+                        theirsEnded = !theirs.MoveNext();
+                        continue;
+                    }
+
+                    int comp = comparer.Compare(mine.Current, theirsCurrent);
+
+                    if (comp < 0)
+                    {
+                        mineEnded = !mine.MoveNext();
+                    }
+                    else if (comp == 0)
+                    {
+                        merged[c++] = mine.Current;
+
+                        mineEnded = !mine.MoveNext();
+
+                        prevOther = theirsCurrent;
+                        hasPrevOther = true;
+                        theirsEnded = !theirs.MoveNext();
+                    }
+                    else
+                    {
+                        prevOther = theirsCurrent;
+                        hasPrevOther = true;
+                        theirsEnded = !theirs.MoveNext();
+                    }
+                }
+
+                // Rebuild tree from merged intersection
+                root = null;
+                root = ConstructRootFromSortedArray(merged, 0, c - 1, null);
+                count = c;
+                version++;
+            }
+            else
+            {
+                IntersectWithEnumerable(other);
+            }
+        }
+
+        // J2N: Optimized fallback to reduce allocations and tree noise with Add()
         internal virtual void IntersectWithEnumerable(IEnumerable<T> other)
         {
-            // TODO: Perhaps a more space-conservative way to do this
-            List<T> toSave = new List<T>(Count);
+            int? otherCount = null;
+            if (other is ICollection<T> collection)
+            {
+                otherCount = collection.Count;
+            }
+#if FEATURE_IREADONLYCOLLECTIONS
+            else if (other is IReadOnlyCollection<T> readOnlyCollection)
+            {
+                otherCount = readOnlyCollection.Count;
+            }
+#endif
+
+            if (otherCount == 0)
+            {
+                Clear();
+                return;
+            }
+
+            List<T> toSave = new(otherCount.HasValue ? Math.Min(this.Count, otherCount.Value) : this.Count);
             foreach (T item in other)
             {
                 if (Contains(item))
@@ -3114,10 +3223,48 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            Clear();
-            foreach (T item in toSave)
+            TreeSubSet? treeSubset = this as TreeSubSet;
+
+            if (treeSubset is null)
             {
-                Add(item);
+                int count = toSave.Count;
+
+                if (count > 0)
+                {
+                    T[] elements = toSave._items;
+                    Array.Sort(elements, 0, count, comparer);
+
+                    // Overwrite duplicates while shifting the distinct elements towards
+                    // the front of the array.
+                    int index = 1;
+                    for (int i = 1; i < count; i++)
+                    {
+                        if (comparer.Compare(elements[i], elements[i - 1]) != 0)
+                        {
+                            elements[index++] = elements[i];
+                        }
+                    }
+
+                    count = index;
+                    root = null;
+                    root = ConstructRootFromSortedArray(elements, 0, count - 1, null);
+                    this.count = count;
+                    version++;
+                }
+                else
+                {
+                    Clear();
+                }
+            }
+            else
+            {
+                // J2N: Rebuilding the root of a TreeSubSet is not valid, as the underlying set may
+                // have elements outside of the view. So, we must use Clear() and Add() to ensure validity.
+                Clear();
+                foreach (T item in toSave)
+                {
+                    Add(item);
+                }
             }
         }
 

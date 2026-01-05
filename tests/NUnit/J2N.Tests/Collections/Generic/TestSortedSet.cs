@@ -879,6 +879,144 @@ namespace J2N.Collections.Generic
             CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, left);
         }
 
+
+
+        [Test]
+        public void Test_IntersectWith_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 3 };
+            SortedSet<int> right = new() { 2, 3 };
+
+            left.IntersectWith(right);
+
+            CollectionAssert.AreEqual(new[] { 3 }, left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 3 };
+            SCG.SortedSet<int> right = new() { 2, 3 };
+
+            left.IntersectWith(right);
+
+            CollectionAssert.AreEqual(new[] { 3 }, left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_J2NSortedDictionaryKeys()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            SortedDictionary<int, string> dict = new()
+            {
+                [3] = "c",
+                [4] = "d"
+            };
+
+            left.IntersectWith(dict.Keys);
+
+            CollectionAssert.AreEqual(new[] { 3 }, left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_J2NSortedDictionaryValues_Deduplicates()
+        {
+            SortedSet<int> left = new() { 10, 20, 30 };
+
+            SortedDictionary<int, int> dict = new()
+            {
+                [1] = 10,
+                [2] = 10,
+                [3] = 20,
+                [4] = 20,
+                [5] = 40
+            };
+
+            left.IntersectWith(dict.Values); // Fallback path
+
+            CollectionAssert.AreEqual(new[] { 10, 20 }, left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_SortedNonDistinct_UsesOptimizedMergePath()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                1, 1, 2, 2, 3, 3
+            };
+
+            left.IntersectWith(nonDistinct);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_UnsortedEnumerable_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            int[] other = { 4, 3, 3, 5 };
+
+            left.IntersectWith(other);
+
+            CollectionAssert.AreEqual(new[] { 3, 4 }, left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_EmptyOther_ClearsSet()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            left.IntersectWith(Array.Empty<int>());
+
+            CollectionAssert.IsEmpty(left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_Self_NoChange()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            left.IntersectWith(left);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, left);
+        }
+
+        [Test]
+        public void Test_IntersectWith_TreeSubSet_InBounds_DistinctSorted()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedSet<int> other = new() { 1, 3, 5, 7 };
+
+            subset.IntersectWith(other);
+
+            CollectionAssert.AreEqual(new[] { 3, 5 }, subset);
+            CollectionAssert.AreEqual(new[] { 1, 3, 5, 6 }, root);
+        }
+
+        [Test]
+        public void Test_IntersectWith_TreeSubSet_InBounds_SortedNonDistinct()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 3, 3, 4, 4
+            };
+
+            subset.IntersectWith(nonDistinct);
+
+            CollectionAssert.AreEqual(new[] { 2, 3, 4 }, subset);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 6 }, root);
+        }
+
+
         #endregion Loading and Comparing
 
         /// <summary>
