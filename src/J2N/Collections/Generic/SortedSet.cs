@@ -2159,6 +2159,11 @@ namespace J2N.Collections.Generic
             /// <paramref name="upperValue"/> (inclusive), as defined by the comparer. This method does not copy elements from the
             /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// If this method is called on a view, it will inherit the <c>lowerValueInclusive</c> and <c>upperValueInclusive</c>
+            /// behavior of the view. To override this behavior, call the
+            /// <see cref="GetViewBetween(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/> overload
+            /// instead.
             /// </remarks>
             public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, ReadOnlySpan<TAlternateSpan> upperValue)
             {
