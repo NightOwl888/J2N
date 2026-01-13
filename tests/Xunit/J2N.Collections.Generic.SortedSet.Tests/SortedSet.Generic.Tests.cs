@@ -3,12 +3,12 @@
 // See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Linq;
+using System.Reflection;
 using Xunit;
 using SCG = System.Collections.Generic;
-using System.Reflection;
-using J2N.TestUtilities.Xunit;
 
 namespace J2N.Collections.Tests
 {
@@ -363,6 +363,365 @@ namespace J2N.Collections.Tests
             Assert.True(comparerSet2.SetEquals(set));
         }
         #endregion
+
+        #region GetSpanAlternateLookup
+
+        [Fact]
+        public void GetSpanAlternateLookup_FailsWhenIncompatible()
+        {
+            var hashSet = new SortedSet<string>(StringComparer.Ordinal);
+
+            hashSet.GetSpanAlternateLookup<char>();
+            Assert.True(hashSet.TryGetSpanAlternateLookup<char>(out _));
+
+            Assert.Throws<InvalidOperationException>(() => hashSet.GetSpanAlternateLookup<byte>());
+            Assert.Throws<InvalidOperationException>(() => hashSet.GetSpanAlternateLookup<string>());
+            Assert.Throws<InvalidOperationException>(() => hashSet.GetSpanAlternateLookup<int>());
+
+            Assert.False(hashSet.TryGetSpanAlternateLookup<byte>(out _));
+            Assert.False(hashSet.TryGetSpanAlternateLookup<string>(out _));
+            Assert.False(hashSet.TryGetSpanAlternateLookup<int>(out _));
+        }
+
+        [Theory]
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        public void SortedSet_GetSpanAlternateLookup_OperationsMatchUnderlyingSet(int mode)
+        {
+            // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying set
+            SortedSet<string> set = new(mode switch
+            {
+                0 => StringComparer.Ordinal,
+                1 => StringComparer.OrdinalIgnoreCase,
+                2 => StringComparer.InvariantCulture,
+                3 => StringComparer.InvariantCultureIgnoreCase,
+                4 => StringComparer.CurrentCulture,
+                5 => StringComparer.CurrentCultureIgnoreCase,
+                _ => throw new ArgumentOutOfRangeException(nameof(mode))
+            });
+
+            AssertSpanLookupMatchesRootSet(set);
+        }
+
+        [Fact]
+        public void SortedSet_GetSpanAlternateLookup_GetViewBetween_MatchesSet()
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                set.Add(i.ToString());
+
+            var lookup = set.GetSpanAlternateLookup<char>();
+
+            // Inclusive
+            var setView = set.GetViewBetween("3", "6");
+            var lookupView = lookup.GetViewBetween("3".AsSpan(), "6".AsSpan());
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+            // Exclusive
+            setView = set.GetViewBetween("3", false, "6", false);
+            lookupView = lookup.GetViewBetween("3".AsSpan(), false, "6".AsSpan(), false);
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+        }
+
+        [Fact]
+        public void SortedSet_GetSpanAlternateLookup_WorksOnRootSet()
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            AssertSpanLookupMatchesRootSet(set);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void SortedSet_GetSpanAlternateLookup_WorksOnView(
+            bool lowerInclusive,
+            bool upperInclusive)
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                set.Add(i.ToString("D2"));
+
+            // View: [02,07]
+            var view = set.GetViewBetween("02", lowerInclusive, "07", upperInclusive);
+
+            int minInclusive = lowerInclusive ? 2 : 3;
+            int maxInclusive = upperInclusive ? 7 : 6;
+
+            AssertSpanLookupMatchesView(view, minInclusive, maxInclusive);
+
+            int actualLower = lowerInclusive ? 1 : 2;
+            int actualUpper = upperInclusive ? 8 : 7;
+
+            AssertSpanLookupRejectsOutOfRangeValues(
+                view,
+                actualLower,
+                actualUpper,
+                lowerInclusive,
+                upperInclusive);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void SortedSet_GetSpanAlternateLookup_WorksOnNestedView(
+            bool lowerInclusive,
+            bool upperInclusive)
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                set.Add(i.ToString("D2"));
+
+            var view1 = set.GetViewBetween("02", lowerInclusive, "08", upperInclusive);
+            var view2 = view1.GetViewBetween("03", lowerInclusive, "06", upperInclusive);
+
+            int minInclusive = lowerInclusive ? 3 : 4;
+            int maxInclusive = upperInclusive ? 6 : 5;
+
+            AssertSpanLookupMatchesView(view2, minInclusive, maxInclusive);
+
+            int lowerReject = lowerInclusive ? 2 : 3;
+            int upperReject = upperInclusive ? 7 : 6;
+
+            AssertSpanLookupRejectsOutOfRangeValues(
+                view2,
+                lowerReject,
+                upperReject,
+                lowerInclusive,
+                upperInclusive);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void SortedSet_GetSpanAlternateLookup_WorksOnDeeplyNestedViews(
+            bool lowerInclusive,
+            bool upperInclusive)
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < 20; i++)
+                set.Add(i.ToString("D2"));
+
+            var v1 = set.GetViewBetween("01", lowerInclusive, "18", upperInclusive);
+            var v2 = v1.GetViewBetween("03", lowerInclusive, "15", upperInclusive);
+            var v3 = v2.GetViewBetween("05", lowerInclusive, "10", upperInclusive);
+
+            int minInclusive = lowerInclusive ? 5 : 6;
+            int maxInclusive = upperInclusive ? 10 : 9;
+
+            AssertSpanLookupMatchesView(v3, minInclusive, maxInclusive);
+
+            int lowerReject = lowerInclusive ? 4 : 5;
+            int upperReject = upperInclusive ? 11 : 10;
+
+            AssertSpanLookupRejectsOutOfRangeValues(
+                v3,
+                lowerReject,
+                upperReject,
+                lowerInclusive,
+                upperInclusive);
+        }
+        private static void AssertSpanLookupMatchesRootSet(SortedSet<string> set)
+        {
+            var lookup = set.GetSpanAlternateLookup<char>();
+            Assert.Same(set, lookup.Set);
+            Assert.Same(lookup.Set, lookup.Set);
+
+            // Add to the set and validate that the lookup reflects the changes
+            Assert.True(set.Add("123"));
+            Assert.True(lookup.Contains("123".AsSpan()));
+            Assert.False(lookup.Add("123".AsSpan()));
+            Assert.True(lookup.Remove("123".AsSpan()));
+            Assert.False(set.Contains("123"));
+
+            // Add via the lookup and validate that the set reflects the changes
+            Assert.True(lookup.Add("123".AsSpan()));
+            Assert.True(set.Contains("123"));
+            lookup.TryGetValue("123".AsSpan(), out string value);
+            Assert.Equal("123", value);
+            Assert.False(lookup.Remove("321".AsSpan()));
+            Assert.True(lookup.Remove("123".AsSpan()));
+
+            // Ensure that case-sensitivity of the comparer is respected
+            Assert.True(lookup.Add("a".AsSpan()));
+            if (set.Comparer.Equals(StringComparer.Ordinal) ||
+                set.Comparer.Equals(StringComparer.InvariantCulture) ||
+                set.Comparer.Equals(StringComparer.CurrentCulture))
+            {
+                Assert.True(lookup.Add("A".AsSpan()));
+                Assert.True(lookup.Remove("a".AsSpan()));
+                Assert.False(lookup.Remove("a".AsSpan()));
+                Assert.True(lookup.Remove("A".AsSpan()));
+            }
+            else
+            {
+                Assert.False(lookup.Add("A".AsSpan()));
+                Assert.True(lookup.Remove("A".AsSpan()));
+                Assert.False(lookup.Remove("a".AsSpan()));
+                Assert.False(lookup.Remove("A".AsSpan()));
+            }
+
+            // Test the behavior of null vs "" in the set and lookup
+            Assert.True(set.Add(null));
+            Assert.True(set.Add(string.Empty));
+            Assert.True(set.Contains(null));
+            Assert.True(set.Contains(""));
+            Assert.True(lookup.Contains("".AsSpan()));
+            Assert.True(lookup.Remove("".AsSpan()));
+            Assert.Equal(1, set.Count);
+            Assert.False(lookup.Remove("".AsSpan()));
+            Assert.True(set.Remove(null));
+            Assert.Equal(0, set.Count);
+
+            // Test adding multiple entries via the lookup
+            for (int i = 0; i < 10; i++)
+            {
+                Assert.Equal(i, set.Count);
+                Assert.True(lookup.Add(i.ToString().AsSpan()));
+                Assert.False(lookup.Add(i.ToString().AsSpan()));
+            }
+
+            Assert.Equal(10, set.Count);
+
+            // Test that the lookup and the set agree on what's in and not in
+            for (int i = -1; i <= 10; i++)
+            {
+                Assert.Equal(set.TryGetValue(i.ToString(), out string dv), lookup.TryGetValue(i.ToString().AsSpan(), out string lv));
+                Assert.Equal(dv, lv);
+            }
+
+            // Test removing multiple entries via the lookup
+            for (int i = 9; i >= 0; i--)
+            {
+                Assert.True(lookup.Remove(i.ToString().AsSpan()));
+                Assert.False(lookup.Remove(i.ToString().AsSpan()));
+                Assert.Equal(i, set.Count);
+            }
+
+
+            // Add some sequential items again
+            for (int i = 0; i < 5; i++)
+            {
+                Assert.Equal(i, set.Count);
+                Assert.True(lookup.Add(i.ToString().AsSpan()));
+            }
+
+            // Test TryGetPredecessor, TryGetSuccessor,
+            // TryGetFlor, TryGetCeiling
+            for (int i = 0; i < 5; i++)
+            {
+                string item = i.ToString();
+                Assert.Equal(set.TryGetPredecessor(item, out string predecessor),
+                    lookup.TryGetPredecessor(item.AsSpan(), out string spanPredecessor));
+                Assert.Equal(predecessor, spanPredecessor);
+
+                Assert.Equal(set.TryGetSuccessor(item, out string successor),
+                    lookup.TryGetSuccessor(item.AsSpan(), out string spanSuccessor));
+                Assert.Equal(successor, spanSuccessor);
+
+                Assert.Equal(set.TryGetFloor(item, out string floor),
+                    lookup.TryGetFloor(item.AsSpan(), out string spanFloor));
+                Assert.Equal(floor, spanFloor);
+
+                Assert.Equal(set.TryGetCeiling(item, out string ceiling),
+                    lookup.TryGetCeiling(item.AsSpan(), out string spanCeiling));
+                Assert.Equal(ceiling, spanCeiling);
+            }
+        }
+        private static void AssertSpanLookupMatchesView(SortedSet<string> set, int minInclusive, int maxInclusive)
+        {
+            var lookup = set.GetSpanAlternateLookup<char>();
+            Assert.Same(set, lookup.Set);
+
+            // in-range add/remove
+            for (int i = minInclusive; i <= maxInclusive; i++)
+            {
+                string s = i.ToString("D2");
+
+                //Assert.True(lookup.Add(s.AsSpan()));
+                Assert.False(lookup.Add(s.AsSpan()));
+                Assert.False(set.Add(s));
+
+                Assert.True(lookup.Contains(s.AsSpan()));
+                Assert.True(set.Contains(s));
+
+                lookup.TryGetValue(s.AsSpan(), out string v1);
+                Assert.Equal(s, v1);
+
+                set.TryGetValue(s, out string v2);
+                Assert.Equal(s, v2);
+            }
+
+            // predecessor / successor within range
+            for (int i = minInclusive; i <= maxInclusive; i++)
+            {
+                string s = i.ToString("D2");
+
+                Assert.Equal(
+                    set.TryGetPredecessor(s, out var predecessor),
+                    lookup.TryGetPredecessor(s.AsSpan(), out var spanPredecessor));
+                Assert.Equal(predecessor, spanPredecessor);
+
+                Assert.Equal(
+                    set.TryGetSuccessor(s, out var successor),
+                    lookup.TryGetSuccessor(s.AsSpan(), out var spanSuccessor));
+                Assert.Equal(successor, spanSuccessor);
+
+                Assert.Equal(
+                    set.TryGetPredecessor(s, out var floor),
+                    lookup.TryGetPredecessor(s.AsSpan(), out var spanFloor));
+                Assert.Equal(floor, spanFloor);
+
+                Assert.Equal(
+                    set.TryGetSuccessor(s, out var ceiling),
+                    lookup.TryGetSuccessor(s.AsSpan(), out var spanCeiling));
+                Assert.Equal(ceiling, spanCeiling);
+            }
+
+            // in-range remove
+            for (int i = maxInclusive; i >= minInclusive; i--)
+            {
+                string s = i.ToString("D2");
+                Assert.True(lookup.Remove(s.AsSpan()));
+                Assert.False(lookup.Remove(s.AsSpan()));
+
+                Assert.False(set.Remove(s));
+            }
+
+            Assert.Equal(0, set.Count);
+        }
+
+        private static void AssertSpanLookupRejectsOutOfRangeValues(SortedSet<string> set, int below, int above, bool lowerInclusive, bool upperInclusive)
+        {
+            var lookup = set.GetSpanAlternateLookup<char>();
+
+            string low = below.ToString("D2");
+            string high = above.ToString("D2");
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(low));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.Add(low.AsSpan()));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(high));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.Add(high.AsSpan()));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => set.GetViewBetween(low, high));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(low.AsSpan(), high.AsSpan()));
+            Assert.Throws<ArgumentOutOfRangeException>(() => set.GetViewBetween(low, lowerInclusive, high, upperInclusive));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(low.AsSpan(), lowerInclusive, high.AsSpan(), upperInclusive));
+        }
+
+        #endregion SpanAlternateLookup
 
         #region TryGetValue
 

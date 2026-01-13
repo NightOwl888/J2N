@@ -159,4 +159,27 @@ namespace J2N.Collections.Tests
 
         #endregion
     }
+
+    public class SortedDictionary_Tests
+    {
+        [Fact]
+        public void TryAdd_AddsItem()
+        {
+            var dictionary = new SortedDictionary<string, string>();
+            Assert.True(dictionary.TryAdd("a", "b"));
+
+            Assert.True(dictionary.ContainsKey("a"));
+        }
+
+        [Fact]
+        public void TryAdd_ItemAlreadyExists_DoesNotAddItem()
+        {
+            var dictionary = new SortedDictionary<string, string>();
+            dictionary.Add("a", "b");
+
+            Assert.False(dictionary.TryAdd("a", "c"));
+            Assert.True(dictionary.TryGetValue("a", out string value));
+            Assert.Equal("b", value);
+        }
+    }
 }

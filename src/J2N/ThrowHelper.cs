@@ -1132,6 +1132,8 @@ namespace J2N
                     return "list";
                 case ExceptionArgument.lockSize:
                     return "lockSize";
+                case ExceptionArgument.lowerValue:
+                    return "lowerValue";
                 case ExceptionArgument.match:
                     return "match";
                 case ExceptionArgument.maxValue:
@@ -1212,6 +1214,8 @@ namespace J2N
                     return "type";
                 case ExceptionArgument.uiCulture:
                     return "uiCulture";
+                case ExceptionArgument.upperValue:
+                    return "upperValue";
                 case ExceptionArgument.value:
                     return "value";
                 case ExceptionArgument.writer:
@@ -1595,6 +1599,14 @@ namespace J2N
                     return SR.InvalidOperation_ViewFailedVersion;
                 case ExceptionResource.LurchTable_NeedLimitIntMaxValue:
                     return SR.LurchTable_NeedLimitIntMaxValue;
+                case ExceptionResource.NotSupported_SerializationDeprecated:
+                    return SR.NotSupported_SerializationDeprecated;
+                case ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue:
+                    return SR.SortedSet_LowerValueGreaterThanUpperValue;
+                case ExceptionResource.Serialization_MissingValues:
+                    return SR.Serialization_MissingValues;
+                case ExceptionResource.Serialization_InvalidOnDeser:
+                    return SR.Serialization_InvalidOnDeser;
                 default:
                     Debug.Fail("The enum value is not defined, please check the ExceptionResource Enum.");
                     return "";
@@ -1654,6 +1666,7 @@ namespace J2N
         limit,
         list,
         lockSize,
+        lowerValue,
         match,
         maxValue,
         memoryMappedFile,
@@ -1694,6 +1707,7 @@ namespace J2N
         toStringFormatProvider,
         type,
         uiCulture,
+        upperValue,
         value,
         writer,
         year,
@@ -1899,5 +1913,9 @@ namespace J2N
         ArgumentOutOfRange_LimitMustBeLessThanCapacity,
         InvalidOperation_ViewFailedVersion,
         LurchTable_NeedLimitIntMaxValue,
+        NotSupported_SerializationDeprecated,
+        SortedSet_LowerValueGreaterThanUpperValue,
+        Serialization_MissingValues,
+        Serialization_InvalidOnDeser,
     }
 }

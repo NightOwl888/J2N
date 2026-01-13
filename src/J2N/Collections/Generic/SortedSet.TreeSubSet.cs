@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
@@ -20,9 +22,6 @@ namespace J2N.Collections.Generic
         /// This class represents a subset view into the tree. Any changes to this view
         /// are reflected in the actual tree. It uses the comparer of the underlying tree.
         /// </summary>
-#if FEATURE_SERIALIZABLE
-        [Serializable]
-#endif
         [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
         [DebuggerDisplay("Count = {Count}")]
         internal sealed class TreeSubSet : SortedSet<T>
@@ -45,6 +44,25 @@ namespace J2N.Collections.Generic
             private bool _lBoundInclusive, _uBoundInclusive;
 
             // used to see if the count is out of date
+
+
+
+            #region Properties for Alternate Lookup
+
+            // J2N: This is state from TreeSubSet exposed to allow range checks in Alternate Lookup
+
+            internal override SortedSet<T> UnderlyingSet => _underlying;
+
+            internal override bool HasLowerBound => _lBoundActive;
+            internal override bool HasUpperBound => _uBoundActive;
+
+            internal override bool LowerBoundInclusive => _lBoundInclusive;
+            internal override bool UpperBoundInclusive => _uBoundInclusive;
+
+            internal override T? LowerBound => _min;
+            internal override T? UpperBound => _max;
+
+            #endregion
 
 #if DEBUG
             internal override bool versionUpToDate()
@@ -69,24 +87,11 @@ namespace J2N.Collections.Generic
                 _countVersion = -1;
             }
 
-#if FEATURE_SERIALIZABLE
-            [SuppressMessage("Microsoft.Usage", "CA2236:CallBaseClassMethodsOnISerializableTypes", Justification = "special case TreeSubSet serialization")]
-            [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "CA2236 doesn't fire on all target frameworks")]
-            [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-            private TreeSubSet(SerializationInfo info, StreamingContext context)
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider declaring as nullable.
-            {
-                siInfo = info;
-                OnDeserializationImpl(info);
-            }
-#endif
-
             internal override bool AddIfNotPresent(T item)
             {
                 if (!IsWithinRange(item))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(item));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.item);
                 }
 
                 bool ret = _underlying.AddIfNotPresent(item);
@@ -107,14 +112,15 @@ namespace J2N.Collections.Generic
                 return base.Contains(item);
             }
 
-            internal override bool DoRemove(T item)
+            internal override bool DoRemove(T item, [MaybeNullWhen(false)] out T removed)
             {
                 if (!IsWithinRange(item))
                 {
+                    removed = default;
                     return false;
                 }
 
-                bool ret = _underlying.Remove(item);
+                bool ret = _underlying.DoRemove(item, out removed);
                 VersionCheck();
 #if DEBUG
                 Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
@@ -142,16 +148,19 @@ namespace J2N.Collections.Generic
                 version = _underlying.version;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal override bool IsWithinRange(T item)
             {
                 return !IsTooLow(item) && !IsTooHigh(item);
             }
 
-            private bool IsTooHigh([AllowNull] T item)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal override bool IsTooHigh([AllowNull] T item)
             {
                 return IsTooHigh(item, _uBoundInclusive);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsTooHigh([AllowNull] T item, bool upperBoundInclusive)
             {
                 if (_uBoundActive)
@@ -163,11 +172,13 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            private bool IsTooLow([AllowNull] T item)
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal override bool IsTooLow([AllowNull] T item)
             {
                 return IsTooLow(item, _lBoundInclusive);
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsTooLow([AllowNull] T item, bool lowerBoundInclusive)
             {
                 if (_lBoundActive)
@@ -406,15 +417,15 @@ namespace J2N.Collections.Generic
             // Cannot increase the bounds of the subset, can only decrease it
             public override SortedSet<T> GetViewBetween([AllowNull] T lowerValue, [AllowNull] T upperValue)
             {
-                if (IsTooLow(lowerValue))
+                if (IsTooLow(lowerValue, _lBoundInclusive))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(lowerValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                if (IsTooHigh(upperValue))
+                if (IsTooHigh(upperValue, _uBoundInclusive))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(upperValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                return (TreeSubSet)_underlying.GetViewBetween(lowerValue, upperValue);
+                return (TreeSubSet)_underlying.GetViewBetween(lowerValue, _lBoundInclusive, upperValue, _uBoundInclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -424,11 +435,11 @@ namespace J2N.Collections.Generic
             {
                 if (IsTooLow(lowerValue, lowerValueInclusive))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(lowerValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
                 if (IsTooHigh(upperValue, upperValueInclusive))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(upperValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
                 return (TreeSubSet)_underlying.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
             }
@@ -449,14 +460,10 @@ namespace J2N.Collections.Generic
 #endif
 
                 // If item is at or below lower bound, no strict predecessor exists
-                if (_lBoundActive)
+                if (IsTooLow(item!))
                 {
-                    int c = Comparer.Compare(item!, _min!);
-                    if (c <= 0)
-                    {
-                        result = default!;
-                        return false;
-                    }
+                    result = default!;
+                    return false;
                 }
 
                 Node? current = root;
@@ -496,14 +503,10 @@ namespace J2N.Collections.Generic
 #endif
 
                 // If item is at or above upper bound, no strict successor exists
-                if (_uBoundActive)
+                if (IsTooHigh(item!))
                 {
-                    int c = Comparer.Compare(item!, _max!);
-                    if (c >= 0)
-                    {
-                        result = default!;
-                        return false;
-                    }
+                    result = default!;
+                    return false;
                 }
 
                 Node? current = root;
@@ -615,70 +618,12 @@ namespace J2N.Collections.Generic
             [EditorBrowsable(EditorBrowsableState.Never)]
             protected override void GetObjectData(SerializationInfo info, StreamingContext context)
             {
-                if (info is null)
-                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
-
-                info.AddValue(maxName, _max, typeof(T));
-                info.AddValue(minName, _min, typeof(T));
-                info.AddValue(lBoundActiveName, _lBoundActive);
-                info.AddValue(uBoundActiveName, _uBoundActive);
-                info.AddValue(lBoundInclusiveName, _lBoundInclusive);
-                info.AddValue(uBoundInclusiveName, _uBoundInclusive);
-                base.GetObjectData(info, context);
+                ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_SerializationDeprecated);
             }
 
-            void IDeserializationCallback.OnDeserialization(object? sender) => OnDeserialization(sender);
+            void IDeserializationCallback.OnDeserialization(object? sender) => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_SerializationDeprecated);
 
-            protected override void OnDeserialization(object? sender)
-            {
-                OnDeserializationImpl(sender);
-            }
-
-            [SuppressMessage("Style", "IDE0060:Remove unused parameter", Justification = "Following Microsoft's code style")]
-            [SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "IDE0060 doesn't fire on all target frameworks")]
-            private void OnDeserializationImpl(object? sender)
-            {
-                if (siInfo == null)
-                {
-                    throw new SerializationException(SR.Serialization_InvalidOnDeser);
-                }
-
-                comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
-                int savedCount = siInfo.GetInt32(CountName);
-                _max = (T)siInfo.GetValue(maxName, typeof(T))!;
-                _min = (T)siInfo.GetValue(minName, typeof(T))!;
-                _lBoundActive = siInfo.GetBoolean(lBoundActiveName);
-                _uBoundActive = siInfo.GetBoolean(uBoundActiveName);
-                _lBoundInclusive = siInfo.GetBoolean(lBoundInclusiveName);
-                _uBoundInclusive = siInfo.GetBoolean(uBoundInclusiveName);
-                _underlying = new SortedSet<T>();
-
-                if (savedCount != 0)
-                {
-                    T[]? items = (T[]?)siInfo.GetValue(ItemsName, typeof(T[]));
-
-                    if (items == null)
-                    {
-                        throw new SerializationException(SR.Serialization_MissingValues);
-                    }
-
-                    for (int i = 0; i < items.Length; i++)
-                    {
-                        _underlying.Add(items[i]);
-                    }
-                }
-                _underlying.version = siInfo.GetInt32(VersionName);
-                count = _underlying.count;
-                version = _underlying.version - 1;
-                VersionCheck(); //this should update the count to be right and update root to be right
-
-                if (count != savedCount)
-                {
-                    throw new SerializationException(SR.Serialization_MismatchedCount);
-                }
-                siInfo = null;
-
-            }
+            protected override void OnDeserialization(object? sender) => ThrowHelper.ThrowNotSupportedException(ExceptionResource.NotSupported_SerializationDeprecated);
 #endif
         }
     }

@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.ObjectModel;
-using J2N.Runtime.CompilerServices;
 using J2N.Text;
 using System;
 using System.Collections;
@@ -10,10 +9,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Threading;
+using SCG = System.Collections.Generic;
+
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
-using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
@@ -72,6 +74,12 @@ namespace J2N.Collections.Generic
         private ValueCollection? _values;
 
         private readonly TreeSet<KeyValuePair<TKey, TValue>> _set; // Do not rename (binary serialization)
+
+#if FEATURE_SERIALIZABLE
+        [NonSerialized]
+#endif
+        private object? _spanAdapterCache;
+
 
         #region Constructors
 
@@ -151,8 +159,9 @@ namespace J2N.Collections.Generic
             var keyValuePairComparer = new KeyValuePairComparer(comparer);
 
             if (dictionary is SortedDictionary<TKey, TValue> sortedDictionary &&
-            sortedDictionary._set.Comparer is KeyValuePairComparer kv &&
-                kv.keyComparer.Equals(keyValuePairComparer.keyComparer))
+                sortedDictionary._set.Comparer is KeyValuePairComparer kv &&
+                // J2N: Use Comparer property to ensure we compare the *user* comparer for equality, not a wrapper
+                kv.Comparer.Equals(keyValuePairComparer.Comparer))
             {
                 _set = new TreeSet<KeyValuePair<TKey, TValue>>(sortedDictionary._set, keyValuePairComparer);
             }
@@ -162,7 +171,11 @@ namespace J2N.Collections.Generic
 
                 foreach (KeyValuePair<TKey, TValue> pair in dictionary)
                 {
-                    _set.Add(pair);
+                    // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
+                    if (!_set.Add(pair))
+                    {
+                        ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(pair.Key);
+                    }
                 }
             }
         }
@@ -211,7 +224,11 @@ namespace J2N.Collections.Generic
 
         void ICollection<KeyValuePair<TKey, TValue>>.Add(KeyValuePair<TKey, TValue> keyValuePair)
         {
-            _set.Add(keyValuePair);
+            // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
+            if (!_set.Add(keyValuePair))
+            {
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(keyValuePair.Key);
+            }
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair)
@@ -283,15 +300,18 @@ namespace J2N.Collections.Generic
         {
             get
             {
-                //if (key == null) // J2N: Making key nullable
-                //{
-                //    throw new ArgumentNullException(nameof(key));
-                //}
+                // J2N supports null keys
 
                 TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
                 {
-                    ThrowHelper.ThrowKeyNotFoundException(key?.ToString() ?? "(null)");
+                    if (key is null)
+                    {
+                        ThrowHelper.ThrowKeyNotFoundException("(null)");
+                        return default;
+                    }
+
+                    ThrowHelper.ThrowKeyNotFoundException(key);
                     return default;
                 }
 
@@ -299,10 +319,7 @@ namespace J2N.Collections.Generic
             }
             set
             {
-                //if (key == null) // J2N: Making key nullable
-                //{
-                //    throw new ArgumentNullException(nameof(key));
-                //}
+                // J2N supports null keys
 
                 TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _set.FindNode(new KeyValuePair<TKey, TValue>(key, default!));
                 if (node == null)
@@ -339,7 +356,7 @@ namespace J2N.Collections.Generic
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
         public IComparer<TKey> Comparer
-            => ((KeyValuePairComparer)_set.Comparer).keyComparer;
+            => ((KeyValuePairComparer)_set.Comparer).Comparer;
 
         /// <summary>
         /// Gets a collection containing the keys in the <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -408,13 +425,15 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an O(log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/>.
         /// </remarks>
-        public void Add([AllowNull] TKey key, [AllowNull]TValue value)
+        public void Add([AllowNull] TKey key, [AllowNull] TValue value)
         {
-            //if (key == null) // J2N: Making key nullable
-            //{
-            //    throw new ArgumentNullException(nameof(key));
-            //}
-            _set.Add(new KeyValuePair<TKey, TValue>(key!, value!));
+            // J2N supports null keys
+
+            // J2N: Throw exception here instead of TreeSet<T> so we can support TryAdd()
+            if (!_set.Add(new KeyValuePair<TKey, TValue>(key!, value!)))
+            {
+                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<TKey>(key);
+            }
         }
 
         /// <summary>
@@ -626,9 +645,9 @@ namespace J2N.Collections.Generic
         // It is redefined here to ensure we have it in prior platforms.
         public bool Remove([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
         {
-            if (TryGetValue(key, out value))
+            if (_set.DoRemove(new KeyValuePair<TKey, TValue>(key!, default!), out KeyValuePair<TKey, TValue> removed))
             {
-                _set.Remove(new KeyValuePair<TKey, TValue>(key!, default!));
+                value = removed.Value;
                 return true;
             }
 
@@ -648,16 +667,8 @@ namespace J2N.Collections.Generic
         /// <see cref="TryAdd(TKey, TValue)"/> does nothing and returns <c>false</c>.</remarks>
         // J2N: This is an extension method on IDictionary<TKey, TValue>, but only for .NET Standard 2.1+.
         // It is redefined here to ensure we have it in prior platforms.
-        public bool TryAdd([AllowNull] TKey key, TValue value)
-        {
-            if (!ContainsKey(key))
-            {
-                Add(key, value);
-                return true;
-            }
-
-            return false;
-        }
+        public bool TryAdd([AllowNull] TKey key, [AllowNull] TValue value)
+            => _set.Add(new KeyValuePair<TKey, TValue>(key!, value!));
 
         /// <summary>
         /// Gets the value associated with the specified key.
@@ -682,8 +693,6 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method approaches an O(1) operation.
         /// </remarks>
-
-
 #pragma warning disable CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
         public bool TryGetValue([AllowNull] TKey key, [MaybeNullWhen(false)] out TValue value)
 #pragma warning restore CS8767 // Nullability of reference types in type of parameter 'value' of 'bool Dictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' doesn't match implicitly implemented member 'bool IDictionary<TKey, TValue>.TryGetValue(TKey key, out TValue value)' (possibly because of nullability attributes).
@@ -841,6 +850,33 @@ namespace J2N.Collections.Generic
 
         #endregion
 
+        #region Members for Alternate Lookup
+
+        // This calls the correct layer to get the *outermost* comparer (a user comparer or a comparer wrapper around a BCL StringComparer)
+        internal IComparer<TKey> RawComparer => ((KeyValuePairComparer)_set.RawComparer).keyComparer;
+
+        // A simple one-instance cache to ensure that multiple SpanAlternateLookup calls with the same TAlternateKeySpan
+        // don't incur runtime heap overhead. We need this because our comparer requires an adapter of type TAlternateKeySpan
+        // which isn't known until the time of lookup, but our comparer is created during construction.
+        private AlternateKeyValuePairComparer<TAlternateKeySpan> GetOrCreateAlternateComparer<TAlternateKeySpan>()
+        {
+            // Fast path (no fence)
+            object? cache = _spanAdapterCache;
+            if (cache is AlternateKeyValuePairComparer<TAlternateKeySpan> typed)
+                return typed;
+
+            // Create candidate
+            var created = new AlternateKeyValuePairComparer<TAlternateKeySpan>((KeyValuePairComparer)_set.RawComparer);
+
+            // Publish if still empty
+            object? original = Interlocked.CompareExchange(ref _spanAdapterCache, created, null);
+
+            // If we won the race, use ours; otherwise use existing
+            return (original ?? created) as AlternateKeyValuePairComparer<TAlternateKeySpan> ?? created;
+        }
+
+        #endregion Members for Alternate Lookup
+
         #region Java TreeMap-like Members
 
         /// <summary>
@@ -848,8 +884,8 @@ namespace J2N.Collections.Generic
         /// is the predecessor of the specified <paramref name="key"/>.
         /// </summary>
         /// <param name="key">The key of the entry to get the predecessor of.</param>
-        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predessor, if any.</param>
-        /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the predecessor, if any.</param>
+        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool TryGetPredecessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
         {
@@ -863,9 +899,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the predecessor of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
-        /// <returns><c>true</c> if a predecessor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict predecessor</c> in order theory.
         /// <para/>
@@ -890,7 +926,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <param name="key">The key of the entry to get the successor of.</param>
         /// <param name="result">The <see cref="KeyValuePair{TKey, TValue}"/> representing the successor, if any.</param>
-        /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public bool TryGetSuccessor(TKey key, out KeyValuePair<TKey, TValue> result) // J2N TODO: API - make this obsolete in 3.0
         {
@@ -904,9 +940,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the successor of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
-        /// <returns><c>true</c> if a succesor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict successor</c> in order theory.
         /// <para/>
@@ -932,9 +968,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the floor of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
-        /// <returns><c>true</c> if a floor to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a floor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>weak predecessor</c> in order theory.
         /// <para/>
@@ -960,9 +996,9 @@ namespace J2N.Collections.Generic
         /// <param name="key">The key of the entry to get the ceiling of.</param>
         /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
         /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
-        /// <returns><c>true</c> if a ceiling to <paramref name="key"/> exists; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if a ceiling to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <b>weak successor</b> in order theory.
         /// <para/>
@@ -982,6 +1018,356 @@ namespace J2N.Collections.Generic
         }
 
         #endregion
+
+        #region SpanAlternateLookup
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="SortedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        /// <returns>The created lookup instance.</returns>
+        /// <exception cref="InvalidOperationException">The dictionary's comparer is not compatible with <typeparamref name="TAlternateKeySpan"/>.</exception>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateKeySpan, TKey}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
+        /// If it doesn't, an exception will be thrown.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateKeySpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
+        /// </remarks>
+        public SpanAlternateLookup<TAlternateKeySpan> GetSpanAlternateLookup<TAlternateKeySpan>()
+        {
+            if (!SpanAlternateLookup<TAlternateKeySpan>.IsCompatibleKey(this))
+            {
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+            }
+
+            return new SpanAlternateLookup<TAlternateKeySpan>(this);
+        }
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="SortedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default instance
+        /// that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateKeySpan, TKey}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
+        /// If it doesn't, the method will return <see langword="false"/>.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateKeySpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
+        /// </remarks>
+        public bool TryGetSpanAlternateLookup<TAlternateKeySpan>(out SpanAlternateLookup<TAlternateKeySpan> lookup)
+        {
+            if (SpanAlternateLookup<TAlternateKeySpan>.IsCompatibleKey(this))
+            {
+                lookup = new SpanAlternateLookup<TAlternateKeySpan>(this);
+                return true;
+            }
+
+            lookup = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a type that may be used to perform operations on a <see cref="SortedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        public readonly struct SpanAlternateLookup<TAlternateKeySpan>
+        {
+            private readonly TreeSet<KeyValuePair<TKey, TValue>> _set;
+            private readonly SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateKeySpan> _setLookup;
+            private readonly AlternateKeyValuePairComparer<TAlternateKeySpan> _alternateComparer;
+
+            /// <summary>Initialize the instance. The dictionary must have already been verified to have a compatible comparer.</summary>
+            internal SpanAlternateLookup(SortedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                Debug.Assert(IsCompatibleKey(dictionary!)); // [!]: asserted above
+                Dictionary = dictionary!; // [!]: asserted above
+                _set = dictionary!._set; // [!]: asserted above
+                _alternateComparer = dictionary!.GetOrCreateAlternateComparer<TAlternateKeySpan>(); // [!]: asserted above
+                _setLookup = _set.GetSpanAlternateLookup(_alternateComparer);
+            }
+
+            /// <summary>Gets the <see cref="SortedDictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
+            public SortedDictionary<TKey, TValue> Dictionary { get; }
+
+            /// <summary>Gets or sets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get or set.</param>
+            /// <value>
+            /// The value associated with the specified alternate key. If the specified alternate key is not found, a get operation throws
+            /// a <see cref="KeyNotFoundException"/>, and a set operation creates a new element with the specified key.
+            /// </value>
+            /// <exception cref="KeyNotFoundException">The property is retrieved and alternate key does not exist in the collection.</exception>
+            public TValue this[ReadOnlySpan<TAlternateKeySpan> key]
+            {
+                get
+                {
+                    if (!_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                    {
+                        ThrowHelper.ThrowKeyNotFoundException(GetAlternateComparer(Dictionary).Create(key));
+                    }
+
+                    return pair.Value;
+                }
+                set
+                {
+                    TreeSet<KeyValuePair<TKey, TValue>>.Node? node = _setLookup.FindNode(key);
+                    if (node is null)
+                    {
+                        _set.Add(new KeyValuePair<TKey, TValue>(GetAlternateComparer(Dictionary).Create(key), value));
+                    }
+                    else
+                    {
+                        node.Item = new KeyValuePair<TKey, TValue>(node.Item.Key, value);
+                        _set.UpdateVersion();
+                    }
+                }
+            }
+
+            /// <summary>Checks whether the dictionary has a comparer compatible with <typeparamref name="TAlternateKeySpan"/>.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static bool IsCompatibleKey(SortedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                return dictionary!.RawComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey>; // [!]: asserted above
+            }
+
+            /// <summary>Gets the dictionary's alternate comparer. The dictionary must have already been verified as compatible.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static ISpanAlternateComparer<TAlternateKeySpan, TKey> GetAlternateComparer(SortedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(IsCompatibleKey(dictionary));
+                return Unsafe.As<ISpanAlternateComparer<TAlternateKeySpan, TKey>>(dictionary.RawComparer)!;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            public bool TryGetValue(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TValue value)
+            {
+                if (_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                {
+                    value = pair.Value;
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="actualKey">
+            /// When this method returns, contains the actual key associated with the alternate key, if the key is found;
+            /// otherwise, the default value for the type of the key parameter.
+            /// </param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryGetValue(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                if (_setLookup.TryGetValue(key, out KeyValuePair<TKey, TValue> pair))
+                {
+                    actualKey = pair.Key;
+                    value = pair.Value;
+                    return true;
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Determines whether the <see cref="Dictionary{TKey, TValue}"/> contains the specified alternate key.</summary>
+            /// <param name="key">The alternate key to check.</param>
+            /// <returns><see langword="true"/> if the key is in the dictionary; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool ContainsKey(ReadOnlySpan<TAlternateKeySpan> key) =>
+                _setLookup.Contains(key);
+
+            /// <summary>Removes the value with the specified alternate key from the <see cref="Dictionary{TKey, TValue}"/>.</summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove(ReadOnlySpan<TAlternateKeySpan> key) =>
+                _setLookup.Remove(key);
+
+            /// <summary>
+            /// Removes the value with the specified alternate key from the <see cref="Dictionary{TKey, TValue}"/>,
+            /// and copies the element to the value parameter.
+            /// </summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <param name="actualKey">The removed key.</param>
+            /// <param name="value">The removed element.</param>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                if (_setLookup.Remove(key, out KeyValuePair<TKey, TValue> removed))
+                {
+                    actualKey = removed.Key;
+                    value = removed.Value;
+                    return true;
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
+            /// <param name="key">The alternate key of the element to add.</param>
+            /// <param name="value">The value of the element to add.</param>
+            /// <returns><see langword="true"/> if the key/value pair was added to the dictionary successfully; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryAdd(ReadOnlySpan<TAlternateKeySpan> key, TValue value) =>
+                _setLookup.TryAdd(key, value, _alternateComparer);
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the predecessor of the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the predecessor of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the predecessor.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the predecessor.</param>
+            /// <returns><see langword="true"/> if a predecessor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <c>strict predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>lowerEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetPredecessor(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetPredecessor(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the successor of the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the successor of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the successor.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the successor.</param>
+            /// <returns><see langword="true"/> if a successor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <c>strict successor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>higherEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetSuccessor(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetSuccessor(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the greatest element less than or equal to the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the floor of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the floor.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the floor.</param>
+            /// <returns><see langword="true"/> if a floor to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <c>weak predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>floorEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetFloor(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetFloor(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+            /// is the lease element greater than or equal to the specified <paramref name="key"/>.
+            /// </summary>
+            /// <param name="key">The key of the entry to get the ceiling of.</param>
+            /// <param name="resultKey">Upon successful return, contains the key of the ceiling.</param>
+            /// <param name="resultValue">Upon successful return, contains the value of the ceiling.</param>
+            /// <returns><see langword="true"/> if a ceiling to <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <b>weak successor</b> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>ceilingEntry()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetCeiling(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey resultKey, [MaybeNullWhen(false)] out TValue resultValue)
+            {
+                if (_setLookup.TryGetCeiling(key, out KeyValuePair<TKey, TValue> result))
+                {
+                    resultKey = result.Key;
+                    resultValue = result.Value;
+                    return true;
+                }
+                resultKey = default;
+                resultValue = default;
+                return false;
+            }
+        }
+
+        #endregion SpanAlternateLookup
 
         #region Structural Equality
 
@@ -1978,22 +2364,89 @@ namespace J2N.Collections.Generic
 
         #region Nested Class: KeyValuePairComparer
 
+        // This class provides different comparer visibility:
+        //
+        // 1. keyComparer is the comparer used by SortedDictionary<TKey, TValue>, which may be wrapped in an IInternalStringComparer instance.
+        // 2. The Comparer property provides access to the comparer that was provided by the user and unwraps it if necessary.
+        // 3. SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> uses the keyComparer property to check whether ISpanAlternateComparer<TAlternateKeySpan, T> is implemented.
+        //    Alternate lookup will fail without it.
+
 #if FEATURE_SERIALIZABLE
         [Serializable]
 #endif
         internal sealed class KeyValuePairComparer : SCG.Comparer<KeyValuePair<TKey, TValue>> // J2N TODO: API - This is public in .NET, but I cannot find any docs for it.
+#if FEATURE_SERIALIZABLE
+            , ISerializable
+#endif
         {
-            internal IComparer<TKey> keyComparer; // Do not rename (binary serialization)
+
+#if FEATURE_SERIALIZABLE
+            private const string ComparerName = "keyComparer"; // Do not rename (binary serialization)
+
+            // J2N NOTE: The constants in StringComparerMetadataSerializer are also used to round-trip any StringComparer metadata
+#endif
+
+            internal IComparer<TKey> keyComparer;
 
             public KeyValuePairComparer(IComparer<TKey>? keyComparer)
             {
-                if (keyComparer == null)
+                this.keyComparer = keyComparer ?? Comparer<TKey>.Default;
+
+                // J2N: Special-case Comparer<string>.Default and StringComparer (all options).
+                // We wrap these comparers to ensure that alternate string comparison is available.
+                if (typeof(TKey) == typeof(string) &&
+                    WrappedStringComparer.GetStringComparer(this.keyComparer) is IComparer<string> stringComparer)
                 {
-                    this.keyComparer = Comparer<TKey>.Default;
+                    this.keyComparer = (IComparer<TKey>)stringComparer;
                 }
-                else
+            }
+
+#if FEATURE_SERIALIZABLE
+            private KeyValuePairComparer(SerializationInfo info, StreamingContext context)
+            {
+                keyComparer = (IComparer<TKey>)info.GetValue(ComparerName, typeof(IComparer<TKey>))!;
+
+                // J2N:Try to wrap the comparer with WrappedStringComparer
+                if (typeof(TKey) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(info, out IComparer<string?>? stringComparer))
                 {
-                    this.keyComparer = keyComparer;
+                    keyComparer = (IComparer<TKey>)stringComparer;
+                }
+            }
+
+            void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
+            {
+                IComparer<TKey> comparerToSerialize = keyComparer;
+
+                if (typeof(TKey) == typeof(string) && comparerToSerialize is IInternalStringComparer internalComparer)
+                {
+                    comparerToSerialize = (IComparer<TKey>)internalComparer.GetUnderlyingComparer();
+                }
+
+                info.AddValue(ComparerName, comparerToSerialize, typeof(IComparer<TKey>));
+
+                // J2N: Add metadata to the serialization blob so we can rehydrate the WrappedStringComparer properly
+                if (typeof(TKey) == typeof(string) && StringComparerDescriptor.TryDescribe(comparerToSerialize, out StringComparerDescriptor descriptor))
+                {
+                    info.AddValue(descriptor);
+                }
+            }
+#endif
+
+
+            internal IComparer<TKey> Comparer
+            {
+                get
+                {
+                    Debug.Assert(keyComparer is not null, "The comparer should never be null.");
+                    // J2N: We must unwrap the comparer before returning it to the user.
+                    if (typeof(TKey) == typeof(string))
+                    {
+                        return (IComparer<TKey>)InternalStringComparer.GetUnderlyingComparer((IComparer<string?>)keyComparer!); // [!]: asserted above
+                    }
+                    else
+                    {
+                        return keyComparer!; // [!]: asserted above
+                    }
                 }
             }
 
@@ -2006,15 +2459,84 @@ namespace J2N.Collections.Generic
             {
                 if (obj is KeyValuePairComparer other)
                 {
+                    // J2N: Get the underlying comparer for comparison, not a wrapper
+                    IComparer<TKey> thisComparer = Comparer;
+                    IComparer<TKey> otherComparer = other.Comparer;
+
                     // Commonly, both comparers will be the default comparer (and reference-equal). Avoid a virtual method call to Equals() in that case.
-                    return this.keyComparer == other.keyComparer || this.keyComparer.Equals(other.keyComparer);
+                    return thisComparer == otherComparer || thisComparer.Equals(otherComparer);
                 }
                 return false;
             }
 
             public override int GetHashCode()
             {
-                return this.keyComparer.GetHashCode();
+                // J2N: Get the underlying comparer for comparison, not a wrapper
+                return Comparer.GetHashCode();
+            }
+        }
+
+        #endregion
+
+        #region Nested Class: AlternateKeyValuePairComparer<TAlternateKeySpan>
+
+        /// <summary>
+        /// An adapter to allow alternate lookup to cascade calls to the (already instantiated) comparer of <see cref="SortedSet{T}"/>
+        /// and deferring the identification of <typeparamref name="TAlternateKeySpan"/> until alternate lookup is used.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The type of <see cref="ReadOnlySpan{T}"/> for the alternate lookup comparer.</typeparam>
+        internal sealed class AlternateKeyValuePairComparer<TAlternateKeySpan> : ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>
+        {
+            private readonly KeyValuePairComparer comparer;
+
+            public AlternateKeyValuePairComparer(KeyValuePairComparer comparer)
+            {
+                Debug.Assert(comparer is not null);
+                this.comparer = comparer!; // [!] asserted above
+            }
+
+            // J2N: To use span alternate lookup from the underlying SortedSet<KeyValuePair<TKey, TValue>>, we
+            // need this interface implemented so the checks pass when cascading from
+            // SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> ->
+            // SortedSet<KeyValuePair<TKey, TValue>>.SpanAlternateLookup<TAlternateSpan>
+            int ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other) => Compare(span, other);
+
+            public int Compare(ReadOnlySpan<TAlternateKeySpan> span, KeyValuePair<TKey, TValue> other)
+            {
+                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
+                {
+                    return spanAlternateComparer.Compare(span, other.Key);
+                }
+
+                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+                return 0;
+            }
+
+            KeyValuePair<TKey, TValue> ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>.Create(ReadOnlySpan<TAlternateKeySpan> span)
+            {
+                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
+                {
+                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, default!);
+                }
+
+                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+                return default;
+            }
+
+            // This overload is not part of the ISpanAlternateComparer<TAlternateKeySpan, KeyValuePair<TKey, TValue>>
+            // contract, but is needed to allow the value to be passed to the KeyValuePair constructor.
+            public KeyValuePair<TKey, TValue> Create(ReadOnlySpan<TAlternateKeySpan> span, TValue value)
+            {
+                if (comparer.keyComparer is ISpanAlternateComparer<TAlternateKeySpan, TKey> spanAlternateComparer)
+                {
+                    return new KeyValuePair<TKey, TValue>(spanAlternateComparer.Create(span)!, value);
+                }
+
+                // Should never get here - the above check should also be checked by the SpanAlternateComparer constructor
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+                return default;
             }
         }
 
@@ -2028,7 +2550,9 @@ namespace J2N.Collections.Generic
     /// TreeSet. To ensure that we can read back anything that has already been written to disk, we need to
     /// make sure that we have a class named TreeSet that does everything the way it used to.
     ///
-    /// The only thing that makes it different from SortedSet is that it throws on duplicates
+    /// The only thing that makes it different from SortedSet is the type for serialization. Note that
+    /// that the AddIfNotPresent() method is not overridden here so we can use the method from
+    /// <see cref="SortedDictionary{TKey, TValue}.TryAdd(TKey, TValue)"/> without throwing exceptions.
     /// </summary>
     /// <typeparam name="T"></typeparam>
 #if FEATURE_SERIALIZABLE
@@ -2048,15 +2572,5 @@ namespace J2N.Collections.Generic
         [Obsolete("This API supports obsolete formatter-based serialization. It should not be called or extended by application code.")]
         private TreeSet(SerializationInfo siInfo, StreamingContext context) : base(siInfo, context) { /* Intentionally blank */ }
 #endif
-
-        internal override bool AddIfNotPresent(T item)
-        {
-            bool ret = base.AddIfNotPresent(item);
-            if (!ret)
-            {
-                ThrowHelper.ThrowAddingDuplicateWithKeyArgumentException<T>(item);
-            }
-            return ret;
-        }
     }
 }

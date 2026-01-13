@@ -10,10 +10,12 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Runtime.CompilerServices;
+
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
-using Interlocked = System.Threading.Interlocked;
 
 namespace J2N.Collections.Generic
 {
@@ -165,20 +167,15 @@ namespace J2N.Collections.Generic
         private const string CountName = "Count"; // Do not rename (binary serialization)
         private const string ItemsName = "Items"; // Do not rename (binary serialization)
         private const string VersionName = "Version"; // Do not rename (binary serialization)
+
+        // J2N NOTE: The constants in StringComparerMetadataSerializer are also used to round-trip any StringComparer metadata
+
         //needed for enumerator
         private const string TreeName = "Tree";
         private const string NodeValueName = "Item";
         private const string EnumStartName = "EnumStarted";
         private const string ReverseName = "Reverse";
         private const string EnumVersionName = "EnumVersion";
-
-        //needed for TreeSubset
-        private const string minName = "Min";
-        private const string maxName = "Max";
-        private const string lBoundActiveName = "lBoundActive";
-        private const string uBoundActiveName = "uBoundActive";
-        private const string lBoundInclusiveName = "lBoundInclusive";
-        private const string uBoundInclusiveName = "uBoundInclusive";
 
         private SerializationInfo? siInfo; //A temporary variable which we need during deserialization.
 #endif
@@ -193,8 +190,8 @@ namespace J2N.Collections.Generic
         /// Initializes a new instance of the <see cref="SortedSet{T}"/> class.
         /// </summary>
         public SortedSet()
+            : this(Comparer<T>.Default)
         {
-            comparer = Comparer<T>.Default;
         }
 
         /// <summary>
@@ -209,6 +206,14 @@ namespace J2N.Collections.Generic
         public SortedSet(IComparer<T>? comparer)
         {
             this.comparer = comparer ?? Comparer<T>.Default;
+
+            // J2N: Special-case Comparer<string>.Default and StringComparer (all options).
+            // We wrap these comparers to ensure that alternate string comparison is available.
+            if (typeof(T) == typeof(string) &&
+                WrappedStringComparer.GetStringComparer(this.comparer) is IComparer<string> stringComparer)
+            {
+                this.comparer = (IComparer<T>)stringComparer;
+            }
         }
 
         /// <summary>
@@ -454,13 +459,47 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Retrieving the value of this property is an <c>O(1)</c> operation.
         /// </remarks>
-        public IComparer<T> Comparer => comparer;
+        public IComparer<T> Comparer
+        {
+            get
+            {
+                Debug.Assert(comparer is not null, "The comparer should never be null.");
+                // J2N: We must unwrap the comparer before returning it to the user.
+                if (typeof(T) == typeof(string))
+                {
+                    return (IComparer<T>)InternalStringComparer.GetUnderlyingComparer((IComparer<string?>)comparer!); // [!]: asserted above
+                }
+                else
+                {
+                    return comparer!; // [!]: asserted above
+                }
+            }
+        }
 
         bool ICollection<T>.IsReadOnly => false;
 
         bool ICollection.IsSynchronized => false;
 
         object ICollection.SyncRoot => this;
+
+        #endregion
+
+        #region Properties for Alternate Lookup
+
+        // This calls the correct layer to get the *outermost* comparer (a user comparer or a comparer wrapper around a BCL StringComparer)
+        internal IComparer<T> RawComparer => comparer;
+
+        // J2N: This is state from TreeSubSet exposed to allow range checks in Alternate Lookup
+        internal virtual SortedSet<T> UnderlyingSet => this;
+
+        internal virtual bool HasLowerBound => false;
+        internal virtual bool HasUpperBound => false;
+
+        internal virtual bool LowerBoundInclusive => true; // J2N: Default to true to match the BCL
+        internal virtual bool UpperBoundInclusive => true; // J2N: Default to true to match the BCL
+
+        internal virtual T? LowerBound => default;
+        internal virtual T? UpperBound => default;
 
         #endregion
 
@@ -473,6 +512,10 @@ namespace J2N.Collections.Generic
 
         // Virtual function for TreeSubSet, which may need to do range checks.
         internal virtual bool IsWithinRange(T item) => true;
+
+        internal virtual bool IsTooLow(T item) => false;
+
+        internal virtual bool IsTooHigh(T item) => false;
 
         #endregion
 
@@ -501,10 +544,10 @@ namespace J2N.Collections.Generic
         /// is the predecessor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the predecessor of.</param>
-        /// <param name="result">The predessor, if any.</param>
+        /// <param name="result">The predecessor, if any.</param>
         /// <returns><c>true</c> if a predecessor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict predecessor</c> in order theory.
         /// <para/>
@@ -552,13 +595,13 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
-        /// is the sucessor of the specified <paramref name="item"/>.
+        /// is the successor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the successor of.</param>
         /// <param name="result">The successor, if any.</param>
         /// <returns><c>true</c> if a successor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>strict successor</c> in order theory.
         /// <para/>
@@ -612,7 +655,7 @@ namespace J2N.Collections.Generic
         /// <param name="result">The floor, if any.</param>
         /// <returns><c>true</c> if a floor to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <c>weak predecessor</c> in order theory.
         /// <para/>
@@ -659,7 +702,7 @@ namespace J2N.Collections.Generic
         /// <param name="result">The ceiling, if any.</param>
         /// <returns><c>true</c> if a ceiling to <paramref name="item"/> exists; otherwise, <c>false</c>.</returns>
         /// <remarks>
-        /// This method is a O(log n) operation.
+        /// This method is a O(log <c>n</c>) operation.
         /// <para/>
         /// This is referred to as <b>weak successor</b> in order theory.
         /// <para/>
@@ -806,12 +849,13 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an <c>O(log n)</c> operation.
         /// </remarks>
-        public bool Remove(T item) => DoRemove(item); // Hack so the implementation can be made virtual
+        public bool Remove(T item) => DoRemove(item, out _); // Hack so the implementation can be made virtual
 
-        internal virtual bool DoRemove(T item)
+        internal virtual bool DoRemove(T item, [MaybeNullWhen(false)] out T removed)
         {
             if (root == null)
             {
+                removed = default;
                 return false;
             }
 
@@ -919,8 +963,13 @@ namespace J2N.Collections.Generic
             // Move successor to the matching node position and replace links.
             if (match != null)
             {
+                removed = match.Item;
                 ReplaceNode(match, parentOfMatch!, parent!, grandParent!);
                 --count;
+            }
+            else
+            {
+                removed = default;
             }
 
             root?.ColorBlack();
@@ -1060,6 +1109,1247 @@ namespace J2N.Collections.Generic
         }
 
         #endregion
+
+        #region SpanAlternateLookup
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="SortedSet{T}"/>
+        /// using a <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateSpan">The alternate type of <see cref="ReadOnlySpan{T}"/> instance for performing lookups.</typeparam>
+        /// <returns>The created lookup instance.</returns>
+        /// <exception cref="InvalidOperationException">The set's comparer is not compatible with <typeparamref name="TAlternateSpan"/>.</exception>
+        /// <remarks>
+        /// The set must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateSpan, T}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> and <typeparamref name="T"/>.
+        /// If it doesn't, an exception will be thrown.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateSpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
+        /// </remarks>
+        public SpanAlternateLookup<TAlternateSpan> GetSpanAlternateLookup<TAlternateSpan>()
+        {
+            if (!SpanAlternateLookup<TAlternateSpan>.IsCompatibleItem(this))
+            {
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+            }
+
+            return new SpanAlternateLookup<TAlternateSpan>(this);
+        }
+
+        // This overload is a special case for the comparer to be passed down from SortedDictionary<TKey, TValue>,
+        // since it requires an adapter. This is recursively called inside of this type to ensure the same comparer
+        // is used by other view instances, even if it is not the SortedSet<T> comparer.
+        internal SpanAlternateLookup<TAlternateSpan> GetSpanAlternateLookup<TAlternateSpan>(ISpanAlternateComparer<TAlternateSpan, T>? alternateComparer)
+        {
+            if (alternateComparer is null)
+            {
+                return new SpanAlternateLookup<TAlternateSpan>(this);
+            }
+
+            return new SpanAlternateLookup<TAlternateSpan>(this, alternateComparer!);
+        }
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="SortedSet{T}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateSpan">The alternate type of <see cref="ReadOnlySpan{T}"/> instance for performing lookups.</typeparam>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default instance
+        /// that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// The set must be using a comparer that implements <see cref="ISpanAlternateComparer{TAlternateSpan, T}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> and <typeparamref name="T"/>.
+        /// If it doesn't, the method returns <see langword="false"/>.
+        /// <para/>
+        /// The following <see cref="StringComparer" /> options have built-in support when
+        /// <typeparamref name="TAlternateSpan"/> is <see cref="char"/>.
+        /// <list type="bullet">
+        ///     <item><description><see cref="StringComparer.Ordinal"/></description></item>
+        ///     <item><description><see cref="StringComparer.OrdinalIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.InvariantCultureIgnoreCase"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCulture"/></description></item>
+        ///     <item><description><see cref="StringComparer.CurrentCultureIgnoreCase"/></description></item>
+        /// </list>
+        /// </remarks>
+        public bool TryGetSpanAlternateLookup<TAlternateSpan>(out SpanAlternateLookup<TAlternateSpan> lookup)
+        {
+            if (SpanAlternateLookup<TAlternateSpan>.IsCompatibleItem(this))
+            {
+                lookup = new SpanAlternateLookup<TAlternateSpan>(this);
+                return true;
+            }
+
+            lookup = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a type that may be used to perform operations on a <see cref="SortedSet{T}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateSpan">The alternate type of instance for performing lookups.</typeparam>
+        public readonly struct SpanAlternateLookup<TAlternateSpan>
+        {
+            private readonly ISpanAlternateComparer<TAlternateSpan, T>? _alternateComparer;
+            private readonly bool _isUnderlying;
+
+            /// <summary>Initialize the instance. The set must have already been verified to have a compatible comparer.</summary>
+            internal SpanAlternateLookup(SortedSet<T> set)
+            {
+                Debug.Assert(set is not null);
+                Debug.Assert(IsCompatibleItem(set!)); // [!]: asserted above
+                Set = set!; // [!]: asserted above
+                _isUnderlying = set == set!.UnderlyingSet; // [!]: asserted above
+                _alternateComparer = null;
+            }
+
+            /// <summary>Initialize the instance. The comparer must have already been verified to be compatible with the set.</summary>
+            internal SpanAlternateLookup(SortedSet<T> set, ISpanAlternateComparer<TAlternateSpan, T> alternateComparer)
+            {
+                Debug.Assert(set is not null);
+                Debug.Assert(alternateComparer is not null); // [!]: asserted above
+                Set = set!; // [!]: asserted above
+                _isUnderlying = set == set!.UnderlyingSet; // [!]: asserted above
+                _alternateComparer = alternateComparer;
+            }
+
+            /// <summary>Gets the <see cref="SortedSet{T}"/> against which this instance performs operations.</summary>
+            public SortedSet<T> Set { get; }
+
+            /// <summary>Checks whether the set has a comparer compatible with <typeparamref name="TAlternateSpan"/>.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static bool IsCompatibleItem(SortedSet<T> set)
+            {
+                Debug.Assert(set is not null);
+                return set!.comparer is ISpanAlternateComparer<TAlternateSpan, T>; // [!]: asserted above
+            }
+
+            /// <summary>Gets the set's alternate comparer. The set must have already been verified as compatible.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal ISpanAlternateComparer<TAlternateSpan, T> GetAlternateComparer()
+            {
+                if (_alternateComparer is null)
+                {
+                    Debug.Assert(IsCompatibleItem(Set));
+                    return Unsafe.As<ISpanAlternateComparer<TAlternateSpan, T>>(Set.comparer)!;
+                }
+
+                // This path is for the SortedDictionary<TKey, TValue>, since it will pass its comparer through the constructor directly
+                // to satisfy the generic closing types (something that KeyValuePairComparer cannot do).
+                return _alternateComparer;
+            }
+
+            #region Add
+
+            /// <summary>Adds the specified element to a set.</summary>
+            /// <param name="item">The element to add to the set.</param>
+            /// <returns><see langword="true"/> if the element is added to the set; <see langword="false"/> if the element is already present.</returns>
+            public bool Add(ReadOnlySpan<TAlternateSpan> item)
+            {
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (_isUnderlying)
+                    return AddIfNotPresent(item, comparer);
+
+                return Add_View(item, comparer);
+            }
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private bool Add_View(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+
+                if (!IsWithinRange(item, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.item);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                bool ret = underlying.GetSpanAlternateLookup(_alternateComparer).AddIfNotPresent(item, comparer);
+
+                set.VersionCheck();
+
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == underlying.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                return ret;
+            }
+
+            private bool AddIfNotPresent(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> set = Set;
+
+                if (set.root == null)
+                {
+                    // The tree is empty and this is the first item.
+                    set.root = new Node(comparer.Create(item), NodeColor.Black);
+                    set.count = 1;
+                    set.version++;
+                    return true;
+                }
+
+                // Search for a node at bottom to insert the new node.
+                // If we can guarantee the node we found is not a 4-node, it would be easy to do insertion.
+                // We split 4-nodes along the search path.
+                Node? current = set.root;
+                Node? parent = null;
+                Node? grandParent = null;
+                Node? greatGrandParent = null;
+
+                // Even if we don't actually add to the set, we may be altering its structure (by doing rotations and such).
+                // So update `_version` to disable any instances of Enumerator/TreeSubSet from working on it.
+                set.version++;
+
+                int order = 0;
+                while (current != null)
+                {
+                    order = comparer.Compare(item, current.Item);
+                    if (order == 0)
+                    {
+                        // We could have changed root node to red during the search process.
+                        // We need to set it to black before we return.
+                        set.root.ColorBlack();
+                        return false;
+                    }
+
+                    // Split a 4-node into two 2-nodes.
+                    if (current.Is4Node)
+                    {
+                        current.Split4Node();
+                        // We could have introduced two consecutive red nodes after split. Fix that by rotation.
+                        if (Node.IsNonNullRed(parent))
+                        {
+                            set.InsertionBalance(current, ref parent!, grandParent!, greatGrandParent!);
+                        }
+                    }
+
+                    greatGrandParent = grandParent;
+                    grandParent = parent;
+                    parent = current;
+                    current = (order < 0) ? current.Left : current.Right;
+                }
+
+                Debug.Assert(parent != null);
+                // We're ready to insert the new node.
+                Node node = new Node(comparer.Create(item), NodeColor.Red);
+                if (order > 0)
+                {
+                    parent!.Right = node;
+                }
+                else
+                {
+                    parent!.Left = node;
+                }
+
+                // The new node will be red, so we will need to adjust colors if its parent is also red.
+                if (parent.IsRed)
+                {
+                    set.InsertionBalance(node, ref parent!, grandParent!, greatGrandParent!);
+                }
+
+                // The root node is always black.
+                set.root.ColorBlack();
+                ++set.count;
+                return true;
+            }
+
+            #endregion Add
+
+            #region TryAdd
+
+            // J2N: Called from SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> only. We need to do tasks in the following order:
+            //
+            // 1. Traverse the tree to see if the node exists
+            // 2. If not, instantiate the TKey value
+            // 3. Create a KeyValuePair, populating both TKey and TValue
+            // 4. Add the KeyValuePair to the SortedSet as type T
+            //
+            // This method requires both type info about the dictionary and the ability to traverse the tree and internal state of SortedSet<T>.
+            // Since SortedSet<T> owns the tree and ReadOnlySpan<T> limits how we can instantiate the value, it is more sensible to do unsafe casts here than to
+            // expose all of the internal state of SortedSet<T> to SortedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> to pull this off.
+            internal bool TryAdd<TKey, TValue>(ReadOnlySpan<TAlternateSpan> key, TValue value, SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan> comparer)
+            {
+#if DEBUG
+                Debug.Assert(typeof(T) == typeof(KeyValuePair<TKey, TValue>));
+#endif
+
+                if (_isUnderlying)
+                    return AddIfNotPresent(key, value, comparer);
+
+                return TryAdd_View(key, value, comparer);
+            }
+
+            internal bool TryAdd_View<TKey, TValue>(ReadOnlySpan<TAlternateSpan> key, TValue value, SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan> comparer)
+            {
+#if DEBUG
+                Debug.Assert(typeof(T) == typeof(KeyValuePair<TKey, TValue>));
+                Debug.Assert(_alternateComparer is not null);
+#endif
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> cmp = Unsafe.As<SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan>, ISpanAlternateComparer<TAlternateSpan, T>>(ref comparer);
+
+                if (!IsWithinRange(key, cmp))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.key);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                bool ret = underlying.GetSpanAlternateLookup(_alternateComparer).AddIfNotPresent(key, value, comparer);
+
+                set.VersionCheck();
+
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == underlying.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                return ret;
+            }
+
+
+            private bool AddIfNotPresent<TKey, TValue>(ReadOnlySpan<TAlternateSpan> key, TValue value, SortedDictionary<TKey, TValue>.AlternateKeyValuePairComparer<TAlternateSpan> comparer)
+            {
+#if DEBUG
+                Debug.Assert(typeof(T) == typeof(KeyValuePair<TKey, TValue>));
+#endif
+
+                SortedSet<T> set = Set;
+
+                if (set.root == null)
+                {
+                    // The tree is empty and this is the first item.
+                    KeyValuePair<TKey, TValue> kvpBlack = comparer.Create(key, value);
+                    set.root = new Node(Unsafe.As<KeyValuePair<TKey,TValue>, T>(ref kvpBlack), NodeColor.Black);
+                    set.count = 1;
+                    set.version++;
+                    return true;
+                }
+
+                // Search for a node at bottom to insert the new node.
+                // If we can guarantee the node we found is not a 4-node, it would be easy to do insertion.
+                // We split 4-nodes along the search path.
+                Node? current = set.root;
+                Node? parent = null;
+                Node? grandParent = null;
+                Node? greatGrandParent = null;
+
+                // Even if we don't actually add to the set, we may be altering its structure (by doing rotations and such).
+                // So update `_version` to disable any instances of Enumerator/TreeSubSet from working on it.
+                set.version++;
+
+                int order = 0;
+                while (current != null)
+                {
+                    ref T item = ref current.Item;
+                    order = comparer.Compare(key, Unsafe.As<T, KeyValuePair<TKey,TValue>>(ref item));
+                    if (order == 0)
+                    {
+                        // We could have changed root node to red during the search process.
+                        // We need to set it to black before we return.
+                        set.root.ColorBlack();
+                        return false;
+                    }
+
+                    // Split a 4-node into two 2-nodes.
+                    if (current.Is4Node)
+                    {
+                        current.Split4Node();
+                        // We could have introduced two consecutive red nodes after split. Fix that by rotation.
+                        if (Node.IsNonNullRed(parent))
+                        {
+                            set.InsertionBalance(current, ref parent!, grandParent!, greatGrandParent!);
+                        }
+                    }
+
+                    greatGrandParent = grandParent;
+                    grandParent = parent;
+                    parent = current;
+                    current = (order < 0) ? current.Left : current.Right;
+                }
+
+                Debug.Assert(parent != null);
+                // We're ready to insert the new node.
+                KeyValuePair<TKey, TValue> kvpRed = comparer.Create(key, value);
+                Node node = new Node(Unsafe.As<KeyValuePair<TKey, TValue>, T>(ref kvpRed), NodeColor.Red);
+                if (order > 0)
+                {
+                    parent!.Right = node;
+                }
+                else
+                {
+                    parent!.Left = node;
+                }
+
+                // The new node will be red, so we will need to adjust colors if its parent is also red.
+                if (parent.IsRed)
+                {
+                    set.InsertionBalance(node, ref parent!, grandParent!, greatGrandParent!);
+                }
+
+                // The root node is always black.
+                set.root.ColorBlack();
+                ++set.count;
+                return true;
+            }
+
+            #endregion TryAdd
+
+            #region Remove
+
+            /// <summary>Removes the specified element from a set.</summary>
+            /// <param name="item">The element to remove.</param>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
+            public bool Remove(ReadOnlySpan<TAlternateSpan> item)
+            {
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (_isUnderlying)
+                    return DoRemove(item, comparer, out _);
+
+                return Remove_View(item, comparer, out _);
+            }
+
+            internal bool Remove(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T removed)
+            {
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (_isUnderlying)
+                    return DoRemove(item, comparer, out removed);
+
+                return Remove_View(item, comparer, out removed);
+            }
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private bool Remove_View(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer, [MaybeNullWhen(false)] out T removed)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+
+                if (!IsWithinRange(item, comparer))
+                {
+                    removed = default;
+                    return false;
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                bool ret = underlying.GetSpanAlternateLookup(_alternateComparer).DoRemove(item, comparer, out removed);
+
+                set.VersionCheck();
+
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == underlying.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                return ret;
+            }
+
+            private bool DoRemove(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer, [MaybeNullWhen(false)] out T removed)
+            {
+                SortedSet<T> set = Set;
+
+                if (set.root is null)
+                {
+                    removed = default;
+                    return false;
+                }
+
+                // Search for a node and then find its successor.
+                // Then copy the item from the successor to the matching node, and delete the successor.
+                // If a node doesn't have a successor, we can replace it with its left child (if not empty),
+                // or delete the matching node.
+                //
+                // In top-down implementation, it is important to make sure the node to be deleted is not a 2-node.
+                // Following code will make sure the node on the path is not a 2-node.
+
+                // Even if we don't actually remove from the set, we may be altering its structure (by doing rotations
+                // and such). So update our version to disable any enumerators/subsets working on it.
+                set.version++;
+
+                Node? current = set.root;
+                Node? parent = null;
+                Node? grandParent = null;
+                Node? match = null;
+                Node? parentOfMatch = null;
+                bool foundMatch = false;
+                while (current != null)
+                {
+                    if (current.Is2Node)
+                    {
+                        // Fix up 2-node
+                        if (parent == null)
+                        {
+                            // `current` is the root. Mark it red.
+                            current.ColorRed();
+                        }
+                        else
+                        {
+                            Node sibling = parent.GetSibling(current);
+                            if (sibling.IsRed)
+                            {
+                                // If parent is a 3-node, flip the orientation of the red link.
+                                // We can achieve this by a single rotation.
+                                // This case is converted to one of the other cases below.
+                                Debug.Assert(parent.IsBlack);
+                                if (parent.Right == sibling)
+                                {
+                                    parent.RotateLeft();
+                                }
+                                else
+                                {
+                                    parent.RotateRight();
+                                }
+
+                                parent.ColorRed();
+                                sibling.ColorBlack(); // The red parent can't have black children.
+                                                      // `sibling` becomes the child of `grandParent` or `root` after rotation. Update the link from that node.
+                                set.ReplaceChildOrRoot(grandParent, parent, sibling);
+                                // `sibling` will become the grandparent of `current`.
+                                grandParent = sibling;
+                                if (parent == match)
+                                {
+                                    parentOfMatch = sibling;
+                                }
+
+                                sibling = parent.GetSibling(current);
+                            }
+
+                            Debug.Assert(Node.IsNonNullBlack(sibling));
+
+                            if (sibling.Is2Node)
+                            {
+                                parent.Merge2Nodes();
+                            }
+                            else
+                            {
+                                // `current` is a 2-node and `sibling` is either a 3-node or a 4-node.
+                                // We can change the color of `current` to red by some rotation.
+                                Node newGrandParent = parent.Rotate(parent.GetRotation(current, sibling))!;
+
+                                newGrandParent.Color = parent.Color;
+                                parent.ColorBlack();
+                                current.ColorRed();
+
+                                set.ReplaceChildOrRoot(grandParent, parent, newGrandParent);
+                                if (parent == match)
+                                {
+                                    parentOfMatch = newGrandParent;
+                                }
+                            }
+                        }
+                    }
+
+                    // We don't need to compare after we find the match.
+                    int order = foundMatch ? -1 : comparer.Compare(item, current.Item);
+                    if (order == 0)
+                    {
+                        // Save the matching node.
+                        foundMatch = true;
+                        match = current;
+                        parentOfMatch = parent;
+                    }
+
+                    grandParent = parent;
+                    parent = current;
+                    // If we found a match, continue the search in the right sub-tree.
+                    current = order < 0 ? current.Left : current.Right;
+                }
+
+                // Move successor to the matching node position and replace links.
+                if (match != null)
+                {
+                    removed = match.Item;
+                    set.ReplaceNode(match, parentOfMatch!, parent!, grandParent!);
+                    --set.count;
+                }
+                else
+                {
+                    removed = default;
+                }
+
+                set.root?.ColorBlack();
+
+                return foundMatch;
+            }
+
+            #endregion Remove
+
+            #region Contains
+
+            /// <summary>Determines whether a set contains the specified element.</summary>
+            /// <param name="item">The element to locate in the set.</param>
+            /// <returns><see langword="true"/> if the set contains the specified element; otherwise, <see langword="false"/>.</returns>
+            public bool Contains(ReadOnlySpan<TAlternateSpan> item)
+            {
+                if (_isUnderlying)
+                    return FindNode(item) is not null;
+
+                return Contains_View(item);
+            }
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private bool Contains_View(ReadOnlySpan<TAlternateSpan> item)
+            {
+                SortedSet<T> set = Set;
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                return FindNode_View(item) is not null;
+            }
+
+            #endregion Contains
+
+            #region TryGetValue
+
+            /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
+            /// <param name="equalValue">The value to search for.</param>
+            /// <param name="actualValue">The value from the set that the search found, or the default value of
+            /// <typeparamref name="T"/> when the search yielded no match.</param>
+            /// <returns>A value indicating whether the search was successful.</returns>
+            public bool TryGetValue(ReadOnlySpan<TAlternateSpan> equalValue, [MaybeNullWhen(false)] out T actualValue)
+            {
+                Node? node = _isUnderlying ? FindNode(equalValue) : FindNode_View(equalValue);
+                if (node is not null)
+                {
+                    actualValue = node.Item;
+                    return true;
+                }
+
+                actualValue = default!;
+                return false;
+            }
+
+            #endregion TryGetValue
+
+            #region TryGetPredecessor
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
+            /// is the predecessor of the specified <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The entry to get the predecessor of.</param>
+            /// <param name="result">The predecessor, if any.</param>
+            /// <returns><see langword="true"/> if a predecessor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <c>strict predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>lower()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetPredecessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetPredecessor(item, out result) : DoTryGetPredecessor_View(item, out result);
+
+            private bool DoTryGetPredecessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                Node? current = set.root, match = null;
+
+                while (current != null)
+                {
+                    int comp = comparer.Compare(item, current.Item);
+
+                    if (comp > 0)
+                    {
+                        match = current;
+                        current = current.Right;
+                    }
+                    else if (comp == 0)
+                    {
+                        current = current.Left;
+                        while (current != null)
+                        {
+                            match = current;
+                            current = current.Right;
+                        }
+                    }
+                    else
+                        current = current.Left;
+                }
+
+                if (match == null)
+                {
+                    result = default!;
+                    return false;
+                }
+                else
+                {
+                    result = match.Item;
+                    return true;
+                }
+            }
+
+            private bool DoTryGetPredecessor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                // If item is at or below lower bound, no strict predecessor exists
+                if (IsTooLow(item, comparer))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                Node? current = set.root;
+                Node? match = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        match = current;
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        current = current.Left;
+                    }
+                }
+
+                // Final safety check: candidate must be within view
+                if (match == null || set.IsTooLow(match.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = match.Item;
+                return true;
+            }
+
+            #endregion TryGetPredecessor
+
+            #region TryGetSuccessor
+
+            /// <summary>
+            /// Gets the entry in the <see cref="SortedSet{T}"/> whose value
+            /// is the successor of the specified <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The entry to get the successor of.</param>
+            /// <param name="result">The successor, if any.</param>
+            /// <returns><see langword="true"/> if a successor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <c>strict successor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>higher()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetSuccessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetSuccessor(item, out result) : DoTryGetSuccessor_View(item, out result);
+
+            private bool DoTryGetSuccessor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                Node? current = set.root, match = null;
+
+                while (current != null)
+                {
+                    int comp = comparer.Compare(item, current.Item);
+
+                    if (comp < 0)
+                    {
+                        match = current;
+                        current = current.Left;
+                    }
+                    else if (comp == 0)
+                    {
+                        current = current.Right;
+                        while (current != null)
+                        {
+                            match = current;
+                            current = current.Left;
+                        }
+                    }
+                    else
+                        current = current.Right;
+                }
+
+                if (match == null)
+                {
+                    result = default!;
+                    return false;
+                }
+                else
+                {
+                    result = match.Item;
+                    return true;
+                }
+            }
+
+            private bool DoTryGetSuccessor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                // If item is at or above upper bound, no strict successor exists
+                if (IsTooHigh(item, comparer))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                Node? current = set.root;
+                Node? match = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        match = current;
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        current = current.Right;
+                    }
+                }
+
+                // Final safety check
+                if (match == null || set.IsTooHigh(match.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = match.Item;
+                return true;
+            }
+
+            #endregion TryGetSuccessor
+
+            #region TryGetFloor
+
+            /// <summary>
+            /// Gets the value in the <see cref="SortedSet{T}"/> whose value
+            /// is the greatest element less than or equal to <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The entry to get the floor of.</param>
+            /// <param name="result">The floor, if any.</param>
+            /// <returns><see langword="true"/> if a floor to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <c>weak predecessor</c> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>floor()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetFloor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetFloor(item, out result) :DoTryGetFloor_View(item, out result);
+
+            private bool DoTryGetFloor(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Right;
+                    }
+                }
+
+                if (candidate == null)
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            private bool DoTryGetFloor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp < 0)
+                    {
+                        current = current.Left;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Right;
+                    }
+                }
+
+                if (candidate == null || set.IsTooLow(candidate.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            #endregion TryGetFloor
+
+            #region TryGetCeiling
+
+            /// <summary>
+            /// Gets the value in the <see cref="SortedSet{T}"/> whose value
+            /// is the least element greater than or equal to <paramref name="item"/>.
+            /// </summary>
+            /// <param name="item">The entry to get the ceiling of.</param>
+            /// <param name="result">The ceiling, if any.</param>
+            /// <returns><see langword="true"/> if a ceiling to <paramref name="item"/> exists; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>
+            /// This method is a O(log <c>n</c>) operation.
+            /// <para/>
+            /// This is referred to as <b>weak successor</b> in order theory.
+            /// <para/>
+            /// Usage Note: This corresponds to the <c>ceiling()</c> method in the JDK.
+            /// </remarks>
+            public bool TryGetCeiling(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result) =>
+                _isUnderlying ? DoTryGetCeiling(item, out result) : DoTryGetCeiling_View(item, out result);
+
+            private bool DoTryGetCeiling(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Left;
+                    }
+                }
+
+                if (candidate == null)
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            private bool DoTryGetCeiling_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                set.VersionCheck();
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+
+                Node? current = set.root;
+                Node? candidate = null;
+
+                while (current != null)
+                {
+                    int cmp = comparer.Compare(item, current.Item);
+
+                    if (cmp > 0)
+                    {
+                        current = current.Right;
+                    }
+                    else
+                    {
+                        candidate = current;
+                        current = current.Left;
+                    }
+                }
+
+                if (candidate == null || set.IsTooHigh(candidate.Item))
+                {
+                    result = default!;
+                    return false;
+                }
+
+                result = candidate.Item;
+                return true;
+            }
+
+            #endregion TryGetCeiling
+
+            #region GetViewBetween
+
+            /// <summary>
+            /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// Usage Note: In Java, the upper bound of TreeSet.subSet() is exclusive. To match the behavior, call
+            /// <see cref="GetViewBetween(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/>,
+            /// setting <c>lowerValueInclusive</c> to <see langword="true"/> and <c>upperValueInclusive</c> to <see langword="false"/>.
+            /// </summary>
+            /// <param name="lowerValue">The lowest desired value in the view.</param>
+            /// <param name="upperValue">The highest desired value in the view.</param>
+            /// <returns>A subset view that contains only the values in the specified range.</returns>
+            /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
+            /// according to the comparer.</exception>
+            /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
+            /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
+            /// <remarks>
+            /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
+            /// <paramref name="upperValue"/> (inclusive), as defined by the comparer. This method does not copy elements from the
+            /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+            /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// If this method is called on a view, it will inherit the <c>lowerValueInclusive</c> and <c>upperValueInclusive</c>
+            /// behavior of the view. To override this behavior, call the
+            /// <see cref="GetViewBetween(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/> overload
+            /// instead.
+            /// </remarks>
+            public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, ReadOnlySpan<TAlternateSpan> upperValue)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (IsTooLow(lowerValue, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                }
+                if (IsTooHigh(upperValue, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                return _isUnderlying
+                    ? GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer)
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer);
+            }
+
+            /// <summary>
+            /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="lowerValueInclusive"/>
+            /// set to <see langword="true"/> and <paramref name="upperValueInclusive"/> set to <see langword="false"/>.
+            /// </summary>
+            /// <param name="lowerValue">The lowest value in the range for the view.</param>
+            /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
+            /// otherwise, it is an exclusive lower bound.</param>
+            /// <param name="upperValue">The highest desired value in the view.</param>
+            /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
+            /// otherwise, it is an exclusive upper bound.</param>
+            /// <returns>A subset view that contains only the values in the specified range.</returns>
+            /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
+            /// according to the comparer.</exception>
+            /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
+            /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
+            /// <remarks>
+            /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
+            /// <paramref name="upperValue"/>, as defined by the comparer. Each bound may either be inclusive
+            /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="lowerValueInclusive"/>
+            /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
+            /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+            /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// </remarks>
+            public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (IsTooLow(lowerValue, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                }
+                if (IsTooHigh(upperValue, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                return _isUnderlying
+                    ? GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer)
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer);
+            }
+
+            internal SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> underlying = Set.UnderlyingSet;
+
+                // J2N: We instantiate the upper instance prior to comparing to see whether we should
+                // throw when lowerValue is greater than upperValue. This is so we don't have
+                // to change the design of the ISpanAlternateComparer interface to allow matching 2
+                // ReadOnlySpan instances. We must get two instances anyway because TreeSubSet requires
+                // them as fields, so there is no harm in doing it this way.
+
+                if (!TryGetValue(upperValue, out T? upper))
+                {
+                    upper = comparer.Create(upperValue);
+                }
+                if (comparer.Compare(lowerValue, upper) > 0)
+                {
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
+                }
+                if (!TryGetValue(lowerValue, out T? lower))
+                {
+                    lower = comparer.Create(lowerValue);
+                }
+
+                return new TreeSubSet(underlying, lower, lowerValueInclusive, upper, upperValueInclusive, true, true);
+            }
+
+            #endregion GetViewBetween
+
+            #region FindNode
+
+            [MethodImpl(MethodImplOptions.NoInlining)]
+            private Node? FindNode_View(ReadOnlySpan<TAlternateSpan> item)
+            {
+                SortedSet<T> set = Set;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (!IsWithinRange(item, comparer))
+                {
+                    return null;
+                }
+
+                set.VersionCheck();
+
+#if DEBUG
+                Debug.Assert(set.versionUpToDate() && set.root == set.UnderlyingSet.FindRange(set.LowerBound, set.UpperBound, set.LowerBoundInclusive, set.UpperBoundInclusive, set.HasLowerBound, set.HasUpperBound));
+#endif
+                return FindNode(item, comparer);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal Node? FindNode(ReadOnlySpan<TAlternateSpan> item)
+            {
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                return FindNode(item, comparer);
+            }
+
+            /// <summary>Finds the item in the set and returns a reference to the found item, or a null reference if not found.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private Node? FindNode(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                Node? current = Set.root;
+
+                while (current != null)
+                {
+                    int order = comparer.Compare(item, current.Item);
+                    if (order == 0)
+                    {
+                        return current;
+                    }
+
+                    current = order < 0 ? current.Left : current.Right;
+                }
+
+                return null;
+            }
+
+            #endregion
+
+            #region Bounds Checking
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private bool IsWithinRange(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                return !IsTooLow(item, comparer) && !IsTooHigh(item, comparer);
+            }
+
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private bool IsTooLow(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> set = Set;
+
+                if (!set.HasLowerBound)
+                    return false;
+
+                int c = comparer.Compare(item, set.LowerBound);
+                return c < 0 || (c == 0 && !set.LowerBoundInclusive);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private bool IsTooHigh(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> set = Set;
+
+                if (!set.HasUpperBound)
+                    return false;
+
+                int c = comparer.Compare(item, set.UpperBound);
+                return c > 0 || (c == 0 && !set.UpperBoundInclusive);
+            }
+
+            #endregion Bounds Checking
+        }
+
+        #endregion SpanAlternateLookup
 
         #region IEnumerable<T> members
 
@@ -2179,8 +3469,8 @@ namespace J2N.Collections.Generic
         /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
         /// <para/>
         /// Usage Note: In Java, the upper bound of TreeSet.subSet() is exclusive. To match the behavior, call
-        /// <see cref="GetViewBetween(T, bool, T, bool)"/>, setting <c>lowerValueInclusive</c> to <c>true</c>
-        /// and <c>upperValueInclusive</c> to <c>false</c>.
+        /// <see cref="GetViewBetween(T, bool, T, bool)"/>, setting <c>lowerValueInclusive</c> to <see langword="true"/>
+        /// and <c>upperValueInclusive</c> to <see langword="false"/>.
         /// </summary>
         /// <param name="lowerValue">The lowest desired value in the view.</param>
         /// <param name="upperValue">The highest desired value in the view.</param>
@@ -2194,27 +3484,31 @@ namespace J2N.Collections.Generic
         /// <paramref name="upperValue"/> (inclusive), as defined by the comparer. This method does not copy elements from the
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+        /// <para/>
+        /// If this method is called on a view, it will inherit the <c>lowerValueInclusive</c> and <c>upperValueInclusive</c>
+        /// behavior of the view. To override this behavior, call the <see cref="GetViewBetween(T, bool, T, bool)"/> overload
+        /// instead.
         /// </remarks>
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, T? upperValue)
         {
             if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
-                throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
-            return new TreeSubSet(this, lowerValue, true, upperValue, true, true, true);
+            return new TreeSubSet(this, lowerValue, LowerBoundInclusive, upperValue, UpperBoundInclusive, true, true);
         }
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
         /// <para/>
         /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="lowerValueInclusive"/>
-        /// set to <c>true</c> and <paramref name="upperValueInclusive"/> set to <c>false</c>.
+        /// set to <see langword="true"/> and <paramref name="upperValueInclusive"/> set to <see langword="false"/>.
         /// </summary>
         /// <param name="lowerValue">The lowest value in the range for the view.</param>
-        /// <param name="lowerValueInclusive">If <c>true</c>, <paramref name="lowerValue"/> will be included in the range;
+        /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
         /// otherwise, it is an exclusive lower bound.</param>
         /// <param name="upperValue">The highest desired value in the view.</param>
-        /// <param name="upperValueInclusive">If <c>true</c>, <paramref name="upperValue"/> will be included in the range;
+        /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
         /// otherwise, it is an exclusive upper bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
@@ -2224,7 +3518,7 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
         /// <paramref name="upperValue"/>, as defined by the comparer. Each bound may either be inclusive
-        /// (<c>true</c>) or exclusive (<c>false</c>) depending on the values of <paramref name="lowerValueInclusive"/>
+        /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="lowerValueInclusive"/>
         /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
@@ -2233,7 +3527,7 @@ namespace J2N.Collections.Generic
         {
             if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
-                throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
             return new TreeSubSet(this, lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, true, true);
         }
@@ -2273,7 +3567,14 @@ namespace J2N.Collections.Generic
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
 
             info.AddValue(CountName, count); // This is the length of the bucket array.
-            info.AddValue(ComparerName, comparer, typeof(IComparer<T>));
+            info.AddValue(ComparerName, Comparer, typeof(IComparer<T>)); // J2N: Ensure we call the Comparer property to unwrap the comparer for serialization.
+
+            // J2N: Add metadata to the serialization blob so we can rehydrate the WrappedStringComparer properly
+            if (typeof(T) == typeof(string) && StringComparerDescriptor.TryDescribe(Comparer, out StringComparerDescriptor descriptor))
+            {
+                info.AddValue(descriptor);
+            }
+
             info.AddValue(VersionName, version);
 
             if (root != null)
@@ -2303,10 +3604,17 @@ namespace J2N.Collections.Generic
 
             if (siInfo == null)
             {
-                throw new SerializationException(SR.Serialization_InvalidOnDeser);
+                ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_InvalidOnDeser);
             }
 
             comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
+
+            // J2N:Try to wrap the comparer with WrappedStringComparer
+            if (typeof(T) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(siInfo, out IComparer<string?>? stringComparer))
+            {
+                comparer = (IComparer<T>)stringComparer;
+            }
+
             int savedCount = siInfo.GetInt32(CountName);
 
             if (savedCount != 0)
@@ -2315,7 +3623,7 @@ namespace J2N.Collections.Generic
 
                 if (items == null)
                 {
-                    throw new SerializationException(SR.Serialization_MissingValues);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingValues);
                 }
 
                 for (int i = 0; i < items.Length; i++)
@@ -2327,7 +3635,7 @@ namespace J2N.Collections.Generic
             version = siInfo.GetInt32(VersionName);
             if (count != savedCount)
             {
-                throw new SerializationException(SR.Serialization_MismatchedCount);
+                ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MismatchedCount);
             }
 
             siInfo = null;
@@ -2353,7 +3661,7 @@ namespace J2N.Collections.Generic
 
             public static bool IsNullOrBlack(Node? node) => node == null || node.IsBlack;
 
-            public T Item { get; set; }
+            public T Item; // J2N: Changed to a field so we can directly access it with Unsafe
 
             public Node? Left { get; set; }
 
@@ -2732,7 +4040,7 @@ namespace J2N.Collections.Generic
             {
                 if (_siInfo == null)
                 {
-                    throw new SerializationException(SR.Serialization_InvalidOnDeser);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_InvalidOnDeser);
                 }
 
                 _tree = (SortedSet<T>)_siInfo.GetValue(TreeName, typeof(SortedSet<T>))!;
