@@ -2178,8 +2178,8 @@ namespace J2N.Collections.Generic
                 // Delegate to underlying set.
                 // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
                 return _isUnderlying
-                    ? GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true, comparer)
-                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true, comparer);
+                    ? GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer)
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer);
             }
 
             /// <summary>
