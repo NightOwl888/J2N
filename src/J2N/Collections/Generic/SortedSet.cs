@@ -1273,7 +1273,7 @@ namespace J2N.Collections.Generic
 
                 if (!IsWithinRange(item, comparer))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(item));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.item);
                 }
 
                 // Delegate to underlying set.
@@ -1405,7 +1405,7 @@ namespace J2N.Collections.Generic
 
                 if (!IsWithinRange(key, cmp))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(key));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.key);
                 }
 
                 // Delegate to underlying set.
@@ -2168,11 +2168,11 @@ namespace J2N.Collections.Generic
 
                 if (IsTooLow(lowerValue, comparer))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(lowerValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
                 if (IsTooHigh(upperValue, comparer))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(upperValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
 
                 // Delegate to underlying set.
@@ -2215,11 +2215,11 @@ namespace J2N.Collections.Generic
 
                 if (IsTooLow(lowerValue, comparer))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(lowerValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
                 if (IsTooHigh(upperValue, comparer))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(upperValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
 
                 // Delegate to underlying set.
@@ -2245,7 +2245,7 @@ namespace J2N.Collections.Generic
                 }
                 if (comparer.Compare(lowerValue, upper) > 0)
                 {
-                    throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
+                    ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
                 }
                 if (!TryGetValue(lowerValue, out T? lower))
                 {
@@ -3484,7 +3484,7 @@ namespace J2N.Collections.Generic
         {
             if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
-                throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
             return new TreeSubSet(this, lowerValue, true, upperValue, true, true, true);
         }
@@ -3518,7 +3518,7 @@ namespace J2N.Collections.Generic
         {
             if (Comparer.Compare(lowerValue!, upperValue!) > 0)
             {
-                throw new ArgumentException(SR.SortedSet_LowerValueGreaterThanUpperValue, nameof(lowerValue));
+                ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
             return new TreeSubSet(this, lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, true, true);
         }
@@ -3595,7 +3595,7 @@ namespace J2N.Collections.Generic
 
             if (siInfo == null)
             {
-                throw new SerializationException(SR.Serialization_InvalidOnDeser);
+                ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_InvalidOnDeser);
             }
 
             comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
@@ -3614,7 +3614,7 @@ namespace J2N.Collections.Generic
 
                 if (items == null)
                 {
-                    throw new SerializationException(SR.Serialization_MissingValues);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingValues);
                 }
 
                 for (int i = 0; i < items.Length; i++)
@@ -3626,7 +3626,7 @@ namespace J2N.Collections.Generic
             version = siInfo.GetInt32(VersionName);
             if (count != savedCount)
             {
-                throw new SerializationException(SR.Serialization_MismatchedCount);
+                ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MismatchedCount);
             }
 
             siInfo = null;
@@ -4031,7 +4031,7 @@ namespace J2N.Collections.Generic
             {
                 if (_siInfo == null)
                 {
-                    throw new SerializationException(SR.Serialization_InvalidOnDeser);
+                    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_InvalidOnDeser);
                 }
 
                 _tree = (SortedSet<T>)_siInfo.GetValue(TreeName, typeof(SortedSet<T>))!;

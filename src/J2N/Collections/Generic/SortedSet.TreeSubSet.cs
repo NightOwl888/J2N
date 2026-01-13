@@ -91,7 +91,7 @@ namespace J2N.Collections.Generic
             {
                 if (!IsWithinRange(item))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(item));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.item);
                 }
 
                 bool ret = _underlying.AddIfNotPresent(item);
@@ -419,11 +419,11 @@ namespace J2N.Collections.Generic
             {
                 if (IsTooLow(lowerValue))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(lowerValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
                 if (IsTooHigh(upperValue))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(upperValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
                 return (TreeSubSet)_underlying.GetViewBetween(lowerValue, upperValue);
             }
@@ -435,11 +435,11 @@ namespace J2N.Collections.Generic
             {
                 if (IsTooLow(lowerValue, lowerValueInclusive))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(lowerValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
                 if (IsTooHigh(upperValue, upperValueInclusive))
                 {
-                    throw new ArgumentOutOfRangeException(nameof(upperValue));
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
                 return (TreeSubSet)_underlying.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
             }
