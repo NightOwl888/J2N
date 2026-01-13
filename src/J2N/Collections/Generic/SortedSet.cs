@@ -3277,10 +3277,17 @@ namespace J2N.Collections.Generic
         /// This method removes any element in the current <see cref="SortedSet{T}"/> that is also in <paramref name="other"/>.
         /// Duplicate values in <paramref name="other"/> are ignored.
         /// <para/>
-        /// This method is an <c>O(n)</c> operation, where <c>n</c> is the number of elements in the
-        /// <paramref name="other"/> parameter.
+        /// If the collection represented by the <paramref name="other"/> parameter is a <see cref="SortedSet{T}"/>,
+        /// <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>, <see cref="SortedDictionary{TKey, TValue}"/>,
+        /// <see cref="SCG.SortedSet{T}"/>, or <see cref="IDistinctSortedCollection{T}"/> with the same equality
+        /// comparer as the current <see cref="SortedSet{T}"/> object, this method is an O(<c>k</c> log <c>n</c>)
+        /// where <c>n</c> is <see cref="Count"/> and <c>k</c> is the number of elements in <paramref name="other"/>
+        /// that fall within the range of the current set. Otherwise, this method is an O(<c>m</c> log <c>n</c>) operation,
+        /// where <c>m</c> is the number of elements in the <paramref name="other"/> parameter.
         /// </remarks>
-        public void ExceptWith(IEnumerable<T> other)
+        public void ExceptWith(IEnumerable<T> other) => DoExceptWith(other);
+
+        internal virtual void DoExceptWith(IEnumerable<T> other)
         {
             if (other is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
@@ -3294,12 +3301,31 @@ namespace J2N.Collections.Generic
                 return;
             }
 
-            SortedSet<T>? asSorted = other as SortedSet<T>;
-
-            if (asSorted != null && HasEqualComparer(asSorted))
+            if (other is INavigableCollection<T> navigableCollection)
             {
-                // Outside range, no point in doing anything
-                if (comparer.Compare(asSorted.Max!, Min!) >= 0 && comparer.Compare(asSorted.Min!, Max!) <= 0)
+                if (ComparerEquals(Comparer, navigableCollection.Comparer))
+                {
+                    // Outside range, no point in doing anything
+                    if (comparer.Compare(navigableCollection.Max!, Min!) >= 0 && comparer.Compare(navigableCollection.Min!, Max!) <= 0)
+                    {
+                        T? min = Min;
+                        T? max = Max;
+                        foreach (T item in other)
+                        {
+                            if (comparer.Compare(item!, min!) < 0)
+                                continue;
+                            if (comparer.Compare(item!, max!) > 0)
+                                break;
+                            Remove(item);
+                        }
+                    }
+                    return;
+                }
+            }
+            // J2N: RemoveAllElements() also uses Contains() to remove unnecessary calls to Remove() when there are duplicates in ISortedCollection<T>.
+            else if (other is IDistinctSortedCollection<T> sortedCollection)
+            {
+                if (ComparerEquals(Comparer, sortedCollection.Comparer))
                 {
                     T? min = Min;
                     T? max = Max;
@@ -3311,12 +3337,32 @@ namespace J2N.Collections.Generic
                             break;
                         Remove(item);
                     }
+                    return;
                 }
             }
-            else
+            else if (other is SCG.SortedSet<T> bclSortedSet)
             {
-                RemoveAllElements(other);
+                if (ComparerEquals(Comparer, bclSortedSet.Comparer))
+                {
+                    // Outside range, no point in doing anything
+                    if (comparer.Compare(bclSortedSet.Max!, Min!) >= 0 && comparer.Compare(bclSortedSet.Min!, Max!) <= 0)
+                    {
+                        T? min = Min;
+                        T? max = Max;
+                        foreach (T item in other)
+                        {
+                            if (comparer.Compare(item!, min!) < 0)
+                                continue;
+                            if (comparer.Compare(item!, max!) > 0)
+                                break;
+                            Remove(item);
+                        }
+                    }
+                    return;
+                }
             }
+
+            RemoveAllElements(other);
         }
 
         /// <summary>

@@ -452,6 +452,33 @@ namespace J2N.Collections.Generic
             }
 #endif
 
+            // J2N: We must override this to ensure that we use _min and _max of the subset instead of the calculated values
+            // MinInternal and MaxInternal (which is what SortedSet<T> does).
+            internal override void DoExceptWith(IEnumerable<T> other)
+            {
+                if (other is null)
+                    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
+
+                if (Count == 0)
+                {
+                    return;
+                }
+
+                if (other == this)
+                {
+                    Clear();
+                    return;
+                }
+
+                foreach (T item in other)
+                {
+                    Remove(item);
+                }
+#if DEBUG
+                Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+            }
+
             internal override bool DoTryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();

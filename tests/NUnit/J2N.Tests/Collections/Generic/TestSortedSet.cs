@@ -1017,6 +1017,138 @@ namespace J2N.Collections.Generic
         }
 
 
+
+        [Test]
+        public void Test_ExceptWith_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+            SortedSet<int> right = new() { 2, 4 };
+
+            left.ExceptWith(right);
+
+            CollectionAssert.AreEqual(new[] { 1, 3 }, left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+            SCG.SortedSet<int> right = new() { 2, 4 };
+
+            left.ExceptWith(right);
+
+            CollectionAssert.AreEqual(new[] { 1, 3 }, left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_J2NSortedDictionaryKeys()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            SortedDictionary<int, string> dict = new()
+            {
+                [2] = "b",
+                [4] = "d"
+            };
+
+            left.ExceptWith(dict.Keys);
+
+            CollectionAssert.AreEqual(new[] { 1, 3 }, left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_IDistinctSortedCollection()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4, 5 };
+
+            DistinctSortedCollection<int> other = new()
+            {
+                2, 4
+            };
+
+            left.ExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 1, 3, 5 }, left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_SortedNonDistinct_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 4, 4
+            };
+
+            left.ExceptWith(nonDistinct);
+
+            CollectionAssert.AreEqual(new[] { 1, 3 }, left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_UnsortedEnumerable_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            int[] other = { 4, 2, 2, 10 };
+
+            left.ExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 1, 3 }, left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_EmptyOther_NoChange()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            left.ExceptWith(Array.Empty<int>());
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_Self_Clears()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            left.ExceptWith(left);
+
+            CollectionAssert.IsEmpty(left);
+        }
+
+        [Test]
+        public void Test_ExceptWith_TreeSubSet_InBounds()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedSet<int> other = new() { 3, 5 };
+
+            subset.ExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 2, 4 }, subset);
+            CollectionAssert.AreEqual(new[] { 1, 2, 4, 6 }, root);
+        }
+
+        [Test]
+        public void Test_ExceptWith_TreeSubSet_SortedNonDistinct()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 4, 4
+            };
+
+            subset.ExceptWith(nonDistinct);
+
+            CollectionAssert.AreEqual(new[] { 3, 5 }, subset);
+            CollectionAssert.AreEqual(new[] { 1, 3, 5, 6 }, root);
+        }
+
         #endregion Loading and Comparing
 
         /// <summary>
@@ -1036,6 +1168,48 @@ namespace J2N.Collections.Generic
             }
 
             public SortedCollection(IComparer<T>? comparer)
+            {
+                this.comparer = comparer ?? Comparer<T>.Default;
+            }
+
+            public IComparer<T> Comparer => comparer;
+
+            public int Count => list.Count;
+
+            public bool IsReadOnly => false;
+
+            public void Add(T item) => list.Add(item);
+
+            public void Clear() => list.Clear();
+
+            public bool Contains(T item) => list.Contains(item);
+
+            public void CopyTo(T[] array, int arrayIndex) => list.CopyTo(array, arrayIndex);
+
+            public IEnumerator<T> GetEnumerator() => list.GetEnumerator();
+
+            public bool Remove(T item) => list.Remove(item);
+
+            IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)list).GetEnumerator();
+        }
+
+        /// <summary>
+        /// Represents a sorted collection that contains only distinct elements. Note this is just a mock and
+        /// the data provided to the constructor must already be sorted according to the provided comparer.
+        /// The <see cref="IDistinctSortedCollection{T}"/> interface is guaranteed only by implementation, not by
+        /// interface contract.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        private sealed class DistinctSortedCollection<T> : IDistinctSortedCollection<T>
+        {
+            private readonly IComparer<T> comparer;
+            private readonly List<T> list = new List<T>();
+
+            public DistinctSortedCollection() : this(null)
+            {
+            }
+
+            public DistinctSortedCollection(IComparer<T>? comparer)
             {
                 this.comparer = comparer ?? Comparer<T>.Default;
             }
