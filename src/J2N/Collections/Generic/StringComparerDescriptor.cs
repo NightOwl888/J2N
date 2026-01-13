@@ -166,17 +166,17 @@ namespace J2N.Collections.Generic
                 case Classification.CurrentCulture:
                 case Classification.CurrentCultureIgnoreCase:
                     {
+                        bool ignoreCase = (descriptor.Options & CompareOptions.IgnoreCase) != 0;
                         try
                         {
                             CultureInfo culture = CultureInfo.GetCultureInfo(descriptor.CultureName!);
-                            bool ignoreCase = (descriptor.Options & CompareOptions.IgnoreCase) != 0;
                             comparer = StringComparer.Create(culture, ignoreCase);
                             return true;
                         }
                         catch (CultureNotFoundException)
                         {
                             // Culture doesn't exist on the current system (may happen after deserialization). Default to current culture.
-                            comparer = StringComparer.CurrentCulture;
+                            comparer = ignoreCase ? StringComparer.CurrentCultureIgnoreCase : StringComparer.CurrentCulture;
                             return true;
                         }
                     }
