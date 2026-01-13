@@ -495,8 +495,8 @@ namespace J2N.Collections.Generic
         internal virtual bool HasLowerBound => false;
         internal virtual bool HasUpperBound => false;
 
-        internal virtual bool LowerBoundInclusive => false;
-        internal virtual bool UpperBoundInclusive => false;
+        internal virtual bool LowerBoundInclusive => true; // J2N: Default to true to match the BCL
+        internal virtual bool UpperBoundInclusive => true; // J2N: Default to true to match the BCL
 
         internal virtual T? LowerBound => default;
         internal virtual T? UpperBound => default;
