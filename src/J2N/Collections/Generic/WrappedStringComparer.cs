@@ -142,7 +142,7 @@ namespace J2N.Collections.Generic
             }
 
             if (StringComparerDescriptor.TryDescribe(comparer, out StringComparerDescriptor descriptor) &&
-                TryGetStringComparer(descriptor, out IComparer<string?>? stringComparer))
+                TryGetStringComparer(in descriptor, out IComparer<string?>? stringComparer))
             {
                 return stringComparer;
             }

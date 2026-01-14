@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Runtime.Serialization;
 
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
@@ -223,27 +225,24 @@ namespace J2N.Collections.Generic
            , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
 #endif
         {
-            public static readonly CultureAwareComparer InvariantCulture = new CultureAwareComparer(StringComparer.InvariantCulture, StringComparison.InvariantCulture);
-            public static readonly CultureAwareComparer InvariantCultureIgnoreCase = new CultureAwareComparer(StringComparer.InvariantCultureIgnoreCase, StringComparison.InvariantCultureIgnoreCase);
+            public static readonly CultureAwareComparer InvariantCulture = new CultureAwareComparer(StringComparer.InvariantCulture);
+            public static readonly CultureAwareComparer InvariantCultureIgnoreCase = new CultureAwareComparer(StringComparer.InvariantCultureIgnoreCase);
 
             private readonly IEqualityComparer<string?> _underlyingComparer;
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
             private readonly IAlternateEqualityComparer<ReadOnlySpan<char>, string?>? _alternateComparer;
 #endif
-            private readonly StringComparison _comparison;
-
-            internal CultureAwareComparer(IEqualityComparer<string?> wrappedComparer, StringComparison comparison)
+            internal CultureAwareComparer(IEqualityComparer<string?> wrappedComparer)
             {
                 _underlyingComparer = wrappedComparer;
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
                 _alternateComparer = wrappedComparer as IAlternateEqualityComparer<ReadOnlySpan<char>, string?>;
 #endif
-                _comparison = comparison;
             }
 
             public IEqualityComparer<string?> GetUnderlyingEqualityComparer() => _underlyingComparer;
 
-            public bool Equals(string? x, string? y) => string.Equals(x, y, _comparison);
+            public bool Equals(string? x, string? y) => _underlyingComparer.Equals(x, y);
 
             public int GetHashCode(string? obj)
             {
@@ -255,11 +254,7 @@ namespace J2N.Collections.Generic
                 // The BCL seed will always be the same for a given process, so the hash codes will be consistent,
                 // however, the J2N seed will likely be different.
 
-#if FEATURE_STRING_GETHASHCODE_STRINGCOMPARISON
-                return obj.GetHashCode(_comparison);
-#else
-                return StringHelper.GetHashCode(obj, _comparison);
-#endif
+                return _underlyingComparer.GetHashCode(obj);
             }
 
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
@@ -274,11 +269,8 @@ namespace J2N.Collections.Generic
                 if (_alternateComparer is not null)
                     return _alternateComparer.GetHashCode(span);
 
-#if FEATURE_STRING_GETHASHCODE_READONLYSPAN_STRINGCOMPARISON
-                return string.GetHashCode(span, _comparison);
-#else
-                return StringHelper.GetHashCode(span, _comparison);
-#endif
+                // Legacy - no choice but to allocate (this will never be hit)
+                return _underlyingComparer.GetHashCode(span.ToString());
             }
 
             bool IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Equals(ReadOnlySpan<char> span, string? target)
@@ -292,7 +284,8 @@ namespace J2N.Collections.Generic
                 if (_alternateComparer is not null)
                     return _alternateComparer.Equals(span, target);
 
-                return System.MemoryExtensions.Equals(span, target, _comparison);
+                // Legacy - no choice but to allocate (this will never be hit)
+                return _underlyingComparer.Equals(span.ToString(), target);
             }
 
             string? IAlternateEqualityComparer<ReadOnlySpan<char>, string?>.Create(ReadOnlySpan<char> span) =>
@@ -309,11 +302,17 @@ namespace J2N.Collections.Generic
                 if (_alternateComparer is not null)
                     return _alternateComparer.GetHashCode(span);
 #endif
-#if FEATURE_STRING_GETHASHCODE_READONLYSPAN_STRINGCOMPARISON
-                return string.GetHashCode(span, _comparison);
-#else
-                return StringHelper.GetHashCode(span, _comparison);
+
+#if FEATURE_STRINGCOMPARER_ISWELLKNOWNCULTUREAWARECOMPARER
+                if (_underlyingComparer is IEqualityComparer<string?> ec &&
+                    StringComparer.IsWellKnownCultureAwareComparer(ec, out CompareInfo? compareInfo, out CompareOptions compareOptions))
+                {
+                    return compareInfo.GetHashCode(span, compareOptions);
+                }
 #endif
+
+                // Legacy - no choice but to allocate
+                return _underlyingComparer.GetHashCode(span.ToString());
             }
 
             bool ISpanAlternateEqualityComparer<char, string?>.Equals(ReadOnlySpan<char> span, string? target)
@@ -328,7 +327,20 @@ namespace J2N.Collections.Generic
                 if (_alternateComparer is not null)
                     return _alternateComparer.Equals(span, target);
 #endif
-                return System.MemoryExtensions.Equals(span, target, _comparison);
+
+#if FEATURE_STRINGCOMPARER_ISWELLKNOWNCULTUREAWARECOMPARER
+                if (_underlyingComparer is IEqualityComparer<string?> ec &&
+                    StringComparer.IsWellKnownCultureAwareComparer(ec, out CompareInfo? compareInfo, out CompareOptions compareOptions))
+                {
+                    // NOTE: For culture-aware comparisons, Compare() == 0 is the only
+                    // correct definition of equality. There is no Equals-only alternative.
+                    return compareInfo.Compare(span, target, compareOptions) == 0;
+                }
+#endif
+
+                // Legacy - no choice but to allocate one side. This is cheaper than
+                // calling System.MemoryExtensions.Equals() which will allocate both sides.
+                return _underlyingComparer.Equals(span.ToString(), target);
             }
 
             string? ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
@@ -356,30 +368,59 @@ namespace J2N.Collections.Generic
                 return WrappedAroundStringComparerOrdinalIgnoreCase;
             }
 
-            if (ReferenceEquals(comparer, StringComparer.InvariantCulture))
+            if (StringComparerDescriptor.TryDescribe(comparer, out StringComparerDescriptor descriptor) &&
+                TryGetStringComparer(in descriptor, out IEqualityComparer<string?>? stringComparer))
             {
-                return CultureAwareComparer.InvariantCulture;
-            }
-
-            if (ReferenceEquals(comparer, StringComparer.InvariantCultureIgnoreCase))
-            {
-                return CultureAwareComparer.InvariantCultureIgnoreCase;
-            }
-
-            // These are not cached, since they read the culture of the current thread upon creation. So,
-            // we need to actively check whether the culture matches the one of the current thread rather than
-            // checking against a specific instance.
-            if (StringComparer.CurrentCulture.Equals(comparer))
-            {
-                return new CultureAwareComparer((IEqualityComparer<string?>)comparer, StringComparison.CurrentCulture);
-            }
-
-            if (StringComparer.CurrentCultureIgnoreCase.Equals(comparer))
-            {
-                return new CultureAwareComparer((IEqualityComparer<string?>)comparer, StringComparison.CurrentCultureIgnoreCase);
+                return stringComparer;
             }
 
             return null;
+        }
+
+        public static bool TryGetStringComparer(in StringComparerDescriptor descriptor, [MaybeNullWhen(false)] out IEqualityComparer<string?>? comparer)
+        {
+            if (descriptor.Type == StringComparerDescriptor.Classification.Ordinal)
+            {
+                comparer = WrappedAroundStringComparerOrdinal;
+                return true;
+            }
+
+            if (descriptor.Type == StringComparerDescriptor.Classification.OrdinalIgnoreCase)
+            {
+                comparer = WrappedAroundStringComparerOrdinalIgnoreCase;
+                return true;
+            }
+
+            if (descriptor.Type == StringComparerDescriptor.Classification.InvariantCulture)
+            {
+                comparer = CultureAwareComparer.InvariantCulture;
+                return true;
+            }
+
+            if (descriptor.Type == StringComparerDescriptor.Classification.InvariantCultureIgnoreCase)
+            {
+                comparer = CultureAwareComparer.InvariantCultureIgnoreCase;
+                return true;
+            }
+
+            if (descriptor.TryCreateStringComparer(out StringComparer? stringComparer))
+            {
+                // Otherwise, this is culture-aware
+                if (descriptor.Type == StringComparerDescriptor.Classification.CurrentCultureIgnoreCase)
+                {
+                    comparer = new CultureAwareComparer(stringComparer!);
+                    return true;
+                }
+
+                if (descriptor.Type == StringComparerDescriptor.Classification.CurrentCulture)
+                {
+                    comparer = new CultureAwareComparer(stringComparer!);
+                    return true;
+                }
+            }
+
+            comparer = null;
+            return false;
         }
     }
 }
