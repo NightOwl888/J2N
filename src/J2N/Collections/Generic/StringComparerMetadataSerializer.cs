@@ -31,12 +31,39 @@ namespace J2N.Collections.Generic
         private const string ComparerDescriptorOptionsName = "ComparerDescriptor.Options";
 
         // Tries to read a StringComparer from a deserialization stream and returns false if it cannot be deserialized
+        internal static bool TryGetKnownStringComparer(SerializationInfo info, [MaybeNullWhen(false)] out IEqualityComparer<string?> comparer)
+        {
+            Debug.Assert(info != null);
+
+            if (!TryReadDescriptor(info!, out StringComparerDescriptor descriptor)) // [!] asserted above
+            {
+                comparer = null;
+                return false;
+            }
+
+            return NonRandomizedStringEqualityComparer.TryGetStringComparer(in descriptor, out comparer);
+        }
+
+        // Tries to read a StringComparer from a deserialization stream and returns false if it cannot be deserialized
         internal static bool TryGetKnownStringComparer(SerializationInfo info, [MaybeNullWhen(false)] out IComparer<string?> comparer)
         {
             Debug.Assert(info != null);
 
+            if (!TryReadDescriptor(info!, out StringComparerDescriptor descriptor)) // [!] asserted above
+            {
+                comparer = null;
+                return false;
+            }
+
+            return WrappedStringComparer.TryGetStringComparer(in descriptor, out comparer);
+        }
+
+        private static bool TryReadDescriptor(SerializationInfo info, out StringComparerDescriptor descriptor)
+        {
+            Debug.Assert(info != null);
+
             // Descriptor fields may not exist (old blobs)
-            SerializationInfoEnumerator e = info!.GetEnumerator();
+            SerializationInfoEnumerator e = info!.GetEnumerator(); // [!] asserted above
 
             StringComparerDescriptor.Classification type = default;
             StringComparerDescriptor.Fields found = StringComparerDescriptor.Fields.None;
@@ -65,20 +92,18 @@ namespace J2N.Collections.Generic
 
                 // Exit early once we have everything we need
                 if (found == StringComparerDescriptor.Fields.All)
-                {
                     break;
-                }
             }
 
             if ((found & StringComparerDescriptor.Fields.Type) == 0)
             {
                 // Old blob – descriptor not present
-                comparer = null;
+                descriptor = default;
                 return false;
             }
 
-            StringComparerDescriptor descriptor = new(type, cultureName, options);
-            return WrappedStringComparer.TryGetStringComparer(descriptor, out comparer);
+            descriptor = new StringComparerDescriptor(type, cultureName, options);
+            return true;
         }
 
         // Writes a StringComparerDescriptor to a serialization stream
