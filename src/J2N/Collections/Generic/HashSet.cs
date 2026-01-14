@@ -1531,6 +1531,13 @@ namespace J2N.Collections.Generic
 
             info.AddValue(VersionName, _version); // need to serialize version to avoid problems with serializing while enumerating
             info.AddValue(EqualityComparerName, EqualityComparer, typeof(IEqualityComparer<T>));
+
+            // J2N: Add metadata to the serialization blob so we can rehydrate the NonRandomizedStringEqualityComparer properly
+            if (typeof(T) == typeof(string) && StringComparerDescriptor.TryDescribe(EqualityComparer, out StringComparerDescriptor descriptor))
+            {
+                info.AddValue(ref descriptor);
+            }
+
             info.AddValue(CapacityName, _buckets == null ? 0 : _buckets.Length);
 
             if (_buckets != null)
@@ -1575,6 +1582,13 @@ namespace J2N.Collections.Generic
 
             int capacity = siInfo.GetInt32(CapacityName);
             _comparer = (IEqualityComparer<T>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<T>))!;
+
+            // J2N:Try to wrap the comparer with NonRandomizedStringEqualityComparer
+            if (typeof(T) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(siInfo, out IEqualityComparer<string?>? stringComparer))
+            {
+                _comparer = (IEqualityComparer<T>)stringComparer;
+            }
+
             _freeList = -1;
             _freeCount = 0;
 
