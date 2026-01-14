@@ -671,6 +671,13 @@ namespace J2N.Collections.Generic
 
             info.AddValue(VersionName, _version);
             info.AddValue(EqualityComparerName, EqualityComparer, typeof(IEqualityComparer<TKey>));
+
+            // J2N: Add metadata to the serialization blob so we can rehydrate the NonRandomizedStringEqualityComparer properly
+            if (typeof(TKey) == typeof(string) && StringComparerDescriptor.TryDescribe(EqualityComparer, out StringComparerDescriptor descriptor))
+            {
+                info.AddValue(ref descriptor);
+            }
+
             info.AddValue(HashSizeName, _buckets == null ? 0 : _buckets.Length); // This is the length of the bucket array
 
             if (_buckets != null)
@@ -718,6 +725,12 @@ namespace J2N.Collections.Generic
                 hashsize = siInfo.GetInt32(CountName);
             }
             _comparer = (IEqualityComparer<TKey>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<TKey>))!; // When serialized if comparer is null, we use the default.
+
+            // J2N:Try to wrap the comparer with NonRandomizedStringEqualityComparer
+            if (typeof(TKey) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(siInfo, out IEqualityComparer<string?>? stringComparer))
+            {
+                _comparer = (IEqualityComparer<TKey>)stringComparer;
+            }
 
             if (hashsize != 0)
             {
