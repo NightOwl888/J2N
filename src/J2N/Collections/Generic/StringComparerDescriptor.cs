@@ -59,7 +59,7 @@ namespace J2N.Collections.Generic
             CultureName = cultureName;
 
             // J2N: Only IgnoreCase is supported by J2N, so we ignore any other options that are inadvertently specfied.
-            // No options are ever vaid for Ordinal or OrdinalIgnoreCase.
+            // No options are ever valid for Ordinal or OrdinalIgnoreCase.
 
             Options = type switch
             {
