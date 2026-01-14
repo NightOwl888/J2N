@@ -107,7 +107,7 @@ namespace J2N.Collections.Generic
         }
 
         // Writes a StringComparerDescriptor to a serialization stream
-        internal static void AddValue(this SerializationInfo info, StringComparerDescriptor descriptor)
+        internal static void AddValue(this SerializationInfo info, ref StringComparerDescriptor descriptor)
         {
             Debug.Assert(info != null);
 

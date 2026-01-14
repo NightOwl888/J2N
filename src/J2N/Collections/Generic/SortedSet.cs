@@ -3572,7 +3572,7 @@ namespace J2N.Collections.Generic
             // J2N: Add metadata to the serialization blob so we can rehydrate the WrappedStringComparer properly
             if (typeof(T) == typeof(string) && StringComparerDescriptor.TryDescribe(Comparer, out StringComparerDescriptor descriptor))
             {
-                info.AddValue(descriptor);
+                info.AddValue(ref descriptor);
             }
 
             info.AddValue(VersionName, version);
