@@ -727,7 +727,7 @@ namespace J2N.Collections.Generic
             _comparer = (IEqualityComparer<TKey>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<TKey>))!; // When serialized if comparer is null, we use the default.
 
             // J2N:Try to wrap the comparer with NonRandomizedStringEqualityComparer
-            if (typeof(TKey) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(siInfo, out IEqualityComparer<string?>? stringComparer))
+            if (typeof(TKey) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(_comparer, siInfo, out IEqualityComparer<string?>? stringComparer))
             {
                 _comparer = (IEqualityComparer<TKey>)stringComparer;
             }

@@ -2407,7 +2407,7 @@ namespace J2N.Collections.Generic
                 keyComparer = (IComparer<TKey>)info.GetValue(ComparerName, typeof(IComparer<TKey>))!;
 
                 // J2N:Try to wrap the comparer with WrappedStringComparer
-                if (typeof(TKey) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(info, out IComparer<string?>? stringComparer))
+                if (typeof(TKey) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(keyComparer, info, out IComparer<string?>? stringComparer))
                 {
                     keyComparer = (IComparer<TKey>)stringComparer;
                 }

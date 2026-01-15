@@ -1584,7 +1584,7 @@ namespace J2N.Collections.Generic
             _comparer = (IEqualityComparer<T>)siInfo.GetValue(EqualityComparerName, typeof(IEqualityComparer<T>))!;
 
             // J2N:Try to wrap the comparer with NonRandomizedStringEqualityComparer
-            if (typeof(T) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(siInfo, out IEqualityComparer<string?>? stringComparer))
+            if (typeof(T) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(_comparer, siInfo, out IEqualityComparer<string?>? stringComparer))
             {
                 _comparer = (IEqualityComparer<T>)stringComparer;
             }

@@ -31,7 +31,7 @@ namespace J2N.Collections.Generic
         private const string ComparerDescriptorOptionsName = "ComparerDescriptor.Options";
 
         // Tries to read a StringComparer from a deserialization stream and returns false if it cannot be deserialized
-        internal static bool TryGetKnownStringComparer(SerializationInfo info, [MaybeNullWhen(false)] out IEqualityComparer<string?> comparer)
+        internal static bool TryGetKnownStringComparer(object rawComparer, SerializationInfo info, [MaybeNullWhen(false)] out IEqualityComparer<string?> comparer)
         {
             Debug.Assert(info != null);
 
@@ -41,11 +41,11 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            return NonRandomizedStringEqualityComparer.TryGetStringComparer(in descriptor, out comparer);
+            return NonRandomizedStringEqualityComparer.TryGetStringComparer(rawComparer, in descriptor, out comparer);
         }
 
         // Tries to read a StringComparer from a deserialization stream and returns false if it cannot be deserialized
-        internal static bool TryGetKnownStringComparer(SerializationInfo info, [MaybeNullWhen(false)] out IComparer<string?> comparer)
+        internal static bool TryGetKnownStringComparer(object rawComparer, SerializationInfo info, [MaybeNullWhen(false)] out IComparer<string?> comparer)
         {
             Debug.Assert(info != null);
 
@@ -55,7 +55,7 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            return WrappedStringComparer.TryGetStringComparer(in descriptor, out comparer);
+            return WrappedStringComparer.TryGetStringComparer(rawComparer, in descriptor, out comparer);
         }
 
         private static bool TryReadDescriptor(SerializationInfo info, out StringComparerDescriptor descriptor)
