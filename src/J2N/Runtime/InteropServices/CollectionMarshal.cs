@@ -93,7 +93,6 @@ namespace J2N.Runtime.InteropServices
         /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
         /// </remarks>
         public static ref TValue GetValueRefOrNullRef<TKey, TValue, TAlternateKey>(Dictionary<TKey, TValue>.AlternateLookup<TAlternateKey> dictionary, TAlternateKey key)
-            where TKey : notnull
             where TAlternateKey : allows ref struct
             => ref dictionary.FindValue(key, out _);
 
@@ -110,7 +109,6 @@ namespace J2N.Runtime.InteropServices
         /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
         /// </remarks>
         public static ref TValue GetValueRefOrNullRef<TKey, TValue, TAlternateKey>(OrderedDictionary<TKey, TValue>.AlternateLookup<TAlternateKey> dictionary, TAlternateKey key)
-            where TKey : notnull
             where TAlternateKey : allows ref struct
             => ref dictionary.FindValue(key, out _);
 
