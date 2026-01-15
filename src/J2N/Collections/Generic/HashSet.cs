@@ -762,7 +762,7 @@ namespace J2N.Collections.Generic
         /// using a <typeparamref name="TAlternate"/> instead of a <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="TAlternate">The alternate type of instance for performing lookups.</typeparam>
-        public struct AlternateLookup<TAlternate> where TAlternate : allows ref struct
+        public readonly struct AlternateLookup<TAlternate> where TAlternate : allows ref struct
         {
             /// <summary>Initialize the instance. The set must have already been verified to have a compatible comparer.</summary>
             internal AlternateLookup(HashSet<T> set)
