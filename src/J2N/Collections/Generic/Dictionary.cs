@@ -2060,11 +2060,12 @@ namespace J2N.Collections.Generic
         /// using a <typeparamref name="TAlternateKey"/> as a key instead of a <typeparamref name="TKey"/>.
         /// </summary>
         /// <typeparam name="TAlternateKey">The alternate type of a key for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
-        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or
+        /// a default instance that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The dictionary must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternateKey, TKey}"/> with
-        /// <typeparamref name="TAlternateKey"/> and <typeparamref name="TKey"/>. If it doesn't, the method will return false.
+        /// <typeparamref name="TAlternateKey"/> and <typeparamref name="TKey"/>. If it doesn't, the method will return <see langword="false"/>.
         /// </remarks>
         public bool TryGetAlternateLookup<TAlternateKey>(
             out AlternateLookup<TAlternateKey> lookup)
@@ -2199,7 +2200,7 @@ namespace J2N.Collections.Generic
             /// <summary>Finds the entry associated with the specified alternate key.</summary>
             /// <param name="key">The alternate key.</param>
             /// <param name="actualKey">The actual key, if found.</param>
-            /// <returns>A reference to the value associated with the key, if found; otherwise, a null reference.</returns>
+            /// <returns>A reference to the value associated with the key, if found; otherwise, a <see langword="null"/> reference.</returns>
             internal ref TValue FindValue([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TKey actualKey)
             {
                 Dictionary<TKey, TValue> dictionary = Dictionary;
@@ -2289,7 +2290,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the value with the specified alternate key from the <see cref="Dictionary{TKey, TValue}"/>.</summary>
             /// <param name="key">The alternate key of the element to remove.</param>
-            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove([AllowNull] TAlternateKey key) =>
                 Remove(key, out _, out _);
@@ -2301,7 +2302,7 @@ namespace J2N.Collections.Generic
             /// <param name="key">The alternate key of the element to remove.</param>
             /// <param name="actualKey">The removed key.</param>
             /// <param name="value">The removed element.</param>
-            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
             {
@@ -2437,7 +2438,7 @@ namespace J2N.Collections.Generic
             /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
             /// <param name="key">The alternate key of the element to add.</param>
             /// <param name="value">The value of the element to add.</param>
-            /// <returns>true if the key/value pair was added to the dictionary successfully; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the key/value pair was added to the dictionary successfully; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool TryAdd([AllowNull] TAlternateKey key, TValue value)
             {
@@ -2614,13 +2615,13 @@ namespace J2N.Collections.Generic
         /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
         /// </summary>
         /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns <c>true</c>, or a default instance
-        /// that should not be used if the method returns <c>false</c>.</param>
-        /// <returns><c>true</c> if a lookup could be created; otherwise, <c>false</c>.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default instance
+        /// that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateEqualityComparer{TAlternateKeySpan, TKey}"/> with
         /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
-        /// If it doesn't, the method will return <c>false</c>.
+        /// If it doesn't, the method will return <see langword="false"/>.
         /// </remarks>
         public bool TryGetSpanAlternateLookup<TAlternateKeySpan>(out SpanAlternateLookup<TAlternateKeySpan> lookup)
         {
@@ -2806,7 +2807,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the value with the specified alternate key from the <see cref="Dictionary{TKey, TValue}"/>.</summary>
             /// <param name="key">The alternate key of the element to remove.</param>
-            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove(ReadOnlySpan<TAlternateKeySpan> key) =>
                 Remove(key, out _, out _);
@@ -2818,7 +2819,7 @@ namespace J2N.Collections.Generic
             /// <param name="key">The alternate key of the element to remove.</param>
             /// <param name="actualKey">The removed key.</param>
             /// <param name="value">The removed element.</param>
-            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
             {
@@ -2894,7 +2895,7 @@ namespace J2N.Collections.Generic
             /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
             /// <param name="key">The alternate key of the element to add.</param>
             /// <param name="value">The value of the element to add.</param>
-            /// <returns><c>true</c> if the key/value pair was added to the dictionary successfully; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the key/value pair was added to the dictionary successfully; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool TryAdd(ReadOnlySpan<TAlternateKeySpan> key, TValue value)
             {

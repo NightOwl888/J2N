@@ -737,11 +737,12 @@ namespace J2N.Collections.Generic
         /// using a <typeparamref name="TAlternate"/> instead of a <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="TAlternate">The alternate type of instance for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
-        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a
+        /// default instance that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The set must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternate, T}"/> with
-        /// <typeparamref name="TAlternate"/> and <typeparamref name="T"/>. If it doesn't, the method returns false.
+        /// <typeparamref name="TAlternate"/> and <typeparamref name="T"/>. If it doesn't, the method returns <see langword="false"/>.
         /// </remarks>
         public bool TryGetAlternateLookup<TAlternate>(out AlternateLookup<TAlternate> lookup)
             where TAlternate : allows ref struct
@@ -792,7 +793,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Adds the specified element to a set.</summary>
             /// <param name="item">The element to add to the set.</param>
-            /// <returns>true if the element is added to the set; false if the element is already present.</returns>
+            /// <returns><see langword="true"/> if the element is added to the set; <see langword="false"/> if the element is already present.</returns>
             public bool Add(TAlternate item)
             {
                 HashSet<T> set = Set;
@@ -909,7 +910,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the specified element from a set.</summary>
             /// <param name="item">The element to remove.</param>
-            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             public bool Remove(TAlternate item)
             {
                 HashSet<T> set = Set;
@@ -1020,12 +1021,13 @@ namespace J2N.Collections.Generic
 
             /// <summary>Determines whether a set contains the specified element.</summary>
             /// <param name="item">The element to locate in the set.</param>
-            /// <returns>true if the set contains the specified element; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the set contains the specified element; otherwise, <see langword="false"/>.</returns>
             public bool Contains(TAlternate item) => !Unsafe.IsNullRef(in FindValue(item));
 
             /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
             /// <param name="equalValue">The value to search for.</param>
-            /// <param name="actualValue">The value from the set that the search found, or the default value of <typeparamref name="T"/> when the search yielded no match.</param>
+            /// <param name="actualValue">The value from the set that the search found, or the default value of
+            /// <typeparamref name="T"/> when the search yielded no match.</param>
             /// <returns>A value indicating whether the search was successful.</returns>
             public bool TryGetValue(TAlternate equalValue, [MaybeNullWhen(false)] out T actualValue)
             {
@@ -1154,12 +1156,13 @@ namespace J2N.Collections.Generic
         /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> instead of a <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="TAlternateSpan">The alternate type of <see cref="ReadOnlySpan{T}"/> instance for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
-        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default
+        /// instance that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The set must be using a comparer that implements <see cref="ISpanAlternateEqualityComparer{TAlternateSpan, T}"/> with
         /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateSpan"/> and <typeparamref name="T"/>.
-        /// If it doesn't, the method returns false.
+        /// If it doesn't, the method returns <see langword="false"/>.
         /// </remarks>
         public bool TryGetSpanAlternateLookup<TAlternateSpan>(out SpanAlternateLookup<TAlternateSpan> lookup)
         {
@@ -1209,7 +1212,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Adds the specified element to a set.</summary>
             /// <param name="item">The element to add to the set.</param>
-            /// <returns><c>true</c> if the element is added to the set; <c>false</c> if the element is already present.</returns>
+            /// <returns><see langword="true"/> if the element is added to the set; <see langword="false"/> if the element is already present.</returns>
             public bool Add(ReadOnlySpan<TAlternateSpan> item)
             {
                 HashSet<T> set = Set;
@@ -1300,7 +1303,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the specified element from a set.</summary>
             /// <param name="item">The element to remove.</param>
-            /// <returns><c>true</c> if the element is successfully found and removed; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             public bool Remove(ReadOnlySpan<TAlternateSpan> item)
             {
                 HashSet<T> set = Set;
@@ -1365,7 +1368,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Determines whether a set contains the specified element.</summary>
             /// <param name="item">The element to locate in the set.</param>
-            /// <returns><c>true</c> if the set contains the specified element; otherwise, <c>false</c>.</returns>
+            /// <returns><see langword="true"/> if the set contains the specified element; otherwise, <see langword="false"/>.</returns>
             public bool Contains(ReadOnlySpan<TAlternateSpan> item) => !Unsafe.IsNullRef(ref FindValue(item));
 
             /// <summary>Searches the set for a given value and returns the equal value it finds, if any.</summary>
