@@ -52,7 +52,7 @@ namespace J2N.Collections.Generic
             internal uint p1;
         }
 
-        private sealed class OrdinalComparer : RandomizedStringEqualityComparer
+        private sealed class OrdinalComparer : RandomizedStringEqualityComparer, ISpanAlternateEqualityComparer<char, string?>
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
             , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
 #endif
@@ -111,9 +111,28 @@ namespace J2N.Collections.Generic
                     _seed.p0, _seed.p1);
 #endif
 
+            string ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
+
+            bool ISpanAlternateEqualityComparer<char, string?>.Equals(ReadOnlySpan<char> alternate, string? other)
+            {
+                // See explanation in System.OrdinalComparer.Equals.
+                if (alternate.IsEmpty && other is null)
+                {
+                    return false;
+                }
+
+                return alternate.SequenceEqual(other);
+            }
+
+            int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> alternate) =>
+                Marvin.ComputeHash32(
+                    ref Unsafe.As<char, byte>(ref MemoryMarshal.GetReference(alternate)),
+                    (uint)alternate.Length * 2,
+                    _seed.p0, _seed.p1);
         }
 
-        private sealed class OrdinalIgnoreCaseComparer : RandomizedStringEqualityComparer
+        private sealed class OrdinalIgnoreCaseComparer : RandomizedStringEqualityComparer, ISpanAlternateEqualityComparer<char, string?>
 #if FEATURE_IALTERNATEEQUALITYCOMPARER
             , IAlternateEqualityComparer<ReadOnlySpan<char>, string?>
 #endif
@@ -173,6 +192,25 @@ namespace J2N.Collections.Generic
                     _seed.p0, _seed.p1);
 #endif
 
+            string ISpanAlternateEqualityComparer<char, string?>.Create(ReadOnlySpan<char> span) =>
+                span.ToString();
+
+            bool ISpanAlternateEqualityComparer<char, string?>.Equals(ReadOnlySpan<char> alternate, string? other)
+            {
+                // See explanation in System.OrdinalComparer.Equals.
+                if (alternate.IsEmpty && other is null)
+                {
+                    return false;
+                }
+
+                return System.MemoryExtensions.Equals(alternate, other, StringComparison.OrdinalIgnoreCase);
+            }
+
+            int ISpanAlternateEqualityComparer<char, string?>.GetHashCode(ReadOnlySpan<char> alternate) =>
+                Marvin.ComputeHash32OrdinalIgnoreCase(
+                    ref MemoryMarshal.GetReference(alternate),
+                    alternate.Length,
+                    _seed.p0, _seed.p1);
         }
     }
 }

@@ -93,7 +93,6 @@ namespace J2N.Runtime.InteropServices
         /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
         /// </remarks>
         public static ref TValue GetValueRefOrNullRef<TKey, TValue, TAlternateKey>(Dictionary<TKey, TValue>.AlternateLookup<TAlternateKey> dictionary, TAlternateKey key)
-            where TKey : notnull
             where TAlternateKey : allows ref struct
             => ref dictionary.FindValue(key, out _);
 
@@ -110,11 +109,40 @@ namespace J2N.Runtime.InteropServices
         /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
         /// </remarks>
         public static ref TValue GetValueRefOrNullRef<TKey, TValue, TAlternateKey>(OrderedDictionary<TKey, TValue>.AlternateLookup<TAlternateKey> dictionary, TAlternateKey key)
-            where TKey : notnull
             where TAlternateKey : allows ref struct
             => ref dictionary.FindValue(key, out _);
 
 #endif
+
+        /// <summary>
+        /// Gets either a ref to a <typeparamref name="TValue"/> in the <see cref="Dictionary{TKey, TValue}"/> or a ref null if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <typeparam name="TAlternateKeySpan">The <see cref="ReadOnlySpan{T}"/> type of an alternate key for lookups in the dictionary.</typeparam>
+        /// <remarks>
+        /// Items should not be added or removed from the <see cref="Dictionary{TKey, TValue}"/> while the ref <typeparamref name="TValue"/> is in use.
+        /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
+        /// </remarks>
+        public static ref TValue GetValueRefOrNullRef<TKey, TValue, TAlternateKeySpan>(Dictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> dictionary, ReadOnlySpan<TAlternateKeySpan> key)
+            => ref dictionary.FindValue(key, out _);
+
+        /// <summary>
+        /// Gets either a ref to a <typeparamref name="TValue"/> in the <see cref="OrderedDictionary{TKey, TValue}"/> or a ref null if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <typeparam name="TAlternateKeySpan">The <see cref="ReadOnlySpan{T}"/> type of an alternate key for lookups in the dictionary.</typeparam>
+        /// <remarks>
+        /// Items should not be added or removed from the <see cref="OrderedDictionary{TKey, TValue}"/> while the ref <typeparamref name="TValue"/> is in use.
+        /// The ref null can be detected using System.Runtime.CompilerServices.Unsafe.IsNullRef
+        /// </remarks>
+        public static ref TValue GetValueRefOrNullRef<TKey, TValue, TAlternateKeySpan>(OrderedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> dictionary, ReadOnlySpan<TAlternateKeySpan> key)
+            => ref dictionary.FindValue(key, out _);
 
         /// <summary>
         /// Gets a ref to a <typeparamref name="TValue"/> in the <see cref="Dictionary{TKey, TValue}"/>, adding a new entry with a default value if it does not exist in the <paramref name="dictionary"/>.
@@ -171,6 +199,32 @@ namespace J2N.Runtime.InteropServices
             => ref dictionary.GetValueRefOrAddDefault(key, out exists);
 
 #endif
+
+        /// <summary>
+        /// Gets a ref to a <typeparamref name="TValue"/> in the <see cref="Dictionary{TKey, TValue}.SpanAlternateLookup{TAlternateKeySpan}"/>, adding a new entry with a default value if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <param name="exists">Whether or not a new entry for the given key was added to the dictionary.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <typeparam name="TAlternateKeySpan">The <see cref="ReadOnlySpan{T}"/> type of the alternate key in the dictionary lookup.</typeparam>
+        /// <remarks>Items should not be added to or removed from the <see cref="Dictionary{TKey, TValue}.SpanAlternateLookup{TAlternateKeySpan}"/> while the ref <typeparamref name="TValue"/> is in use.</remarks>
+        public static ref TValue? GetValueRefOrAddDefault<TKey, TValue, TAlternateKeySpan>(Dictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> dictionary, ReadOnlySpan<TAlternateKeySpan> key, out bool exists)
+            => ref dictionary.GetValueRefOrAddDefault(key, out exists);
+
+        /// <summary>
+        /// Gets a ref to a <typeparamref name="TValue"/> in the <see cref="OrderedDictionary{TKey, TValue}.SpanAlternateLookup{TAlternateKeySpan}"/>, adding a new entry with a default value if it does not exist in the <paramref name="dictionary"/>.
+        /// </summary>
+        /// <param name="dictionary">The dictionary to get the ref to <typeparamref name="TValue"/> from.</param>
+        /// <param name="key">The key used for lookup.</param>
+        /// <param name="exists">Whether or not a new entry for the given key was added to the dictionary.</param>
+        /// <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+        /// <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        /// <typeparam name="TAlternateKeySpan">The <see cref="ReadOnlySpan{T}"/> type of the alternate key in the dictionary lookup.</typeparam>
+        /// <remarks>Items should not be added to or removed from the <see cref="OrderedDictionary{TKey, TValue}.SpanAlternateLookup{TAlternateKeySpan}"/> while the ref <typeparamref name="TValue"/> is in use.</remarks>
+        public static ref TValue? GetValueRefOrAddDefault<TKey, TValue, TAlternateKeySpan>(OrderedDictionary<TKey, TValue>.SpanAlternateLookup<TAlternateKeySpan> dictionary, ReadOnlySpan<TAlternateKeySpan> key, out bool exists)
+            => ref dictionary.GetValueRefOrAddDefault(key, out exists);
 
         /// <summary>
         /// Sets the count of the <see cref="List{T}"/> to the specified value.

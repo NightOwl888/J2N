@@ -171,7 +171,7 @@ namespace J2N.Collections.Generic
                 }
             }
             else if (comparer is not null && // first check for null to avoid forcing default comparer instantiation unnecessarily
-                     !ReferenceEquals(comparer, EqualityComparer<TKey>.Default)) // J2N: use ReferenceEquals to be explicit
+                     comparer != EqualityComparer<TKey>.Default)
             {
                 _comparer = comparer;
             }
@@ -254,11 +254,11 @@ namespace J2N.Collections.Generic
         /// <summary>
         /// Returns a read-only <see cref="ReadOnlyDictionary{TKey, TValue}"/> wrapper for the current collection.
         /// </summary>
-        /// <returns>An object that acts as a read-only wrapper around the current <see cref="Dictionary{TKey, TValue}"/>.</returns>
+        /// <returns>An object that acts as a read-only wrapper around the current <see cref="OrderedDictionary{TKey, TValue}"/>.</returns>
         /// <remarks>
-        /// To prevent any modifications to the <see cref="Dictionary{TKey, TValue}"/> object, expose it only through this wrapper.
+        /// To prevent any modifications to the <see cref="OrderedDictionary{TKey, TValue}"/> object, expose it only through this wrapper.
         /// A <see cref="ReadOnlyDictionary{TKey, TValue}"/> object does not expose methods that modify the collection. However,
-        /// if changes are made to the underlying <see cref="Dictionary{TKey, TValue}"/> object, the read-only collection reflects those changes.
+        /// if changes are made to the underlying <see cref="OrderedDictionary{TKey, TValue}"/> object, the read-only collection reflects those changes.
         /// <para/>
         /// This method is an O(1) operation.
         /// </remarks>
@@ -286,12 +286,12 @@ namespace J2N.Collections.Generic
             {
                 IEqualityComparer<TKey>? comparer = _comparer;
 
-                // If the key is a string, we may have substituted a non-randomized comparer during construction.
-                // If we did, fish out and return the actual comparer that had been provided.
-                if (typeof(TKey) == typeof(string) &&
-                    (comparer as NonRandomizedStringEqualityComparer)?.GetUnderlyingEqualityComparer() is IEqualityComparer<TKey> ec)
+                // J2N specific - using the implementation from Dictionary<TKey, TValue> because we may have an IInternalStringEqualityComparer type that is
+                // not a NonRandomizedStringEqualityComparer. We still need to fetch the underlying comparer in this case.
+                if (typeof(TKey) == typeof(string))
                 {
-                    return ec;
+                    Debug.Assert(_comparer is not null, "The comparer should never be null for a reference type.");
+                    return (IEqualityComparer<TKey>)InternalStringEqualityComparer.GetUnderlyingEqualityComparer((IEqualityComparer<string?>)_comparer!); // [!]: asserted above
                 }
 
                 // Otherwise, return whatever comparer we have, or the default if none was provided.
@@ -1327,7 +1327,9 @@ namespace J2N.Collections.Generic
             {
                 // Store the original randomized comparer instead of the non-randomized one.
                 Debug.Assert(_comparer is NonRandomizedStringEqualityComparer);
-                IEqualityComparer<TKey> comparer = _comparer = (IEqualityComparer<TKey>)((NonRandomizedStringEqualityComparer)_comparer!).GetUnderlyingEqualityComparer(); // [!]: asserted above
+                // J2N: We must use the internal RandomizedEqualityComparer rather than the underlying comparer here, since we have custom
+                // interfaces that must be respected for the span alternate lookup functionality.
+                IEqualityComparer<TKey> comparer = _comparer = (IEqualityComparer<TKey>)((NonRandomizedStringEqualityComparer)_comparer!).GetRandomizedEqualityComparer(); // [!]: asserted above
                 Debug.Assert(_comparer is not null);
                 Debug.Assert(_comparer is not NonRandomizedStringEqualityComparer);
 
@@ -2341,11 +2343,12 @@ namespace J2N.Collections.Generic
         /// using a <typeparamref name="TAlternateKey"/> as a key instead of a <typeparamref name="TKey"/>.
         /// </summary>
         /// <typeparam name="TAlternateKey">The alternate type of a key for performing lookups.</typeparam>
-        /// <param name="lookup">The created lookup instance when the method returns true, or a default instance that should not be used if the method returns false.</param>
-        /// <returns>true if a lookup could be created; otherwise, false.</returns>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default
+        /// instance that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
         /// <remarks>
         /// The dictionary must be using a comparer that implements <see cref="IAlternateEqualityComparer{TAlternateKey, TKey}"/> with
-        /// <typeparamref name="TAlternateKey"/> and <typeparamref name="TKey"/>. If it doesn't, the method will return false.
+        /// <typeparamref name="TAlternateKey"/> and <typeparamref name="TKey"/>. If it doesn't, the method will return <see langword="false"/>.
         /// </remarks>
         public bool TryGetAlternateLookup<TAlternateKey>(
             out AlternateLookup<TAlternateKey> lookup)
@@ -2376,7 +2379,7 @@ namespace J2N.Collections.Generic
                 Dictionary = dictionary;
             }
 
-            /// <summary>Gets the <see cref="Dictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
+            /// <summary>Gets the <see cref="OrderedDictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
             public OrderedDictionary<TKey, TValue> Dictionary { get; }
 
             /// <summary>Gets or sets the value associated with the specified alternate key.</summary>
@@ -2385,7 +2388,6 @@ namespace J2N.Collections.Generic
             /// The value associated with the specified alternate key. If the specified alternate key is not found, a get operation throws
             /// a <see cref="KeyNotFoundException"/>, and a set operation creates a new element with the specified key.
             /// </value>
-            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             /// <exception cref="KeyNotFoundException">The property is retrieved and alternate key does not exist in the collection.</exception>
             public TValue this[[AllowNull] TAlternateKey key]
             {
@@ -2591,7 +2593,7 @@ namespace J2N.Collections.Generic
 
             /// <summary>Removes the value with the specified alternate key from the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
             /// <param name="key">The alternate key of the element to remove.</param>
-            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove([AllowNull] TAlternateKey key)
             {
@@ -2621,7 +2623,7 @@ namespace J2N.Collections.Generic
             /// <param name="key">The alternate key of the element to remove.</param>
             /// <param name="actualKey">The removed key.</param>
             /// <param name="value">The removed element.</param>
-            /// <returns>true if the element is successfully found and removed; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool Remove([AllowNull] TAlternateKey key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
             {
@@ -2654,7 +2656,6 @@ namespace J2N.Collections.Generic
             /// <summary>Determines the index of a specific alternate key in the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
             /// <param name="key">The alternate key to locate.</param>
             /// <returns>The index of <paramref name="key"/> if found; otherwise, -1.</returns>
-            /// <exception cref="ArgumentNullException"><paramref name="key"/> is null.</exception>
             public int IndexOf([AllowNull] TAlternateKey key)
             {
                 // J2N: allow null keys
@@ -2762,7 +2763,7 @@ namespace J2N.Collections.Generic
             /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
             /// <param name="key">The alternate key of the element to add.</param>
             /// <param name="value">The value of the element to add.</param>
-            /// <returns>true if the key/value pair was added to the dictionary successfully; otherwise, false.</returns>
+            /// <returns><see langword="true"/> if the key/value pair was added to the dictionary successfully; otherwise, <see langword="false"/>.</returns>
             /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
             public bool TryAdd([AllowNull] TAlternateKey key, TValue value)
             {
@@ -2849,6 +2850,475 @@ namespace J2N.Collections.Generic
 #endif
 
         #endregion AlternateLookup
+
+        #region SpanAlternateLookup
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedDictionary{TKey, TValue}"/>
+        /// using a <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        /// <returns>The created lookup instance.</returns>
+        /// <exception cref="InvalidOperationException">The dictionary's comparer is not compatible with <typeparamref name="TAlternateKeySpan"/>.</exception>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateEqualityComparer{TAlternateKeySpan, TKey}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
+        /// If it doesn't, an exception will be thrown.
+        /// </remarks>
+        public SpanAlternateLookup<TAlternateKeySpan> GetSpanAlternateLookup<TAlternateKeySpan>()
+        {
+            if (!SpanAlternateLookup<TAlternateKeySpan>.IsCompatibleKey(this))
+            {
+                ThrowHelper.ThrowInvalidOperationException(ExceptionResource.InvalidOperation_IncompatibleComparer);
+            }
+
+            return new SpanAlternateLookup<TAlternateKeySpan>(this);
+        }
+
+        /// <summary>
+        /// Gets an instance of a type that may be used to perform operations on the current <see cref="OrderedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        /// <param name="lookup">The created lookup instance when the method returns <see langword="true"/>, or a default
+        /// instance that should not be used if the method returns <see langword="false"/>.</param>
+        /// <returns><see langword="true"/> if a lookup could be created; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// The dictionary must be using a comparer that implements <see cref="ISpanAlternateEqualityComparer{TAlternateKeySpan, TKey}"/> with
+        /// a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> and <typeparamref name="TKey"/>.
+        /// If it doesn't, the method will return <see langword="false"/>.
+        /// </remarks>
+        public bool TryGetSpanAlternateLookup<TAlternateKeySpan>(out SpanAlternateLookup<TAlternateKeySpan> lookup)
+        {
+            if (SpanAlternateLookup<TAlternateKeySpan>.IsCompatibleKey(this))
+            {
+                lookup = new SpanAlternateLookup<TAlternateKeySpan>(this);
+                return true;
+            }
+
+            lookup = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Provides a type that may be used to perform operations on an <see cref="OrderedDictionary{TKey, TValue}"/>
+        /// using a <see cref="ReadOnlySpan{T}"/> of type <typeparamref name="TAlternateKeySpan"/> as a key instead of a <typeparamref name="TKey"/>.
+        /// </summary>
+        /// <typeparam name="TAlternateKeySpan">The alternate <see cref="ReadOnlySpan{T}"/> type of a key for performing lookups.</typeparam>
+        public readonly struct SpanAlternateLookup<TAlternateKeySpan>
+        {
+            /// <summary>Initialize the instance. The dictionary must have already been verified to have a compatible comparer.</summary>
+            internal SpanAlternateLookup(OrderedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                Debug.Assert(IsCompatibleKey(dictionary!)); // [!]: asserted above
+                Dictionary = dictionary!; // [!]: asserted above
+            }
+
+            /// <summary>Gets the <see cref="OrderedDictionary{TKey, TValue}"/> against which this instance performs operations.</summary>
+            public OrderedDictionary<TKey, TValue> Dictionary { get; }
+
+            /// <summary>Gets or sets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get or set.</param>
+            /// <value>
+            /// The value associated with the specified alternate key. If the specified alternate key is not found, a get operation throws
+            /// a <see cref="KeyNotFoundException"/>, and a set operation creates a new element with the specified key.
+            /// </value>
+            /// <exception cref="KeyNotFoundException">The property is retrieved and alternate key does not exist in the collection.</exception>
+            public TValue this[ReadOnlySpan<TAlternateKeySpan> key]
+            {
+                get
+                {
+                    if (!TryGetValue(key, out TValue? value))
+                    {
+                        ThrowHelper.ThrowKeyNotFoundException(GetAlternateComparer(Dictionary).Create(key));
+                    }
+
+                    return value!; // [!]: checked above
+                }
+                set => GetValueRefOrAddDefault(key, out _) = value;
+            }
+
+            /// <summary>Checks whether the dictionary has a comparer compatible with <typeparamref name="TAlternateKeySpan"/>.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static bool IsCompatibleKey(OrderedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(dictionary is not null);
+                return dictionary!._comparer is ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey>; // [!]: asserted above
+            }
+
+            /// <summary>Gets the dictionary's alternate comparer. The dictionary must have already been verified as compatible.</summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey> GetAlternateComparer(OrderedDictionary<TKey, TValue> dictionary)
+            {
+                Debug.Assert(IsCompatibleKey(dictionary));
+                return Unsafe.As<ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey>>(dictionary._comparer)!;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryGetValue(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TValue value)
+            {
+                // The overload TryGetValue(TAlternateKey key, out TKey actualKey, out TValue value) is a copy of this method with one additional
+                // statement to copy the key for entry into the output parameter.
+                // Code has been intentionally duplicated for performance reasons.
+
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Return its value.
+                    Debug.Assert(dictionary._entries is not null);
+                    value = dictionary._entries![index].Value!; // [!]: asserted above
+                    return true;
+                }
+
+                value = default;
+                return false;
+            }
+
+            /// <summary>Gets the value associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key of the value to get.</param>
+            /// <param name="actualKey">
+            /// When this method returns, contains the actual key associated with the alternate key, if the key is found;
+            /// otherwise, the default value for the type of the key parameter.
+            /// </param>
+            /// <param name="value">
+            /// When this method returns, contains the value associated with the specified key, if the key is found;
+            /// otherwise, the default value for the type of the value parameter.
+            /// </param>
+            /// <returns><see langword="true"/> if an entry was found; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryGetValue(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Return its actual key and value.
+                    Debug.Assert(dictionary._entries is not null);
+                    ref Entry entry = ref dictionary._entries![index];
+                    actualKey = entry.Key;
+                    value = entry.Value!; // [!]: asserted above
+                    return true;
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Determines whether the <see cref="OrderedDictionary{TKey, TValue}"/> contains the specified alternate key.</summary>
+            /// <param name="key">The alternate key to check.</param>
+            /// <returns><see langword="true"/> if the key is in the dictionary; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool ContainsKey(ReadOnlySpan<TAlternateKeySpan> key) => IndexOf(key) >= 0;
+
+            /// <summary>Finds the entry associated with the specified alternate key.</summary>
+            /// <param name="key">The alternate key.</param>
+            /// <param name="actualKey">The actual key, if found.</param>
+            /// <returns>A reference to the value associated with the key, if found; otherwise, a null reference.</returns>
+            internal ref TValue FindValue(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+                if (dictionary._buckets != null)
+                {
+                    Debug.Assert(dictionary._entries != null, "expected entries to be != null");
+
+                    ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey> comparer = GetAlternateComparer(dictionary);
+
+                    uint hashCode = (uint)comparer.GetHashCode(key);
+                    int i = dictionary.GetBucket(hashCode);
+                    Entry[]? entries = dictionary._entries;
+                    uint collisionCount = 0;
+                    i--; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+                    do
+                    {
+                        // Should be a while loop https://github.com/dotnet/runtime/issues/9422
+                        // Test in if to drop range check for following array access
+                        if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                        {
+                            goto ReturnNotFound;
+                        }
+
+                        entry = ref entries[i];
+                        if (entry.HashCode == hashCode && comparer.Equals(key, entry.Key))
+                        {
+                            goto ReturnFound;
+                        }
+
+                        i = entry.Next;
+
+                        collisionCount++;
+                    } while (collisionCount <= (uint)entries.Length);
+
+                    // The chain of entries forms a loop; which means a concurrent update has happened.
+                    // Break out of the loop and throw, rather than looping forever.
+                    goto ConcurrentOperation;
+                }
+
+                goto ReturnNotFound;
+
+            ConcurrentOperation:
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+            ReturnFound:
+                ref TValue value = ref entry.Value;
+                actualKey = entry.Key;
+            Return:
+                return ref value;
+            ReturnNotFound:
+                value = ref Unsafe.NullRef<TValue>();
+                actualKey = default!;
+                goto Return;
+            }
+
+            /// <summary>Removes the value with the specified alternate key from the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove(ReadOnlySpan<TAlternateKeySpan> key)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Remove it.
+                    Debug.Assert(dictionary._entries is not null);
+                    dictionary.RemoveAt(index);
+
+                    return true;
+                }
+
+                return false;
+            }
+
+            /// <summary>
+            /// Removes the value with the specified alternate key from the <see cref="OrderedDictionary{TKey, TValue}"/>,
+            /// and copies the element to the value parameter.
+            /// </summary>
+            /// <param name="key">The alternate key of the element to remove.</param>
+            /// <param name="actualKey">The removed key.</param>
+            /// <param name="value">The removed element.</param>
+            /// <returns><see langword="true"/> if the element is successfully found and removed; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool Remove(ReadOnlySpan<TAlternateKeySpan> key, [MaybeNullWhen(false)] out TKey actualKey, [MaybeNullWhen(false)] out TValue value)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                // Find the key.
+                int index = IndexOf(key);
+                if (index >= 0)
+                {
+                    // It exists. Remove it.
+                    Debug.Assert(dictionary._entries is not null);
+
+                    ref Entry entry = ref dictionary._entries![index];
+                    actualKey = entry.Key;
+                    value = entry.Value!; // [!]: asserted above
+
+                    dictionary.RemoveAt(index);
+
+                    return true;
+                }
+
+                actualKey = default;
+                value = default;
+                return false;
+            }
+
+            /// <summary>Determines the index of a specific alternate key in the <see cref="OrderedDictionary{TKey, TValue}"/>.</summary>
+            /// <param name="key">The alternate key to locate.</param>
+            /// <returns>The index of <paramref name="key"/> if found; otherwise, -1.</returns>
+            public int IndexOf(ReadOnlySpan<TAlternateKeySpan> key)
+            {
+                // J2N: allow null keys
+                //ThrowIfNull(key, ExceptionArgument.key);
+
+                uint _ = 0;
+                return IndexOf(key, ref _, ref _);
+            }
+
+            private int IndexOf(ReadOnlySpan<TAlternateKeySpan> key, ref uint outHashCode, ref uint outCollisionCount)
+            {
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+
+                // J2N: allow null keys
+                //Debug.Assert(key is not null, "Key nullness should have been validated by caller.");
+
+                uint hashCode;
+                uint collisionCount = 0;
+                ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey> comparer = GetAlternateComparer(dictionary);
+
+                if (dictionary._buckets is null)
+                {
+                    hashCode = (uint)comparer.GetHashCode(key);
+                    collisionCount = 0;
+                    goto ReturnNotFound;
+                }
+
+                int i = -1;
+                ref Entry entry = ref Unsafe.NullRef<Entry>();
+
+                Entry[]? entries = dictionary._entries;
+                Debug.Assert(entries is not null, "expected entries to be is not null");
+
+                Debug.Assert(comparer is not null);
+                hashCode = (uint)comparer!.GetHashCode(key); // [!]: asserted above
+                i = dictionary.GetBucket(hashCode) - 1; // Value in _buckets is 1-based; subtract 1 from i. We do it here so it fuses with the following conditional.
+
+                do
+                {
+                    // Test in if to drop range check for following array access
+                    if ((uint)i >= (uint)entries!.Length) // [!]: asserted above
+                    {
+                        goto ReturnNotFound;
+                    }
+
+                    entry = ref entries[i];
+                    if (entry.HashCode == hashCode &&
+                        comparer!.Equals(key, entry.Key))
+                    {
+                        goto Return;
+                    }
+
+                    i = entry.Next;
+
+                    collisionCount++;
+                } while (collisionCount <= (uint)entries.Length);
+
+                // The chain of entries forms a loop; which means a concurrent update has happened.
+                // Break out of the loop and throw, rather than looping forever.
+                goto ConcurrentOperation;
+
+            ReturnNotFound:
+                i = -1;
+                outCollisionCount = collisionCount;
+                goto Return;
+
+            ConcurrentOperation:
+                // We examined more entries than are actually in the list, which means there's a cycle
+                // that's caused by erroneous concurrent use.
+                ThrowHelper.ThrowInvalidOperationException_ConcurrentOperationsNotSupported();
+
+            Return:
+                outHashCode = hashCode;
+                return i;
+            }
+
+            /// <summary>Attempts to add the specified key and value to the dictionary.</summary>
+            /// <param name="key">The alternate key of the element to add.</param>
+            /// <param name="value">The value of the element to add.</param>
+            /// <returns><see langword="true"/> if the key/value pair was added to the dictionary successfully; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentNullException"><paramref name="key"/> is <see langword="null"/>.</exception>
+            public bool TryAdd(ReadOnlySpan<TAlternateKeySpan> key, TValue value)
+            {
+                ref TValue? slot = ref GetValueRefOrAddDefault(key, out bool exists);
+                if (!exists)
+                {
+                    slot = value;
+                    return true;
+                }
+
+                return false;
+            }
+
+            /// <inheritdoc cref="CollectionMarshal.GetValueRefOrAddDefault{TKey, TValue}(OrderedDictionary{TKey, TValue}, TKey, out bool)"/>
+            internal ref TValue? GetValueRefOrAddDefault(ReadOnlySpan<TAlternateKeySpan> key, out bool exists)
+            {
+                // NOTE: this method is a mirror of GetValueRefOrAddDefault above. Keep it in sync.
+
+                OrderedDictionary<TKey, TValue> dictionary = Dictionary;
+                ISpanAlternateEqualityComparer<TAlternateKeySpan, TKey> comparer = GetAlternateComparer(dictionary);
+
+                // Search for the key in the dictionary.
+                uint hashCode = 0, collisionCount = 0;
+                int i = IndexOf(key, ref hashCode, ref collisionCount);
+
+                if (dictionary._buckets == null)
+                {
+                    dictionary.EnsureBucketsAndEntriesInitialized(0);
+                }
+                Debug.Assert(dictionary._buckets != null);
+
+                Entry[]? entries = dictionary._entries;
+                Debug.Assert(entries != null, "expected entries to be non-null");
+
+                // The key exists, get the value
+                if (i >= 0)
+                {
+                    exists = true;
+                    //keyIndex = i; // J2N: Return this? We already return the value, so no reason to find the entry except to get the key
+                    return ref entries![i].Value!; // [!]: asserted above
+                }
+
+                // The key doesn't exist. If a non-negative index was provided, that is the desired index at which to insert,
+                // which should have already been validated by the caller. If negative, we're appending.
+                exists = false;
+                int index = dictionary._count;
+
+                // Grow capacity if necessary to accommodate the extra entry.
+                if (entries!.Length == dictionary._count) // [!]: asserted above
+                {
+                    dictionary.Resize(HashHelpers.ExpandPrime(entries.Length));
+                    entries = dictionary._entries;
+                }
+
+                // The _entries array is ordered, so we need to insert the new entry at the specified index. That means
+                // not only shifting up all elements at that index and higher, but also updating the buckets and chains
+                // to record the newly updated indices.
+                for (i = dictionary._count - 1; i >= index; --i)
+                {
+                    entries![i + 1] = entries[i]; // [!]: asserted above
+                    dictionary.UpdateBucketIndex(i, shiftAmount: 1);
+                }
+
+                TKey? actualKey = comparer.Create(key);
+
+                // Store the new key/value pair.
+                ref Entry entry = ref entries![index]; // [!]: asserted above
+                entry.HashCode = hashCode;
+                entry.Key = actualKey; // allow null keys
+                entry.Value = default; // allow null values
+                dictionary.PushEntryIntoBucket(ref entry, index);
+                dictionary._count++;
+                dictionary._version++;
+
+                dictionary.RehashIfNecessary(collisionCount, entries);
+
+                //keyIndex = index;
+                //Debug.Assert(0 <= keyIndex && keyIndex < dictionary._count);
+
+                return ref entry.Value!;
+            }
+        }
+
+        #endregion SpanAlternateLookup
 
         #region Structural Equality
 

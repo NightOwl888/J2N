@@ -3572,7 +3572,7 @@ namespace J2N.Collections.Generic
             // J2N: Add metadata to the serialization blob so we can rehydrate the WrappedStringComparer properly
             if (typeof(T) == typeof(string) && StringComparerDescriptor.TryDescribe(Comparer, out StringComparerDescriptor descriptor))
             {
-                info.AddValue(descriptor);
+                info.AddValue(ref descriptor);
             }
 
             info.AddValue(VersionName, version);
@@ -3610,7 +3610,7 @@ namespace J2N.Collections.Generic
             comparer = (IComparer<T>)siInfo.GetValue(ComparerName, typeof(IComparer<T>))!;
 
             // J2N:Try to wrap the comparer with WrappedStringComparer
-            if (typeof(T) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(siInfo, out IComparer<string?>? stringComparer))
+            if (typeof(T) == typeof(string) && StringComparerMetadataSerializer.TryGetKnownStringComparer(comparer, siInfo, out IComparer<string?>? stringComparer))
             {
                 comparer = (IComparer<T>)stringComparer;
             }

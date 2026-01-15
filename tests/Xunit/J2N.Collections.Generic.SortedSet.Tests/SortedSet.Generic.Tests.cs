@@ -3,10 +3,13 @@
 // See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
+using J2N.TestUtilities;
 using J2N.TestUtilities.Xunit;
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Serialization.Formatters.Binary;
 using Xunit;
 using SCG = System.Collections.Generic;
 
@@ -782,5 +785,70 @@ namespace J2N.Collections.Tests
         }
 
         #endregion
+
+        #region Serialization
+
+#if FEATURE_SERIALIZABLE
+        [ConditionalFact(typeof(PlatformDetection), nameof(PlatformDetection.IsBinaryFormatterSupported))]
+        public void ComparerSerialization()
+        {
+            // J2N: We don't care about the internal type names as long as we get back the BCL comparer type.
+            // Our deserialization works differently than the BCL so we can implement both J2N and BCL alternate
+            // comparer interfaces. We never rely on the internal BCL types for alternate lookup.
+
+            // Strings switch between randomized and non-randomized comparers,
+            // however this should never be observable externally.
+            TestComparerSerialization(Comparer<string>.Default /*, "System.OrdinalComparer"*/);
+
+            // OrdinalCaseSensitiveComparer is internal and (de)serializes as OrdinalComparer
+            TestComparerSerialization(StringComparer.Ordinal /*, "System.OrdinalComparer"*/);
+
+            // OrdinalIgnoreCaseComparer is internal and (de)serializes as OrdinalComparer
+            TestComparerSerialization(StringComparer.OrdinalIgnoreCase /*, "System.OrdinalComparer"*/);
+            TestComparerSerialization(StringComparer.CurrentCulture);
+            TestComparerSerialization(StringComparer.CurrentCultureIgnoreCase);
+            TestComparerSerialization(StringComparer.InvariantCulture);
+            TestComparerSerialization(StringComparer.InvariantCultureIgnoreCase);
+
+            // Check other types while here, IEquatable valuetype, nullable valuetype, and non IEquatable object
+            TestComparerSerialization(Comparer<int>.Default);
+            TestComparerSerialization(Comparer<int?>.Default);
+            TestComparerSerialization(Comparer<object>.Default);
+
+            static void TestComparerSerialization<TCompared>(SCG.IComparer<TCompared> equalityComparer, string internalTypeName = null)
+            {
+                var bf = new BinaryFormatter();
+                var s = new MemoryStream();
+
+                var set = new SortedSet<TCompared>(equalityComparer);
+
+                Assert.Same(equalityComparer, set.Comparer);
+
+                bf.Serialize(s, set);
+                s.Position = 0;
+                set = (SortedSet<TCompared>)bf.Deserialize(s);
+
+                // J2N: this assertion fails on .NET <= 8, due to different internal implementations. Skipping it for now.
+                // if (equalityComparer.Equals(EqualityComparer<string>.Default))
+                // {
+                //     // EqualityComparer<string>.Default is mapped to StringEqualityComparer, but serialized as GenericEqualityComparer<string>
+                //     Assert.Equal("System.Collections.Generic.GenericEqualityComparer`1[System.String]", set.Comparer.GetType().ToString());
+                //     return;
+                // }
+
+                if (internalTypeName == null)
+                {
+                    Assert.IsType(equalityComparer.GetType(), set.Comparer);
+                }
+                else
+                {
+                    Assert.Equal(internalTypeName, set.Comparer.GetType().ToString());
+                }
+
+                Assert.True(equalityComparer.Equals(set.Comparer));
+            }
+        }
+#endif
+        #endregion Serialization
     }
 }

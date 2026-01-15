@@ -4,14 +4,15 @@
 
 using J2N.Collections.Generic;
 using J2N.Collections.Tests;
+using J2N.TestUtilities;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Collections;
-using SCG = System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using Xunit;
-using J2N.TestUtilities.Xunit;
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Concurrent.Tests
 {
@@ -412,53 +413,7 @@ namespace J2N.Collections.Concurrent.Tests
             return dict;
         }
 
-#if FEATURE_SERIALIZABLE
-        [Fact]
-        public void ComparerSerialization()
-        {
-            // Strings switch between randomized and non-randomized comparers,
-            // however this should never be observable externally.
-            TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<string>.Default, "System.OrdinalComparer");
-            // OrdinalCaseSensitiveComparer is internal and (de)serializes as OrdinalComparer
-            TestComparerSerialization(StringComparer.Ordinal, "System.OrdinalComparer");
-            // OrdinalIgnoreCaseComparer is internal and (de)serializes as OrdinalComparer
-            TestComparerSerialization(StringComparer.OrdinalIgnoreCase, "System.OrdinalComparer");
-            TestComparerSerialization(StringComparer.CurrentCulture);
-            TestComparerSerialization(StringComparer.CurrentCultureIgnoreCase);
-            TestComparerSerialization(StringComparer.InvariantCulture);
-            TestComparerSerialization(StringComparer.InvariantCultureIgnoreCase);
-
-            // Check other types while here, IEquatable valuetype, nullable valuetype, and non IEquatable object
-            TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<int>.Default);
-            TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<int?>.Default);
-            TestComparerSerialization(J2N.Collections.Generic.EqualityComparer<object>.Default);
-        }
-
-        private static void TestComparerSerialization<T>(SCG.IEqualityComparer<T> equalityComparer, string internalTypeName = null)
-        {
-            var bf = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
-            var s = new MemoryStream();
-
-            var dict = new Dictionary<T, T>(equalityComparer);
-
-            Assert.Same(equalityComparer, dict.EqualityComparer);
-
-            bf.Serialize(s, dict);
-            s.Position = 0;
-            dict = (Dictionary<T, T>)bf.Deserialize(s);
-
-            if (internalTypeName == null)
-            {
-                Assert.IsType(equalityComparer.GetType(), dict.EqualityComparer);
-            }
-            else
-            {
-                Assert.Equal(internalTypeName, dict.EqualityComparer.GetType().ToString());
-            }
-
-            Assert.True(equalityComparer.Equals(dict.EqualityComparer));
-        }
-#endif
+        // J2N: Removed ComparerSerialization() because LurchTable<TKey, TValue> is not marked as [Serializable]
 
         private sealed class LurchTableSubclass<TKey, TValue> : LurchTable<TKey, TValue>
         {

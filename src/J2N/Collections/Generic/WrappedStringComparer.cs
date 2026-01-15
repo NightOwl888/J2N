@@ -141,8 +141,43 @@ namespace J2N.Collections.Generic
                 return WrappedAroundStringComparerOrdinalIgnoreCase;
             }
 
+            if (ReferenceEquals(comparer, StringComparer.InvariantCulture))
+            {
+                return CultureAwareComparer.InvariantCulture;
+            }
+
+            if (ReferenceEquals(comparer, StringComparer.InvariantCultureIgnoreCase))
+            {
+                return CultureAwareComparer.InvariantCultureIgnoreCase;
+            }
+
+            // NOTE: It is possible for users to create custom StringComparer instances that are invariant and in this
+            // case we need to wrap the user's comparer instance rather than using the static one.
+            if (StringComparer.InvariantCulture.Equals(comparer))
+            {
+                return new CultureAwareComparer((IComparer<string?>)comparer);
+            }
+
+            // NOTE: It is possible for users to create custom StringComparer instances that are invariant and in this
+            // case we need to wrap the user's comparer instance rather than using the static one.
+            if (StringComparer.InvariantCultureIgnoreCase.Equals(comparer))
+            {
+                return new CultureAwareComparer((IComparer<string?>)comparer);
+            }
+
+            if (StringComparer.CurrentCulture.Equals(comparer))
+            {
+                return new CultureAwareComparer((IComparer<string?>)comparer);
+            }
+
+            if (StringComparer.CurrentCultureIgnoreCase.Equals(comparer))
+            {
+                return new CultureAwareComparer((IComparer<string?>)comparer);
+            }
+
+            // If the culture changed since the comparer was created, detect it in a more robust way.
             if (StringComparerDescriptor.TryDescribe(comparer, out StringComparerDescriptor descriptor) &&
-                TryGetStringComparer(descriptor, out IComparer<string?>? stringComparer))
+                TryGetStringComparer(comparer, in descriptor, out IComparer<string?>? stringComparer))
             {
                 return stringComparer;
             }
@@ -150,7 +185,7 @@ namespace J2N.Collections.Generic
             return null;
         }
 
-        public static bool TryGetStringComparer(in StringComparerDescriptor descriptor, [MaybeNullWhen(false)] out IComparer<string?>? comparer)
+        public static bool TryGetStringComparer(object rawComparer, in StringComparerDescriptor descriptor, [MaybeNullWhen(false)] out IComparer<string?>? comparer)
         {
             if (descriptor.Type == StringComparerDescriptor.Classification.Ordinal)
             {
@@ -176,7 +211,7 @@ namespace J2N.Collections.Generic
                 return true;
             }
 
-            if (descriptor.TryCreateStringComparer(out StringComparer? stringComparer))
+            if (descriptor.TryCreateStringComparer(rawComparer, out StringComparer? stringComparer))
             {
                 // Otherwise, this is culture-aware
                 if (descriptor.Type == StringComparerDescriptor.Classification.CurrentCultureIgnoreCase)
