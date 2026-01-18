@@ -3374,7 +3374,8 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// Any duplicate elements in <paramref name="other"/> are ignored.
         /// <para/>
-        /// If the other parameter is a <see cref="SortedSet{T}"/> collection with the same equality comparer as
+        /// If the other parameter is a <see cref="SortedSet{T}"/>, <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>,
+        /// <see cref="IDistinctSortedCollection{T}"/> or <see cref="ISortedCollection{T}"/> with the same equality comparer as
         /// the current <see cref="SortedSet{T}"/> object, this method is an <c>O(n log m)</c> operation. Otherwise,
         /// this method is an <c>O(n log m) + O(n log n)</c> operation, where <c>n</c> is the number of elements
         /// in <paramref name="other"/> and <c>m</c> is <see cref="Count"/>.
@@ -3396,34 +3397,84 @@ namespace J2N.Collections.Generic
                 return;
             }
 
-            SortedSet<T>? asSorted = other as SortedSet<T>;
+            if (other is IDistinctSortedCollection<T> distinctSortedCollection)
+            {
+                if (ComparerEquals(Comparer, distinctSortedCollection!.Comparer))
+                {
+                    SymmetricExceptWithSameComparer(distinctSortedCollection);
+                    return;
+                }
+            }
+            else if (other is ISortedCollection<T> sortedCollection)
+            {
+                if (ComparerEquals(Comparer, sortedCollection!.Comparer))
+                {
+                    SymmetricExceptWithSameComparer(sortedCollection);
+                    return;
+                }
+            }
 
-            if (asSorted != null && HasEqualComparer(asSorted))
-            {
-                SymmetricExceptWithSameComparer(asSorted);
-            }
-            else
-            {
-                int length;
-                T[] elements = EnumerableHelpers.ToArray(other, out length);
-                Array.Sort(elements, 0, length, Comparer);
-                SymmetricExceptWithSameComparer(elements, length);
-            }
+            int length;
+            T[] elements = EnumerableHelpers.ToArray(other, out length);
+            Array.Sort(elements, 0, length, Comparer);
+            SymmetricExceptWithSameComparer(elements, length);
         }
 
-        private void SymmetricExceptWithSameComparer(SortedSet<T> other)
+        internal virtual void SymmetricExceptWithSameComparer(IDistinctSortedCollection<T> other)
         {
             Debug.Assert(other != null);
-            Debug.Assert(HasEqualComparer(other!));
+            Debug.Assert(ComparerEquals(Comparer, other!.Comparer));
+
+            if (other!.Count == 0) // [!] asserted above
+            {
+                return;
+            }
 
             foreach (T item in other!)
             {
-                bool result = Contains(item) ? Remove(item) : Add(item);
-                Debug.Assert(result);
+                SymmetricExceptWithValue(item);
             }
         }
 
-        private void SymmetricExceptWithSameComparer(T[] other, int count)
+        internal virtual void SymmetricExceptWithSameComparer(ISortedCollection<T> other)
+        {
+            Debug.Assert(other != null);
+            Debug.Assert(ComparerEquals(Comparer, other!.Comparer));
+
+            if (other!.Count == 0) // [!] asserted above
+            {
+                return;
+            }
+
+            using var enumerator = other.GetEnumerator();
+            bool hasNext = enumerator.MoveNext();
+            Debug.Assert(hasNext);
+
+            T current = enumerator.Current;
+            while (true)
+            {
+                T next = default!;
+
+                // Skip duplicates
+                while (hasNext = enumerator.MoveNext())
+                {
+                    next = enumerator.Current;
+                    if (comparer.Compare(next, current) != 0)
+                        break;
+                }
+
+                // Process the current unique value
+                SymmetricExceptWithValue(current);
+
+                // If no more items, we are done.
+                if (!hasNext)
+                    break;
+
+                current = next;
+            }
+        }
+
+        internal virtual void SymmetricExceptWithSameComparer(T[] other, int count)
         {
             Debug.Assert(other != null);
             Debug.Assert(count >= 0 && count <= other!.Length);
@@ -3441,10 +3492,15 @@ namespace J2N.Collections.Generic
                 if (i >= count)
                     break;
                 T current = other[i];
-                bool result = Contains(current) ? Remove(current) : Add(current);
-                Debug.Assert(result);
+                SymmetricExceptWithValue(current);
                 previous = current;
             }
+        }
+
+        internal virtual void SymmetricExceptWithValue(T item)
+        {
+            bool result = Contains(item) ? Remove(item) : Add(item);
+            Debug.Assert(result);
         }
 
         /// <summary>

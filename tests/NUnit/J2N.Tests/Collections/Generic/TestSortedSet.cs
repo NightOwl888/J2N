@@ -1149,6 +1149,116 @@ namespace J2N.Collections.Generic
             CollectionAssert.AreEqual(new[] { 1, 3, 5, 6 }, root);
         }
 
+
+
+        [Test]
+        public void Test_SymmetricExceptWith_IDistinctSortedCollection_SameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4, 5 };
+
+            DistinctSortedCollection<int> other = new()
+            {
+                2, 4, 6
+            };
+
+            left.SymmetricExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 1, 3, 5, 6 }, left);
+        }
+
+        [Test]
+        public void Test_SymmetricExceptWith_SortedNonDistinct_SameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            SortedCollection<int> other = new()
+            {
+                2, 2, 3, 3, 5
+            };
+
+            left.SymmetricExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 1, 4, 5 }, left);
+        }
+
+        [Test]
+        public void Test_SymmetricExceptWith_BclSortedSet_SameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+            SCG.SortedSet<int> other = new() { 2, 5 };
+
+            left.SymmetricExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 1, 3, 4, 5 }, left);
+        }
+
+        [Test]
+        public void Test_SymmetricExceptWith_UnsortedEnumerable_Fallback()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            int[] other = { 4, 2, 2, 10 };
+
+            left.SymmetricExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 1, 3, 10 }, left);
+        }
+
+        [Test]
+        public void Test_SymmetricExceptWith_SortedDifferentComparer_Fallback()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            SortedSet<string> other = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "B", "c", "d"
+            };
+
+            left.SymmetricExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { "B", "a", "b", "d" }, left);
+        }
+
+        [Test]
+        public void Test_SymmetricExceptWith_EmptyOther_NoChange()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            left.SymmetricExceptWith(Array.Empty<int>());
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, left);
+        }
+
+        [Test]
+        public void Test_SymmetricExceptWith_Self_Clears()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            left.SymmetricExceptWith(left);
+
+            CollectionAssert.IsEmpty(left);
+        }
+
+        [Test]
+        public void Test_SymmetricExceptWith_TreeSubSet()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedSet<int> other = new() { 3, 6 };
+
+            subset.SymmetricExceptWith(other);
+
+            CollectionAssert.AreEqual(new[] { 2, 4, 5 }, subset);
+            CollectionAssert.AreEqual(new[] { 1, 2, 4, 5, 6 }, root);
+        }
+
+
+
+
         #endregion Loading and Comparing
 
         /// <summary>

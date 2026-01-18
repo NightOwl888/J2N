@@ -151,7 +151,23 @@ namespace J2N.Collections.Generic
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal override bool IsWithinRange(T item)
             {
-                return !IsTooLow(item) && !IsTooHigh(item);
+                // Check whether too low
+                if (_lBoundActive)
+                {
+                    int c = comparer.Compare(item!, _min!);
+                    if (c < 0 || (c == 0 && !_lBoundInclusive))
+                        return false;
+                }
+
+                // Check whether too high
+                if (_uBoundActive)
+                {
+                    int c = comparer.Compare(item!, _max!);
+                    if (c > 0 || (c == 0 && !_uBoundInclusive))
+                        return false;
+                }
+
+                return true;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -478,6 +494,51 @@ namespace J2N.Collections.Generic
                 Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
 #endif
             }
+
+            internal override void SymmetricExceptWithValue(T item)
+            {
+                // J2N: We perform the range check here to bypass the range checks in
+                // Add/Remove/FindNode. This relies on TreeSubSet invariants and must
+                // stay up to date with the underlying tree semantics.
+
+                // We only check the range once
+                if (!IsWithinRange(item))
+                {
+                    return;
+                }
+
+                /////////////////////////////////////
+                // Contains (FindNode) (without range check)
+                /////////////////////////////////////
+
+                VersionCheck();
+#if DEBUG
+                Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+                if (base.FindNode(item) != null)
+                {
+                    /////////////////////////////////////
+                    // Remove (without range check)
+                    /////////////////////////////////////
+                    _underlying.DoRemove(item, out _);
+                    VersionCheck();
+#if DEBUG
+                    Debug.Assert(versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+                }
+                else
+                {
+                    /////////////////////////////////////
+                    // Add (without range check)
+                    /////////////////////////////////////
+                    _underlying.AddIfNotPresent(item);
+                    VersionCheck();
+#if DEBUG
+                    Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
+#endif
+                }
+            }
+
 
             internal override bool DoTryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
             {
