@@ -165,7 +165,7 @@ namespace J2N.Collections.Generic
             {
                 if (_uBoundActive)
                 {
-                    int c = Comparer.Compare(item!, _max!);
+                    int c = comparer.Compare(item!, _max!);
                     if (c > 0 || (c == 0 && !upperBoundInclusive))
                         return true;
                 }
@@ -183,7 +183,7 @@ namespace J2N.Collections.Generic
             {
                 if (_lBoundActive)
                 {
-                    int c = Comparer.Compare(item!, _min!);
+                    int c = comparer.Compare(item!, _min!);
                     if (c < 0 || (c == 0 && !lowerBoundInclusive))
                         return true;
                 }
@@ -199,7 +199,7 @@ namespace J2N.Collections.Generic
 
                     while (current != null)
                     {
-                        int comp = _lBoundActive ? Comparer.Compare(_min!, current.Item!) : -1;
+                        int comp = _lBoundActive ? comparer.Compare(_min!, current.Item!) : -1;
                         if (comp > 0 || (comp == 0 && !_lBoundInclusive))
                         {
                             current = current.Right;
@@ -233,7 +233,7 @@ namespace J2N.Collections.Generic
 
                     while (current != null)
                     {
-                        int comp = _uBoundActive ? Comparer.Compare(_max!, current.Item!) : 1;
+                        int comp = _uBoundActive ? comparer.Compare(_max!, current.Item!) : 1;
                         if (comp < 0 || (comp == 0 && !_uBoundInclusive))
                         {
                             current = current.Left;
@@ -337,11 +337,11 @@ namespace J2N.Collections.Generic
                     {
                         return false;
                     }
-                    if (current.Left != null && (!_lBoundActive || Comparer.Compare(_min!, current.Item!) < 0))
+                    if (current.Left != null && (!_lBoundActive || comparer.Compare(_min!, current.Item!) < 0))
                     {
                         processQueue.Enqueue(current.Left);
                     }
-                    if (current.Right != null && (!_uBoundActive || Comparer.Compare(_max!, current.Item!) > 0))
+                    if (current.Right != null && (!_uBoundActive || comparer.Compare(_max!, current.Item!) > 0))
                     {
                         processQueue.Enqueue(current.Right);
                     }
@@ -371,7 +371,7 @@ namespace J2N.Collections.Generic
                 foreach (T i in this)
                 {
                     count++;
-                    if (Comparer.Compare(item, i) == 0)
+                    if (comparer.Compare(item, i) == 0)
                         return count;
                 }
 #if DEBUG
@@ -498,7 +498,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = Comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item, current.Item);
 
                     if (cmp > 0)
                     {
@@ -541,7 +541,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = Comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item, current.Item);
 
                     if (cmp < 0)
                     {
@@ -577,7 +577,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = Comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item, current.Item);
 
                     if (cmp < 0)
                     {
@@ -612,7 +612,7 @@ namespace J2N.Collections.Generic
 
                 while (current != null)
                 {
-                    int cmp = Comparer.Compare(item, current.Item);
+                    int cmp = comparer.Compare(item, current.Item);
 
                     if (cmp > 0)
                     {
