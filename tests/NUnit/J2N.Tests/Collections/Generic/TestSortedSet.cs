@@ -1259,6 +1259,479 @@ namespace J2N.Collections.Generic
 
 
 
+
+        [Test] // Regression for BCL issue (GetViewBetween Throws)
+        public void Test_IsSubsetOf_DoesNotThrow_WhenOtherSubsetBoundsDoNotOverlap()
+        {
+            var root = new SortedSet<int> { 10, 20, 30, 40, 50 };
+            var thisSubset = root.GetViewBetween(20, 40);
+
+            var otherRoot = new SortedSet<int> { 1, 2, 3, 4, 5 };
+            var otherSubset = otherRoot.GetViewBetween(2, 4);
+
+            Assert.DoesNotThrow(() =>
+            {
+                bool result = thisSubset.IsSubsetOf(otherSubset);
+                Assert.False(result);
+            });
+        }
+
+        [Test] // Regression for BCL issue (GetViewBetween Throws)
+        public void Test_IsSubsetOf_SubsetOfSubset_WithOutOfRangeMinMax()
+        {
+            var root = new SortedSet<int> { 1, 2, 3, 4, 5, 6 };
+            var subset1 = root.GetViewBetween(2, 5);   // [2..5]
+            var subset2 = subset1.GetViewBetween(3, 4); // [3..4]
+
+            var otherRoot = new SortedSet<int> { 0, 1, 2, 3 };
+            var otherSubset = otherRoot.GetViewBetween(0, 2); // [0..2]
+
+            bool result = subset2.IsSubsetOf(otherSubset);
+
+            Assert.False(result);
+        }
+
+        [Test] // Regression for BCL issue (GetViewBetween Throws)
+        public void Test_IsSubsetOf_SameComparer_NoOverlap_NoException()
+        {
+            var a = new SortedSet<int> { 5, 6, 7 };
+            var b = new SortedSet<int> { 8, 9, 10, 11 };
+
+            bool result = a.IsSubsetOf(b);
+
+            Assert.False(result);
+        }
+
+
+
+        [Test]
+        public void Test_IsSubsetOf_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+            SortedSet<int> right = new() { 1, 2, 3, 4 };
+
+            Assert.True(left.IsSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+            SCG.SortedSet<int> right = new() { 1, 2, 3, 4 };
+
+            Assert.True(left.IsSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_J2NSortedDictionaryKeys()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            SortedDictionary<int, string> dict = new()
+            {
+                [1] = "a",
+                [2] = "b",
+                [3] = "c",
+                [4] = "d"
+            };
+
+            Assert.True(left.IsSubsetOf(dict.Keys));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_IDistinctSortedCollection()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            DistinctSortedCollection<int> other = new()
+            {
+                1, 2, 3, 4
+            };
+
+            Assert.True(left.IsSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_SortedNonDistinct_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                1, 2, 2, 3, 4, 4
+            };
+
+            Assert.True(left.IsSubsetOf(nonDistinct));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_UnsortedEnumerable_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            int[] other = { 4, 2, 2, 10 };
+
+            Assert.True(left.IsSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_EmptyLeft_ReturnsTrue()
+        {
+            SortedSet<int> left = new();
+            int[] other = { 1, 2, 3 };
+
+            Assert.True(left.IsSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_LeftLargerThanOther_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SortedSet<int> right = new() { 1, 2 };
+
+            Assert.False(left.IsSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_Self_ReturnsTrue()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            Assert.True(left.IsSubsetOf(left));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_TreeSubSet_InBounds()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedSet<int> other = new() { 2, 3, 4, 5 };
+
+            Assert.True(subset.IsSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_TreeSubSet_SortedNonDistinct()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 3, 4, 4, 5
+            };
+
+            Assert.True(subset.IsSubsetOf(nonDistinct));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_HashSet_StringComparerOrdinal()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b"
+            };
+
+            HashSet<string> right = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            Assert.True(left.IsSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_HashSet_StringComparerMismatch_FallsBack()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a"
+            };
+
+            HashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A"
+            };
+
+            Assert.False(left.IsSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_OrderedHashSet_StringComparer()
+        {
+            SortedSet<string> left = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "a", "b"
+            };
+
+            OrderedHashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "B", "C"
+            };
+
+            Assert.True(left.IsSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_BclHashSet_StringComparer()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b"
+            };
+
+            SCG.HashSet<string> right = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            Assert.True(left.IsSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSubsetOf_HashSet_NonString_NoComparerOptimization()
+        {
+            SortedSet<int> left = new()
+            {
+                1, 2
+            };
+
+            HashSet<int> right = new()
+            {
+                1, 2, 3
+            };
+
+            Assert.True(left.IsSubsetOf(right)); // fallback path
+        }
+
+
+
+        [Test]
+        public void Test_IsProperSubsetOf_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+            SortedSet<int> right = new() { 1, 2, 3, 4 };
+
+            Assert.True(left.IsProperSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+            SCG.SortedSet<int> right = new() { 1, 2, 3, 4 };
+
+            Assert.True(left.IsProperSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_J2NSortedDictionaryKeys()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            SortedDictionary<int, string> dict = new()
+            {
+                [1] = "a",
+                [2] = "b",
+                [3] = "c",
+                [4] = "d"
+            };
+
+            Assert.True(left.IsProperSubsetOf(dict.Keys));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_IDistinctSortedCollection()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            DistinctSortedCollection<int> other = new()
+            {
+                1, 2, 3, 4
+            };
+
+            Assert.True(left.IsProperSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_SortedNonDistinct_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                1, 2, 2, 3, 4, 4
+            };
+
+            Assert.True(left.IsProperSubsetOf(nonDistinct));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_UnsortedEnumerable_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            int[] other = { 4, 2, 2, 10 };
+
+            Assert.True(left.IsProperSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_EmptyLeft_ReturnsTrue()
+        {
+            SortedSet<int> left = new();
+            SortedSet<int> right = new() { 1 };
+
+            Assert.True(left.IsProperSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_EqualSets_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SortedSet<int> right = new() { 1, 2, 3 };
+
+            Assert.False(left.IsProperSubsetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_Self_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            Assert.False(left.IsProperSubsetOf(left));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_TreeSubSet_InBounds_ReturnsTrue()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedSet<int> other = new() { 1, 2, 3, 4, 5, 6 };
+
+            Assert.True(subset.IsProperSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_TreeSubSet_SortedNonDistinct_ReturnsTrue()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
+            SortedSet<int> subset = root.GetViewBetween(2, 5);
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                1, 2, 2, 3, 4, 4, 5, 6
+            };
+
+            Assert.True(subset.IsProperSubsetOf(nonDistinct));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_HashSet_StringComparerOrdinalIgnoreCase_ProperSubSet_ReturnsTrue()
+        {
+            SortedSet<string> left = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "a", "b"
+            };
+
+            HashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "B", "C"
+            };
+
+            Assert.True(left.IsProperSubsetOf(right));
+        }
+
+        [Test]
+        public void IsProperSubsetOf_HashSet_SameStringComparer_EqualSets_ReturnsFalse()
+        {
+            SortedSet<string> set = new SortedSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "a", "b", "c"
+            };
+
+            HashSet<string> other = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "B", "C"
+            };
+
+            Assert.IsFalse(set.IsProperSubsetOf(other));
+        }
+
+        [Test]
+        public void Test_IsProperSubsetOf_OrderedHashSet_StringComparerOrdinalIgnoreCase_ProperSubSet_ReturnsTrue()
+        {
+            SortedSet<string> left = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "a", "b"
+            };
+
+            OrderedHashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "B", "C"
+            };
+
+            Assert.True(left.IsProperSubsetOf(right));
+        }
+
+        [Test]
+        public void IsProperSubsetOf_OrderedHashSet_SameStringComparer_EqualSets_ReturnsFalse()
+        {
+            SortedSet<string> set = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "a", "b", "c"
+            };
+
+            OrderedHashSet<string> other = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "B", "C"
+            };
+
+            Assert.IsFalse(set.IsProperSubsetOf(other));
+        }
+
+        [Test]
+        public void IsProperSubsetOf_BclSortedSet_SameStringComparer_ProperSubset_ReturnsTrue()
+        {
+            StringComparer comparer = StringComparer.Ordinal;
+
+            SortedSet<string> set = new SortedSet<string>(comparer)
+            {
+                "a", "b"
+            };
+
+            SCG.SortedSet<string> other = new(comparer)
+            {
+                "a", "b", "c"
+            };
+
+            Assert.IsTrue(set.IsProperSubsetOf(other));
+        }
+
+        [Test]
+        public void IsProperSubsetOf_BclSortedSet_View_SameStringComparer_UsesFallback()
+        {
+            StringComparer comparer = StringComparer.Ordinal;
+
+            SCG.SortedSet<string> root = new(comparer)
+            {
+                "a", "b", "c", "d"
+            };
+
+            SCG.SortedSet<string> view = root.GetViewBetween("b", "c");
+
+            SortedSet<string> set = new SortedSet<string>(comparer)
+            {
+                "b"
+            };
+
+            Assert.IsTrue(set.IsProperSubsetOf(view));
+        }
+
+
+
         #endregion Loading and Comparing
 
         /// <summary>

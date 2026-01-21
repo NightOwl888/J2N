@@ -6,6 +6,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -13,6 +14,8 @@ using System.Runtime.CompilerServices;
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
+
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
@@ -537,6 +540,36 @@ namespace J2N.Collections.Generic
                     Debug.Assert(this.versionUpToDate() && root == _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive));
 #endif
                 }
+            }
+
+            internal override bool IsSubsetOfNavigableCollectionWithSameComparer(INavigableCollection<T> navigableCollection)
+            {
+                if (navigableCollection is TreeSubSet)
+                    return IsSubsetOfCollectionWithSameComparer(navigableCollection);
+
+                // J2N: We cannot make any assumptions about the whether the inclusivity of the other collection is the same as this one,
+                // so we override it. The Contains() call will weed out the bounds if they are different.
+                INavigableCollection<T> prunedOther = navigableCollection.GetViewBetween(_min, lowerValueInclusive: true, _max, upperValueInclusive: true);
+                foreach (T item in this)
+                {
+                    if (!prunedOther.Contains(item))
+                        return false;
+                }
+                return true;
+            }
+
+            internal override bool IsSubsetOfBclSortedSetWithSameComparer(SCG.SortedSet<T> bclSortedSet)
+            {
+                if (bclSortedSet.GetType() == typeof(SCG.SortedSet<T>))
+                    return IsSubsetOfCollectionWithSameComparer(bclSortedSet);
+
+                SCG.SortedSet<T> prunedOther = bclSortedSet.GetViewBetween(_min!, _max!);
+                foreach (T item in this)
+                {
+                    if (!prunedOther.Contains(item))
+                        return false;
+                }
+                return true;
             }
 
 
