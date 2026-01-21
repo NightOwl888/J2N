@@ -206,6 +206,10 @@ namespace J2N.Collections.Generic
             if (double.IsNaN(x) && double.IsNaN(y))
                 return true;
 
+            // If only one is NaN, they're not equal
+            if (double.IsNaN(x) || double.IsNaN(y))
+                return false;
+
             // Deal with +0.0 and -0.0
             long d1 = BitConversion.DoubleToRawInt64Bits(x); // NaN already dealt with, so we can use "raw" here
             long d2 = BitConversion.DoubleToRawInt64Bits(y);
@@ -284,6 +288,10 @@ namespace J2N.Collections.Generic
 
             if (float.IsNaN(x) && float.IsNaN(y))
                 return true;
+
+            // If only one is NaN, they're not equal
+            if (float.IsNaN(x) || float.IsNaN(y))
+                return false;
 
             // Deal with +0.0 and -0.0
             int f1 = BitConversion.SingleToRawInt32Bits(x); // NaN already dealt with, so we can use "raw" here

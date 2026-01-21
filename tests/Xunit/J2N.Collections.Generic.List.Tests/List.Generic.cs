@@ -80,4 +80,22 @@ namespace J2N.Collections.Tests
 
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
     }
+
+    public class List_Generic_Tests_float : List_Generic_Tests<float>
+    {
+        protected override float CreateT(int seed)
+        {
+            Random rand = new Random(seed);
+            return (float)rand.NextDouble();
+        }
+    }
+
+    public class List_Generic_Tests_double : List_Generic_Tests<double>
+    {
+        protected override double CreateT(int seed)
+        {
+            Random rand = new Random(seed);
+            return rand.NextDouble();
+        }
+    }
 }

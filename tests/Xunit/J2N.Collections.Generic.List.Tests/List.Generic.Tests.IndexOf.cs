@@ -252,5 +252,292 @@ namespace J2N.Collections.Tests
         }
 
         #endregion
+
+        #region Float and Double NaN and Signed Zero Tests
+
+        // These tests ensure that float and double IndexOf/LastIndexOf methods match Java's behavior
+        // regarding NaN and signed zero comparisons.
+
+        /// <summary>
+        /// Tests IndexOf with float NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_FloatNaN()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            // Test with different NaN bit patterns
+            float nanDefault = float.NaN; // 0x7FC00000
+            float nanVariant1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+            float nanVariant2 = BitConversion.Int32BitsToSingle(unchecked((int)0xFFC00001));
+
+            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)nanDefault, (T)(object)3.0f };
+
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.IndexOf(nanDefault));
+            Assert.Equal(1, list.IndexOf(nanVariant1));
+            Assert.Equal(1, list.IndexOf(nanVariant2));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<float> { nanVariant1, 1.0f, nanDefault, 3.0f, nanVariant2 };
+            Assert.Equal(0, list2.IndexOf(nanDefault));
+            Assert.Equal(0, list2.IndexOf(nanVariant1));
+            Assert.Equal(0, list2.IndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 1));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 2, 3));
+        }
+
+        /// <summary>
+        /// Tests IndexOf with double NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_DoubleNaN()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            // Test with different NaN bit patterns
+            double nanDefault = double.NaN; // 0x7FF8000000000000
+            double nanVariant1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001);
+            double nanVariant2 = BitConversion.Int64BitsToDouble(unchecked((long)0xFFF8000000000001));
+
+            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)nanDefault, (T)(object)3.0d };
+
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.IndexOf(nanDefault));
+            Assert.Equal(1, list.IndexOf(nanVariant1));
+            Assert.Equal(1, list.IndexOf(nanVariant2));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0));
+
+            Assert.Equal(1, list.IndexOf(nanDefault, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant1, 0, 3));
+            Assert.Equal(1, list.IndexOf(nanVariant2, 0, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<double> { nanVariant1, 1.0d, nanDefault, 3.0d, nanVariant2 };
+            Assert.Equal(0, list2.IndexOf(nanDefault));
+            Assert.Equal(0, list2.IndexOf(nanVariant1));
+            Assert.Equal(0, list2.IndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 1));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 1));
+
+            Assert.Equal(2, list2.IndexOf(nanDefault, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant1, 2, 3));
+            Assert.Equal(2, list2.IndexOf(nanVariant2, 2, 3));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with float NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_FloatNaN()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            // Test with different NaN bit patterns
+            float nanDefault = float.NaN; // 0x7FC00000
+            float nanVariant1 = BitConversion.Int32BitsToSingle(0x7FC00001);
+            float nanVariant2 = BitConversion.Int32BitsToSingle(unchecked((int)0xFFC00001));
+
+            List<float> list = (List<float>)(object)new List<T> { (T)(object)1.0f, (T)(object)nanDefault, (T)(object)3.0f };
+
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.LastIndexOf(nanDefault));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<float> { nanVariant1, 1.0f, nanDefault, 3.0f, nanVariant2 };
+            Assert.Equal(4, list2.LastIndexOf(nanDefault));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant1));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.LastIndexOf(nanDefault, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(0, list2.LastIndexOf(nanDefault, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant1, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant2, 1, 2));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with double NaN values. In Java/J2N, NaN == NaN, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_DoubleNaN()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            // Test with different NaN bit patterns
+            double nanDefault = double.NaN; // 0x7FF8000000000000
+            double nanVariant1 = BitConversion.Int64BitsToDouble(0x7FF8000000000001);
+            double nanVariant2 = BitConversion.Int64BitsToDouble(unchecked((long)0xFFF8000000000001));
+
+            List<double> list = (List<double>)(object)new List<T> { (T)(object)1.0d, (T)(object)nanDefault, (T)(object)3.0d };
+
+            // NaN should be found at index 1 regardless of NaN bit pattern
+            Assert.Equal(1, list.LastIndexOf(nanDefault));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(1, list.LastIndexOf(nanDefault, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant1, 2, 3));
+            Assert.Equal(1, list.LastIndexOf(nanVariant2, 2, 3));
+
+            // NaN at different positions with multiple NaN bit patterns
+            var list2 = new List<double> { nanVariant1, 1.0d, nanDefault, 3.0d, nanVariant2 };
+            Assert.Equal(4, list2.LastIndexOf(nanDefault));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant1));
+            Assert.Equal(4, list2.LastIndexOf(nanVariant2));
+
+            Assert.Equal(2, list2.LastIndexOf(nanDefault, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant1, 2));
+            Assert.Equal(2, list2.LastIndexOf(nanVariant2, 2));
+
+            Assert.Equal(0, list2.LastIndexOf(nanDefault, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant1, 1, 2));
+            Assert.Equal(0, list2.LastIndexOf(nanVariant2, 1, 2));
+        }
+
+        /// <summary>
+        /// Tests IndexOf with float signed zero. In Java/J2N, +0.0f != -0.0f, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_FloatSignedZero()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            float positiveZero = 0.0f;
+            float negativeZero = -0.0f;
+
+            List<float> list = (List<float>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0f,
+                (T)(object)negativeZero,
+                (T)(object)3.0f
+            };
+
+            // +0.0f should be found at index 0, not at index 2
+            Assert.Equal(0, list.IndexOf(positiveZero));
+            Assert.Equal(2, list.IndexOf(negativeZero));
+        }
+
+        /// <summary>
+        /// Tests IndexOf with double signed zero. In Java/J2N, +0.0d != -0.0d, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void IndexOf_DoubleSignedZero()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            double positiveZero = 0.0d;
+            double negativeZero = -0.0d;
+
+            List<double> list = (List<double>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0d,
+                (T)(object)negativeZero,
+                (T)(object)3.0d
+            };
+
+            // +0.0d should be found at index 0, not at index 2
+            Assert.Equal(0, list.IndexOf(positiveZero));
+            Assert.Equal(2, list.IndexOf(negativeZero));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with float signed zero. In Java/J2N, +0.0f != -0.0f, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_FloatSignedZero()
+        {
+            if (typeof(T) != typeof(float))
+                return;
+
+            float positiveZero = 0.0f;
+            float negativeZero = -0.0f;
+
+            List<float> list = (List<float>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0f,
+                (T)(object)negativeZero,
+                (T)(object)positiveZero,
+                (T)(object)3.0f
+            };
+
+            // Searching for +0.0f should return the last occurrence at index 3
+            // Searching for -0.0f should return the occurrence at index 2
+            Assert.Equal(3, list.LastIndexOf(positiveZero));
+            Assert.Equal(2, list.LastIndexOf(negativeZero));
+        }
+
+        /// <summary>
+        /// Tests LastIndexOf with double signed zero. In Java/J2N, +0.0d != -0.0d, unlike .NET's BCL.
+        /// </summary>
+        [Fact]
+        public void LastIndexOf_DoubleSignedZero()
+        {
+            if (typeof(T) != typeof(double))
+                return;
+
+            double positiveZero = 0.0d;
+            double negativeZero = -0.0d;
+
+            List<double> list = (List<double>)(object)new List<T>
+            {
+                (T)(object)positiveZero,
+                (T)(object)1.0d,
+                (T)(object)negativeZero,
+                (T)(object)positiveZero,
+                (T)(object)3.0d
+            };
+
+            // Searching for +0.0d should return the last occurrence at index 3
+            // Searching for -0.0d should return the occurrence at index 2
+            Assert.Equal(3, list.LastIndexOf(positiveZero));
+            Assert.Equal(2, list.LastIndexOf(negativeZero));
+        }
+
+        #endregion
     }
 }
