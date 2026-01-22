@@ -4064,9 +4064,13 @@ namespace J2N.Collections.Generic
         /// <remarks>
         /// This method ignores the order of elements and any duplicate elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by other is a <see cref="SortedSet{T}"/> collection with the same
-        /// equality comparer as the current <see cref="SortedSet{T}"/> object, this method is an <c>O(log n)</c>
-        /// operation. Otherwise, this method is an <c>O(n + m)</c> operation, where <c>n</c> is the number of
+        /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/>,
+        /// <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>, or <see cref="IDistinctSortedCollection{T}"/>
+        /// with the same equality comparer as the current <see cref="SortedSet{T}"/> object, this method is an O(log <c>n</c>)
+        /// operation. If the collection represented by <paramref name="other"/> is a <see cref="HashSet{T}"/>,
+        /// <see cref="OrderedHashSet{T}"/>, or <see cref="SCG.HashSet{T}"/> with the same equality comparer as the
+        /// current <see cref="SortedSet{T}"/> object, this method is an O(n) operation.
+        /// Otherwise, this method is an O(<c>n</c> + <c>m</c>) operation, where <c>n</c> is the number of
         /// elements in other and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
         public bool SetEquals(IEnumerable<T> other)
@@ -4074,28 +4078,137 @@ namespace J2N.Collections.Generic
             if (other is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
-            SortedSet<T>? asSorted = other as SortedSet<T>;
-            if (asSorted != null && HasEqualComparer(asSorted))
+            // A set is equal to itself.
+            if (other == this)
+                return true;
+
+            IDistinctSortedCollection<T>? distinctSortedCollection;
+            if (other is not SCG.SortedSet<T> otherSortedSet)
+                distinctSortedCollection = other as IDistinctSortedCollection<T>;
+            else
+                distinctSortedCollection = new BclSortedSetAdapter(otherSortedSet);
+
+            if (distinctSortedCollection != null)
             {
-                IEnumerator<T> mine = GetEnumerator();
-                IEnumerator<T> theirs = asSorted.GetEnumerator();
-                bool mineEnded = !mine.MoveNext();
-                bool theirsEnded = !theirs.MoveNext();
-                while (!mineEnded && !theirsEnded)
+                IComparer<T>? comparer;
+                if (ComparerEquals(comparer = Comparer, distinctSortedCollection.Comparer))
                 {
-                    if (Comparer.Compare(mine.Current, theirs.Current) != 0)
+                    IEnumerator<T> mine = GetEnumerator();
+                    IEnumerator<T> theirs = distinctSortedCollection.GetEnumerator();
+                    bool mineEnded = !mine.MoveNext();
+                    bool theirsEnded = !theirs.MoveNext();
+                    while (!mineEnded && !theirsEnded)
                     {
-                        return false;
+                        if (comparer.Compare(mine.Current, theirs.Current) != 0)
+                        {
+                            return false;
+                        }
+                        mineEnded = !mine.MoveNext();
+                        theirsEnded = !theirs.MoveNext();
                     }
-                    mineEnded = !mine.MoveNext();
-                    theirsEnded = !theirs.MoveNext();
+                    return mineEnded && theirsEnded;
                 }
-                return mineEnded && theirsEnded;
+            }
+            else if (other is ISortedCollection<T> sortedCollection)
+            {
+                if (ComparerEquals(Comparer, sortedCollection.Comparer))
+                    return SetEqualsSortedNonDistinctCollectionWithSameComparer(sortedCollection);
+            }
+            else if (other is HashSet<T> hashSet)
+            {
+                if (ComparerEquals(Comparer, hashSet.EqualityComparer))
+                    return SetEqualsDistinctCollectionWithSameComparer(hashSet);
+            }
+            else if (other is OrderedHashSet<T> orderedHashSet)
+            {
+                if (ComparerEquals(Comparer, orderedHashSet.EqualityComparer))
+                    return SetEqualsDistinctCollectionWithSameComparer(orderedHashSet);
+            }
+            else if (other is SCG.HashSet<T> bclHashSet)
+            {
+                if (ComparerEquals(Comparer, bclHashSet.Comparer))
+                    return SetEqualsDistinctCollectionWithSameComparer(bclHashSet);
             }
 
             // Worst case: I mark every element in my set and see if I've counted all of them. O(size of the other collection).
-            ElementCount result = CheckUniqueAndUnfoundElements(other, true);
+            ElementCount result = CheckUniqueAndUnfoundElements(other, returnIfUnfound: true);
             return result.UniqueCount == Count && result.UnfoundCount == 0;
+        }
+
+        private bool SetEqualsSortedNonDistinctCollectionWithSameComparer(ISortedCollection<T> other)
+        {
+            Debug.Assert(other != null);
+
+            // Early bounds check:
+            // If this set is empty, other must be empty.
+            if (Count == 0)
+            {
+                return other!.Count == 0; // [!] asserted above
+            }
+
+            IEnumerator<T> mine = GetEnumerator();
+            IEnumerator<T> theirs = other!.GetEnumerator(); // [!] asserted above
+
+            bool mineEnded = !mine.MoveNext();
+            bool theirsEnded = !theirs.MoveNext();
+
+            Debug.Assert(!mineEnded); // Count > 0 guarantees this
+
+            int matched = 0;
+            bool hasPrevOther = false;
+            T prevOther = default!;
+
+            while (!mineEnded && !theirsEnded)
+            {
+                T currentOther = theirs.Current;
+
+                // Collapse duplicates in 'other' using the comparer
+                if (hasPrevOther && comparer.Compare(prevOther, currentOther) == 0)
+                {
+                    theirsEnded = !theirs.MoveNext();
+                    continue;
+                }
+
+                int cmp = comparer.Compare(mine.Current, currentOther);
+                if (cmp != 0)
+                    return false;
+
+                matched++;
+
+                mineEnded = !mine.MoveNext();
+
+                prevOther = currentOther;
+                hasPrevOther = true;
+                theirsEnded = !theirs.MoveNext();
+            }
+
+            // If we still have items in 'other', they must all be duplicates
+            while (!theirsEnded)
+            {
+                if (!hasPrevOther || comparer.Compare(prevOther, theirs.Current) != 0)
+                    return false;
+
+                theirsEnded = !theirs.MoveNext();
+            }
+
+            // Must have consumed all of 'mine' and matched exactly Count elements
+            return mineEnded && matched == Count;
+        }
+
+        private bool SetEqualsDistinctCollectionWithSameComparer(ICollection<T> collection)
+        {
+            Debug.Assert(collection != null);
+
+            if (Count != collection!.Count) // [!] asserted above
+                return false;
+
+            foreach (T item in this)
+            {
+                if (!collection.Contains(item))
+                    return false;
+            }
+
+            return true;
         }
 
         /// <summary>

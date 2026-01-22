@@ -2039,6 +2039,187 @@ namespace J2N.Collections.Generic
         }
 
 
+        [Test]
+        public void Test_SetEquals_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SortedSet<int> right = new() { 1, 2, 3 };
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SCG.SortedSet<int> right = new() { 1, 2, 3 };
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_IDistinctSortedCollection()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            DistinctSortedCollection<int> right = new()
+            {
+                1, 2, 3
+            };
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_SortedNonDistinct_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            SortedCollection<int> right = new()
+            {
+                1, 1, 2, 2, 3, 3
+            };
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_SortedNonDistinct_ExtraElement_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            SortedCollection<int> right = new()
+            {
+                1, 2, 3, 4, 4
+            };
+
+            Assert.False(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_HashSet_StringComparerOrdinal()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            HashSet<string> right = new(StringComparer.Ordinal)
+            {
+                "c", "b", "a"
+            };
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_HashSet_StringComparerMismatch_ReturnsFalse()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a"
+            };
+
+            HashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A"
+            };
+
+            Assert.False(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_OrderedHashSet_StringComparerOrdinal()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            OrderedHashSet<string> right = new(StringComparer.Ordinal)
+            {
+                "c", "b", "a"
+            };
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_OrderedHashSet_StringComparerMismatch_ReturnsFalse()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a"
+            };
+
+            OrderedHashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A"
+            };
+
+            Assert.False(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_BclHashSet_StringComparerOrdinal()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            SCG.HashSet<string> right = new(StringComparer.Ordinal)
+            {
+                "c", "b", "a"
+            };
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_BclHashSet_StringComparerMismatch_ReturnsFalse()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a"
+            };
+
+            SCG.HashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A"
+            };
+
+            Assert.False(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_Self_ReturnsTrue()
+        {
+            SortedSet<int> set = new() { 1, 2, 3 };
+
+            Assert.True(set.SetEquals(set));
+        }
+
+        [Test]
+        public void Test_SetEquals_BothEmpty_ReturnsTrue()
+        {
+            SortedSet<int> left = new();
+            SortedSet<int> right = new();
+
+            Assert.True(left.SetEquals(right));
+        }
+
+        [Test]
+        public void Test_SetEquals_EmptyAndNonEmpty_ReturnsFalse()
+        {
+            SortedSet<int> left = new();
+            int[] right = { 1 };
+
+            Assert.False(left.SetEquals(right));
+        }
+
+
+
 
         #endregion Loading and Comparing
 
