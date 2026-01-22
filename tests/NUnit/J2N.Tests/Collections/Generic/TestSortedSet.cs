@@ -812,6 +812,24 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
+        public void Test_UnionWith_J2NSortedDictionaryKeys_ThisAsView()
+        {
+            SortedSet<int> left = new() { 1, 3, 5, 7, 9 };
+            SortedSet<int> leftView = left.GetViewBetween(1, 4);
+
+            SortedDictionary<int, string> dict = new()
+            {
+                [3] = "c",
+                [2] = "b",
+            };
+
+            leftView.UnionWith(dict.Keys);
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, leftView);
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 5, 7, 9 }, left);
+        }
+
+        [Test]
         public void Test_UnionWith_J2NSortedDictionaryValues_Deduplicates()
         {
             SortedSet<int> left = new() { 5 };
