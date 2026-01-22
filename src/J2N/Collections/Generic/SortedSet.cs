@@ -4215,8 +4215,15 @@ namespace J2N.Collections.Generic
         /// Determines whether the current <see cref="SortedSet{T}"/> object and a specified collection share common elements.
         /// </summary>
         /// <param name="other">The collection to compare to the current <see cref="SortedSet{T}"/> object.</param>
-        /// <returns><c>true</c> if the <see cref="SortedSet{T}"/> object and <paramref name="other"/> share at
-        /// least one common element; otherwise, <c>false</c>.</returns>
+        /// <returns><see langword="true"/> if the <see cref="SortedSet{T}"/> object and <paramref name="other"/> share at
+        /// least one common element; otherwise, <see langword="false"/>.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="other"/> is <see langword="null"/>.</exception>
+        /// <remarks>
+        /// Any duplicate elements in <paramref name="other"/> are ignored.
+        /// <para/>
+        /// This method is an O(<c>n</c> log <c>m</c>) operation, wheer <c>m</c> is <see cref="Count"/> and <c>n</c> is the
+        /// number of elements in <paramref name="other"/>.
+        /// </remarks>
         public bool Overlaps(IEnumerable<T> other)
         {
             if (other is null)
@@ -4225,13 +4232,28 @@ namespace J2N.Collections.Generic
             if (Count == 0)
                 return false;
 
-            if (other is ICollection<T> c && c.Count == 0)
+            if (other is ICollection<T> genericCollection && genericCollection.Count == 0)
+                return false;
+            else if (other is ICollection c && c.Count == 0)
                 return false;
 
-            SortedSet<T>? asSorted = other as SortedSet<T>;
-            if (asSorted != null && HasEqualComparer(asSorted) && (comparer.Compare(Min!, asSorted.Max!) > 0 || comparer.Compare(Max!, asSorted.Min!) < 0))
+            // J2N: Note that views (whether this or other) are up to date by this point because of the calls to Count above,
+            // so no special-case handling is required.
+            if (other is INavigableCollection<T> navigableCollection)
             {
-                return false;
+                if (ComparerEquals(Comparer, navigableCollection.Comparer) &&
+                    (comparer.Compare(Min!, navigableCollection.Max!) > 0 || comparer.Compare(Max!, navigableCollection.Min!) < 0))
+                {
+                    return false;
+                }
+            }
+            else if (other is SCG.SortedSet<T> bclSortedSet)
+            {
+                if (ComparerEquals(Comparer, bclSortedSet.Comparer) &&
+                    (comparer.Compare(Min!, bclSortedSet.Max!) > 0 || comparer.Compare(Max!, bclSortedSet.Min!) < 0))
+                {
+                    return false;
+                }
             }
 
             foreach (T item in other)

@@ -2220,6 +2220,258 @@ namespace J2N.Collections.Generic
 
 
 
+        [Test]
+        public void Test_Overlaps_J2NSortedSet_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SortedSet<int> right = new() { 3, 4, 5 };
+
+            Assert.True(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_J2NSortedSet_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SortedSet<int> right = new() { 4, 5, 6 };
+
+            Assert.False(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_BclSortedSet_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SCG.SortedSet<int> right = new() { 3, 4 };
+
+            Assert.True(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_BclSortedSet_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SCG.SortedSet<int> right = new() { 4, 5 };
+
+            Assert.False(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_SortedDictionaryKeys_WithOverlap_ReturnsTrue()
+        {
+            SortedDictionary<int, string> dict = new()
+            {
+                [1] = "a",
+                [2] = "b",
+                [3] = "c"
+            };
+
+            SortedSet<int> set = new() { 3, 4, 5 };
+
+            Assert.True(set.Overlaps(dict.Keys));
+        }
+
+        [Test]
+        public void Test_Overlaps_SortedDictionaryKeys_NoOverlap_ReturnsFalse()
+        {
+            SortedDictionary<int, string> dict = new()
+            {
+                [4] = "a",
+                [5] = "b"
+            };
+
+            SortedSet<int> set = new() { 1, 2, 3 };
+
+            Assert.False(set.Overlaps(dict.Keys));
+        }
+
+
+        [Test]
+        public void Test_Overlaps_SortedDictionary_WithOverlap_ReturnsTrue()
+        {
+            SortedDictionary<int, string> dict = new()
+            {
+                [1] = "a",
+                [2] = "b"
+            };
+
+            // J2N: KeyValuePair doesn't implement IComparable<T> so we have to shoehorn the SortedDictionary<TKey, TValue> comparer
+            // into this set for them to match. This is just proof that Overlaps() can be called inside of SortedDictionary<TKey, TValue>
+            // which may be used as a future optimization.
+            SortedSet<KeyValuePair<int, string>> set = new(new SortedDictionary<int, string>.KeyValuePairComparer(dict.Comparer))
+            {
+                new(2, "b"),
+                new(3, "c")
+            };
+
+            Assert.True(set.Overlaps(dict));
+        }
+
+        [Test]
+        public void Test_Overlaps_SortedDictionary_NoOverlap_ReturnsFalse()
+        {
+            SortedDictionary<int, string> dict = new()
+            {
+                [1] = "a"
+            };
+
+            // J2N: KeyValuePair doesn't implement IComparable<T> so we have to shoehorn the SortedDictionary<TKey, TValue> comparer
+            // into this set for them to match. This is just proof that Overlaps() can be called inside of SortedDictionary<TKey, TValue>
+            // which may be used as a future optimization.
+            SortedSet<KeyValuePair<int, string>> set = new(new SortedDictionary<int, string>.KeyValuePairComparer(dict.Comparer))
+            {
+                new(2, "b")
+            };
+
+            Assert.False(set.Overlaps(dict));
+        }
+
+        [Test]
+        public void Test_Overlaps_ViewAsThis_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+            SortedSet<int> view = root.GetViewBetween(2, 4);
+
+            SortedSet<int> other = new() { 4, 6 };
+
+            Assert.True(view.Overlaps(other));
+        }
+
+        [Test]
+        public void Test_Overlaps_ViewAsThis_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+            SortedSet<int> view = root.GetViewBetween(2, 3);
+
+            SortedSet<int> other = new() { 4, 5 };
+
+            Assert.False(view.Overlaps(other));
+        }
+
+        [Test]
+        public void Test_Overlaps_ViewAsOther_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+            SortedSet<int> view = root.GetViewBetween(3, 5);
+
+            SortedSet<int> set = new() { 2, 3 };
+
+            Assert.True(set.Overlaps(view));
+        }
+
+        [Test]
+        public void Test_Overlaps_ViewAsOther_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+            SortedSet<int> view = root.GetViewBetween(4, 5);
+
+            SortedSet<int> set = new() { 1, 2 };
+
+            Assert.False(set.Overlaps(view));
+        }
+
+        [Test]
+        public void Test_Overlaps_BothViews_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> left = root.GetViewBetween(2, 4);
+            SortedSet<int> right = root.GetViewBetween(4, 5);
+
+            Assert.True(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_BothViews_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> left = root.GetViewBetween(1, 2);
+            SortedSet<int> right = root.GetViewBetween(4, 5);
+
+            Assert.False(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_HashSet_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            HashSet<int> right = new() { 3, 4 };
+
+            Assert.True(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_HashSet_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            HashSet<int> right = new() { 4, 5 };
+
+            Assert.False(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_OrderedHashSet_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            OrderedHashSet<int> right = new() { 3, 4 };
+
+            Assert.True(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_OrderedHashSet_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            OrderedHashSet<int> right = new() { 4, 5 };
+
+            Assert.False(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_BclHashSet_WithOverlap_ReturnsTrue()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SCG.HashSet<int> right = new() { 3, 4 };
+
+            Assert.True(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_BclHashSet_NoOverlap_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SCG.HashSet<int> right = new() { 4, 5 };
+
+            Assert.False(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_EmptyThis_ReturnsFalse()
+        {
+            SortedSet<int> left = new();
+            SortedSet<int> right = new() { 1 };
+
+            Assert.False(left.Overlaps(right));
+        }
+
+        [Test]
+        public void Test_Overlaps_EmptyOther_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2 };
+            int[] other = Array.Empty<int>();
+
+            Assert.False(left.Overlaps(other));
+        }
+
+        [Test]
+        public void Test_Overlaps_Self_ReturnsTrue()
+        {
+            SortedSet<int> set = new() { 1, 2, 3 };
+
+            Assert.True(set.Overlaps(set));
+        }
+
 
         #endregion Loading and Comparing
 
