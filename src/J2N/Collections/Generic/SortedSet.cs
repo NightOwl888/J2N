@@ -3295,15 +3295,29 @@ namespace J2N.Collections.Generic
         /// that fall within the range of the current set. Otherwise, this method is an O(<c>m</c> log <c>n</c>) operation,
         /// where <c>m</c> is the number of elements in the <paramref name="other"/> parameter.
         /// </remarks>
-        public void ExceptWith(IEnumerable<T> other) => DoExceptWith(other);
-
-        internal virtual void DoExceptWith(IEnumerable<T> other)
+        public void ExceptWith(IEnumerable<T> other)
         {
             if (other is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
-            if (count == 0)
+            // J2N: Important - We call the Count property here on purpose rather than the count field
+            // because it will do a version check and update the count if we are a TreeSubSet view.
+            // We also call other.Count to ensure any other views are also up to date for the Min and Max
+            // calls below.
+            if (Count == 0)
                 return;
+
+            // Other is already the empty set; return.
+            if (other is ICollection<T> genericCollection)
+            {
+                if (genericCollection.Count == 0)
+                    return;
+            }
+            else if (other is ICollection c)
+            {
+                if (c.Count == 0)
+                    return;
+            }
 
             if (other == this)
             {
@@ -3359,7 +3373,7 @@ namespace J2N.Collections.Generic
                     {
                         T? min = Min;
                         T? max = Max;
-                        foreach (T item in other)
+                        foreach (T item in bclSortedSet)
                         {
                             if (comparer.Compare(item!, min!) < 0)
                                 continue;
