@@ -3762,15 +3762,6 @@ namespace J2N.Collections.Generic
                     return IsSubsetOfCollectionWithSameComparer(distinctSortedCollection);
                 }
             }
-            else if (other is ISortedCollection<T> sortedCollection)
-            {
-                if (ComparerEquals(Comparer, sortedCollection.Comparer))
-                {
-                    // Non-distinct, so we cannot optimize on count here
-
-                    return IsSubsetOfCollectionWithSameComparer(sortedCollection);
-                }
-            }
             else if (other is HashSet<T> hashSet)
             {
                 if (ComparerEquals(Comparer, hashSet.EqualityComparer))
@@ -4029,15 +4020,6 @@ namespace J2N.Collections.Generic
                         return false;
 
                     return IsSupersetOfEnumerableWithSameComparer(distinctSortedCollection);
-                }
-            }
-            else if (other is ISortedCollection<T> sortedCollection)
-            {
-                if (ComparerEquals(Comparer, sortedCollection.Comparer))
-                {
-                    // Non-distinct, so we cannot optimize on count here
-
-                    return IsSupersetOfEnumerableWithSameComparer(sortedCollection);
                 }
             }
             else if (other is HashSet<T> hashSet)
