@@ -4113,6 +4113,16 @@ namespace J2N.Collections.Generic
             if (other is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
+            // Early bounds check:
+            // If this set is empty, other must be empty.
+            if (Count == 0)
+            {
+                if (other is ICollection<T> genericCollection)
+                    return genericCollection!.Count == 0; // [!] asserted above
+                else if (other is ICollection c)
+                    return c!.Count == 0;
+            }
+
             // A set is equal to itself.
             if (other == this)
                 return true;
@@ -4173,13 +4183,6 @@ namespace J2N.Collections.Generic
         private bool SetEqualsSortedNonDistinctCollectionWithSameComparer(ISortedCollection<T> other)
         {
             Debug.Assert(other != null);
-
-            // Early bounds check:
-            // If this set is empty, other must be empty.
-            if (Count == 0)
-            {
-                return other!.Count == 0; // [!] asserted above
-            }
 
             IEnumerator<T> mine = GetEnumerator();
             IEnumerator<T> theirs = other!.GetEnumerator(); // [!] asserted above
