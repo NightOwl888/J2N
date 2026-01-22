@@ -12,7 +12,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
         [DebuggerDisplay("Count = {Count}")]
-        internal class SubList : List<T>
+        internal class SubList : List<T>, ICollectionView
         {
             private readonly List<T> origin;
             internal List<T> parent; // Internal for testing
@@ -31,6 +31,12 @@ namespace J2N.Collections.Generic
                 offset = startIndex + parent.Offset;
                 size =  count;
             }
+
+            #region ICollectionView Members
+
+            bool ICollectionView.IsView => true;
+
+            #endregion ICollectionView Members
 
             internal override int Offset => offset;
 

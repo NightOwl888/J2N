@@ -18,7 +18,7 @@ namespace J2N.Collections.Generic
     /// <typeparam name="T"></typeparam>
     [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
     [DebuggerDisplay("Count = {Count}")]
-    internal class SubList<T> : IList<T>, IStructuralEquatable, IStructuralFormattable
+    internal class SubList<T> : IList<T>, IStructuralEquatable, IStructuralFormattable, ICollectionView
     {
         internal IList<T> parent; // Internal for testing
         private readonly int parentOffset; // Tracks the diff between current offset and parent's offset (for calls to parent)
@@ -194,6 +194,12 @@ namespace J2N.Collections.Generic
         }
 
         #endregion  IList<T> Members
+
+        #region ICollectionView Members
+
+        bool ICollectionView.IsView => true;
+
+        #endregion ICollectionView Members
 
         #region Structural Equality
 

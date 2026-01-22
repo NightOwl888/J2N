@@ -27,7 +27,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         [DebuggerTypeProxy(typeof(ICollectionDebugView<>))]
         [DebuggerDisplay("Count = {Count}")]
-        internal sealed class TreeSubSet : SortedSet<T>
+        internal sealed class TreeSubSet : SortedSet<T>, ICollectionView
 #if FEATURE_SERIALIZABLE
             , ISerializable, IDeserializationCallback
 #endif
@@ -48,7 +48,11 @@ namespace J2N.Collections.Generic
 
             // used to see if the count is out of date
 
+            #region ICollectionView Members
 
+            bool ICollectionView.IsView => true;
+
+            #endregion
 
             #region Properties for Alternate Lookup
 

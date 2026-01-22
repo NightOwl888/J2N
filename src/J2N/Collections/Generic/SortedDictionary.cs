@@ -58,7 +58,7 @@ namespace J2N.Collections.Generic
 #if FEATURE_SERIALIZABLE
     [Serializable]
 #endif
-    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, INavigableCollection<KeyValuePair<TKey, TValue>>,
+    public class SortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary, INavigableCollection<KeyValuePair<TKey, TValue>>, ICollectionView,
 #if FEATURE_IREADONLYCOLLECTIONS
         IReadOnlyDictionary<TKey, TValue>,
 #endif
@@ -1399,7 +1399,7 @@ namespace J2N.Collections.Generic
 
         #endregion SpanAlternateLookup
 
-        #region ISortedCollection<KeyValuePair<TKey, TValue>> members
+        #region INavigableCollection<KeyValuePair<TKey, TValue>> members
 
         IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => ((KeyValuePairComparer)_set.Comparer); // J2N TODO: This should be KeyComparer once we merge with the alternate lookup functionality
 
@@ -1425,7 +1425,13 @@ namespace J2N.Collections.Generic
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetCeiling(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
             => _set.TryGetCeiling(item, out result);
 
-        #endregion ISortedCollection<KeyValuePair<TKey, TValue>> members
+        #endregion INavigableCollection<KeyValuePair<TKey, TValue>> members
+
+        #region ICollectionView Members
+
+        bool ICollectionView.IsView => _set is ICollectionView view && view.IsView;
+
+        #endregion
 
         #region GetView Members
 
@@ -1832,7 +1838,7 @@ namespace J2N.Collections.Generic
         [DebuggerTypeProxy(typeof(DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
         [SuppressMessage("Design", "CA1034:Nested types should not be visible", Justification = "Collection design requires this to be public")]
-        public sealed class KeyCollection : ICollection<TKey>, ICollection, INavigableCollection<TKey>
+        public sealed class KeyCollection : ICollection<TKey>, ICollection, INavigableCollection<TKey>, ICollectionView
 #if FEATURE_IREADONLYCOLLECTIONS
             , IReadOnlyCollection<TKey>
 #endif
@@ -2052,6 +2058,12 @@ namespace J2N.Collections.Generic
             IComparer<TKey> ISortedCollection<TKey>.Comparer => _dictionary.Comparer;
 
             #endregion INavigableSet<T> members
+
+            #region ICollectionView Members
+
+            bool ICollectionView.IsView => _dictionary._set is ICollectionView view && view.IsView;
+
+            #endregion ICollectionView Members
 
             /// <summary>
             /// Enumerates the elements of a <see cref="KeyCollection"/>.
