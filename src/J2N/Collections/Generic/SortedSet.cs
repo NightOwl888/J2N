@@ -4270,10 +4270,16 @@ namespace J2N.Collections.Generic
             if (Count == 0)
                 return false;
 
-            if (other is ICollection<T> genericCollection && genericCollection.Count == 0)
-                return false;
-            else if (other is ICollection c && c.Count == 0)
-                return false;
+            if (other is ICollection<T> genericCollection)
+            {
+                if (genericCollection.Count == 0)
+                    return false;
+            }
+            else if (other is ICollection c)
+            {
+                if (c.Count == 0)
+                    return false;
+            }
 
             // J2N: Note that views (whether this or other) are up to date by this point because of the calls to Count above,
             // so no special-case handling is required.
