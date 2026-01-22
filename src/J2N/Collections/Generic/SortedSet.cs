@@ -2670,6 +2670,18 @@ namespace J2N.Collections.Generic
             if (other is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
+            // Other is already the empty set; return.
+            if (other is ICollection<T> genericCollection)
+            {
+                if (genericCollection.Count == 0)
+                    return;
+            }
+            else if (other is ICollection c)
+            {
+                if (c.Count == 0)
+                    return;
+            }
+
             IDistinctSortedCollection<T>? asSorted;
             if (other is not SCG.SortedSet<T> otherSortedSet)
                 asSorted = other as IDistinctSortedCollection<T>;
