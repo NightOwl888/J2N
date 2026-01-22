@@ -3591,8 +3591,6 @@ namespace J2N.Collections.Generic
                     if (count > navigableCollection.Count)
                         return false;
 
-                    // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
-
                     return IsSubsetOfNavigableCollectionWithSameComparer(navigableCollection);
                 }
             }
@@ -3663,8 +3661,8 @@ namespace J2N.Collections.Generic
 
         internal virtual bool IsSubsetOfNavigableCollectionWithSameComparer(INavigableCollection<T> navigableCollection)
         {
-            // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
-            if (navigableCollection is TreeSubSet)
+            // J2N: If other is a view, GetViewBetween() may throw, so we fall back.
+            if (navigableCollection is ICollectionView view && view.IsView)
                 return IsSubsetOfCollectionWithSameComparer(navigableCollection);
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of the other collection is the same as this one,
@@ -3680,7 +3678,8 @@ namespace J2N.Collections.Generic
 
         internal virtual bool IsSubsetOfBclSortedSetWithSameComparer(SCG.SortedSet<T> bclSortedSet)
         {
-            // J2N: If this is not exactly SCG.SortedSet<T>, we assume it is a view
+            // J2N: If this is not exactly SCG.SortedSet<T>, we assume it is a view.
+            // J2N: If other is a view, GetViewBetween() may throw, so we fall back.
             if (bclSortedSet.GetType() != typeof(SCG.SortedSet<T>))
                 return IsSubsetOfCollectionWithSameComparer(bclSortedSet);
 
