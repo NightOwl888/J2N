@@ -3470,7 +3470,7 @@ namespace J2N.Collections.Generic
             SymmetricExceptWithSameComparer(elements, length);
         }
 
-        internal virtual void SymmetricExceptWithSameComparer(IDistinctSortedCollection<T> other)
+        private void SymmetricExceptWithSameComparer(IDistinctSortedCollection<T> other)
         {
             Debug.Assert(other != null);
             Debug.Assert(ComparerEquals(Comparer, other!.Comparer));
@@ -3486,7 +3486,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        internal virtual void SymmetricExceptWithSameComparer(ISortedCollection<T> other)
+        private void SymmetricExceptWithSameComparer(ISortedCollection<T> other)
         {
             Debug.Assert(other != null);
             Debug.Assert(ComparerEquals(Comparer, other!.Comparer));
@@ -3524,7 +3524,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        internal virtual void SymmetricExceptWithSameComparer(T[] other, int count)
+        private void SymmetricExceptWithSameComparer(T[] other, int count)
         {
             Debug.Assert(other != null);
             Debug.Assert(count >= 0 && count <= other!.Length);
