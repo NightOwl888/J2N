@@ -1625,6 +1625,19 @@ namespace J2N.Collections.Generic
             Assert.True(left.IsProperSubsetOf(nonDistinct));
         }
 
+        [Test] // J2N: Regression for not ensuring Count >= other.Count
+        public void Test_IsProperSubsetOf_SortedNonDistinct_SameDistinctElements_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 4, 4
+            };
+
+            Assert.False(left.IsProperSubsetOf(nonDistinct));
+        }
+
         [Test]
         public void Test_IsProperSubsetOf_UnsortedEnumerable_FallsBackCorrectly()
         {
@@ -2020,6 +2033,19 @@ namespace J2N.Collections.Generic
             };
 
             Assert.True(left.IsProperSupersetOf(nonDistinct));
+        }
+
+        [Test] // J2N: Regression for not ensuring other.Count >= Count
+        public void Test_IsProperSupersetOf_SortedNonDistinct_SameDistinctElements_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 2, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 4, 4
+            };
+
+            Assert.False(left.IsProperSupersetOf(nonDistinct));
         }
 
         [Test]
