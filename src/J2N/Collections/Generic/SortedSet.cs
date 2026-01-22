@@ -3139,7 +3139,6 @@ namespace J2N.Collections.Generic
             IComparer<T> comparer = Comparer;
             if (ComparerEquals(comparer, other!.Comparer)) // [!] asserted above
             {
-
                 // Result cannot exceed the smaller of this.Count or other.Count
                 T[] merged = new T[Math.Min(this.Count, other.Count)];
                 int c = 0;
@@ -3162,8 +3161,7 @@ namespace J2N.Collections.Generic
                     T theirsCurrent = theirs.Current;
 
                     // Collapse duplicates in "other"
-                    if (hasPrevOther &&
-                        EqualityComparer<T>.Default.Equals(theirsCurrent, prevOther))
+                    if (hasPrevOther && comparer.Compare(theirsCurrent, prevOther) == 0)
                     {
                         theirsEnded = !theirs.MoveNext();
                         continue;
