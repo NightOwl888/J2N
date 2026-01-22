@@ -3931,8 +3931,8 @@ namespace J2N.Collections.Generic
 
         private bool IsSupersetOfNavigableCollectionWithSameComparer(INavigableCollection<T> navigableCollection)
         {
-            // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
-            if (this is TreeSubSet)
+            // J2N: If this is a view, GetViewBetween() may throw, so we fall back.
+            if (this is ICollectionView view && view.IsView)
                 return IsSupersetOfEnumerableWithSameComparer(navigableCollection);
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of this collection is the same as the other one,
@@ -3948,8 +3948,8 @@ namespace J2N.Collections.Generic
 
         private bool IsSupersetOfBclSortedSetWithSameComparer(SCG.SortedSet<T> bclSortedSet)
         {
-            // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
-            if (this is TreeSubSet)
+            // J2N: If other is a view, GetViewBetween() may throw, so we fall back.
+            if (this is ICollectionView view && view.IsView)
                 return IsSupersetOfEnumerableWithSameComparer(bclSortedSet);
 
             SortedSet<T> pruned = GetViewBetween(bclSortedSet.Min, bclSortedSet.Max);
