@@ -3063,6 +3063,24 @@ namespace J2N.Collections.Generic
             if (Count == 0)
                 return;
 
+            // If other is empty, we can simply call Clear() to save some steps.
+            if (other is ICollection<T> genericCollection)
+            {
+                if (genericCollection.Count == 0)
+                {
+                    Clear();
+                    return;
+                }
+            }
+            else if (other is ICollection c)
+            {
+                if (c.Count == 0)
+                {
+                    Clear();
+                    return;
+                }
+            }
+
             if (other == this)
                 return;
 
@@ -3207,22 +3225,18 @@ namespace J2N.Collections.Generic
         internal virtual void IntersectWithEnumerable(IEnumerable<T> other)
         {
             int? otherCount = null;
-            if (other is ICollection<T> collection)
+            if (other is ICollection<T> genericCollection)
             {
-                otherCount = collection.Count;
+                otherCount = genericCollection.Count;
             }
-#if FEATURE_IREADONLYCOLLECTIONS
-            else if (other is IReadOnlyCollection<T> readOnlyCollection)
+            else if (other is ICollection c)
             {
-                otherCount = readOnlyCollection.Count;
+                otherCount = c.Count;
             }
-#endif
 
-            if (otherCount == 0)
-            {
-                Clear();
-                return;
-            }
+            // J2N: Clear() is unnecessary here because we do it at the top of IntersectWith()
+            // So we should never reach here if otherCount is 0 (if other is a collection)
+            Debug.Assert(otherCount is null || otherCount > 0);
 
             List<T> toSave = new(otherCount.HasValue ? Math.Min(this.Count, otherCount.Value) : this.Count);
             foreach (T item in other)
