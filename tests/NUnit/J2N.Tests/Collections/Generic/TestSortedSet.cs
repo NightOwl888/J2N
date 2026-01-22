@@ -773,6 +773,24 @@ namespace J2N.Collections.Generic
         }
 
 
+        [Test] // J2N: Regression for failure due to hard coding EqualityComparer<T>.Default
+        public void Test_UnionWith_SortedNonDistinct_OrdinalIgnoreCase_Deduplicates()
+        {
+            SortedSet<string> left = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "a"
+            };
+
+            SortedCollection<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "a"
+            };
+
+            left.UnionWith(right);
+
+            Assert.That(left.SetEquals(new[] { "a" }));
+        }
+
         [Test]
         public void Test_UnionWith_J2NSortedSet_WithSameComparer()
         {
