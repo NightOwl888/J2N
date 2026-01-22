@@ -10,13 +10,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
 using System.Runtime.CompilerServices;
-using SCG = System.Collections.Generic;
 
 #if FEATURE_SERIALIZABLE
 using System.Runtime.Serialization;
 #endif
+
+using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
@@ -3532,7 +3532,7 @@ namespace J2N.Collections.Generic
         /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/>,
         /// <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>, or <see cref="SCG.SortedSet{T}"/> with the same equality comparer as the
         /// current <see cref="SortedSet{T}"/> object, this method is an O(<c>n</c>) operation. If the collection represented by <paramref name="other"/>
-        /// if a <see cref="HashSet{T}"/>, <see cref="OrderedHashSet{T}"/>, <see cref="SCG.HashSet{T}"/>, or <see cref="ISortedCollection{T}"/> this method
+        /// is a <see cref="HashSet{T}"/>, <see cref="OrderedHashSet{T}"/>, <see cref="SCG.HashSet{T}"/>, or <see cref="ISortedCollection{T}"/> this method
         /// is an O(<c>n</c> log <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c> is the number of elements in <paramref name="other"/>.
         /// Otherwise, this method is an O(<c>n</c> log <c>n</c> + <c>m</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/> and
         /// <c>m</c> is the number of elements in <paramref name="other"/>.
@@ -3555,15 +3555,26 @@ namespace J2N.Collections.Generic
                     if (count > navigableCollection.Count)
                         return false;
 
+                    // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
+
                     return IsSubsetOfNavigableCollectionWithSameComparer(navigableCollection);
+                }
+            }
+            else if (other is IDistinctSortedCollection<T> distinctSortedCollection)
+            {
+                if (ComparerEquals(Comparer, distinctSortedCollection.Comparer))
+                {
+                    if (count > distinctSortedCollection.Count)
+                        return false;
+
+                    return IsSubsetOfCollectionWithSameComparer(distinctSortedCollection);
                 }
             }
             else if (other is ISortedCollection<T> sortedCollection)
             {
                 if (ComparerEquals(Comparer, sortedCollection.Comparer))
                 {
-                    if (count > sortedCollection.Count)
-                        return false;
+                    // Non-distinct, so we cannot optimize on count here
 
                     return IsSubsetOfCollectionWithSameComparer(sortedCollection);
                 }
@@ -3616,6 +3627,7 @@ namespace J2N.Collections.Generic
 
         internal virtual bool IsSubsetOfNavigableCollectionWithSameComparer(INavigableCollection<T> navigableCollection)
         {
+            // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
             if (navigableCollection is TreeSubSet)
                 return IsSubsetOfCollectionWithSameComparer(navigableCollection);
 
@@ -3673,7 +3685,7 @@ namespace J2N.Collections.Generic
         /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/>,
         /// <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>, or <see cref="SCG.SortedSet{T}"/> with the same equality comparer as the
         /// current <see cref="SortedSet{T}"/> object, this method is an O(<c>n</c>) operation. If the collection represented by <paramref name="other"/>
-        /// if a <see cref="HashSet{T}"/>, <see cref="OrderedHashSet{T}"/>, <see cref="SCG.HashSet{T}"/>, or <see cref="ISortedCollection{T}"/> this method
+        /// is a <see cref="HashSet{T}"/>, <see cref="OrderedHashSet{T}"/>, <see cref="SCG.HashSet{T}"/>, or <see cref="ISortedCollection{T}"/> this method
         /// is an O(<c>n</c> log <c>m</c>) operation, where <c>n</c> is <see cref="Count"/> and <c>m</c> is the number of elements in <paramref name="other"/>.
         /// Otherwise, this method is an O(<c>n</c> log <c>n</c> + <c>m</c> log <c>n</c>) operation, where <c>n</c> is <see cref="Count"/> and
         /// <c>m</c> is the number of elements in <paramref name="other"/>.
@@ -3705,12 +3717,21 @@ namespace J2N.Collections.Generic
                     return IsSubsetOfNavigableCollectionWithSameComparer(navigableCollection);
                 }
             }
+            else if (other is IDistinctSortedCollection<T> distinctSortedCollection)
+            {
+                if (ComparerEquals(Comparer, distinctSortedCollection.Comparer))
+                {
+                    if (count >= distinctSortedCollection.Count)
+                        return false;
+
+                    return IsSubsetOfCollectionWithSameComparer(distinctSortedCollection);
+                }
+            }
             else if (other is ISortedCollection<T> sortedCollection)
             {
                 if (ComparerEquals(Comparer, sortedCollection.Comparer))
                 {
-                    if (count >= sortedCollection.Count)
-                        return false;
+                    // Non-distinct, so we cannot optimize on count here
 
                     return IsSubsetOfCollectionWithSameComparer(sortedCollection);
                 }
@@ -3775,37 +3796,144 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than the number of elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/> collection with
-        /// the same equality comparer as the current <see cref="SortedSet{T}"/> object, this method is an <c>O(n)</c>
-        /// operation. Otherwise, this method is an <c>O(n + m)</c> operation, where <c>n</c> is the number of
-        /// elements in <paramref name="other"/> and <c>m</c> is <see cref="Count"/>.
+        /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/>,
+        /// <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>, or <see cref="SCG.SortedSet{T}"/> with the same equality comparer as the
+        /// current <see cref="SortedSet{T}"/> object, this method is an O(<c>n</c>) operation. If the collection represented by <paramref name="other"/>
+        /// is a <see cref="HashSet{T}"/>, <see cref="OrderedHashSet{T}"/>, <see cref="SCG.HashSet{T}"/>, or <see cref="ISortedCollection{T}"/> this method
+        /// is an O(<c>n</c> log <c>m</c>) operation, where <c>n</c> is the number of elements in <paramref name="other"/> and <c>m</c> is <see cref="Count"/>.
+        /// Otherwise, this method is an O(<c>n</c> log <c>n</c> + <c>m</c> log <c>n</c>) operation, where <c>n</c> is the number of elements in
+        /// <paramref name="other"/> and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
         public bool IsSupersetOf(IEnumerable<T> other)
         {
             if (other is null)
                 ThrowHelper.ThrowArgumentNullException(ExceptionArgument.other);
 
-            if (other is ICollection c && c.Count == 0)
-                return true;
-
-            // do it one way for HashSets
-            // another for sorted sets with the same comparer
-            SortedSet<T>? asSorted = other as SortedSet<T>;
-            if (asSorted != null && HasEqualComparer(asSorted))
+            if (other is ICollection<T> genericCollection)
             {
-                if (Count < asSorted.Count)
-                    return false;
-                SortedSet<T> pruned = GetViewBetween(asSorted.Min, asSorted.Max);
-                foreach (T item in asSorted)
+                if (genericCollection.Count == 0)
+                    return true;
+            }
+            else if (other is ICollection c)
+            {
+                if (c.Count == 0)
+                    return true;
+            }
+
+            if (other is INavigableCollection<T> navigableCollection)
+            {
+                if (ComparerEquals(Comparer, navigableCollection.Comparer))
                 {
-                    if (!pruned.Contains(item))
+                    if (Count < navigableCollection.Count)
                         return false;
+
+                    return IsSupersetOfNavigableCollectionWithSameComparer(navigableCollection);
                 }
-                return true;
+            }
+            else if (other is IDistinctSortedCollection<T> distinctSortedCollection)
+            {
+                if (ComparerEquals(Comparer, distinctSortedCollection.Comparer))
+                {
+                    if (Count < distinctSortedCollection.Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(distinctSortedCollection);
+                }
+            }
+            else if (other is ISortedCollection<T> sortedCollection)
+            {
+                if (ComparerEquals(Comparer, sortedCollection.Comparer))
+                {
+                    // Non-distinct, so we cannot optimize on count here
+
+                    return IsSupersetOfEnumerableWithSameComparer(sortedCollection);
+                }
+            }
+            else if (other is HashSet<T> hashSet)
+            {
+                if (ComparerEquals(Comparer, hashSet.EqualityComparer))
+                {
+                    if (Count < hashSet.Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(hashSet);
+                }
+            }
+            else if (other is OrderedHashSet<T> orderedHashSet)
+            {
+                if (ComparerEquals(Comparer, orderedHashSet.EqualityComparer))
+                {
+                    if (Count < orderedHashSet.Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(orderedHashSet);
+                }
+            }
+            else if (other is SCG.SortedSet<T> bclSortedSet)
+            {
+                if (ComparerEquals(Comparer, bclSortedSet.Comparer))
+                {
+                    if (Count < bclSortedSet.Count)
+                        return false;
+
+                    return IsSupersetOfBclSortedSetWithSameComparer(bclSortedSet);
+                }
+            }
+            else if (other is SCG.HashSet<T> bclHashSet)
+            {
+                if (ComparerEquals(Comparer, bclHashSet.Comparer))
+                {
+                    if (Count < bclHashSet.Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(bclHashSet);
+                }
             }
 
             // and a third for everything else
             return ContainsAllElements(other);
+        }
+
+        private bool IsSupersetOfNavigableCollectionWithSameComparer(INavigableCollection<T> navigableCollection)
+        {
+            // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
+            if (this is TreeSubSet)
+                return IsSupersetOfEnumerableWithSameComparer(navigableCollection);
+
+            // J2N: We cannot make any assumptions about the whether the inclusivity of this collection is the same as the other one,
+            // so we override it. The Contains() call will weed out the bounds if they are different.
+            SortedSet<T> pruned = GetViewBetween(navigableCollection.Min, lowerValueInclusive: true, navigableCollection.Max, upperValueInclusive: true);
+            foreach (T item in navigableCollection)
+            {
+                if (!pruned.Contains(item))
+                    return false;
+            }
+            return true;
+        }
+
+        private bool IsSupersetOfBclSortedSetWithSameComparer(SCG.SortedSet<T> bclSortedSet)
+        {
+            // J2N TODO: Check for Dictionary<TKey, TValue>.KeyCollection or Dictionary<TKey, TValue> views
+            if (this is TreeSubSet)
+                return IsSupersetOfEnumerableWithSameComparer(bclSortedSet);
+
+            SortedSet<T> pruned = GetViewBetween(bclSortedSet.Min, bclSortedSet.Max);
+            foreach (T item in bclSortedSet)
+            {
+                if (!pruned.Contains(item))
+                    return false;
+            }
+            return true;
+        }
+
+        private bool IsSupersetOfEnumerableWithSameComparer(IEnumerable<T> collection)
+        {
+            foreach (T item in collection)
+            {
+                if (!Contains(item))
+                    return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -3821,9 +3949,13 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method always returns <c>false</c> if <see cref="Count"/> is less than or equal to the number of elements in <paramref name="other"/>.
         /// <para/>
-        /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/> collection with the same equality comparer
-        /// as the current <see cref="SortedSet{T}"/> object, this method is an <c>O(n)</c> operation. Otherwise, this
-        /// method is an <c>O(n + m)</c> operation, where <c>n</c> is the number of elements in <paramref name="other"/> and <c>m</c> is <see cref="Count"/>.
+        /// If the collection represented by <paramref name="other"/> is a <see cref="SortedSet{T}"/>,
+        /// <see cref="SortedDictionary{TKey, TValue}.KeyCollection"/>, or <see cref="SCG.SortedSet{T}"/> with the same equality comparer as the
+        /// current <see cref="SortedSet{T}"/> object, this method is an O(<c>n</c>) operation. If the collection represented by <paramref name="other"/>
+        /// is a <see cref="HashSet{T}"/>, <see cref="OrderedHashSet{T}"/>, <see cref="SCG.HashSet{T}"/>, or <see cref="ISortedCollection{T}"/> this method
+        /// is an O(<c>n</c> log <c>m</c>) operation, where <c>n</c> is the number of elements in <paramref name="other"/> and <c>m</c> is <see cref="Count"/>.
+        /// Otherwise, this method is an O(<c>n</c> log <c>n</c> + <c>m</c> log <c>n</c>) operation, where <c>n</c> is the number of elements in
+        /// <paramref name="other"/> and <c>m</c> is <see cref="Count"/>.
         /// </remarks>
         public bool IsProperSupersetOf(IEnumerable<T> other)
         {
@@ -3833,22 +3965,85 @@ namespace J2N.Collections.Generic
             if (Count == 0)
                 return false;
 
-            if (other is ICollection c && c.Count == 0)
-                return true;
-
-            // another way for sorted sets
-            SortedSet<T>? asSorted = other as SortedSet<T>;
-            if (asSorted != null && HasEqualComparer(asSorted))
+            if (other is ICollection<T> genericCollection)
             {
-                if (asSorted.Count >= Count)
-                    return false;
-                SortedSet<T> pruned = GetViewBetween(asSorted.Min, asSorted.Max);
-                foreach (T item in asSorted)
+                if (genericCollection.Count == 0)
+                    return true;
+            }
+            else if (other is ICollection c)
+            {
+                if (c.Count == 0)
+                    return true;
+            }
+
+            if (other is INavigableCollection<T> navigableCollection)
+            {
+                if (ComparerEquals(Comparer, navigableCollection.Comparer))
                 {
-                    if (!pruned.Contains(item))
+                    if (navigableCollection.Count >= Count)
                         return false;
+
+                    return IsSupersetOfNavigableCollectionWithSameComparer(navigableCollection);
                 }
-                return true;
+            }
+            else if (other is IDistinctSortedCollection<T> distinctSortedCollection)
+            {
+                if (ComparerEquals(Comparer, distinctSortedCollection.Comparer))
+                {
+                    if (distinctSortedCollection.Count >= Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(distinctSortedCollection);
+                }
+            }
+            else if (other is ISortedCollection<T> sortedCollection)
+            {
+                if (ComparerEquals(Comparer, sortedCollection.Comparer))
+                {
+                    // Non-distinct, so we cannot optimize on count here
+
+                    return IsSupersetOfEnumerableWithSameComparer(sortedCollection);
+                }
+            }
+            else if (other is HashSet<T> hashSet)
+            {
+                if (ComparerEquals(Comparer, hashSet.EqualityComparer))
+                {
+                    if (hashSet.Count >= Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(hashSet);
+                }
+            }
+            else if (other is OrderedHashSet<T> orderedHashSet)
+            {
+                if (ComparerEquals(Comparer, orderedHashSet.EqualityComparer))
+                {
+                    if (orderedHashSet.Count >= Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(orderedHashSet);
+                }
+            }
+            else if (other is SCG.SortedSet<T> bclSortedSet)
+            {
+                if (ComparerEquals(Comparer, bclSortedSet.Comparer))
+                {
+                    if (bclSortedSet.Count >= Count)
+                        return false;
+
+                    return IsSupersetOfBclSortedSetWithSameComparer(bclSortedSet);
+                }
+            }
+            else if (other is SCG.HashSet<T> bclHashSet)
+            {
+                if (ComparerEquals(Comparer, bclHashSet.Comparer))
+                {
+                    if (bclHashSet.Count >= Count)
+                        return false;
+
+                    return IsSupersetOfEnumerableWithSameComparer(bclHashSet);
+                }
             }
 
             // Worst case: I mark every element in my set and see if I've counted all of them. O(M log N).

@@ -1732,6 +1732,314 @@ namespace J2N.Collections.Generic
 
 
 
+
+        [Test]
+        public void Test_IsSupersetOf_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+            SortedSet<int> right = new() { 2, 4 };
+
+            Assert.True(left.IsSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+            SCG.SortedSet<int> right = new() { 2, 4 };
+
+            Assert.True(left.IsSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_J2NSortedDictionaryKeys()
+        {
+            SortedDictionary<int, string> dict = new()
+            {
+                [1] = "a",
+                [2] = "b",
+                [3] = "c",
+                [4] = "d"
+            };
+
+            SortedSet<int> set = new() { 1, 2, 3, 4 };
+
+            Assert.True(set.IsSupersetOf(dict.Keys));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_IDistinctSortedCollection()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            DistinctSortedCollection<int> right = new()
+            {
+                2, 4
+            };
+
+            Assert.True(left.IsSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_SortedNonDistinct_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 4, 4
+            };
+
+            Assert.True(left.IsSupersetOf(nonDistinct));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_UnsortedEnumerable_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            int[] other = { 4, 2, 2 };
+
+            Assert.True(left.IsSupersetOf(other));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_EmptyOther_ReturnsTrue()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+
+            int[] other = Array.Empty<int>();
+
+            Assert.True(left.IsSupersetOf(other));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_OtherLargerThanLeft_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2 };
+            SortedSet<int> right = new() { 1, 2, 3 };
+
+            Assert.False(left.IsSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_Self_ReturnsTrue()
+        {
+            SortedSet<int> set = new() { 1, 2, 3 };
+
+            Assert.True(set.IsSupersetOf(set));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_TreeSubSet_FallsBackCorrectly()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+            SortedSet<int> subset = root.GetViewBetween(2, 4);
+
+            SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
+
+            Assert.True(set.IsSupersetOf(subset));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_HashSet_StringComparerOrdinal()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            HashSet<string> right = new(StringComparer.Ordinal)
+            {
+                "a", "b"
+            };
+
+            Assert.True(left.IsSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_HashSet_StringComparerMismatch_FallsBack()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a"
+            };
+
+            HashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A"
+            };
+
+            Assert.False(left.IsSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_OrderedHashSet_StringComparer()
+        {
+            SortedSet<string> left = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "a", "b", "c"
+            };
+
+            OrderedHashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "B"
+            };
+
+            Assert.True(left.IsSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsSupersetOf_BclHashSet_StringComparer()
+        {
+            SortedSet<string> left = new(StringComparer.Ordinal)
+            {
+                "a", "b", "c"
+            };
+
+            SCG.HashSet<string> right = new(StringComparer.Ordinal)
+            {
+                "a", "b"
+            };
+
+            Assert.True(left.IsSupersetOf(right));
+        }
+
+
+        [Test]
+        public void Test_IsProperSupersetOf_J2NSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+            SortedSet<int> right = new() { 2, 4 };
+
+            Assert.True(left.IsProperSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_BclSortedSet_WithSameComparer()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+            SCG.SortedSet<int> right = new() { 2, 4 };
+
+            Assert.True(left.IsProperSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_J2NSortedDictionaryKeys()
+        {
+            SortedDictionary<int, string> dict = new()
+            {
+                [2] = "b",
+                [4] = "d"
+            };
+
+            SortedSet<int> set = new() { 1, 2, 3, 4 };
+
+            Assert.True(set.IsProperSupersetOf(dict.Keys));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_IDistinctSortedCollection()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            DistinctSortedCollection<int> right = new()
+            {
+                2, 4
+            };
+
+            Assert.True(left.IsProperSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_SortedNonDistinct_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            SortedCollection<int> nonDistinct = new()
+            {
+                2, 2, 4, 4
+            };
+
+            Assert.True(left.IsProperSupersetOf(nonDistinct));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_UnsortedEnumerable_FallsBackCorrectly()
+        {
+            SortedSet<int> left = new() { 1, 2, 3, 4 };
+
+            int[] other = { 4, 2 };
+
+            Assert.True(left.IsProperSupersetOf(other));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_EqualSets_ReturnsFalse()
+        {
+            SortedSet<int> left = new() { 1, 2, 3 };
+            SortedSet<int> right = new() { 1, 2, 3 };
+
+            Assert.False(left.IsProperSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_Self_ReturnsFalse()
+        {
+            SortedSet<int> set = new() { 1, 2, 3 };
+
+            Assert.False(set.IsProperSupersetOf(set));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_TreeSubSet_FallsBackCorrectly()
+        {
+            SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
+            SortedSet<int> subset = root.GetViewBetween(2, 4);
+
+            SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
+
+            Assert.True(set.IsProperSupersetOf(subset));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_HashSet_StringComparerOrdinalIgnoreCase()
+        {
+            SortedSet<string> left = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "a", "b", "c"
+            };
+
+            HashSet<string> right = new(StringComparer.OrdinalIgnoreCase)
+            {
+                "A", "B"
+            };
+
+            Assert.True(left.IsProperSupersetOf(right));
+        }
+
+        [Test]
+        public void Test_IsProperSupersetOf_BclSortedSet_View_SameComparer_UsesFallback()
+        {
+            StringComparer comparer = StringComparer.Ordinal;
+
+            SCG.SortedSet<string> root = new(comparer)
+            {
+                "a", "b", "c", "d"
+            };
+
+            SCG.SortedSet<string> view = root.GetViewBetween("b", "c");
+
+            SortedSet<string> set = new SortedSet<string>(comparer)
+            {
+                "a", "b", "c", "d"
+            };
+
+            Assert.True(set.IsProperSupersetOf(view));
+        }
+
+
+
         #endregion Loading and Comparing
 
         /// <summary>
