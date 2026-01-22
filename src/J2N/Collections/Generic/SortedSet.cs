@@ -3074,20 +3074,20 @@ namespace J2N.Collections.Generic
             else
                 asSorted = new BclSortedSetAdapter(otherSortedSet);
 
-            TreeSubSet? treeSubset = this as TreeSubSet;
+            bool thisIsView = this is ICollectionView view && view.IsView;
 
-            if (treeSubset != null)
+            if (thisIsView)
                 VersionCheck();
 
             // If asSorted is null, this is not a distinct sorted collection.
-            if (asSorted == null && treeSubset == null && other is ISortedCollection<T> otherSortedNonDistinct)
+            if (asSorted == null && !thisIsView && other is ISortedCollection<T> otherSortedNonDistinct)
             {
                 IntersectWithSortedNonDistinctCollection(otherSortedNonDistinct);
                 return;
             }
 
             IComparer<T>? comparer;
-            if (asSorted != null && treeSubset == null && ComparerEquals(comparer = Comparer, asSorted.Comparer))
+            if (asSorted != null && !thisIsView && ComparerEquals(comparer = Comparer, asSorted.Comparer))
             {
                 // First do a merge sort to an array.
                 T[] merged = new T[Math.Min(this.Count, asSorted.Count)];
@@ -3233,9 +3233,9 @@ namespace J2N.Collections.Generic
                 }
             }
 
-            TreeSubSet? treeSubset = this as TreeSubSet;
+            bool thisIsView = this is ICollectionView view && view.IsView;
 
-            if (treeSubset is null)
+            if (!thisIsView)
             {
                 int count = toSave.Count;
 
