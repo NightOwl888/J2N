@@ -2802,8 +2802,7 @@ namespace J2N.Collections.Generic
                 T theirsCurrent = theirs.Current;
 
                 // Collapse duplicates in "other"
-                if (hasPrevOther &&
-                    EqualityComparer<T>.Default.Equals(theirsCurrent, prevOther))
+                if (hasPrevOther && comparer.Compare(prevOther, theirsCurrent) == 0)
                 {
                     theirsEnded = !theirs.MoveNext();
                     continue;
@@ -2849,8 +2848,7 @@ namespace J2N.Collections.Generic
                 {
                     T current = theirs.Current;
 
-                    if (!hasPrevOther ||
-                        !EqualityComparer<T>.Default.Equals(current, prevOther))
+                    if (!hasPrevOther || comparer.Compare(prevOther, current) != 0)
                     {
                         merged[c++] = current;
                         prevOther = current;
