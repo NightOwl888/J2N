@@ -221,6 +221,10 @@ namespace J2N.Collections.Generic
                     if (version != _underlying!.version) // [!] asserted above
                         VersionCheck();
 
+                    // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                    if (minVersion == version)
+                        return cachedMin;
+
                     Node? current = root;
                     T? result = default;
 
@@ -247,6 +251,8 @@ namespace J2N.Collections.Generic
                         }
                     }
 
+                    minVersion = version;
+                    cachedMin = result;
                     return result;
                 }
             }
@@ -258,6 +264,10 @@ namespace J2N.Collections.Generic
                     Debug.Assert(_underlying != null);
                     if (version != _underlying!.version) // [!] asserted above
                         VersionCheck();
+
+                    // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                    if (maxVersion == version)
+                        return cachedMax;
 
                     Node? current = root;
                     T? result = default;
@@ -285,6 +295,8 @@ namespace J2N.Collections.Generic
                         }
                     }
 
+                    maxVersion = version;
+                    cachedMax = result;
                     return result;
                 }
             }

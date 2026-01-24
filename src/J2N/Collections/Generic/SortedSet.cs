@@ -163,6 +163,14 @@ namespace J2N.Collections.Generic
         private int count;
         private int version;
 
+        // J2N: Added caching fields for Min/Max
+
+        private T? cachedMin;
+        private T? cachedMax;
+
+        private int minVersion = -1;
+        private int maxVersion = -1;
+
 #if FEATURE_SERIALIZABLE
         private const string ComparerName = "Comparer"; // Do not rename (binary serialization)
         private const string CountName = "Count"; // Do not rename (binary serialization)
@@ -4457,18 +4465,27 @@ namespace J2N.Collections.Generic
         {
             get
             {
+                // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                if (minVersion == version)
+                    return cachedMin;
+
                 if (root == null)
                 {
-                    return default!;
+                    cachedMin = default;
                 }
-
-                Node current = root;
-                while (current.Left != null)
+                else
                 {
-                    current = current.Left;
+                    Node current = root;
+                    while (current.Left != null)
+                    {
+                        current = current.Left;
+                    }
+
+                    cachedMin = current.Item;
                 }
 
-                return current.Item;
+                minVersion = version;
+                return cachedMin;
             }
         }
 
@@ -4485,18 +4502,27 @@ namespace J2N.Collections.Generic
         {
             get
             {
+                // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                if (maxVersion == version)
+                    return cachedMax;
+
                 if (root == null)
                 {
-                    return default!;
+                    cachedMax = default;
                 }
-
-                Node current = root;
-                while (current.Right != null)
+                else
                 {
-                    current = current.Right;
+                    Node current = root;
+                    while (current.Right != null)
+                    {
+                        current = current.Right;
+                    }
+
+                    cachedMax = current.Item;
                 }
 
-                return current.Item;
+                maxVersion = version;
+                return cachedMax;
             }
         }
 
