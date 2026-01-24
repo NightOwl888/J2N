@@ -213,10 +213,14 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            internal override T MinInternal
+            internal override T? MinInternal
             {
                 get
                 {
+                    Debug.Assert(_underlying != null);
+                    if (version != _underlying!.version) // [!] asserted above
+                        VersionCheck();
+
                     Node? current = root;
                     T? result = default;
 
@@ -243,14 +247,18 @@ namespace J2N.Collections.Generic
                         }
                     }
 
-                    return result!;
+                    return result;
                 }
             }
 
-            internal override T MaxInternal
+            internal override T? MaxInternal
             {
                 get
                 {
+                    Debug.Assert(_underlying != null);
+                    if (version != _underlying!.version) // [!] asserted above
+                        VersionCheck();
+
                     Node? current = root;
                     T? result = default;
 
@@ -277,7 +285,7 @@ namespace J2N.Collections.Generic
                         }
                     }
 
-                    return result!;
+                    return result;
                 }
             }
 
