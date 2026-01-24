@@ -619,6 +619,38 @@ namespace J2N.Collections.Generic
         }
 #endif
 
+
+        [Test] // J2N: Regression test for BCL bug on Min (out of date)
+        public void Test_Min_ViewReflectsUnderlyingMutation()
+        {
+            SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> view = set.GetViewBetween(2, 4);
+
+            // Sanity check
+            Assert.AreEqual(2, view.Min);
+
+            // Mutate underlying set in a way that affects the view
+            set.Remove(2);
+
+            // BUG: Without VersionCheck() in MinInternal, this returns 2
+            Assert.AreEqual(3, view.Min);
+        }
+
+        [Test] // J2N: Regression test for BCL bug on Max (out of date)
+        public void Test_Max_ViewReflectsUnderlyingMutation()
+        {
+            SortedSet<string> set = new() { "1", "2", "3", "4", "5" };
+
+            SortedSet<string> view = set.GetViewBetween("2", "4");
+
+            // Mutate underlying set *outside* the view's range
+            set.Clear();
+
+            // BUG: Without VersionCheck() in MaxInternal, returns "4"
+            Assert.AreEqual(null, view.Max);
+        }
+
         #region Loading and Comparing
 
         [Test]
