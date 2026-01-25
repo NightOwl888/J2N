@@ -32,7 +32,7 @@ namespace J2N.Collections.Tests
         protected override bool DefaultValueAllowed => true;
 
         [Fact]
-        public void SortedSet_Generic_GetViewBetween_MinMax()
+        public void SortedSet_Generic_GetViewBetween_FirstLast()
         {
             var set = (SortedSet<int>)CreateSortedSet(new[] { 1, 3, 5, 7, 9 }, 5, 5);
             SortedSet<int> view = set.GetViewBetween(4, 8);
