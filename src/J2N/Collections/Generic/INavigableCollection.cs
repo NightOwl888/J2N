@@ -30,10 +30,10 @@ namespace J2N.Collections.Generic
     internal interface INavigableCollection<T> : IDistinctSortedCollection<T>
     {
         /// <summary>
-        /// Gets the first (lowest) value in the <see cref="IDistinctSortedCollection{T}"/>, as defined by the comparer.
+        /// Gets the first (lowest) value in the <see cref="INavigableCollection{T}"/>, as defined by the comparer.
         /// </summary>
         /// <remarks>
-        /// If the <see cref="IDistinctSortedCollection{T}"/> has no elements, then the <see cref="First"/> property returns
+        /// If the <see cref="INavigableCollection{T}"/> has no elements, then the <see cref="First"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// <para/>
         /// This corresponds to the <c>first()</c> method in the JDK.
@@ -41,10 +41,10 @@ namespace J2N.Collections.Generic
         T? First { get; }
 
         /// <summary>
-        /// Gets the last (highest) value in the <see cref="IDistinctSortedCollection{T}"/>, as defined by the comparer.
+        /// Gets the last (highest) value in the <see cref="INavigableCollection{T}"/>, as defined by the comparer.
         /// </summary>
         /// <remarks>
-        /// If the <see cref="IDistinctSortedCollection{T}"/> has no elements, then the <see cref="Last"/> property returns
+        /// If the <see cref="INavigableCollection{T}"/> has no elements, then the <see cref="Last"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// <para/>
         /// This corresponds to the <c>last()</c> method in the JDK.
@@ -99,7 +99,7 @@ namespace J2N.Collections.Generic
         INavigableCollection<T> GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive);
 
         /// <summary>
-        /// Gets the entry in the <see cref="IDistinctSortedCollection{T}"/> whose value
+        /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
         /// is the predecessor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the predecessor of.</param>
@@ -115,7 +115,7 @@ namespace J2N.Collections.Generic
         bool TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
-        /// Gets the entry in the <see cref="IDistinctSortedCollection{T}"/> whose value
+        /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value
         /// is the sucessor of the specified <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the successor of.</param>
@@ -131,7 +131,7 @@ namespace J2N.Collections.Generic
         bool TryGetSuccessor(T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
-        /// Gets the value in the <see cref="IDistinctSortedCollection{T}"/> whose value
+        /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
         /// is the greatest element less than or equal to <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the floor of.</param>
@@ -147,7 +147,7 @@ namespace J2N.Collections.Generic
         bool TryGetFloor(T item, [MaybeNullWhen(false)] out T result);
 
         /// <summary>
-        /// Gets the value in the <see cref="IDistinctSortedCollection{T}"/> whose value
+        /// Gets the value in the <see cref="INavigableCollection{T}"/> whose value
         /// is the least element greater than or equal to <paramref name="item"/>.
         /// </summary>
         /// <param name="item">The entry to get the ceiling of.</param>
