@@ -1403,9 +1403,9 @@ namespace J2N.Collections.Generic
 
         IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => ((KeyValuePairComparer)_set.Comparer); // J2N TODO: This should be KeyComparer once we merge with the alternate lookup functionality
 
-        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Min => _set.Min;
+        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.First => _set.First;
 
-        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Max => _set.Max;
+        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Last => _set.Last;
 
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBetween(KeyValuePair<TKey, TValue> lowerValue, KeyValuePair<TKey, TValue> upperValue)
             => _set.GetViewBetween(lowerValue, upperValue);
@@ -2023,9 +2023,9 @@ namespace J2N.Collections.Generic
 
             #region INavigableSet<T> members
 
-            TKey INavigableCollection<TKey>.Min => _dictionary._set.Min.Key;
+            TKey INavigableCollection<TKey>.First => _dictionary._set.First.Key;
 
-            TKey INavigableCollection<TKey>.Max => _dictionary._set.Max.Key;
+            TKey INavigableCollection<TKey>.Last => _dictionary._set.Last.Key;
 
             INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBetween(TKey? lowerKey, TKey? upperKey)
             {

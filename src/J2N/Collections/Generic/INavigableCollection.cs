@@ -30,26 +30,26 @@ namespace J2N.Collections.Generic
     internal interface INavigableCollection<T> : IDistinctSortedCollection<T>
     {
         /// <summary>
-        /// Gets the minimum value in the <see cref="IDistinctSortedCollection{T}"/>, as defined by the comparer.
+        /// Gets the first (lowest) value in the <see cref="IDistinctSortedCollection{T}"/>, as defined by the comparer.
         /// </summary>
         /// <remarks>
-        /// If the <see cref="IDistinctSortedCollection{T}"/> has no elements, then the <see cref="Min"/> property returns
+        /// If the <see cref="IDistinctSortedCollection{T}"/> has no elements, then the <see cref="First"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// <para/>
-        /// This corresponds to the <c>pollFirst()</c> method in the JDK.
+        /// This corresponds to the <c>first()</c> method in the JDK.
         /// </remarks>
-        T? Min { get; }
+        T? First { get; }
 
         /// <summary>
-        /// Gets the maximum value in the <see cref="IDistinctSortedCollection{T}"/>, as defined by the comparer.
+        /// Gets the last (highest) value in the <see cref="IDistinctSortedCollection{T}"/>, as defined by the comparer.
         /// </summary>
         /// <remarks>
-        /// If the <see cref="IDistinctSortedCollection{T}"/> has no elements, then the <see cref="Max"/> property returns
+        /// If the <see cref="IDistinctSortedCollection{T}"/> has no elements, then the <see cref="Last"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// <para/>
-        /// This corresponds to the <c>pollLast()</c> method in the JDK.
+        /// This corresponds to the <c>last()</c> method in the JDK.
         /// </remarks>
-        T? Max { get; }
+        T? Last { get; }
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/>.

@@ -338,11 +338,11 @@ namespace J2N.Collections.Generic
 
         private void RemoveAllElements(IEnumerable<T> collection)
         {
-            T? min = Min;
-            T? max = Max;
+            T? first = First;
+            T? last = Last;
             foreach (T item in collection)
             {
-                if (!(comparer.Compare(item!, min!) < 0 || comparer.Compare(item!, max!) > 0) && Contains(item))
+                if (!(comparer.Compare(item!, first!) < 0 || comparer.Compare(item!, last!) > 0) && Contains(item))
                 {
                     Remove(item);
                 }
@@ -3133,9 +3133,9 @@ namespace J2N.Collections.Generic
                 IEnumerator<T> mine = this.GetEnumerator();
                 IEnumerator<T> theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
-                T? max = Max;
+                T? last = Last;
 
-                while (!mineEnded && !theirsEnded && comparer.Compare(theirs.Current!, max!) <= 0)
+                while (!mineEnded && !theirsEnded && comparer.Compare(theirs.Current!, last!) <= 0)
                 {
                     int comp = comparer.Compare(mine.Current, theirs.Current);
                     if (comp < 0)
@@ -3190,11 +3190,11 @@ namespace J2N.Collections.Generic
                 bool hasPrevOther = false;
                 T prevOther = default!;
 
-                // Optional pruning using Max
-                T max = Max!;
+                // Optional pruning using Last
+                T last = Last!;
 
                 while (!mineEnded && !theirsEnded &&
-                       comparer.Compare(theirs.Current, max) <= 0)
+                       comparer.Compare(theirs.Current, last) <= 0)
                 {
                     T theirsCurrent = theirs.Current;
 
@@ -3364,15 +3364,15 @@ namespace J2N.Collections.Generic
                 if (ComparerEquals(Comparer, navigableCollection.Comparer))
                 {
                     // Outside range, no point in doing anything
-                    if (comparer.Compare(navigableCollection.Max!, Min!) >= 0 && comparer.Compare(navigableCollection.Min!, Max!) <= 0)
+                    if (comparer.Compare(navigableCollection.Last!, First!) >= 0 && comparer.Compare(navigableCollection.First!, Last!) <= 0)
                     {
-                        T? min = Min;
-                        T? max = Max;
+                        T? first = First;
+                        T? last = Last;
                         foreach (T item in other)
                         {
-                            if (comparer.Compare(item!, min!) < 0)
+                            if (comparer.Compare(item!, first!) < 0)
                                 continue;
-                            if (comparer.Compare(item!, max!) > 0)
+                            if (comparer.Compare(item!, last!) > 0)
                                 break;
                             Remove(item);
                         }
@@ -3385,13 +3385,13 @@ namespace J2N.Collections.Generic
             {
                 if (ComparerEquals(Comparer, sortedCollection.Comparer))
                 {
-                    T? min = Min;
-                    T? max = Max;
+                    T? first = First;
+                    T? last = Last;
                     foreach (T item in other)
                     {
-                        if (comparer.Compare(item!, min!) < 0)
+                        if (comparer.Compare(item!, first!) < 0)
                             continue;
-                        if (comparer.Compare(item!, max!) > 0)
+                        if (comparer.Compare(item!, last!) > 0)
                             break;
                         Remove(item);
                     }
@@ -3403,15 +3403,15 @@ namespace J2N.Collections.Generic
                 if (ComparerEquals(Comparer, bclSortedSet.Comparer))
                 {
                     // Outside range, no point in doing anything
-                    if (comparer.Compare(bclSortedSet.Max!, Min!) >= 0 && comparer.Compare(bclSortedSet.Min!, Max!) <= 0)
+                    if (comparer.Compare(bclSortedSet.Max!, First!) >= 0 && comparer.Compare(bclSortedSet.Min!, Last!) <= 0)
                     {
-                        T? min = Min;
-                        T? max = Max;
+                        T? first = First;
+                        T? last = Last;
                         foreach (T item in bclSortedSet)
                         {
-                            if (comparer.Compare(item!, min!) < 0)
+                            if (comparer.Compare(item!, first!) < 0)
                                 continue;
-                            if (comparer.Compare(item!, max!) > 0)
+                            if (comparer.Compare(item!, last!) > 0)
                                 break;
                             Remove(item);
                         }
@@ -3675,7 +3675,7 @@ namespace J2N.Collections.Generic
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of the other collection is the same as this one,
             // so we override it. The Contains() call will weed out the bounds if they are different.
-            INavigableCollection<T> prunedOther = navigableCollection.GetViewBetween(Min, lowerValueInclusive: true, Max, upperValueInclusive: true);
+            INavigableCollection<T> prunedOther = navigableCollection.GetViewBetween(First, lowerValueInclusive: true, Last, upperValueInclusive: true);
             foreach (T item in this)
             {
                 if (!prunedOther.Contains(item))
@@ -3691,7 +3691,7 @@ namespace J2N.Collections.Generic
             if (bclSortedSet.GetType() != typeof(SCG.SortedSet<T>))
                 return IsSubsetOfCollectionWithSameComparer(bclSortedSet);
 
-            SCG.SortedSet<T> prunedOther = bclSortedSet.GetViewBetween(Min!, Max!);
+            SCG.SortedSet<T> prunedOther = bclSortedSet.GetViewBetween(First!, Last!);
             foreach (T item in this)
             {
                 if (!prunedOther.Contains(item))
@@ -3936,7 +3936,7 @@ namespace J2N.Collections.Generic
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of this collection is the same as the other one,
             // so we override it. The Contains() call will weed out the bounds if they are different.
-            SortedSet<T> pruned = GetViewBetween(navigableCollection.Min, lowerValueInclusive: true, navigableCollection.Max, upperValueInclusive: true);
+            SortedSet<T> pruned = GetViewBetween(navigableCollection.First, lowerValueInclusive: true, navigableCollection.Last, upperValueInclusive: true);
             foreach (T item in navigableCollection)
             {
                 if (!pruned.Contains(item))
@@ -4276,7 +4276,7 @@ namespace J2N.Collections.Generic
             if (other is INavigableCollection<T> navigableCollection)
             {
                 if (ComparerEquals(Comparer, navigableCollection.Comparer) &&
-                    (comparer.Compare(Min!, navigableCollection.Max!) > 0 || comparer.Compare(Max!, navigableCollection.Min!) < 0))
+                    (comparer.Compare(First!, navigableCollection.Last!) > 0 || comparer.Compare(Last!, navigableCollection.First!) < 0))
                 {
                     return false;
                 }
@@ -4284,7 +4284,7 @@ namespace J2N.Collections.Generic
             else if (other is SCG.SortedSet<T> bclSortedSet)
             {
                 if (ComparerEquals(Comparer, bclSortedSet.Comparer) &&
-                    (comparer.Compare(Min!, bclSortedSet.Max!) > 0 || comparer.Compare(Max!, bclSortedSet.Min!) < 0))
+                    (comparer.Compare(First!, bclSortedSet.Max!) > 0 || comparer.Compare(Last!, bclSortedSet.Min!) < 0))
                 {
                     return false;
                 }
@@ -4424,9 +4424,9 @@ namespace J2N.Collections.Generic
 
         #region INavigableCollection<T> members
 
-        T? INavigableCollection<T>.Min => Min;
+        T? INavigableCollection<T>.First => First;
 
-        T? INavigableCollection<T>.Max => Max;
+        T? INavigableCollection<T>.Last => Last;
 
         INavigableCollection<T> INavigableCollection<T>.GetViewBetween(T? lowerValue, T? upperValue)
             => GetViewBetween(lowerValue, upperValue);
@@ -4459,6 +4459,8 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Min"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
+        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use First instead.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Min => MinInternal;
 
         internal virtual T? MinInternal
@@ -4496,6 +4498,8 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Max"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
+        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use Last instead.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Max => MaxInternal;
 
         internal virtual T? MaxInternal
@@ -4525,6 +4529,28 @@ namespace J2N.Collections.Generic
                 return cachedMax;
             }
         }
+
+        /// <summary>
+        /// Gets the first (lowest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="First"/> property returns
+        /// the <see langword="null"/>.
+        /// <para/>
+        /// This corresponds to the <c>first()</c> method in the JDK.
+        /// </remarks>
+        public T? First => MinInternal; // J2N: Added for consistency with other view members (Min doesn't correspond well with GetViewBefore())
+
+        /// <summary>
+        /// Gets the last (highest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Last"/> property returns
+        /// the default value of <typeparamref name="T"/>.
+        /// <para/>
+        /// This corresponds to the <c>last()</c> method in the JDK.
+        /// </remarks>
+        public T? Last => MaxInternal; // J2N: Added for consistency with other view members (Max doesn't correspond well with GetViewAfter())
 
         /// <summary>
         /// Returns an <see cref="IEnumerable{T}"/> that iterates over the

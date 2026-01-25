@@ -49,11 +49,11 @@ namespace J2N.Collections.Tests
             Assert.True(view.Contains(7));
             Assert.False(view.Contains(9));
 
-            Assert.Equal(1, set.Min);
-            Assert.Equal(9, set.Max);
+            Assert.Equal(1, set.First);
+            Assert.Equal(9, set.Last);
 
-            Assert.Equal(5, view.Min);
-            Assert.Equal(7, view.Max);
+            Assert.Equal(5, view.First);
+            Assert.Equal(7, view.Last);
         }
 
         [Fact]
@@ -84,6 +84,31 @@ namespace J2N.Collections.Tests
                     {
                         Assert.Equal(i + ((i + 1) % 2), view.Min);
                         Assert.Equal(j - ((j + 1) % 2), view.Max);
+                    }
+                }
+            }
+        }
+
+        // J2N: Added First and Last properties to replace Min and Max
+        [Fact]
+        public void SortedSet_Generic_GetViewBetween_FirstLast_Exhaustive()
+        {
+            var set = (SortedSet<int>)CreateSortedSet(new[] { 7, 11, 3, 1, 5, 9, 13 }, 7, 7);
+            for (int i = 0; i < 14; i++)
+            {
+                for (int j = i; j < 14; j++)
+                {
+                    SortedSet<int> view = set.GetViewBetween(i, j);
+
+                    if (j < i || (j == i && i % 2 == 0))
+                    {
+                        Assert.Equal(default(int), view.First);
+                        Assert.Equal(default(int), view.Last);
+                    }
+                    else
+                    {
+                        Assert.Equal(i + ((i + 1) % 2), view.First);
+                        Assert.Equal(j - ((j + 1) % 2), view.Last);
                     }
                 }
             }

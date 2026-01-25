@@ -108,6 +108,26 @@ namespace J2N.Collections.Tests
             }
         }
 
+        // J2N: Added First and Last properties to replace Min and Max
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_FirstAndLast(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            if (setLength > 0)
+            {
+                List<T> expected = set.ToList();
+                expected.Sort(GetIComparer());
+                Assert.Equal(expected[0], set.First);
+                Assert.Equal(expected[setLength - 1], set.Last);
+            }
+            else
+            {
+                Assert.Equal(default(T), set.First);
+                Assert.Equal(default(T), set.Last);
+            }
+        }
+
         #endregion
 
         #region GetViewBetween
