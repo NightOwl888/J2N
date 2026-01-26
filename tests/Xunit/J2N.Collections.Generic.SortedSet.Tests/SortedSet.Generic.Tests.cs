@@ -221,7 +221,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void SortedSet_Generic_GetViewBetween_Empty_MinMax(int setLength)
+        public void SortedSet_Generic_GetViewBetween_Empty_FirstLast(int setLength)
         {
             if (setLength < 4) return;
 
@@ -245,6 +245,15 @@ namespace J2N.Collections.Tests
 
             Assert.Equal(default(T), view.Min);
             Assert.Equal(default(T), view.Max);
+
+            Assert.Equal(default(T), view.First);
+            Assert.Equal(default(T), view.Last);
+
+            Assert.False(view.TryGetFirst(out T value));
+            Assert.Equal(default(T), value);
+
+            Assert.False(view.TryGetLast(out value));
+            Assert.Equal(default(T), value);
         }
 
         #endregion
