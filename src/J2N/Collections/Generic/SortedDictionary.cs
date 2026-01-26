@@ -910,6 +910,74 @@ namespace J2N.Collections.Generic
         #region Java TreeMap-like Members
 
         /// <summary>
+        /// Gets the first (lowest) key in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="SortedDictionary{TKey, TValue}"/> has no elements, then the <see cref="FirstKey"/> property returns
+        /// the default value of <typeparamref name="TKey"/>.
+        /// <para/>
+        /// This corresponds to the <c>firstKey()</c> method in the JDK.
+        /// </remarks>
+        public TKey? FirstKey => _set.TryGetFirst(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
+
+        /// <summary>
+        /// Gets the last (highest) key in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="SortedDictionary{TKey, TValue}"/> has no elements, then the <see cref="LastKey"/> property returns
+        /// the default value of <typeparamref name="TKey"/>.
+        /// <para/>
+        /// This corresponds to the <c>lastKey()</c> method in the JDK.
+        /// </remarks>
+        public TKey? LastKey => _set.TryGetLast(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the first (lowest) value, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">Upon successful return, contains the first (lowest) key in the collection.</param>
+        /// <param name="value">Upon successful return, contains the value corresponding to the first (lowest) key in the collection.</param>
+        /// <returns><see langword="true"/> if a first <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// Usage Note: This corresponds to the <c>firstEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.TryGetFirst(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
+        /// is the last (highest) value, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">Upon successful return, contains the last (highest) key in the collection.</param>
+        /// <param name="value">Upon successful return, contains the value corresponding to the last (highest) key in the collection.</param>
+        /// <returns><see langword="true"/> if a last <paramref name="key"/> exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// Usage Note: This corresponds to the <c>lastEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool TryGetLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.TryGetLast(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        /// <summary>
         /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
         /// is the predecessor of the specified <paramref name="key"/>.
         /// </summary>
@@ -1407,6 +1475,10 @@ namespace J2N.Collections.Generic
 
         KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Last => _set.Last;
 
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetFirst(out KeyValuePair<TKey, TValue> result) => _set.TryGetFirst(out result);
+
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetLast(out KeyValuePair<TKey, TValue> result) => _set.TryGetLast(out result);
+
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBetween(KeyValuePair<TKey, TValue> lowerValue, KeyValuePair<TKey, TValue> upperValue)
             => _set.GetViewBetween(lowerValue, upperValue);
 
@@ -1455,7 +1527,7 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
         /// </remarks>
-        internal SortedDictionary<TKey, TValue> GetViewBetween(TKey? lowerKey, TKey? upperKey)
+        public SortedDictionary<TKey, TValue> GetViewBetween(TKey? lowerKey, TKey? upperKey)
         {
             SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewBetween(
                 new KeyValuePair<TKey, TValue>(lowerKey!, default!),
@@ -1489,7 +1561,7 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedDictionary{TKey, TValue}"/>.
         /// </remarks>
-        internal SortedDictionary<TKey, TValue> GetViewBetween(TKey? lowerKey, bool lowerKeyInclusive, TKey? upperKey, bool upperKeyInclusive)
+        public SortedDictionary<TKey, TValue> GetViewBetween(TKey? lowerKey, bool lowerKeyInclusive, TKey? upperKey, bool upperKeyInclusive)
         {
             SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewBetween(
                 new KeyValuePair<TKey, TValue>(lowerKey!, default!),
@@ -2023,10 +2095,31 @@ namespace J2N.Collections.Generic
 
             #region INavigableSet<T> members
 
-            TKey INavigableCollection<TKey>.First => _dictionary._set.First.Key;
+            TKey? INavigableCollection<TKey>.First => _dictionary._set.TryGetFirst(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
 
-            TKey INavigableCollection<TKey>.Last => _dictionary._set.Last.Key;
+            TKey? INavigableCollection<TKey>.Last => _dictionary._set.TryGetLast(out KeyValuePair<TKey, TValue> result) ? result.Key : default;
 
+            bool INavigableCollection<TKey>.TryGetFirst([MaybeNullWhen(false)] out TKey result)
+            {
+                if (_dictionary._set.TryGetFirst(out KeyValuePair<TKey, TValue> kvp))
+                {
+                    result = kvp.Key;
+                    return true;
+                }
+                result = default;
+                return false;
+            }
+
+            bool INavigableCollection<TKey>.TryGetLast([MaybeNullWhen(false)] out TKey result)
+            {
+                if (_dictionary._set.TryGetLast(out KeyValuePair<TKey, TValue> kvp))
+                {
+                    result = kvp.Key;
+                    return true;
+                }
+                result = default;
+                return false;
+            }
             INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBetween(TKey? lowerKey, TKey? upperKey)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewBetween() and properly

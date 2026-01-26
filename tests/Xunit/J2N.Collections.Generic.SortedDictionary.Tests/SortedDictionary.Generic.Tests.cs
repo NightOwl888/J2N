@@ -406,5 +406,45 @@ namespace J2N.Collections.Tests
         }
 
         #endregion
+
+        #region FirstKey and LastKey
+
+        // J2N: Added FirstKey and LastKey properties to replace Min and Max
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_FirstAndLast(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            if (count > 0)
+            {
+                List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+                expected.Sort(GetIComparer());
+                Assert.Equal(expected[0].Key, dictionary.FirstKey);
+                Assert.Equal(expected[count - 1].Key, dictionary.LastKey);
+
+                Assert.True(dictionary.TryGetFirst(out TKey key, out TValue value));
+                Assert.Equal(expected[0].Key, key);
+                Assert.Equal(expected[0].Value, value);
+
+                Assert.True(dictionary.TryGetLast(out key, out value));
+                Assert.Equal(expected[count - 1].Key, key);
+                Assert.Equal(expected[count - 1].Value, value);
+            }
+            else
+            {
+                Assert.Equal(default(TKey), dictionary.FirstKey);
+                Assert.Equal(default(TKey), dictionary.LastKey);
+
+                Assert.False(dictionary.TryGetFirst(out TKey key, out TValue value));
+                Assert.Equal(default(TKey), key);
+                Assert.Equal(default(TValue), value);
+
+                Assert.False(dictionary.TryGetLast(out key, out value));
+                Assert.Equal(default(TKey), key);
+                Assert.Equal(default(TValue), value);
+            }
+        }
+
+        #endregion FirstKey and LastKey
     }
 }

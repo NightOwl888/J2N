@@ -54,6 +54,18 @@ namespace J2N.Collections.Tests
 
             Assert.Equal(5, view.First);
             Assert.Equal(7, view.Last);
+
+            Assert.True(set.TryGetFirst(out int value));
+            Assert.Equal(1, value);
+
+            Assert.True(set.TryGetLast(out value));
+            Assert.Equal(9, value);
+
+            Assert.True(view.TryGetFirst(out value));
+            Assert.Equal(5, value);
+
+            Assert.True(view.TryGetLast(out value));
+            Assert.Equal(7, value);
         }
 
         [Fact]
@@ -104,11 +116,20 @@ namespace J2N.Collections.Tests
                     {
                         Assert.Equal(default(int), view.First);
                         Assert.Equal(default(int), view.Last);
+
+                        Assert.False(view.TryGetFirst(out _));
+                        Assert.False(view.TryGetLast(out _));
                     }
                     else
                     {
                         Assert.Equal(i + ((i + 1) % 2), view.First);
                         Assert.Equal(j - ((j + 1) % 2), view.Last);
+
+                        Assert.True(view.TryGetFirst(out int value));
+                        Assert.Equal(i + ((i + 1) % 2), value);
+
+                        Assert.True(view.TryGetLast(out value));
+                        Assert.Equal(j - ((j + 1) % 2), value);
                     }
                 }
             }

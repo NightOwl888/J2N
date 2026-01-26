@@ -4535,7 +4535,7 @@ namespace J2N.Collections.Generic
         /// </summary>
         /// <remarks>
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="First"/> property returns
-        /// the <see langword="null"/>.
+        /// the default value of <typeparamref name="T"/>.
         /// <para/>
         /// This corresponds to the <c>first()</c> method in the JDK.
         /// </remarks>
@@ -4551,6 +4551,54 @@ namespace J2N.Collections.Generic
         /// This corresponds to the <c>last()</c> method in the JDK.
         /// </remarks>
         public T? Last => MaxInternal; // J2N: Added for consistency with other view members (Max doesn't correspond well with GetViewAfter())
+
+        /// <summary>
+        /// Gets the first (lowest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="result">Upon successful return, contains the first (lowest) value.</param>
+        /// <returns><see langword="true"/> if a first value exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>first()</c> method in the JDK. Calling <see cref="TryGetFirst(out T)"/> is
+        /// generally a better fit than using <see cref="First"/>, since using <see cref="First"/> requires to
+        /// check for <see cref="ICollection{T}.Count"/> > 0 on value types to determine whether a first value
+        /// exists in the collection.
+        /// </remarks>
+        public bool TryGetFirst([MaybeNullWhen(false)] out T result) => DoTryGetFirst(out result);
+
+        internal virtual bool DoTryGetFirst([MaybeNullWhen(false)] out T result)
+        {
+            if (count > 0)
+            {
+                result = MinInternal!;
+                return true;
+            }
+            result = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Gets the last (highest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="result">Upon successful return, contains the last (highest) value.</param>
+        /// <returns><see langword="true"/> if a last value exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>last()</c> method in the JDK. Calling <see cref="TryGetLast(out T)"/> is
+        /// generally a better fit than using <see cref="Last"/>, since using <see cref="Last"/> requires to
+        /// check for <see cref="ICollection{T}.Count"/> > 0 on value types to determine whether a last value
+        /// exists in the collection.
+        /// </remarks>
+        public bool TryGetLast([MaybeNullWhen(false)] out T result) => DoTryGetLast(out result);
+
+        internal virtual bool DoTryGetLast([MaybeNullWhen(false)] out T result)
+        {
+            if (count > 0)
+            {
+                result = MaxInternal!;
+                return true;
+            }
+            result = default;
+            return false;
+        }
 
         /// <summary>
         /// Returns an <see cref="IEnumerable{T}"/> that iterates over the

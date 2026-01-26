@@ -181,5 +181,97 @@ namespace J2N.Collections.Tests
             Assert.True(dictionary.TryGetValue("a", out string value));
             Assert.Equal("b", value);
         }
+
+        [Fact]
+        public void SortedDictionary_Generic_GetViewBetween_FirstLast()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 100,
+                [3] = 300,
+                [5] = 500,
+                [7] = 700,
+                [9] = 900,
+            };
+            SortedDictionary<int, int> view = dictionary.GetViewBetween(4, 8);
+
+            Assert.True(dictionary.ContainsKey(1));
+            Assert.True(dictionary.ContainsKey(3));
+            Assert.True(dictionary.ContainsKey(5));
+            Assert.True(dictionary.ContainsKey(7));
+            Assert.True(dictionary.ContainsKey(9));
+
+            Assert.False(view.ContainsKey(1));
+            Assert.False(view.ContainsKey(3));
+            Assert.True(view.ContainsKey(5));
+            Assert.True(view.ContainsKey(7));
+            Assert.False(view.ContainsKey(9));
+
+            Assert.Equal(1, dictionary.FirstKey);
+            Assert.Equal(9, dictionary.LastKey);
+
+            Assert.Equal(5, view.FirstKey);
+            Assert.Equal(7, view.LastKey);
+
+            Assert.True(dictionary.TryGetFirst(out int key, out int value));
+            Assert.Equal(1, key);
+            Assert.Equal(100, value);
+
+            Assert.True(dictionary.TryGetLast(out key, out value));
+            Assert.Equal(9, key);
+            Assert.Equal(900, value);
+
+            Assert.True(view.TryGetFirst(out key, out value));
+            Assert.Equal(5, key);
+            Assert.Equal(500, value);
+
+            Assert.True(view.TryGetLast(out key, out value));
+            Assert.Equal(7, key);
+            Assert.Equal(700, value);
+        }
+
+        // J2N: Added First and Last properties to replace Min and Max
+        [Fact]
+        public void SortedDictionary_Generic_GetViewBetween_FirstLast_Exhaustive()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [7] = 700,
+                [11] = 1100,
+                [3] = 300,
+                [1] = 100,
+                [5] = 500,
+                [9] = 900,
+                [13] = 1300,
+            };
+            for (int i = 0; i < 14; i++)
+            {
+                for (int j = i; j < 14; j++)
+                {
+                    SortedDictionary<int, int> view = dictionary.GetViewBetween(i, j);
+
+                    if (j < i || (j == i && i % 2 == 0))
+                    {
+                        Assert.Equal(default(int), view.FirstKey);
+                        Assert.Equal(default(int), view.LastKey);
+
+                        Assert.False(view.TryGetFirst(out _, out _));
+                        Assert.False(view.TryGetLast(out _, out _));
+                    }
+                    else
+                    {
+                        Assert.Equal(i + ((i + 1) % 2), view.FirstKey);
+                        Assert.Equal(j - ((j + 1) % 2), view.LastKey);
+
+                        Assert.True(view.TryGetFirst(out int key, out int value));
+                        Assert.Equal(i + ((i + 1) % 2), key);
+                        Assert.Equal((i + ((i + 1) % 2)) * 100, value);
+                        Assert.True(view.TryGetLast(out key, out value));
+                        Assert.Equal(j - ((j + 1) % 2), key);
+                        Assert.Equal((j - ((j + 1) % 2)) * 100, value);
+                    }
+                }
+            }
+        }
     }
 }

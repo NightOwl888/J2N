@@ -108,6 +108,10 @@ namespace J2N.Collections.Tests
             }
         }
 
+        #endregion
+
+        #region First and Last
+
         // J2N: Added First and Last properties to replace Min and Max
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
@@ -120,11 +124,23 @@ namespace J2N.Collections.Tests
                 expected.Sort(GetIComparer());
                 Assert.Equal(expected[0], set.First);
                 Assert.Equal(expected[setLength - 1], set.Last);
+
+                Assert.True(set.TryGetFirst(out T value));
+                Assert.Equal(expected[0], value);
+
+                Assert.True(set.TryGetLast(out value));
+                Assert.Equal(expected[setLength - 1], value);
             }
             else
             {
                 Assert.Equal(default(T), set.First);
                 Assert.Equal(default(T), set.Last);
+
+                Assert.False(set.TryGetFirst(out T value));
+                Assert.Equal(default(T), value);
+
+                Assert.False(set.TryGetLast(out value));
+                Assert.Equal(default(T), value);
             }
         }
 

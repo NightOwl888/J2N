@@ -301,6 +301,20 @@ namespace J2N.Collections.Generic
                 }
             }
 
+            internal override bool DoTryGetFirst([MaybeNullWhen(false)] out T result)
+            {
+                VersionCheck(updateCount: true);
+
+                return base.DoTryGetFirst(out result);
+            }
+
+            internal override bool DoTryGetLast([MaybeNullWhen(false)] out T result)
+            {
+                VersionCheck(updateCount: true);
+
+                return base.DoTryGetLast(out result);
+            }
+
             internal override bool InOrderTreeWalk(TreeWalkPredicate<T> action)
             {
                 VersionCheck();

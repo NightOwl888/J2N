@@ -52,6 +52,32 @@ namespace J2N.Collections.Generic
         T? Last { get; }
 
         /// <summary>
+        /// Gets the first (lowest) value in the <see cref="INavigableCollection{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="result">Upon successful return, contains the first (lowest) value.</param>
+        /// <returns><see langword="true"/> if a first value exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>first()</c> method in the JDK. Calling <see cref="TryGetFirst(out T)"/> is
+        /// generally a better fit than using <see cref="First"/>, since using <see cref="First"/> requires to
+        /// check for <see cref="ICollection{T}.Count"/> > 0 on value types to determine whether a first value
+        /// exists in the collection.
+        /// </remarks>
+        bool TryGetFirst([MaybeNullWhen(false)] out T result);
+
+        /// <summary>
+        /// Gets the last (highest) value in the <see cref="INavigableCollection{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="result">Upon successful return, contains the last (highest) value.</param>
+        /// <returns><see langword="true"/> if a last value exists; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>last()</c> method in the JDK. Calling <see cref="TryGetLast(out T)"/> is
+        /// generally a better fit than using <see cref="Last"/>, since using <see cref="Last"/> requires to
+        /// check for <see cref="ICollection{T}.Count"/> > 0 on value types to determine whether a last value
+        /// exists in the collection.
+        /// </remarks>
+        bool TryGetLast([MaybeNullWhen(false)] out T result);
+
+        /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/>.
         /// </summary>
         /// <param name="lowerValue">The lowest desired value in the view.</param>
