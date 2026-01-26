@@ -2,6 +2,7 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using J2N.Collections.Generic;
+using J2N.TestUtilities.Xunit;
 using System;
 using System.Linq;
 using Xunit;
@@ -446,5 +447,116 @@ namespace J2N.Collections.Tests
         }
 
         #endregion FirstKey and LastKey
+
+        #region GetViewBetween
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBetween_EntireSet(int count)
+        {
+            if (count > 0)
+            {
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+                SortedDictionary<TKey, TValue> view = dictionary.GetViewBetween(firstElement.Key, lastElement.Key);
+                Assert.Equal(count, view.Count);
+                Assert.True(dictionary.SequenceEqual(view));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBetween_MiddleOfSet(int count)
+        {
+            if (count >= 3)
+            {
+                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
+
+                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(count - 2);
+                foreach (SCG.KeyValuePair<TKey, TValue> kvp in dictionary)
+                    if (comparer.Compare(kvp, firstElement) >= 0 && comparer.Compare(kvp, lastElement) <= 0)
+                        expected.Add(kvp);
+
+                SortedDictionary<TKey, TValue> view = dictionary.GetViewBetween(firstElement.Key, lastElement.Key);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBetween_LowerValueGreaterThanUpperValue_ThrowsArgumentException(int count)
+        {
+            if (count >= 2)
+            {
+                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+                if (comparer.Compare(firstElement, lastElement) < 0)
+                    AssertExtensions.Throws<ArgumentException>("lowerValue", /*null,*/ () => dictionary.GetViewBetween(lastElement.Key, firstElement.Key)); // J2N TODO: We should probably not include a field name here because it bleeds through from set to dictioanry (which has a different name)
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBetween_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int count)
+        {
+            if (count >= 3)
+            {
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+                SCG.KeyValuePair<TKey, TValue> middleElement = dictionary.ElementAt(count / 2);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedDictionary<TKey, TValue> view = dictionary.GetViewBetween(firstElement.Key, middleElement.Key);
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBetween(middleElement.Key, lastElement.Key)); // J2N TODO: The JDK doesn't throw in this case, it simply returns an empty view
+                }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBetween_Empty_FirstLast(int count)
+        {
+            if (count < 4) return;
+
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            Assert.Equal(count, dictionary.Count);
+
+            SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+            SCG.KeyValuePair<TKey, TValue> secondElement = dictionary.ElementAt(1);
+            SCG.KeyValuePair<TKey, TValue> nextToLastElement = dictionary.ElementAt(count - 2);
+            SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+
+            SCG.KeyValuePair<TKey, TValue>[] items = dictionary.ToArray();
+            for (int i = 1; i < count - 1; i++)
+            {
+                dictionary.Remove(items[i].Key);
+            }
+            Assert.Equal(2, dictionary.Count);
+
+            SortedDictionary<TKey, TValue> view = dictionary.GetViewBetween(secondElement.Key, nextToLastElement.Key);
+            Assert.Equal(0, view.Count);
+
+            Assert.Equal(default(TKey), view.FirstKey);
+            Assert.Equal(default(TKey), view.LastKey);
+
+            Assert.False(view.TryGetFirst(out TKey key, out TValue value));
+            Assert.Equal(default(TKey), key);
+            Assert.Equal(default(TValue), value);
+
+            Assert.False(view.TryGetLast(out key, out value));
+            Assert.Equal(default(TKey), key);
+            Assert.Equal(default(TValue), value);
+        }
+
+        #endregion
     }
 }
