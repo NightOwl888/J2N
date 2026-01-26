@@ -78,6 +78,26 @@ namespace J2N.Collections.Generic
         bool TryGetLast([MaybeNullWhen(false)] out T result);
 
         /// <summary>
+        /// Removes the first (lowest) value in the <see cref="INavigableCollection{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollFirst()</c> method in the JDK.
+        /// </remarks>
+        bool RemoveFirst([MaybeNullWhen(false)] out T value); // J2N: The parameter naming of "value" instead of "result" is intentional here because this is a mutation, not a query
+
+        /// <summary>
+        /// Removes the last (highest) value in the <see cref="INavigableCollection{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollLast()</c> method in the JDK.
+        /// </remarks>
+        bool RemoveLast([MaybeNullWhen(false)] out T value); // J2N: The parameter naming of "value" instead of "result" is intentional here because this is a mutation, not a query
+
+        /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/>.
         /// </summary>
         /// <param name="lowerValue">The lowest desired value in the view.</param>

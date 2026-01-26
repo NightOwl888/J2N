@@ -66,6 +66,43 @@ namespace J2N.Collections.Tests
 
             Assert.True(view.TryGetLast(out value));
             Assert.Equal(7, value);
+
+            Assert.True(set.RemoveFirst(out value));
+            Assert.Equal(1, value);
+            Assert.Equal(3, set.First);
+            Assert.Equal(5, view.First);
+            Assert.True(view.TryGetFirst(out value));
+            Assert.Equal(5, value);
+
+            Assert.True(view.RemoveFirst(out value));
+            Assert.Equal(5, value);
+            Assert.Equal(7, view.First);
+            Assert.True(view.TryGetFirst(out value));
+            Assert.Equal(7, value);
+
+            Assert.True(set.RemoveLast(out value));
+            Assert.Equal(9, value);
+            Assert.Equal(7, set.Last);
+            Assert.Equal(7, view.Last);
+            Assert.True(view.TryGetLast(out value));
+            Assert.Equal(7, value);
+
+            Assert.True(view.RemoveLast(out value));
+            Assert.Equal(7, value);
+            Assert.Equal(0, view.Count);
+            Assert.Equal(0, view.First);
+            Assert.Equal(0, view.Last);
+            Assert.False(view.TryGetFirst(out value));
+            Assert.Equal(0, value);
+            Assert.False(view.TryGetLast(out value));
+            Assert.Equal(0, value);
+            Assert.False(view.RemoveFirst(out value));
+            Assert.Equal(0, value);
+            Assert.False(view.RemoveLast(out value));
+            Assert.Equal(0, value);
+
+            Assert.Equal(1, set.Count);
+            Assert.True(set.Contains(3));
         }
 
         [Fact]

@@ -978,6 +978,50 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
+        /// Removes the first (lowest) element in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">The key of the element before it is removed.</param>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollFirstEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool RemoveFirst([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.RemoveFirst(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        /// <summary>
+        /// Removes the last (highest) element in the <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="key">The key of the element before it is removed.</param>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollLastEntry()</c> method in the JDK.
+        /// </remarks>
+        public bool RemoveLast([MaybeNullWhen(false)] out TKey key, [MaybeNullWhen(false)] out TValue value)
+        {
+            if (_set.RemoveLast(out KeyValuePair<TKey, TValue> result))
+            {
+                key = result.Key;
+                value = result.Value;
+                return true;
+            }
+            key = default;
+            value = default;
+            return false;
+        }
+
+        /// <summary>
         /// Gets the entry in the <see cref="SortedDictionary{TKey, TValue}"/> whose key
         /// is the predecessor of the specified <paramref name="key"/>.
         /// </summary>
@@ -1478,6 +1522,10 @@ namespace J2N.Collections.Generic
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetFirst(out KeyValuePair<TKey, TValue> result) => _set.TryGetFirst(out result);
 
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetLast(out KeyValuePair<TKey, TValue> result) => _set.TryGetLast(out result);
+
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.RemoveFirst(out KeyValuePair<TKey, TValue> value) => _set.TryGetFirst(out value);
+
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.RemoveLast(out KeyValuePair<TKey, TValue> value) => _set.TryGetLast(out value);
 
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBetween(KeyValuePair<TKey, TValue> lowerValue, KeyValuePair<TKey, TValue> upperValue)
             => _set.GetViewBetween(lowerValue, upperValue);
@@ -2120,6 +2168,29 @@ namespace J2N.Collections.Generic
                 result = default;
                 return false;
             }
+
+            bool INavigableCollection<TKey>.RemoveFirst([MaybeNullWhen(false)] out TKey value)
+            {
+                if (_dictionary._set.RemoveFirst(out KeyValuePair<TKey, TValue> kvp))
+                {
+                    value = kvp.Key;
+                    return true;
+                }
+                value = default;
+                return false;
+            }
+
+            bool INavigableCollection<TKey>.RemoveLast([MaybeNullWhen(false)] out TKey value)
+            {
+                if (_dictionary._set.RemoveLast(out KeyValuePair<TKey, TValue> kvp))
+                {
+                    value = kvp.Key;
+                    return true;
+                }
+                value = default;
+                return false;
+            }
+
             INavigableCollection<TKey> INavigableCollection<TKey>.GetViewBetween(TKey? lowerKey, TKey? upperKey)
             {
                 // Note that if this is called on TreeSubSet, it overrides GetViewBetween() and properly

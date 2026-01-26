@@ -4601,6 +4601,48 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
+        /// Removes the first (lowest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollFirst()</c> method in the JDK.
+        /// </remarks>
+        public bool RemoveFirst([MaybeNullWhen(false)] out T value) => DoRemoveFirst(out value);
+
+        internal virtual bool DoRemoveFirst([MaybeNullWhen(false)] out T value)
+        {
+            if (count == 0)
+            {
+                value = default;
+                return false;
+            }
+
+            return DoRemove(MinInternal!, out value);
+        }
+
+        /// <summary>
+        /// Removes the last (highest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
+        /// </summary>
+        /// <param name="value">The value of the element before it is removed.</param>
+        /// <returns><see langword="true"/>  if the element is successfully removed; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// This corresponds to the <c>pollLast()</c> method in the JDK.
+        /// </remarks>
+        public bool RemoveLast([MaybeNullWhen(false)] out T value) => DoRemoveLast(out value);
+
+        internal virtual bool DoRemoveLast([MaybeNullWhen(false)] out T value)
+        {
+            if (count == 0)
+            {
+                value = default;
+                return false;
+            }
+
+            return DoRemove(MaxInternal!, out value);
+        }
+
+        /// <summary>
         /// Returns an <see cref="IEnumerable{T}"/> that iterates over the
         /// <see cref="SortedSet{T}"/> in reverse order.
         /// </summary>

@@ -228,6 +228,54 @@ namespace J2N.Collections.Tests
             Assert.True(view.TryGetLast(out key, out value));
             Assert.Equal(7, key);
             Assert.Equal(700, value);
+
+            Assert.True(dictionary.RemoveFirst(out key, out value));
+            Assert.Equal(1, key);
+            Assert.Equal(100, value);
+            Assert.Equal(3, dictionary.FirstKey);
+            Assert.Equal(5, view.FirstKey);
+            Assert.True(view.TryGetFirst(out key, out value));
+            Assert.Equal(5, key);
+            Assert.Equal(500, value);
+
+            Assert.True(view.RemoveFirst(out key, out value));
+            Assert.Equal(5, key);
+            Assert.Equal(500, value);
+            Assert.Equal(7, view.FirstKey);
+            Assert.True(view.TryGetFirst(out key, out value));
+            Assert.Equal(7, key);
+            Assert.Equal(700, value);
+
+            Assert.True(dictionary.RemoveLast(out key, out value));
+            Assert.Equal(9, key);
+            Assert.Equal(900, value);
+            Assert.Equal(7, dictionary.LastKey);
+            Assert.Equal(7, view.LastKey);
+            Assert.True(view.TryGetLast(out key, out value));
+            Assert.Equal(7, key);
+            Assert.Equal(700, value);
+
+            Assert.True(view.RemoveLast(out key, out value));
+            Assert.Equal(7, key);
+            Assert.Equal(700, value);
+            Assert.Equal(0, view.Count);
+            Assert.Equal(0, view.FirstKey);
+            Assert.Equal(0, view.LastKey);
+            Assert.False(view.TryGetFirst(out key, out value));
+            Assert.Equal(0, key);
+            Assert.Equal(0, value);
+            Assert.False(view.TryGetLast(out key, out value));
+            Assert.Equal(0, key);
+            Assert.Equal(0, value);
+            Assert.False(view.RemoveFirst(out key, out value));
+            Assert.Equal(0, key);
+            Assert.Equal(0, value);
+            Assert.False(view.RemoveLast(out key, out value));
+            Assert.Equal(0, key);
+            Assert.Equal(0, value);
+
+            Assert.Equal(1, dictionary.Count);
+            Assert.True(dictionary.ContainsKey(3));
         }
 
         // J2N: Added First and Last properties to replace Min and Max

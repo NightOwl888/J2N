@@ -315,6 +315,20 @@ namespace J2N.Collections.Generic
                 return base.DoTryGetLast(out result);
             }
 
+            internal override bool DoRemoveFirst([MaybeNullWhen(false)] out T value)
+            {
+                VersionCheck(updateCount: true);
+
+                return base.DoRemoveFirst(out value);
+            }
+
+            internal override bool DoRemoveLast([MaybeNullWhen(false)] out T value)
+            {
+                VersionCheck(updateCount: true);
+
+                return base.DoRemoveLast(out value);
+            }
+
             internal override bool InOrderTreeWalk(TreeWalkPredicate<T> action)
             {
                 VersionCheck();
