@@ -451,6 +451,14 @@ namespace J2N.Collections.Generic
                 return -1;
             }
 
+            // J2N: We need to override for views to ensure the underlying set version is updated
+            internal override void UpdateVersion()
+            {
+                Debug.Assert(_underlying != null);
+                _underlying!.UpdateVersion(); // [!] asserted above
+                base.UpdateVersion();
+            }
+
             /// <summary>
             /// Checks whether this subset is out of date, and updates it if necessary.
             /// <param name="updateCount">Updates the count variable if necessary.</param>
@@ -460,7 +468,7 @@ namespace J2N.Collections.Generic
             private void VersionCheckImpl(bool updateCount)
             {
                 Debug.Assert(_underlying != null);
-                if (version != _underlying!.version)
+                if (version != _underlying!.version) // [!] asserted above
                 {
                     root = _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive);
                     version = _underlying.version;
@@ -480,7 +488,7 @@ namespace J2N.Collections.Generic
             internal override int TotalCount()
             {
                 Debug.Assert(_underlying != null);
-                return _underlying!.Count;
+                return _underlying!.Count; // [!] asserted above
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary

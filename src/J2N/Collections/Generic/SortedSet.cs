@@ -2562,7 +2562,8 @@ namespace J2N.Collections.Generic
             return null;
         }
 
-        internal void UpdateVersion() => ++version;
+        // J2N: We need to override for views to ensure the underlying set version is updated
+        internal virtual void UpdateVersion() => ++version;
 
         /// <summary>
         /// Returns an <see cref="IEqualityComparer{T}"/> object that can be used to create a collection that contains individual sets.

@@ -1,41 +1,122 @@
 ﻿// Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
 
 using J2N.Collections.Generic;
 using J2N.TestUtilities.Xunit;
 using System;
-using System.Collections;
 using System.Linq;
 using Xunit;
 using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
-    public class SortedSet_TreeSubset_Int_Tests : SortedSet_TreeSubset_Tests<int>
+    public class SortedSet_TreeSubset_GetViewBetween_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override int Min => int.MinValue;
-        protected override int Max => int.MaxValue;
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.ISet<int> GenericISetFactory()
+        {
+            OriginalSet = new SortedSet<int>();
+            return OriginalSet.GetViewBetween(LowerBound, UpperBound);
+        }
+    }
+
+    public class SortedSet_TreeSubset_GetViewBetween_string_Tests : SortedSet_TreeSubset_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.ISet<string> GenericISetFactory()
+        {
+            OriginalSet = new SortedSet<string>();
+            return OriginalSet.GetViewBetween(LowerBound, UpperBound);
+        }
+    }
+
+    public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.ISet<int> GenericISetFactory()
+        {
+            OriginalSet = new SortedSet<int>();
+            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.ISet<string> GenericISetFactory()
+        {
+            OriginalSet = new SortedSet<string>();
+            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public abstract class SortedSet_TreeSubset_int_Tests : SortedSet_TreeSubset_Tests<int>
+    {
+        protected override int LowerBound => int.MinValue;
+
+        protected override int UpperBound => int.MaxValue;
 
         protected override bool DefaultValueAllowed => true;
+
 
         protected override int CreateT(int seed)
         {
             Random rand = new Random(seed);
-            return rand.Next();
+            while (true)
+            {
+                int candidate = rand.Next();
+
+                // J2N: don't allow the value to be the lower or upper bound
+                if (candidate == LowerBound || candidate == UpperBound)
+                {
+                    continue;
+                }
+                return candidate;
+            }
         }
     }
 
-    public class SortedSet_TreeSubset_String_Tests : SortedSet_TreeSubset_Tests<string>
+    public abstract class SortedSet_TreeSubset_string_Tests : SortedSet_TreeSubset_Tests<string>
     {
-        protected override string Min => 0.ToString().PadLeft(10);
-        protected override string Max => int.MaxValue.ToString().PadLeft(10);
+        protected override string LowerBound => 0.ToString().PadLeft(10);
+
+        protected override string UpperBound => int.MaxValue.ToString().PadLeft(10);
 
         protected override bool CanAddDefaultValue => false;
 
+
         protected override string CreateT(int seed)
         {
-            return seed.ToString().PadLeft(10);
+            string candidate = seed.ToString().PadLeft(10);
+            // J2N: don't allow the value to be the lower or upper bound
+            if (candidate == LowerBound)
+                return (seed + 1).ToString().PadLeft(10);
+            else if (candidate == UpperBound)
+                return (seed - 1).ToString().PadLeft(10);
+
+            return candidate;
         }
 
         public override void ICollection_Generic_Remove_DefaultValueContainedInCollection(int count)
@@ -60,17 +141,19 @@ namespace J2N.Collections.Tests
 
     public abstract class SortedSet_TreeSubset_Tests<T> : SortedSet_Generic_Tests<T>
     {
-        protected abstract T Min { get; }
-        protected abstract T Max { get; }
+        protected abstract bool HasLowerBound { get; }
+        protected abstract bool LowerBoundInclusive { get; }
+        protected abstract T LowerBound { get; }
+
+        protected abstract bool HasUpperBound { get; }
+        protected abstract bool UpperBoundInclusive { get; }
+        protected abstract T UpperBound { get; }
         protected virtual bool CanAddDefaultValue => true;
 
-        private SortedSet<T> OriginalSet { get; set; }
+        protected SortedSet<T> OriginalSet { get; set; }
 
-        protected override SCG.ISet<T> GenericISetFactory()
-        {
-            OriginalSet = new SortedSet<T>();
-            return OriginalSet.GetViewBetween(Min, Max);
-        }
+
+        protected abstract override SCG.ISet<T> GenericISetFactory();
 
         public override void ICollection_Generic_Add_DefaultValue(int count)
         {
@@ -81,6 +164,179 @@ namespace J2N.Collections.Tests
                 collection.Add(default(T));
                 Assert.Equal(count + 1, collection.Count); // collection is also updated.
                 Assert.Equal(count + 1, OriginalSet.Count);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_TreeSubSet_Add_First(int count)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
+            T first = LowerBound;
+
+            if (set.TryGetFirst(out T currentFirst))
+            {
+                Assert.NotEqual(first, currentFirst); // Sanity check - the collection should not contain first
+            }
+
+            Assert.NotEqual(first, set.First); // Sanity check - the collection should not contain first
+
+            if (LowerBoundInclusive)
+            {
+                set.Add(first);
+                Assert.Equal(count + 1, set.Count); // collection is also updated.
+                Assert.Equal(count + 1, OriginalSet.Count);
+                Assert.Equal(first, set.First);
+            }
+            else
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(first));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_TreeSubSet_Add_Last(int count)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
+            T last = UpperBound;
+
+            if (set.TryGetLast(out T currentLast))
+            {
+                Assert.NotEqual(last, currentLast); // Sanity check - the collection should not contain last
+            }
+
+            if (UpperBoundInclusive)
+            {
+                set.Add(last);
+                Assert.Equal(count + 1, set.Count); // collection is also updated.
+                Assert.Equal(count + 1, OriginalSet.Count);
+                Assert.Equal(last, set.Last);
+            }
+            else
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(last));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_TreeSubSet_Contains_First(int count)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
+            T first = LowerBound;
+
+            if (set.TryGetFirst(out T currentFirst))
+            {
+                Assert.NotEqual(first, currentFirst); // Sanity check - the collection should not contain first
+            }
+
+            if (LowerBoundInclusive)
+            {
+                Assert.True(set.Add(first));
+                Assert.Equal(count + 1, set.Count); // collection is also updated.
+                Assert.Equal(count + 1, OriginalSet.Count);
+                Assert.Equal(first, set.First);
+                Assert.True(set.Contains(first));
+            }
+            else
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(first));
+                Assert.NotEqual(first, set.First);
+                Assert.False(set.Contains(first));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_TreeSubSet_Contains_Last(int count)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
+            T last = UpperBound;
+
+            if (set.TryGetLast(out T currentLast))
+            {
+                Assert.NotEqual(last, currentLast); // Sanity check - the collection should not contain last
+            }
+
+            if (UpperBoundInclusive)
+            {
+                Assert.True(set.Add(last));
+                Assert.Equal(count + 1, set.Count); // collection is also updated.
+                Assert.Equal(count + 1, OriginalSet.Count);
+                Assert.Equal(last, set.Last);
+                Assert.True(set.Contains(last));
+            }
+            else
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(last));
+                Assert.NotEqual(last, set.Last);
+                Assert.False(set.Contains(last));
+            }
+        }
+
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_TreeSubSet_Remove_First(int count)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
+            T first = LowerBound;
+
+            if (set.TryGetFirst(out T currentFirst))
+            {
+                Assert.NotEqual(first, currentFirst); // Sanity check - the collection should not contain first
+            }
+
+            if (LowerBoundInclusive)
+            {
+                Assert.True(set.Add(first));
+                Assert.Equal(count + 1, set.Count); // collection is also updated.
+                Assert.Equal(count + 1, OriginalSet.Count);
+                Assert.Equal(first, set.First);
+                Assert.True(set.Remove(first));
+            }
+            else
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(first));
+                Assert.False(set.Remove(first));
+            }
+
+            if (set.TryGetFirst(out currentFirst))
+            {
+                Assert.NotEqual(first, currentFirst);
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_TreeSubSet_Remove_Last(int count)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
+            T last = UpperBound;
+
+            if (set.TryGetLast(out T currentLast))
+            {
+                Assert.NotEqual(last, currentLast); // Sanity check - the collection should not contain last
+            }
+
+            if (UpperBoundInclusive)
+            {
+                Assert.True(set.Add(last));
+                Assert.Equal(count + 1, set.Count); // collection is also updated.
+                Assert.Equal(count + 1, OriginalSet.Count);
+                Assert.Equal(last, set.Last);
+                Assert.True(set.Remove(last));
+            }
+            else
+            {
+                Assert.Throws<ArgumentOutOfRangeException>(() => set.Add(last));
+                Assert.False(set.Remove(last));
+            }
+
+            if (set.TryGetLast(out currentLast))
+            {
+                Assert.NotEqual(last, currentLast);
             }
         }
     }

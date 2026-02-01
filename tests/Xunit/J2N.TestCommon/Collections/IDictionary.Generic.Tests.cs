@@ -262,7 +262,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void IDictionary_Generic_ItemGet_DefaultKey(int count)
+        public virtual void IDictionary_Generic_ItemGet_DefaultKey(int count)
         {
             if (!IsReadOnly)
             {
@@ -320,7 +320,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void IDictionary_Generic_ItemSet_DefaultKey(int count)
+        public virtual void IDictionary_Generic_ItemSet_DefaultKey(int count)
         {
             if (!IsReadOnly)
             {
@@ -590,7 +590,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void IDictionary_Generic_Add_DefaultKey_DefaultValue(int count)
+        public virtual void IDictionary_Generic_Add_DefaultKey_DefaultValue(int count)
         {
             IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
             TKey missingKey = default(TKey);
@@ -609,7 +609,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void IDictionary_Generic_Add_DefaultKey_NonDefaultValue(int count)
+        public virtual void IDictionary_Generic_Add_DefaultKey_NonDefaultValue(int count)
         {
             IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
             TKey missingKey = default(TKey);
@@ -732,7 +732,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void IDictionary_Generic_ContainsKey_DefaultKeyNotContainedInDictionary(int count)
+        public virtual void IDictionary_Generic_ContainsKey_DefaultKeyNotContainedInDictionary(int count)
         {
             IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
             if (DefaultValueAllowed)
@@ -826,7 +826,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void IDictionary_Generic_RemoveKey_DefaultKeyNotContainedInDictionary(int count)
+        public virtual void IDictionary_Generic_RemoveKey_DefaultKeyNotContainedInDictionary(int count)
         {
             if (!IsReadOnly)
             {
@@ -935,7 +935,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void IDictionary_Generic_TryGetValue_DefaultKeyNotContainedInDictionary(int count)
+        public virtual void IDictionary_Generic_TryGetValue_DefaultKeyNotContainedInDictionary(int count)
         {
             IDictionary<TKey, TValue> dictionary = GenericIDictionaryFactory(count);
             TValue outValue;

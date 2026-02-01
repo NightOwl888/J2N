@@ -204,7 +204,7 @@ namespace J2N.Collections.Tests
 
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
-        public void SortedDictionary_Generic_RemoveKey_DefaultKeyNotContainedInDictionary(int count)
+        public virtual void SortedDictionary_Generic_RemoveKey_DefaultKeyNotContainedInDictionary(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
             TValue outValue;
