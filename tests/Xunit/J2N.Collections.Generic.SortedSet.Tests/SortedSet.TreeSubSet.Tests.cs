@@ -12,10 +12,8 @@ namespace J2N.Collections.Tests
 {
     public class SortedSet_TreeSubset_GetViewBetween_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -28,10 +26,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -43,10 +39,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -59,10 +53,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -74,10 +66,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
 
@@ -90,10 +80,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -105,10 +93,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -121,10 +107,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -136,10 +120,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
 
@@ -152,10 +134,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -168,10 +148,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBefore_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -184,10 +162,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBefore_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -199,10 +175,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBefore_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -215,10 +189,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBefore_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -230,10 +202,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBefore_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
 
@@ -246,10 +216,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewBefore_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -261,10 +229,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewAfter_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -277,10 +243,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewAfter_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -292,10 +256,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewAfter_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -308,10 +270,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewAfter_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -323,10 +283,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewAfter_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -339,10 +297,8 @@ namespace J2N.Collections.Tests
 
     public class SortedSet_TreeSubset_GetViewAfter_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<string> GenericISetFactory()
@@ -423,11 +379,8 @@ namespace J2N.Collections.Tests
 
     public abstract class SortedSet_TreeSubset_Tests<T> : SortedSet_Generic_Tests<T>
     {
-        protected abstract bool HasLowerBound { get; }
         protected abstract override bool LowerBoundInclusive { get; }
         protected abstract T LowerBound { get; }
-
-        protected abstract bool HasUpperBound { get; }
         protected abstract override bool UpperBoundInclusive { get; }
         protected abstract T UpperBound { get; }
         protected virtual bool CanAddDefaultValue => true;

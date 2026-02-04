@@ -8,10 +8,7 @@ namespace J2N.Collections.Tests
 {
     public class SortedDictionary_TreeSubset_GetViewBetween_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
-
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -24,10 +21,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -40,10 +35,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
@@ -55,10 +48,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -70,10 +61,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
@@ -85,10 +74,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -100,10 +87,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
@@ -115,10 +100,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -130,10 +113,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
@@ -145,10 +126,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -161,10 +140,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBefore_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -177,10 +154,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBefore_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -192,10 +167,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBefore_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -208,10 +181,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBefore_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -223,10 +194,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBefore_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
 
@@ -239,10 +208,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewBefore_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => false;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => true;
         protected override bool UpperBoundInclusive => false;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -255,10 +222,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewAfter_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -271,10 +236,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewAfter_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -286,10 +249,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewAfter_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -302,10 +263,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewAfter_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => true;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -317,10 +276,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewAfter_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
 
@@ -333,10 +290,8 @@ namespace J2N.Collections.Tests
 
     public class SortedDictionary_TreeSubset_GetViewAfter_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
-        protected override bool HasLowerBound => true;
         protected override bool LowerBoundInclusive => false;
 
-        protected override bool HasUpperBound => false;
         protected override bool UpperBoundInclusive => true;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
@@ -427,11 +382,8 @@ namespace J2N.Collections.Tests
 
     public abstract class SortedDictionary_TreeSubset_Tests<TKey, TValue> : SortedDictionary_Generic_Tests<TKey, TValue>
     {
-        protected abstract bool HasLowerBound { get; }
         protected abstract override bool LowerBoundInclusive { get; }
         protected abstract TKey LowerBound { get; }
-
-        protected abstract bool HasUpperBound { get; }
         protected abstract override bool UpperBoundInclusive { get; }
         protected abstract TKey UpperBound { get; }
         protected virtual bool CanAddDefaultValue => true;
