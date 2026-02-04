@@ -18,6 +18,9 @@ namespace J2N.Collections.Tests
     public abstract class SortedSet_Generic_Tests<T> : ISet_Generic_Tests<T>
     {
         #region ISet<T> Helper Methods
+        // J2N: Added virtual properties to control inclusivity of bounds in GetViewBetween tests
+        protected virtual bool LowerBoundInclusive => true;
+        protected virtual bool UpperBoundInclusive => true;
 
         protected override SCG.ISet<T> GenericISetFactory()
         {
@@ -148,6 +151,38 @@ namespace J2N.Collections.Tests
 
         #region GetViewBetween
 
+        private SCG.List<T> GetExpectedViewBetween(SortedSet<T> set, T lowerValue, T upperValue)
+        {
+            SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+            SCG.List<T> expected = new SCG.List<T>(set.Count);
+            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
+            if (LowerBoundInclusive && UpperBoundInclusive)
+            {
+                foreach (T value in set)
+                    if (comparer.Compare(value, lowerValue) >= 0 && comparer.Compare(value, upperValue) <= 0)
+                        expected.Add(value);
+            }
+            else if (!LowerBoundInclusive && !UpperBoundInclusive)
+            {
+                foreach (T value in set)
+                    if (comparer.Compare(value, lowerValue) > 0 && comparer.Compare(value, upperValue) < 0)
+                        expected.Add(value);
+            }
+            else if (!LowerBoundInclusive)
+            {
+                foreach (T value in set)
+                    if (comparer.Compare(value, lowerValue) > 0 && comparer.Compare(value, upperValue) <= 0)
+                        expected.Add(value);
+            }
+            else if (!UpperBoundInclusive)
+            {
+                foreach (T value in set)
+                    if (comparer.Compare(value, lowerValue) >= 0 && comparer.Compare(value, upperValue) < 0)
+                        expected.Add(value);
+            }
+            return expected;
+        }
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedSet_Generic_GetViewBetween_EntireSet(int setLength)
@@ -158,8 +193,10 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, lastElement);
-                Assert.Equal(setLength, view.Count);
-                Assert.True(set.SetEquals(view));
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, lastElement);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SetEquals(expected));
             }
         }
 
@@ -174,10 +211,8 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
 
-                SCG.List<T> expected = new SCG.List<T>(setLength - 2);
-                foreach (T value in set)
-                    if (comparer.Compare(value, firstElement) >= 0 && comparer.Compare(value, lastElement) <= 0)
-                        expected.Add(value);
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, lastElement);
 
                 SortedSet<T> view = set.GetViewBetween(firstElement, lastElement);
                 Assert.Equal(expected.Count, view.Count);

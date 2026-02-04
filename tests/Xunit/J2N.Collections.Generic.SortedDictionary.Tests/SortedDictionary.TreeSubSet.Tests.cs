@@ -68,6 +68,95 @@ namespace J2N.Collections.Tests
         }
     }
 
+    public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => false;
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => false;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => false;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => false;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => false;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => false;
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => false;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => false;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+        }
+    }
 
     public abstract class SortedDictionary_TreeSubset_int_int_Tests : SortedDictionary_TreeSubset_Tests<int, int>
     {
@@ -150,11 +239,11 @@ namespace J2N.Collections.Tests
     public abstract class SortedDictionary_TreeSubset_Tests<TKey, TValue> : SortedDictionary_Generic_Tests<TKey, TValue>
     {
         protected abstract bool HasLowerBound { get; }
-        protected abstract bool LowerBoundInclusive { get; }
+        protected abstract override bool LowerBoundInclusive { get; }
         protected abstract TKey LowerBound { get; }
 
         protected abstract bool HasUpperBound { get; }
-        protected abstract bool UpperBoundInclusive { get; }
+        protected abstract override bool UpperBoundInclusive { get; }
         protected abstract TKey UpperBound { get; }
         protected virtual bool CanAddDefaultValue => true;
 

@@ -17,6 +17,11 @@ namespace J2N.Collections.Tests
     public abstract class SortedDictionary_Generic_Tests<TKey, TValue> : IDictionary_Generic_Tests<TKey, TValue>
     {
         #region IDictionary<TKey, TValue> Helper Methods
+
+        // J2N: Added virtual properties to control inclusivity of bounds in GetViewBetween tests
+        protected virtual bool LowerBoundInclusive => true;
+        protected virtual bool UpperBoundInclusive => true;
+
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
         protected override bool Enumerator_Empty_ModifiedDuringEnumeration_ThrowsInvalidOperationException => false;
@@ -450,6 +455,38 @@ namespace J2N.Collections.Tests
 
         #region GetViewBetween
 
+        private SCG.List<SCG.KeyValuePair<TKey, TValue>> GetExpectedViewBetween(SortedDictionary<TKey, TValue> dictionary, SCG.KeyValuePair<TKey, TValue> lowerElement, SCG.KeyValuePair<TKey, TValue> upperElement)
+        {
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+            SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(dictionary.Count);
+            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
+            if (LowerBoundInclusive && UpperBoundInclusive)
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, lowerElement) >= 0 && comparer.Compare(value, upperElement) <= 0)
+                        expected.Add(value);
+            }
+            else if (!LowerBoundInclusive && !UpperBoundInclusive)
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, lowerElement) > 0 && comparer.Compare(value, upperElement) < 0)
+                        expected.Add(value);
+            }
+            else if (!LowerBoundInclusive)
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, lowerElement) > 0 && comparer.Compare(value, upperElement) <= 0)
+                        expected.Add(value);
+            }
+            else if (!UpperBoundInclusive)
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, lowerElement) >= 0 && comparer.Compare(value, upperElement) < 0)
+                        expected.Add(value);
+            }
+            return expected;
+        }
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_GetViewBetween_EntireSet(int count)
@@ -460,8 +497,10 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBetween(firstElement.Key, lastElement.Key);
-                Assert.Equal(count, view.Count);
-                Assert.True(dictionary.SequenceEqual(view));
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = GetExpectedViewBetween(dictionary, firstElement, lastElement);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
             }
         }
 
@@ -476,10 +515,8 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
 
-                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(count - 2);
-                foreach (SCG.KeyValuePair<TKey, TValue> kvp in dictionary)
-                    if (comparer.Compare(kvp, firstElement) >= 0 && comparer.Compare(kvp, lastElement) <= 0)
-                        expected.Add(kvp);
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = GetExpectedViewBetween(dictionary, firstElement, lastElement);
 
                 SortedDictionary<TKey, TValue> view = dictionary.GetViewBetween(firstElement.Key, lastElement.Key);
                 Assert.Equal(expected.Count, view.Count);
