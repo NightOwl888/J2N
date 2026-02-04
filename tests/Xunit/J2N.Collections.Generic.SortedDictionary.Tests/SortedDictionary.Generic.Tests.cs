@@ -594,6 +594,238 @@ namespace J2N.Collections.Tests
             Assert.Equal(default(TValue), value);
         }
 
-        #endregion
+        #endregion GetViewBetween
+
+        #region GetViewBefore
+
+        private SCG.List<SCG.KeyValuePair<TKey, TValue>> GetExpectedViewBefore(SortedDictionary<TKey, TValue> dictionary, SCG.KeyValuePair<TKey, TValue> upperElement)
+        {
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+            SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(dictionary.Count);
+            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
+            if (UpperBoundInclusive)
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, upperElement) <= 0)
+                        expected.Add(value);
+            }
+            else
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, upperElement) < 0)
+                        expected.Add(value);
+            }
+            return expected;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBefore_EntireSet(int count)
+        {
+            if (count > 0)
+            {
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+                SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key);
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = GetExpectedViewBefore(dictionary, lastElement);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBefore_MiddleOfSet(int count)
+        {
+            if (count >= 3)
+            {
+                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
+
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = GetExpectedViewBefore(dictionary, lastElement);
+
+                SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(lastElement.Key);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBefore_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int count)
+        {
+            if (count >= 3)
+            {
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+                SCG.KeyValuePair<TKey, TValue> middleElement = dictionary.ElementAt(count / 2);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+                if (comparer.Compare(middleElement, lastElement) < 0)
+                {
+                    SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(middleElement.Key);
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key)); // J2N TODO: The JDK doesn't throw in this case, it simply returns an empty view
+                }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewBefore_Empty_FirstLast(int count)
+        {
+            if (count < 4) return;
+
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            Assert.Equal(count, dictionary.Count);
+
+            SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+            SCG.KeyValuePair<TKey, TValue> secondElement = dictionary.ElementAt(1);
+            SCG.KeyValuePair<TKey, TValue> nextToLastElement = dictionary.ElementAt(count - 2);
+            SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+
+            SCG.KeyValuePair<TKey, TValue>[] items = dictionary.ToArray();
+            for (int i = 0; i < count - 1; i++)
+            {
+                dictionary.Remove(items[i].Key);
+            }
+            Assert.Equal(1, dictionary.Count);
+
+            SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(nextToLastElement.Key);
+            Assert.Equal(0, view.Count);
+
+            Assert.Equal(default(TKey), view.FirstKey);
+            Assert.Equal(default(TKey), view.LastKey);
+
+            Assert.False(view.TryGetFirst(out TKey key, out TValue value));
+            Assert.Equal(default(TKey), key);
+            Assert.Equal(default(TValue), value);
+
+            Assert.False(view.TryGetLast(out key, out value));
+            Assert.Equal(default(TKey), key);
+            Assert.Equal(default(TValue), value);
+        }
+
+        #endregion GetViewBefore
+
+        #region GetViewAfter
+
+        private SCG.List<SCG.KeyValuePair<TKey, TValue>> GetExpectedViewAfter(SortedDictionary<TKey, TValue> dictionary, SCG.KeyValuePair<TKey, TValue> lowerElement)
+        {
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+            SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(dictionary.Count);
+            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
+            if (LowerBoundInclusive)
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, lowerElement) >= 0)
+                        expected.Add(value);
+            }
+            else
+            {
+                foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
+                    if (comparer.Compare(value, lowerElement) > 0)
+                        expected.Add(value);
+            }
+            return expected;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewAfter_EntireSet(int count)
+        {
+            if (count > 0)
+            {
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+                SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key);
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = GetExpectedViewAfter(dictionary, firstElement);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewAfter_MiddleOfSet(int count)
+        {
+            if (count >= 3)
+            {
+                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
+
+                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
+                SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = GetExpectedViewAfter(dictionary, firstElement);
+
+                SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(firstElement.Key);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewAfter_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int count)
+        {
+            if (count >= 3)
+            {
+                SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+                SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+                SCG.KeyValuePair<TKey, TValue> middleElement = dictionary.ElementAt(count / 2);
+                SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(middleElement.Key);
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key)); // J2N TODO: The JDK doesn't throw in this case, it simply returns an empty view
+                }
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewAfter_Empty_FirstLast(int count)
+        {
+            if (count < 4) return;
+
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            Assert.Equal(count, dictionary.Count);
+
+            SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(0);
+            SCG.KeyValuePair<TKey, TValue> secondElement = dictionary.ElementAt(1);
+            SCG.KeyValuePair<TKey, TValue> nextToLastElement = dictionary.ElementAt(count - 2);
+            SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
+
+            SCG.KeyValuePair<TKey, TValue>[] items = dictionary.ToArray();
+            for (int i = 1; i < count; i++)
+            {
+                dictionary.Remove(items[i].Key);
+            }
+            Assert.Equal(1, dictionary.Count);
+
+            SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(secondElement.Key);
+            Assert.Equal(0, view.Count);
+
+            Assert.Equal(default(TKey), view.FirstKey);
+            Assert.Equal(default(TKey), view.LastKey);
+
+            Assert.False(view.TryGetFirst(out TKey key, out TValue value));
+            Assert.Equal(default(TKey), key);
+            Assert.Equal(default(TValue), value);
+
+            Assert.False(view.TryGetLast(out key, out value));
+            Assert.Equal(default(TKey), key);
+            Assert.Equal(default(TValue), value);
+        }
+
+        #endregion GetViewAfter
     }
 }

@@ -523,6 +523,54 @@ namespace J2N.Collections.Generic
                 return (TreeSubSet)_underlying.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
             }
 
+            // This passes functionality down to the underlying tree, clipping edges if necessary
+            // There's nothing gained by having a nested subset. May as well draw it from the base
+            // Cannot increase the bounds of the subset, can only decrease it
+            public override SortedSet<T> GetViewBefore([AllowNull] T upperValue)
+            {
+                if (IsTooHigh(upperValue, _uBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                }
+                return (TreeSubSet)_underlying.GetViewBefore(upperValue, _uBoundInclusive);
+            }
+
+            // This passes functionality down to the underlying tree, clipping edges if necessary
+            // There's nothing gained by having a nested subset. May as well draw it from the base
+            // Cannot increase the bounds of the subset, can only decrease it
+            public override SortedSet<T> GetViewBefore([AllowNull] T upperValue, bool upperValueInclusive)
+            {
+                if (IsTooHigh(upperValue, upperValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                }
+                return (TreeSubSet)_underlying.GetViewBefore(upperValue, upperValueInclusive);
+            }
+
+            // This passes functionality down to the underlying tree, clipping edges if necessary
+            // There's nothing gained by having a nested subset. May as well draw it from the base
+            // Cannot increase the bounds of the subset, can only decrease it
+            public override SortedSet<T> GetViewAfter([AllowNull] T lowerValue)
+            {
+                if (IsTooLow(lowerValue, _lBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                }
+                return (TreeSubSet)_underlying.GetViewAfter(lowerValue, _lBoundInclusive);
+            }
+
+            // This passes functionality down to the underlying tree, clipping edges if necessary
+            // There's nothing gained by having a nested subset. May as well draw it from the base
+            // Cannot increase the bounds of the subset, can only decrease it
+            public override SortedSet<T> GetViewAfter([AllowNull] T lowerValue, bool lowerValueInclusive)
+            {
+                if (IsTooLow(lowerValue, lowerValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                }
+                return (TreeSubSet)_underlying.GetViewAfter(lowerValue, lowerValueInclusive);
+            }
+
 #if DEBUG
             internal override void IntersectWithEnumerable(IEnumerable<T> other)
             {

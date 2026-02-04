@@ -158,6 +158,195 @@ namespace J2N.Collections.Tests
         }
     }
 
+
+    public class SortedDictionary_TreeSubset_GetViewBefore_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => false;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewBefore(UpperBound);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBefore_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => false;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewBefore(UpperBound);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBefore_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => false;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBefore_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => false;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBefore_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => false;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => false;
+
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewBefore_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => false;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => true;
+        protected override bool UpperBoundInclusive => false;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+        }
+    }
+
+
+    public class SortedDictionary_TreeSubset_GetViewAfter_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => false;
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewAfter(LowerBound);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewAfter_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => false;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewAfter(LowerBound);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewAfter_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => false;
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewAfter_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool HasUpperBound => false;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewAfter_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => false;
+
+        protected override bool HasUpperBound => false;
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewAfter_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool HasLowerBound => true;
+        protected override bool LowerBoundInclusive => false;
+
+        protected override bool HasUpperBound => false;
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+        }
+    }
+
+
     public abstract class SortedDictionary_TreeSubset_int_int_Tests : SortedDictionary_TreeSubset_Tests<int, int>
     {
         protected override int LowerBound => int.MinValue;
