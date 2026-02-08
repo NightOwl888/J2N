@@ -736,6 +736,11 @@ namespace J2N.Collections.Tests
 
             Assert.Equal(setView.ToArray(), lookupView.ToArray());
 
+            setView = set.GetViewBetween("3", true, "6", true);
+            lookupView = lookup.GetViewBetween("3".AsSpan(), true, "6".AsSpan(), true);
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
             // Exclusive
             setView = set.GetViewBetween("3", false, "6", false);
             lookupView = lookup.GetViewBetween("3".AsSpan(), false, "6".AsSpan(), false);
@@ -743,11 +748,137 @@ namespace J2N.Collections.Tests
             Assert.Equal(setView.ToArray(), lookupView.ToArray());
         }
 
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_GetSpanAlternateLookup_GetViewBetween_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<string> comparer = StringComparer.Ordinal;
+                var set = new SortedSet<string>(comparer);
+                for (int i = 0; i < setLength; i++)
+                    set.Add(i.ToString());
+
+                string firstElement = set.ElementAt(0);
+                string middleElement = set.ElementAt(setLength / 2);
+                string lastElement = set.ElementAt(setLength - 1);
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedSet<string> view = set.GetViewBetween(firstElement, middleElement);
+                    var lookup = view.GetSpanAlternateLookup<char>();
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(middleElement.AsSpan(), lastElement));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(middleElement.AsSpan(), lowerValueInclusive: true, lastElement, upperValueInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(middleElement.AsSpan(), lowerValueInclusive: false, lastElement, upperValueInclusive: false));
+                }
+            }
+        }
+
         [Fact]
-        public void SortedSet_GetSpanAlternateLookup_WorksOnRootSet()
+        public void SortedSet_GetSpanAlternateLookup_GetViewBefore_MatchesSet()
         {
             var set = new SortedSet<string>(StringComparer.Ordinal);
-            AssertSpanLookupMatchesRootSet(set);
+            for (int i = 0; i < 10; i++)
+                set.Add(i.ToString());
+
+            var lookup = set.GetSpanAlternateLookup<char>();
+
+            // Inclusive
+            var setView = set.GetViewBefore("6");
+            var lookupView = lookup.GetViewBefore("6".AsSpan());
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+            setView = set.GetViewBefore("6", true);
+            lookupView = lookup.GetViewBefore("6".AsSpan(), true);
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+            // Exclusive
+            setView = set.GetViewBefore("6", false);
+            lookupView = lookup.GetViewBefore("6".AsSpan(), false);
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_GetSpanAlternateLookup_GetViewBefore_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<string> comparer = StringComparer.Ordinal;
+                var set = new SortedSet<string>(comparer);
+                for (int i = 0; i < setLength; i++)
+                    set.Add(i.ToString());
+
+                string firstElement = set.ElementAt(0);
+                string middleElement = set.ElementAt(setLength / 2);
+                string lastElement = set.ElementAt(setLength - 1);
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedSet<string> view = set.GetViewBetween(firstElement, middleElement);
+                    var lookup = view.GetSpanAlternateLookup<char>();
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan()));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperValueInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperValueInclusive: false));
+                    Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), upperValueInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(middleElement.AsSpan(), upperValueInclusive: false));
+                }
+            }
+        }
+
+        [Fact]
+        public void SortedSet_GetSpanAlternateLookup_GetViewAfter_MatchesSet()
+        {
+            var set = new SortedSet<string>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                set.Add(i.ToString());
+
+            var lookup = set.GetSpanAlternateLookup<char>();
+
+            // Inclusive
+            var setView = set.GetViewAfter("3");
+            var lookupView = lookup.GetViewAfter("3".AsSpan());
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+            setView = set.GetViewAfter("3", true);
+            lookupView = lookup.GetViewAfter("3".AsSpan(), true);
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+            // Exclusive
+            setView = set.GetViewAfter("3", false);
+            lookupView = lookup.GetViewAfter("3".AsSpan(), false);
+
+            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_GetSpanAlternateLookup_GetViewAfter_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<string> comparer = StringComparer.Ordinal;
+                var set = new SortedSet<string>(comparer);
+                for (int i = 0; i < setLength; i++)
+                    set.Add(i.ToString());
+
+                string firstElement = set.ElementAt(0);
+                string middleElement = set.ElementAt(setLength / 2);
+                string lastElement = set.ElementAt(setLength - 1);
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedSet<string> view = set.GetViewAfter(middleElement);
+                    var lookup = view.GetSpanAlternateLookup<char>();
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan()));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerValueInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerValueInclusive: false));
+                    Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), lowerValueInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(middleElement.AsSpan(), lowerValueInclusive: false));
+                }
+            }
         }
 
         [Theory]

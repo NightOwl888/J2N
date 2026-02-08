@@ -248,18 +248,7 @@ namespace J2N.Collections.Tests
 
         #endregion
 
-        public static SCG.IEnumerable<object[]> SortedDictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData()
-        {
-            yield return new object[] { EqualityComparer<string>.Default };
-            yield return new object[] { StringComparer.Ordinal };
-            yield return new object[] { StringComparer.OrdinalIgnoreCase };
-            yield return new object[] { StringComparer.InvariantCulture };
-            yield return new object[] { StringComparer.InvariantCultureIgnoreCase };
-            yield return new object[] { StringComparer.CurrentCulture };
-            yield return new object[] { StringComparer.CurrentCultureIgnoreCase };
-        }
-
-        #region GetSpanAlternateComparer
+        #region GetSpanAlternateLookup
 
         [Fact]
         public void GetSpanAlternateLookup_FailsWhenIncompatible()
@@ -279,11 +268,288 @@ namespace J2N.Collections.Tests
         }
 
         [Theory]
-        [MemberData(nameof(SortedDictionary_GetAlternateLookup_OperationsMatchUnderlyingDictionary_MemberData))]
-        public void SortedDictionary_GetSpanAlternateLookup_OperationsMatchUnderlyingDictionary(SCG.IComparer<string> comparer)
+        [InlineData(0)]
+        [InlineData(1)]
+        [InlineData(2)]
+        [InlineData(3)]
+        [InlineData(4)]
+        [InlineData(5)]
+        public void SortedDictionary_GetSpanAlternateLookup_OperationsMatchUnderlyingDictionary(int mode)
         {
             // Test with a variety of comparers to ensure that the alternate lookup is consistent with the underlying dictionary
-            SortedDictionary<string, int> dictionary = new(comparer);
+            SortedDictionary<string, int> dictionary = new(mode switch
+            {
+                0 => StringComparer.Ordinal,
+                1 => StringComparer.OrdinalIgnoreCase,
+                2 => StringComparer.InvariantCulture,
+                3 => StringComparer.InvariantCultureIgnoreCase,
+                4 => StringComparer.CurrentCulture,
+                5 => StringComparer.CurrentCultureIgnoreCase,
+                _ => throw new ArgumentOutOfRangeException(nameof(mode))
+            });
+
+            AssertSpanLookupMatchesRootDictionary(dictionary);
+        }
+
+        [Fact]
+        public void SortedDictionary_GetSpanAlternateLookup_GetViewBetween_MatchesDictionary()
+        {
+            var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                dictionary.Add(i.ToString(), i);
+
+            var lookup = dictionary.GetSpanAlternateLookup<char>();
+
+            // Inclusive
+            var dictionaryView = dictionary.GetViewBetween("3", "6");
+            var lookupView = lookup.GetViewBetween("3".AsSpan(), "6".AsSpan());
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+
+            dictionaryView = dictionary.GetViewBetween("3", true, "6", true);
+            lookupView = lookup.GetViewBetween("3".AsSpan(), true, "6".AsSpan(), true);
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+
+            // Exclusive
+            dictionaryView = dictionary.GetViewBetween("3", false, "6", false);
+            lookupView = lookup.GetViewBetween("3".AsSpan(), false, "6".AsSpan(), false);
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_GetSpanAlternateLookup_GetViewBetween_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int count)
+        {
+            if (count >= 3)
+            {
+                SCG.IComparer<string> comparer = StringComparer.Ordinal;
+                var dictionary = new SortedDictionary<string, int>(comparer);
+                for (int i = 0; i < count; i++)
+                    dictionary.Add(i.ToString(), i);
+
+                string firstElement = dictionary.ElementAt(0).Key;
+                string middleElement = dictionary.ElementAt(count / 2).Key;
+                string lastElement = dictionary.ElementAt(count - 1).Key;
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedDictionary<string, int> view = dictionary.GetViewBetween(firstElement, middleElement);
+                    var lookup = view.GetSpanAlternateLookup<char>();
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(middleElement.AsSpan(), lastElement));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(middleElement.AsSpan(), lowerKeyInclusive: true, lastElement, upperKeyInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(middleElement.AsSpan(), lowerKeyInclusive: false, lastElement, upperKeyInclusive: false));
+                }
+            }
+        }
+
+        [Fact]
+        public void SortedDictionary_GetSpanAlternateLookup_GetViewBefore_MatchesDictionary()
+        {
+            var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                dictionary.Add(i.ToString(), i);
+
+            var lookup = dictionary.GetSpanAlternateLookup<char>();
+
+            // Inclusive
+            var dictionaryView = dictionary.GetViewBefore("6");
+            var lookupView = lookup.GetViewBefore("6".AsSpan());
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+
+            dictionaryView = dictionary.GetViewBefore("6", true);
+            lookupView = lookup.GetViewBefore("6".AsSpan(), true);
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+
+            // Exclusive
+            dictionaryView = dictionary.GetViewBefore("6", false);
+            lookupView = lookup.GetViewBefore("6".AsSpan(), false);
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_GetSpanAlternateLookup_GetViewBefore_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int count)
+        {
+            if (count >= 3)
+            {
+                SCG.IComparer<string> comparer = StringComparer.Ordinal;
+                var dictionary = new SortedDictionary<string, int>(comparer);
+                for (int i = 0; i < count; i++)
+                    dictionary.Add(i.ToString(), i);
+
+                string firstElement = dictionary.ElementAt(0).Key;
+                string middleElement = dictionary.ElementAt(count / 2).Key;
+                string lastElement = dictionary.ElementAt(count - 1).Key;
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedDictionary<string, int> view = dictionary.GetViewBetween(firstElement, middleElement);
+                    var lookup = view.GetSpanAlternateLookup<char>();
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan()));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperKeyInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperKeyInclusive: false));
+                    Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), upperKeyInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(middleElement.AsSpan(), upperKeyInclusive: false));
+                }
+            }
+        }
+
+        [Fact]
+        public void SortedDictionary_GetSpanAlternateLookup_GetViewAfter_MatchesDictionary()
+        {
+            var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                dictionary.Add(i.ToString(), i);
+
+            var lookup = dictionary.GetSpanAlternateLookup<char>();
+
+            // Inclusive
+            var dictionaryView = dictionary.GetViewAfter("3");
+            var lookupView = lookup.GetViewAfter("3".AsSpan());
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+
+            dictionaryView = dictionary.GetViewAfter("3", true);
+            lookupView = lookup.GetViewAfter("3".AsSpan(), true);
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+
+            // Exclusive
+            dictionaryView = dictionary.GetViewAfter("3", false);
+            lookupView = lookup.GetViewAfter("3".AsSpan(), false);
+
+            Assert.Equal(dictionaryView.ToArray(), lookupView.ToArray());
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_GetSpanAlternateLookup_GetViewAfter_SubsequentOutOfRangeCall_ThrowsArgumentOutOfRangeException(int count)
+        {
+            if (count >= 3)
+            {
+                SCG.IComparer<string> comparer = StringComparer.Ordinal;
+                var set = new SortedDictionary<string, int>(comparer);
+                for (int i = 0; i < count; i++)
+                    set.Add(i.ToString(), i);
+
+                string firstElement = set.ElementAt(0).Key;
+                string middleElement = set.ElementAt(count / 2).Key;
+                string lastElement = set.ElementAt(count - 1).Key;
+                if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
+                {
+                    SortedDictionary<string, int> view = set.GetViewAfter(middleElement);
+                    var lookup = view.GetSpanAlternateLookup<char>();
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan()));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerKeyInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerKeyInclusive: false));
+                    Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), lowerKeyInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(middleElement.AsSpan(), lowerKeyInclusive: false));
+                }
+            }
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void SortedDictionary_GetSpanAlternateLookup_WorksOnView(
+           bool lowerInclusive,
+           bool upperInclusive)
+        {
+            var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                dictionary.Add(i.ToString("D2"), i);
+
+            // View: [02,07]
+            var view = dictionary.GetViewBetween("02", lowerInclusive, "07", upperInclusive);
+
+            int minInclusive = lowerInclusive ? 2 : 3;
+            int maxInclusive = upperInclusive ? 7 : 6;
+
+            AssertSpanLookupMatchesView(view, minInclusive, maxInclusive);
+
+            int actualLower = lowerInclusive ? 1 : 2;
+            int actualUpper = upperInclusive ? 8 : 7;
+
+            AssertSpanLookupRejectsOutOfRangeValues(
+                view,
+                actualLower,
+                actualUpper,
+                lowerInclusive,
+                upperInclusive);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void SortedDictionary_GetSpanAlternateLookup_WorksOnNestedView(
+            bool lowerInclusive,
+            bool upperInclusive)
+        {
+            var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < 10; i++)
+                dictionary.Add(i.ToString("D2"), i);
+
+            var view1 = dictionary.GetViewBetween("02", lowerInclusive, "08", upperInclusive);
+            var view2 = view1.GetViewBetween("03", lowerInclusive, "06", upperInclusive);
+
+            int minInclusive = lowerInclusive ? 3 : 4;
+            int maxInclusive = upperInclusive ? 6 : 5;
+
+            AssertSpanLookupMatchesView(view2, minInclusive, maxInclusive);
+
+            int lowerReject = lowerInclusive ? 2 : 3;
+            int upperReject = upperInclusive ? 7 : 6;
+
+            AssertSpanLookupRejectsOutOfRangeValues(
+                view2,
+                lowerReject,
+                upperReject,
+                lowerInclusive,
+                upperInclusive);
+        }
+
+        [Theory]
+        [InlineData(true, true)]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void SortedDictionary_GetSpanAlternateLookup_WorksOnDeeplyNestedViews(
+            bool lowerInclusive,
+            bool upperInclusive)
+        {
+            var dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal);
+            for (int i = 0; i < 20; i++)
+                dictionary.Add(i.ToString("D2"), i);
+
+            var v1 = dictionary.GetViewBetween("01", lowerInclusive, "18", upperInclusive);
+            var v2 = v1.GetViewBetween("03", lowerInclusive, "15", upperInclusive);
+            var v3 = v2.GetViewBetween("05", lowerInclusive, "10", upperInclusive);
+
+            int minInclusive = lowerInclusive ? 5 : 6;
+            int maxInclusive = upperInclusive ? 10 : 9;
+
+            AssertSpanLookupMatchesView(v3, minInclusive, maxInclusive);
+
+            int lowerReject = lowerInclusive ? 4 : 5;
+            int upperReject = upperInclusive ? 11 : 10;
+
+            AssertSpanLookupRejectsOutOfRangeValues(
+                v3,
+                lowerReject,
+                upperReject,
+                lowerInclusive,
+                upperInclusive);
+        }
+
+        private static void AssertSpanLookupMatchesRootDictionary(SortedDictionary<string, int> dictionary)
+        {
             SortedDictionary<string, int>.SpanAlternateLookup<char> lookup = dictionary.GetSpanAlternateLookup<char>();
             Assert.Same(dictionary, lookup.Dictionary);
             Assert.Same(lookup.Dictionary, lookup.Dictionary);
@@ -411,7 +677,100 @@ namespace J2N.Collections.Tests
             }
         }
 
-        #endregion
+        private static void AssertSpanLookupMatchesView(SortedDictionary<string, int> dictionary, int minInclusive, int maxInclusive)
+        {
+            var lookup = dictionary.GetSpanAlternateLookup<char>();
+            Assert.Same(dictionary, lookup.Dictionary);
+
+            string actualKey;
+            int value;
+
+            // in-range add/remove
+            for (int i = minInclusive; i <= maxInclusive; i++)
+            {
+                string s = i.ToString("D2");
+
+                Assert.False(lookup.TryAdd(s.AsSpan(), i));
+                Assert.False(dictionary.TryAdd(s, i));
+
+                Assert.True(lookup.ContainsKey(s.AsSpan()));
+                Assert.True(dictionary.ContainsKey(s));
+
+                lookup.TryGetValue(s.AsSpan(), out actualKey, out value);
+                Assert.Equal(s, actualKey);
+                Assert.Equal(i, value);
+
+                dictionary.TryGetValue(s, out value);
+                Assert.Equal(i, value);
+            }
+
+            int spanValue;
+
+            // predecessor / successor within range
+            for (int i = minInclusive; i <= maxInclusive; i++)
+            {
+                string s = i.ToString("D2");
+
+                Assert.Equal(
+                    dictionary.TryGetPredecessor(s, out string predecessor, out value),
+                    lookup.TryGetPredecessor(s.AsSpan(), out string spanPredecessor, out spanValue));
+                Assert.Equal(predecessor, spanPredecessor);
+                Assert.Equal(value, spanValue);
+
+                Assert.Equal(
+                    dictionary.TryGetSuccessor(s, out string successor, out value),
+                    lookup.TryGetSuccessor(s.AsSpan(), out var spanSuccessor, out spanValue));
+                Assert.Equal(successor, spanSuccessor);
+                Assert.Equal(value, spanValue);
+
+                Assert.Equal(
+                    dictionary.TryGetPredecessor(s, out string floor, out value),
+                    lookup.TryGetPredecessor(s.AsSpan(), out string spanFloor, out spanValue));
+                Assert.Equal(floor, spanFloor);
+                Assert.Equal(value, spanValue);
+
+                Assert.Equal(
+                    dictionary.TryGetSuccessor(s, out string ceiling, out value),
+                    lookup.TryGetSuccessor(s.AsSpan(), out string spanCeiling, out spanValue));
+                Assert.Equal(ceiling, spanCeiling);
+                Assert.Equal(value, spanValue);
+            }
+
+            // in-range remove
+            for (int i = maxInclusive; i >= minInclusive; i--)
+            {
+                string s = i.ToString("D2");
+                Assert.True(lookup.Remove(s.AsSpan()));
+                Assert.False(lookup.Remove(s.AsSpan()));
+
+                Assert.False(dictionary.Remove(s));
+            }
+
+            Assert.Equal(0, dictionary.Count);
+        }
+
+        private static void AssertSpanLookupRejectsOutOfRangeValues(SortedDictionary<string, int> dictionary, int below, int above, bool lowerInclusive, bool upperInclusive)
+        {
+            var lookup = dictionary.GetSpanAlternateLookup<char>();
+
+            string low = below.ToString("D2");
+            string high = above.ToString("D2");
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.Add(low, below));
+            Assert.False(dictionary.TryAdd(low, below));
+            Assert.False(lookup.TryAdd(low.AsSpan(), below));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.Add(high, above));
+            Assert.False(dictionary.TryAdd(high, above));
+            Assert.False(lookup.TryAdd(high.AsSpan(), above));
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.GetViewBetween(low, high));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(low.AsSpan(), high.AsSpan()));
+            Assert.Throws<ArgumentOutOfRangeException>(() => dictionary.GetViewBetween(low, lowerInclusive, high, upperInclusive));
+            Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBetween(low.AsSpan(), lowerInclusive, high.AsSpan(), upperInclusive));
+        }
+
+        #endregion GetSpanAlternateLookup
 
         #region FirstKey and LastKey
 

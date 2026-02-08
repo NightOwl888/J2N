@@ -1422,7 +1422,8 @@ namespace J2N.Collections.Generic
 
                 if (!IsWithinRange(key, cmp))
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.key);
+                    //ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.key);
+                    return false;
                 }
 
                 // Delegate to underlying set.
@@ -2181,6 +2182,8 @@ namespace J2N.Collections.Generic
             /// behavior of the view. To override this behavior, call the
             /// <see cref="GetViewBetween(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/> overload
             /// instead.
+            /// <para/>
+            /// This corresponds to the <c>subSet()</c> method in the JDK.
             /// </remarks>
             public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, ReadOnlySpan<TAlternateSpan> upperValue)
             {
@@ -2228,6 +2231,8 @@ namespace J2N.Collections.Generic
             /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
             /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// This corresponds to the <c>subSet()</c> method in the JDK.
             /// </remarks>
             public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive)
             {
@@ -2235,11 +2240,11 @@ namespace J2N.Collections.Generic
                 SortedSet<T> underlying = set.UnderlyingSet;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
-                if (IsTooLow(lowerValue, comparer))
+                if (IsTooLow(lowerValue, lowerValueInclusive, comparer))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                if (IsTooHigh(upperValue, comparer))
+                if (IsTooHigh(upperValue, upperValueInclusive, comparer))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
@@ -2278,6 +2283,170 @@ namespace J2N.Collections.Generic
             }
 
             #endregion GetViewBetween
+
+            #region GetViewBefore
+
+            /// <summary>
+            /// Returns the view of a subset in a <see cref="SortedSet{T}"/> with no lower bound.
+            /// </summary>
+            /// <param name="upperValue">The highest desired value in the view.</param>
+            /// <returns>A subset view that contains only the values in the specified range.</returns>
+            /// <remarks>
+            /// This method returns a view of the range of elements that fall before <paramref name="upperValue"/>
+            /// (inclusive), as defined by the comparer. This method does not copy elements from the
+            /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+            /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// This corresponds to the <c>headSet()</c> method in the JDK.
+            /// </remarks>
+            public SortedSet<T> GetViewBefore(ReadOnlySpan<TAlternateSpan> upperValue)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (IsTooHigh(upperValue, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                return _isUnderlying
+                    ? GetViewBefore(upperValue, set.UpperBoundInclusive, comparer)
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBefore(upperValue, set.UpperBoundInclusive, comparer);
+            }
+
+            /// <summary>
+            /// Returns the view of a subset in a <see cref="SortedSet{T}"/> with no lower bound.
+            /// <para/>
+            /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="upperValueInclusive"/>
+            /// set to <see langword="false"/>.
+            /// </summary>
+            /// <param name="upperValue">The highest desired value in the view.</param>
+            /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
+            /// otherwise, it is an exclusive upper bound.</param>
+            /// <returns>
+            /// This method returns a view of the range of elements that fall before <paramref name="upperValue"/>, as defined by the comparer.
+            /// The upper bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
+            /// value of <paramref name="upperValueInclusive"/>. This method does not copy elements from the
+            /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+            /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// This corresponds to the <c>headSet()</c> method in the JDK.
+            /// </returns>
+            public SortedSet<T> GetViewBefore(ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (IsTooHigh(upperValue, upperValueInclusive, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                return _isUnderlying
+                    ? GetViewBefore(upperValue, upperValueInclusive, comparer)
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBefore(upperValue, upperValueInclusive, comparer);
+            }
+
+            internal SortedSet<T> GetViewBefore(ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> underlying = Set.UnderlyingSet;
+
+                if (!TryGetValue(upperValue, out T? upper))
+                {
+                    upper = comparer.Create(upperValue);
+                }
+
+                return new TreeSubSet(underlying, default, true, upper, upperValueInclusive, false, true);
+            }
+
+            #endregion GetViewBefore
+
+            #region GetViewAfter
+
+            /// <summary>
+            /// Returns a view of a subset in a <see cref="SortedSet{T}"/> with no upper bound.
+            /// </summary>
+            /// <param name="lowerValue">The lowest value in the range for the view.</param>
+            /// <returns>A subset view that contains only the values in the specified range.</returns>
+            /// <remarks>
+            /// This method returns a view of the range of elements that fall after <paramref name="lowerValue"/>
+            /// (inclusive), as defined by the comparer. This method does not copy elements from the
+            /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+            /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// This corresponds to the <c>tailSet()</c> method in the JDK.
+            /// </remarks>
+            public SortedSet<T> GetViewAfter(ReadOnlySpan<TAlternateSpan> lowerValue)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (IsTooLow(lowerValue, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                return _isUnderlying
+                    ? GetViewAfter(lowerValue, set.LowerBoundInclusive, comparer)
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewAfter(lowerValue, set.LowerBoundInclusive, comparer);
+            }
+
+            /// <summary>
+            /// Returns a view of a subset in a <see cref="SortedSet{T}"/> with no upper bound.
+            /// </summary>
+            /// <param name="lowerValue">The lowest value in the range for the view.</param>
+            /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
+            /// otherwise, it is an exclusive lower bound.</param>
+            /// <returns>A subset view that contains only the values in the specified range.</returns>
+            /// <remarks>
+            /// This method returns a view of the range of elementst that fall after <paramref name="lowerValue"/>, as defined by the comparer.
+            /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
+            /// value of <paramref name="lowerValueInclusive"/>. This method does not copy elements from the
+            /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+            /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+            /// <para/>
+            /// This corresponds to the <c>tailSet()</c> method in the JDK.
+            /// </remarks>
+            public SortedSet<T> GetViewAfter(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive)
+            {
+                SortedSet<T> set = Set;
+                SortedSet<T> underlying = set.UnderlyingSet;
+                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
+
+                if (IsTooLow(lowerValue, lowerValueInclusive, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                }
+
+                // Delegate to underlying set.
+                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
+                return _isUnderlying
+                    ? GetViewAfter(lowerValue, lowerValueInclusive, comparer)
+                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewAfter(lowerValue, lowerValueInclusive, comparer);
+            }
+
+            internal SortedSet<T> GetViewAfter(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> underlying = Set.UnderlyingSet;
+
+                if (!TryGetValue(lowerValue, out T? lower))
+                {
+                    lower = comparer.Create(lowerValue);
+                }
+
+                return new TreeSubSet(underlying, lower, lowerValueInclusive, default, true, true, false);
+            }
+
+            #endregion GetViewAfter
 
             #region FindNode
 
@@ -2335,32 +2504,81 @@ namespace J2N.Collections.Generic
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsWithinRange(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
-                return !IsTooLow(item, comparer) && !IsTooHigh(item, comparer);
+                SortedSet<T> set = Set;
+
+                // Check whether too low
+                if (set.HasLowerBound)
+                {
+                    int c = comparer.Compare(item, set.LowerBound!);
+                    if (c < 0 || (c == 0 && !set.LowerBoundInclusive))
+                        return false;
+                }
+
+                // Check whether too high
+                if (set.HasUpperBound)
+                {
+                    int c = comparer.Compare(item, set.UpperBound!);
+                    if (c > 0 || (c == 0 && !set.UpperBoundInclusive))
+                        return false;
+                }
+
+                return true;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal bool IsTooHigh(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> set = Set;
+
+                if (set.HasUpperBound)
+                {
+                    int c = comparer.Compare(item!, set.UpperBound!);
+                    if (c > 0 || (c == 0 && !set.UpperBoundInclusive))
+                        return true;
+                }
+                return false;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private bool IsTooHigh(ReadOnlySpan<TAlternateSpan> item, bool upperBoundInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                SortedSet<T> set = Set;
+
+                if (set.HasUpperBound)
+                {
+                    int c = comparer.Compare(item!, set.UpperBound!);
+                    if (c > 0 || (c == 0 && !upperBoundInclusive))
+                        return true;
+                }
+                return false;
+            }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsTooLow(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
                 SortedSet<T> set = Set;
 
-                if (!set.HasLowerBound)
-                    return false;
-
-                int c = comparer.Compare(item, set.LowerBound);
-                return c < 0 || (c == 0 && !set.LowerBoundInclusive);
+                if (set.HasLowerBound)
+                {
+                    int c = comparer.Compare(item, set.LowerBound!);
+                    if (c < 0 || (c == 0 && !set.LowerBoundInclusive))
+                        return true;
+                }
+                return false;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool IsTooHigh(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            private bool IsTooLow(ReadOnlySpan<TAlternateSpan> item, bool lowerBoundInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
                 SortedSet<T> set = Set;
 
-                if (!set.HasUpperBound)
-                    return false;
-
-                int c = comparer.Compare(item, set.UpperBound);
-                return c > 0 || (c == 0 && !set.UpperBoundInclusive);
+                if (set.HasLowerBound)
+                {
+                    int c = comparer.Compare(item, set.LowerBound!);
+                    if (c < 0 || (c == 0 && !lowerBoundInclusive))
+                        return true;
+                }
+                return false;
             }
 
             #endregion Bounds Checking
