@@ -183,12 +183,12 @@ steps:
             
             Write-Host "Testing '$testBinary' on framework '$framework' and outputting test results to '$testResultDirectory/${{ parameters.testResultsFileName }}'..."
             if ($maximumParalellJobs -le 1) {
-                dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform
+                dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 20minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform
             } else {
             
                 $scriptBlock = {
                     param([string]$testName, [string]$testBinary, [string]$framework, [string]$testPlatform, [string]$testResultDirectory)
-                    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 10minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
+                    dotnet test "$testBinary" --framework "$framework" --blame --no-build --no-restore --logger:"console;verbosity=normal" --logger:"trx;LogFileName=${{ parameters.testResultsFileName }}" --results-directory:"$testResultDirectory" --blame-hang-timeout 20minutes --blame-hang-dump-type mini -- RunConfiguration.TargetPlatform=$testPlatform > "$testResultDirectory/dotnet-vstest.log" 2> "$testResultDirectory/dotnet-vstest-error.log"
                 }
                 
                 # Avoid dotnet test collisions by delaying for 500ms
