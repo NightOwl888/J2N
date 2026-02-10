@@ -515,8 +515,6 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public bool ContainsValue(TValue value)
         {
-            // NOTE: We do this check here to override the .NET default equality comparer
-            // with J2N's version
             return ContainsValue(value, null);
         }
 
@@ -1676,7 +1674,7 @@ namespace J2N.Collections.Generic
 
         #region INavigableCollection<KeyValuePair<TKey, TValue>> members
 
-        IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => ((KeyValuePairComparer)_set.Comparer); // J2N TODO: This should be KeyComparer once we merge with the alternate lookup functionality
+        IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => (KeyValuePairComparer)_set.Comparer;
 
         KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.First => _set.First;
 
