@@ -256,7 +256,7 @@ namespace J2N.Collections.Generic
             // These are explicit type checks in the mold of HashSet. It would have worked better with
             // something like an ISorted<T> interface. (We could make this work for SortedList.Keys, etc.)
             SortedSet<T>? sortedSet = collection as SortedSet<T>;
-            if (sortedSet != null && !(sortedSet is TreeSubSet) && HasEqualComparer(sortedSet))
+            if (sortedSet != null && !(sortedSet is TreeSubSet) && ComparerEquals(Comparer, sortedSet.Comparer))
             {
                 if (sortedSet.Count > 0)
                 {
@@ -2816,7 +2816,7 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            if (set1.HasEqualComparer(set2))
+            if (ComparerEquals(set1.Comparer, set2.Comparer))
             {
                 return set1.Count == set2.Count && set1.SetEquals(set2);
             }
@@ -2843,30 +2843,31 @@ namespace J2N.Collections.Generic
         }
 
         /// <summary>
-        /// Determines whether two <see cref="SortedSet{T}"/> instances have the same comparer.
+        /// Determines whether two <see cref="IComparer{T}"/> instances are equal.
         /// </summary>
-        /// <param name="other">The other <see cref="SortedSet{T}"/>.</param>
-        /// <returns>A value indicating whether both sets have the same comparer.</returns>
-        private bool HasEqualComparer(SortedSet<T> other)
-        {
-            // Commonly, both comparers will be the default comparer (and reference-equal). Avoid a virtual method call to Equals() in that case.
-            return Comparer == other.Comparer || Comparer.Equals(other.Comparer);
-        }
-
+        /// <param name="a">The first <see cref="IComparer{T}"/>.</param>
+        /// <param name="b">The second <see cref="IComparer{T}"/>.</param>
+        /// <returns>A value indicating whether both comparers are equal.</returns>
+        // J2N NOTE: This is equivalent to HasEqualComparer() in the BCL, but allows for comparing on any collection type.
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool ComparerEquals(IComparer<T> a, IComparer<T>? b)
             // Commonly, both comparers will be the default comparer (and reference-equal). Avoid a virtual method call to Equals() in that case.
             => a == b || a.Equals(b);
 
+        /// <summary>
+        /// Determines whether an <see cref="IComparer{T}"/> is equivalent to an <see cref="IEqualityComparer{T}"/>.
+        /// </summary>
+        /// <param name="a">The first <see cref="IComparer{T}"/>.</param>
+        /// <param name="b">The second <see cref="IComparer{T}"/>.</param>
+        /// <returns>A value indicating whether both comparers are equal.</returns>
         private static bool ComparerEquals(IComparer<T> a, IEqualityComparer<T>? b)
         {
             // Commonly, both comparers will be the default comparer (and reference-equal). Avoid a virtual method call to Equals() in that case.
             if (a == b)
                 return true;
-            
-            if (typeof(T) == typeof(string) &&
-                a is StringComparer sca &&
-                b is StringComparer scb)
+
+            // Currently, only StringComparer instances can be compared for equivalence.
+            if (typeof(T) == typeof(string) && a is StringComparer sca && b is StringComparer scb)
                 return a.Equals(b);
 
             return false;
