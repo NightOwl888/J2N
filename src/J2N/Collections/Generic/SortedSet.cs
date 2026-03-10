@@ -3581,7 +3581,8 @@ namespace J2N.Collections.Generic
 
             if (other is INavigableCollection<T> navigableCollection)
             {
-                if (ComparerEquals(Comparer, navigableCollection.Comparer))
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, navigableCollection.Comparer))
                 {
                     // Outside range, no point in doing anything
                     if (comparer.Compare(navigableCollection.Last!, First!) >= 0 && comparer.Compare(navigableCollection.First!, Last!) <= 0)
@@ -3603,7 +3604,8 @@ namespace J2N.Collections.Generic
             // J2N: RemoveAllElements() also uses Contains() to remove unnecessary calls to Remove() when there are duplicates in ISortedCollection<T>.
             else if (other is IDistinctSortedCollection<T> sortedCollection)
             {
-                if (ComparerEquals(Comparer, sortedCollection.Comparer))
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, sortedCollection.Comparer))
                 {
                     T? first = First;
                     T? last = Last;
@@ -3620,7 +3622,8 @@ namespace J2N.Collections.Generic
             }
             else if (other is SCG.SortedSet<T> bclSortedSet)
             {
-                if (ComparerEquals(Comparer, bclSortedSet.Comparer))
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, bclSortedSet.Comparer))
                 {
                     // Outside range, no point in doing anything
                     if (comparer.Compare(bclSortedSet.Max!, First!) >= 0 && comparer.Compare(bclSortedSet.Min!, Last!) <= 0)
@@ -4345,8 +4348,8 @@ namespace J2N.Collections.Generic
 
             if (distinctSortedCollection != null)
             {
-                IComparer<T>? comparer;
-                if (ComparerEquals(comparer = Comparer, distinctSortedCollection.Comparer))
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, distinctSortedCollection.Comparer))
                 {
                     IEnumerator<T> mine = GetEnumerator();
                     IEnumerator<T> theirs = distinctSortedCollection.GetEnumerator();
@@ -4366,8 +4369,9 @@ namespace J2N.Collections.Generic
             }
             else if (other is ISortedCollection<T> sortedCollection)
             {
-                if (ComparerEquals(Comparer, sortedCollection.Comparer))
-                    return SetEqualsSortedNonDistinctCollectionWithSameComparer(sortedCollection);
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, sortedCollection.Comparer))
+                    return SetEqualsSortedNonDistinctCollectionWithSameComparer(sortedCollection, comparer);
             }
             else if (other is HashSet<T> hashSet)
             {
@@ -4390,7 +4394,7 @@ namespace J2N.Collections.Generic
             return result.UniqueCount == Count && result.UnfoundCount == 0;
         }
 
-        private bool SetEqualsSortedNonDistinctCollectionWithSameComparer(ISortedCollection<T> other)
+        private bool SetEqualsSortedNonDistinctCollectionWithSameComparer(ISortedCollection<T> other, IComparer<T> comparer)
         {
             Debug.Assert(other != null);
 
@@ -4495,7 +4499,8 @@ namespace J2N.Collections.Generic
             // so no special-case handling is required.
             if (other is INavigableCollection<T> navigableCollection)
             {
-                if (ComparerEquals(Comparer, navigableCollection.Comparer) &&
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, navigableCollection.Comparer) &&
                     (comparer.Compare(First!, navigableCollection.Last!) > 0 || comparer.Compare(Last!, navigableCollection.First!) < 0))
                 {
                     return false;
@@ -4503,7 +4508,8 @@ namespace J2N.Collections.Generic
             }
             else if (other is SCG.SortedSet<T> bclSortedSet)
             {
-                if (ComparerEquals(Comparer, bclSortedSet.Comparer) &&
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, bclSortedSet.Comparer) &&
                     (comparer.Compare(First!, bclSortedSet.Max!) > 0 || comparer.Compare(Last!, bclSortedSet.Min!) < 0))
                 {
                     return false;
