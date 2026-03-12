@@ -2930,7 +2930,7 @@ namespace J2N.Collections.Generic
 
             if (asSorted != null && !thisIsView && Count == 0)
             {
-                SortedSet<T> dummy = new SortedSet<T>(asSorted, Comparer);
+                SortedSet<T> dummy = new SortedSet<T>(asSorted, UnderlyingSet.Comparer);
                 root = dummy.root;
                 count = dummy.count;
                 version++;
@@ -3000,7 +3000,7 @@ namespace J2N.Collections.Generic
 
             if (Count ==  0)
             {
-                SortedSet<T> dummy = new SortedSet<T>(other!, Comparer);
+                SortedSet<T> dummy = new SortedSet<T>(other!, UnderlyingSet.Comparer);
                 root = dummy.root;
                 count = dummy.count;
                 version++;
