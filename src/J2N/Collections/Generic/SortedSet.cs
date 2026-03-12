@@ -3688,16 +3688,17 @@ namespace J2N.Collections.Generic
             }
             else if (other is ISortedCollection<T> sortedCollection)
             {
-                if (ComparerEquals(Comparer, sortedCollection!.Comparer))
+                IComparer<T> comparer = Comparer;
+                if (ComparerEquals(comparer, sortedCollection!.Comparer))
                 {
-                    SymmetricExceptWithSameComparer(sortedCollection);
+                    SymmetricExceptWithSameComparer(sortedCollection, comparer);
                     return;
                 }
             }
 
             int length;
             T[] elements = EnumerableHelpers.ToArray(other, out length);
-            Array.Sort(elements, 0, length, Comparer);
+            Array.Sort(elements, 0, length, comparer); // J2N: Always use forward comparer to match underlying tree
             SymmetricExceptWithSameComparer(elements, length);
         }
 
@@ -3717,7 +3718,7 @@ namespace J2N.Collections.Generic
             }
         }
 
-        private void SymmetricExceptWithSameComparer(ISortedCollection<T> other)
+        private void SymmetricExceptWithSameComparer(ISortedCollection<T> other, IComparer<T> comparer)
         {
             Debug.Assert(other != null);
             Debug.Assert(ComparerEquals(Comparer, other!.Comparer));
