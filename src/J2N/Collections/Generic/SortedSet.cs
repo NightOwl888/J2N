@@ -503,6 +503,9 @@ namespace J2N.Collections.Generic
 
         #region Properties for Alternate Lookup
 
+        // J2N: Indicates whether the current view is reversed
+        internal virtual bool IsReversed => false;
+
         // This calls the correct layer to get the *outermost* comparer (a user comparer or a comparer wrapper around a BCL StringComparer)
         internal IComparer<T> RawComparer => comparer;
 
@@ -521,6 +524,70 @@ namespace J2N.Collections.Generic
         #endregion
 
         #region Subclass helpers
+
+        /// <summary>
+        /// Indicates the physical lowest value regardless of whether the view is reversed.
+        /// This aligns with the structure of the underlying tree.
+        /// </summary>
+        internal virtual T? LowerValue
+        {
+            get
+            {
+                // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                if (minVersion == version)
+                    return cachedMin;
+
+                if (root == null)
+                {
+                    cachedMin = default;
+                }
+                else
+                {
+                    Node current = root;
+                    while (current.Left != null)
+                    {
+                        current = current.Left;
+                    }
+
+                    cachedMin = current.Item;
+                }
+
+                minVersion = version;
+                return cachedMin;
+            }
+        }
+
+        /// <summary>
+        /// Indicates the physical highest value regardless of whether the view is reversed.
+        /// This aligns with the structure of the underlying tree.
+        /// </summary>
+        internal virtual T? UpperValue
+        {
+            get
+            {
+                // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                if (maxVersion == version)
+                    return cachedMax;
+
+                if (root == null)
+                {
+                    cachedMax = default;
+                }
+                else
+                {
+                    Node current = root;
+                    while (current.Right != null)
+                    {
+                        current = current.Right;
+                    }
+
+                    cachedMax = current.Item;
+                }
+
+                maxVersion = version;
+                return cachedMax;
+            }
+        }
 
         // Virtual function for TreeSubSet, which may need to update its count.
         internal virtual void VersionCheck(bool updateCount = false) { }
@@ -2600,9 +2667,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This method is an <c>O(log n)</c> operation.
         /// </remarks>
-        public IEnumerator<T> GetEnumerator() => new Enumerator(this);
+        public IEnumerator<T> GetEnumerator() => new Enumerator(this, IsReversed); // J2N: Pass through the IsReversed property to align the enumeration order with the view
 
-        internal Enumerator GetEnumeratorInternal() => new Enumerator(this);
+        internal Enumerator GetEnumeratorInternal() => new Enumerator(this, IsReversed);
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
@@ -4702,33 +4769,10 @@ namespace J2N.Collections.Generic
         [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Min => MinInternal;
 
-        internal virtual T? MinInternal
-        {
-            get
-            {
-                // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
-                if (minVersion == version)
-                    return cachedMin;
-
-                if (root == null)
-                {
-                    cachedMin = default;
-                }
-                else
-                {
-                    Node current = root;
-                    while (current.Left != null)
-                    {
-                        current = current.Left;
-                    }
-
-                    cachedMin = current.Item;
-                }
-
-                minVersion = version;
-                return cachedMin;
-            }
-        }
+        /// <summary>
+        /// Indicates the lowest logical value (which may be reversed)
+        /// </summary>
+        internal virtual T? MinInternal => LowerValue;
 
         /// <summary>
         /// Gets the maximum value in the <see cref="SortedSet{T}"/>, as defined by the comparer.
@@ -4741,33 +4785,10 @@ namespace J2N.Collections.Generic
         [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Max => MaxInternal;
 
-        internal virtual T? MaxInternal
-        {
-            get
-            {
-                // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
-                if (maxVersion == version)
-                    return cachedMax;
-
-                if (root == null)
-                {
-                    cachedMax = default;
-                }
-                else
-                {
-                    Node current = root;
-                    while (current.Right != null)
-                    {
-                        current = current.Right;
-                    }
-
-                    cachedMax = current.Item;
-                }
-
-                maxVersion = version;
-                return cachedMax;
-            }
-        }
+        /// <summary>
+        /// Indicates the maximum logical value (which may be reversed)
+        /// </summary>
+        internal virtual T? MaxInternal => UpperValue;
 
         /// <summary>
         /// Gets the first (lowest) value in the <see cref="SortedSet{T}"/>, as defined by the comparer.

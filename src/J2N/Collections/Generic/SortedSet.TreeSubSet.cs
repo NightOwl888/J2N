@@ -32,9 +32,9 @@ namespace J2N.Collections.Generic
             , ISerializable, IDeserializationCallback
 #endif
         {
-            private SortedSet<T> _underlying;
-            private T? _min;
-            private T? _max;
+            private readonly SortedSet<T> _underlying;
+            private readonly T? _min;
+            private readonly T? _max;
             // keeps track of whether the count variable is up to date
             // up to date -> _countVersion = _underlying.version
             // not up to date -> _countVersion < _underlying.version
@@ -43,8 +43,10 @@ namespace J2N.Collections.Generic
             // for instance, you could allow this subset to be defined for i > 10. The set will throw if
             // anything <= 10 is added, but there is no upper bound. These features Head(), Tail(), were punted
             // in the spec, and are not available, but the framework is there to make them available at some point.
-            private bool _lBoundActive, _uBoundActive;
-            private bool _lBoundInclusive, _uBoundInclusive;
+            private readonly bool _lBoundActive, _uBoundActive;
+            private readonly bool _lBoundInclusive, _uBoundInclusive;
+
+            private readonly bool _reverse;
 
             // used to see if the count is out of date
 
@@ -57,6 +59,8 @@ namespace J2N.Collections.Generic
             #region Properties for Alternate Lookup
 
             // J2N: This is state from TreeSubSet exposed to allow range checks in Alternate Lookup
+
+            internal override bool IsReversed => _reverse;
 
             internal override SortedSet<T> UnderlyingSet => _underlying;
 
@@ -71,6 +75,100 @@ namespace J2N.Collections.Generic
 
             #endregion
 
+            #region Subclass helpers
+
+            /// <inheritdoc/>
+            internal override T? LowerValue
+            {
+                get
+                {
+                    Debug.Assert(_underlying != null);
+                    if (version != _underlying!.version) // [!] asserted above
+                        VersionCheck();
+
+                    // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                    if (minVersion == version)
+                        return cachedMin;
+
+                    Node? current = root;
+                    T? result = default;
+
+                    while (current != null)
+                    {
+                        int comp = _lBoundActive ? comparer.Compare(_min!, current.Item!) : -1;
+                        if (comp > 0 || (comp == 0 && !_lBoundInclusive))
+                        {
+                            current = current.Right;
+                        }
+                        else
+                        {
+                            result = current.Item;
+                            if (comp == 0)
+                            {
+                                if (!_lBoundInclusive)
+                                {
+                                    current = current.Left;
+                                    result = current != null ? current.Item : default;
+                                }
+                                break;
+                            }
+                            current = current.Left;
+                        }
+                    }
+
+                    minVersion = version;
+                    cachedMin = result;
+                    return result;
+                }
+            }
+
+            /// <inheritdoc/>
+            internal override T? UpperValue
+            {
+                get
+                {
+                    Debug.Assert(_underlying != null);
+                    if (version != _underlying!.version) // [!] asserted above
+                        VersionCheck();
+
+                    // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
+                    if (maxVersion == version)
+                        return cachedMax;
+
+                    Node? current = root;
+                    T? result = default;
+
+                    while (current != null)
+                    {
+                        int comp = _uBoundActive ? comparer.Compare(_max!, current.Item!) : 1;
+                        if (comp < 0 || (comp == 0 && !_uBoundInclusive))
+                        {
+                            current = current.Left;
+                        }
+                        else
+                        {
+                            result = current.Item;
+                            if (comp == 0)
+                            {
+                                if (!_uBoundInclusive)
+                                {
+                                    current = current.Right;
+                                    result = current != null ? current.Item : default;
+                                }
+                                break;
+                            }
+                            current = current.Right;
+                        }
+                    }
+
+                    maxVersion = version;
+                    cachedMax = result;
+                    return result;
+                }
+            }
+
+            #endregion
+
 #if DEBUG
             internal override bool versionUpToDate()
             {
@@ -78,6 +176,7 @@ namespace J2N.Collections.Generic
             }
 #endif
 
+            // J2N TODO: Add a reverse parameter and set the local field and cached comparer instance accordingly.
             public TreeSubSet(SortedSet<T> Underlying, [AllowNull] T Min, bool lowerBoundInclusive, [AllowNull] T Max, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
                 : base(Underlying.Comparer)
             {
@@ -213,93 +312,11 @@ namespace J2N.Collections.Generic
                 return false;
             }
 
-            internal override T? MinInternal
-            {
-                get
-                {
-                    Debug.Assert(_underlying != null);
-                    if (version != _underlying!.version) // [!] asserted above
-                        VersionCheck();
+            /// <inheritdoc/>
+            internal override T? MinInternal => _reverse ? UpperValue : LowerValue;
 
-                    // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
-                    if (minVersion == version)
-                        return cachedMin;
-
-                    Node? current = root;
-                    T? result = default;
-
-                    while (current != null)
-                    {
-                        int comp = _lBoundActive ? comparer.Compare(_min!, current.Item!) : -1;
-                        if (comp > 0 || (comp == 0 && !_lBoundInclusive))
-                        {
-                            current = current.Right;
-                        }
-                        else
-                        {
-                            result = current.Item;
-                            if (comp == 0)
-                            {
-                                if (!_lBoundInclusive)
-                                {
-                                    current = current.Left;
-                                    result = current != null ? current.Item : default;
-                                }
-                                break;
-                            }
-                            current = current.Left;
-                        }
-                    }
-
-                    minVersion = version;
-                    cachedMin = result;
-                    return result;
-                }
-            }
-
-            internal override T? MaxInternal
-            {
-                get
-                {
-                    Debug.Assert(_underlying != null);
-                    if (version != _underlying!.version) // [!] asserted above
-                        VersionCheck();
-
-                    // J2N: Added caching to the value so we don't have to traverse the tree again unless the set is mutated.
-                    if (maxVersion == version)
-                        return cachedMax;
-
-                    Node? current = root;
-                    T? result = default;
-
-                    while (current != null)
-                    {
-                        int comp = _uBoundActive ? comparer.Compare(_max!, current.Item!) : 1;
-                        if (comp < 0 || (comp == 0 && !_uBoundInclusive))
-                        {
-                            current = current.Left;
-                        }
-                        else
-                        {
-                            result = current.Item;
-                            if (comp == 0)
-                            {
-                                if (!_uBoundInclusive)
-                                {
-                                    current = current.Right;
-                                    result = current != null ? current.Item : default;
-                                }
-                                break;
-                            }
-                            current = current.Right;
-                        }
-                    }
-
-                    maxVersion = version;
-                    cachedMax = result;
-                    return result;
-                }
-            }
+            /// <inheritdoc/>
+            internal override T? MaxInternal => _reverse ? LowerValue : UpperValue;
 
             internal override bool DoTryGetFirst([MaybeNullWhen(false)] out T result)
             {
