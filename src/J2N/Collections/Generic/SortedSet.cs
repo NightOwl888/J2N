@@ -270,6 +270,7 @@ namespace J2N.Collections.Generic
             if (TryGetSortedItems(collection, out T[]? sortedItems, out int sortedCount))
             {
                 // We have a sorted array of items with no duplicates.
+                EnsureTreeOrder(sortedItems, sortedCount); // J2N: ensure the order matches the underlying tree if we have a reverse view
                 root = ConstructRootFromSortedArray(sortedItems!, 0, sortedCount - 1, null);
                 this.count = sortedCount;
                 return;
@@ -588,6 +589,9 @@ namespace J2N.Collections.Generic
                 return cachedMax;
             }
         }
+
+        // Virtual function for TreeSubSet, which may need to reverse an array order to match the underlying tree forward order.
+        internal virtual void EnsureTreeOrder(T[] array, int length) { /* Intentionally empty */ }
 
         // Virtual function for TreeSubSet, which may need to update its count.
         internal virtual void VersionCheck(bool updateCount = false) { }
@@ -3051,6 +3055,7 @@ namespace J2N.Collections.Generic
                 // safe to gc the root, we  have all the elements
                 root = null;
 
+                EnsureTreeOrder(merged, c); // J2N: ensure the order matches the underlying tree if we have a reverse view
                 root = ConstructRootFromSortedArray(merged, 0, c - 1, null);
                 count = c;
                 version++;
@@ -3167,6 +3172,7 @@ namespace J2N.Collections.Generic
 
             // Replace tree
             root = null;
+            EnsureTreeOrder(merged, c); // J2N: ensure the order matches the underlying tree if we have a reverse view
             root = ConstructRootFromSortedArray(merged, 0, c - 1, null);
             count = c;
             version++;
@@ -3446,6 +3452,7 @@ namespace J2N.Collections.Generic
                 // safe to gc the root, we  have all the elements
                 root = null;
 
+                EnsureTreeOrder(merged, c); // J2N: ensure the order matches the underlying tree if we have a reverse view
                 root = ConstructRootFromSortedArray(merged, 0, c - 1, null);
                 count = c;
                 version++;
@@ -3518,6 +3525,7 @@ namespace J2N.Collections.Generic
 
                 // Rebuild tree from merged intersection
                 root = null;
+                EnsureTreeOrder(merged, c); // J2N: ensure the order matches the underlying tree if we have a reverse view
                 root = ConstructRootFromSortedArray(merged, 0, c - 1, null);
                 count = c;
                 version++;

@@ -167,6 +167,14 @@ namespace J2N.Collections.Generic
                 }
             }
 
+            internal override void EnsureTreeOrder(T[] array, int length)
+            {
+                if (_reverse && length > 1)
+                {
+                    Array.Reverse(array, 0, length);
+                }
+            }
+
             #endregion
 
 #if DEBUG
