@@ -1684,9 +1684,9 @@ namespace J2N.Collections.Generic
 
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetLast(out KeyValuePair<TKey, TValue> result) => _set.TryGetLast(out result);
 
-        bool INavigableCollection<KeyValuePair<TKey, TValue>>.RemoveFirst(out KeyValuePair<TKey, TValue> value) => _set.TryGetFirst(out value);
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.RemoveFirst(out KeyValuePair<TKey, TValue> value) => _set.RemoveFirst(out value);
 
-        bool INavigableCollection<KeyValuePair<TKey, TValue>>.RemoveLast(out KeyValuePair<TKey, TValue> value) => _set.TryGetLast(out value);
+        bool INavigableCollection<KeyValuePair<TKey, TValue>>.RemoveLast(out KeyValuePair<TKey, TValue> value) => _set.RemoveLast(out value);
 
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewBetween(KeyValuePair<TKey, TValue> lowerValue, KeyValuePair<TKey, TValue> upperValue)
             => _set.GetViewBetween(lowerValue, upperValue);
