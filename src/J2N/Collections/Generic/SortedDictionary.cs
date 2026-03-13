@@ -1676,9 +1676,9 @@ namespace J2N.Collections.Generic
 
         IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => (KeyValuePairComparer)_set.Comparer;
 
-        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.First => _set.First;
+        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.First => _set.MinInternal;
 
-        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Last => _set.Last;
+        KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.Last => _set.MaxInternal;
 
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetFirst(out KeyValuePair<TKey, TValue> result) => _set.TryGetFirst(out result);
 

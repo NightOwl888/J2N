@@ -338,8 +338,8 @@ namespace J2N.Collections.Generic
 
         private void RemoveAllElements(IEnumerable<T> collection)
         {
-            T? first = First;
-            T? last = Last;
+            T? first = MinInternal;
+            T? last = MaxInternal;
             foreach (T item in collection)
             {
                 if (!(comparer.Compare(item!, first!) < 0 || comparer.Compare(item!, last!) > 0) && Contains(item))
@@ -3420,7 +3420,7 @@ namespace J2N.Collections.Generic
                 IEnumerator<T> mine = this.GetEnumerator();
                 IEnumerator<T> theirs = asSorted.GetEnumerator();
                 bool mineEnded = !mine.MoveNext(), theirsEnded = !theirs.MoveNext();
-                T? last = Last;
+                T? last = MaxInternal;
 
                 while (!mineEnded && !theirsEnded && comparer.Compare(theirs.Current!, last!) <= 0)
                 {
@@ -3478,7 +3478,7 @@ namespace J2N.Collections.Generic
                 T prevOther = default!;
 
                 // Optional pruning using Last
-                T last = Last!;
+                T last = MaxInternal!;
 
                 while (!mineEnded && !theirsEnded &&
                        comparer.Compare(theirs.Current, last) <= 0)
@@ -3652,10 +3652,10 @@ namespace J2N.Collections.Generic
                 if (ComparerEquals(comparer, navigableCollection.Comparer))
                 {
                     // Outside range, no point in doing anything
-                    if (comparer.Compare(navigableCollection.Last!, First!) >= 0 && comparer.Compare(navigableCollection.First!, Last!) <= 0)
+                    if (comparer.Compare(navigableCollection.Last!, MinInternal!) >= 0 && comparer.Compare(navigableCollection.First!, MaxInternal!) <= 0)
                     {
-                        T? first = First;
-                        T? last = Last;
+                        T? first = MinInternal;
+                        T? last = MaxInternal;
                         foreach (T item in other)
                         {
                             if (comparer.Compare(item!, first!) < 0)
@@ -3674,8 +3674,8 @@ namespace J2N.Collections.Generic
                 IComparer<T> comparer = Comparer;
                 if (ComparerEquals(comparer, sortedCollection.Comparer))
                 {
-                    T? first = First;
-                    T? last = Last;
+                    T? first = MinInternal;
+                    T? last = MaxInternal;
                     foreach (T item in other)
                     {
                         if (comparer.Compare(item!, first!) < 0)
@@ -3693,10 +3693,10 @@ namespace J2N.Collections.Generic
                 if (ComparerEquals(comparer, bclSortedSet.Comparer))
                 {
                     // Outside range, no point in doing anything
-                    if (comparer.Compare(bclSortedSet.Max!, First!) >= 0 && comparer.Compare(bclSortedSet.Min!, Last!) <= 0)
+                    if (comparer.Compare(bclSortedSet.Max!, MinInternal!) >= 0 && comparer.Compare(bclSortedSet.Min!, MaxInternal!) <= 0)
                     {
-                        T? first = First;
-                        T? last = Last;
+                        T? first = MinInternal;
+                        T? last = MaxInternal;
                         foreach (T item in bclSortedSet)
                         {
                             if (comparer.Compare(item!, first!) < 0)
@@ -3966,7 +3966,7 @@ namespace J2N.Collections.Generic
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of the other collection is the same as this one,
             // so we override it. The Contains() call will weed out the bounds if they are different.
-            INavigableCollection<T> prunedOther = navigableCollection.GetViewBetween(First, lowerValueInclusive: true, Last, upperValueInclusive: true);
+            INavigableCollection<T> prunedOther = navigableCollection.GetViewBetween(LowerValue, lowerValueInclusive: true, UpperValue, upperValueInclusive: true);
             foreach (T item in this)
             {
                 if (!prunedOther.Contains(item))
@@ -3982,7 +3982,7 @@ namespace J2N.Collections.Generic
             if (bclSortedSet.GetType() != typeof(SCG.SortedSet<T>))
                 return IsSubsetOfCollectionWithSameComparer(bclSortedSet);
 
-            SCG.SortedSet<T> prunedOther = bclSortedSet.GetViewBetween(First!, Last!);
+            SCG.SortedSet<T> prunedOther = bclSortedSet.GetViewBetween(LowerValue!, UpperValue!);
             foreach (T item in this)
             {
                 if (!prunedOther.Contains(item))
@@ -4569,7 +4569,7 @@ namespace J2N.Collections.Generic
             {
                 IComparer<T> comparer = Comparer;
                 if (ComparerEquals(comparer, navigableCollection.Comparer) &&
-                    (comparer.Compare(First!, navigableCollection.Last!) > 0 || comparer.Compare(Last!, navigableCollection.First!) < 0))
+                    (comparer.Compare(MinInternal!, navigableCollection.Last!) > 0 || comparer.Compare(MaxInternal!, navigableCollection.First!) < 0))
                 {
                     return false;
                 }
@@ -4578,7 +4578,7 @@ namespace J2N.Collections.Generic
             {
                 IComparer<T> comparer = Comparer;
                 if (ComparerEquals(comparer, bclSortedSet.Comparer) &&
-                    (comparer.Compare(First!, bclSortedSet.Max!) > 0 || comparer.Compare(Last!, bclSortedSet.Min!) < 0))
+                    (comparer.Compare(MinInternal!, bclSortedSet.Max!) > 0 || comparer.Compare(MaxInternal!, bclSortedSet.Min!) < 0))
                 {
                     return false;
                 }
@@ -4718,9 +4718,9 @@ namespace J2N.Collections.Generic
 
         #region INavigableCollection<T> members
 
-        T? INavigableCollection<T>.First => First;
+        T? INavigableCollection<T>.First => MinInternal;
 
-        T? INavigableCollection<T>.Last => Last;
+        T? INavigableCollection<T>.Last => MaxInternal;
 
         INavigableCollection<T> INavigableCollection<T>.GetViewBetween(T? lowerValue, T? upperValue)
             => GetViewBetween(lowerValue, upperValue);
