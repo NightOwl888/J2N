@@ -47,8 +47,20 @@ namespace J2N.Collections.Generic
             private readonly bool _lBoundInclusive, _uBoundInclusive;
 
             private readonly bool _reverse;
+            private IComparer<T>? _reverseComparer;
 
-            // used to see if the count is out of date
+            internal override IComparer<T> ComparerInternal
+            {
+                get
+                {
+                    IComparer<T> cmp = _underlying.ComparerInternal;
+                    if (_reverse)
+                    {
+                        return _reverseComparer ??= ReverseComparer<T>.Create(cmp);
+                    }
+                    return cmp;
+                }
+            }
 
             #region ICollectionView Members
 
@@ -177,15 +189,15 @@ namespace J2N.Collections.Generic
 
             #endregion
 
+
+            // used to see if the count is out of date
 #if DEBUG
             internal override bool versionUpToDate()
             {
                 return (version == _underlying.version);
             }
 #endif
-
-            // J2N TODO: Add a reverse parameter and set the local field and cached comparer instance accordingly.
-            public TreeSubSet(SortedSet<T> Underlying, [AllowNull] T Min, bool lowerBoundInclusive, [AllowNull] T Max, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive)
+            public TreeSubSet(SortedSet<T> Underlying, [AllowNull] T Min, bool lowerBoundInclusive, [AllowNull] T Max, bool upperBoundInclusive, bool lowerBoundActive, bool upperBoundActive, bool reverse)
                 : base(Underlying.Comparer)
             {
                 _underlying = Underlying;
@@ -195,6 +207,7 @@ namespace J2N.Collections.Generic
                 _uBoundInclusive = upperBoundInclusive;
                 _lBoundActive = lowerBoundActive;
                 _uBoundActive = upperBoundActive;
+                _reverse = reverse;
                 root = _underlying.FindRange(_min, _max, _lBoundInclusive, _uBoundInclusive, _lBoundActive, _uBoundActive); // root is first element within range
                 count = 0;
                 version = -1;
@@ -529,7 +542,7 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                return (TreeSubSet)_underlying.GetViewBetween(lowerValue, _lBoundInclusive, upperValue, _uBoundInclusive);
+                return (TreeSubSet)base.GetViewBetween(lowerValue, _lBoundInclusive, upperValue, _uBoundInclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -545,7 +558,7 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                return (TreeSubSet)_underlying.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
+                return (TreeSubSet)base.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -557,7 +570,7 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                return (TreeSubSet)_underlying.GetViewBefore(upperValue, _uBoundInclusive);
+                return (TreeSubSet)base.GetViewBefore(upperValue, _uBoundInclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -569,7 +582,7 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                return (TreeSubSet)_underlying.GetViewBefore(upperValue, upperValueInclusive);
+                return (TreeSubSet)base.GetViewBefore(upperValue, upperValueInclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -581,7 +594,7 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                return (TreeSubSet)_underlying.GetViewAfter(lowerValue, _lBoundInclusive);
+                return (TreeSubSet)base.GetViewAfter(lowerValue, _lBoundInclusive);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -593,7 +606,7 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                return (TreeSubSet)_underlying.GetViewAfter(lowerValue, lowerValueInclusive);
+                return (TreeSubSet)base.GetViewAfter(lowerValue, lowerValueInclusive);
             }
 
 #if DEBUG

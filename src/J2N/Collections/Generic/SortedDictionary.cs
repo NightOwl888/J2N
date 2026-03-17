@@ -72,6 +72,10 @@ namespace J2N.Collections.Generic
         [NonSerialized]
 #endif
         private ValueCollection? _values;
+#if FEATURE_SERIALIZABLE
+        [NonSerialized]
+#endif
+        private IComparer<TKey>? _reverseKeyComparer; // J2N: Cache reverse key comparer
 
         // J2N NOTE: In the BCL, this field was type TreeSet<KeyValuePair<TKey, TValue>>.
         // We have changed it to SortedSet<KeyValuePair<TKey, TValue>> to allow
@@ -168,7 +172,8 @@ namespace J2N.Collections.Generic
             var keyValuePairComparer = new KeyValuePairComparer(comparer);
 
             if (dictionary is SortedDictionary<TKey, TValue> sortedDictionary &&
-                sortedDictionary._set.Comparer is KeyValuePairComparer kv &&
+                // J2N: Use RawComparer property to ensure we never get a ReverseComparer here
+                sortedDictionary._set.RawComparer is KeyValuePairComparer kv &&
                 // J2N: Use Comparer property to ensure we compare the *user* comparer for equality, not a wrapper
                 kv.Comparer.Equals(keyValuePairComparer.Comparer))
             {
@@ -386,7 +391,25 @@ namespace J2N.Collections.Generic
         /// Getting the value of this property is an O(1) operation.
         /// </remarks>
         public IComparer<TKey> Comparer
-            => ((KeyValuePairComparer)_set.Comparer).Comparer;
+        {
+            get
+            {
+                // Ensure we return the unwrapped comparer from the original set so we don't stack
+                // reverse comparers. We use RawComparer here because it is slightly more efficient
+                // than ComparerInternal and we know we will never be dealing with a string here
+                // because it is always KeyValuePairComparer.
+                var kv = (KeyValuePairComparer)_set.UnderlyingSet.RawComparer;
+                // KeyValuePairComparer now will do the string comparer unwrapping for us.
+                IComparer<TKey> cmp = kv.Comparer;
+
+                if (_set.IsReversed)
+                {
+                    return _reverseKeyComparer ??= ReverseComparer<TKey>.Create(cmp);
+                }
+
+                return cmp;
+            }
+        }
 
         /// <summary>
         /// Gets a collection containing the keys in the <see cref="SortedDictionary{TKey, TValue}"/>.
@@ -1674,7 +1697,7 @@ namespace J2N.Collections.Generic
 
         #region INavigableCollection<KeyValuePair<TKey, TValue>> members
 
-        IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => (KeyValuePairComparer)_set.Comparer;
+        IComparer<KeyValuePair<TKey, TValue>> ISortedCollection<KeyValuePair<TKey, TValue>>.Comparer => _set.Comparer;
 
         KeyValuePair<TKey, TValue> INavigableCollection<KeyValuePair<TKey, TValue>>.First => _set.MinInternal;
 

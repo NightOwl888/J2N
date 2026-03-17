@@ -477,7 +477,9 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// Retrieving the value of this property is an <c>O(1)</c> operation.
         /// </remarks>
-        public IComparer<T> Comparer
+        public IComparer<T> Comparer => ComparerInternal;
+
+        internal virtual IComparer<T> ComparerInternal
         {
             get
             {
@@ -2259,7 +2261,6 @@ namespace J2N.Collections.Generic
             public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, ReadOnlySpan<TAlternateSpan> upperValue)
             {
                 SortedSet<T> set = Set;
-                SortedSet<T> underlying = set.UnderlyingSet;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooLow(lowerValue, comparer))
@@ -2271,11 +2272,7 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
 
-                // Delegate to underlying set.
-                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                return _isUnderlying
-                    ? GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer)
-                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer);
+                return GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer);
             }
 
             /// <summary>
@@ -2307,8 +2304,6 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive)
             {
-                SortedSet<T> set = Set;
-                SortedSet<T> underlying = set.UnderlyingSet;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooLow(lowerValue, lowerValueInclusive, comparer))
@@ -2320,17 +2315,11 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
 
-                // Delegate to underlying set.
-                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                return _isUnderlying
-                    ? GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer)
-                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer);
+                return GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer);
             }
 
             internal SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
-                SortedSet<T> underlying = Set.UnderlyingSet;
-
                 // J2N: We instantiate the upper instance prior to comparing to see whether we should
                 // throw when lowerValue is greater than upperValue. This is so we don't have
                 // to change the design of the ISpanAlternateComparer interface to allow matching 2
@@ -2350,7 +2339,8 @@ namespace J2N.Collections.Generic
                     lower = comparer.Create(lowerValue);
                 }
 
-                return new TreeSubSet(underlying, lower, lowerValueInclusive, upper, upperValueInclusive, true, true);
+                SortedSet<T> set = Set;
+                return new TreeSubSet(set.UnderlyingSet, lower, lowerValueInclusive, upper, upperValueInclusive, true, true, set.IsReversed);
             }
 
             #endregion GetViewBetween
@@ -2372,8 +2362,6 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public SortedSet<T> GetViewBefore(ReadOnlySpan<TAlternateSpan> upperValue)
             {
-                SortedSet<T> set = Set;
-                SortedSet<T> underlying = set.UnderlyingSet;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooHigh(upperValue, comparer))
@@ -2381,11 +2369,7 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
 
-                // Delegate to underlying set.
-                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                return _isUnderlying
-                    ? GetViewBefore(upperValue, set.UpperBoundInclusive, comparer)
-                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBefore(upperValue, set.UpperBoundInclusive, comparer);
+                return GetViewBefore(upperValue, Set.UpperBoundInclusive, comparer);
             }
 
             /// <summary>
@@ -2408,8 +2392,6 @@ namespace J2N.Collections.Generic
             /// </returns>
             public SortedSet<T> GetViewBefore(ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive)
             {
-                SortedSet<T> set = Set;
-                SortedSet<T> underlying = set.UnderlyingSet;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooHigh(upperValue, upperValueInclusive, comparer))
@@ -2417,23 +2399,18 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
 
-                // Delegate to underlying set.
-                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                return _isUnderlying
-                    ? GetViewBefore(upperValue, upperValueInclusive, comparer)
-                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewBefore(upperValue, upperValueInclusive, comparer);
+                return GetViewBefore(upperValue, upperValueInclusive, comparer);
             }
 
             internal SortedSet<T> GetViewBefore(ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
-                SortedSet<T> underlying = Set.UnderlyingSet;
-
                 if (!TryGetValue(upperValue, out T? upper))
                 {
                     upper = comparer.Create(upperValue);
                 }
 
-                return new TreeSubSet(underlying, default, true, upper, upperValueInclusive, false, true);
+                SortedSet<T> set = Set;
+                return new TreeSubSet(set.UnderlyingSet, default, true, upper, upperValueInclusive, false, true, set.IsReversed);
             }
 
             #endregion GetViewBefore
@@ -2455,8 +2432,6 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public SortedSet<T> GetViewAfter(ReadOnlySpan<TAlternateSpan> lowerValue)
             {
-                SortedSet<T> set = Set;
-                SortedSet<T> underlying = set.UnderlyingSet;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooLow(lowerValue, comparer))
@@ -2464,11 +2439,7 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
 
-                // Delegate to underlying set.
-                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                return _isUnderlying
-                    ? GetViewAfter(lowerValue, set.LowerBoundInclusive, comparer)
-                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewAfter(lowerValue, set.LowerBoundInclusive, comparer);
+                return GetViewAfter(lowerValue, Set.LowerBoundInclusive, comparer);
             }
 
             /// <summary>
@@ -2489,8 +2460,6 @@ namespace J2N.Collections.Generic
             /// </remarks>
             public SortedSet<T> GetViewAfter(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive)
             {
-                SortedSet<T> set = Set;
-                SortedSet<T> underlying = set.UnderlyingSet;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
                 if (IsTooLow(lowerValue, lowerValueInclusive, comparer))
@@ -2498,23 +2467,18 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
 
-                // Delegate to underlying set.
-                // All views share the same Comparer instance. Therefore, passing the alternate comparer to the other instance is also safe.
-                return _isUnderlying
-                    ? GetViewAfter(lowerValue, lowerValueInclusive, comparer)
-                    : underlying.GetSpanAlternateLookup(_alternateComparer).GetViewAfter(lowerValue, lowerValueInclusive, comparer);
+                return GetViewAfter(lowerValue, lowerValueInclusive, comparer);
             }
 
             internal SortedSet<T> GetViewAfter(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
-                SortedSet<T> underlying = Set.UnderlyingSet;
-
                 if (!TryGetValue(lowerValue, out T? lower))
                 {
                     lower = comparer.Create(lowerValue);
                 }
 
-                return new TreeSubSet(underlying, lower, lowerValueInclusive, default, true, true, false);
+                SortedSet<T> set = Set;
+                return new TreeSubSet(set.UnderlyingSet, lower, lowerValueInclusive, default, true, true, false, set.IsReversed);
             }
 
             #endregion GetViewAfter
@@ -4956,7 +4920,7 @@ namespace J2N.Collections.Generic
             {
                 ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
-            return new TreeSubSet(this, lowerValue, LowerBoundInclusive, upperValue, UpperBoundInclusive, true, true);
+            return new TreeSubSet(UnderlyingSet, lowerValue, LowerBoundInclusive, upperValue, UpperBoundInclusive, true, true, IsReversed);
         }
 
         /// <summary>
@@ -4992,7 +4956,7 @@ namespace J2N.Collections.Generic
             {
                 ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
-            return new TreeSubSet(this, lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, true, true);
+            return new TreeSubSet(UnderlyingSet, lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, true, true, IsReversed);
         }
 
         /// <summary>
@@ -5010,7 +4974,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual SortedSet<T> GetViewBefore(T? upperValue)
         {
-            return new TreeSubSet(this, default, true, upperValue, upperBoundInclusive: true, false, true);
+            return new TreeSubSet(UnderlyingSet, default, true, upperValue, upperBoundInclusive: true, false, true, IsReversed);
         }
 
         /// <summary>
@@ -5033,7 +4997,7 @@ namespace J2N.Collections.Generic
         /// </returns>
         public virtual SortedSet<T> GetViewBefore(T? upperValue, bool upperValueInclusive)
         {
-            return new TreeSubSet(this, default, true, upperValue, upperValueInclusive, false, true);
+            return new TreeSubSet(UnderlyingSet, default, true, upperValue, upperValueInclusive, false, true, IsReversed);
         }
 
         /// <summary>
@@ -5051,7 +5015,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual SortedSet<T> GetViewAfter(T? lowerValue)
         {
-            return new TreeSubSet(this, lowerValue, lowerBoundInclusive: true, default, true, true, false);
+            return new TreeSubSet(UnderlyingSet, lowerValue, lowerBoundInclusive: true, default, true, true, false, IsReversed);
         }
 
         /// <summary>
@@ -5072,7 +5036,7 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual SortedSet<T> GetViewAfter(T? lowerValue, bool lowerValueInclusive)
         {
-            return new TreeSubSet(this, lowerValue, lowerValueInclusive, default, true, true, false);
+            return new TreeSubSet(UnderlyingSet, lowerValue, lowerValueInclusive, default, true, true, false, IsReversed);
         }
 
 #if DEBUG
