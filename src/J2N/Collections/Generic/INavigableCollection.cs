@@ -204,7 +204,7 @@ namespace J2N.Collections.Generic
         /// otherwise, it is an exclusive lower bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elementst that fall after <paramref name="lowerValue"/>, as defined by the comparer.
+        /// This method returns a view of the range of elements that fall after <paramref name="lowerValue"/>, as defined by the comparer.
         /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
         /// value of <paramref name="lowerValueInclusive"/>. This method does not copy elements from the
         /// <see cref="INavigableCollection{T}"/>, but provides a window into the underlying <see cref="INavigableCollection{T}"/> itself.
@@ -213,6 +213,17 @@ namespace J2N.Collections.Generic
         /// This corresponds to the <c>tailSet()</c> method in the JDK.
         /// </remarks>
         INavigableCollection<T> GetViewAfter(T? lowerValue,  bool lowerValueInclusive);
+
+        /// <summary>
+        /// Returns a reverse order view of the elements of the current <see cref="INavigableCollection{T}"/>.
+        /// </summary>
+        /// <returns>A view that contains the values of the current <see cref="INavigableCollection{T}"/> in reverse order.</returns>
+        /// <remarks>
+        /// This method returns a reverse order view of the range of elements of this <see cref="INavigableCollection{T}"/>, as defined by the comparer.
+        /// <para/>
+        /// This corresponds to the <c>descendingSet()</c> method in the JDK.
+        /// </remarks>
+        INavigableCollection<T> GetViewDescending();
 
         /// <summary>
         /// Gets the entry in the <see cref="INavigableCollection{T}"/> whose value

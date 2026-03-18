@@ -2450,7 +2450,7 @@ namespace J2N.Collections.Generic
             /// otherwise, it is an exclusive lower bound.</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
             /// <remarks>
-            /// This method returns a view of the range of elementst that fall after <paramref name="lowerValue"/>, as defined by the comparer.
+            /// This method returns a view of the range of elements that fall after <paramref name="lowerValue"/>, as defined by the comparer.
             /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
             /// value of <paramref name="lowerValueInclusive"/>. This method does not copy elements from the
             /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
@@ -4712,6 +4712,9 @@ namespace J2N.Collections.Generic
         INavigableCollection<T> INavigableCollection<T>.GetViewAfter(T? lowerValue, bool lowerValueInclusive)
             => GetViewAfter(lowerValue, lowerValueInclusive);
 
+        INavigableCollection<T> INavigableCollection<T>.GetViewDescending()
+            => GetViewDescending();
+
         IComparer<T> ISortedCollection<T>.Comparer => Comparer;
 
         bool INavigableCollection<T>.TryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
@@ -5026,7 +5029,7 @@ namespace J2N.Collections.Generic
         /// otherwise, it is an exclusive lower bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elementst that fall after <paramref name="lowerValue"/>, as defined by the comparer.
+        /// This method returns a view of the range of elements that fall after <paramref name="lowerValue"/>, as defined by the comparer.
         /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
         /// value of <paramref name="lowerValueInclusive"/>. This method does not copy elements from the
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
@@ -5037,6 +5040,25 @@ namespace J2N.Collections.Generic
         public virtual SortedSet<T> GetViewAfter(T? lowerValue, bool lowerValueInclusive)
         {
             return new TreeSubSet(UnderlyingSet, lowerValue, lowerValueInclusive, default, true, true, false, IsReversed);
+        }
+
+        /// <summary>
+        /// Returns a reverse order view of the elements of the current <see cref="SortedSet{T}"/>.
+        /// </summary>
+        /// <returns>A view that contains the values of the current <see cref="SortedSet{T}"/> in reverse order.</returns>
+        /// <remarks>
+        /// This method returns a reverse order view of the range of elements of this <see cref="SortedSet{T}"/>, as defined by the comparer.
+        /// <para/>
+        /// This corresponds to the <c>descendingSet()</c> method in the JDK.
+        /// </remarks>
+        public virtual SortedSet<T> GetViewDescending()
+        {
+            return new TreeSubSet(UnderlyingSet,
+                LowerBound, lowerBoundInclusive: true, /* ignored */
+                UpperBound, upperBoundInclusive: true, /* ignored */
+                lowerBoundActive: false, /* disable to include whole set including changes */
+                upperBoundActive: false, /* disable to include whole set including changes */
+                !IsReversed);
         }
 
 #if DEBUG

@@ -609,6 +609,11 @@ namespace J2N.Collections.Generic
                 return (TreeSubSet)base.GetViewAfter(lowerValue, lowerValueInclusive);
             }
 
+            public override SortedSet<T> GetViewDescending()
+            {
+                return new TreeSubSet(_underlying, _min, _lBoundInclusive, _max, _uBoundInclusive, _lBoundActive, _uBoundActive, !_reverse);
+            }
+
 #if DEBUG
             internal override void IntersectWithEnumerable(IEnumerable<T> other)
             {

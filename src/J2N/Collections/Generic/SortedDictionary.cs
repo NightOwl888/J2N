@@ -1676,7 +1676,7 @@ namespace J2N.Collections.Generic
             /// otherwise, it is an exclusive lower bound.</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
             /// <remarks>
-            /// This method returns a view of the range of elementst that fall after <paramref name="lowerKey"/>, as defined by the comparer.
+            /// This method returns a view of the range of elements that fall after <paramref name="lowerKey"/>, as defined by the comparer.
             /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
             /// value of <paramref name="lowerKeyInclusive"/>. This method does not copy elements from the
             /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
@@ -1728,6 +1728,9 @@ namespace J2N.Collections.Generic
 
         INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewAfter(KeyValuePair<TKey, TValue> lowerValue, bool lowerValueInclusive)
             => _set.GetViewAfter(lowerValue, lowerValueInclusive);
+
+        INavigableCollection<KeyValuePair<TKey, TValue>> INavigableCollection<KeyValuePair<TKey, TValue>>.GetViewDescending()
+            => _set.GetViewDescending();
 
         bool INavigableCollection<KeyValuePair<TKey, TValue>>.TryGetPredecessor(KeyValuePair<TKey, TValue> item, out KeyValuePair<TKey, TValue> result)
             => _set.TryGetPredecessor(item, out result);
@@ -1897,7 +1900,7 @@ namespace J2N.Collections.Generic
         /// otherwise, it is an exclusive lower bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
         /// <remarks>
-        /// This method returns a view of the range of elementst that fall after <paramref name="lowerKey"/>, as defined by the comparer.
+        /// This method returns a view of the range of elements that fall after <paramref name="lowerKey"/>, as defined by the comparer.
         /// The lower bound may either be inclusive (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the
         /// value of <paramref name="lowerKeyInclusive"/>. This method does not copy elements from the
         /// <see cref="SortedDictionary{TKey, TValue}"/>, but provides a window into the underlying <see cref="SortedDictionary{TKey, TValue}"/> itself.
@@ -1911,6 +1914,21 @@ namespace J2N.Collections.Generic
                 new KeyValuePair<TKey, TValue>(lowerKey!, default!),
                 lowerKeyInclusive);
 
+            return new SortedDictionary<TKey, TValue>(viewSet);
+        }
+
+        /// <summary>
+        /// Returns a reverse order view of the elements of the current <see cref="SortedDictionary{TKey, TValue}"/>.
+        /// </summary>
+        /// <returns>A view that contains the values of the current <see cref="SortedDictionary{TKey, TValue}"/> in reverse order.</returns>
+        /// <remarks>
+        /// This method returns a reverse order view of the range of elements of this <see cref="SortedDictionary{TKey, TValue}"/>, as defined by the comparer.
+        /// <para/>
+        /// This corresponds to the <c>descendingMap()</c> method in the JDK.
+        /// </remarks>
+        public SortedDictionary<TKey, TValue> GetViewDescending()
+        {
+            SortedSet<KeyValuePair<TKey, TValue>> viewSet = _set.GetViewDescending();
             return new SortedDictionary<TKey, TValue>(viewSet);
         }
 
@@ -2530,6 +2548,14 @@ namespace J2N.Collections.Generic
                 // Note that if this is called on TreeSubSet, it overrides GetViewAfter() and properly
                 // cascades the call to the underlying set.
                 SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewAfter(lowerValue, lowerValueInclusive);
+                return new KeyCollection(viewDictionary);
+            }
+
+            INavigableCollection<TKey> INavigableCollection<TKey>.GetViewDescending()
+            {
+                // Note that if this is called on TreeSubSet, it overrides GetViewDescending() and properly
+                // cascades the call to the underlying set.
+                SortedDictionary<TKey, TValue> viewDictionary = _dictionary.GetViewDescending();
                 return new KeyCollection(viewDictionary);
             }
 
