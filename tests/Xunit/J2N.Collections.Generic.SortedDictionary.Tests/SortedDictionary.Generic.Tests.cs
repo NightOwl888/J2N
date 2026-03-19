@@ -851,20 +851,17 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_Generic_FirstAndLast(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            SortedDictionary<TKey, TValue> descendingDictionary = dictionary.GetViewDescending();
             if (count > 0)
             {
                 List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
                 expected.Sort(GetIComparer());
-                Assert.Equal(expected[0].Key, dictionary.FirstKey);
-                Assert.Equal(expected[count - 1].Key, dictionary.LastKey);
 
-                Assert.True(dictionary.TryGetFirst(out TKey key, out TValue value));
-                Assert.Equal(expected[0].Key, key);
-                Assert.Equal(expected[0].Value, value);
+                AssertFirstLastMatch(expected, dictionary, count);
 
-                Assert.True(dictionary.TryGetLast(out key, out value));
-                Assert.Equal(expected[count - 1].Key, key);
-                Assert.Equal(expected[count - 1].Value, value);
+                expected.Reverse();
+
+                AssertFirstLastMatch(expected, descendingDictionary, count);
             }
             else
             {
@@ -878,6 +875,20 @@ namespace J2N.Collections.Tests
                 Assert.False(dictionary.TryGetLast(out key, out value));
                 Assert.Equal(default(TKey), key);
                 Assert.Equal(default(TValue), value);
+            }
+
+            static void AssertFirstLastMatch(List<SCG.KeyValuePair<TKey, TValue>> expected, SortedDictionary<TKey, TValue> dictionary, int count)
+            {
+                Assert.Equal(expected[0].Key, dictionary.FirstKey);
+                Assert.Equal(expected[count - 1].Key, dictionary.LastKey);
+
+                Assert.True(dictionary.TryGetFirst(out TKey key, out TValue value));
+                Assert.Equal(expected[0].Key, key);
+                Assert.Equal(expected[0].Value, value);
+
+                Assert.True(dictionary.TryGetLast(out key, out value));
+                Assert.Equal(expected[count - 1].Key, key);
+                Assert.Equal(expected[count - 1].Value, value);
             }
         }
 

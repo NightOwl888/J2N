@@ -121,18 +121,17 @@ namespace J2N.Collections.Tests
         public void SortedSet_Generic_FirstAndLast(int setLength)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            SortedSet<T> descendingSet = set.GetViewDescending();
             if (setLength > 0)
             {
                 List<T> expected = set.ToList();
                 expected.Sort(GetIComparer());
-                Assert.Equal(expected[0], set.First);
-                Assert.Equal(expected[setLength - 1], set.Last);
 
-                Assert.True(set.TryGetFirst(out T value));
-                Assert.Equal(expected[0], value);
+                AssertFirstLastMatch(expected, set, setLength);
 
-                Assert.True(set.TryGetLast(out value));
-                Assert.Equal(expected[setLength - 1], value);
+                expected.Reverse();
+
+                AssertFirstLastMatch(expected, descendingSet, setLength);
             }
             else
             {
@@ -144,6 +143,18 @@ namespace J2N.Collections.Tests
 
                 Assert.False(set.TryGetLast(out value));
                 Assert.Equal(default(T), value);
+            }
+
+            static void AssertFirstLastMatch(List<T> expected, SortedSet< T> set, int setLength)
+            {
+                Assert.Equal(expected[0], set.First);
+                Assert.Equal(expected[setLength - 1], set.Last);
+
+                Assert.True(set.TryGetFirst(out T value));
+                Assert.Equal(expected[0], value);
+
+                Assert.True(set.TryGetLast(out value));
+                Assert.Equal(expected[setLength - 1], value);
             }
         }
 
