@@ -140,12 +140,83 @@ namespace J2N.Collections.Tests
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedDictionary_Generic_DictionaryIsProperlySortedAccordingToComparer(int setLength)
         {
-            SortedDictionary<TKey, TValue> set = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
-            J2N.Collections.Generic.List<SCG.KeyValuePair<TKey, TValue>> expected = set.ToList();
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
             expected.Sort(GetIComparer());
             int expectedIndex = 0;
-            foreach (SCG.KeyValuePair<TKey, TValue> value in set)
+            foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
                 Assert.Equal(expected[expectedIndex++], value);
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewDescending_IsProperlySortedAccordingToComparer(int setLength)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
+            SortedDictionary<TKey, TValue> descendingDictionary = dictionary.GetViewDescending();
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+            expected.Sort(GetIComparer());
+            expected.Reverse();
+            int expectedIndex = 0;
+            foreach (SCG.KeyValuePair<TKey, TValue> value in descendingDictionary)
+                Assert.Equal(expected[expectedIndex++], value);
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewDescending_GetViewDescending_IsProperlySortedAccordingToComparer(int setLength)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
+            SortedDictionary<TKey, TValue> doubleDescendingDictionary = dictionary.GetViewDescending().GetViewDescending();
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+            expected.Sort(GetIComparer());
+            int expectedIndex = 0;
+            foreach (SCG.KeyValuePair<TKey, TValue> value in doubleDescendingDictionary)
+                Assert.Equal(expected[expectedIndex++], value);
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_GetViewDescending_HasComparerWithReversedBehavior(int setLength)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(setLength);
+            SortedDictionary<TKey, TValue> descendingDictionary = dictionary.GetViewDescending();
+            SortedDictionary<TKey, TValue> doubleDescendingDictionary = dictionary.GetViewDescending().GetViewDescending();
+            SCG.IComparer<TKey> originalComparer = dictionary.Comparer;
+            SCG.IComparer<TKey> descendingComparer = descendingDictionary.Comparer;
+            SCG.IComparer<TKey> doubleDescendingComparer = doubleDescendingDictionary.Comparer;
+
+            List<TKey> keys = dictionary.Keys.ToList();
+            int limit = Math.Min(keys.Count, 10);
+
+            for (int i = 0; i < limit; i++)
+            {
+                for (int j = 0; j < limit; j++)
+                {
+                    TKey a = keys[i];
+                    TKey b = keys[j];
+
+                    int original = originalComparer.Compare(a, b);
+
+                    int reverse = descendingComparer.Compare(a, b);
+                    int reverseSwapped = descendingComparer.Compare(b, a);
+
+                    int forward = doubleDescendingComparer.Compare(a, b);
+                    int forwardSwapped = doubleDescendingComparer.Compare(b, a);
+
+                    // Core invariant: reversed ordering
+                    Assert.Equal(Math.Sign(original), -Math.Sign(reverse));
+
+                    // Symmetry invariant
+                    Assert.Equal(Math.Sign(original), Math.Sign(reverseSwapped));
+
+                    // Core invariant: double-reversed ordering (forward)
+                    Assert.Equal(Math.Sign(original), Math.Sign(forward));
+
+                    // Symmetry invariant (double-reversed)
+                    Assert.Equal(Math.Sign(original), -Math.Sign(forwardSwapped));
+                }
+            }
         }
 
         #endregion

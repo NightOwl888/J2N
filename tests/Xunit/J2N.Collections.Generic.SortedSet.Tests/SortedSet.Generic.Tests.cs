@@ -584,6 +584,77 @@ namespace J2N.Collections.Tests
                 Assert.Equal(expected[expectedIndex++], value);
         }
 
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewDescending_IsProperlySortedAccordingToComparer(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            SortedSet<T> descendingSet = set.GetViewDescending();
+            List<T> expected = set.ToList();
+            expected.Sort(GetIComparer());
+            expected.Reverse();
+            int expectedIndex = 0;
+            foreach (T value in descendingSet)
+                Assert.Equal(expected[expectedIndex++], value);
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewDescending_GetViewDescending_IsProperlySortedAccordingToComparer(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            SortedSet<T> doubleDescendingSet = set.GetViewDescending().GetViewDescending();
+            List<T> expected = set.ToList();
+            expected.Sort(GetIComparer());
+            int expectedIndex = 0;
+            foreach (T value in doubleDescendingSet)
+                Assert.Equal(expected[expectedIndex++], value);
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewDescending_HasComparerWithReversedBehavior(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            SortedSet<T> descendingSet = set.GetViewDescending();
+            SortedSet<T> doubleDescendingSet = set.GetViewDescending().GetViewDescending();
+            SCG.IComparer<T> originalComparer = set.Comparer;
+            SCG.IComparer<T> descendingComparer = descendingSet.Comparer;
+            SCG.IComparer<T> doubleDescendingComparer = doubleDescendingSet.Comparer;
+
+            List<T> values = set.ToList();
+            int limit = Math.Min(values.Count, 10);
+
+            for (int i = 0; i < limit; i++)
+            {
+                for (int j = 0; j < limit; j++)
+                {
+                    T a = values[i];
+                    T b = values[j];
+
+                    int original = originalComparer.Compare(a, b);
+
+                    int reverse = descendingComparer.Compare(a, b);
+                    int reverseSwapped = descendingComparer.Compare(b, a);
+
+                    int forward = doubleDescendingComparer.Compare(a, b);
+                    int forwardSwapped = doubleDescendingComparer.Compare(b, a);
+
+                    // Core invariant: reversed ordering
+                    Assert.Equal(Math.Sign(original), -Math.Sign(reverse));
+
+                    // Symmetry invariant
+                    Assert.Equal(Math.Sign(original), Math.Sign(reverseSwapped));
+
+                    // Core invariant: double-reversed ordering (forward)
+                    Assert.Equal(Math.Sign(original), Math.Sign(forward));
+
+                    // Symmetry invariant (double-reversed)
+                    Assert.Equal(Math.Sign(original), -Math.Sign(forwardSwapped));
+                }
+            }
+        }
+
         [Fact]
         public void SortedSet_Generic_TestSubSetEnumerator()
         {
@@ -599,6 +670,16 @@ namespace J2N.Collections.Tests
 
             SCG.IEnumerable<int> en = mySubSet.Reverse();
             Assert.True(mySubSet.SetEquals(en)); //"Expected to be the same set."
+
+            // J2N: Added asserts for descending set comparison
+            SortedSet<int> descending = mySubSet.GetViewDescending();
+            using var descendingEnumerator = descending.GetEnumerator();
+            foreach (int element in en)
+            {
+                Assert.True(descendingEnumerator.MoveNext());
+                Assert.Equal(element, descendingEnumerator.Current);
+            }
+            Assert.False(descendingEnumerator.MoveNext());
         }
 
         #endregion
