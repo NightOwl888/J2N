@@ -698,6 +698,21 @@ namespace J2N.Collections.Tests
             Assert.Equal(expected, actual);
         }
 
+        // J2N: Added to test descending set CopyTo method
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_CopyTo_GetViewDescending_WithoutIndex_PreservesReverseOrder(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            SortedSet<T> descendingSet = set.GetViewDescending();
+            List<T> expected = descendingSet.ToList();
+            expected.Sort(GetIComparer());
+            expected.Reverse();
+            T[] actual = new T[setLength];
+            descendingSet.CopyTo(actual);
+            Assert.Equal(expected, actual);
+        }
+
         [Theory]
         [MemberData(nameof(ValidCollectionSizes))]
         public void SortedSet_Generic_CopyTo_WithValidFullCount(int setLength)
@@ -707,6 +722,21 @@ namespace J2N.Collections.Tests
             expected.Sort(GetIComparer());
             T[] actual = new T[setLength];
             set.CopyTo(actual, 0, setLength);
+            Assert.Equal(expected, actual);
+        }
+
+        // J2N: Added to test descending set CopyTo method
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_CopyTo_GetViewDescending_WithValidFullCount_PreservesReverseOrder(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            SortedSet<T> descendingSet = set.GetViewDescending();
+            List<T> expected = descendingSet.ToList();
+            expected.Sort(GetIComparer());
+            expected.Reverse();
+            T[] actual = new T[setLength];
+            descendingSet.CopyTo(actual, 0, setLength);
             Assert.Equal(expected, actual);
         }
 

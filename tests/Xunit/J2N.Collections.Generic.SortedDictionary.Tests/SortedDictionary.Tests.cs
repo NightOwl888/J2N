@@ -157,6 +157,21 @@ namespace J2N.Collections.Tests
                 Assert.Equal(array[i++], obj);
         }
 
+        // J2N: Added to test descending dictionary CopyTo method
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void ICollection_NonGeneric_CopyTo_GetViewDescending_WithIndex_PreservesReverseOrder(int count)
+        {
+            SortedDictionary<string, string> collection = (SortedDictionary<string, string>)NonGenericICollectionFactory(count);
+            ICollection descendingCollection = collection.GetViewDescending();
+            SCG.KeyValuePair<string, string>[] array = new SCG.KeyValuePair<string, string>[count];
+            object[] objarray = new object[count];
+            descendingCollection.CopyTo(array, 0);
+            descendingCollection.CopyTo(objarray, 0);
+            for (int i = 0; i < count; i++)
+                Assert.Equal(array[i], (SCG.KeyValuePair<string, string>)(objarray[i]));
+        }
+
         #endregion
     }
 

@@ -116,6 +116,19 @@ namespace J2N.Collections.Tests
             foreach (object obj in collection)
                 Assert.Equal(array[i++], obj);
         }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_KeyCollection_CopyTo_GetViewDescending_WithIndex_PreservesReverseOrder(int count)
+        {
+            ICollection collection = NonGenericICollectionFactory(count);
+            ICollection descendingCollection = (ICollection)((INavigableCollection<string>)collection).GetViewDescending();
+            string[] array = new string[count];
+            descendingCollection.CopyTo(array, 0);
+            int i = 0;
+            foreach (object obj in descendingCollection)
+                Assert.Equal(array[i++], obj);
+        }
     }
 }
 

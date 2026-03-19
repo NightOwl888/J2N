@@ -1257,5 +1257,24 @@ namespace J2N.Collections.Tests
         }
 
         #endregion GetViewAfter
+
+        #region CopyTo
+
+        // J2N: Added to test descending dictionary CopyTo method
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_CopyTo_GetViewDescending_WithIndex_PreservesReverseOrder(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            SortedDictionary<TKey, TValue> descendingDictionary = dictionary.GetViewDescending();
+            List<SCG.KeyValuePair<TKey, TValue>> expected = descendingDictionary.ToList();
+            expected.Sort(GetIComparer());
+            expected.Reverse();
+            SCG.KeyValuePair<TKey, TValue>[] actual = new SCG.KeyValuePair<TKey, TValue>[count];
+            descendingDictionary.CopyTo(actual, 0);
+            Assert.Equal(expected, actual);
+        }
+
+        #endregion CopyTo
     }
 }
