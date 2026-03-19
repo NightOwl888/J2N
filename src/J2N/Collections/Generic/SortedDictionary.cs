@@ -2373,8 +2373,11 @@ namespace J2N.Collections.Generic
                 if (array.Length - index < Count)
                     ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
-                // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
-                _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Key; return true; });
+                // J2N: Ensure we always stay aligned with enumerator order
+                foreach (var kvp  in _dictionary._set)
+                {
+                    array[index++] = kvp.Key;
+                }
             }
 
             void ICollection.CopyTo(Array array, int index)
@@ -2399,8 +2402,12 @@ namespace J2N.Collections.Generic
                     try
                     {
                         object?[] objects = (object?[])array;
-                        // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
-                        _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Key; return true; });
+
+                        // J2N: Ensure we always stay aligned with enumerator order
+                        foreach (var kvp in _dictionary._set)
+                        {
+                            objects[index++] = kvp.Key;
+                        }
                     }
                     catch (ArrayTypeMismatchException)
                     {
@@ -2835,8 +2842,11 @@ namespace J2N.Collections.Generic
                 if (array.Length - index < Count)
                     ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
-                // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
-                _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { array[index++] = node.Item.Value; return true; });
+                // J2N: Ensure we always stay aligned with enumerator order
+                foreach (var kvp in _dictionary._set)
+                {
+                    array[index++] = kvp.Value;
+                }
             }
 
             void ICollection.CopyTo(Array array, int index)
@@ -2875,8 +2885,11 @@ namespace J2N.Collections.Generic
                     try
                     {
                         object?[] objects = (object?[])array;
-                        // J2N: Changed cast from TreeSet<T> to SortedSet<T> so we can support views
-                        _dictionary._set.InOrderTreeWalk(delegate (SortedSet<KeyValuePair<TKey, TValue>>.Node node) { objects[index++] = node.Item.Value; return true; });
+                        // J2N: Ensure we always stay aligned with enumerator order
+                        foreach (var kvp in _dictionary._set)
+                        {
+                            objects[index++] = kvp.Value;
+                        }
                     }
                     catch (ArrayTypeMismatchException)
                     {

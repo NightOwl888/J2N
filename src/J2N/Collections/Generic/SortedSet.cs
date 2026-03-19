@@ -1143,18 +1143,14 @@ namespace J2N.Collections.Generic
             if (count > array.Length - index)
                 ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
 
-            count += index; // Make `count` the upper bound.
+            // J2N: Ensure we always stay aligned with enumerator order
+            int end = index + count;
 
-            InOrderTreeWalk(node =>
+            using var enumerator = GetEnumerator();
+            while (index < end && enumerator.MoveNext())
             {
-                if (index >= count)
-                {
-                    return false;
-                }
-
-                array[index++] = node.Item;
-                return true;
-            });
+                array[index++] = enumerator.Current;
+            }
         }
 
         void ICollection.CopyTo(Array array, int index)
@@ -1185,11 +1181,14 @@ namespace J2N.Collections.Generic
 
                 try
                 {
-                    InOrderTreeWalk(node =>
+                    // J2N: Ensure we always stay aligned with enumerator order
+                    using (var enumerator = GetEnumerator())
                     {
-                        objects[index++] = node.Item;
-                        return true;
-                    });
+                        while (enumerator.MoveNext())
+                        {
+                            objects[index++] = enumerator.Current;
+                        }
+                    }
                 }
                 catch (ArrayTypeMismatchException)
                 {
