@@ -6,7 +6,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
@@ -15,7 +14,6 @@ using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 #endif
 
-using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Generic
 {
