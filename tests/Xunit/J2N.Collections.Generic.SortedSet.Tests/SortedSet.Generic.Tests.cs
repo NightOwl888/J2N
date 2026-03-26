@@ -841,6 +841,8 @@ namespace J2N.Collections.Tests
             });
 
             AssertSpanLookupMatchesRootSet(set);
+            set.Clear();
+            AssertSpanLookupMatchesRootSet(set.GetViewDescending());
         }
 
         [Fact]
@@ -1024,6 +1026,12 @@ namespace J2N.Collections.Tests
 
             AssertSpanLookupMatchesView(view, minInclusive, maxInclusive);
 
+            set.Clear();
+            for (int i = 0; i < 10; i++)
+                set.Add(i.ToString("D2"));
+
+            AssertSpanLookupMatchesView(view.GetViewDescending(), minInclusive, maxInclusive);
+
             int actualLower = lowerInclusive ? 1 : 2;
             int actualUpper = upperInclusive ? 8 : 7;
 
@@ -1055,6 +1063,12 @@ namespace J2N.Collections.Tests
             int maxInclusive = upperInclusive ? 6 : 5;
 
             AssertSpanLookupMatchesView(view2, minInclusive, maxInclusive);
+
+            set.Clear();
+            for (int i = 0; i < 10; i++)
+                set.Add(i.ToString("D2"));
+
+            AssertSpanLookupMatchesView(view2.GetViewDescending(), minInclusive, maxInclusive);
 
             int lowerReject = lowerInclusive ? 2 : 3;
             int upperReject = upperInclusive ? 7 : 6;
@@ -1088,6 +1102,12 @@ namespace J2N.Collections.Tests
             int maxInclusive = upperInclusive ? 10 : 9;
 
             AssertSpanLookupMatchesView(v3, minInclusive, maxInclusive);
+
+            v3.Clear();
+            for (int i = 0; i < 20; i++)
+                set.Add(i.ToString("D2"));
+
+            AssertSpanLookupMatchesView(v3.GetViewDescending(), minInclusive, maxInclusive);
 
             int lowerReject = lowerInclusive ? 4 : 5;
             int upperReject = upperInclusive ? 11 : 10;
@@ -1124,7 +1144,10 @@ namespace J2N.Collections.Tests
             Assert.True(lookup.Add("a".AsSpan()));
             if (set.Comparer.Equals(StringComparer.Ordinal) ||
                 set.Comparer.Equals(StringComparer.InvariantCulture) ||
-                set.Comparer.Equals(StringComparer.CurrentCulture))
+                set.Comparer.Equals(StringComparer.CurrentCulture) ||
+                set.Comparer.Equals(ReverseComparer<string>.Create(StringComparer.Ordinal)) ||
+                set.Comparer.Equals(ReverseComparer<string>.Create(StringComparer.InvariantCulture)) ||
+                set.Comparer.Equals(ReverseComparer<string>.Create(StringComparer.CurrentCulture)))
             {
                 Assert.True(lookup.Add("A".AsSpan()));
                 Assert.True(lookup.Remove("a".AsSpan()));
@@ -1349,5 +1372,228 @@ namespace J2N.Collections.Tests
         }
 
         #endregion
+
+        #region TryGetPredecessor
+
+        private static bool TryGetPredecessorExpected(
+            List<T> sorted,
+            T value,
+            SCG.IComparer<T> comparer,
+            out T result)
+        {
+            result = default!;
+            for (int i = sorted.Count - 1; i >= 0; i--)
+            {
+                if (comparer.Compare(sorted[i], value) < 0)
+                {
+                    result = sorted[i];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_TryGetPredecessor(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            var comparer = GetIComparer() ?? Comparer<T>.Default;
+
+            List<T> expected = set.ToList();
+            expected.Sort(comparer);
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetPredecessorExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = set.TryGetPredecessor(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+
+            // Descending view
+            SortedSet<T> desc = set.GetViewDescending();
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetSuccessorExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = desc.TryGetPredecessor(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+        }
+
+        #endregion TryGetPredecessor
+
+        #region TryGetSuccessor
+
+        private static bool TryGetSuccessorExpected(
+            List<T> sorted,
+            T value,
+            SCG.IComparer<T> comparer,
+            out T result)
+        {
+            result = default!;
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                if (comparer.Compare(sorted[i], value) > 0)
+                {
+                    result = sorted[i];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_TryGetSuccessor(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            var comparer = GetIComparer() ?? Comparer<T>.Default;
+
+            List<T> expected = set.ToList();
+            expected.Sort(comparer);
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetSuccessorExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = set.TryGetSuccessor(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+
+            // Descending view
+            SortedSet<T> desc = set.GetViewDescending();
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetPredecessorExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = desc.TryGetSuccessor(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+        }
+
+        #endregion TryGetSuccessor
+
+        #region TryGetFloor
+
+        private static bool TryGetFloorExpected(
+            List<T> sorted,
+            T value,
+            SCG.IComparer<T> comparer,
+            out T result)
+        {
+            result = default!;
+            for (int i = sorted.Count - 1; i >= 0; i--)
+            {
+                if (comparer.Compare(sorted[i], value) <= 0)
+                {
+                    result = sorted[i];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_TryGetFloor(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            var comparer = GetIComparer() ?? Comparer<T>.Default;
+
+            List<T> expected = set.ToList();
+            expected.Sort(comparer);
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetFloorExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = set.TryGetFloor(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+
+            SortedSet<T> desc = set.GetViewDescending();
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetCeilingExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = desc.TryGetFloor(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+        }
+
+        #endregion TryGetFloor
+
+        #region TryGetCeiling
+
+        private static bool TryGetCeilingExpected(
+            List<T> sorted,
+            T value,
+            SCG.IComparer<T> comparer,
+            out T result)
+        {
+            result = default!;
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                if (comparer.Compare(sorted[i], value) >= 0)
+                {
+                    result = sorted[i];
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_TryGetCeiling(int setLength)
+        {
+            SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+            var comparer = GetIComparer() ?? Comparer<T>.Default;
+
+            List<T> expected = set.ToList();
+            expected.Sort(comparer);
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetCeilingExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = set.TryGetCeiling(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+
+            SortedSet<T> desc = set.GetViewDescending();
+
+            foreach (T value in expected)
+            {
+                bool foundExpected = TryGetFloorExpected(expected, value, comparer, out T expectedValue);
+                bool foundActual = desc.TryGetCeiling(value, out T actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                    Assert.Equal(expectedValue, actualValue);
+            }
+        }
+
+        #endregion TryGetCeiling
+
     }
 }

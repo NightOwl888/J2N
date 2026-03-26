@@ -95,7 +95,8 @@
     <InternalsVisibleTo Include="J2N.Collections.Generic.List.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.OrderedDictionary.Tests" />
     <InternalsVisibleTo Include="J2N.Collections.Generic.Net5.HashSet.Tests" />
-    <InternalsVisibleTo Include="J2N.Collections.Generic.SortedDictionary.Tests"/>
+    <InternalsVisibleTo Include="J2N.Collections.Generic.SortedDictionary.Tests" />
+    <InternalsVisibleTo Include="J2N.Collections.Generic.SortedSet.Tests" />
     <InternalsVisibleTo Include="J2N.Runtime.Tests" />
   </ItemGroup>
 

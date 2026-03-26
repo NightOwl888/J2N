@@ -360,6 +360,8 @@ namespace J2N.Collections.Tests
             });
 
             AssertSpanLookupMatchesRootDictionary(dictionary);
+            dictionary.Clear();
+            AssertSpanLookupMatchesRootDictionary(dictionary.GetViewDescending());
         }
 
         [Fact]
@@ -543,6 +545,12 @@ namespace J2N.Collections.Tests
 
             AssertSpanLookupMatchesView(view, minInclusive, maxInclusive);
 
+            dictionary.Clear();
+            for (int i = 0; i < 10; i++)
+                dictionary.Add(i.ToString("D2"), i);
+
+            AssertSpanLookupMatchesView(view.GetViewDescending(), minInclusive, maxInclusive);
+
             int actualLower = lowerInclusive ? 1 : 2;
             int actualUpper = upperInclusive ? 8 : 7;
 
@@ -574,6 +582,12 @@ namespace J2N.Collections.Tests
             int maxInclusive = upperInclusive ? 6 : 5;
 
             AssertSpanLookupMatchesView(view2, minInclusive, maxInclusive);
+
+            dictionary.Clear();
+            for (int i = 0; i < 10; i++)
+                dictionary.Add(i.ToString("D2"), i);
+
+            AssertSpanLookupMatchesView(view2.GetViewDescending(), minInclusive, maxInclusive);
 
             int lowerReject = lowerInclusive ? 2 : 3;
             int upperReject = upperInclusive ? 7 : 6;
@@ -607,6 +621,12 @@ namespace J2N.Collections.Tests
             int maxInclusive = upperInclusive ? 10 : 9;
 
             AssertSpanLookupMatchesView(v3, minInclusive, maxInclusive);
+
+            dictionary.Clear();
+            for (int i = 0; i < 20; i++)
+                dictionary.Add(i.ToString("D2"), i);
+
+            AssertSpanLookupMatchesView(v3.GetViewDescending(), minInclusive, maxInclusive);
 
             int lowerReject = lowerInclusive ? 4 : 5;
             int upperReject = upperInclusive ? 11 : 10;
@@ -656,7 +676,10 @@ namespace J2N.Collections.Tests
             if (dictionary.Comparer.Equals(Comparer<string>.Default) ||
                 dictionary.Comparer.Equals(StringComparer.Ordinal) ||
                 dictionary.Comparer.Equals(StringComparer.InvariantCulture) ||
-                dictionary.Comparer.Equals(StringComparer.CurrentCulture))
+                dictionary.Comparer.Equals(StringComparer.CurrentCulture) ||
+                dictionary.Comparer.Equals(ReverseComparer<string>.Create(StringComparer.Ordinal)) ||
+                dictionary.Comparer.Equals(ReverseComparer<string>.Create(StringComparer.InvariantCulture)) ||
+                dictionary.Comparer.Equals(ReverseComparer<string>.Create(StringComparer.CurrentCulture)))
             {
                 Assert.True(lookup.TryGetValue("a".AsSpan(), out actualKey, out value));
                 Assert.Equal("a", actualKey);
@@ -1287,5 +1310,263 @@ namespace J2N.Collections.Tests
         }
 
         #endregion CopyTo
+
+        #region TryGetPredecessor
+
+        private static bool TryGetPredecessorExpected(
+            List<SCG.KeyValuePair<TKey, TValue>> sorted,
+            SCG.KeyValuePair<TKey, TValue> value,
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer,
+            out TKey resultKey,
+            out TValue resultValue)
+        {
+            resultKey = default!;
+            resultValue = default!;
+            for (int i = sorted.Count - 1; i >= 0; i--)
+            {
+                if (comparer.Compare(sorted[i], value) < 0)
+                {
+                    resultKey = sorted[i].Key;
+                    resultValue = sorted[i].Value;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_TryGetPredecessor(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            var comparer = GetIComparer() ?? Comparer<SCG.KeyValuePair<TKey, TValue>>.Default;
+
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+            expected.Sort(comparer);
+
+            foreach (SCG.KeyValuePair<TKey, TValue> kvp in expected)
+            {
+                bool foundExpected = TryGetPredecessorExpected(expected, kvp, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = dictionary.TryGetPredecessor(kvp.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+
+            // Descending view
+            SortedDictionary<TKey, TValue> desc = dictionary.GetViewDescending();
+
+            foreach (SCG.KeyValuePair<TKey, TValue> kvp in expected)
+            {
+                bool foundExpected = TryGetSuccessorExpected(expected, kvp, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = desc.TryGetPredecessor(kvp.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+        }
+
+        #endregion TryGetPredecessor
+
+        #region TryGetSuccessor
+
+        private static bool TryGetSuccessorExpected(
+            List<SCG.KeyValuePair<TKey, TValue>> sorted,
+            SCG.KeyValuePair<TKey, TValue> value,
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer,
+            out TKey resultKey,
+            out TValue resultValue)
+        {
+            resultKey = default!;
+            resultValue = default!;
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                if (comparer.Compare(sorted[i], value) > 0)
+                {
+                    resultKey = sorted[i].Key;
+                    resultValue = sorted[i].Value;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_TryGetSuccessor(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            var comparer = GetIComparer() ?? Comparer<SCG.KeyValuePair<TKey, TValue>>.Default;
+
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+            expected.Sort(comparer);
+
+            foreach (SCG.KeyValuePair<TKey, TValue> kvp in expected)
+            {
+                bool foundExpected = TryGetSuccessorExpected(expected, kvp, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = dictionary.TryGetSuccessor(kvp.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+
+            // Descending view
+            SortedDictionary<TKey, TValue> desc = dictionary.GetViewDescending();
+
+            foreach (SCG.KeyValuePair<TKey, TValue> kvp in expected)
+            {
+                bool foundExpected = TryGetPredecessorExpected(expected, kvp, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = desc.TryGetSuccessor(kvp.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+        }
+
+        #endregion TryGetSuccessor
+
+        #region TryGetFloor
+
+        private static bool TryGetFloorExpected(
+            List<SCG.KeyValuePair<TKey, TValue>> sorted,
+            SCG.KeyValuePair<TKey, TValue> value,
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer,
+            out TKey resultKey,
+            out TValue resultValue)
+        {
+            resultKey = default!;
+            resultValue = default!;
+            for (int i = sorted.Count - 1; i >= 0; i--)
+            {
+                if (comparer.Compare(sorted[i], value) <= 0)
+                {
+                    resultKey = sorted[i].Key;
+                    resultValue = sorted[i].Value;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_TryGetFloor(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            var comparer = GetIComparer() ?? Comparer<SCG.KeyValuePair<TKey, TValue>>.Default;
+
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+            expected.Sort(comparer);
+
+            foreach (SCG.KeyValuePair<TKey, TValue> kvp in expected)
+            {
+                bool foundExpected = TryGetFloorExpected(expected, kvp, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = dictionary.TryGetFloor(kvp.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+
+            SortedDictionary<TKey, TValue> desc = dictionary.GetViewDescending();
+
+            foreach (SCG.KeyValuePair<TKey, TValue> kvp in expected)
+            {
+                bool foundExpected = TryGetCeilingExpected(expected, kvp, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = desc.TryGetFloor(kvp.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+        }
+
+        #endregion TryGetFloor
+
+        #region TryGetCeiling
+
+        private static bool TryGetCeilingExpected(
+            List<SCG.KeyValuePair<TKey, TValue>> sorted,
+            SCG.KeyValuePair<TKey, TValue> value,
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer,
+            out TKey resultKey,
+            out TValue resultValue)
+        {
+            resultKey = default!;
+            resultValue = default!;
+            for (int i = 0; i < sorted.Count; i++)
+            {
+                if (comparer.Compare(sorted[i], value) >= 0)
+                {
+                    resultKey = sorted[i].Key;
+                    resultValue = sorted[i].Value;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedDictionary_Generic_TryGetCeiling(int count)
+        {
+            SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
+            var comparer = GetIComparer() ?? Comparer<SCG.KeyValuePair<TKey, TValue>>.Default;
+
+            List<SCG.KeyValuePair<TKey, TValue>> expected = dictionary.ToList();
+            expected.Sort(comparer);
+
+            foreach (SCG.KeyValuePair<TKey, TValue> value in expected)
+            {
+                bool foundExpected = TryGetCeilingExpected(expected, value, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = dictionary.TryGetCeiling(value.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+
+            SortedDictionary<TKey, TValue> desc = dictionary.GetViewDescending();
+
+            foreach (SCG.KeyValuePair<TKey, TValue> value in expected)
+            {
+                bool foundExpected = TryGetFloorExpected(expected, value, comparer, out TKey expectedKey, out TValue expectedValue);
+                bool foundActual = desc.TryGetCeiling(value.Key, out TKey actualKey, out TValue actualValue);
+
+                Assert.Equal(foundExpected, foundActual);
+                if (foundExpected)
+                {
+                    Assert.Equal(expectedKey, actualKey);
+                    Assert.Equal(expectedValue, actualValue);
+                }
+            }
+        }
+
+        #endregion TryGetCeiling
     }
 }

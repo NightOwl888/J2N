@@ -667,6 +667,9 @@ namespace J2N.Collections.Generic
             }
 
             internal override bool DoTryGetPredecessor(T item, [MaybeNullWhen(false)] out T result)
+                => _reverse ? TryGetSuccessorCore(item, out result) : TryGetPredecessorCore(item, out result);
+
+            internal bool TryGetPredecessorCore(T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG
@@ -710,6 +713,9 @@ namespace J2N.Collections.Generic
             }
 
             internal override bool DoTryGetSuccessor(T item, [MaybeNullWhen(false)] out T result)
+                => _reverse ? TryGetPredecessorCore(item, out result) : TryGetSuccessorCore(item, out result);
+
+            internal bool TryGetSuccessorCore(T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG
@@ -753,6 +759,9 @@ namespace J2N.Collections.Generic
             }
 
             internal override bool DoTryGetFloor(T item, [MaybeNullWhen(false)] out T result)
+                => _reverse ? TryGetCeilingCore(item, out result) : TryGetFloorCore(item, out result);
+
+            internal bool TryGetFloorCore(T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG
@@ -788,6 +797,9 @@ namespace J2N.Collections.Generic
             }
 
             internal override bool DoTryGetCeiling(T item, [MaybeNullWhen(false)] out T result)
+                => _reverse ? TryGetFloorCore(item, out result) : TryGetCeilingCore(item, out result);
+
+            internal bool TryGetCeilingCore(T item, [MaybeNullWhen(false)] out T result)
             {
                 VersionCheck();
 #if DEBUG

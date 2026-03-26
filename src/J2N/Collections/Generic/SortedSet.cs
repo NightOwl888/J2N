@@ -1889,6 +1889,9 @@ namespace J2N.Collections.Generic
             }
 
             private bool DoTryGetPredecessor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+                => Set.IsReversed ? TryGetSuccessorCore_View(item, out result) : TryGetPredecessorCore_View(item, out result);
+
+            private bool TryGetPredecessorCore_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
@@ -1997,6 +2000,9 @@ namespace J2N.Collections.Generic
             }
 
             private bool DoTryGetSuccessor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+                => Set.IsReversed ? TryGetPredecessorCore_View(item, out result) : TryGetSuccessorCore_View(item, out result);
+
+            private bool TryGetSuccessorCore_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
@@ -2097,6 +2103,9 @@ namespace J2N.Collections.Generic
             }
 
             private bool DoTryGetFloor_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+                => Set.IsReversed ? TryGetCeilingCore_View(item, out result) : TryGetFloorCore_View(item, out result);
+
+            private bool TryGetFloorCore_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
@@ -2189,6 +2198,9 @@ namespace J2N.Collections.Generic
             }
 
             private bool DoTryGetCeiling_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
+                => Set.IsReversed ? TryGetFloorCore_View(item, out result) : TryGetCeilingCore_View(item, out result);
+
+            private bool TryGetCeilingCore_View(ReadOnlySpan<TAlternateSpan> item, [MaybeNullWhen(false)] out T result)
             {
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
