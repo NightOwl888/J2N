@@ -31,7 +31,7 @@ namespace J2N.Collections.Generic
         public override bool Equals(object? obj)
         {
             if (obj is ReverseComparer<T> reverse)
-                return _inner.Equals(reverse);
+                return _inner.Equals(reverse._inner);
 
             return false;
         }
