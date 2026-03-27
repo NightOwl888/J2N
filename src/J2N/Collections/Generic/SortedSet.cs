@@ -4931,7 +4931,9 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, T? upperValue)
         {
-            if (Comparer.Compare(lowerValue!, upperValue!) > 0)
+            // J2N: Use forward-only comparer here, since this method requires the paramters to be passed in logical
+            // order regardless of whether the set is reversed or not.
+            if (comparer.Compare(lowerValue!, upperValue!) > 0)
             {
                 ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
@@ -4967,7 +4969,9 @@ namespace J2N.Collections.Generic
         /// </remarks>
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive)
         {
-            if (Comparer.Compare(lowerValue!, upperValue!) > 0)
+            // J2N: Use forward-only comparer here, since this method requires the paramters to be passed in logical
+            // order regardless of whether the set is reversed or not.
+            if (comparer.Compare(lowerValue!, upperValue!) > 0)
             {
                 ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
