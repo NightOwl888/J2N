@@ -4947,7 +4947,7 @@ namespace J2N.Collections.Generic
         /// <returns>An enumerator that iterates over the <see cref="SortedSet{T}"/> in reverse order.</returns>
         public IEnumerable<T> Reverse()
         {
-            Enumerator e = new Enumerator(this, reverse: true);
+            Enumerator e = new Enumerator(this, reverse: !IsReversed);
             while (e.MoveNext())
             {
                 yield return e.Current;
