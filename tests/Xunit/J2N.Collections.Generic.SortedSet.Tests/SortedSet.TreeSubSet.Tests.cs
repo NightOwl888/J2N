@@ -308,6 +308,43 @@ namespace J2N.Collections.Tests
         }
     }
 
+    public class SortedSet_TreeSubset_GetViewDescending_int_Tests : SortedSet_TreeSubset_int_Tests
+    {
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.ISet<int> GenericISetFactory()
+        {
+            OriginalSet = new SortedSet<int>();
+            return OriginalSet.GetViewDescending();
+        }
+
+        protected override SCG.IComparer<int> GetIComparer()
+        {
+            return ReverseComparer<int>.Create(base.GetIComparer());
+        }
+    }
+
+    public class SortedSet_TreeSubset_GetViewDescending_string_Tests : SortedSet_TreeSubset_string_Tests
+    {
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.ISet<string> GenericISetFactory()
+        {
+            OriginalSet = new SortedSet<string>();
+            return OriginalSet.GetViewDescending();
+        }
+
+        protected override SCG.IComparer<string> GetIComparer()
+        {
+            return ReverseComparer<string>.Create(base.GetIComparer());
+        }
+    }
+
 
     public abstract class SortedSet_TreeSubset_int_Tests : SortedSet_TreeSubset_Tests<int>
     {

@@ -302,6 +302,43 @@ namespace J2N.Collections.Tests
     }
 
 
+    public class SortedDictionary_TreeSubset_GetViewDescending_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    {
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool UpperBoundInclusive => true;
+
+
+        protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<int, int>();
+            return OriginalDictionary.GetViewDescending();
+        }
+
+        public override SCG.IComparer<int> GetKeyIComparer()
+        {
+            return ReverseComparer<int>.Create(base.GetKeyIComparer());
+        }
+    }
+
+    public class SortedDictionary_TreeSubset_GetViewDescending_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    {
+        protected override bool LowerBoundInclusive => true;
+
+        protected override bool UpperBoundInclusive => true;
+
+        protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
+        {
+            OriginalDictionary = new SortedDictionary<string, string>();
+            return OriginalDictionary.GetViewDescending();
+        }
+
+        public override SCG.IComparer<string> GetKeyIComparer()
+        {
+            return ReverseComparer<string>.Create(base.GetKeyIComparer());
+        }
+    }
+
     public abstract class SortedDictionary_TreeSubset_int_int_Tests : SortedDictionary_TreeSubset_Tests<int, int>
     {
         protected override int LowerBound => int.MinValue;

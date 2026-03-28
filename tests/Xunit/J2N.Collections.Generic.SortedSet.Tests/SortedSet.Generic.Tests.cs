@@ -162,9 +162,28 @@ namespace J2N.Collections.Tests
 
         #region GetViewBetween
 
-        private SCG.List<T> GetExpectedViewBetween(SortedSet<T> set, T lowerValue, T upperValue)
+        private SCG.IComparer<T> GetForwardComparer()
         {
             SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+
+            if (comparer is ReverseComparer<T> reverse)
+                return reverse.InnerComparer;
+
+            return comparer;
+        }
+
+        private List<T> GetForwardSortedElements(SortedSet<T> set)
+        {
+            SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+            List<T> forwardList = set.ToList();
+            if (comparer is ReverseComparer<T>)
+                forwardList.Reverse();
+            return forwardList;
+        }
+
+        private SCG.List<T> GetExpectedViewBetween(SortedSet<T> set, T lowerValue, T upperValue)
+        {
+            SCG.IComparer<T> comparer = GetForwardComparer();
             SCG.List<T> expected = new SCG.List<T>(set.Count);
             // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
             if (LowerBoundInclusive && UpperBoundInclusive)
@@ -201,8 +220,9 @@ namespace J2N.Collections.Tests
             if (setLength > 0)
             {
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                T firstElement = set.ElementAt(0);
-                T lastElement = set.ElementAt(setLength - 1);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(0);
+                T lastElement = forwardList.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, lastElement);
                 // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
                 SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, lastElement);
@@ -219,8 +239,9 @@ namespace J2N.Collections.Tests
             {
                 SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                T firstElement = set.ElementAt(1);
-                T lastElement = set.ElementAt(setLength - 2);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(1);
+                T lastElement = forwardList.ElementAt(setLength - 2);
 
                 // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
                 SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, lastElement);
@@ -239,8 +260,9 @@ namespace J2N.Collections.Tests
             {
                 SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                T firstElement = set.ElementAt(0);
-                T lastElement = set.ElementAt(setLength - 1);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(0);
+                T lastElement = forwardList.ElementAt(setLength - 1);
                 if (comparer.Compare(firstElement, lastElement) < 0)
                     AssertExtensions.Throws<ArgumentException>("lowerValue", /*null,*/ () => set.GetViewBetween(lastElement, firstElement));
             }
@@ -254,9 +276,10 @@ namespace J2N.Collections.Tests
             {
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
-                T firstElement = set.ElementAt(0);
-                T middleElement = set.ElementAt(setLength / 2);
-                T lastElement = set.ElementAt(setLength - 1);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(0);
+                T middleElement = forwardList.ElementAt(setLength / 2);
+                T lastElement = forwardList.ElementAt(setLength - 1);
                 if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
                 {
                     SortedSet<T> view = set.GetViewBetween(firstElement, middleElement);
@@ -274,15 +297,15 @@ namespace J2N.Collections.Tests
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
             Assert.Equal(setLength, set.Count);
 
-            T firstElement = set.ElementAt(0);
-            T secondElement = set.ElementAt(1);
-            T nextToLastElement = set.ElementAt(setLength - 2);
-            T lastElement = set.ElementAt(setLength - 1);
+            List<T> forwardList = GetForwardSortedElements(set);
+            T firstElement = forwardList.ElementAt(0);
+            T secondElement = forwardList.ElementAt(1);
+            T nextToLastElement = forwardList.ElementAt(setLength - 2);
+            T lastElement = forwardList.ElementAt(setLength - 1);
 
-            T[] items = set.ToArray();
             for (int i = 1; i < setLength - 1; i++)
             {
-                set.Remove(items[i]);
+                set.Remove(forwardList[i]);
             }
             Assert.Equal(2, set.Count);
 
@@ -854,22 +877,33 @@ namespace J2N.Collections.Tests
 
             var lookup = set.GetSpanAlternateLookup<char>();
 
-            // Inclusive
-            var setView = set.GetViewBetween("3", "6");
-            var lookupView = lookup.GetViewBetween("3".AsSpan(), "6".AsSpan());
+            AssertLookupMatchesSet(set, lookup);
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            // Descending set/view
+            var descendingSet = set.GetViewDescending();
+            var descendingLookup = descendingSet.GetSpanAlternateLookup<char>();
 
-            setView = set.GetViewBetween("3", true, "6", true);
-            lookupView = lookup.GetViewBetween("3".AsSpan(), true, "6".AsSpan(), true);
+            AssertLookupMatchesSet(descendingSet, descendingLookup);
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            static void AssertLookupMatchesSet(SortedSet<string> set, SortedSet<string>.SpanAlternateLookup<char> lookup)
+            {
+                // Inclusive
+                var setView = set.GetViewBetween("3", "6");
+                var lookupView = lookup.GetViewBetween("3".AsSpan(), "6".AsSpan());
 
-            // Exclusive
-            setView = set.GetViewBetween("3", false, "6", false);
-            lookupView = lookup.GetViewBetween("3".AsSpan(), false, "6".AsSpan(), false);
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+                setView = set.GetViewBetween("3", true, "6", true);
+                lookupView = lookup.GetViewBetween("3".AsSpan(), true, "6".AsSpan(), true);
+
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+                // Exclusive
+                setView = set.GetViewBetween("3", false, "6", false);
+                lookupView = lookup.GetViewBetween("3".AsSpan(), false, "6".AsSpan(), false);
+
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            }
         }
 
         [Theory]
@@ -906,22 +940,33 @@ namespace J2N.Collections.Tests
 
             var lookup = set.GetSpanAlternateLookup<char>();
 
-            // Inclusive
-            var setView = set.GetViewBefore("6");
-            var lookupView = lookup.GetViewBefore("6".AsSpan());
+            AssertLookupMatchesSet(set, lookup);
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            // Descending set/view
+            var descendingSet = set.GetViewDescending();
+            var descendingLookup = descendingSet.GetSpanAlternateLookup<char>();
 
-            setView = set.GetViewBefore("6", true);
-            lookupView = lookup.GetViewBefore("6".AsSpan(), true);
+            AssertLookupMatchesSet(descendingSet, descendingLookup);
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            static void AssertLookupMatchesSet(SortedSet<string> set, SortedSet<string>.SpanAlternateLookup<char> lookup)
+            {
+                // Inclusive
+                var setView = set.GetViewBefore("6");
+                var lookupView = lookup.GetViewBefore("6".AsSpan());
 
-            // Exclusive
-            setView = set.GetViewBefore("6", false);
-            lookupView = lookup.GetViewBefore("6".AsSpan(), false);
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+                setView = set.GetViewBefore("6", true);
+                lookupView = lookup.GetViewBefore("6".AsSpan(), true);
+
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+                // Exclusive
+                setView = set.GetViewBefore("6", false);
+                lookupView = lookup.GetViewBefore("6".AsSpan(), false);
+
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            }
         }
 
         [Theory]
@@ -960,22 +1005,33 @@ namespace J2N.Collections.Tests
 
             var lookup = set.GetSpanAlternateLookup<char>();
 
-            // Inclusive
-            var setView = set.GetViewAfter("3");
-            var lookupView = lookup.GetViewAfter("3".AsSpan());
+            AssertLookupMatchesSet(set, lookup);
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            // Descending set/view
+            var descendingSet = set.GetViewDescending();
+            var descendingLookup = descendingSet.GetSpanAlternateLookup<char>();
 
-            setView = set.GetViewAfter("3", true);
-            lookupView = lookup.GetViewAfter("3".AsSpan(), true);
+            AssertLookupMatchesSet(descendingSet, descendingLookup);
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            static void AssertLookupMatchesSet(SortedSet<string> set, SortedSet<string>.SpanAlternateLookup<char> lookup)
+            {
+                // Inclusive
+                var setView = set.GetViewAfter("3");
+                var lookupView = lookup.GetViewAfter("3".AsSpan());
 
-            // Exclusive
-            setView = set.GetViewAfter("3", false);
-            lookupView = lookup.GetViewAfter("3".AsSpan(), false);
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
 
-            Assert.Equal(setView.ToArray(), lookupView.ToArray());
+                setView = set.GetViewAfter("3", true);
+                lookupView = lookup.GetViewAfter("3".AsSpan(), true);
+
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
+
+                // Exclusive
+                setView = set.GetViewAfter("3", false);
+                lookupView = lookup.GetViewAfter("3".AsSpan(), false);
+
+                Assert.Equal(setView.ToArray(), lookupView.ToArray());
+            }
         }
 
         [Theory]

@@ -105,6 +105,9 @@ namespace J2N.Collections.Tests
                 _equalityComparer = eq;
             }
 
+            public IComparer<TKey> KeyComparer => _comparer;
+            public IEqualityComparer<TKey> KeyEqualityComparer;
+
             public int Compare(KeyValuePair<TKey, TValue> x, KeyValuePair<TKey, TValue> y)
             {
                 return _comparer.Compare(x.Key, y.Key);
