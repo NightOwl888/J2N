@@ -22,6 +22,8 @@ namespace J2N.Collections.Generic
             _inner = inner!; // [!]: asserted above
         }
 
+        public IComparer<T> InnerComparer => _inner;
+
         public static ReverseComparer<T> Create(IComparer<T> inner)
             => new(inner);
 
