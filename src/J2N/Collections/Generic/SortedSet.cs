@@ -341,6 +341,7 @@ namespace J2N.Collections.Generic
         {
             T? first = MinInternal;
             T? last = MaxInternal;
+            IComparer<T> comparer = Comparer; // J2N: Use the outer comparer to ensure we do the correct range checks for reverse views, etc.
             foreach (T item in collection)
             {
                 if (!(comparer.Compare(item!, first!) < 0 || comparer.Compare(item!, last!) > 0) && Contains(item))
