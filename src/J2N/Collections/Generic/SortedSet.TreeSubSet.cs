@@ -564,11 +564,22 @@ namespace J2N.Collections.Generic
             // Cannot increase the bounds of the subset, can only decrease it
             public override SortedSet<T> GetViewBefore([AllowNull] T upperValue)
             {
-                if (IsTooHigh(upperValue, _uBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                if (!_reverse)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    if (IsTooHigh(upperValue, _uBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    }
+                    return (TreeSubSet)base.GetViewBefore(upperValue, _uBoundInclusive);
                 }
-                return (TreeSubSet)base.GetViewBefore(upperValue, _uBoundInclusive);
+                else
+                {
+                    if (IsTooLow(upperValue, _lBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    }
+                    return (TreeSubSet)base.GetViewAfter(upperValue, _lBoundInclusive);
+                }
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -576,11 +587,22 @@ namespace J2N.Collections.Generic
             // Cannot increase the bounds of the subset, can only decrease it
             public override SortedSet<T> GetViewBefore([AllowNull] T upperValue, bool upperValueInclusive)
             {
-                if (IsTooHigh(upperValue, upperValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                if (!_reverse)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    if (IsTooHigh(upperValue, upperValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    }
+                    return (TreeSubSet)base.GetViewBefore(upperValue, upperValueInclusive);
                 }
-                return (TreeSubSet)base.GetViewBefore(upperValue, upperValueInclusive);
+                else
+                {
+                    if (IsTooLow(upperValue, upperValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    }
+                    return (TreeSubSet)base.GetViewAfter(upperValue, upperValueInclusive);
+                }
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -588,11 +610,22 @@ namespace J2N.Collections.Generic
             // Cannot increase the bounds of the subset, can only decrease it
             public override SortedSet<T> GetViewAfter([AllowNull] T lowerValue)
             {
-                if (IsTooLow(lowerValue, _lBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                if (!_reverse)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    if (IsTooLow(lowerValue, _lBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    }
+                    return (TreeSubSet)base.GetViewAfter(lowerValue, _lBoundInclusive);
                 }
-                return (TreeSubSet)base.GetViewAfter(lowerValue, _lBoundInclusive);
+                else
+                {
+                    if (IsTooHigh(lowerValue, _uBoundInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    }
+                    return (TreeSubSet)base.GetViewBefore(lowerValue, _uBoundInclusive);
+                }
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary
@@ -600,11 +633,22 @@ namespace J2N.Collections.Generic
             // Cannot increase the bounds of the subset, can only decrease it
             public override SortedSet<T> GetViewAfter([AllowNull] T lowerValue, bool lowerValueInclusive)
             {
-                if (IsTooLow(lowerValue, lowerValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                if (!_reverse)
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    if (IsTooLow(lowerValue, lowerValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    }
+                    return (TreeSubSet)base.GetViewAfter(lowerValue, lowerValueInclusive);
                 }
-                return (TreeSubSet)base.GetViewAfter(lowerValue, lowerValueInclusive);
+                else
+                {
+                    if (IsTooHigh(lowerValue, lowerValueInclusive)) // J2N TOOD: Remove (the JDK doesn't throw in this case, it returns an empty view)
+                    {
+                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    }
+                    return (TreeSubSet)base.GetViewBefore(lowerValue, lowerValueInclusive);
+                }
             }
 
             public override SortedSet<T> GetViewDescending()
