@@ -156,7 +156,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBefore(UpperBound);
+            return OriginalSet.GetViewBefore(Last);
         }
     }
 
@@ -169,7 +169,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBefore(UpperBound);
+            return OriginalSet.GetViewBefore(Last);
         }
     }
 
@@ -183,7 +183,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetViewBefore(Last, LastInclusive);
         }
     }
 
@@ -196,7 +196,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetViewBefore(Last, LastInclusive);
         }
     }
 
@@ -210,7 +210,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetViewBefore(Last, LastInclusive);
         }
     }
 
@@ -223,7 +223,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetViewBefore(Last, LastInclusive);
         }
     }
 
@@ -237,7 +237,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewAfter(LowerBound);
+            return OriginalSet.GetViewAfter(First);
         }
     }
 
@@ -250,7 +250,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewAfter(LowerBound);
+            return OriginalSet.GetViewAfter(First);
         }
     }
 
@@ -264,7 +264,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalSet.GetViewAfter(First, FirstInclusive);
         }
     }
 
@@ -277,7 +277,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalSet.GetViewAfter(First, FirstInclusive);
         }
     }
 
@@ -304,7 +304,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalSet.GetViewAfter(First, FirstInclusive);
         }
     }
 

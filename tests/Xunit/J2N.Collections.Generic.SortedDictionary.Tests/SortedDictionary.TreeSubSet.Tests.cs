@@ -148,7 +148,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBefore(UpperBound);
+            return OriginalDictionary.GetViewBefore(LastKey);
         }
     }
 
@@ -161,7 +161,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBefore(UpperBound);
+            return OriginalDictionary.GetViewBefore(LastKey);
         }
     }
 
@@ -175,7 +175,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
         }
     }
 
@@ -188,7 +188,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
         }
     }
 
@@ -202,7 +202,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
         }
     }
 
@@ -215,7 +215,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBefore(UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetViewBefore(LastKey, LastKeyInclusive);
         }
     }
 
@@ -230,7 +230,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewAfter(LowerBound);
+            return OriginalDictionary.GetViewAfter(FirstKey);
         }
     }
 
@@ -243,7 +243,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewAfter(LowerBound);
+            return OriginalDictionary.GetViewAfter(FirstKey);
         }
     }
 
@@ -257,7 +257,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
         }
     }
 
@@ -270,7 +270,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
         }
     }
 
@@ -284,7 +284,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
         }
     }
 
@@ -297,7 +297,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalDictionary.GetViewAfter(FirstKey, FirstKeyInclusive);
         }
     }
 
