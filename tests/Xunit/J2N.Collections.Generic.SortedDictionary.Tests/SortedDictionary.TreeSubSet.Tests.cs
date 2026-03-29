@@ -427,10 +427,8 @@ namespace J2N.Collections.Tests
         protected override bool DefaultValueAllowed => true;
 
         protected virtual TKey FirstKey => IsDescending ? UpperBound : LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
-        protected virtual bool FirstKeyInclusive => IsDescending ? UpperBoundInclusive : LowerBoundInclusive;
 
         protected virtual TKey LastKey => IsDescending ? LowerBound : UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
-        protected virtual bool LastKeyInclusive => IsDescending ? LowerBoundInclusive : UpperBoundInclusive;
 
         protected SortedDictionary<TKey, TValue> OriginalDictionary { get; set; }
 

@@ -18,9 +18,17 @@ namespace J2N.Collections.Tests
     public abstract class SortedSet_Generic_Tests<T> : ISet_Generic_Tests<T>
     {
         #region ISet<T> Helper Methods
+
         // J2N: Added virtual properties to control inclusivity of bounds in GetViewBetween tests
+        private bool? _isDescending;
+        protected bool IsDescending => _isDescending ??= IsReverseIComparer(GetIComparer() ?? Comparer<T>.Default);
+
         protected virtual bool LowerBoundInclusive => true;
         protected virtual bool UpperBoundInclusive => true;
+
+        protected virtual bool FirstInclusive => IsDescending ? UpperBoundInclusive : LowerBoundInclusive;
+
+        protected virtual bool LastInclusive => IsDescending ? LowerBoundInclusive : UpperBoundInclusive;
 
         protected override SCG.ISet<T> GenericISetFactory()
         {
@@ -52,8 +60,6 @@ namespace J2N.Collections.Tests
 
             return list;
         }
-
-        protected bool IsDescending => IsReverseIComparer(GetIComparer() ?? Comparer<T>.Default);
 
         #endregion
 
@@ -342,8 +348,8 @@ namespace J2N.Collections.Tests
         {
             SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
             SCG.List<T> expected = new SCG.List<T>(set.Count);
-            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
-            if (UpperBoundInclusive)
+            // J2N: Adjusted to use FirstInclusive and LastInclusive
+            if (LastInclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, upperValue) <= 0)
@@ -459,8 +465,8 @@ namespace J2N.Collections.Tests
         {
             SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
             SCG.List<T> expected = new SCG.List<T>(set.Count);
-            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
-            if (LowerBoundInclusive)
+            // J2N: Adjusted to use FirstInclusive and LastInclusive
+            if (FirstInclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, lowerValue) >= 0)

@@ -291,7 +291,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewAfter(LowerBound, LowerBoundInclusive);
+            return OriginalSet.GetViewAfter(First, FirstInclusive);
         }
     }
 
@@ -422,10 +422,10 @@ namespace J2N.Collections.Tests
         protected virtual bool CanAddDefaultValue => true;
 
         protected virtual T First => IsDescending ? UpperBound : LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
-        protected virtual bool FirstInclusive => IsDescending ? UpperBoundInclusive : LowerBoundInclusive;
+        
 
         protected virtual T Last => IsDescending ? LowerBound : UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
-        protected virtual bool LastInclusive => IsDescending ? LowerBoundInclusive : UpperBoundInclusive;
+        
 
         protected SortedSet<T> OriginalSet { get; set; }
 

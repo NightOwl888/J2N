@@ -19,8 +19,15 @@ namespace J2N.Collections.Tests
         #region IDictionary<TKey, TValue> Helper Methods
 
         // J2N: Added virtual properties to control inclusivity of bounds in GetViewBetween tests
+
+        private bool? _isDesending;
+        protected bool IsDescending => _isDesending ??= IsReverseKeyIComparer(GetKeyIComparer());
+
         protected virtual bool LowerBoundInclusive => true;
         protected virtual bool UpperBoundInclusive => true;
+
+        protected virtual bool FirstKeyInclusive => IsDescending ? UpperBoundInclusive : LowerBoundInclusive;
+        protected virtual bool LastKeyInclusive => IsDescending ? LowerBoundInclusive : UpperBoundInclusive;
 
         protected override bool Enumerator_Empty_UsesSingletonInstance => true;
         protected override bool Enumerator_Empty_Current_UndefinedOperation_Throws => true;
@@ -55,8 +62,6 @@ namespace J2N.Collections.Tests
                 list.Reverse();
             return list;
         }
-
-        protected bool IsDescending => IsReverseKeyIComparer(GetKeyIComparer());
 
         #endregion
 
@@ -1129,8 +1134,8 @@ namespace J2N.Collections.Tests
         {
             SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
             SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(dictionary.Count);
-            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
-            if (UpperBoundInclusive)
+            // J2N: Adjusted to use FirstKeyInclusive and LastKeyInclusive
+            if (LastKeyInclusive)
             {
                 foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
                     if (comparer.Compare(value, upperElement) <= 0)
@@ -1245,8 +1250,8 @@ namespace J2N.Collections.Tests
         {
             SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
             SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(dictionary.Count);
-            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
-            if (LowerBoundInclusive)
+            // J2N: Adjusted to use FirstKeyInclusive and LastKeyInclusive
+            if (FirstKeyInclusive)
             {
                 foreach (SCG.KeyValuePair<TKey, TValue> value in dictionary)
                     if (comparer.Compare(value, lowerElement) >= 0)
