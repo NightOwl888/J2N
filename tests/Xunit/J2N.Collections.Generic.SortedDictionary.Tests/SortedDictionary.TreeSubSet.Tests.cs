@@ -308,6 +308,13 @@ namespace J2N.Collections.Tests
 
         protected override bool UpperBoundInclusive => true;
 
+        protected override int FirstKey => base.UpperBound;
+
+        protected override bool FirstKeyInclusive => base.LastKeyInclusive;
+
+        protected override int LastKey => base.LowerBound;
+
+        protected override bool LastKeyInclusive => base.FirstKeyInclusive;
 
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
@@ -326,6 +333,14 @@ namespace J2N.Collections.Tests
         protected override bool LowerBoundInclusive => true;
 
         protected override bool UpperBoundInclusive => true;
+
+        protected override string FirstKey => base.UpperBound;
+
+        protected override bool FirstKeyInclusive => base.LastKeyInclusive;
+
+        protected override string LastKey => base.LowerBound;
+
+        protected override bool LastKeyInclusive => base.FirstKeyInclusive;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
@@ -420,12 +435,18 @@ namespace J2N.Collections.Tests
     public abstract class SortedDictionary_TreeSubset_Tests<TKey, TValue> : SortedDictionary_Generic_Tests<TKey, TValue>
     {
         protected abstract override bool LowerBoundInclusive { get; }
-        protected abstract TKey LowerBound { get; }
+        protected abstract TKey LowerBound { get; } // Not reversible - always matches the lower value
         protected abstract override bool UpperBoundInclusive { get; }
-        protected abstract TKey UpperBound { get; }
+        protected abstract TKey UpperBound { get; } // Not reversible - always matches the upper value
         protected virtual bool CanAddDefaultValue => true;
 
         protected override bool DefaultValueAllowed => true;
+
+        protected virtual TKey FirstKey => LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
+        protected virtual bool FirstKeyInclusive => LowerBoundInclusive;
+
+        protected virtual TKey LastKey => UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
+        protected virtual bool LastKeyInclusive => UpperBoundInclusive;
 
         protected SortedDictionary<TKey, TValue> OriginalDictionary { get; set; }
 
@@ -523,14 +544,14 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_TreeSubSet_Add_FirstKey(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TKey firstKey = LowerBound;
+            TKey firstKey = FirstKey;
 
             if (dictionary.TryGetFirst(out TKey currentFirstKey, out _))
             {
                 Assert.NotEqual(firstKey, currentFirstKey); // Sanity check - the collection should not contain first
             }
 
-            if (LowerBoundInclusive)
+            if (FirstKeyInclusive)
             {
                 dictionary.Add(firstKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
@@ -548,14 +569,14 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_TreeSubSet_Add_LastKey(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TKey lastKey = UpperBound;
+            TKey lastKey = LastKey;
 
             if (dictionary.TryGetLast(out TKey currentLastKey, out _))
             {
                 Assert.NotEqual(lastKey, currentLastKey); // Sanity check - the collection should not contain last
             }
 
-            if (UpperBoundInclusive)
+            if (LastKeyInclusive)
             {
                 dictionary.Add(lastKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
@@ -573,14 +594,14 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_TreeSubSet_ContainsKey_FirstKey(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TKey firstKey = LowerBound;
+            TKey firstKey = FirstKey;
 
             if (dictionary.TryGetFirst(out TKey currentFirstKey, out _))
             {
                 Assert.NotEqual(firstKey, currentFirstKey); // Sanity check - the collection should not contain first
             }
 
-            if (LowerBoundInclusive)
+            if (FirstKeyInclusive)
             {
                 dictionary.Add(firstKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
@@ -601,14 +622,14 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_TreeSubSet_ContainsKey_LastKey(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TKey lastKey = UpperBound;
+            TKey lastKey = LastKey;
 
             if (dictionary.TryGetLast(out TKey currentLastKey, out _))
             {
                 Assert.NotEqual(lastKey, currentLastKey); // Sanity check - the collection should not contain last
             }
 
-            if (UpperBoundInclusive)
+            if (LastKeyInclusive)
             {
                 dictionary.Add(lastKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
@@ -629,14 +650,14 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_TreeSubSet_Remove_FirstKey(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TKey firstKey = LowerBound;
+            TKey firstKey = FirstKey;
 
             if (dictionary.TryGetFirst(out TKey currentFirstKey, out _))
             {
                 Assert.NotEqual(firstKey, currentFirstKey); // Sanity check - the collection should not contain first
             }
 
-            if (LowerBoundInclusive)
+            if (FirstKeyInclusive)
             {
                 dictionary.Add(firstKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.
@@ -661,14 +682,14 @@ namespace J2N.Collections.Tests
         public void SortedDictionary_TreeSubSet_Remove_LastKey(int count)
         {
             SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
-            TKey lastKey = UpperBound;
+            TKey lastKey = LastKey;
 
             if (dictionary.TryGetLast(out TKey currentLastKey, out _))
             {
                 Assert.NotEqual(lastKey, currentLastKey); // Sanity check - the collection should not contain last
             }
 
-            if (UpperBoundInclusive)
+            if (LastKeyInclusive)
             {
                 dictionary.Add(lastKey, default(TValue));
                 Assert.Equal(count + 1, dictionary.Count); // collection is also updated.

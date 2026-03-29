@@ -314,6 +314,13 @@ namespace J2N.Collections.Tests
 
         protected override bool UpperBoundInclusive => true;
 
+        protected override int First => base.UpperBound;
+
+        protected override bool FirstInclusive => base.LastInclusive;
+
+        protected override int Last => base.LowerBound;
+
+        protected override bool LastInclusive => base.FirstInclusive;
 
         protected override SCG.ISet<int> GenericISetFactory()
         {
@@ -332,6 +339,14 @@ namespace J2N.Collections.Tests
         protected override bool LowerBoundInclusive => true;
 
         protected override bool UpperBoundInclusive => true;
+
+        protected override string First => base.UpperBound;
+
+        protected override bool FirstInclusive => base.LastInclusive;
+
+        protected override string Last => base.LowerBound;
+
+        protected override bool LastInclusive => base.FirstInclusive;
 
         protected override SCG.ISet<string> GenericISetFactory()
         {
@@ -417,10 +432,16 @@ namespace J2N.Collections.Tests
     public abstract class SortedSet_TreeSubset_Tests<T> : SortedSet_Generic_Tests<T>
     {
         protected abstract override bool LowerBoundInclusive { get; }
-        protected abstract T LowerBound { get; }
+        protected abstract T LowerBound { get; } // Not reversible - always matches the lower value
         protected abstract override bool UpperBoundInclusive { get; }
-        protected abstract T UpperBound { get; }
+        protected abstract T UpperBound { get; } // Not reversible - always matches the upper value
         protected virtual bool CanAddDefaultValue => true;
+
+        protected virtual T First => LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
+        protected virtual bool FirstInclusive => LowerBoundInclusive;
+
+        protected virtual T Last => UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
+        protected virtual bool LastInclusive => UpperBoundInclusive;
 
         protected SortedSet<T> OriginalSet { get; set; }
 
@@ -444,7 +465,7 @@ namespace J2N.Collections.Tests
         public void SortedSet_TreeSubSet_Add_First(int count)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
-            T first = LowerBound;
+            T first = First;
 
             if (set.TryGetFirst(out T currentFirst))
             {
@@ -453,7 +474,7 @@ namespace J2N.Collections.Tests
 
             Assert.NotEqual(first, set.First); // Sanity check - the collection should not contain first
 
-            if (LowerBoundInclusive)
+            if (FirstInclusive)
             {
                 set.Add(first);
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
@@ -471,14 +492,14 @@ namespace J2N.Collections.Tests
         public void SortedSet_TreeSubSet_Add_Last(int count)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
-            T last = UpperBound;
+            T last = Last;
 
             if (set.TryGetLast(out T currentLast))
             {
                 Assert.NotEqual(last, currentLast); // Sanity check - the collection should not contain last
             }
 
-            if (UpperBoundInclusive)
+            if (LastInclusive)
             {
                 set.Add(last);
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
@@ -496,14 +517,14 @@ namespace J2N.Collections.Tests
         public void SortedSet_TreeSubSet_Contains_First(int count)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
-            T first = LowerBound;
+            T first = First;
 
             if (set.TryGetFirst(out T currentFirst))
             {
                 Assert.NotEqual(first, currentFirst); // Sanity check - the collection should not contain first
             }
 
-            if (LowerBoundInclusive)
+            if (FirstInclusive)
             {
                 Assert.True(set.Add(first));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
@@ -524,14 +545,14 @@ namespace J2N.Collections.Tests
         public void SortedSet_TreeSubSet_Contains_Last(int count)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
-            T last = UpperBound;
+            T last = Last;
 
             if (set.TryGetLast(out T currentLast))
             {
                 Assert.NotEqual(last, currentLast); // Sanity check - the collection should not contain last
             }
 
-            if (UpperBoundInclusive)
+            if (LastInclusive)
             {
                 Assert.True(set.Add(last));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
@@ -553,14 +574,14 @@ namespace J2N.Collections.Tests
         public void SortedSet_TreeSubSet_Remove_First(int count)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
-            T first = LowerBound;
+            T first = First;
 
             if (set.TryGetFirst(out T currentFirst))
             {
                 Assert.NotEqual(first, currentFirst); // Sanity check - the collection should not contain first
             }
 
-            if (LowerBoundInclusive)
+            if (FirstInclusive)
             {
                 Assert.True(set.Add(first));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
@@ -585,14 +606,14 @@ namespace J2N.Collections.Tests
         public void SortedSet_TreeSubSet_Remove_Last(int count)
         {
             SortedSet<T> set = (SortedSet<T>)GenericISetFactory(count);
-            T last = UpperBound;
+            T last = Last;
 
             if (set.TryGetLast(out T currentLast))
             {
                 Assert.NotEqual(last, currentLast); // Sanity check - the collection should not contain last
             }
 
-            if (UpperBoundInclusive)
+            if (LastInclusive)
             {
                 Assert.True(set.Add(last));
                 Assert.Equal(count + 1, set.Count); // collection is also updated.
