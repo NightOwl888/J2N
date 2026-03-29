@@ -27,6 +27,34 @@ namespace J2N.Collections.Tests
             return new SortedSet<T>();
         }
 
+        protected static bool IsReverseIComparer(SCG.IComparer<T> comparer)
+        {
+            return comparer is ReverseComparer<T>;
+        }
+
+        private SCG.IComparer<T> GetForwardIComparer()
+        {
+            SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+
+            if (comparer is ReverseComparer<T> reverse)
+                return reverse.InnerComparer;
+
+            return comparer;
+        }
+
+        private List<T> GetForwardSortedElements(SortedSet<T> set)
+        {
+            SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+            List<T> list = set.ToList();
+
+            if (IsReverseIComparer(comparer))
+                list.Reverse();
+
+            return list;
+        }
+
+        protected bool IsDescending => IsReverseIComparer(GetIComparer() ?? Comparer<T>.Default);
+
         #endregion
 
         #region Constructors
@@ -162,28 +190,9 @@ namespace J2N.Collections.Tests
 
         #region GetViewBetween
 
-        private SCG.IComparer<T> GetForwardComparer()
-        {
-            SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
-
-            if (comparer is ReverseComparer<T> reverse)
-                return reverse.InnerComparer;
-
-            return comparer;
-        }
-
-        private List<T> GetForwardSortedElements(SortedSet<T> set)
-        {
-            SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
-            List<T> forwardList = set.ToList();
-            if (comparer is ReverseComparer<T>)
-                forwardList.Reverse();
-            return forwardList;
-        }
-
         private SCG.List<T> GetExpectedViewBetween(SortedSet<T> set, T lowerValue, T upperValue)
         {
-            SCG.IComparer<T> comparer = GetForwardComparer();
+            SCG.IComparer<T> comparer = GetForwardIComparer();
             SCG.List<T> expected = new SCG.List<T>(set.Count);
             // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
             if (LowerBoundInclusive && UpperBoundInclusive)

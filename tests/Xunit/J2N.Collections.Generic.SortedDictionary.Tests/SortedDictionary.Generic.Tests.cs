@@ -32,6 +32,32 @@ namespace J2N.Collections.Tests
             return new SortedDictionary<TKey, TValue>();
         }
 
+        protected static bool IsReverseKeyIComparer(SCG.IComparer<TKey> comparer)
+        {
+            return comparer is ReverseComparer<TKey>;
+        }
+
+        private SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> GetForwardIComparer()
+        {
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
+
+            if (comparer is KVPComparer kvpComparer && kvpComparer.KeyComparer is ReverseComparer<TKey> reverse)
+                return new KVPComparer(reverse.InnerComparer, kvpComparer.KeyEqualityComparer);
+
+            return comparer;
+        }
+
+        private List<SCG.KeyValuePair<TKey, TValue>> GetForwardSortedElements(SortedDictionary<TKey, TValue> dictionary)
+        {
+            SCG.IComparer<TKey> comparer = GetKeyIComparer();
+            List<SCG.KeyValuePair<TKey, TValue>> list = dictionary.ToList();
+            if (IsReverseKeyIComparer(comparer))
+                list.Reverse();
+            return list;
+        }
+
+        protected bool IsDescending => IsReverseKeyIComparer(GetKeyIComparer());
+
         #endregion
 
         #region Constructors
@@ -952,28 +978,9 @@ namespace J2N.Collections.Tests
 
         #region GetViewBetween
 
-        private SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> GetForwardComparer()
-        {
-            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
-
-            if (comparer is KVPComparer kvpComparer && kvpComparer.KeyComparer is ReverseComparer<TKey> reverse)
-                return new KVPComparer(reverse.InnerComparer, kvpComparer.KeyEqualityComparer);
-
-            return comparer;
-        }
-
-        private List<SCG.KeyValuePair<TKey, TValue>> GetForwardSortedElements(SortedDictionary<TKey, TValue> dictionary)
-        {
-            SCG.IComparer<TKey> comparer = GetKeyIComparer();
-            List<SCG.KeyValuePair<TKey, TValue>> forwardList = dictionary.ToList();
-            if (comparer is ReverseComparer<TKey>)
-                forwardList.Reverse();
-            return forwardList;
-        }
-
         private SCG.List<SCG.KeyValuePair<TKey, TValue>> GetExpectedViewBetween(SortedDictionary<TKey, TValue> dictionary, SCG.KeyValuePair<TKey, TValue> lowerElement, SCG.KeyValuePair<TKey, TValue> upperElement)
         {
-            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetForwardComparer();
+            SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetForwardIComparer();
             SCG.List<SCG.KeyValuePair<TKey, TValue>> expected = new SCG.List<SCG.KeyValuePair<TKey, TValue>>(dictionary.Count);
             // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
             if (LowerBoundInclusive && UpperBoundInclusive)
