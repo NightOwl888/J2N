@@ -314,14 +314,6 @@ namespace J2N.Collections.Tests
 
         protected override bool UpperBoundInclusive => true;
 
-        protected override int First => base.UpperBound;
-
-        protected override bool FirstInclusive => base.LastInclusive;
-
-        protected override int Last => base.LowerBound;
-
-        protected override bool LastInclusive => base.FirstInclusive;
-
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
@@ -339,14 +331,6 @@ namespace J2N.Collections.Tests
         protected override bool LowerBoundInclusive => true;
 
         protected override bool UpperBoundInclusive => true;
-
-        protected override string First => base.UpperBound;
-
-        protected override bool FirstInclusive => base.LastInclusive;
-
-        protected override string Last => base.LowerBound;
-
-        protected override bool LastInclusive => base.FirstInclusive;
 
         protected override SCG.ISet<string> GenericISetFactory()
         {
@@ -437,11 +421,11 @@ namespace J2N.Collections.Tests
         protected abstract T UpperBound { get; } // Not reversible - always matches the upper value
         protected virtual bool CanAddDefaultValue => true;
 
-        protected virtual T First => LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
-        protected virtual bool FirstInclusive => LowerBoundInclusive;
+        protected virtual T First => IsDescending ? UpperBound : LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
+        protected virtual bool FirstInclusive => IsDescending ? UpperBoundInclusive : LowerBoundInclusive;
 
-        protected virtual T Last => UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
-        protected virtual bool LastInclusive => UpperBoundInclusive;
+        protected virtual T Last => IsDescending ? LowerBound : UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
+        protected virtual bool LastInclusive => IsDescending ? LowerBoundInclusive : UpperBoundInclusive;
 
         protected SortedSet<T> OriginalSet { get; set; }
 

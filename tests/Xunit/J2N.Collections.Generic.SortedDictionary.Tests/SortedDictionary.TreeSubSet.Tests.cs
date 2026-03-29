@@ -308,14 +308,6 @@ namespace J2N.Collections.Tests
 
         protected override bool UpperBoundInclusive => true;
 
-        protected override int FirstKey => base.UpperBound;
-
-        protected override bool FirstKeyInclusive => base.LastKeyInclusive;
-
-        protected override int LastKey => base.LowerBound;
-
-        protected override bool LastKeyInclusive => base.FirstKeyInclusive;
-
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
@@ -333,14 +325,6 @@ namespace J2N.Collections.Tests
         protected override bool LowerBoundInclusive => true;
 
         protected override bool UpperBoundInclusive => true;
-
-        protected override string FirstKey => base.UpperBound;
-
-        protected override bool FirstKeyInclusive => base.LastKeyInclusive;
-
-        protected override string LastKey => base.LowerBound;
-
-        protected override bool LastKeyInclusive => base.FirstKeyInclusive;
 
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
@@ -442,11 +426,11 @@ namespace J2N.Collections.Tests
 
         protected override bool DefaultValueAllowed => true;
 
-        protected virtual TKey FirstKey => LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
-        protected virtual bool FirstKeyInclusive => LowerBoundInclusive;
+        protected virtual TKey FirstKey => IsDescending ? UpperBound : LowerBound; // Reversible - matches the lower value when ascending, upper value when descending
+        protected virtual bool FirstKeyInclusive => IsDescending ? UpperBoundInclusive : LowerBoundInclusive;
 
-        protected virtual TKey LastKey => UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
-        protected virtual bool LastKeyInclusive => UpperBoundInclusive;
+        protected virtual TKey LastKey => IsDescending ? LowerBound : UpperBound; // Reversible - matches the upper value when ascending, lower value when descending
+        protected virtual bool LastKeyInclusive => IsDescending ? LowerBoundInclusive : UpperBoundInclusive;
 
         protected SortedDictionary<TKey, TValue> OriginalDictionary { get; set; }
 
