@@ -540,7 +540,7 @@ namespace J2N.Collections.Generic
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                return (TreeSubSet)base.GetViewBetween(lowerValue, _lBoundInclusive, upperValue, _uBoundInclusive);
+                return (TreeSubSet)base.GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary

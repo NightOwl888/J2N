@@ -4974,10 +4974,6 @@ namespace J2N.Collections.Generic
         /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
         /// <para/>
-        /// If this method is called on a view, it will inherit the <c>lowerValueInclusive</c> and <c>upperValueInclusive</c>
-        /// behavior of the view. To override this behavior, call the <see cref="GetViewBetween(T, bool, T, bool)"/> overload
-        /// instead.
-        /// <para/>
         /// This corresponds to the <c>subSet()</c> method in the JDK.
         /// </remarks>
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, T? upperValue)
@@ -4988,7 +4984,7 @@ namespace J2N.Collections.Generic
             {
                 ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
             }
-            return new TreeSubSet(UnderlyingSet, lowerValue, LowerBoundInclusive, upperValue, UpperBoundInclusive, true, true, IsReversed);
+            return new TreeSubSet(UnderlyingSet, lowerValue, lowerBoundInclusive: true, upperValue, upperBoundInclusive: true, true, true, IsReversed);
         }
 
         /// <summary>

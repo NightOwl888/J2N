@@ -196,30 +196,29 @@ namespace J2N.Collections.Tests
 
         #region GetViewBetween
 
-        private SCG.List<T> GetExpectedViewBetween(SortedSet<T> set, T lowerValue, T upperValue)
+        private SCG.List<T> GetExpectedViewBetween(SortedSet<T> set, T lowerValue, bool lowerValueInclusive, T upperValue, bool upperValueInclusive)
         {
             SCG.IComparer<T> comparer = GetForwardIComparer();
             SCG.List<T> expected = new SCG.List<T>(set.Count);
-            // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive
-            if (LowerBoundInclusive && UpperBoundInclusive)
+            if (lowerValueInclusive && upperValueInclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, lowerValue) >= 0 && comparer.Compare(value, upperValue) <= 0)
                         expected.Add(value);
             }
-            else if (!LowerBoundInclusive && !UpperBoundInclusive)
+            else if (!lowerValueInclusive && !upperValueInclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, lowerValue) > 0 && comparer.Compare(value, upperValue) < 0)
                         expected.Add(value);
             }
-            else if (!LowerBoundInclusive)
+            else if (!lowerValueInclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, lowerValue) > 0 && comparer.Compare(value, upperValue) <= 0)
                         expected.Add(value);
             }
-            else if (!UpperBoundInclusive)
+            else if (!upperValueInclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, lowerValue) >= 0 && comparer.Compare(value, upperValue) < 0)
@@ -239,10 +238,77 @@ namespace J2N.Collections.Tests
                 T firstElement = forwardList.ElementAt(0);
                 T lastElement = forwardList.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBetween(firstElement, lastElement);
-                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
-                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, lastElement);
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, true, lastElement, true);
                 Assert.Equal(expected.Count, view.Count);
-                Assert.True(view.SetEquals(expected));
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Inclusive_Inclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(0);
+                T lastElement = forwardList.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, true);
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, true, lastElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Inclusive_Exclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(0);
+                T lastElement = forwardList.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, false);
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, true, lastElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Exclusive_Inclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(0);
+                T lastElement = forwardList.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, true);
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, false, lastElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Exclusive_Exclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(0);
+                T lastElement = forwardList.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, false);
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, false, lastElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
             }
         }
 
@@ -258,12 +324,91 @@ namespace J2N.Collections.Tests
                 T firstElement = forwardList.ElementAt(1);
                 T lastElement = forwardList.ElementAt(setLength - 2);
 
-                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
-                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, lastElement);
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, true, lastElement, true);
 
                 SortedSet<T> view = set.GetViewBetween(firstElement, lastElement);
                 Assert.Equal(expected.Count, view.Count);
-                Assert.True(view.SetEquals(expected));
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Inclusive_Inclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(1);
+                T lastElement = forwardList.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, true, lastElement, true);
+
+                SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Inclusive_Exclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(1);
+                T lastElement = forwardList.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, true, lastElement, false);
+
+                SortedSet<T> view = set.GetViewBetween(firstElement, true, lastElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Exclusive_Inclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(1);
+                T lastElement = forwardList.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, false, lastElement, true);
+
+                SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBetween_Exclusive_Exclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                List<T> forwardList = GetForwardSortedElements(set);
+                T firstElement = forwardList.ElementAt(1);
+                T lastElement = forwardList.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewBetween(set, firstElement, false, lastElement, false);
+
+                SortedSet<T> view = set.GetViewBetween(firstElement, false, lastElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
             }
         }
 
@@ -273,7 +418,7 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 2)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SCG.IComparer<T> comparer = GetForwardIComparer();
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 List<T> forwardList = GetForwardSortedElements(set);
                 T firstElement = forwardList.ElementAt(0);
@@ -290,7 +435,7 @@ namespace J2N.Collections.Tests
             if (setLength >= 3)
             {
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SCG.IComparer<T> comparer = GetForwardIComparer();
                 List<T> forwardList = GetForwardSortedElements(set);
                 T firstElement = forwardList.ElementAt(0);
                 T middleElement = forwardList.ElementAt(setLength / 2);
