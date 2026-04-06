@@ -344,12 +344,12 @@ namespace J2N.Collections.Tests
 
         #region GetViewBefore
 
-        private SCG.List<T> GetExpectedViewBefore(SortedSet<T> set, T upperValue)
+        private SCG.List<T> GetExpectedViewBefore(SortedSet<T> set, T upperValue, bool inclusive)
         {
             SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
             SCG.List<T> expected = new SCG.List<T>(set.Count);
-            // J2N: Adjusted to use FirstInclusive and LastInclusive
-            if (LastInclusive)
+            
+            if (inclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, upperValue) <= 0)
@@ -374,10 +374,41 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewBefore(lastElement);
-                // J2N: Adjusted to use UpperBoundInclusive (inherited from current view by default)
-                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement);
+                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement, true);
                 Assert.Equal(expected.Count, view.Count);
-                Assert.True(view.SetEquals(expected));
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBefore_Inclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(0);
+                T lastElement = set.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewBefore(lastElement, true);
+                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBefore_Exclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(0);
+                T lastElement = set.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewBefore(lastElement, false);
+                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
             }
         }
 
@@ -392,12 +423,49 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 2);
 
-                // J2N: Adjusted to use UpperBoundInclusive (inherited from current view by default)
-                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement);
+                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement, true);
 
                 SortedSet<T> view = set.GetViewBefore(lastElement);
                 Assert.Equal(expected.Count, view.Count);
-                Assert.True(view.SetEquals(expected));
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBefore_Inclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(0);
+                T lastElement = set.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement, true);
+
+                SortedSet<T> view = set.GetViewBefore(lastElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewBefore_Exclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(0);
+                T lastElement = set.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewBefore(set, lastElement, false);
+
+                SortedSet<T> view = set.GetViewBefore(lastElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
             }
         }
 
@@ -408,7 +476,7 @@ namespace J2N.Collections.Tests
             if (setLength >= 3)
             {
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SCG.IComparer<T> comparer = GetForwardIComparer();
                 T firstElement = set.ElementAt(0);
                 T middleElement = set.ElementAt(setLength / 2);
                 T lastElement = set.ElementAt(setLength - 1);
@@ -461,12 +529,11 @@ namespace J2N.Collections.Tests
 
         #region GetViewAfter
 
-        private SCG.List<T> GetExpectedViewAfter(SortedSet<T> set, T lowerValue)
+        private SCG.List<T> GetExpectedViewAfter(SortedSet<T> set, T lowerValue, bool inclusive)
         {
             SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
             SCG.List<T> expected = new SCG.List<T>(set.Count);
-            // J2N: Adjusted to use FirstInclusive and LastInclusive
-            if (FirstInclusive)
+            if (inclusive)
             {
                 foreach (T value in set)
                     if (comparer.Compare(value, lowerValue) >= 0)
@@ -491,10 +558,41 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 1);
                 SortedSet<T> view = set.GetViewAfter(firstElement);
-                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
-                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement);
+                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement, true);
                 Assert.Equal(expected.Count, view.Count);
-                Assert.True(view.SetEquals(expected));
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewAfter_Inclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(0);
+                T lastElement = set.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewAfter(firstElement, true);
+                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewAfter_Exclusive_EntireSet(int setLength)
+        {
+            if (setLength > 0)
+            {
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(0);
+                T lastElement = set.ElementAt(setLength - 1);
+                SortedSet<T> view = set.GetViewAfter(firstElement, false);
+                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
             }
         }
 
@@ -509,12 +607,49 @@ namespace J2N.Collections.Tests
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
 
-                // J2N: Adjusted to use LowerBoundInclusive and UpperBoundInclusive (inherited from current view by default)
-                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement);
+                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement, true);
 
                 SortedSet<T> view = set.GetViewAfter(firstElement);
                 Assert.Equal(expected.Count, view.Count);
-                Assert.True(view.SetEquals(expected));
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewAfter_Inclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(1);
+                T lastElement = set.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement, true);
+
+                SortedSet<T> view = set.GetViewAfter(firstElement, true);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
+            }
+        }
+
+        [Theory]
+        [MemberData(nameof(ValidCollectionSizes))]
+        public void SortedSet_Generic_GetViewAfter_Exclusive_MiddleOfSet(int setLength)
+        {
+            if (setLength >= 3)
+            {
+                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
+                T firstElement = set.ElementAt(1);
+                T lastElement = set.ElementAt(setLength - 2);
+
+                SCG.List<T> expected = GetExpectedViewAfter(set, firstElement, false);
+
+                SortedSet<T> view = set.GetViewAfter(firstElement, false);
+                Assert.Equal(expected.Count, view.Count);
+                Assert.True(view.SequenceEqual(expected));
             }
         }
 
@@ -525,7 +660,7 @@ namespace J2N.Collections.Tests
             if (setLength >= 3)
             {
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
+                SCG.IComparer<T> comparer = GetForwardIComparer();
                 T firstElement = set.ElementAt(0);
                 T middleElement = set.ElementAt(setLength / 2);
                 T lastElement = set.ElementAt(setLength - 1);

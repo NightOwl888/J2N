@@ -2591,6 +2591,127 @@ namespace J2N.Collections.Generic
 
         #endregion Loading and Comparing
 
+        [Test]
+        public void Test_headSet_descendingSet()
+        {
+            SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> ascending = set.GetViewBefore(4, true);
+            SortedSet<int> descending = ascending.GetViewDescending();
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4 }, ascending.ToArray());
+            CollectionAssert.AreEqual(new int[] { 4, 3, 2, 1 }, descending.ToArray());
+        }
+
+        [Test]
+        public void Test_descendingSet_headSet()
+        {
+            SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> ascending = set.GetViewBefore(4, true);
+            SortedSet<int> descending = set.GetViewDescending().GetViewBefore(4, true);
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4 }, ascending.ToArray());
+            CollectionAssert.AreEqual(new int[] { 5, 4 }, descending.ToArray());
+        }
+
+        [Test]
+        public void Test_tailSet_descendingSet()
+        {
+            SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> ascending = set.GetViewAfter(4, true);
+            SortedSet<int> descending = ascending.GetViewDescending();
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 4, 5 }, ascending.ToArray());
+            CollectionAssert.AreEqual(new int[] { 5, 4 }, descending.ToArray());
+        }
+
+        [Test]
+        public void Test_descendingSet_tailSet()
+        {
+            SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> ascending = set.GetViewAfter(4, true);
+            SortedSet<int> descending = set.GetViewDescending().GetViewAfter(4, true);
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 4, 5 }, ascending.ToArray());
+            CollectionAssert.AreEqual(new int[] { 4, 3, 2, 1 }, descending.ToArray());
+        }
+
+        // Edge cases
+        [Test]
+        public void Test_GetViewBetween_GetViewDescending_GetViewBefore_MatchesSubset()
+        {
+            SortedSet<int> set = new SortedSet<int> { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> result = set.GetViewBetween(2, true, 5, true)
+                            .GetViewDescending()
+                            .GetViewBefore(4, true);
+
+            CollectionAssert.AreEqual(new[] { 5, 4 }, result.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewBefore_Exclusive_MatchesSubset()
+        {
+            SortedSet<int> set = new SortedSet<int> { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> result = set.GetViewDescending().GetViewBefore(3, false);
+
+            CollectionAssert.AreEqual(new[] { 5, 4 }, result.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewDescending_MatchesSet()
+        {
+            SortedSet<int> set = new SortedSet<int> { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> result = set.GetViewDescending().GetViewDescending();
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5 }, result.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewAfter_OutOfRange_Lower_Empty()
+        {
+            SortedSet<int> set = new SortedSet<int> { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> descending = set.GetViewDescending();
+
+            SortedSet<int> tail = descending.GetViewAfter(0, true);
+
+            CollectionAssert.AreEqual(Arrays.Empty<int>(), tail.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewBefore_OutOfRange_Lower_Unchanged()
+        {
+            SortedSet<int> set = new SortedSet<int> { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> descending = set.GetViewDescending();
+
+            SortedSet<int> head = descending.GetViewBefore(0, true);
+
+            CollectionAssert.AreEqual(new[] { 5, 4, 3, 2, 1 }, head.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewAfter_GetViewBefore_OutOfRange_Higher_Throws()
+        {
+            SortedSet<int> set = new SortedSet<int> { 1, 2, 3, 4, 5 };
+
+            SortedSet<int> descending = set.GetViewDescending();
+
+            SortedSet<int> tail = descending.GetViewAfter(3, true);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => tail.GetViewBefore(4, true));
+        }
+
         /// <summary>
         /// Represents a sorted collection that may contain duplicates. Note this is just a mock and
         /// the data provided to the constructor must already be sorted according to the provided comparer.

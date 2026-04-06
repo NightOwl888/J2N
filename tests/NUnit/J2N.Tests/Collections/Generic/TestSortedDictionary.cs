@@ -422,5 +422,196 @@ namespace J2N.Collections.Generic
                 dict.Values.ToArray());
         }
 
+
+        [Test]
+        public void Test_headMap_descendingMap()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> ascending = dictionary.GetViewBefore(4, true);
+            SortedDictionary<int, int> descending = ascending.GetViewDescending();
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4 }, ascending.Keys.ToArray());
+            CollectionAssert.AreEqual(new int[] { 4, 3, 2, 1 }, descending.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_descendingMap_headMap()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> ascending = dictionary.GetViewBefore(4, true);
+            SortedDictionary<int, int> descending = dictionary.GetViewDescending().GetViewBefore(4, true);
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 1, 2, 3, 4 }, ascending.Keys.ToArray());
+            CollectionAssert.AreEqual(new int[] { 5, 4 }, descending.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_tailMap_descendingMap()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> ascending = dictionary.GetViewAfter(4, true);
+            SortedDictionary<int, int> descending = ascending.GetViewDescending();
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 4, 5 }, ascending.Keys.ToArray());
+            CollectionAssert.AreEqual(new int[] { 5, 4 }, descending.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_descendingMap_tailMap()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> ascending = dictionary.GetViewAfter(4, true);
+            SortedDictionary<int, int> descending = dictionary.GetViewDescending().GetViewAfter(4, true);
+
+            // Different iteration order
+            CollectionAssert.AreEqual(new int[] { 4, 5 }, ascending.Keys.ToArray());
+            CollectionAssert.AreEqual(new int[] { 4, 3, 2, 1 }, descending.Keys.ToArray());
+        }
+
+        // Edge cases
+        [Test]
+        public void Test_GetViewBetween_GetViewDescending_GetViewBefore_MatchesSubset()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> result = dictionary.GetViewBetween(2, true, 5, true)
+                            .GetViewDescending()
+                            .GetViewBefore(4, true);
+
+            CollectionAssert.AreEqual(new[] { 5, 4 }, result.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewBefore_Exclusive_MatchesSubset()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> result = dictionary.GetViewDescending().GetViewBefore(3, false);
+
+            CollectionAssert.AreEqual(new[] { 5, 4 }, result.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewDescending_MatchesSet()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> result = dictionary.GetViewDescending().GetViewDescending();
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4, 5 }, result.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewAfter_OutOfRange_Lower_Empty()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> descending = dictionary.GetViewDescending();
+
+            SortedDictionary<int, int> tail = descending.GetViewAfter(0, true);
+
+            CollectionAssert.AreEqual(Arrays.Empty<int>(), tail.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewBefore_OutOfRange_Lower_Unchanged()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> descending = dictionary.GetViewDescending();
+
+            SortedDictionary<int, int> head = descending.GetViewBefore(0, true);
+
+            CollectionAssert.AreEqual(new[] { 5, 4, 3, 2, 1 }, head.Keys.ToArray());
+        }
+
+        [Test]
+        public void Test_GetViewDescending_GetViewAfter_GetViewBefore_OutOfRange_Higher_Throws()
+        {
+            SortedDictionary<int, int> dictionary = new()
+            {
+                [1] = 1,
+                [2] = 2,
+                [3] = 3,
+                [4] = 4,
+                [5] = 5
+            };
+
+            SortedDictionary<int, int> descending = dictionary.GetViewDescending();
+
+            SortedDictionary<int, int> tail = descending.GetViewAfter(3, true);
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => tail.GetViewBefore(4, true));
+        }
     }
 }
