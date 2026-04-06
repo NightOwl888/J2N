@@ -318,7 +318,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 List<T> forwardList = GetForwardSortedElements(set);
                 T firstElement = forwardList.ElementAt(1);
@@ -338,7 +337,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 List<T> forwardList = GetForwardSortedElements(set);
                 T firstElement = forwardList.ElementAt(1);
@@ -358,7 +356,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 List<T> forwardList = GetForwardSortedElements(set);
                 T firstElement = forwardList.ElementAt(1);
@@ -378,7 +375,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 List<T> forwardList = GetForwardSortedElements(set);
                 T firstElement = forwardList.ElementAt(1);
@@ -398,7 +394,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 List<T> forwardList = GetForwardSortedElements(set);
                 T firstElement = forwardList.ElementAt(1);
@@ -563,7 +558,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 2);
@@ -582,7 +576,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 2);
@@ -601,7 +594,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 T firstElement = set.ElementAt(0);
                 T lastElement = set.ElementAt(setLength - 2);
@@ -747,7 +739,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
@@ -766,7 +757,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);
@@ -785,7 +775,6 @@ namespace J2N.Collections.Tests
         {
             if (setLength >= 3)
             {
-                SCG.IComparer<T> comparer = GetIComparer() ?? Comparer<T>.Default;
                 SortedSet<T> set = (SortedSet<T>)GenericISetFactory(setLength);
                 T firstElement = set.ElementAt(1);
                 T lastElement = set.ElementAt(setLength - 2);

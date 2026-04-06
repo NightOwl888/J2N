@@ -1105,7 +1105,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 List<SCG.KeyValuePair<TKey, TValue>> forwardList = GetForwardSortedElements(dictionary);
                 SCG.KeyValuePair<TKey, TValue> firstElement = forwardList.ElementAt(1);
@@ -1125,7 +1124,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 List<SCG.KeyValuePair<TKey, TValue>> forwardList = GetForwardSortedElements(dictionary);
                 SCG.KeyValuePair<TKey, TValue> firstElement = forwardList.ElementAt(1);
@@ -1145,7 +1143,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 List<SCG.KeyValuePair<TKey, TValue>> forwardList = GetForwardSortedElements(dictionary);
                 SCG.KeyValuePair<TKey, TValue> firstElement = forwardList.ElementAt(1);
@@ -1165,7 +1162,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 List<SCG.KeyValuePair<TKey, TValue>> forwardList = GetForwardSortedElements(dictionary);
                 SCG.KeyValuePair<TKey, TValue> firstElement = forwardList.ElementAt(1);
@@ -1185,7 +1181,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 List<SCG.KeyValuePair<TKey, TValue>> forwardList = GetForwardSortedElements(dictionary);
                 SCG.KeyValuePair<TKey, TValue> firstElement = forwardList.ElementAt(1);
@@ -1348,7 +1343,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
@@ -1367,7 +1361,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
@@ -1386,7 +1379,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
@@ -1531,7 +1523,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
@@ -1550,7 +1541,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
@@ -1569,7 +1559,6 @@ namespace J2N.Collections.Tests
         {
             if (count >= 3)
             {
-                SCG.IComparer<SCG.KeyValuePair<TKey, TValue>> comparer = GetIComparer();
                 SortedDictionary<TKey, TValue> dictionary = (SortedDictionary<TKey, TValue>)GenericIDictionaryFactory(count);
                 SCG.KeyValuePair<TKey, TValue> firstElement = dictionary.ElementAt(1);
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 2);
