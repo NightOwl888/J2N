@@ -619,8 +619,13 @@ namespace J2N.Collections.Tests
                 T lastElement = set.ElementAt(setLength - 1);
                 if (comparer.Compare(middleElement, lastElement) < 0)
                 {
+                    // J2N: this was confirmed to match JDK behavior
                     SortedSet<T> view = set.GetViewBefore(middleElement);
                     Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement, upperValueInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement, upperValueInclusive: false));
+                    Assert.NotNull(view.GetViewBefore(middleElement, upperValueInclusive: true));
+                    Assert.NotNull(view.GetViewBefore(middleElement, upperValueInclusive: false));
                 }
             }
         }
@@ -800,8 +805,13 @@ namespace J2N.Collections.Tests
                 T lastElement = set.ElementAt(setLength - 1);
                 if (comparer.Compare(firstElement, middleElement) < 0)
                 {
+                    // J2N: this was confirmed to match JDK behavior
                     SortedSet<T> view = set.GetViewAfter(middleElement);
                     Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement, lowerValueInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement, lowerValueInclusive: false));
+                    Assert.NotNull(view.GetViewAfter(middleElement, lowerValueInclusive: true));
+                    Assert.NotNull(view.GetViewAfter(middleElement, lowerValueInclusive: false));
                 }
             }
         }

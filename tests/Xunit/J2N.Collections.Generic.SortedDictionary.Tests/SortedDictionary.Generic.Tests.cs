@@ -1406,8 +1406,13 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 if (comparer.Compare(middleElement, lastElement) < 0)
                 {
+                    // J2N: this was confirmed to match JDK behavior
                     SortedDictionary<TKey, TValue> view = dictionary.GetViewBefore(middleElement.Key);
                     Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key, upperKeyInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewBefore(lastElement.Key, upperKeyInclusive: false));
+                    Assert.NotNull(view.GetViewBefore(middleElement.Key, upperKeyInclusive: true));
+                    Assert.NotNull(view.GetViewBefore(middleElement.Key, upperKeyInclusive: false));
                 }
             }
         }
@@ -1586,8 +1591,13 @@ namespace J2N.Collections.Tests
                 SCG.KeyValuePair<TKey, TValue> lastElement = dictionary.ElementAt(count - 1);
                 if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
                 {
+                    // J2N: this was confirmed to match JDK behavior
                     SortedDictionary<TKey, TValue> view = dictionary.GetViewAfter(middleElement.Key);
                     Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key, lowerKeyInclusive: true));
+                    Assert.Throws<ArgumentOutOfRangeException>(() => view.GetViewAfter(firstElement.Key, lowerKeyInclusive: false));
+                    Assert.NotNull(view.GetViewAfter(middleElement.Key, lowerKeyInclusive: true));
+                    Assert.NotNull(view.GetViewAfter(middleElement.Key, lowerKeyInclusive: false));
                 }
             }
         }
