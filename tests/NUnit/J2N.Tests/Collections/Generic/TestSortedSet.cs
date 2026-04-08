@@ -2712,6 +2712,47 @@ namespace J2N.Collections.Generic
             Assert.Throws<ArgumentOutOfRangeException>(() => tail.GetViewBefore(4, true));
         }
 
+        [Test]
+        public void Test_GetViewBetween_RangeOutsideOfBaseSet_Empty()
+        {
+            SortedSet<string> set = new SortedSet<string>(StringComparer.Ordinal) { "1", "2", "3" };
+
+            SortedSet<string> view = set.GetViewBetween("4", "9");
+            Assert.AreEqual(0, view.Count);
+
+            var lookup = set.GetSpanAlternateLookup<char>();
+            SortedSet<string> lookupView = lookup.GetViewBetween("4".AsSpan(), "9".AsSpan());
+            Assert.AreEqual(0, lookupView.Count);
+        }
+
+        [Test]
+        public void Test_GetViewBetween_Exclusive_Exclusive_SameValue_Empty()
+        {
+            SortedSet<string> set = new SortedSet<string>(StringComparer.Ordinal) { "1", "2", "3", "4", "5" };
+
+            SortedSet<string> view = set.GetViewBetween("3", false, "3", false);
+            Assert.AreEqual(0, view.Count);
+
+            var lookup = set.GetSpanAlternateLookup<char>();
+            SortedSet<string> lookupView = lookup.GetViewBetween("3".AsSpan(), false, "3".AsSpan(), false);
+            Assert.AreEqual(0, lookupView.Count);
+        }
+
+        [Test]
+        public void Test_GetViewBetween_GetViewBetween_Exclusive_Exclusive_SameValue_Empty()
+        {
+            SortedSet<string> set = new SortedSet<string>(StringComparer.Ordinal) { "1", "2", "3", "4", "5" };
+
+            SortedSet<string> view1 = set.GetViewBetween("2", "4");
+
+            SortedSet<string> view2 = view1.GetViewBetween("3", false, "3", false);
+            Assert.AreEqual(0, view2.Count);
+
+            var lookup = view1.GetSpanAlternateLookup<char>();
+            SortedSet<string> lookupView = lookup.GetViewBetween("3".AsSpan(), false, "3".AsSpan(), false);
+            Assert.AreEqual(0, lookupView.Count);
+        }
+
         /// <summary>
         /// Represents a sorted collection that may contain duplicates. Note this is just a mock and
         /// the data provided to the constructor must already be sorted according to the provided comparer.
