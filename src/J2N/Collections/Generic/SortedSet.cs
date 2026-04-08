@@ -2284,7 +2284,7 @@ namespace J2N.Collections.Generic
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
 
-                return GetViewBetween(lowerValue, set.LowerBoundInclusive, upperValue, set.UpperBoundInclusive, comparer);
+                return GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true, comparer);
             }
 
             /// <summary>
