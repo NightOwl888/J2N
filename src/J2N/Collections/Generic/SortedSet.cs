@@ -2318,11 +2318,11 @@ namespace J2N.Collections.Generic
             {
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
-                if (IsTooLow(lowerValue, lowerValueInclusive, comparer))
+                if (IsTooLow(lowerValue, comparer))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                if (IsTooHigh(upperValue, upperValueInclusive, comparer))
+                if (IsTooHigh(upperValue, comparer))
                 {
                     ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
@@ -2377,24 +2377,14 @@ namespace J2N.Collections.Generic
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
-                if (!set.IsReversed)
+                if (IsTooHigh(upperValue, comparer))
                 {
-                    if (IsTooHigh(upperValue, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
-                    }
-
-                    return GetViewBefore(upperValue, set.UpperBoundInclusive, comparer);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                else
-                {
-                    if (IsTooLow(upperValue, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
-                    }
 
-                    return GetViewAfter(upperValue, set.LowerBoundInclusive, comparer);
-                }
+                return !set.IsReversed
+                    ? GetViewBefore(upperValue, upperValueInclusive: true, comparer)
+                    : GetViewAfter(upperValue, lowerValueInclusive: true, comparer);
             }
 
             /// <summary>
@@ -2420,24 +2410,14 @@ namespace J2N.Collections.Generic
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
-                if (!set.IsReversed)
+                if (IsTooHigh(upperValue, comparer))
                 {
-                    if (IsTooHigh(upperValue, upperValueInclusive, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
-                    }
-
-                    return GetViewBefore(upperValue, upperValueInclusive, comparer);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
                 }
-                else
-                {
-                    if (IsTooLow(upperValue, upperValueInclusive, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
-                    }
 
-                    return GetViewAfter(upperValue, upperValueInclusive, comparer);
-                }
+                return !set.IsReversed
+                    ? GetViewBefore(upperValue, upperValueInclusive, comparer)
+                    : GetViewAfter(upperValue, upperValueInclusive, comparer);
             }
 
             internal SortedSet<T> GetViewBefore(ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
@@ -2473,24 +2453,14 @@ namespace J2N.Collections.Generic
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
-                if (!set.IsReversed)
+                if (IsTooLow(lowerValue, comparer))
                 {
-                    if (IsTooLow(lowerValue, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
-                    }
-
-                    return GetViewAfter(lowerValue, set.LowerBoundInclusive, comparer);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                else
-                {
-                    if (IsTooHigh(lowerValue, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
-                    }
 
-                    return GetViewBefore(lowerValue, set.UpperBoundInclusive, comparer);
-                }
+                return !set.IsReversed
+                    ? GetViewAfter(lowerValue, lowerValueInclusive: true, comparer)
+                    : GetViewBefore(lowerValue, upperValueInclusive: true, comparer);
             }
 
             /// <summary>
@@ -2514,23 +2484,14 @@ namespace J2N.Collections.Generic
                 SortedSet<T> set = Set;
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
-                if (!set.IsReversed)
+                if (IsTooLow(lowerValue, comparer))
                 {
-                    if (IsTooLow(lowerValue, lowerValueInclusive, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
-                    }
-                    return GetViewAfter(lowerValue, lowerValueInclusive, comparer);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
                 }
-                else
-                {
-                    if (IsTooHigh(lowerValue, lowerValueInclusive, comparer))
-                    {
-                        ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
-                    }
 
-                    return GetViewBefore(lowerValue, lowerValueInclusive, comparer);
-                }
+                return !set.IsReversed
+                    ? GetViewAfter(lowerValue, lowerValueInclusive, comparer)
+                    : GetViewBefore(lowerValue, lowerValueInclusive, comparer);
             }
 
             internal SortedSet<T> GetViewAfter(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
@@ -2638,20 +2599,6 @@ namespace J2N.Collections.Generic
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool IsTooHigh(ReadOnlySpan<TAlternateSpan> item, bool upperBoundInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
-            {
-                SortedSet<T> set = Set;
-
-                if (set.HasUpperBound)
-                {
-                    int c = comparer.Compare(item!, set.UpperBound!);
-                    if (c > 0 || (c == 0 && !upperBoundInclusive))
-                        return true;
-                }
-                return false;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool IsTooLow(ReadOnlySpan<TAlternateSpan> item, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
                 SortedSet<T> set = Set;
@@ -2660,20 +2607,6 @@ namespace J2N.Collections.Generic
                 {
                     int c = comparer.Compare(item, set.LowerBound!);
                     if (c < 0 || (c == 0 && !set.LowerBoundInclusive))
-                        return true;
-                }
-                return false;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool IsTooLow(ReadOnlySpan<TAlternateSpan> item, bool lowerBoundInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
-            {
-                SortedSet<T> set = Set;
-
-                if (set.HasLowerBound)
-                {
-                    int c = comparer.Compare(item, set.LowerBound!);
-                    if (c < 0 || (c == 0 && !lowerBoundInclusive))
                         return true;
                 }
                 return false;

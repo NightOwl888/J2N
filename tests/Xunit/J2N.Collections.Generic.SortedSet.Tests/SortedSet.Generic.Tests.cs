@@ -1269,13 +1269,14 @@ namespace J2N.Collections.Tests
                 string lastElement = set.ElementAt(setLength - 1);
                 if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
                 {
+                    // J2N: this was confirmed to match JDK behavior
                     SortedSet<string> view = set.GetViewBetween(firstElement, middleElement);
                     var lookup = view.GetSpanAlternateLookup<char>();
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan()));
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperValueInclusive: true));
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(lastElement.AsSpan(), upperValueInclusive: false));
                     Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), upperValueInclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewBefore(middleElement.AsSpan(), upperValueInclusive: false));
+                    Assert.NotNull(lookup.GetViewBefore(middleElement.AsSpan(), upperValueInclusive: false));
                 }
             }
         }
@@ -1334,13 +1335,14 @@ namespace J2N.Collections.Tests
                 string lastElement = set.ElementAt(setLength - 1);
                 if ((comparer.Compare(firstElement, middleElement) < 0) && (comparer.Compare(middleElement, lastElement) < 0))
                 {
+                    // J2N: this was confirmed to match JDK behavior
                     SortedSet<string> view = set.GetViewAfter(middleElement);
                     var lookup = view.GetSpanAlternateLookup<char>();
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan()));
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerValueInclusive: true));
                     Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(firstElement.AsSpan(), lowerValueInclusive: false));
                     Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), lowerValueInclusive: true));
-                    Assert.Throws<ArgumentOutOfRangeException>(() => lookup.GetViewAfter(middleElement.AsSpan(), lowerValueInclusive: false));
+                    Assert.NotNull(lookup.GetViewAfter(middleElement.AsSpan(), lowerValueInclusive: false));
                 }
             }
         }
