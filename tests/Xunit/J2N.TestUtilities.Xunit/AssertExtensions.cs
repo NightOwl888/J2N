@@ -1315,5 +1315,28 @@ namespace J2N.TestUtilities.Xunit
             throw EqualException.ForMismatchedValues(ToStringPadded(expected), ToStringPadded(actual));
         }
 #endif
+
+
+        // J2N extensions
+
+        public static void ThrowsSameArgumentException<T>(Action action1, Action action2)
+            where T : ArgumentException
+        {
+            Exception exception1 = Record.Exception(action1);
+            Exception exception2 = Record.Exception(action2);
+
+            Assert.NotNull(exception1);
+            Assert.NotNull(exception2);
+
+            // Enforce exact type match to TException
+            Assert.Equal(typeof(T), exception1.GetType());
+            Assert.Equal(typeof(T), exception2.GetType());
+
+            var argumentException1 = (T)exception1;
+            var argumentException2 = (T)exception2;
+
+            Assert.Equal(argumentException1.ParamName, argumentException2.ParamName);
+            Assert.Equal(argumentException1.Message, argumentException2.Message);
+        }
     }
 }
