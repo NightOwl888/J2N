@@ -198,7 +198,7 @@ namespace J2N.Collections.Tests
         }
 
         [Fact]
-        public void SortedDictionary_Generic_GetViewBetween_FirstLast()
+        public void SortedDictionary_Generic_GetView_FirstLast()
         {
             SortedDictionary<int, int> dictionary = new()
             {
@@ -208,7 +208,7 @@ namespace J2N.Collections.Tests
                 [7] = 700,
                 [9] = 900,
             };
-            SortedDictionary<int, int> view = dictionary.GetViewBetween(4, 8);
+            SortedDictionary<int, int> view = dictionary.GetView(4, 8);
 
             Assert.True(dictionary.ContainsKey(1));
             Assert.True(dictionary.ContainsKey(3));
@@ -295,7 +295,7 @@ namespace J2N.Collections.Tests
 
         // J2N: Added First and Last properties to replace Min and Max
         [Fact]
-        public void SortedDictionary_Generic_GetViewBetween_FirstLast_Exhaustive()
+        public void SortedDictionary_Generic_GetView_FirstLast_Exhaustive()
         {
             SortedDictionary<int, int> dictionary = new()
             {
@@ -311,7 +311,7 @@ namespace J2N.Collections.Tests
             {
                 for (int j = i; j < 14; j++)
                 {
-                    SortedDictionary<int, int> view = dictionary.GetViewBetween(i, j);
+                    SortedDictionary<int, int> view = dictionary.GetView(i, j);
 
                     if (j < i || (j == i && i % 2 == 0))
                     {

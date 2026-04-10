@@ -10,7 +10,7 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
-    public class SortedSet_TreeSubset_GetViewBetween_int_Tests : SortedSet_TreeSubset_int_Tests
+    public class SortedSet_TreeSubset_GetView_int_Tests : SortedSet_TreeSubset_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -20,11 +20,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBetween(LowerBound, UpperBound);
+            return OriginalSet.GetView(LowerBound, UpperBound);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_string_Tests : SortedSet_TreeSubset_string_Tests
+    public class SortedSet_TreeSubset_GetView_string_Tests : SortedSet_TreeSubset_string_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -33,11 +33,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBetween(LowerBound, UpperBound);
+            return OriginalSet.GetView(LowerBound, UpperBound);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
+    public class SortedSet_TreeSubset_GetView_Inclusive_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -47,11 +47,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
+    public class SortedSet_TreeSubset_GetView_Inclusive_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -60,11 +60,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
+    public class SortedSet_TreeSubset_GetView_Inclusive_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -74,11 +74,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Inclusive_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
+    public class SortedSet_TreeSubset_GetView_Inclusive_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -87,11 +87,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
+    public class SortedSet_TreeSubset_GetView_Exclusive_Inclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -101,11 +101,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
+    public class SortedSet_TreeSubset_GetView_Exclusive_Inclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -114,11 +114,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
+    public class SortedSet_TreeSubset_GetView_Exclusive_Exclusive_int_Tests : SortedSet_TreeSubset_int_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -128,11 +128,11 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<int> GenericISetFactory()
         {
             OriginalSet = new SortedSet<int>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedSet_TreeSubset_GetViewBetween_Exclusive_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
+    public class SortedSet_TreeSubset_GetView_Exclusive_Exclusive_string_Tests : SortedSet_TreeSubset_string_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -141,7 +141,7 @@ namespace J2N.Collections.Tests
         protected override SCG.ISet<string> GenericISetFactory()
         {
             OriginalSet = new SortedSet<string>();
-            return OriginalSet.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalSet.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 

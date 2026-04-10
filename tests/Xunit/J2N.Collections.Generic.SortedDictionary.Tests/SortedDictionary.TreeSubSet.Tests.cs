@@ -6,7 +6,7 @@ using SCG = System.Collections.Generic;
 
 namespace J2N.Collections.Tests
 {
-    public class SortedDictionary_TreeSubset_GetViewBetween_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    public class SortedDictionary_TreeSubset_GetView_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
         protected override bool UpperBoundInclusive => true;
@@ -15,11 +15,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBetween(LowerBound, UpperBound);
+            return OriginalDictionary.GetView(LowerBound, UpperBound);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    public class SortedDictionary_TreeSubset_GetView_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -28,12 +28,12 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBetween(LowerBound, UpperBound);
+            return OriginalDictionary.GetView(LowerBound, UpperBound);
         }
     }
 
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    public class SortedDictionary_TreeSubset_GetView_Inclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -42,11 +42,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    public class SortedDictionary_TreeSubset_GetView_Inclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -55,11 +55,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    public class SortedDictionary_TreeSubset_GetView_Inclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -68,11 +68,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Inclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    public class SortedDictionary_TreeSubset_GetView_Inclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
         protected override bool LowerBoundInclusive => true;
 
@@ -81,11 +81,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    public class SortedDictionary_TreeSubset_GetView_Exclusive_Inclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -94,11 +94,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    public class SortedDictionary_TreeSubset_GetView_Exclusive_Inclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -107,11 +107,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
+    public class SortedDictionary_TreeSubset_GetView_Exclusive_Exclusive_int_int_Tests : SortedDictionary_TreeSubset_int_int_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -120,11 +120,11 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<int, int> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<int, int>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 
-    public class SortedDictionary_TreeSubset_GetViewBetween_Exclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
+    public class SortedDictionary_TreeSubset_GetView_Exclusive_Exclusive_string_string_Tests : SortedDictionary_TreeSubset_string_string_Tests
     {
         protected override bool LowerBoundInclusive => false;
 
@@ -133,7 +133,7 @@ namespace J2N.Collections.Tests
         protected override SCG.IDictionary<string, string> GenericIDictionaryFactory()
         {
             OriginalDictionary = new SortedDictionary<string, string>();
-            return OriginalDictionary.GetViewBetween(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
+            return OriginalDictionary.GetView(LowerBound, LowerBoundInclusive, UpperBound, UpperBoundInclusive);
         }
     }
 

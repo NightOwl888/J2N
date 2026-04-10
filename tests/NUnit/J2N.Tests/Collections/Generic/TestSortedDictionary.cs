@@ -505,7 +505,7 @@ namespace J2N.Collections.Generic
 
         // Edge cases
         [Test]
-        public void Test_GetViewBetween_GetViewDescending_GetViewBefore_MatchesSubset()
+        public void Test_GetView_GetViewDescending_GetViewBefore_MatchesSubset()
         {
             SortedDictionary<int, int> dictionary = new()
             {
@@ -516,7 +516,7 @@ namespace J2N.Collections.Generic
                 [5] = 5
             };
 
-            SortedDictionary<int, int> result = dictionary.GetViewBetween(2, true, 5, true)
+            SortedDictionary<int, int> result = dictionary.GetView(2, true, 5, true)
                             .GetViewDescending()
                             .GetViewBefore(4, true);
 
@@ -615,7 +615,7 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
-        public void Test_GetViewBetween_RangeOutsideOfBaseSet_Empty()
+        public void Test_GetView_RangeOutsideOfBaseSet_Empty()
         {
             SortedDictionary<string, int> dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal)
             {
@@ -624,16 +624,16 @@ namespace J2N.Collections.Generic
                 ["3"] = 3
             };
 
-            SortedDictionary<string, int> view = dictionary.GetViewBetween("4", "9");
+            SortedDictionary<string, int> view = dictionary.GetView("4", "9");
             Assert.AreEqual(0, view.Count);
 
             var lookup = dictionary.GetSpanAlternateLookup<char>();
-            SortedDictionary<string, int> lookupView = lookup.GetViewBetween("4".AsSpan(), "9".AsSpan());
+            SortedDictionary<string, int> lookupView = lookup.GetView("4".AsSpan(), "9".AsSpan());
             Assert.AreEqual(0, lookupView.Count);
         }
 
         [Test]
-        public void Test_GetViewBetween_Exclusive_Exclusive_SameValue_Empty()
+        public void Test_GetView_Exclusive_Exclusive_SameValue_Empty()
         {
             SortedDictionary<string, int> dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal)
             {
@@ -644,16 +644,16 @@ namespace J2N.Collections.Generic
                 ["5"] = 5
             };
 
-            SortedDictionary<string, int> view = dictionary.GetViewBetween("3", false, "3", false);
+            SortedDictionary<string, int> view = dictionary.GetView("3", false, "3", false);
             Assert.AreEqual(0, view.Count);
 
             var lookup = dictionary.GetSpanAlternateLookup<char>();
-            SortedDictionary<string, int> lookupView = lookup.GetViewBetween("3".AsSpan(), false, "3".AsSpan(), false);
+            SortedDictionary<string, int> lookupView = lookup.GetView("3".AsSpan(), false, "3".AsSpan(), false);
             Assert.AreEqual(0, lookupView.Count);
         }
 
         [Test]
-        public void Test_GetViewBetween_GetViewBetween_Exclusive_Exclusive_SameValue_Empty()
+        public void Test_GetView_GetView_Exclusive_Exclusive_SameValue_Empty()
         {
             SortedDictionary<string, int> dictionary = new SortedDictionary<string, int>(StringComparer.Ordinal)
             {
@@ -664,13 +664,13 @@ namespace J2N.Collections.Generic
                 ["5"] = 5
             };
 
-            SortedDictionary<string, int> view1 = dictionary.GetViewBetween("2", "4");
+            SortedDictionary<string, int> view1 = dictionary.GetView("2", "4");
 
-            SortedDictionary<string, int> view2 = view1.GetViewBetween("3", false, "3", false);
+            SortedDictionary<string, int> view2 = view1.GetView("3", false, "3", false);
             Assert.AreEqual(0, view2.Count);
 
             var lookup = view1.GetSpanAlternateLookup<char>();
-            SortedDictionary<string, int> lookupView = lookup.GetViewBetween("3".AsSpan(), false, "3".AsSpan(), false);
+            SortedDictionary<string, int> lookupView = lookup.GetView("3".AsSpan(), false, "3".AsSpan(), false);
             Assert.AreEqual(0, lookupView.Count);
         }
     }

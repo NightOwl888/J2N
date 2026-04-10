@@ -2241,96 +2241,97 @@ namespace J2N.Collections.Generic
 
             #endregion TryGetCeiling
 
-            #region GetViewBetween
+            #region GetView
 
             /// <summary>
             /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
             /// <para/>
-            /// Usage Note: In Java, the upper bound of TreeSet.subSet() is exclusive. To match the behavior, call
-            /// <see cref="GetViewBetween(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/>,
-            /// setting <c>lowerValueInclusive</c> to <see langword="true"/> and <c>upperValueInclusive</c> to <see langword="false"/>.
+            /// Usage Note: In Java, the <paramref name="toValue"/> of TreeSet.subSet() is exclusive. To match the behavior, call
+            /// <see cref="GetView(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/>, setting <c>fromInclusive</c> to <see langword="true"/>
+            /// and <c>toInclusive</c> to <see langword="false"/>.
             /// </summary>
-            /// <param name="lowerValue">The lowest desired value in the view.</param>
-            /// <param name="upperValue">The highest desired value in the view.</param>
+            /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
+            /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
-            /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
-            /// according to the comparer.</exception>
+            /// <exception cref="ArgumentException"><paramref name="fromValue"/> is after <paramref name="toValue"/>
+            /// in the current view order according to the comparer.</exception>
             /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
-            /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
+            /// specified by <paramref name="fromValue"/> and <paramref name="toValue"/>.</exception>
             /// <remarks>
-            /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
-            /// <paramref name="upperValue"/> (inclusive), as defined by the comparer. This method does not copy elements from the
-            /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+            /// This method returns a view of the range of elements that fall between <paramref name="fromValue"/> and
+            /// <paramref name="toValue"/> (inclusive), as defined by the current view order and the comparer.
+            /// This method does not copy elements from the <see cref="SortedSet{T}"/>, but provides a window into the
+            /// underlying <see cref="SortedSet{T}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
-            /// <para/>
-            /// If this method is called on a view, it will inherit the <c>lowerValueInclusive</c> and <c>upperValueInclusive</c>
-            /// behavior of the view. To override this behavior, call the
-            /// <see cref="GetViewBetween(ReadOnlySpan{TAlternateSpan}, bool, ReadOnlySpan{TAlternateSpan}, bool)"/> overload
-            /// instead.
             /// <para/>
             /// This corresponds to the <c>subSet()</c> method in the JDK.
             /// </remarks>
-            public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, ReadOnlySpan<TAlternateSpan> upperValue)
-            {
-                SortedSet<T> set = Set;
-                ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
-
-                if (IsTooLow(lowerValue, comparer))
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
-                }
-                if (IsTooHigh(upperValue, comparer))
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
-                }
-
-                return GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true, comparer);
-            }
+            public SortedSet<T> GetView(ReadOnlySpan<TAlternateSpan> fromValue, ReadOnlySpan<TAlternateSpan> toValue)
+                => DoGetView(fromValue, fromInclusive: true, ExceptionArgument.fromValue, toValue, toInclusive: true, ExceptionArgument.toValue);
 
             /// <summary>
             /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
             /// <para/>
-            /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="lowerValueInclusive"/>
-            /// set to <see langword="true"/> and <paramref name="upperValueInclusive"/> set to <see langword="false"/>.
+            /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="fromInclusive"/>
+            /// set to <see langword="true"/> and <paramref name="toInclusive"/> set to <see langword="false"/>.
             /// </summary>
-            /// <param name="lowerValue">The lowest value in the range for the view.</param>
-            /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
-            /// otherwise, it is an exclusive lower bound.</param>
-            /// <param name="upperValue">The highest desired value in the view.</param>
-            /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
-            /// otherwise, it is an exclusive upper bound.</param>
+            /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
+            /// <param name="fromInclusive">If <see langword="true"/>, <paramref name="fromValue"/> will be included in the range;
+            /// otherwise, it is an exclusive bound.</param>
+            /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
+            /// <param name="toInclusive">If <see langword="true"/>, <paramref name="toValue"/> will be included in the range;
+            /// otherwise, it is an exclusive bound.</param>
             /// <returns>A subset view that contains only the values in the specified range.</returns>
-            /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
-            /// according to the comparer.</exception>
+            /// <exception cref="ArgumentException"><paramref name="fromValue"/> is after than <paramref name="toValue"/>
+            /// in the current view order according to the comparer.</exception>
             /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
-            /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
+            /// specified by <paramref name="fromValue"/> and <paramref name="toValue"/>.</exception>
             /// <remarks>
-            /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
-            /// <paramref name="upperValue"/>, as defined by the comparer. Each bound may either be inclusive
-            /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="lowerValueInclusive"/>
-            /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
+            /// This method returns a view of the range of elements that fall between <paramref name="fromValue"/> and
+            /// <paramref name="toValue"/>, as defined by the current view order and the comparer. Each bound may either be inclusive
+            /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="fromInclusive"/>
+            /// and <paramref name="toInclusive"/>. This method does not copy elements from the
             /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
             /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
             /// <para/>
             /// This corresponds to the <c>subSet()</c> method in the JDK.
             /// </remarks>
-            public SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive)
+            public SortedSet<T> GetView(ReadOnlySpan<TAlternateSpan> fromValue, bool fromInclusive, ReadOnlySpan<TAlternateSpan> toValue, bool toInclusive)
+                => DoGetView(fromValue, fromInclusive, ExceptionArgument.fromValue, toValue, toInclusive, ExceptionArgument.toValue);
+
+            internal SortedSet<T> DoGetView(ReadOnlySpan<TAlternateSpan> fromValue, bool fromInclusive, ExceptionArgument fromArgumentName, ReadOnlySpan<TAlternateSpan> toValue, bool toInclusive, ExceptionArgument toArgumentName)
             {
                 ISpanAlternateComparer<TAlternateSpan, T> comparer = GetAlternateComparer();
 
-                if (IsTooLow(lowerValue, comparer))
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
-                }
-                if (IsTooHigh(upperValue, comparer))
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
-                }
-
-                return GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, comparer);
+                return _isUnderlying
+                    ? DoGetView(fromValue, fromInclusive, fromArgumentName, toValue, toInclusive, toArgumentName, comparer)
+                    : DoGetView_View(fromValue, fromInclusive, fromArgumentName, toValue, toInclusive, toArgumentName, comparer);
             }
 
-            internal SortedSet<T> GetViewBetween(ReadOnlySpan<TAlternateSpan> lowerValue, bool lowerValueInclusive, ReadOnlySpan<TAlternateSpan> upperValue, bool upperValueInclusive, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            internal SortedSet<T> DoGetView_View(ReadOnlySpan<TAlternateSpan> fromValue, bool fromInclusive, ExceptionArgument fromArgumentName, ReadOnlySpan<TAlternateSpan> toValue, bool toInclusive, ExceptionArgument toArgumentName, ISpanAlternateComparer<TAlternateSpan, T> comparer)
+            {
+                bool reverse = Set.IsReversed;
+
+                ReadOnlySpan<TAlternateSpan> lower = reverse ? toValue : fromValue;
+                ReadOnlySpan<TAlternateSpan> upper = reverse ? fromValue : toValue;
+                bool lowerInclusive = reverse ? toInclusive : fromInclusive;
+                bool upperInclusive = reverse ? fromInclusive : toInclusive;
+                ExceptionArgument lowerArgumentName = reverse ? toArgumentName : fromArgumentName;
+                ExceptionArgument upperArgumentName = reverse ? fromArgumentName : toArgumentName;
+
+                if (IsTooLow(lower, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(lowerArgumentName);
+                }
+                if (IsTooHigh(upper, comparer))
+                {
+                    ThrowHelper.ThrowArgumentOutOfRangeException(upperArgumentName);
+                }
+
+                return DoGetView(lower, lowerInclusive, lowerArgumentName, upper, upperInclusive, upperArgumentName, comparer);
+            }
+
+            internal SortedSet<T> DoGetView(ReadOnlySpan<TAlternateSpan> fromValue, bool fromInclusive, ExceptionArgument fromArgumentName, ReadOnlySpan<TAlternateSpan> toValue, bool toInclusive, ExceptionArgument toArgumentName, ISpanAlternateComparer<TAlternateSpan, T> comparer)
             {
                 // J2N: We instantiate the upper instance prior to comparing to see whether we should
                 // throw when lowerValue is greater than upperValue. This is so we don't have
@@ -2338,24 +2339,24 @@ namespace J2N.Collections.Generic
                 // ReadOnlySpan instances. We must get two instances anyway because TreeSubSet requires
                 // them as fields, so there is no harm in doing it this way.
 
-                if (!TryGetValue(upperValue, out T? upper))
+                if (!TryGetValue(toValue, out T? to))
                 {
-                    upper = comparer.Create(upperValue);
+                    to = comparer.Create(toValue);
                 }
-                if (comparer.Compare(lowerValue, upper) > 0)
+                if (comparer.Compare(fromValue, to) > 0)
                 {
-                    ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
+                    ThrowHelper.ThrowArgumentException_SortedSet_LowerValueGreaterThanUpperValue(fromArgumentName, toArgumentName);
                 }
-                if (!TryGetValue(lowerValue, out T? lower))
+                if (!TryGetValue(fromValue, out T? from))
                 {
-                    lower = comparer.Create(lowerValue);
+                    from = comparer.Create(fromValue);
                 }
 
                 SortedSet<T> set = Set;
-                return new TreeSubSet(set.UnderlyingSet, lower, lowerValueInclusive, upper, upperValueInclusive, true, true, set.IsReversed);
+                return new TreeSubSet(set.UnderlyingSet, from, fromInclusive, to, toInclusive, true, true, set.IsReversed);
             }
 
-            #endregion GetViewBetween
+            #endregion GetView
 
             #region GetViewBefore
 
@@ -3928,13 +3929,13 @@ namespace J2N.Collections.Generic
 
         private bool IsSubsetOfNavigableCollectionWithSameComparer(INavigableCollection<T> navigableCollection)
         {
-            // J2N: If other is a view, GetViewBetween() may throw, so we fall back.
+            // J2N: If other is a view, GetView() may throw, so we fall back.
             if (navigableCollection is ICollectionView view && view.IsView)
                 return IsSubsetOfCollectionWithSameComparer(navigableCollection);
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of the other collection is the same as this one,
             // so we override it. The Contains() call will weed out the bounds if they are different.
-            INavigableCollection<T> prunedOther = navigableCollection.GetViewBetween(LowerValue, lowerValueInclusive: true, UpperValue, upperValueInclusive: true);
+            INavigableCollection<T> prunedOther = navigableCollection.GetView(First, fromInclusive: true, Last, toInclusive: true);
             foreach (T item in this)
             {
                 if (!prunedOther.Contains(item))
@@ -4189,13 +4190,13 @@ namespace J2N.Collections.Generic
 
         private bool IsSupersetOfNavigableCollectionWithSameComparer(INavigableCollection<T> navigableCollection)
         {
-            // J2N: If this is a view, GetViewBetween() may throw, so we fall back.
+            // J2N: If this is a view, GetView() may throw, so we fall back.
             if (this is ICollectionView view && view.IsView)
                 return IsSupersetOfEnumerableWithSameComparer(navigableCollection);
 
             // J2N: We cannot make any assumptions about the whether the inclusivity of this collection is the same as the other one,
-            // so we override it. The Contains() call will weed out the bounds if they are different.
-            SortedSet<T> pruned = GetViewBetween(navigableCollection.First, lowerValueInclusive: true, navigableCollection.Last, upperValueInclusive: true);
+            // so we use explicit bounds. The Contains() call will weed out the bounds if they are different.
+            SortedSet<T> pruned = GetView(navigableCollection.First, fromInclusive: true, navigableCollection.Last, toInclusive: true);
             foreach (T item in navigableCollection)
             {
                 if (!pruned.Contains(item))
@@ -4206,11 +4207,11 @@ namespace J2N.Collections.Generic
 
         private bool IsSupersetOfBclSortedSetWithSameComparer(SCG.SortedSet<T> bclSortedSet)
         {
-            // J2N: If other is a view, GetViewBetween() may throw, so we fall back.
+            // J2N: If other is a view, GetView() may throw, so we fall back.
             if (this is ICollectionView view && view.IsView)
                 return IsSupersetOfEnumerableWithSameComparer(bclSortedSet);
 
-            SortedSet<T> pruned = GetViewBetween(bclSortedSet.Min, bclSortedSet.Max);
+            SortedSet<T> pruned = GetView(bclSortedSet.Min, bclSortedSet.Max);
             foreach (T item in bclSortedSet)
             {
                 if (!pruned.Contains(item))
@@ -4690,11 +4691,11 @@ namespace J2N.Collections.Generic
 
         T? INavigableCollection<T>.Last => MaxInternal;
 
-        INavigableCollection<T> INavigableCollection<T>.GetViewBetween(T? lowerValue, T? upperValue)
-            => GetViewBetween(lowerValue, upperValue);
+        INavigableCollection<T> INavigableCollection<T>.GetView([AllowNull] T fromValue, [AllowNull] T toValue)
+            => GetView(fromValue, toValue);
 
-        INavigableCollection<T> INavigableCollection<T>.GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive) 
-            => GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
+        INavigableCollection<T> INavigableCollection<T>.GetView([AllowNull] T fromValue, bool fromInclusive, [AllowNull] T toValue, bool toInclusive) 
+            => GetView(fromValue, fromInclusive, toValue, toInclusive);
 
         INavigableCollection<T> INavigableCollection<T>.GetViewBefore(T? upperValue)
             => GetViewBefore(upperValue);
@@ -4909,16 +4910,11 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This corresponds to the <c>subSet()</c> method in the JDK.
         /// </remarks>
+        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use GetView() instead
+        // due to misleading argument names in descending order views.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, T? upperValue)
-        {
-            // J2N: Use forward-only comparer here, since this method requires the paramters to be passed in logical
-            // order regardless of whether the set is reversed or not.
-            if (comparer.Compare(lowerValue!, upperValue!) > 0)
-            {
-                ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
-            }
-            return new TreeSubSet(UnderlyingSet, lowerValue, lowerBoundInclusive: true, upperValue, upperBoundInclusive: true, true, true, IsReversed);
-        }
+            => DoGetView(lowerValue, fromInclusive: true, ExceptionArgument.lowerValue, upperValue, toInclusive: true, ExceptionArgument.upperValue);
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
@@ -4947,15 +4943,77 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This corresponds to the <c>subSet()</c> method in the JDK.
         /// </remarks>
+        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use GetView() instead
+        // due to misleading argument names in descending order views.
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive)
+            => DoGetView(lowerValue, fromInclusive: lowerValueInclusive, ExceptionArgument.lowerValue, upperValue, toInclusive: upperValueInclusive, ExceptionArgument.upperValue);
+
+        /// <summary>
+        /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
+        /// <para/>
+        /// Usage Note: In Java, the <paramref name="toValue"/> of TreeSet.subSet() is exclusive. To match the behavior, call
+        /// <see cref="GetView(T, bool, T, bool)"/>, setting <c>fromInclusive</c> to <see langword="true"/>
+        /// and <c>toInclusive</c> to <see langword="false"/>.
+        /// </summary>
+        /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
+        /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
+        /// <returns>A subset view that contains only the values in the specified range.</returns>
+        /// <exception cref="ArgumentException"><paramref name="fromValue"/> is after <paramref name="toValue"/>
+        /// in the current view order according to the comparer.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
+        /// specified by <paramref name="fromValue"/> and <paramref name="toValue"/>.</exception>
+        /// <remarks>
+        /// This method returns a view of the range of elements that fall between <paramref name="fromValue"/> and
+        /// <paramref name="toValue"/> (inclusive), as defined by the current view order and the comparer.
+        /// This method does not copy elements from the <see cref="SortedSet{T}"/>, but provides a window into the
+        /// underlying <see cref="SortedSet{T}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+        /// <para/>
+        /// This corresponds to the <c>subSet()</c> method in the JDK.
+        /// </remarks>
+        public SortedSet<T> GetView([AllowNull] T fromValue, [AllowNull] T toValue)
+            => DoGetView(fromValue, fromInclusive: true, fromArgumentName: ExceptionArgument.fromValue, toValue, toInclusive: true, toArgumentName: ExceptionArgument.toValue);
+
+        /// <summary>
+        /// Returns a view of a subset in a <see cref="SortedSet{T}"/>.
+        /// <para/>
+        /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="fromInclusive"/>
+        /// set to <see langword="true"/> and <paramref name="toInclusive"/> set to <see langword="false"/>.
+        /// </summary>
+        /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
+        /// <param name="fromInclusive">If <see langword="true"/>, <paramref name="fromValue"/> will be included in the range;
+        /// otherwise, it is an exclusive bound.</param>
+        /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
+        /// <param name="toInclusive">If <see langword="true"/>, <paramref name="toValue"/> will be included in the range;
+        /// otherwise, it is an exclusive bound.</param>
+        /// <returns>A subset view that contains only the values in the specified range.</returns>
+        /// <exception cref="ArgumentException"><paramref name="fromValue"/> is after <paramref name="toValue"/>
+        /// in the current view order according to the comparer.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
+        /// specified by <paramref name="fromValue"/> and <paramref name="toValue"/>.</exception>
+        /// <remarks>
+        /// This method returns a view of the range of elements that fall between <paramref name="fromValue"/> and
+        /// <paramref name="toValue"/>, as defined by the current view order and the comparer. Each bound may either be inclusive
+        /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="fromInclusive"/>
+        /// and <paramref name="toInclusive"/>. This method does not copy elements from the
+        /// <see cref="SortedSet{T}"/>, but provides a window into the underlying <see cref="SortedSet{T}"/> itself.
+        /// You can make changes in both the view and in the underlying <see cref="SortedSet{T}"/>.
+        /// <para/>
+        /// This corresponds to the <c>subSet()</c> method in the JDK.
+        /// </remarks>
+        public SortedSet<T> GetView([AllowNull] T fromValue, bool fromInclusive, [AllowNull] T toValue, bool toInclusive)
+            => DoGetView(fromValue, fromInclusive, ExceptionArgument.fromValue, toValue, toInclusive, ExceptionArgument.toValue);
+
+        internal virtual SortedSet<T> DoGetView([AllowNull] T fromValue, bool fromInclusive, ExceptionArgument fromArgumentName, [AllowNull] T toValue, bool toInclusive, ExceptionArgument toArgumentName)
         {
-            // J2N: Use forward-only comparer here, since this method requires the paramters to be passed in logical
+            // J2N: Use forward-only comparer here, since this method requires the paramters to be passed in value
             // order regardless of whether the set is reversed or not.
-            if (comparer.Compare(lowerValue!, upperValue!) > 0)
+            if (comparer.Compare(fromValue!, toValue!) > 0)
             {
-                ThrowHelper.ThrowArgumentException(ExceptionResource.SortedSet_LowerValueGreaterThanUpperValue, ExceptionArgument.lowerValue);
+                ThrowHelper.ThrowArgumentException_SortedSet_LowerValueGreaterThanUpperValue(fromArgumentName, toArgumentName);
             }
-            return new TreeSubSet(UnderlyingSet, lowerValue, lowerValueInclusive, upperValue, upperValueInclusive, true, true, IsReversed);
+            return new TreeSubSet(UnderlyingSet, fromValue, lowerBoundInclusive: fromInclusive, toValue, upperBoundInclusive: toInclusive, true, true, IsReversed);
         }
 
         /// <summary>

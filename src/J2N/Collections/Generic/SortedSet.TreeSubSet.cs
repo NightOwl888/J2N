@@ -527,36 +527,28 @@ namespace J2N.Collections.Generic
                 return _underlying!.Count; // [!] asserted above
             }
 
-            // This passes functionality down to the underlying tree, clipping edges if necessary
-            // There's nothing gained by having a nested subset. May as well draw it from the base
-            // Cannot increase the bounds of the subset, can only decrease it
-            public override SortedSet<T> GetViewBetween([AllowNull] T lowerValue, [AllowNull] T upperValue)
+            // This passes functionality down to the underlying tree, clipping edges and reversing
+            // argument order if necessary. There's nothing gained by having a nested subset. May
+            // as well draw it from the base. Cannot increase the bounds of the subset, can only decrease it.
+            internal override SortedSet<T> DoGetView([AllowNull] T fromValue, bool fromInclusive, ExceptionArgument fromArgumentName, [AllowNull] T toValue, bool toInclusive, ExceptionArgument toArgumentName)
             {
-                if (IsTooLow(lowerValue, _lBoundInclusive))
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
-                }
-                if (IsTooHigh(upperValue, _uBoundInclusive))
-                {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
-                }
-                return (TreeSubSet)base.GetViewBetween(lowerValue, lowerValueInclusive: true, upperValue, upperValueInclusive: true);
-            }
+                T? lower = _reverse ? toValue : fromValue;
+                T? upper = _reverse ? fromValue : toValue;
+                bool lowerInclusive = _reverse ? toInclusive : fromInclusive;
+                bool upperInclusive = _reverse ? fromInclusive : toInclusive;
+                ExceptionArgument lowerArgumentName = _reverse ? toArgumentName : fromArgumentName;
+                ExceptionArgument upperArgumentName = _reverse ? fromArgumentName : toArgumentName;
 
-            // This passes functionality down to the underlying tree, clipping edges if necessary
-            // There's nothing gained by having a nested subset. May as well draw it from the base
-            // Cannot increase the bounds of the subset, can only decrease it
-            public override SortedSet<T> GetViewBetween([AllowNull] T lowerValue, bool lowerValueInclusive, [AllowNull] T upperValue, bool upperValueInclusive)
-            {
-                if (IsTooLow(lowerValue, lowerValueInclusive))
+                if (IsTooLow(lower))
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.lowerValue);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(lowerArgumentName);
                 }
-                if (IsTooHigh(upperValue, upperValueInclusive))
+                if (IsTooHigh(upper))
                 {
-                    ThrowHelper.ThrowArgumentOutOfRangeException(ExceptionArgument.upperValue);
+                    ThrowHelper.ThrowArgumentOutOfRangeException(upperArgumentName);
                 }
-                return (TreeSubSet)base.GetViewBetween(lowerValue, lowerValueInclusive, upperValue, upperValueInclusive);
+
+                return base.DoGetView(lower, lowerInclusive, lowerArgumentName, upper, upperInclusive, upperArgumentName);
             }
 
             // This passes functionality down to the underlying tree, clipping edges if necessary

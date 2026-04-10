@@ -38,7 +38,7 @@ namespace J2N.Collections.Generic
                 tree!.Add(2 * i);
         }
 
-        private void LoadForGetViewBetween()
+        private void LoadForGetView()
         {
             for (int i = 0; i < objArray.Length; i++)
             {
@@ -67,7 +67,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetPredecessor_View()
         {
             loadup();
-            var view = tree!.GetViewBetween(6, 14);
+            var view = tree!.GetView(6, 14);
 
             int res;
             Assert.IsTrue(view.TryGetPredecessor(9, out res) && res == 8);
@@ -86,7 +86,7 @@ namespace J2N.Collections.Generic
             loadup();
 
             // View is (6, 14] or (6, 14) depending on implementation
-            var view = tree!.GetViewBetween(6, lowerValueInclusive: false, 14, upperValueInclusive: true);
+            var view = tree!.GetView(6, fromInclusive: false, 14, toInclusive: true);
 
             // 6 is excluded — predecessor should NOT exist
             bool found = view.TryGetPredecessor(6, out int res);
@@ -100,7 +100,7 @@ namespace J2N.Collections.Generic
         {
             loadup();
 
-            var view = tree!.GetViewBetween(6, lowerValueInclusive: false, 14, upperValueInclusive: true);
+            var view = tree!.GetView(6, fromInclusive: false, 14, toInclusive: true);
 
             // 7 → predecessor would be 6, but 6 is excluded
             bool found = view.TryGetPredecessor(7, out int res);
@@ -139,7 +139,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetSuccessor_View()
         {
             loadup();
-            var view = tree!.GetViewBetween(6, 14);
+            var view = tree!.GetView(6, 14);
 
             int res;
             Assert.IsTrue(view.TryGetSuccessor(9, out res) && res == 10);
@@ -157,7 +157,7 @@ namespace J2N.Collections.Generic
         {
             loadup();
 
-            var view = tree!.GetViewBetween(6, lowerValueInclusive: true, 14, upperValueInclusive: false);
+            var view = tree!.GetView(6, fromInclusive: true, 14, toInclusive: false);
 
             // 14 is excluded — successor should NOT exist
             bool found = view.TryGetSuccessor(14, out int res);
@@ -171,7 +171,7 @@ namespace J2N.Collections.Generic
         {
             loadup();
 
-            var view = tree!.GetViewBetween(6, lowerValueInclusive: true, 14, upperValueInclusive: false);
+            var view = tree!.GetView(6, fromInclusive: true, 14, toInclusive: false);
 
             // 13 → successor would be 14, but 14 is excluded
             bool found = view.TryGetSuccessor(13, out int res);
@@ -199,7 +199,7 @@ namespace J2N.Collections.Generic
                 set.Add(i);
 
             // View contains [4..7]
-            var view = set.GetViewBetween(4, 7);
+            var view = set.GetView(4, 7);
 
             // Ask for successor of the maximum element in the view
             bool found = view.TryGetSuccessor(7, out int successor);
@@ -228,7 +228,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetFloor_View()
         {
             loadup();
-            var view = tree!.GetViewBetween(6, 14);
+            var view = tree!.GetView(6, 14);
 
             Assert.IsTrue(view.TryGetFloor(9, out int res) && res == 8);
             Assert.IsTrue(view.TryGetFloor(10, out res) && res == 10);
@@ -246,7 +246,7 @@ namespace J2N.Collections.Generic
         {
             loadup();
 
-            var view = tree!.GetViewBetween(6, lowerValueInclusive: false, 14, upperValueInclusive: true);
+            var view = tree!.GetView(6, fromInclusive: false, 14, toInclusive: true);
 
             // Floor of 6 would be 6, but 6 is excluded
             bool found = view.TryGetFloor(6, out int res);
@@ -282,7 +282,7 @@ namespace J2N.Collections.Generic
         public void TestTryGetCeiling_View()
         {
             loadup();
-            var view = tree!.GetViewBetween(6, 14);
+            var view = tree!.GetView(6, 14);
 
             Assert.IsTrue(view.TryGetCeiling(8, out int res) && res == 8);
             Assert.IsTrue(view.TryGetCeiling(9, out res) && res == 10);
@@ -301,7 +301,7 @@ namespace J2N.Collections.Generic
         {
             loadup();
 
-            var view = tree!.GetViewBetween(6, lowerValueInclusive: true, 14, upperValueInclusive: false);
+            var view = tree!.GetView(6, fromInclusive: true, 14, toInclusive: false);
 
             // Ceiling of 14 would be 14, but 14 is excluded
             bool found = view.TryGetCeiling(14, out int res);
@@ -322,7 +322,7 @@ namespace J2N.Collections.Generic
         public void TryGetCeiling_View_TooHigh()
         {
             loadup();
-            var view = tree!.GetViewBetween(6, 14);
+            var view = tree!.GetView(6, 14);
 
             Assert.IsFalse(view.TryGetCeiling(15, out int res));
             Assert.AreEqual(0, res);
@@ -342,7 +342,7 @@ namespace J2N.Collections.Generic
         //public void TestRange()
         //{
         //    var set = new SortedSet<string>(System.StringComparer.Ordinal) { "H", "G", "F", "E", "D", "C", "B", "A" };
-        //    var range = set.GetViewBetween("B", false, "G", false);
+        //    var range = set.GetView("B", false, "G", false);
         //    var count = range.Count;
 
         //}
@@ -353,13 +353,13 @@ namespace J2N.Collections.Generic
         [Test]
         public void Test_subSetLjava_lang_ObjectLjava_lang_Object()
         {
-            LoadForGetViewBetween();
+            LoadForGetView();
 
             // Test for method java.util.SortedSet
             // java.util.TreeSet.subSet(java.lang.Object, java.lang.Object)
             int startPos = objArray.Length / 4;
             int endPos = 3 * objArray.Length / 4;
-            SortedSet<int> aSubSet = tree!.GetViewBetween(objArray[startPos], lowerValueInclusive: true, objArray[endPos], upperValueInclusive: false);
+            SortedSet<int> aSubSet = tree!.GetView(objArray[startPos], fromInclusive: true, objArray[endPos], toInclusive: false);
             assertTrue("Subset has wrong number of elements",
                     aSubSet.Count == (endPos - startPos));
             for (int counter = startPos; counter < endPos; counter++)
@@ -369,7 +369,7 @@ namespace J2N.Collections.Generic
             int result;
             try
             {
-                tree.GetViewBetween(objArray[3], lowerValueInclusive: true, objArray[0], upperValueInclusive: false);
+                tree.GetView(objArray[3], fromInclusive: true, objArray[0], toInclusive: false);
                 result = 0;
             }
             catch (ArgumentException e)
@@ -625,7 +625,7 @@ namespace J2N.Collections.Generic
         {
             SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
 
-            SortedSet<int> view = set.GetViewBetween(2, 4);
+            SortedSet<int> view = set.GetView(2, 4);
 
             // Sanity check
             Assert.AreEqual(2, view.First);
@@ -642,7 +642,7 @@ namespace J2N.Collections.Generic
         {
             SortedSet<string> set = new() { "1", "2", "3", "4", "5" };
 
-            SortedSet<string> view = set.GetViewBetween("2", "4");
+            SortedSet<string> view = set.GetView("2", "4");
 
             // Mutate underlying set *outside* the view's range
             set.Clear();
@@ -865,7 +865,7 @@ namespace J2N.Collections.Generic
         public void Test_UnionWith_J2NSortedDictionaryKeys_ThisAsView()
         {
             SortedSet<int> left = new() { 1, 3, 5, 7, 9 };
-            SortedSet<int> leftView = left.GetViewBetween(1, 4);
+            SortedSet<int> leftView = left.GetView(1, 4);
 
             SortedDictionary<int, string> dict = new()
             {
@@ -1079,7 +1079,7 @@ namespace J2N.Collections.Generic
         public void Test_IntersectWith_TreeSubSet_InBounds_DistinctSorted()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedSet<int> other = new() { 1, 3, 5, 7 };
 
@@ -1093,7 +1093,7 @@ namespace J2N.Collections.Generic
         public void Test_IntersectWith_TreeSubSet_InBounds_SortedNonDistinct()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedCollection<int> nonDistinct = new()
             {
@@ -1212,7 +1212,7 @@ namespace J2N.Collections.Generic
         public void Test_ExceptWith_TreeSubSet_InBounds()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedSet<int> other = new() { 3, 5 };
 
@@ -1226,7 +1226,7 @@ namespace J2N.Collections.Generic
         public void Test_ExceptWith_TreeSubSet_SortedNonDistinct()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedCollection<int> nonDistinct = new()
             {
@@ -1336,7 +1336,7 @@ namespace J2N.Collections.Generic
         public void Test_SymmetricExceptWith_TreeSubSet()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedSet<int> other = new() { 3, 6 };
 
@@ -1354,10 +1354,10 @@ namespace J2N.Collections.Generic
         public void Test_IsSubsetOf_DoesNotThrow_WhenOtherSubsetBoundsDoNotOverlap()
         {
             var root = new SortedSet<int> { 10, 20, 30, 40, 50 };
-            var thisSubset = root.GetViewBetween(20, 40);
+            var thisSubset = root.GetView(20, 40);
 
             var otherRoot = new SortedSet<int> { 1, 2, 3, 4, 5 };
-            var otherSubset = otherRoot.GetViewBetween(2, 4);
+            var otherSubset = otherRoot.GetView(2, 4);
 
             Assert.DoesNotThrow(() =>
             {
@@ -1370,11 +1370,11 @@ namespace J2N.Collections.Generic
         public void Test_IsSubsetOf_SubsetOfSubset_WithOutOfRangeMinMax()
         {
             var root = new SortedSet<int> { 1, 2, 3, 4, 5, 6 };
-            var subset1 = root.GetViewBetween(2, 5);   // [2..5]
-            var subset2 = subset1.GetViewBetween(3, 4); // [3..4]
+            var subset1 = root.GetView(2, 5);   // [2..5]
+            var subset2 = subset1.GetView(3, 4); // [3..4]
 
             var otherRoot = new SortedSet<int> { 0, 1, 2, 3 };
-            var otherSubset = otherRoot.GetViewBetween(0, 2); // [0..2]
+            var otherSubset = otherRoot.GetView(0, 2); // [0..2]
 
             bool result = subset2.IsSubsetOf(otherSubset);
 
@@ -1494,7 +1494,7 @@ namespace J2N.Collections.Generic
         public void Test_IsSubsetOf_TreeSubSet_InBounds()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedSet<int> other = new() { 2, 3, 4, 5 };
 
@@ -1505,7 +1505,7 @@ namespace J2N.Collections.Generic
         public void Test_IsSubsetOf_TreeSubSet_SortedNonDistinct()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedCollection<int> nonDistinct = new()
             {
@@ -1710,7 +1710,7 @@ namespace J2N.Collections.Generic
         public void Test_IsProperSubsetOf_TreeSubSet_InBounds_ReturnsTrue()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedSet<int> other = new() { 1, 2, 3, 4, 5, 6 };
 
@@ -1721,7 +1721,7 @@ namespace J2N.Collections.Generic
         public void Test_IsProperSubsetOf_TreeSubSet_SortedNonDistinct_ReturnsTrue()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5, 6 };
-            SortedSet<int> subset = root.GetViewBetween(2, 5);
+            SortedSet<int> subset = root.GetView(2, 5);
 
             SortedCollection<int> nonDistinct = new()
             {
@@ -1937,7 +1937,7 @@ namespace J2N.Collections.Generic
         public void Test_IsSupersetOf_TreeSubSet_FallsBackCorrectly()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
-            SortedSet<int> subset = root.GetViewBetween(2, 4);
+            SortedSet<int> subset = root.GetView(2, 4);
 
             SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
 
@@ -2111,7 +2111,7 @@ namespace J2N.Collections.Generic
         public void Test_IsProperSupersetOf_TreeSubSet_FallsBackCorrectly()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
-            SortedSet<int> subset = root.GetViewBetween(2, 4);
+            SortedSet<int> subset = root.GetView(2, 4);
 
             SortedSet<int> set = new() { 1, 2, 3, 4, 5 };
 
@@ -2446,7 +2446,7 @@ namespace J2N.Collections.Generic
         public void Test_Overlaps_ViewAsThis_WithOverlap_ReturnsTrue()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
-            SortedSet<int> view = root.GetViewBetween(2, 4);
+            SortedSet<int> view = root.GetView(2, 4);
 
             SortedSet<int> other = new() { 4, 6 };
 
@@ -2457,7 +2457,7 @@ namespace J2N.Collections.Generic
         public void Test_Overlaps_ViewAsThis_NoOverlap_ReturnsFalse()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
-            SortedSet<int> view = root.GetViewBetween(2, 3);
+            SortedSet<int> view = root.GetView(2, 3);
 
             SortedSet<int> other = new() { 4, 5 };
 
@@ -2468,7 +2468,7 @@ namespace J2N.Collections.Generic
         public void Test_Overlaps_ViewAsOther_WithOverlap_ReturnsTrue()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
-            SortedSet<int> view = root.GetViewBetween(3, 5);
+            SortedSet<int> view = root.GetView(3, 5);
 
             SortedSet<int> set = new() { 2, 3 };
 
@@ -2479,7 +2479,7 @@ namespace J2N.Collections.Generic
         public void Test_Overlaps_ViewAsOther_NoOverlap_ReturnsFalse()
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
-            SortedSet<int> view = root.GetViewBetween(4, 5);
+            SortedSet<int> view = root.GetView(4, 5);
 
             SortedSet<int> set = new() { 1, 2 };
 
@@ -2491,8 +2491,8 @@ namespace J2N.Collections.Generic
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
 
-            SortedSet<int> left = root.GetViewBetween(2, 4);
-            SortedSet<int> right = root.GetViewBetween(4, 5);
+            SortedSet<int> left = root.GetView(2, 4);
+            SortedSet<int> right = root.GetView(4, 5);
 
             Assert.True(left.Overlaps(right));
         }
@@ -2502,8 +2502,8 @@ namespace J2N.Collections.Generic
         {
             SortedSet<int> root = new() { 1, 2, 3, 4, 5 };
 
-            SortedSet<int> left = root.GetViewBetween(1, 2);
-            SortedSet<int> right = root.GetViewBetween(4, 5);
+            SortedSet<int> left = root.GetView(1, 2);
+            SortedSet<int> right = root.GetView(4, 5);
 
             Assert.False(left.Overlaps(right));
         }
@@ -2645,11 +2645,11 @@ namespace J2N.Collections.Generic
 
         // Edge cases
         [Test]
-        public void Test_GetViewBetween_GetViewDescending_GetViewBefore_MatchesSubset()
+        public void Test_GetView_GetViewDescending_GetViewBefore_MatchesSubset()
         {
             SortedSet<int> set = new SortedSet<int> { 1, 2, 3, 4, 5 };
 
-            SortedSet<int> result = set.GetViewBetween(2, true, 5, true)
+            SortedSet<int> result = set.GetView(2, true, 5, true)
                             .GetViewDescending()
                             .GetViewBefore(4, true);
 
@@ -2713,43 +2713,43 @@ namespace J2N.Collections.Generic
         }
 
         [Test]
-        public void Test_GetViewBetween_RangeOutsideOfBaseSet_Empty()
+        public void Test_GetView_RangeOutsideOfBaseSet_Empty()
         {
             SortedSet<string> set = new SortedSet<string>(StringComparer.Ordinal) { "1", "2", "3" };
 
-            SortedSet<string> view = set.GetViewBetween("4", "9");
+            SortedSet<string> view = set.GetView("4", "9");
             Assert.AreEqual(0, view.Count);
 
             var lookup = set.GetSpanAlternateLookup<char>();
-            SortedSet<string> lookupView = lookup.GetViewBetween("4".AsSpan(), "9".AsSpan());
+            SortedSet<string> lookupView = lookup.GetView("4".AsSpan(), "9".AsSpan());
             Assert.AreEqual(0, lookupView.Count);
         }
 
         [Test]
-        public void Test_GetViewBetween_Exclusive_Exclusive_SameValue_Empty()
+        public void Test_GetView_Exclusive_Exclusive_SameValue_Empty()
         {
             SortedSet<string> set = new SortedSet<string>(StringComparer.Ordinal) { "1", "2", "3", "4", "5" };
 
-            SortedSet<string> view = set.GetViewBetween("3", false, "3", false);
+            SortedSet<string> view = set.GetView("3", false, "3", false);
             Assert.AreEqual(0, view.Count);
 
             var lookup = set.GetSpanAlternateLookup<char>();
-            SortedSet<string> lookupView = lookup.GetViewBetween("3".AsSpan(), false, "3".AsSpan(), false);
+            SortedSet<string> lookupView = lookup.GetView("3".AsSpan(), false, "3".AsSpan(), false);
             Assert.AreEqual(0, lookupView.Count);
         }
 
         [Test]
-        public void Test_GetViewBetween_GetViewBetween_Exclusive_Exclusive_SameValue_Empty()
+        public void Test_GetView_GetView_Exclusive_Exclusive_SameValue_Empty()
         {
             SortedSet<string> set = new SortedSet<string>(StringComparer.Ordinal) { "1", "2", "3", "4", "5" };
 
-            SortedSet<string> view1 = set.GetViewBetween("2", "4");
+            SortedSet<string> view1 = set.GetView("2", "4");
 
-            SortedSet<string> view2 = view1.GetViewBetween("3", false, "3", false);
+            SortedSet<string> view2 = view1.GetView("3", false, "3", false);
             Assert.AreEqual(0, view2.Count);
 
             var lookup = view1.GetSpanAlternateLookup<char>();
-            SortedSet<string> lookupView = lookup.GetViewBetween("3".AsSpan(), false, "3".AsSpan(), false);
+            SortedSet<string> lookupView = lookup.GetView("3".AsSpan(), false, "3".AsSpan(), false);
             Assert.AreEqual(0, lookupView.Count);
         }
 

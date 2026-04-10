@@ -32,10 +32,10 @@ namespace J2N.Collections.Tests
         protected override bool DefaultValueAllowed => true;
 
         [Fact]
-        public void SortedSet_Generic_GetViewBetween_FirstLast()
+        public void SortedSet_Generic_GetView_FirstLast()
         {
             var set = (SortedSet<int>)CreateSortedSet(new[] { 1, 3, 5, 7, 9 }, 5, 5);
-            SortedSet<int> view = set.GetViewBetween(4, 8);
+            SortedSet<int> view = set.GetView(4, 8);
 
             Assert.True(set.Contains(1));
             Assert.True(set.Contains(3));
@@ -115,14 +115,14 @@ namespace J2N.Collections.Tests
         }
 
         [Fact]
-        public void SortedSet_Generic_GetViewBetween_MinMax_Exhaustive()
+        public void SortedSet_Generic_GetView_MinMax_Exhaustive()
         {
             var set = (SortedSet<int>)CreateSortedSet(new[] { 7, 11, 3, 1, 5, 9, 13 }, 7, 7);
             for (int i = 0; i < 14; i++)
             {
                 for (int j = i; j < 14; j++)
                 {
-                    SortedSet<int> view = set.GetViewBetween(i, j);
+                    SortedSet<int> view = set.GetView(i, j);
 
                     if (j < i || (j == i && i % 2 == 0))
                     {
@@ -140,14 +140,14 @@ namespace J2N.Collections.Tests
 
         // J2N: Added First and Last properties to replace Min and Max
         [Fact]
-        public void SortedSet_Generic_GetViewBetween_FirstLast_Exhaustive()
+        public void SortedSet_Generic_GetView_FirstLast_Exhaustive()
         {
             var set = (SortedSet<int>)CreateSortedSet(new[] { 7, 11, 3, 1, 5, 9, 13 }, 7, 7);
             for (int i = 0; i < 14; i++)
             {
                 for (int j = i; j < 14; j++)
                 {
-                    SortedSet<int> view = set.GetViewBetween(i, j);
+                    SortedSet<int> view = set.GetView(i, j);
 
                     if (j < i || (j == i && i % 2 == 0))
                     {

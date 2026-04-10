@@ -99,52 +99,57 @@ namespace J2N.Collections.Generic
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/>.
+        /// <para/>
+        /// Usage Note: In Java, the <paramref name="toValue"/> of TreeSet.subSet() is exclusive. To match the behavior, call
+        /// <see cref="GetView(T, bool, T, bool)"/>, setting <c>fromInclusive</c> to <see langword="true"/>
+        /// and <c>toInclusive</c> to <see langword="false"/>.
         /// </summary>
-        /// <param name="lowerValue">The lowest desired value in the view.</param>
-        /// <param name="upperValue">The highest desired value in the view.</param>
+        /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
+        /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
-        /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
-        /// according to the comparer.</exception>
+        /// <exception cref="ArgumentException"><paramref name="fromValue"/> is after <paramref name="toValue"/>
+        /// in the current view order according to the comparer.</exception>
         /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
-        /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
+        /// specified by <paramref name="fromValue"/> and <paramref name="toValue"/>.</exception>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
-        /// <paramref name="upperValue"/> (inclusive), as defined by the comparer. This method does not copy elements from the
-        /// <see cref="INavigableCollection{T}"/>, but provides a window into the underlying <see cref="INavigableCollection{T}"/> itself.
+        /// This method returns a view of the range of elements that fall between <paramref name="fromValue"/> and
+        /// <paramref name="toValue"/> (inclusive), as defined by the current view order and the comparer.
+        /// This method does not copy elements from the <see cref="INavigableCollection{T}"/>, but provides a window
+        /// into the underlying <see cref="INavigableCollection{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// This corresponds to the <c>subSet()</c> method in the JDK.
         /// </remarks>
-        INavigableCollection<T> GetViewBetween(T? lowerValue, T? upperValue);
+        INavigableCollection<T> GetView([AllowNull] T fromValue, [AllowNull] T toValue);
 
         /// <summary>
         /// Returns a view of a subset in a <see cref="INavigableCollection{T}"/>.
         /// <para/>
-        /// Usage Note: To match the default behavior of the JDK, call this overload with <paramref name="lowerValueInclusive"/>
-        /// set to <see langword="true"/> and <paramref name="upperValueInclusive"/> set to <see langword="false"/>.
+        /// Usage Note: To match the behavior of the JDK, call this overload with <paramref name="fromInclusive"/>
+        /// set to <see langword="true"/> and <paramref name="toInclusive"/> set to <see langword="false"/>.
         /// </summary>
-        /// <param name="lowerValue">The lowest value in the range for the view.</param>
-        /// <param name="lowerValueInclusive">If <see langword="true"/>, <paramref name="lowerValue"/> will be included in the range;
-        /// otherwise, it is an exclusive lower bound.</param>
-        /// <param name="upperValue">The highest desired value in the view.</param>
-        /// <param name="upperValueInclusive">If <see langword="true"/>, <paramref name="upperValue"/> will be included in the range;
-        /// otherwise, it is an exclusive upper bound.</param>
+        /// <param name="fromValue">The first desired value in the view (lowest in ascending order, highest in descending order).</param>
+        /// <param name="fromInclusive">If <see langword="true"/>, <paramref name="fromValue"/> will be included in the range;
+        /// otherwise, it is an exclusive bound.</param>
+        /// <param name="toValue">The last desired value in the view (highest in ascending order, lowest in descending order).</param>
+        /// <param name="toInclusive">If <see langword="true"/>, <paramref name="toValue"/> will be included in the range;
+        /// otherwise, it is an exclusive bound.</param>
         /// <returns>A subset view that contains only the values in the specified range.</returns>
-        /// <exception cref="ArgumentException"><paramref name="lowerValue"/> is more than <paramref name="upperValue"/>
-        /// according to the comparer.</exception>
+        /// <exception cref="ArgumentException"><paramref name="fromValue"/> is after <paramref name="toValue"/>
+        /// in the current view order according to the comparer.</exception>
         /// <exception cref="ArgumentOutOfRangeException">A tried operation on the view was outside the range
-        /// specified by <paramref name="lowerValue"/> and <paramref name="upperValue"/>.</exception>
+        /// specified by <paramref name="fromValue"/> and <paramref name="toValue"/>.</exception>
         /// <remarks>
-        /// This method returns a view of the range of elements that fall between <paramref name="lowerValue"/> and
-        /// <paramref name="upperValue"/>, as defined by the comparer. Each bound may either be inclusive
-        /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="lowerValueInclusive"/>
-        /// and <paramref name="upperValueInclusive"/>. This method does not copy elements from the
+        /// This method returns a view of the range of elements that fall between <paramref name="fromValue"/> and
+        /// <paramref name="toValue"/>, as defined by the current view order and the comparer. Each bound may either be inclusive
+        /// (<see langword="true"/>) or exclusive (<see langword="false"/>) depending on the values of <paramref name="fromInclusive"/>
+        /// and <paramref name="toInclusive"/>. This method does not copy elements from the
         /// <see cref="INavigableCollection{T}"/>, but provides a window into the underlying <see cref="INavigableCollection{T}"/> itself.
         /// You can make changes in both the view and in the underlying <see cref="INavigableCollection{T}"/>.
         /// <para/>
         /// This corresponds to the <c>subSet()</c> method in the JDK.
         /// </remarks>
-        INavigableCollection<T> GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive);
+        INavigableCollection<T> GetView([AllowNull] T fromValue, bool fromInclusive, [AllowNull] T toValue, bool toInclusive);
 
         /// <summary>
         /// Returns the view of a subset in a <see cref="INavigableCollection{T}"/> with no lower bound.

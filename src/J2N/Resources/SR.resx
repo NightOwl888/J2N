@@ -418,7 +418,7 @@
     <value>The values for this dictionary are missing.</value>
   </data>
   <data name="SortedSet_LowerValueGreaterThanUpperValue" xml:space="preserve">
-    <value>Must be less than or equal to upperValue.</value>
+    <value>Must be less than or equal to {0}.</value>
   </data>
   <data name="ArgumentNull_NullOrNullValue" xml:space="preserve">
     <value>Value cannot be null or wrap a null value.</value>
