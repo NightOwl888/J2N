@@ -4737,7 +4737,7 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Min"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use First instead.
+        [Obsolete("This property is deprecated because the name does not match the behavior in descending order views. Use TryGetFirst(out T) (preferred) or the First property instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Min => MinInternal;
 
@@ -4753,7 +4753,7 @@ namespace J2N.Collections.Generic
         /// If the <see cref="SortedSet{T}"/> has no elements, then the <see cref="Max"/> property returns
         /// the default value of <typeparamref name="T"/>.
         /// </remarks>
-        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use Last instead.
+        [Obsolete("This property is deprecated because the name does not match the behavior in descending order views. Use TryGetLast(out T) (preferred) or the Last property instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public T? Max => MaxInternal;
 
@@ -4910,8 +4910,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This corresponds to the <c>subSet()</c> method in the JDK.
         /// </remarks>
-        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use GetView() instead
-        // due to misleading argument names in descending order views.
+        [Obsolete("This method is deprecated because the argument names do not match the behavior in descending order views. Use GetView(T, T) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, T? upperValue)
             => DoGetView(lowerValue, fromInclusive: true, ExceptionArgument.lowerValue, upperValue, toInclusive: true, ExceptionArgument.upperValue);
@@ -4943,8 +4942,7 @@ namespace J2N.Collections.Generic
         /// <para/>
         /// This corresponds to the <c>subSet()</c> method in the JDK.
         /// </remarks>
-        // J2N: This exists for backward compatibility with the BCL. However, it is hidden because all new development should use GetView() instead
-        // due to misleading argument names in descending order views.
+        [Obsolete("This method is deprecated because the argument names do not match the behavior in descending order views. Use GetView(T, bool, T, bool) instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
         public virtual SortedSet<T> GetViewBetween(T? lowerValue, bool lowerValueInclusive, T? upperValue, bool upperValueInclusive)
             => DoGetView(lowerValue, fromInclusive: lowerValueInclusive, ExceptionArgument.lowerValue, upperValue, toInclusive: upperValueInclusive, ExceptionArgument.upperValue);
